@@ -4,8 +4,11 @@
 SUBDIRS			= private
 
 sublib_name		= gdkmm
+sublib_libname		= gdkmm-1.4
+sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gdk
 sublib_cflags		= $(GDKMM_CFLAGS)
+sublib_topdir = gdkmm
 sublib_win32_dlls_libs	= $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
 	        	  $(top_builddir)/glib/glibmm/libglibmm-2.4.la
 

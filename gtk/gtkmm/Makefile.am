@@ -4,12 +4,16 @@
 SUBDIRS			= private
 
 sublib_name		= gtkmm
+sublib_libname		= gtkmm-2.4
+sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gtk
 sublib_cflags		= $(GTKMM_CFLAGS)
+sublib_topdir = gtkmm
 sublib_win32_dlls_libs	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
 	               	  $(top_builddir)/atk/atkmm/libatkmm-1.4.la \
 			  $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
 			  $(top_builddir)/glib/glibmm/libglibmm-2.4.la
+
 
 sublib_files_extra_posix_cc =
 sublib_files_extra_win32_cc =

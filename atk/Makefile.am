@@ -8,3 +8,7 @@ atkmm_include_HEADERS	= atkmm.h
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = atkmm-1.4.pc
 
+
+
+
+
