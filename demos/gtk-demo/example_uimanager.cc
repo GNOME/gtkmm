@@ -63,7 +63,7 @@ Example_UIManager::Example_UIManager()
   set_border_width(0);
 
   //Define the actions:
-  m_refActionGroup = Gtk::ActionGroup::create();
+  m_refActionGroup = Gtk::ActionGroup::create("Actions"); //It also works with no name, which is probably better if there is only one.
 
   //TODO: Consider ways to reduce the amount of code here:
   //For instance,
@@ -77,29 +77,29 @@ Example_UIManager::Example_UIManager()
   m_refActionGroup->add_action( Gtk::Action::create("ColorMenu", "_Color") );
   m_refActionGroup->add_action( Gtk::Action::create("ShapeMenu", "_Shape") );
   m_refActionGroup->add_action( Gtk::Action::create("HelpMenu", "_Help") );
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("New", Gtk::Stock::NEW, "_New", "Create a new file"),
+  m_refActionGroup->add_action( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
     Gtk::AccelKey("<control>N"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
+  m_refActionGroup->add_action( Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
     Gtk::AccelKey("<control>O"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
+  m_refActionGroup->add_action( Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
     Gtk::AccelKey("<control>S"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("SaveAs", Gtk::Stock::SAVE, "Save _As...", "Save to a file"),
+  m_refActionGroup->add_action( Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As...", "Save to a file"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
+  m_refActionGroup->add_action( Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
     Gtk::AccelKey("<control>Q"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add_action( Gtk::Action::create("About", "_About", "About"),
     Gtk::AccelKey("<control>A"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   //TODO: This StockID does not seem to be registered in the C version either, but it is in appwindow.c:
-  m_refActionGroup->add_action( Gtk::Action::create_from_stock("Logo", Gtk::StockID("demo-gtk-logo"), "", "GTK+"),
+  m_refActionGroup->add_action( Gtk::Action::create("Logo", Gtk::StockID("demo-gtk-logo"), "", "GTK+"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
 
   //Add Toggle Actions:
-  m_refActionGroup->add_action( Gtk::ToggleAction::create_from_stock("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
+  m_refActionGroup->add_action( Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
     Gtk::AccelKey("<control>B"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
 

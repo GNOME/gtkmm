@@ -62,7 +62,10 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/eventbox.h>
-#include <gtkmm/fileselection.h>
+#include <gtkmm/filechooser.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/filefilter.h>
+#include <gtkmm/fileselection.h> //TODO: Deprecated.
 #include <gtkmm/fixed.h>
 #include <gtkmm/fontbutton.h>
 #include <gtkmm/fontselection.h>
