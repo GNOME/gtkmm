@@ -9,7 +9,7 @@ sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gdk
 sublib_cflags		= $(GDKMM_CFLAGS)
 sublib_topdir = gdk
-sublib_win32_dlls_libs	= $(top_builddir)/pango/pangomm/libpangomm-1.6.la
+sublib_win32_dlls_libs	= $(top_builddir)/pango/pangomm/libpangomm-1.4.la
 
 sublib_files_extra_posix_cc =
 sublib_files_extra_win32_cc =
