@@ -53,6 +53,8 @@ struct BuiltinStockID
 namespace Stock
 {
 
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_AUTHENTICATION;   /*!< @image html stock_dialog_authentication_48.png     */
+
 extern GTKMM_API const Gtk::BuiltinStockID DIALOG_INFO;      /*!< @image html stock_dialog_info_48.png         */
 extern GTKMM_API const Gtk::BuiltinStockID DIALOG_WARNING;   /*!< @image html stock_dialog_warning_48.png      */
 extern GTKMM_API const Gtk::BuiltinStockID DIALOG_ERROR;     /*!< @image html stock_dialog_error_48.png        */

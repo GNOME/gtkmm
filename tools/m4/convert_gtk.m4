@@ -475,3 +475,6 @@ _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 _CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`GtkTargetList*',`Glib::RefPtr<TargetList>',`Glib::wrap($3, true)')
+
+#IconInfo
+_CONVERSION(`GtkIconInfo*',`IconInfo',`Glib::wrap($3)')

@@ -182,7 +182,8 @@ bool DnDWindow::on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context
 
   if (context->gobj()->targets)
   {
-    drag_get_data( context, GDK_POINTER_TO_ATOM (context->gobj()->targets->data), time );
+    Glib::ustring temp = Gdk::AtomString::to_cpp_type(GDK_POINTER_TO_ATOM (context->gobj()->targets->data));
+    drag_get_data( context, temp, (uint)(time) );
 
     return true;
   }

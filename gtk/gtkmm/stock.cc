@@ -33,6 +33,7 @@ namespace Gtk
 namespace Stock
 {
 
+const Gtk::BuiltinStockID DIALOG_AUTHENTICATION = { GTK_STOCK_DIALOG_AUTHENTICATION };
 const Gtk::BuiltinStockID DIALOG_INFO = { GTK_STOCK_DIALOG_INFO };
 const Gtk::BuiltinStockID DIALOG_WARNING = { GTK_STOCK_DIALOG_WARNING };
 const Gtk::BuiltinStockID DIALOG_ERROR = { GTK_STOCK_DIALOG_ERROR };

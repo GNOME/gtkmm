@@ -76,8 +76,8 @@ int PopupEntry::get_button_width()
   window.move(-500, -500);
   window.show_all();
 
-  GtkRequisition requisition = { 0, 0 };
-  window.size_request(&requisition);
+  Gtk::Requisition requisition = { 0, 0 };
+  window.size_request(requisition);
 
   return requisition.width;
 }
