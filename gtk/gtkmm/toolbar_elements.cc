@@ -1,9 +1,9 @@
 // -*- c++ -*-
 /* $Id$ */
 
-/* 
+/*
  *
- * Copyright 1998-2002 The gtkmm Development Team
+ * Copyright 1998-2003 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,18 +20,26 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gtkmm/toolbar_elements.h>
 #include <glib.h>
 #include <gtkmm/button.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/tooltips.h>
-//#include <gtkmm/image.h>
 #include <gtkmm/label.h>
 #include <gtk/gtklabel.h>
+
+
+// static
+GType Glib::Value<Gtk::ToolbarChildType>::value_type()
+{
+  return gtk_toolbar_child_type_get_type();
+}
 
 namespace Gtk
 {
 
+// Everything here is deprecated. See toolbar.h.
 namespace Toolbar_Helpers
 {
 
@@ -402,156 +410,6 @@ Label* Tool::get_label() const
 
 } // namespace Toolbar_Helpers
 
-
-Toolbar::ToolList& Toolbar::tools()
-{
-  tools_proxy_ = ToolList(gobj());
-  return tools_proxy_;
-}
-
-const Toolbar::ToolList& Toolbar::tools() const
-{
-  tools_proxy_ =  ToolList(const_cast<GtkToolbar*>(gobj()));
-  return tools_proxy_;
-}
-
-
-
-//Non-STL-style interface:
-
-namespace //anonymous
-{
-  
-// This Signal Proxy allows the C++ coder to specify
-// a SigC::Slot instead of a static function.
-class SignalProxy_ToolbarCallback
-{
-public:
-  typedef Gtk::Toolbar::Callback0 SlotType;
-
-  SignalProxy_ToolbarCallback(const SlotType& slot) : slot_(slot) {}
-  ~SignalProxy_ToolbarCallback();
-
-  static void gtk_callback(void* data);
-
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_ToolbarCallback::~SignalProxy_ToolbarCallback()
-{}
-
-void SignalProxy_ToolbarCallback::gtk_callback(void* data)
-{
-  SignalProxy_ToolbarCallback *const self = static_cast<SignalProxy_ToolbarCallback*>(data);
-
-  try
-  {
-    (self->slot_)();
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-void SignalProxy_ToolbarCallback::gtk_callback_destroy(void* data)
-{
-  delete static_cast<SignalProxy_ToolbarCallback*>(data);
-}
-
-} // anonymous namespace
-
-
-Gtk::Widget* Toolbar::append_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Gtk::Widget& icon, Callback0 slot)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_append_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), icon.gobj(), GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::append_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Callback0 slot)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_append_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), 0, GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::prepend_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Gtk::Widget& icon, Callback0 slot)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_prepend_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), icon.gobj(), GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::prepend_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Callback0 slot)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_prepend_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), 0, GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::insert_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Gtk::Widget& icon, Callback0 slot,
-  int position)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_insert_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), icon.gobj(), GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy, position);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::insert_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Callback0 slot,
-  int position)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_insert_item(gobj(), text.c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), 0, GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy, position);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-Gtk::Widget* Toolbar::insert_stock(const Gtk::StockID& stock_id, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-  Callback0 slot,
-  int position)
-{
-  SignalProxy_ToolbarCallback* pProxy = new SignalProxy_ToolbarCallback(slot);
-  GtkWidget* cwidget = gtk_toolbar_insert_stock(gobj(), stock_id.get_c_str(), tooltip_text.c_str(), tooltip_private_text.c_str(), GTK_SIGNAL_FUNC(SignalProxy_ToolbarCallback::gtk_callback), pProxy, position);
-  g_signal_connect(G_OBJECT(cwidget), "destroy", G_CALLBACK(SignalProxy_ToolbarCallback::gtk_callback_destroy), pProxy); //Delete the callback proxy when the widget is destroyed.
-  return Glib::wrap(cwidget);
-}
-
-void Toolbar::append(ToolItem& item)
-{
-  gtk_toolbar_insert(gobj(), (item).gobj(), -1 /* See GTK+ docs */);
-}
-
-void Toolbar::prepend(ToolItem& item)
-{
-  gtk_toolbar_insert(gobj(), (item).gobj(), 0 /* See GTK+ docs */);
-}
-
-void Toolbar::unset_drop_highlight_item()
-{
-  //See GTK+ docs.
-  gtk_toolbar_set_drop_highlight_item(gobj(), 0, 0);
-}
-
-
-
-
-
- 
 
 } // namespace Gtk
 

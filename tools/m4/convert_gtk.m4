@@ -135,6 +135,7 @@ _CONVERSION(`GtkWidget*',`Gtk::Widget*',__RP2P)
 _CONVERSION(`GtkWidget*',`Widget*',__RP2P)
 _CONVERSION(`GtkWindow*',`Window*',__RP2P)
 _CONVERSION(`GtkMenu*',`Menu*',__RP2P)
+_CONVERSION(`GtkToolItem*',`ToolItem*',__RP2P)
 
 # Ptr (gtk+) -> const Ptr (gtkmm)
 _CONVERSION(`GtkAdjustment*',`const Gtk::Adjustment*',__RP2P)
@@ -142,6 +143,7 @@ _CONVERSION(`GtkAdjustment*',`const Adjustment*',__RP2P)
 _CONVERSION(`GtkWidget*',`const Gtk::Widget*',__RP2P)
 _CONVERSION(`GtkWidget*',`const Widget*',__RP2P)
 _CONVERSION(`GtkWindow*',`const Window*',__RP2P)
+_CONVERSION(`GtkToolItem*',`const ToolItem*',__RP2P)
 
 # Style:
 _CONVERSION(`GtkStyle*',`Glib::RefPtr<Style>',`Glib::wrap($3)')
@@ -241,6 +243,8 @@ _CONVERSION(`Gtk::Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Window&',`GtkWindow*',__FR2P)
 _CONVERSION(`CellRenderer&',`GtkCellRenderer*',__FR2P)
+_CONVERSION(`ToolItem&',`GtkToolItem*',__FR2P)
+_CONVERSION(`const ToolItem&',`GtkToolItem*',__FCR2P)
 
 # Glib::ListHandle<> (gtkmm) -> GList (gtk+)
 _CONVERSION(`const Glib::ListHandle<Glib::ustring>&',`GList*',`$3.data()')
@@ -398,6 +402,7 @@ _CONVERSION(`GtkFileFilter*',`Glib::RefPtr<FileFilter>',`Glib::wrap($3)')
 _CONVERSION(`GtkFileFilter*',`Glib::RefPtr<const FileFilter>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<FileFilter>&',`GtkFileFilter*',__CONVERT_REFPTR_TO_P($3))
 
+_CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 

@@ -206,6 +206,7 @@ _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Device> >',`$2($3, Glib::OW
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Visual> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Window> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Display> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
+_CONVERSION(`gchar**',`Glib::StringArrayHandle',`$2($3)')
 
 
 

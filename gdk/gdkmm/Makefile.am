@@ -15,10 +15,12 @@ sublib_win32_dlls_libs	= $(top_builddir)/pango/pangomm/libpangomm-1.3.la \
 sublib_files_extra_posix_cc =
 sublib_files_extra_win32_cc =
 sublib_files_extra_general_cc = general.cc
+sublib_files_extra_general_deprecated_cc = 
 
 sublib_files_extra_posix_h =
 sublib_files_extra_win32_h =
 sublib_files_extra_general_h = list.h general.h
+sublib_files_extra_general_deprecated_h = 
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 

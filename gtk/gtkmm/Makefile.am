@@ -20,12 +20,14 @@ sublib_files_extra_win32_cc =
 sublib_files_extra_general_cc = accelkey.cc accelmap.cc cellrenderer_generation.cc comboboxtext.cc \
                                 menu_elems.cc radiobuttongroup.cc selectiondata_private.cc stock.cc stockid.cc targetentry.cc \
                                 treemodelcolumn.cc treeview_private.cc
+sublib_files_extra_general_deprecated_cc = toolbar_elements.cc
 
 sublib_files_extra_posix_h =
 sublib_files_extra_win32_h =
 sublib_files_extra_general_h = accelkey.h accelmap.h base.h cellrenderer_generation.h comboboxtext.h \
                                menu_elems.h radiobuttongroup.h selectiondata_private.h stock.h stockid.h targetentry.h \
                                treemodelcolumn.h treeview_private.h
+sublib_files_extra_general_deprecated_h = toolbar_elements.h 
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 
