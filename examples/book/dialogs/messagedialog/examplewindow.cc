@@ -50,7 +50,7 @@ void ExampleWindow::on_button_info_clicked()
 
 void ExampleWindow::on_button_question_clicked()
 {
-  Gtk::MessageDialog dialog(*this, "This is a QUESTION MessageDialog", Gtk::MESSAGE_QUESTION, (Gtk::ButtonsType)(Gtk::BUTTONS_OK | Gtk::BUTTONS_CANCEL));
+  Gtk::MessageDialog dialog(*this, "This is a QUESTION MessageDialog", false /* use_markup */, Gtk::MESSAGE_QUESTION, (Gtk::ButtonsType)(Gtk::BUTTONS_OK | Gtk::BUTTONS_CANCEL));
   int result = dialog.run();
 
   //Handle the response:

@@ -29,9 +29,14 @@
 
 namespace Gtk
 {
- 
+
+//TODO: This will not work because:
+// comboboxtext.cc:36: warning: base initializer for `Gtk::ComboBox'
+// comboboxtext.cc:36: warning: will be re-ordered to precede member
+//I have reorderd them myself now to avoid the warning, but this will segfault. murrayc.
 ComboBoxText::ComboBoxText()
-: Gtk::ComboBox(Gtk::ListStore::create(m_text_columns)) //Create a default treemodel. We must create it in the initializer list, because it is a construct-only property.
+: Gtk::ComboBox(Gtk::ListStore::create(*m_text_columns)), //Create a default treemodel. We must create it in the initializer list, because it is a construct-only property.
+  m_text_columns(new TextModelColumns) //Allocate it dynamically so that it is guarranteed to be created at this point, so we can pass it to the base constructor.
 {
   Glib::RefPtr<TreeModel> model = get_model(); //Get the model that we just created in the initializer list.
 
@@ -71,7 +76,7 @@ Glib::ustring ComboBoxText::get_active_text() const
   if(active_row < children.size())
   {
     Gtk::TreeModel::Row row = children[active_row];
-    result = row[m_text_columns.m_column];
+    result = row[m_text_columns->m_column];
   }
 
   return result;

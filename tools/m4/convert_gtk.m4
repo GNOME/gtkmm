@@ -245,6 +245,7 @@ _CONVERSION(`const Glib::ListHandle<Glib::ustring>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<Widget*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<const Widget*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<Window*>&',`GList*',`$3.data()')
+_CONVERSION(`const Glib::SListHandle< Glib::RefPtr<RadioAction> >&',`GSList*',`$3.data()')
 
 # GList (gtk+) -> Glib::ListHandle<> (gtkmm)
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
@@ -257,11 +258,13 @@ _CONVERSION(`GList*',`Glib::ListHandle<CellRenderer*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const CellRenderer*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<TreeModel::Row>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const TreeModel::Row>',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Action> >',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<ActionGroup> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
-
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 

@@ -21,12 +21,12 @@
 
 
 ExampleWindow::ExampleWindow()
-: m_Button("Show Dialog")
+: m_Button("sans")
 {
   set_title("Gtk::FontSelectionDialog example");
   
   add(m_Button);  
-  m_Button.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_clicked) );
+  m_Button.signal_font_set().connect( SigC::slot(*this, &ExampleWindow::on_button_font_set) );
   
   show_all_children();
 }
@@ -35,30 +35,8 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
-void ExampleWindow::on_button_clicked()
+void ExampleWindow::on_button_font_set()
 {
-  Gtk::FontSelectionDialog dialog;
-  
-  int result = dialog.run();
-  
-  //Handle the response:
-  switch(result)
-  {
-    case(Gtk::RESPONSE_OK):
-    {
-      Glib::ustring font_name = dialog.get_font_name();
-      std::cout << "Font chosen: " << font_name << std::endl;
-      break;
-    }
-    case(Gtk::RESPONSE_CANCEL):
-    {
-      std::cout << "Cancel clicked." << std::endl;
-      break;
-    }
-    default:
-    {
-      std::cout << "Unexpected button clicked." << std::endl;
-      break;
-    }
-  }
+  Glib::ustring font_name = m_Button.get_font_name();
+  std::cout << "Font chosen: " << font_name << std::endl;
 }

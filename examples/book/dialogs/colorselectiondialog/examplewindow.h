@@ -29,11 +29,11 @@ public:
 
 protected:
   //Signal handlers:
-  virtual void on_button_clicked();
+  virtual void on_button_color_set();
 
   //Child widgets:
   Gtk::VBox m_VBox;
-  Gtk::Button m_Button;
+  Gtk::ColorButton m_Button;
   Gtk::DrawingArea m_DrawingArea; //To show the color.
 
   Gdk::Color m_Color;
