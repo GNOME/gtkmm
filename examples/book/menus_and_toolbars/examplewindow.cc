@@ -63,6 +63,11 @@ ExampleWindow::ExampleWindow()
         "      <separator/>"
         "      <menuitem action='Quit'/>"
         "    </menu>"
+        "    <menu action='MenuEdit'>"
+        "      <menuitem action='Cut'/>"
+        "      <menuitem action='Copy'/>"
+        "      <menuitem action='Paste'/>"
+        "    </menu>"
         "  </menubar>"
         "  <toolbar  name='ToolBar'>"
         "    <toolitem action='Open'/>"
@@ -82,6 +87,12 @@ ExampleWindow::ExampleWindow()
   //Add the MenuBar to the window:
   m_Box.pack_start(*pMenuBar, Gtk::PACK_SHRINK);
 
+
+  Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
+
+  //Add the MenuBar to the window:
+  m_Box.pack_start(*pToolbar, Gtk::PACK_SHRINK);
+  
   show_all_children();
 }
 
