@@ -64,6 +64,7 @@ extern GTKMM_API const Gtk::BuiltinStockID DIALOG_QUESTION;  /*!< @image html st
 extern GTKMM_API const Gtk::BuiltinStockID DND;              /*!< @image html stock_dnd_32.png                 */
 extern GTKMM_API const Gtk::BuiltinStockID DND_MULTIPLE;     /*!< @image html stock_dnd_multiple_32.png        */
 
+extern GTKMM_API const Gtk::BuiltinStockID ABOUT;            /*!< @image html stock_about_24.png               */
 extern GTKMM_API const Gtk::BuiltinStockID ADD;              /*!< @image html stock_add_24.png                 */
 extern GTKMM_API const Gtk::BuiltinStockID APPLY;            /*!< @image html stock_apply_20.png               */
 extern GTKMM_API const Gtk::BuiltinStockID BOLD;             /*!< @image html stock_text_bold_24.png           */
@@ -71,11 +72,17 @@ extern GTKMM_API const Gtk::BuiltinStockID CANCEL;           /*!< @image html st
 extern GTKMM_API const Gtk::BuiltinStockID CDROM;            /*!< @image html stock_cdrom_24.png               */
 extern GTKMM_API const Gtk::BuiltinStockID CLEAR;            /*!< @image html stock_clear_24.png               */
 extern GTKMM_API const Gtk::BuiltinStockID CLOSE;            /*!< @image html stock_close_24.png               */
+extern GTKMM_API const Gtk::BuiltinStockID COLOR_PICKER;     /*!< @image html stock_color_picker_24.png        */
 extern GTKMM_API const Gtk::BuiltinStockID CONVERT;          /*!< @image html stock_convert_24.png             */
+extern GTKMM_API const Gtk::BuiltinStockID CONNECT;          /*!< @image html stock_connect_24.png             */
 extern GTKMM_API const Gtk::BuiltinStockID COPY;             /*!< @image html stock_copy_24.png                */
 extern GTKMM_API const Gtk::BuiltinStockID CUT;              /*!< @image html stock_cut_24.png                 */
 extern GTKMM_API const Gtk::BuiltinStockID DELETE;           /*!< @image html stock_trash_24.png               */
+extern GTKMM_API const Gtk::BuiltinStockID DIRECTORY;        /*!< @image html stock_directory_24.png           */
+extern GTKMM_API const Gtk::BuiltinStockID DISCONNECT;       /*!< @image html stock_disconnect_24.png          */
+extern GTKMM_API const Gtk::BuiltinStockID EDIT;             /*!< @image html stock_edit_24.png                */
 extern GTKMM_API const Gtk::BuiltinStockID EXECUTE;          /*!< @image html stock_exec_24.png                */
+extern GTKMM_API const Gtk::BuiltinStockID FILE;             /*!< @image html stock_file_24.png                */
 extern GTKMM_API const Gtk::BuiltinStockID FIND;             /*!< @image html stock_search_24.png              */
 extern GTKMM_API const Gtk::BuiltinStockID FIND_AND_REPLACE; /*!< @image html stock_search_replace_24.png      */
 extern GTKMM_API const Gtk::BuiltinStockID FLOPPY;           /*!< @image html stock_save_24.png                */
@@ -87,9 +94,12 @@ extern GTKMM_API const Gtk::BuiltinStockID GO_BACK;          /*!< @image html st
 extern GTKMM_API const Gtk::BuiltinStockID GO_DOWN;          /*!< @image html stock_down_arrow_24.png          */
 extern GTKMM_API const Gtk::BuiltinStockID GO_FORWARD;       /*!< @image html stock_right_arrow_24.png         */
 extern GTKMM_API const Gtk::BuiltinStockID GO_UP;            /*!< @image html stock_up_arrow_24.png            */
+extern GTKMM_API const Gtk::BuiltinStockID HARDDISK;         /*!< @image html stock_harddisk_24.png            */
 extern GTKMM_API const Gtk::BuiltinStockID HELP;             /*!< @image html stock_help_24.png                */
 extern GTKMM_API const Gtk::BuiltinStockID HOME;             /*!< @image html stock_home_24.png                */
 extern GTKMM_API const Gtk::BuiltinStockID INDEX;            /*!< @image html stock_index_24.png               */
+extern GTKMM_API const Gtk::BuiltinStockID INDENT;           /*!< @image html stock_indent_24.png              */
+extern GTKMM_API const Gtk::BuiltinStockID UNINDENT;         /*!< @image html stock_unindent_24.png            */
 extern GTKMM_API const Gtk::BuiltinStockID ITALIC;           /*!< @image html stock_text_italic_24.png         */
 extern GTKMM_API const Gtk::BuiltinStockID JUMP_TO;          /*!< @image html stock_jump_to_24.png             */
 extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_CENTER;   /*!< @image html stock_align_center_24.png        */
@@ -97,6 +107,15 @@ extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_FILL;     /*!< @image html st
 extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_LEFT;     /*!< @image html stock_align_left_24.png          */
 extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_RIGHT;    /*!< @image html stock_align_right_24.png         */
 extern GTKMM_API const Gtk::BuiltinStockID MISSING_IMAGE;    /*!< @image html stock_broken_image_24.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_FORWARD;    /*!< @image html stock_media_forward_24.png       */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_NEXT;       /*!< @image html stock_media_next_24.png          */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PAUSE;      /*!< @image html stock_media_pause_24.png         */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PLAY;       /*!< @image html stock_media_play_24.png          */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PREVIOUS;   /*!< @image html stock_media_previous_24.png      */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_RECORD;     /*!< @image html stock_media_record_24.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_REWIND;     /*!< @image html stock_media_rewind_24.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_STOP;       /*!< @image html stock_media_stop_24.png          */
+extern GTKMM_API const Gtk::BuiltinStockID NETWORK;          /*!< @image html stock_network_24.png             */
 extern GTKMM_API const Gtk::BuiltinStockID NEW;              /*!< @image html stock_new_24.png                 */
 extern GTKMM_API const Gtk::BuiltinStockID NO;               /*!< @image html stock_no_20.png                  */
 extern GTKMM_API const Gtk::BuiltinStockID OK;               /*!< @image html stock_ok_20.png                  */
