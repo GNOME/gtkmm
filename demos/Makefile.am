@@ -15,16 +15,14 @@ pixbuf_demo_SOURCES = pixbuf-demo.cc
 #Where to find the header files needed by the source files:
 INCLUDES = -I$(top_builddir)/gtk   -I$(top_srcdir)/gtk   \
            -I$(top_builddir)/gdk   -I$(top_srcdir)/gdk   \
-           -I$(top_builddir)/glib  -I$(top_srcdir)/glib  \
            -I$(top_builddir)/pango -I$(top_srcdir)/pango \
            -I$(top_builddir)/atk   -I$(top_srcdir)/atk \
            $(GTKMM_CFLAGS)
 
 #The libraries that the executable needs to link against:
-LIBS = $(top_builddir)/glib/glibmm/libglibmm-2.4.la \
-       $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
-       $(top_builddir)/atk/atkmm/libatkmm-1.4.la \
-       $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
-       $(top_builddir)/gtk/gtkmm/libgtkmm-2.4.la \
+LIBS = $(top_builddir)/pango/pangomm/libpangomm-1.3.la \
+       $(top_builddir)/atk/atkmm/libatkmm-1.3.la \
+       $(top_builddir)/gdk/gdkmm/libgdkmm-2.3.la \
+       $(top_builddir)/gtk/gtkmm/libgtkmm-2.3.la \
        $(GTKMM_LIBS)
 
