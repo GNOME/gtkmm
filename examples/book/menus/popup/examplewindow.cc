@@ -31,7 +31,7 @@ ExampleWindow::ExampleWindow()
 
   //Add an event box that can catch button_press events:
   m_Box.pack_start(m_EventBox);
-  m_EventBox.signal_button_press_event().connect( SigC::slot(*this, &ExampleWindow::on_button_press_event) );
+  m_EventBox.signal_button_press_event().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_press_event) );
 
   m_EventBox.add(m_Label);
 
@@ -41,15 +41,15 @@ ExampleWindow::ExampleWindow()
   	Gtk::Menu::MenuList& menulist = m_Menu_Popup.items();
 
   	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Edit",
-      SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
 	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::AccelKey("<control>p"),
-      SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
   	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
-      SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
 
     //Add a ImageMenuElem:
     menulist.push_back( Gtk::Menu_Helpers::ImageMenuElem("_Something", m_Image,
-      SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) ) ;
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) ) ;
 
 
   }

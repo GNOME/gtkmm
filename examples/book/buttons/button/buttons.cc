@@ -26,7 +26,7 @@ Buttons::Buttons()
   set_title("Pixmap'd buttons!");
   set_border_width(10);
 
-  m_button.signal_clicked().connect( SigC::slot(*this, &Buttons::on_button_clicked) );
+  m_button.signal_clicked().connect( sigc::mem_fun(*this, &Buttons::on_button_clicked) );
   
   add(m_button);
 

@@ -20,7 +20,7 @@ public:
   Glib::PropertyProxy<bool> property_active();
   Glib::PropertyProxy<bool> property_radio();
 
-  typedef SigC::Signal1<void, const Glib::ustring&> SignalToggled;
+  typedef sigc::signal<void, const Glib::ustring&> SignalToggled;
   SignalToggled& signal_toggled();
 
 protected:
@@ -231,7 +231,7 @@ AppWindow::AppWindow()
     tree_view_.append_column(*Gtk::manage(column));
 
     column->add_attribute(renderer->property_active(), list_columns_.active);
-    renderer->signal_toggled().connect(SigC::slot(*this, &AppWindow::on_cell_toggled));
+    renderer->signal_toggled().connect(sigc::mem_fun(*this, &AppWindow::on_cell_toggled));
   }
 
   std::ostringstream output (std::ios::ate);

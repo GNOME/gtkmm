@@ -35,7 +35,7 @@ ExampleWindow::ExampleWindow()
 
   m_ButtonBox.pack_start(m_Button_Close, Gtk::PACK_SHRINK);
 
-  m_Button_Close.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_close) );
+  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_close) );
 
   //Add the toolbar items:
   {
@@ -48,18 +48,18 @@ ExampleWindow::ExampleWindow()
     Gtk::ToolButton* item = Gtk::manage(new Gtk::ToolButton("Click me"));
     //item.set_tooltips(*tooltips, "Toolbar item");
     m_Toolbar.append(*item);
-    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
+    item->signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_toolbar_item) );
 
     m_Toolbar.append( *(Gtk::manage(new Gtk::SeparatorToolItem)) );
     
     item = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::SAVE));
     m_Toolbar.append(*item);
-    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
+    item->signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_toolbar_item) );
 
     item = Gtk::manage(new Gtk::ToggleToolButton("Toggle me"));
     //item.set_tooltips(*tooltips, "toggle duh");
     m_Toolbar.append(*item);
-    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
+    item->signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_toolbar_item) );
 
     //TODO: These don't actually seem to work:
     Gtk::RadioButtonGroup group;

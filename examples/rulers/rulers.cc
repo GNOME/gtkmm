@@ -38,7 +38,7 @@ Rulers::Rulers() :
   m_area.set_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK );
 
   //Connect a signal handler for the DrawingArea's "motion_notify_event" signal, to detect cursor movement:
-  m_area.signal_motion_notify_event().connect( SigC::slot(*this, &Rulers::on_area_motion_notify_event) );
+  m_area.signal_motion_notify_event().connect( sigc::mem_fun(*this, &Rulers::on_area_motion_notify_event) );
 
   // The horizontal ruler goes on top:
   m_hrule.set_metric(Gtk::PIXELS);

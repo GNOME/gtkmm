@@ -126,8 +126,8 @@ void DemoWindow::fill_tree()
 
   m_TreeView.append_column(*pColumn);
 
-  m_refTreeSelection->signal_changed().connect(SigC::slot(*this, &DemoWindow::on_treeselection_changed));
-  m_TreeView.signal_row_activated().connect(SigC::slot(*this, &DemoWindow::on_treeview_row_activated));
+  m_refTreeSelection->signal_changed().connect(sigc::mem_fun(*this, &DemoWindow::on_treeselection_changed));
+  m_TreeView.signal_row_activated().connect(sigc::mem_fun(*this, &DemoWindow::on_treeview_row_activated));
 
   m_TreeView.expand_all();
 }
@@ -154,7 +154,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
       {
         row[columns.italic] = true;
 
-        m_pWindow_Example->signal_hide().connect(SigC::slot(*this, &DemoWindow::on_example_window_hide));
+        m_pWindow_Example->signal_hide().connect(sigc::mem_fun(*this, &DemoWindow::on_example_window_hide));
         m_pWindow_Example->show();
       }
     }

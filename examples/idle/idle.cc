@@ -36,7 +36,7 @@ IdleExample::IdleExample() :
   m_progressbar_d()
 {
   // connect the callbacks
-  m_quit.signal_pressed().connect(SigC::slot(*this, &Gtk::Widget::hide));
+  m_quit.signal_pressed().connect(sigc::mem_fun(*this, &Gtk::Widget::hide));
 
   // put buttons into container
   Gtk::VBox *vbox = manage( new Gtk::VBox(false,5));
@@ -62,10 +62,10 @@ IdleExample::IdleExample() :
   show_all();
 
   // formatting drive c in timeout callback ;-)
-  Glib::signal_timeout().connect(slot(*this,&IdleExample::timer_callback), 50);
+  Glib::signal_timeout().connect(sigc::mem_fun(*this, &IdleExample::timer_callback), 50);
 
   // formatting drive d in idle callback ;-)
-  Glib::signal_idle().connect(slot(*this,&IdleExample::idle_callback));
+  Glib::signal_idle().connect(sigc::mem_fun(*this, &IdleExample::idle_callback));
 }
 
 

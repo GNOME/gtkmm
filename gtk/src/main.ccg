@@ -47,28 +47,29 @@ namespace
  * be handled by a single class.  Special handling is needed for signals that
  * don't support destroy notification; see the comment on connection_list_.
  */
-class GtkMainSigConnectionNode : public SigC::ConnectionNode
+class GtkMainConnectionNode
 {
 public:
   // A function taking a connection id, e.g. gtk_timeout_remove().
   typedef void (*RemoveFunc) (guint);
 
-  explicit GtkMainSigConnectionNode(const SigC::SlotBase& slot);
-  virtual ~GtkMainSigConnectionNode();
+  explicit GtkMainConnectionNode(const sigc::slot_base& slot);
+  virtual ~GtkMainConnectionNode();
 
-  virtual void notify(bool from_child);
-  static  void destroy_notify_handler(gpointer data);
+  static void* notify(void* data);
+  static void destroy_notify_handler(void* data);
 
   // Call this after installing the GTK+ callback.
   void install(guint conn_id, RemoveFunc remove_func);
   void install_no_notify(guint conn_id, RemoveFunc remove_func);
 
-  inline SigC::SlotNode* get_slot_node();
+  inline sigc::slot_base* get_slot();
 
-  static bool list_remove(GtkMainSigConnectionNode* conn_node);
+  static bool list_remove(GtkMainConnectionNode* conn_node);
   static void list_notify_all();
 
 private:
+  sigc::slot_base slot_;
   static GSList*  connection_list_;
 
   guint           conn_id_;
@@ -86,75 +87,70 @@ private:
  * for instance.
  */
 // static
-GSList* GtkMainSigConnectionNode::connection_list_ = 0;
+GSList* GtkMainConnectionNode::connection_list_ = 0;
 
-GtkMainSigConnectionNode::GtkMainSigConnectionNode(const SigC::SlotBase& slot)
+GtkMainConnectionNode::GtkMainConnectionNode(const sigc::slot_base& slot)
 :
-  SigC::ConnectionNode (static_cast<SigC::SlotNode*>(slot.impl())),
+  slot_(slot),
   conn_id_             (0),
   remove_func_         (0)
 {}
 
-GtkMainSigConnectionNode::~GtkMainSigConnectionNode()
+GtkMainConnectionNode::~GtkMainConnectionNode()
 {}
 
-void GtkMainSigConnectionNode::notify(bool from_child)
+//static:
+void* GtkMainConnectionNode::notify(void* data)
 {
-  SigC::ConnectionNode::notify(from_child);
-
-  if(conn_id_ != 0)
+  GtkMainConnectionNode *const self = static_cast<GtkMainConnectionNode*>(data);
+  if(self)
   {
-    (*remove_func_)(conn_id_);
-    conn_id_ = 0;
+    if(self->conn_id_ != 0)
+    {
+      (*(self->remove_func_))(self->conn_id_);
+      self->conn_id_ = 0;
+      delete self;
+    }
   }
+
+  return 0;
 }
 
 // static
-void GtkMainSigConnectionNode::destroy_notify_handler(gpointer data)
+void GtkMainConnectionNode::destroy_notify_handler(void* data)
 {
-  try
+  GtkMainConnectionNode *const self = static_cast<GtkMainConnectionNode*>(data);
+  if(self)
   {
-    GtkMainSigConnectionNode *const self =
-        static_cast<GtkMainSigConnectionNode*>(data);
-
     // The GTK+ side is disconnected now, thus the ID is no longer valid.
     self->conn_id_ = 0;
 
-    if(!self->notified_)
-      self->notify(false);
-
-    // Undo the reference made by install().
-    self->unreference();
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
+    delete self;
   }
 }
 
-void GtkMainSigConnectionNode::install(
-    guint conn_id, GtkMainSigConnectionNode::RemoveFunc remove_func)
+void GtkMainConnectionNode::install(
+    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func)
 {
   conn_id_     = conn_id;
   remove_func_ = remove_func;
-  reference();
 }
 
-void GtkMainSigConnectionNode::install_no_notify(
-    guint conn_id, GtkMainSigConnectionNode::RemoveFunc remove_func)
+void GtkMainConnectionNode::install_no_notify(
+    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func)
 {
   install(conn_id, remove_func);
   connection_list_ = g_slist_prepend(connection_list_, this);
 }
 
 inline
-SigC::SlotNode* GtkMainSigConnectionNode::get_slot_node()
+sigc::slot_base* GtkMainConnectionNode::get_slot()
 {
-  return static_cast<SigC::SlotNode*>(slot().impl());
+  return &slot_;
 }
 
 // static
-bool GtkMainSigConnectionNode::list_remove(GtkMainSigConnectionNode* conn_node)
+bool GtkMainConnectionNode::list_remove(GtkMainConnectionNode* conn_node)
 {
   // The conn_node pointer is only valid if we still hold
   // a reference of the ConnectionNode in our global list.
@@ -173,19 +169,19 @@ bool GtkMainSigConnectionNode::list_remove(GtkMainSigConnectionNode* conn_node)
  * the container.
  */
 // static
-void GtkMainSigConnectionNode::list_notify_all()
+void GtkMainConnectionNode::list_notify_all()
 {
   while(connection_list_ != 0)
   {
-    GtkMainSigConnectionNode *const conn_node =
-        static_cast<GtkMainSigConnectionNode*>(connection_list_->data);
+    GtkMainConnectionNode *const conn_node =
+        static_cast<GtkMainConnectionNode*>(connection_list_->data);
 
     connection_list_ = g_slist_delete_link(connection_list_, connection_list_);
 
-    if(conn_node->get_slot_node())
-      conn_node->notify(false);
+    if(conn_node->get_slot())
+      notify(conn_node);
 
-    conn_node->unreference();
+    delete conn_node;
   }
 }
 
@@ -197,10 +193,10 @@ namespace Gtk
 
 /**** Gtk::RunSig **********************************************************/
 
-SigC::Connection RunSig::connect(const RunSig::SlotType& slot)
+sigc::connection RunSig::connect(const RunSig::SlotType& slot)
 {
-  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
-  const SigC::Connection connection (conn_node);
+  GtkMainConnectionNode *const conn_node = new GtkMainConnectionNode(slot);
+  const sigc::connection connection(*conn_node->get_slot());
 
   // The callback will be invoked the next time gtk_main() is called.
   gtk_init_add(&RunSig::gtk_callback, conn_node);
@@ -212,30 +208,30 @@ SigC::Connection RunSig::connect(const RunSig::SlotType& slot)
 // static
 gboolean RunSig::gtk_callback(gpointer data)
 {
-  GtkMainSigConnectionNode *const conn_node =
-      static_cast<GtkMainSigConnectionNode*>(data);
+  GtkMainConnectionNode *const conn_node =
+      static_cast<GtkMainConnectionNode*>(data);
 
-  if(GtkMainSigConnectionNode::list_remove(conn_node))
+  if(GtkMainConnectionNode::list_remove(conn_node))
   {
-    // Explicitely check wether disconnect() has been called,
+    // TODO: Explicitely check wether disconnect() has been called?,
     // because gtk_init_add() actually doesn't support disconnection.
     //
-    if(!conn_node->notified_)
-    {
+    //if(!conn_node->notified_)
+    //{
       try
       {
-        // Recreate the specific SlotType from the generic SlotNode.
-        SlotType slot (conn_node->get_slot_node());
-        slot();
+        // Recreate the specific SlotType from the generic slot_base.
+        SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
+        (*pSlot)();
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-    }
+    //}
 
     // We don't need it anymore, since RunSig is a one-shot signal.
-    GtkMainSigConnectionNode::destroy_notify_handler(conn_node);
+    GtkMainConnectionNode::destroy_notify_handler(conn_node);
   }
 
   return 0;
@@ -244,14 +240,14 @@ gboolean RunSig::gtk_callback(gpointer data)
 
 /**** Gtk::QuitSig *********************************************************/
 
-SigC::Connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_level)
+sigc::connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_level)
 {
-  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
-  const SigC::Connection connection (conn_node);
+  GtkMainConnectionNode *const conn_node = new GtkMainConnectionNode(slot);
+  const sigc::connection connection(*conn_node->get_slot());
 
   const guint conn_id = gtk_quit_add_full(
       main_level, &QuitSig::gtk_callback, 0 /* marshaller */,
-      conn_node, &GtkMainSigConnectionNode::destroy_notify_handler);
+      conn_node, &GtkMainConnectionNode::destroy_notify_handler);
 
   conn_node->install(conn_id, &gtk_quit_remove);
   return connection;
@@ -262,9 +258,10 @@ gboolean QuitSig::gtk_callback(gpointer data)
 {
   try
   {
-    // Recreate the specific SlotType from the generic slot node.
-    SlotType slot (static_cast<GtkMainSigConnectionNode*>(data)->get_slot_node());
-    return slot();
+    // Call the slot:
+    GtkMainConnectionNode* node = static_cast<GtkMainConnectionNode*>(data);
+    SlotType* pSlot = static_cast<SlotType*>(node->get_slot());
+    (*pSlot)();
   }
   catch(...)
   {
@@ -276,10 +273,10 @@ gboolean QuitSig::gtk_callback(gpointer data)
 
 /**** Gtk::KeySnooperSig ***************************************************/
 
-SigC::Connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
+sigc::connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
 {
-  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
-  const SigC::Connection connection (conn_node);
+  GtkMainConnectionNode *const conn_node = new GtkMainConnectionNode(slot);
+  const sigc::connection connection(*conn_node->get_slot());
 
   const guint conn_id = gtk_key_snooper_install(&KeySnooperSig::gtk_callback, conn_node);
 
@@ -293,8 +290,9 @@ gint KeySnooperSig::gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer
   try
   {
     // Recreate the specific SlotType from the generic slot node.
-    SlotType slot (static_cast<GtkMainSigConnectionNode*>(data)->get_slot_node());
-    return slot(Glib::wrap(widget), event);
+    GtkMainConnectionNode* conn_node = static_cast<GtkMainConnectionNode*>(data);
+    SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
+    return (*pSlot)(Glib::wrap(widget), event);
   }
   catch(...)
   {
@@ -320,7 +318,7 @@ Main::Main(int& argc, char**& argv, bool set_locale)
 }
 
 Main::Main(int* argc, char*** argv, bool set_locale)
-{ 
+{
   init(argc, argv, set_locale);
 }
 
@@ -345,7 +343,7 @@ Main::~Main()
   if(instance_ == this)
   {
     instance_ = 0;
-    GtkMainSigConnectionNode::list_notify_all();
+    GtkMainConnectionNode::list_notify_all();
 
     Glib::init();
   }
@@ -411,7 +409,7 @@ void Main::run()
 void Main::run(Gtk::Window& window)
 {
   window.show();
-  window.signal_hide().connect(SigC::slot(*instance_, &Main::on_window_hide));
+  window.signal_hide().connect(sigc::mem_fun(*instance_, &Main::on_window_hide));
   instance_->run_impl();
 }
 

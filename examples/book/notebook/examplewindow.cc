@@ -37,7 +37,7 @@ ExampleWindow::ExampleWindow()
   m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
 
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
-  m_Button_Quit.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
 
   //Add the Notebook pages:
   m_Notebook.append_page(m_Label1, "First");

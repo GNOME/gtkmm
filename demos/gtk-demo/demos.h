@@ -5,7 +5,7 @@
 
 //typedef	Gtk::Window* (*GDoDemoFunc) (void);
 
-typedef SigC::Slot0<Gtk::Window*> type_slotDo;
+typedef sigc::slot<Gtk::Window*> type_slotDo;
 
 struct Demo
 {
@@ -39,7 +39,7 @@ Gtk::Window* do_treeview_treestore();
 Gtk::Window* do_ui_manager();
 
 Demo child0[] = {
-  { "Editable Cells", "example_treeview_editable_cells.cc", SigC::slot(&do_treeview_editable_cells), 0 },
+  { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), 0 },
   { "List Store", "example_treeview_liststore.cc", do_treeview_liststore, 0 },
   { "Tree Store", "example_treeview_treestore.cc", do_treeview_treestore, 0 },
   { 0, 0, type_slotDo(), 0 }
@@ -48,24 +48,24 @@ Demo child0[] = {
 
 Demo testgtk_demos[] =
 {
-  { "Application main window", "example_appwindow.cc", SigC::slot(&do_appwindow), 0 },
-  { "Button Boxes", "example_buttonbox.cc",  SigC::slot(&do_buttonbox), 0 },
-  { "Change Display", "example_change_display.cc", SigC::slot(&do_change_display), 0 },
-  { "Color Selector", "example_colorsel.cc", SigC::slot(&do_colorsel), 0 },
-  { "Dialog and Message Boxes", "example_dialog.cc", SigC::slot(&do_dialog), 0 },
-  { "Drawing Area", "example_drawingarea.cc", SigC::slot(&do_drawingarea), 0 },
-  { "Images", "example_images.cc", SigC::slot(&do_images), 0 },
+  { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), 0 },
+  { "Button Boxes", "example_buttonbox.cc",  sigc::ptr_fun(&do_buttonbox), 0 },
+  { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), 0 },
+  { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), 0 },
+  { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
+  { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
+  { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
 /*
-  { "Item Factory", "example_item_factory.cc", SigC::slot(&do_item_factory), 0 },
+  { "Item Factory", "example_item_factory.cc", sigc::ptr_fun(&do_item_factory), 0 },
 */
-  { "Menus", "example_menus.cc", SigC::slot(&do_menus), 0 },
-  { "Paned Widgets", "example_panes.cc", SigC::slot(&do_panes), 0 },
-  { "Pixbufs", "example_pixbufs.cc", SigC::slot(&do_pixbufs), 0 },
-  { "Size Groups", "example_sizegroup.cc", SigC::slot(&do_sizegroup), 0 },
-  { "Stock Item and Icon Browser", "example_stockbrowser.cc", SigC::slot(&do_stock_browser), 0 },
-  { "Text Widget", "example_textview.cc", SigC::slot(&do_textview), 0 },
+  { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
+  { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
+  { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
+  { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
+  { "Stock Item and Icon Browser", "example_stockbrowser.cc", sigc::ptr_fun(&do_stock_browser), 0 },
+  { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), 0 },
   { "Tree View", "", type_slotDo(), child0 },
-  { "UI Manager", "example_uimanager.cc", SigC::slot(&do_ui_manager), 0},
+  { "UI Manager", "example_uimanager.cc", sigc::ptr_fun(&do_ui_manager), 0},
   { 0, 0, type_slotDo(), 0 }
 };
 

@@ -31,6 +31,7 @@ protected:
   // Signal Handlers:
   bool on_timer();
   bool on_idle();
+  void on_button_clicked();
 
   // Member data:
   Gtk::VBox m_Box;

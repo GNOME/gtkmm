@@ -86,11 +86,11 @@ Example_Pixbufs::Example_Pixbufs()
 
   set_size_request(m_back_width, m_back_height);
   m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
-  m_DrawingArea.signal_expose_event().connect(SigC::slot(*this, &Example_Pixbufs::on_drawingarea_expose));
+  m_DrawingArea.signal_expose_event().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_expose));
   add(m_DrawingArea);
 
   m_TimeoutConnection = Glib::signal_timeout().connect(
-      SigC::slot(*this, &Example_Pixbufs::on_timeout), FRAME_DELAY);
+      sigc::mem_fun(*this, &Example_Pixbufs::on_timeout), FRAME_DELAY);
 
   show_all();
 }

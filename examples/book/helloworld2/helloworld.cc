@@ -36,7 +36,7 @@ HelloWorld::HelloWorld()
 
   // Now when the button is clicked, we call the "on_button_clicked" function
   // with a pointer to "button 1" as it's argument
-  m_button1.signal_clicked().connect(SigC::bind<Glib::ustring>( SigC::slot(*this, &HelloWorld::on_button_clicked), "button 1") );
+  m_button1.signal_clicked().connect(sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &HelloWorld::on_button_clicked), "button 1") );
 
   // instead of gtk_container_add, we pack this button into the invisible
   // box, which has been packed into the window.
@@ -49,7 +49,7 @@ HelloWorld::HelloWorld()
 
   // call the same signal handler with a different argument,
   // passing a pointer to "button 2" instead.
-  m_button2.signal_clicked().connect(SigC::bind<Glib::ustring>( SigC::slot(*this, &HelloWorld::on_button_clicked), "button 2") );
+  m_button2.signal_clicked().connect(sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &HelloWorld::on_button_clicked), "button 2") );
 
   m_box1.pack_start(m_button2);
 

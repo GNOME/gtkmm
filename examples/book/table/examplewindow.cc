@@ -35,11 +35,11 @@ ExampleWindow::ExampleWindow()
   m_Table.attach(m_Button_Quit, 0, 2, 1, 2);
 
   m_Button_1.signal_clicked().connect(
-      SigC::bind<Glib::ustring>( SigC::slot(*this, &ExampleWindow::on_button_numbered), "button 1") );
+      sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &ExampleWindow::on_button_numbered), "button 1") );
   m_Button_2.signal_clicked().connect(
-      SigC::bind<Glib::ustring>( SigC::slot(*this, &ExampleWindow::on_button_numbered), "button 2") );
+      sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &ExampleWindow::on_button_numbered), "button 2") );
 
-  m_Button_Quit.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
 
   show_all_children();
 }

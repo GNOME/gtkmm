@@ -55,7 +55,7 @@ AppWindow::AppWindow()
     renderer->append_list_item("sloff");
 
     renderer->property_editable() = true;
-    renderer->signal_edited().connect(SigC::slot(*this, &AppWindow::on_cell_edited));
+    renderer->signal_edited().connect(sigc::mem_fun(*this, &AppWindow::on_cell_edited));
   }
 
   std::ostringstream output (std::ios::ate);

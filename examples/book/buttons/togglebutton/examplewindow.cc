@@ -25,7 +25,7 @@ ExampleWindow::ExampleWindow()
   set_title("togglebutton example");
   set_border_width(10);
 
-  m_button.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_clicked) );
+  m_button.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_clicked) );
   
   add(m_button);
 

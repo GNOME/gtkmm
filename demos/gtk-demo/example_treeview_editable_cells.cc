@@ -125,11 +125,11 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
 
   m_HBox.pack_start(m_Button_Add);
   m_Button_Add.signal_clicked().connect(
-    SigC::slot(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
+    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
 
   m_HBox.pack_start(m_Button_Remove);
   m_Button_Remove.signal_clicked().connect(
-    SigC::slot(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
+    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
 
   show_all();
 }
@@ -172,7 +172,7 @@ void Example_TreeView_EditableCells::create_model()
 
   std::for_each(
       m_vecItems.begin(), m_vecItems.end(),
-      SigC::slot(*this, &Example_TreeView_EditableCells::liststore_add_item));
+      sigc::mem_fun(*this, &Example_TreeView_EditableCells::liststore_add_item));
 }
 
 void Example_TreeView_EditableCells::liststore_add_item(const CellItem_Product& foo)

@@ -34,7 +34,7 @@ ExampleWindow::ExampleWindow()
   //And bind an action to it:
   m_EventBox.set_events(Gdk::BUTTON_PRESS_MASK);
   m_EventBox.signal_button_press_event().connect(
-    SigC::slot(*this, &ExampleWindow::on_eventbox_button_press) );
+    sigc::mem_fun(*this, &ExampleWindow::on_eventbox_button_press) );
 
   m_Tooltips.set_tip(m_EventBox, "Click me!");
 

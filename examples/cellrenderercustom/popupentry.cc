@@ -82,7 +82,7 @@ int PopupEntry::get_button_width()
   return requisition.width;
 }
 
-SigC::Signal0<void>& PopupEntry::signal_arrow_clicked()
+PopupEntry::type_signal_arrow_clicked& PopupEntry::signal_arrow_clicked()
 {
   return signal_arrow_clicked_;
 }
@@ -116,16 +116,20 @@ bool PopupEntry::on_key_press_event(GdkEventKey* event)
 
 void PopupEntry::start_editing_vfunc(GdkEvent*)
 {
-  using SigC::slot;
-
   entry_->select_region(0, -1);
 
   // TODO: This is a key-binding signal. Investigate whether we really need to use a keybinding signal
   // when creating a derived CellRenderer.
-  entry_->signal_activate().connect(slot(*this, &Self::on_entry_activate));
-  entry_->signal_key_press_event().connect(slot(*this, &Self::on_entry_key_press_event));
+  entry_->signal_activate().connect(sigc::mem_fun(*this, &Self::on_entry_activate));
+  entry_->signal_key_press_event().connect(sigc::mem_fun(*this, &Self::on_entry_key_press_event));
 
-  button_->signal_clicked().connect(signal_arrow_clicked_.slot());
+  //TODO: Doesn't this mean that we have multiple connection, because this is never disconnected?
+  button_->signal_clicked().connect(sigc::mem_fun(*this, &Self::on_button_clicked));
+}
+
+void PopupEntry::on_button_clicked()
+{
+  signal_arrow_clicked_.emit();
 }
 
 void PopupEntry::on_entry_activate()

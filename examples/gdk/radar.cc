@@ -93,7 +93,7 @@ PPI::PPI()
   colormap->alloc_color(yellow_);
 
   // timeout
-  Glib::signal_timeout().connect(SigC::slot(*this, &PPI::timer_callback), 50);
+  Glib::signal_timeout().connect(sigc::mem_fun(*this, &PPI::timer_callback), 50);
 
   // loop, alpha
   loop = 0;
@@ -306,6 +306,9 @@ public:
   virtual ~Radar();
   
 protected:
+  //signal handlers:
+  void on_button2_clicked();
+  
   // Child widgets
   Gtk::VBox m_box0;
   Gtk::HBox m_box1;
@@ -327,7 +330,7 @@ Radar::Radar()
 {
 
   // box2
-  m_button2.signal_clicked().connect(SigC::slot(*this, &Gtk::Widget::hide));
+  m_button2.signal_clicked().connect(sigc::mem_fun(*this, &Radar::on_button2_clicked));
   m_box2.pack_start(m_box3, /*Gtk::PackOptions*/Gtk::PACK_EXPAND_WIDGET, /*padding*/5);
   m_box2.pack_start(m_button1, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button2, Gtk::PACK_SHRINK, 5);
@@ -350,6 +353,11 @@ Radar::Radar()
 
 Radar::~Radar()
 {
+}
+
+void Radar::on_button2_clicked()
+{
+  hide();
 }
 
 

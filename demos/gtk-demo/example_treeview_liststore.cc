@@ -160,7 +160,7 @@ void Example_TreeView_ListStore::create_model()
 
   std::for_each(
       m_vecItems.begin(), m_vecItems.end(),
-      SigC::slot(*this, &Example_TreeView_ListStore::liststore_add_item));
+      sigc::mem_fun(*this, &Example_TreeView_ListStore::liststore_add_item));
 }
 
 void Example_TreeView_ListStore::liststore_add_item(const CellItem_Bug& foo)

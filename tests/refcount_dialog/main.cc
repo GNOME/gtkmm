@@ -29,7 +29,7 @@ MyWindow::MyWindow()
 {
   set_size_request(200, 200);
 
-  m_Button.signal_clicked().connect( SigC::slot(*this, &MyWindow::on_button_clicked) );
+  m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
   m_Box.pack_start(m_Button);
   add(m_Box);
 }

@@ -36,7 +36,7 @@ class TicTacToe: public Gtk::VBox
 
     void clear();
 
-    SigC::Signal0<void> tictactoe;
+    sigc::signal<void> tictactoe;
 
     TicTacToe();
     ~TicTacToe();

@@ -41,14 +41,12 @@ CellRendererPopup::CellRendererPopup()
   shown_                (false),
   editing_canceled_     (false)
 {
-  using SigC::slot;
+  signal_show_popup_.connect(sigc::mem_fun(*this, &Self::on_show_popup));
+  signal_hide_popup_.connect(sigc::mem_fun(*this, &Self::on_hide_popup));
 
-  signal_show_popup_.connect(slot(*this, &Self::on_show_popup));
-  signal_hide_popup_.connect(slot(*this, &Self::on_hide_popup));
-
-  popup_window_.signal_button_press_event().connect(slot(*this, &Self::on_button_press_event));
-  popup_window_.signal_key_press_event   ().connect(slot(*this, &Self::on_key_press_event));
-  popup_window_.signal_style_changed     ().connect(slot(*this, &Self::on_style_changed));
+  popup_window_.signal_button_press_event().connect(sigc::mem_fun(*this, &Self::on_button_press_event));
+  popup_window_.signal_key_press_event   ().connect(sigc::mem_fun(*this, &Self::on_key_press_event));
+  popup_window_.signal_style_changed     ().connect(sigc::mem_fun(*this, &Self::on_style_changed));
 }
 
 CellRendererPopup::~CellRendererPopup()
@@ -111,17 +109,15 @@ Gtk::CellEditable* CellRendererPopup::start_editing_vfunc(GdkEvent*,
                                                           const Gdk::Rectangle&,
                                                           Gtk::CellRendererState)
 {
-  using SigC::slot;
-
   // If the cell isn't editable we return 0.
   if(!property_editable())
     return 0;
 
   std::auto_ptr<PopupEntry> popup_entry (new PopupEntry(path));
 
-  popup_entry->signal_editing_done ().connect(slot(*this, &Self::on_popup_editing_done));
-  popup_entry->signal_arrow_clicked().connect(slot(*this, &Self::on_popup_arrow_clicked));
-  popup_entry->signal_hide         ().connect(slot(*this, &Self::on_popup_hide));
+  popup_entry->signal_editing_done ().connect(sigc::mem_fun(*this, &Self::on_popup_editing_done));
+  popup_entry->signal_arrow_clicked().connect(sigc::mem_fun(*this, &Self::on_popup_arrow_clicked));
+  popup_entry->signal_hide         ().connect(sigc::mem_fun(*this, &Self::on_popup_hide));
 
   popup_entry->set_text(property_text());
   popup_entry->show();

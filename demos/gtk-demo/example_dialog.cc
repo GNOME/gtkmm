@@ -77,14 +77,14 @@ Example_Dialog::Example_Dialog()
 
   /* Standard message dialog */
   m_VBox.pack_start(m_HBox, Gtk::PACK_SHRINK);
-  m_Button_Message.signal_clicked().connect(SigC::slot(*this, &Example_Dialog::on_button_message));
+  m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
   m_HBox.pack_start(m_Button_Message, Gtk::PACK_SHRINK);
   m_VBox.pack_start(*(Gtk::manage(new Gtk::HSeparator())), Gtk::PACK_SHRINK);
 
 
   /* Interactive dialog*/
   m_VBox.pack_start(m_HBox2, Gtk::PACK_SHRINK);
-  m_Button_Interactive.signal_clicked().connect(SigC::slot(*this, &Example_Dialog::on_button_interactive));
+  m_Button_Interactive.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_interactive));
   m_HBox2.pack_start(m_VBox2, Gtk::PACK_SHRINK);
   m_VBox2.pack_start(m_Button_Interactive, Gtk::PACK_SHRINK);
 

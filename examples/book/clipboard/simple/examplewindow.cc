@@ -45,9 +45,9 @@ ExampleWindow::ExampleWindow()
   //Fill ButtonBox:
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
   m_ButtonBox.pack_start(m_Button_Copy, Gtk::PACK_SHRINK);
-  m_Button_Copy.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_copy) );
+  m_Button_Copy.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_copy) );
   m_ButtonBox.pack_start(m_Button_Paste, Gtk::PACK_SHRINK);
-  m_Button_Paste.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_paste) );
+  m_Button_Paste.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_paste) );
     
   show_all_children();
 }
@@ -74,7 +74,7 @@ void ExampleWindow::on_button_paste()
 {        
   //Tell the clipboard to call our method when it is ready:
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
-  refClipboard->request_text( SigC::slot(*this, &ExampleWindow::on_clipboard_text_received) );
+  refClipboard->request_text( sigc::mem_fun(*this, &ExampleWindow::on_clipboard_text_received) );
 }
 
 void ExampleWindow::on_clipboard_text_received(const Glib::ustring& text)

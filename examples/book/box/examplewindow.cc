@@ -146,7 +146,7 @@ ExampleWindow::ExampleWindow(int which)
   }
 
   // Connect the signal to hide the window:
-  m_buttonQuit.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_quit_clicked) );
+  m_buttonQuit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit_clicked) );
 
   // pack the button into the quitbox.
   // The last 2 arguments to Box::pack_start are: options, padding.

@@ -70,7 +70,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_Frame_Checkerboard.add(m_DrawingArea_Checkerboard);
 
   m_DrawingArea_Checkerboard.signal_expose_event().connect(
-      SigC::slot(*this, &Example_DrawingArea::on_drawingarea_checkerboard_expose_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_checkerboard_expose_event));
 
   /*
    * Create the scribble area
@@ -87,15 +87,15 @@ Example_DrawingArea::Example_DrawingArea()
 
   /* Signals used to handle backing pixmap */
   m_DrawingArea_Scribble.signal_expose_event().connect(
-      SigC::slot(*this, &Example_DrawingArea::on_drawingarea_scribble_expose_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_expose_event));
   m_DrawingArea_Scribble.signal_configure_event().connect(
-      SigC::slot(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event));
 
   /* Event signals */
   m_DrawingArea_Scribble.signal_motion_notify_event().connect(
-      SigC::slot(*this, &Example_DrawingArea::on_drawingarea_scribble_motion_notify_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_motion_notify_event));
   m_DrawingArea_Scribble.signal_button_press_event().connect(
-      SigC::slot(*this, &Example_DrawingArea::on_drawingarea_scribble_button_press_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_button_press_event));
 
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to.

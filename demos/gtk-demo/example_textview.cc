@@ -384,7 +384,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     if (i == 0)
     {
       Gtk::Button* pButton = Gtk::manage( new Gtk::Button("Click Me") );
-      pButton->signal_clicked().connect(SigC::slot(*this, &Example_TextView::on_button_clicked));
+      pButton->signal_clicked().connect(sigc::mem_fun(*this, &Example_TextView::on_button_clicked));
       pWidget = pButton;
     }
     else if (i == 1)

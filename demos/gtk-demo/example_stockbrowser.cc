@@ -120,7 +120,7 @@ Example_StockBrowser::Example_StockBrowser()
   m_refTreeSelection = m_TreeView.get_selection();
   m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
   m_refTreeSelection->signal_changed().connect(
-      SigC::slot(*this, &Example_StockBrowser::on_selection_changed));
+      sigc::mem_fun(*this, &Example_StockBrowser::on_selection_changed));
 
   show_all();
 }

@@ -44,17 +44,22 @@ IdleExample::IdleExample() :
 
   
   // Connect the signal handlers:
-  m_ButtonQuit.signal_pressed().connect( SigC::slot(*this, &Gtk::Widget::hide) );
+  m_ButtonQuit.signal_clicked().connect( sigc::mem_fun(*this, &IdleExample::on_button_clicked) );
 
   // formatting drive c in timeout signal handler - called once every 50ms
-  Glib::signal_timeout().connect( SigC::slot(*this, &IdleExample::on_timer), 50 );
+  Glib::signal_timeout().connect( sigc::mem_fun(*this, &IdleExample::on_timer), 50 );
 
   // formatting drive d in idle signal handler - called as quickly as possible
-  Glib::signal_idle().connect( SigC::slot(*this, &IdleExample::on_idle) );
+  Glib::signal_idle().connect( sigc::mem_fun(*this, &IdleExample::on_idle) );
 
   show_all_children();
 }
 
+
+void IdleExample::on_button_clicked()
+{
+  hide();
+}
 
 // this timer callback function is executed once every 50ms (set in connection above).
 // Use timeouts when speed is not critical. (ie periodically updating something).

@@ -26,7 +26,7 @@ namespace //anonymous
 {
 
 // This Signal Proxy allows the C++ coder to specify
-// a SigC::Slot instead of a static function.
+// a sigc::Slot instead of a static function.
 class SignalProxy_Match
 {
 public:
@@ -109,20 +109,19 @@ namespace //anonymous
 gboolean Widget_signal_match_selected_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
 {
   using namespace Gtk;
-  typedef SigC::Slot1< bool, const TreeModel::iterator& > SlotType;
+  typedef sigc::slot< bool, const TreeModel::iterator& > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
     try
     {
-      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         //This conversion is the custom-written part:
         Gtk::TreeModel::iterator cppIter(c_model, c_iter);
         
-        return static_cast<int>(((*(SlotType::Proxy)(slot->proxy_))
-            (cppIter, slot)));
+        return static_cast<int>( (*static_cast<SlotType*>(slot))(cppIter) );
       }
     }
     catch(...)
@@ -138,20 +137,19 @@ gboolean Widget_signal_match_selected_callback(GtkEntryCompletion* self, GtkTree
 gboolean Widget_signal_match_selected_notify_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
 {
   using namespace Gtk;
-  typedef SigC::Slot1< void, const TreeModel::iterator& > SlotType;
+  typedef sigc::slot< void, const TreeModel::iterator& > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
     try
     {
-      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         //This conversion is the custom-written part:
         Gtk::TreeModel::iterator cppIter(c_model, c_iter);
-      
-        (*(SlotType::Proxy)(slot->proxy_))
-            (cppIter, slot);
+
+        (*static_cast<SlotType*>(slot))(cppIter);
       }
     }
     catch(...)

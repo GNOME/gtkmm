@@ -107,7 +107,7 @@ Example_SizeGroup::Example_SizeGroup()
   /* And a check button to turn grouping on and off */
   m_VBox.pack_start(m_CheckButton, Gtk::PACK_SHRINK);
   m_CheckButton.set_active();
-  m_CheckButton.signal_toggled().connect(SigC::slot(*this, &Example_SizeGroup::on_checkbutton_toggled));
+  m_CheckButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_SizeGroup::on_checkbutton_toggled));
 
   show_all();
 }

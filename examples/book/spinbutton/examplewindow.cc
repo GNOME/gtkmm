@@ -25,7 +25,7 @@ ExampleWindow::ExampleWindow()
   m_Frame_NotAccelerated("Not accelerated"),
   m_Frame_Accelerated("Accelerated"),
   m_VBox_Main(false, 5),
-  m_Label_Day("Day :"), m_Label_Month("Month: "), m_Label_Year("Year: "),
+  m_Label_Day("Day: "), m_Label_Month("Month: "), m_Label_Year("Year: "),
   m_Label_Value("Value: "),
   m_Label_Digits("Digits: "),
   m_adjustment_day(1.0, 1.0, 31.0, 1.0, 5.0, 0.0),
@@ -107,7 +107,7 @@ ExampleWindow::ExampleWindow()
   m_VBox_Digits.pack_start(m_Label_Digits);
 
   m_SpinButton_Digits.set_wrap();
-  m_adjustment_digits.signal_value_changed().connect( SigC::slot(*this, &ExampleWindow::on_spinbutton_digits_changed) );
+  m_adjustment_digits.signal_value_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_spinbutton_digits_changed) );
 
   m_VBox_Digits.pack_start(m_SpinButton_Digits);
 
@@ -115,27 +115,27 @@ ExampleWindow::ExampleWindow()
   //CheckButtons:
   m_VBox_Accelerated.pack_start(m_CheckButton_Snap);
   m_CheckButton_Snap.set_active();
-  m_CheckButton_Snap.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_checkbutton_snap) );
+  m_CheckButton_Snap.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_snap) );
 
   m_VBox_Accelerated.pack_start(m_CheckButton_Numeric);
   m_CheckButton_Numeric.set_active();
-  m_CheckButton_Numeric.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_checkbutton_numeric) );
+  m_CheckButton_Numeric.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_numeric) );
 
 
   //Buttons:
   m_VBox_Accelerated.pack_start (m_HBox_Buttons, Gtk::PACK_SHRINK, 5);
 
-  m_Button_Int.signal_clicked().connect(bind(slot(*this,&ExampleWindow::on_button_getvalue), VALUE_FORMAT_INT));
+  m_Button_Int.signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_button_getvalue), VALUE_FORMAT_INT) );
   m_HBox_Buttons.pack_start(m_Button_Int, Gtk::PACK_EXPAND_WIDGET, 5);
 
-  m_Button_Float.signal_clicked().connect(bind(slot(*this,&ExampleWindow::on_button_getvalue), VALUE_FORMAT_FLOAT));
+  m_Button_Float.signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_button_getvalue), VALUE_FORMAT_FLOAT) );
   m_HBox_Buttons.pack_start(m_Button_Float, Gtk::PACK_EXPAND_WIDGET, 5);
 
   m_VBox_Accelerated.pack_start(m_Label_ShowValue);
   m_Label_ShowValue.set_text("0");
 
   //Close button:
-  m_Button_Close.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_close) );
+  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_close) );
   m_VBox_Main.pack_start(m_Button_Close, Gtk::PACK_SHRINK);
 
   show_all_children();

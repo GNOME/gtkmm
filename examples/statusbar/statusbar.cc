@@ -39,10 +39,10 @@ StatusBarExample::StatusBarExample()
   
   m_vbox.pack_start(m_status_bar);
 
-  m_bPush.signal_clicked().connect( bind(slot(*this, &StatusBarExample::push_item), m_context_id) );
+  m_bPush.signal_clicked().connect( sigc::bind(sigc::mem_fun(*this, &StatusBarExample::push_item), m_context_id) );
   m_vbox.pack_start(m_bPush);
   
-  m_bPop.signal_clicked().connect( bind(slot(*this, &StatusBarExample::pop_item), m_context_id) );
+  m_bPop.signal_clicked().connect( sigc::bind(sigc::mem_fun(*this, &StatusBarExample::pop_item), m_context_id) );
   m_vbox.pack_start(m_bPop);
   
   show_all();

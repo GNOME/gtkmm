@@ -18,10 +18,10 @@ public:
   void set_focus_widget(Gtk::Widget& focus_widget);
   Gtk::Widget* get_focus_widget();
 
-  typedef SigC::Signal5<void,const Glib::ustring&,int,int,int,int> SignalShowPopup;
+  typedef sigc::signal<void,const Glib::ustring&,int,int,int,int> SignalShowPopup;
   SignalShowPopup& signal_show_popup();
 
-  typedef SigC::Signal0<void> SignalHidePopup;
+  typedef sigc::signal<void> SignalHidePopup;
   SignalHidePopup& signal_hide_popup();
 
   void hide_popup();

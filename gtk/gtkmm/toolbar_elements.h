@@ -75,7 +75,7 @@ class RadioButtonGroup;
 namespace Toolbar_Helpers
 {
 
-typedef SigC::Slot0<void> Callback0;
+typedef sigc::slot<void> Callback0;
 
 // Tool is the output class (very thin wrapper)
 class Tool : private GtkToolbarChild

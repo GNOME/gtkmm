@@ -60,38 +60,38 @@ MainWindowClass::MainWindowClass()
 
     Gtk::Button* button = manage (new Gtk::Button ("Quit"));
     button->signal_clicked ()
-        .connect(SigC::slot (*this, &MainWindowClass::quit_pressed_cb));
+        .connect(sigc::mem_fun (*this, &MainWindowClass::quit_pressed_cb));
     vbox->pack_start (*button);
 
 
     toolbar->tools ()
         .push_back (StockElem (Gtk::Stock::NEW,
-                               SigC::bind (SigC::slot (*this,
+                               sigc::bind (sigc::mem_fun (*this,
                                            &MainWindowClass::toolbar_cb),
                                      "New Item"),
                                "New Item"));
     toolbar->tools ()
         .push_back (StockElem (Gtk::Stock::OPEN,
-                               SigC::bind (SigC::slot (*this,
+                               sigc::bind (sigc::mem_fun (*this,
                                            &MainWindowClass::toolbar_cb),
                                      "Open Item"),
                                "Open Item"));
     toolbar->tools ()
         .push_back (StockElem (Gtk::Stock::SAVE,
-                               SigC::bind (SigC::slot (*this,
+                               sigc::bind (sigc::mem_fun (*this,
                                            &MainWindowClass::toolbar_cb),
                                      "Save Item"),
                                "Save Item"));
     toolbar->tools ().push_back (Space ());
     toolbar->tools ()
         .push_back (StockElem (Gtk::Stock::UNDO,
-                               SigC::bind (SigC::slot (*this,
+                               sigc::bind (sigc::mem_fun (*this,
                                            &MainWindowClass::toolbar_cb),
                                      "Undo action"),
                                "Undo action"));
     toolbar->tools ()
         .push_back (StockElem (Gtk::Stock::REDO,
-                               SigC::bind (SigC::slot (*this, 
+                               sigc::bind (sigc::mem_fun (*this, 
                                            &MainWindowClass::toolbar_cb),
                                      "Redo action"),
                                "Redo action"));
@@ -102,25 +102,25 @@ MainWindowClass::MainWindowClass()
 
     menu->items ()
         .push_back (MenuElem ("Icons",
-                              SigC::bind (SigC::slot (*this, 
+                              sigc::bind (sigc::mem_fun (*this, 
                                           &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_ICONS)));
     menu->items ()
         .push_back (MenuElem ("Text",
-                              SigC::bind (SigC::slot (*this, 
+                              sigc::bind (sigc::mem_fun (*this, 
                                           &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_TEXT)));
     menu->items ()
         .push_back (MenuElem ("Both",
-                              SigC::bind (SigC::slot (*this, 
+                              sigc::bind (sigc::mem_fun (*this, 
                                           &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_BOTH)));
     menu->items ()
         .push_back (MenuElem ("Both (horiz)",
-                              SigC::bind (SigC::slot (*this, 
+                              sigc::bind (sigc::mem_fun (*this, 
                                           &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_BOTH_HORIZ)));

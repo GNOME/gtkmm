@@ -30,7 +30,7 @@ public:
   virtual void do_something();
 
   //signal accessor:
-  typedef SigC::Signal2<void, bool, int> type_signal_something;
+  typedef sigc::signal<void, bool, int> type_signal_something;
   type_signal_something signal_something();
 
 protected:

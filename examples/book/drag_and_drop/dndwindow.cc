@@ -38,7 +38,7 @@ DnDWindow::DnDWindow()
   m_Button_Drag.drag_source_set(listTargets);
 		
   //Connect signals:
-  m_Button_Drag.signal_drag_data_get().connect( SigC::slot(*this, &DnDWindow::on_button_drag_data_get));
+  m_Button_Drag.signal_drag_data_get().connect( sigc::mem_fun(*this, &DnDWindow::on_button_drag_data_get));
 
   m_HBox.pack_start(m_Button_Drag);
 
@@ -48,7 +48,7 @@ DnDWindow::DnDWindow()
   m_Label_Drop.drag_dest_set(listTargets);
 
   //Connect signals:
-  m_Label_Drop.signal_drag_data_received().connect( SigC::slot(*this, &DnDWindow::on_label_drop_drag_data_received) );
+  m_Label_Drop.signal_drag_data_received().connect( sigc::mem_fun(*this, &DnDWindow::on_label_drop_drag_data_received) );
 
   m_HBox.pack_start(m_Label_Drop);
 

@@ -26,7 +26,7 @@ int main(int, char**)
   Client client;
 
   //Connect a Server signal to the signal handler in Client.
-  server.signal_something().connect( SigC::slot(client, &Client::on_server_something) );
+  server.signal_something().connect( sigc::mem_fun(client, &Client::on_server_something) );
 
   std::cout << "Before Server::do_something()" << std::endl;
 

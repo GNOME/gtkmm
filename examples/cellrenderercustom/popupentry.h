@@ -23,7 +23,8 @@ public:
 
   static int get_button_width();
 
-  SigC::Signal0<void>& signal_arrow_clicked();
+  typedef sigc::signal<void> type_signal_arrow_clicked;
+  type_signal_arrow_clicked& signal_arrow_clicked();
 
 protected:
   virtual bool on_key_press_event(GdkEventKey* event);
@@ -34,12 +35,13 @@ private:
 
   void on_entry_activate();
   bool on_entry_key_press_event(GdkEventKey* event);
+  void on_button_clicked();
 
   Glib::ustring path_;
   Gtk::Button*  button_;
   Gtk::Entry*   entry_;
   bool          editing_canceled_;
 
-  SigC::Signal0<void> signal_arrow_clicked_;
+  type_signal_arrow_clicked signal_arrow_clicked_;
 };
 

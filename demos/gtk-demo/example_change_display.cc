@@ -137,9 +137,9 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   {
     setup_frame(m_Frame_Display, m_TreeView_Display, m_ButtonBox_Display);
     m_ButtonBox_Display.pack_start(m_Button_Display_Open, Gtk::PACK_SHRINK);
-    m_Button_Display_Open.signal_clicked().connect( SigC::slot(*this, &Example_ChangeDisplay::on_button_display_open) );
+    m_Button_Display_Open.signal_clicked().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_button_display_open) );
     m_ButtonBox_Display.pack_start(m_Button_Display_Close, Gtk::PACK_SHRINK);
-    m_Button_Display_Close.signal_clicked().connect( SigC::slot(*this, &Example_ChangeDisplay::on_button_display_close) );
+    m_Button_Display_Close.signal_clicked().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_button_display_close) );
 
     //Setup TreeView:
     m_refListStore_Display = Gtk::ListStore::create(m_columns_display);
@@ -148,7 +148,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
     //Connect signal:
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = m_TreeView_Display.get_selection();
-    refSelection->signal_changed().connect( SigC::slot(*this, &Example_ChangeDisplay::on_treeview_display_selection_changed) );
+    refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_display_selection_changed) );
 
     m_VBox.pack_start(m_Frame_Display);
 
@@ -167,7 +167,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
     //Connect signal:
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = m_TreeView_Screen.get_selection();
-    refSelection->signal_changed().connect( SigC::slot(*this, &Example_ChangeDisplay::on_treeview_screen_selection_changed) );
+    refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_screen_selection_changed) );
 
     m_VBox.pack_start(m_Frame_Screen);
 
@@ -227,7 +227,7 @@ void Example_ChangeDisplay::initialize_displays()
     row[m_columns_display.m_display] = refDisplay;
 
     refDisplay->signal_closed().connect(
-      SigC::bind( SigC::slot(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
+      sigc::bind( sigc::mem_fun(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
   }
 
 #endif   
@@ -394,7 +394,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
      == Gdk::GRAB_SUCCESS )
   {
     m_popup_clicked = false;
-    m_pPopup->signal_button_release_event().connect( SigC::slot(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
+    m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
     
 
     // Process events until clicked is set by button_release_event_cb.

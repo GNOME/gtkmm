@@ -34,9 +34,9 @@ ExampleWindow::ExampleWindow()
     Gtk::Menu::MenuList& menulist = m_Menu_File_New.items();
 
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New Foo", Gtk::AccelKey("<control>n"),
-      SigC::slot(*this, &ExampleWindow::on_menu_file_new_generic) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) ) );
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("New _Goo",
-      SigC::slot(*this, &ExampleWindow::on_menu_file_new_generic) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) ) );
   }
 
   //File menu:
@@ -45,7 +45,7 @@ ExampleWindow::ExampleWindow()
 
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New", m_Menu_File_New) ); //Add sub menu.
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::AccelKey("<control>q"),
-      SigC::slot(*this, &ExampleWindow::on_menu_file_quit) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) ) );
   }
 
   //Edit menu:
@@ -53,13 +53,13 @@ ExampleWindow::ExampleWindow()
     Gtk::Menu::MenuList& menulist = m_Menu_Edit.items();
 
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Copy",
-      SigC::slot(*this, &ExampleWindow::on_menu_others) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
 
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Paste",
-      SigC::slot(*this, &ExampleWindow::on_menu_others) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
 
     menulist.push_back( Gtk::Menu_Helpers::CheckMenuElem("Something",
-      SigC::slot(*this, &ExampleWindow::on_menu_others) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
   }
   
   //Help menu: (exercise stock items)
@@ -67,7 +67,7 @@ ExampleWindow::ExampleWindow()
     Gtk::Menu::MenuList& menulist = m_Menu_Help.items();
     
     menulist.push_back( Gtk::Menu_Helpers::StockMenuElem(Gtk::Stock::CDROM,
-      SigC::slot(*this, &ExampleWindow::on_menu_others) ) );
+      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
   }
 
   //Add the menus to the MenuBar:

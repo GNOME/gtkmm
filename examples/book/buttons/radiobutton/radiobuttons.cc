@@ -59,7 +59,7 @@ RadioButtons::RadioButtons() :
   m_Button_Close.set_flags(Gtk::CAN_DEFAULT);
   m_Button_Close.grab_default();
 
-  m_Button_Close.signal_clicked().connect( SigC::slot(*this, &RadioButtons::on_button_clicked) );
+  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &RadioButtons::on_button_clicked) );
 
   show_all_children();
 }

@@ -47,7 +47,7 @@ DnDWindow::DnDWindow()
 
   m_Label_Drop.drag_dest_set(m_listTargetsNoRoot, Gtk::DEST_DEFAULT_ALL, Gdk::DragAction(GDK_ACTION_COPY | GDK_ACTION_MOVE));
 
-  m_Label_Drop.signal_drag_data_received().connect( SigC::slot(*this, &DnDWindow::on_label_drop_drag_data_received) );
+  m_Label_Drop.signal_drag_data_received().connect( sigc::mem_fun(*this, &DnDWindow::on_label_drop_drag_data_received) );
 
   m_Table.attach(m_Label_Drop, 0, 1, 0, 1,
                  Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL,
@@ -59,8 +59,8 @@ DnDWindow::DnDWindow()
                  Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL,
                  0, 0);
 
-  m_Label_Popup.signal_drag_motion().connect( SigC::slot(*this, &DnDWindow::on_label_popup_drag_motion) );
-  m_Label_Popup.signal_drag_leave().connect( SigC::slot(*this, &DnDWindow::on_label_popup_drag_leave) );
+  m_Label_Popup.signal_drag_motion().connect( sigc::mem_fun(*this, &DnDWindow::on_label_popup_drag_motion) );
+  m_Label_Popup.signal_drag_leave().connect( sigc::mem_fun(*this, &DnDWindow::on_label_popup_drag_leave) );
 
   m_Image.set(m_trashcan_closed, m_trashcan_closed_mask);
   m_Image.drag_dest_set();
@@ -69,10 +69,10 @@ DnDWindow::DnDWindow()
                  Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL,
                  0, 0);
 
-  m_Image.signal_drag_leave().connect( SigC::slot(*this, &DnDWindow::on_image_drag_leave) );
-  m_Image.signal_drag_motion().connect( SigC::slot(*this, &DnDWindow::on_image_drag_motion) );
-  m_Image.signal_drag_drop().connect( SigC::slot(*this, &DnDWindow::on_image_drag_drop) );
-  m_Image.signal_drag_data_received().connect( SigC::slot(*this, &DnDWindow::on_image_drag_data_received) );
+  m_Image.signal_drag_leave().connect( sigc::mem_fun(*this, &DnDWindow::on_image_drag_leave) );
+  m_Image.signal_drag_motion().connect( sigc::mem_fun(*this, &DnDWindow::on_image_drag_motion) );
+  m_Image.signal_drag_drop().connect( sigc::mem_fun(*this, &DnDWindow::on_image_drag_drop) );
+  m_Image.signal_drag_data_received().connect( sigc::mem_fun(*this, &DnDWindow::on_image_drag_data_received) );
 
   /* Drag site */
 
@@ -85,8 +85,8 @@ DnDWindow::DnDWindow()
                  Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL,
                  0, 0);
 
-  m_Button.signal_drag_data_get().connect( SigC::slot(*this, &DnDWindow::on_button_drag_data_get));
-  m_Button.signal_drag_data_delete().connect( SigC::slot(*this, &DnDWindow::on_button_drag_data_delete));
+  m_Button.signal_drag_data_get().connect( sigc::mem_fun(*this, &DnDWindow::on_button_drag_data_get));
+  m_Button.signal_drag_data_delete().connect( sigc::mem_fun(*this, &DnDWindow::on_button_drag_data_delete));
 
   create_popup();
 
@@ -111,7 +111,7 @@ void DnDWindow::on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragCon
 bool DnDWindow::on_label_popup_drag_motion(const Glib::RefPtr<Gdk::DragContext>&, int, int, guint)
 {
   if (!m_popup_timer)
-    m_popup_timer = Glib::signal_timeout().connect( SigC::slot(*this, &DnDWindow::on_popup_timeout), 500);
+    m_popup_timer = Glib::signal_timeout().connect( sigc::mem_fun(*this, &DnDWindow::on_popup_timeout), 500);
 
   return true;
 }
@@ -124,7 +124,7 @@ void DnDWindow::on_label_popup_drag_leave(const Glib::RefPtr<Gdk::DragContext>&,
    if(!m_popdown_timer)
    {
      g_print ("added popdown\n");
-     m_popdown_timer = Glib::signal_timeout().connect( SigC::slot(*this, &DnDWindow::on_popdown_timeout), 500);
+     m_popdown_timer = Glib::signal_timeout().connect( sigc::mem_fun(*this, &DnDWindow::on_popdown_timeout), 500);
    }
  }
 }
@@ -207,7 +207,7 @@ void DnDWindow::on_button_drag_data_delete(const Glib::RefPtr<Gdk::DragContext>&
 
 bool DnDWindow::on_popdown_timeout()
 {
-  m_popdown_timer.clear();
+  m_popdown_timer.disconnect();
 
   m_PopupWindow.hide();
   m_popped_up = false;
@@ -223,10 +223,10 @@ bool DnDWindow::on_popup_timeout()
     m_popped_up = true;
   }
 
-  m_popdown_timer = Glib::signal_timeout().connect( SigC::slot(*this, &DnDWindow::on_popdown_timeout), 500);
+  m_popdown_timer = Glib::signal_timeout().connect( sigc::mem_fun(*this, &DnDWindow::on_popdown_timeout), 500);
   g_print ("added popdown\n");
 
-  m_popup_timer.clear();
+  m_popup_timer.disconnect();
 
   return false;
 }
@@ -250,7 +250,7 @@ void DnDWindow::create_popup()
                      0, 0);
 
       pButton->drag_dest_set(m_listTargetsNoRoot, Gtk::DEST_DEFAULT_ALL, Gdk::DragAction(GDK_ACTION_COPY | GDK_ACTION_MOVE));
-      pButton->signal_drag_motion().connect( SigC::slot(*this, &DnDWindow::on_popup_button_drag_motion) );                      pButton->signal_drag_leave().connect( SigC::slot(*this, &DnDWindow::on_popup_button_drag_leave) );
+      pButton->signal_drag_motion().connect( sigc::mem_fun(*this, &DnDWindow::on_popup_button_drag_motion) );                      pButton->signal_drag_leave().connect( sigc::mem_fun(*this, &DnDWindow::on_popup_button_drag_leave) );
     }
   }
 
@@ -281,7 +281,7 @@ void DnDWindow::on_popup_button_drag_leave(const Glib::RefPtr<Gdk::DragContext>&
    if(!m_popdown_timer)
    {
      g_print ("added popdown\n");
-     m_popdown_timer = Glib::signal_timeout().connect( SigC::slot(*this, &DnDWindow::on_popdown_timeout), 500);
+     m_popdown_timer = Glib::signal_timeout().connect( sigc::mem_fun(*this, &DnDWindow::on_popdown_timeout), 500);
    }
  }
 }

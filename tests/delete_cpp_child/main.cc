@@ -8,7 +8,7 @@ class AppWindow
     : public Gtk::Window
 {
 public: 
-    AppWindow ();
+    AppWindow();
     
 private:
     void on_button_clicked();
@@ -17,23 +17,23 @@ private:
 };
 
 AppWindow::AppWindow()
-    : m_label (NULL)
+    : m_label (0)
 {
-    Gtk::Box* vbox = manage (new Gtk::VBox (false, 5));
+    Gtk::Box* vbox = Gtk::manage(new Gtk::VBox (false, 5));
     add(*vbox);
 
-    Gtk::Button* button = Gtk::manage (new Gtk::Button ("Delete Label"));
+    Gtk::Button* button = Gtk::manage(new Gtk::Button("Delete Label"));
 
     vbox->pack_start(*button, Gtk::PACK_SHRINK);
 
   
     //m_label = manage (new Gtk::Label ("test"));
-    m_label = new Gtk::Label ("test");
+    m_label = new Gtk::Label("test");
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
     vbox->pack_start(*m_label, Gtk::PACK_SHRINK);
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
 
-    button->signal_clicked ().connect (slot (*this, &AppWindow::on_button_clicked));
+    button->signal_clicked().connect( sigc::mem_fun(*this, &AppWindow::on_button_clicked));
 
     show_all_children();
 }

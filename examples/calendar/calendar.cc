@@ -132,8 +132,8 @@ void CalendarExample::select_font()
   {
     font_dialog_  = new Gtk::FontSelectionDialog("Font Selection Dialog");
     font_dialog_->set_position(Gtk::WIN_POS_MOUSE);
-    font_dialog_->get_ok_button()->signal_clicked().connect(SigC::slot(*this, &CalendarExample::font_selection_ok));
-    //font_dialog_->get_cancel_button()->signal_clicked.connect(SigC::bind(SigC:2:slot(this, &CalendarExample::destroy_widget), font_dialog_));
+    font_dialog_->get_ok_button()->signal_clicked().connect(sigc::mem_fun(*this, &CalendarExample::font_selection_ok));
+    //font_dialog_->get_cancel_button()->signal_clicked.connect(sigc::bind(sigc::mem_fun(this, &CalendarExample::destroy_widget), font_dialog_));
   }
 
   if (!font_dialog_->is_visible())
@@ -178,9 +178,9 @@ CalendarExample::CalendarExample()
   set_flags();
   calendar_->mark_day(19);	
   frame->add(*calendar_);
-  calendar_->signal_month_changed().connect(SigC::slot(*this, &CalendarExample::month_changed));
-  calendar_->signal_day_selected().connect(SigC::slot(*this, &CalendarExample::day_selected));
-  calendar_->signal_day_selected_double_click().connect(SigC::slot(*this, &CalendarExample::day_selected_double_click));
+  calendar_->signal_month_changed().connect(sigc::mem_fun(*this, &CalendarExample::month_changed));
+  calendar_->signal_day_selected().connect(sigc::mem_fun(*this, &CalendarExample::day_selected));
+  calendar_->signal_day_selected_double_click().connect(sigc::mem_fun(*this, &CalendarExample::day_selected_double_click));
 
   Gtk::VSeparator* separator = Gtk::manage(new Gtk::VSeparator());
   hbox->pack_start (*separator, Gtk::PACK_SHRINK);
@@ -209,14 +209,14 @@ CalendarExample::CalendarExample()
   for (int i = 0; i < 5; i++)
   {
     Gtk::CheckButton* toggle = new Gtk::CheckButton(flags[i].label);
-    toggle->signal_toggled().connect(SigC::bind(SigC::slot(*this, &CalendarExample::toggle_flag), toggle));
+    toggle->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &CalendarExample::toggle_flag), toggle));
     vbox3->pack_start(*toggle);
     flag_checkboxes_[i] = toggle;
   }
 
   /* Build the right font-button */ 
   Gtk::Button* button = Gtk::manage(new Gtk::Button("Font..."));
-  button->signal_clicked().connect(SigC::slot(*this, &CalendarExample::select_font));
+  button->signal_clicked().connect(sigc::mem_fun(*this, &CalendarExample::select_font));
   vbox2->pack_start (*button, Gtk::PACK_SHRINK);
 
   /*

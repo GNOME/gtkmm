@@ -114,10 +114,10 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
   m_CheckButton_resize2.set_active(true);
   m_CheckButton_shrink2.set_active(true);
 
-  m_CheckButton_resize1.signal_toggled().connect(SigC::slot(*this, &PaneOptions::on_checkbutton1));
-  m_CheckButton_shrink1.signal_toggled().connect(SigC::slot(*this, &PaneOptions::on_checkbutton1));
-  m_CheckButton_resize2.signal_toggled().connect(SigC::slot(*this, &PaneOptions::on_checkbutton2));
-  m_CheckButton_shrink2.signal_toggled().connect(SigC::slot(*this, &PaneOptions::on_checkbutton2));
+  m_CheckButton_resize1.signal_toggled().connect(sigc::mem_fun(*this, &PaneOptions::on_checkbutton1));
+  m_CheckButton_shrink1.signal_toggled().connect(sigc::mem_fun(*this, &PaneOptions::on_checkbutton1));
+  m_CheckButton_resize2.signal_toggled().connect(sigc::mem_fun(*this, &PaneOptions::on_checkbutton2));
+  m_CheckButton_shrink2.signal_toggled().connect(sigc::mem_fun(*this, &PaneOptions::on_checkbutton2));
 
   // Sync Gtk::Paned options with the CheckButtons' state.  Actually, the
   // preset state of the buttons should match the Gtk::Paned default settings,

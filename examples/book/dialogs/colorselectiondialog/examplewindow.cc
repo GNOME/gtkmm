@@ -28,7 +28,7 @@ ExampleWindow::ExampleWindow()
   add(m_VBox);
   
   m_VBox.pack_start(m_Button, Gtk::PACK_SHRINK);
-  m_Button.signal_color_set().connect( SigC::slot(*this, &ExampleWindow::on_button_color_set) );
+  m_Button.signal_color_set().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_color_set) );
 
   //Set start color:
   m_Color.set_red(0);

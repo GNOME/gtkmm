@@ -2,17 +2,17 @@
 #include <iostream>
 
 //This is _not_ a good example of coding with gtkmm.
-class Dlg : public SigC::Object
+class Dlg : public sigc::trackable
 {
   public:
     Dlg()
     {
       dlg_ = new Gtk::Dialog("Test Dialog");
       Gtk::Button *btn = manage(new Gtk::Button("ClickMe"));
-      btn->signal_clicked().connect(slot(*this, &Dlg::on_button_clicked));
+      btn->signal_clicked().connect(sigc::mem_fun(*this, &Dlg::on_button_clicked));
       dlg_->get_vbox()->pack_start(*btn);
       dlg_->add_button(Gtk::Stock::OK, 0);
-      dlg_->signal_response().connect(slot(*this, &Dlg::on_response));
+      dlg_->signal_response().connect(sigc::mem_fun(*this, &Dlg::on_response));
       dlg_->show_all();
     }
 

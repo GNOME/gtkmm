@@ -116,7 +116,7 @@ Example_Menus::Example_Menus()
   m_VBox_Sub2.set_border_width(10);
   m_VBox1.pack_start(m_VBox_Sub2, Gtk::PACK_SHRINK);
 
-  m_Button.signal_clicked().connect(SigC::slot(*this, &Example_Menus::on_button_clicked));
+  m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));
 
   m_VBox_Sub2.pack_start(m_Button);
   m_Button.property_can_default().set_value(true);

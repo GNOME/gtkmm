@@ -21,9 +21,9 @@
 
 #include <sigc++/sigc++.h>
 
-//Client must inherit from SigC::Object.
+//Client must inherit from sigc::trackable.
 //because libsigc++ needs to keep track of the lifetime of signal handlers.
-class Client : public SigC::Object
+class Client : public sigc::trackable
 {
 public:
   Client();

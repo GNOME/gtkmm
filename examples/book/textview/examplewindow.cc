@@ -50,9 +50,9 @@ ExampleWindow::ExampleWindow()
 
   
   //Connect signals:
-  m_Button_Quit.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_quit) );
-  m_Button_Buffer1.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_buffer1) );
-  m_Button_Buffer2.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_buffer2) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Buffer1.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_buffer1) );
+  m_Button_Buffer2.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_buffer2) );
   
   fill_buffers();
   on_button_buffer1();

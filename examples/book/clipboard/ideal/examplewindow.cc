@@ -58,9 +58,9 @@ ExampleWindow::ExampleWindow()
   //Fill ButtonBox:
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
   m_ButtonBox.pack_start(m_Button_Copy, Gtk::PACK_SHRINK);
-  m_Button_Copy.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_copy) );
+  m_Button_Copy.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_copy) );
   m_ButtonBox.pack_start(m_Button_Paste, Gtk::PACK_SHRINK);
-  m_Button_Paste.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_paste) );
+  m_Button_Paste.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_paste) );
     
   show_all_children();
 
@@ -92,7 +92,7 @@ void ExampleWindow::on_button_copy()
   listTargets.push_back( Gtk::TargetEntry(example_target_custom) );
   listTargets.push_back( Gtk::TargetEntry(example_target_text) );
   
-  refClipboard->set( listTargets, SigC::slot(*this, &ExampleWindow::on_clipboard_get), SigC::slot(*this, &ExampleWindow::on_clipboard_clear) );
+  refClipboard->set( listTargets, sigc::mem_fun(*this, &ExampleWindow::on_clipboard_get), sigc::mem_fun(*this, &ExampleWindow::on_clipboard_clear) );
 
   update_paste_status();
 }
@@ -102,7 +102,7 @@ void ExampleWindow::on_button_paste()
   //Tell the clipboard to call our method when it is ready:
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
 
-  refClipboard->request_contents(example_target_custom,  SigC::slot(*this, &ExampleWindow::on_clipboard_received) );
+  refClipboard->request_contents(example_target_custom,  sigc::mem_fun(*this, &ExampleWindow::on_clipboard_received) );
 
   update_paste_status();
 }
@@ -171,7 +171,7 @@ void ExampleWindow::update_paste_status()
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
 
   //Discover what targets are available:
-  refClipboard->request_targets( SigC::slot(*this, &ExampleWindow::on_clipboard_received_targets) );
+  refClipboard->request_targets( sigc::mem_fun(*this, &ExampleWindow::on_clipboard_received_targets) );
 }
 
 void ExampleWindow::on_clipboard_received_targets(const Glib::StringArrayHandle& targets_array)

@@ -29,10 +29,10 @@ ExampleWindow::ExampleWindow()
   add(m_ButtonBox);
   
   m_ButtonBox.pack_start(m_Button_File);
-  m_Button_File.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_file_clicked) );
+  m_Button_File.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_file_clicked) );
 
   m_ButtonBox.pack_start(m_Button_Folder);
-  m_Button_Folder.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_folder_clicked) );
+  m_Button_Folder.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_folder_clicked) );
 
   show_all_children();
 }

@@ -83,7 +83,7 @@ ExampleWindow::ExampleWindow()
 
   //CheckButton:
   m_CheckButton.set_active();
-  m_CheckButton.signal_toggled().connect( SigC::slot(*this, &ExampleWindow::on_checkbutton_toggled) );
+  m_CheckButton.signal_toggled().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_toggled) );
   m_VBox2.pack_start(m_CheckButton);
 
   //OptionMenus:
@@ -92,24 +92,24 @@ ExampleWindow::ExampleWindow()
 
       MenuList& list_vpos = m_Menu_Position.items();
       list_vpos.push_back(
-        MenuElem("Top", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_position), Gtk::POS_TOP)) );
+        MenuElem("Top", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_position), Gtk::POS_TOP)) );
       list_vpos.push_back(
-        MenuElem("Bottom", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_position), Gtk::POS_BOTTOM)) );
+        MenuElem("Bottom", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_position), Gtk::POS_BOTTOM)) );
       list_vpos.push_back(
-        MenuElem("Left", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_position), Gtk::POS_LEFT)) );
+        MenuElem("Left", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_position), Gtk::POS_LEFT)) );
       list_vpos.push_back(
-        MenuElem("Right", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_position), Gtk::POS_RIGHT)) );
+        MenuElem("Right", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_position), Gtk::POS_RIGHT)) );
 
       m_VBox2.pack_start( *Gtk::manage(new LabeledOptionMenu("Scale Value Position:", m_Menu_Position)) );
 
 
       MenuList& list_upd = m_Menu_Policy.items();
       list_upd.push_back(
-        MenuElem("Continuous", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_CONTINUOUS)) );
+        MenuElem("Continuous", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_CONTINUOUS)) );
       list_upd.push_back(
-        MenuElem("Discontinuous", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_DISCONTINUOUS)) );
+        MenuElem("Discontinuous", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_DISCONTINUOUS)) );
       list_upd.push_back(
-        MenuElem("Delayed", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_DELAYED)) );
+        MenuElem("Delayed", sigc::bind( sigc::mem_fun(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_DELAYED)) );
 
       m_VBox2.pack_start( *Gtk::manage(new LabeledOptionMenu("Scale Update Policy:", m_Menu_Policy)) );
   }
@@ -117,13 +117,13 @@ ExampleWindow::ExampleWindow()
   //Digits:
   m_HBox_Digits.pack_start(*Gtk::manage(new Gtk::Label("Scale Digits:", 0)),  Gtk::PACK_SHRINK);
   m_Scale_Digits.set_digits(0);
-  m_adjustment_digits.signal_value_changed().connect( SigC::slot(*this, &ExampleWindow::on_adjustment1_value_changed) );
+  m_adjustment_digits.signal_value_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_adjustment1_value_changed) );
   m_HBox_Digits.pack_start(m_Scale_Digits);
 
   //Page Size:
   m_HBox_PageSize.pack_start(*Gtk::manage(new Gtk::Label("Scrollbar Page Size:", 0)), Gtk::PACK_SHRINK);
   m_Scale_PageSize.set_digits(0);
-  m_adjustment_pagesize.signal_value_changed().connect( SigC::slot(*this, &ExampleWindow::on_adjustment2_value_changed) );
+  m_adjustment_pagesize.signal_value_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_adjustment2_value_changed) );
   m_HBox_PageSize.pack_start(m_Scale_PageSize);
 
   m_VBox2.pack_start(m_HBox_Digits);
@@ -133,7 +133,7 @@ ExampleWindow::ExampleWindow()
 
   m_Button_Quit.set_flags(Gtk::CAN_DEFAULT);
   m_Button_Quit.grab_default();
-  m_Button_Quit.signal_clicked().connect(SigC::slot(&Gtk::Main::quit));
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
   m_Button_Quit.set_border_width(10);
 
   show_all_children();

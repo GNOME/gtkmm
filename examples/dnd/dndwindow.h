@@ -76,8 +76,8 @@ protected:
   Gtk::Window m_PopupWindow;  //This is a candidate for being a separate class.
   bool m_popped_up;
   bool m_in_popup;
-  SigC::Connection m_popdown_timer;
-  SigC::Connection m_popup_timer;
+  sigc::connection m_popdown_timer;
+  sigc::connection m_popup_timer;
 
   //Positions in the targets list:
   enum

@@ -128,7 +128,7 @@ Example_Images::~Example_Images()
 
 void Example_Images::start_progressive_loading()
 {
-  Glib::signal_timeout().connect(SigC::slot(*this, &Example_Images::on_timeout), 150);
+  Glib::signal_timeout().connect(sigc::mem_fun(*this, &Example_Images::on_timeout), 150);
 }
 
 bool Example_Images::on_timeout()
@@ -234,10 +234,10 @@ bool Example_Images::on_timeout()
     m_refPixbufLoader = Gdk::PixbufLoader::create();
 
     m_refPixbufLoader->signal_area_prepared().connect(
-        SigC::slot(*this, &Example_Images::on_loader_area_prepared));
+        sigc::mem_fun(*this, &Example_Images::on_loader_area_prepared));
 
     m_refPixbufLoader->signal_area_updated().connect(
-        SigC::slot(*this, &Example_Images::on_loader_area_updated));
+        sigc::mem_fun(*this, &Example_Images::on_loader_area_updated));
   }
 
   return true; // leave timeout installed

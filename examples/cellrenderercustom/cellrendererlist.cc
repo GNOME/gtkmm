@@ -32,11 +32,11 @@ CellRendererList::CellRendererList()
   tree_view_.set_headers_visible(false);
   tree_view_.append_column("", popup_columns().item);
   tree_view_.signal_button_release_event().connect(
-      SigC::slot(*this, &Self::on_tree_view_button_release_event));
+      sigc::mem_fun(*this, &Self::on_tree_view_button_release_event));
 
   const Glib::RefPtr<Gtk::TreeSelection> selection = tree_view_.get_selection();
   selection->set_mode(Gtk::SELECTION_BROWSE);
-  selection->signal_changed().connect(SigC::slot(*this, &Self::on_tree_selection_changed));
+  selection->signal_changed().connect(sigc::mem_fun(*this, &Self::on_tree_selection_changed));
 
   Gtk::Frame *const frame = new Gtk::Frame();
   get_popup_window()->add(*Gtk::manage(frame));

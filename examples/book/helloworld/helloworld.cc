@@ -27,7 +27,7 @@ HelloWorld::HelloWorld()
 
   // When the button receives the "clicked" signal, it will call the
   // hello() method. The hello() method is defined below.
-  m_button.signal_clicked().connect(SigC::slot(*this, &HelloWorld::on_button_clicked));
+  m_button.signal_clicked().connect(sigc::mem_fun(*this, &HelloWorld::on_button_clicked));
 
   // This packs the button into the Window (a container).
   add(m_button);

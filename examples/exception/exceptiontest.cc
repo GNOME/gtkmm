@@ -46,7 +46,7 @@ void global_on_clicked()
 void global_on_clicked_throw_glib_error()
 {
   std::cout << "The Button was clicked.\n";
-  Glib::locale_from_utf8("Und tschüss!"); // invalid UTF-8
+  Glib::locale_from_utf8("Und tschÃ¼ss!"); // invalid UTF-8
 }
 
 void global_on_clicked_throw_std_exception()
@@ -94,8 +94,8 @@ int main(int argc, char** argv)
   // New exception handlers are inserted at the front of the per-thread
   // handler list.  Thus, in this example handler2() is executed before
   // handler1().
-  SigC::Connection conn_handler1 = Glib::add_exception_handler(&handler1);
-  SigC::Connection conn_handler2 = Glib::add_exception_handler(&handler2);
+  sigc::connection conn_handler1 = Glib::add_exception_handler(&handler1);
+  sigc::connection conn_handler2 = Glib::add_exception_handler(&handler2);
 
   Gtk::Main main_instance (&argc, &argv);
 
@@ -122,8 +122,8 @@ int main(int argc, char** argv)
   button2->signal_clicked().connect(&global_on_clicked);
   button3->signal_clicked().connect(&global_on_clicked_throw_glib_error);
   button4->signal_clicked().connect(&global_on_clicked_throw_std_exception);
-  button5->signal_clicked().connect(SigC::slot_class(conn_handler1, &SigC::Connection::disconnect));
-  button6->signal_clicked().connect(SigC::slot_class(conn_handler2, &SigC::Connection::disconnect));
+  button5->signal_clicked().connect(sigc::mem_fun(conn_handler1, &sigc::connection::disconnect));
+  button6->signal_clicked().connect(sigc::mem_fun(conn_handler2, &sigc::connection::disconnect));
 
   window.show_all_children();
   Gtk::Main::run(window);

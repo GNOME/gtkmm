@@ -35,22 +35,27 @@ TimerExample::TimerExample() :
   m_Box.pack_start(m_ButtonQuit);
 
   // Connect the three buttons:
-  m_ButtonQuit.signal_clicked().connect(SigC::slot(*this, &Gtk::Widget::hide));
-  m_ButtonAddTimer.signal_clicked().connect(SigC::slot(*this,&TimerExample::on_button_add_timer));
-  m_ButtonDeleteTimer.signal_clicked().connect(SigC::slot(*this,&TimerExample::on_button_delete_timer));
+  m_ButtonQuit.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_quit));
+  m_ButtonAddTimer.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_add_timer));
+  m_ButtonDeleteTimer.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_delete_timer));
 
-  show_all_children(); 
+  show_all_children();
+}
+
+void TimerExample::on_button_quit()
+{
+  hide();
 }
 
 void TimerExample::on_button_add_timer()
 {
   // Creation of a new object prevents long lines and shows us a little
   // how slots work.  We have 0 parameters and bool as a return value
-  // after calling SigC::bind.
-  SigC::Slot0<bool> my_slot = SigC::bind(SigC::slot(*this, &TimerExample::on_timeout), m_timer_number);
+  // after calling sigc::bind.
+  sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*this, &TimerExample::on_timeout), m_timer_number);
 
   // This is where we connect the slot to the Glib::signal_timeout()
-  SigC::Connection conn = Glib::signal_timeout().connect(my_slot, timeout_value);
+  sigc::connection conn = Glib::signal_timeout().connect(my_slot, timeout_value);
 
   // Remember the connection:
   m_timers[m_timer_number] = conn;

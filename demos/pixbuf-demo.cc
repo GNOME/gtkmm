@@ -115,7 +115,7 @@ DemoRenderArea::DemoRenderArea()
   add_events(Gdk::EXPOSURE_MASK);
 
   conn_timeout_ = Glib::signal_timeout().connect(
-      SigC::bind_return(SigC::slot(*this, &DemoRenderArea::generate_next_frame_), true),
+      SigC::bind_return(sigc::mem_fun(*this, &DemoRenderArea::generate_next_frame_), true),
       FRAME_DELAY);
 }
 

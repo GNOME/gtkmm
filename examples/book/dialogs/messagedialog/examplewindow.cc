@@ -30,10 +30,10 @@ ExampleWindow::ExampleWindow()
   add(m_ButtonBox);
   
   m_ButtonBox.pack_start(m_Button_Info);
-  m_Button_Info.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_info_clicked) );
+  m_Button_Info.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_info_clicked) );
 
   m_ButtonBox.pack_start(m_Button_Question);
-  m_Button_Question.signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_button_question_clicked) );
+  m_Button_Question.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_question_clicked) );
 
   show_all_children();
 }
