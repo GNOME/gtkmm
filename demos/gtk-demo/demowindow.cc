@@ -162,7 +162,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
       Gtk::TreeModel::Row row = *iter;
       const DemoColumns& columns = demo_columns();
 
-      type_slotDo slot = row[columns.slot];
+      const type_slotDo& slot = row[columns.slot];
 
       if(slot && (m_pWindow_Example = slot()))
       {
