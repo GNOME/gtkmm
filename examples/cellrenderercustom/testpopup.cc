@@ -24,6 +24,15 @@
 namespace
 {
 
+class ModelColumns : public Gtk::TreeModel::ColumnRecord
+{
+public:
+  Gtk::TreeModelColumn<Glib::ustring> text1;
+  Gtk::TreeModelColumn<Glib::ustring> text2;
+
+  ModelColumns() { add(text1); add(text2); }
+};
+
 class AppWindow : public Gtk::Window
 {
 public:
@@ -31,14 +40,6 @@ public:
   virtual ~AppWindow();
 
 private:
-  struct ModelColumns : public Gtk::TreeModel::ColumnRecord
-  {
-    Gtk::TreeModelColumn<Glib::ustring> text1;
-    Gtk::TreeModelColumn<Glib::ustring> text2;
-
-    ModelColumns() { add(text1); add(text2); }
-  };
-
   ModelColumns                  list_columns_;
   Glib::RefPtr<Gtk::ListStore>  list_store_;
   Gtk::TreeView                 tree_view_;
