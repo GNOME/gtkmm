@@ -20,25 +20,24 @@
 
 #include <gtkmm/treemodel.h>
 
-namespace //anonymous
+namespace
 {
 
-//This is copied from Totem. In future there might be a version in GTK+ itself - see bug #
-static gboolean gtkmm_gtk_tree_model_iter_previous (GtkTreeModel *tree_model, GtkTreeIter *iter)
+// This is copied from Totem. In future there might be a version in GTK+ itself - see bug #
+void gtkmm_gtk_tree_model_iter_previous(GtkTreeModel* tree_model, GtkTreeIter* iter)
 {
-	GtkTreePath *path;
-	gboolean ret;
+  GtkTreePath *const path = gtk_tree_model_get_path(tree_model, iter);
 
-	path = gtk_tree_model_get_path (tree_model, iter);
-	ret = gtk_tree_path_prev (path);
-	if (ret == TRUE)
-		gtk_tree_model_get_iter (tree_model, iter, path);
+  if(gtk_tree_path_prev(path))
+    gtk_tree_model_get_iter(tree_model, iter, path);
+  else
+    g_assert_not_reached();
 
-	gtk_tree_path_free (path);
-	return ret;
+  gtk_tree_path_free(path);
 }
 
-} //anonymous namespace
+} // anonymous namespace
+
 
 namespace Gtk
 {
@@ -98,14 +97,19 @@ const TreeIter TreeIter::operator++(int)
 
 TreeIter& TreeIter::operator--()
 {
-  g_assert(!is_end_);
-
-  GtkTreeIter previous = gobject_;
-
-  if(!gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_))
+  if(!is_end_)
   {
-    is_end_ = true;
-    gtk_tree_model_iter_parent(model_->gobj(), &gobject_, &previous);
+    gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_);
+  }
+  else // --end yields last
+  {
+    GtkTreeIter next = gobject_;
+    GtkTreeIter *const parent = (next.stamp != 0) ? &next : 0;
+
+    const int index = gtk_tree_model_iter_n_children(model_->gobj(), parent) - 1;
+    is_end_ = !gtk_tree_model_iter_nth_child(model_->gobj(), &gobject_, parent, index);
+
+    g_assert(!is_end_);
   }
 
   return *this;
@@ -113,17 +117,23 @@ TreeIter& TreeIter::operator--()
 
 const TreeIter TreeIter::operator--(int)
 {
-  g_assert(!is_end_);
+  TreeIter next (*this);
 
-  TreeIter previous (*this);
-
-  if(!gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_))
+  if(!is_end_)
   {
-    is_end_ = true;
-    gtk_tree_model_iter_parent(model_->gobj(), &gobject_, &previous.gobject_);
+    gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_);
+  }
+  else // --end yields last
+  {
+    GtkTreeIter *const parent = (next.gobject_.stamp != 0) ? &next.gobject_ : 0;
+
+    const int index = gtk_tree_model_iter_n_children(model_->gobj(), parent) - 1;
+    is_end_ = !gtk_tree_model_iter_nth_child(model_->gobj(), &gobject_, parent, index);
+
+    g_assert(!is_end_);
   }
 
-  return previous;
+  return next;
 }
 
 /* There is no public gtk_tree_iter_equal(), so we must write our own.
