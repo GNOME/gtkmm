@@ -23,7 +23,6 @@ public:
     virtual ~ExampleWindow();
 
 protected:
-    virtual void on_button_clicked();
 
     MyButton* m_button;
 };
@@ -34,9 +33,6 @@ ExampleWindow::ExampleWindow()
 
     m_button = manage(new MyButton);
     add(*m_button);
-
-    sigc::connection con = m_button->signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_clicked) ); 
-    con.disconnect();
 	
     show_all_children();
 }
@@ -46,10 +42,6 @@ ExampleWindow::~ExampleWindow()
   g_warning("ExampleWindow::~ExampleWindow()");
 }
 
-void ExampleWindow::on_button_clicked()
-{
-  g_warning("Button clicked.");
-}
 
 int main(int argc, char* argv[])
 {
