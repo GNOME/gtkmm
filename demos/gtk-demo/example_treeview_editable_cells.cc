@@ -196,16 +196,19 @@ void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring
 
   //Get the row from the path:
   Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView._get_base_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
-  {  
-    //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-    char* pchEnd = 0;
-    int new_value = (int) strtod(new_text.c_str(), &pchEnd);
-
-    //Store the user's new text in the model:
-    Gtk::TreeRow row = *iter;
-    row[m_columns.number] = new_value;
+  if(refModel)
+  {
+    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    if(iter)
+    {
+      //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
+      char* pchEnd = 0;
+      int new_value = (int) strtod(new_text.c_str(), &pchEnd);
+  
+      //Store the user's new text in the model:
+      Gtk::TreeRow row = *iter;
+      row[m_columns.number] = new_value;
+    }
   }
 }
 
@@ -215,12 +218,15 @@ void Example_TreeView_EditableCells::on_column_product_edited(const Glib::ustrin
 
   //Get the row from the path:
   Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView._get_base_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
+  if(refModel)
   {
-      //Store the user's new text in the model:
-      Gtk::TreeRow row = *iter;
-      row[m_columns.product] = new_text;
+    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    if(iter)
+    {
+        //Store the user's new text in the model:
+        Gtk::TreeRow row = *iter;
+        row[m_columns.product] = new_text;
+    }
   }
 }
 

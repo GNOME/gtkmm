@@ -652,7 +652,7 @@ _CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',`TreeModel::iterator(gtk
 
   /// Get the treeview's model, but actually get the child model if it's a TreeModelFilter.
   Glib::RefPtr<Gtk::TreeModel> _get_base_model();
-  
+ 
 protected:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -661,7 +661,7 @@ protected:
 
   template <class ColumnType> friend
   void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
-  
+
   void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, int model_column);
 
   template<class ColumnType> friend
@@ -1010,12 +1010,15 @@ void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_st
 
   //Get the row from the path:
   Glib::RefPtr<TreeModel> refModel = this_p->_get_base_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
+  if(refModel)
   {
-      //Store the user's new text in the model:
-      Gtk::TreeRow row = *iter;
-      row.set_value(model_column, (ColumnType)new_text);
+    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    if(iter)
+    {
+        //Store the user's new text in the model:
+        Gtk::TreeRow row = *iter;
+        row.set_value(model_column, (ColumnType)new_text);
+    }
   }
 }
 
@@ -1028,20 +1031,23 @@ void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path
 
   //Get the row from the path:
   Glib::RefPtr<TreeModel> refModel = this_p->_get_base_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
-  { 
-    //std::istringstream astream(new_text); //Put it in a stream.
-    //ColumnType new_value = ColumnType();
-    //new_value << astream; //Get it out of the stream as the numerical type.
-    
-    //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-    char* pchEnd = 0;
-    ColumnType new_value = static_cast<ColumnType>( strtod(new_text.c_str(), &pchEnd) );
+  if(refModel)
+  {
+    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    if(iter)
+    {
+      //std::istringstream astream(new_text); //Put it in a stream.
+      //ColumnType new_value = ColumnType();
+      //new_value << astream; //Get it out of the stream as the numerical type.
 
-    //Store the user's new text in the model:
-    Gtk::TreeRow row = *iter;
-    row.set_value(model_column, (ColumnType)new_value);
+      //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
+      char* pchEnd = 0;
+      ColumnType new_value = static_cast<ColumnType>( strtod(new_text.c_str(), &pchEnd) );
+
+      //Store the user's new text in the model:
+      Gtk::TreeRow row = *iter;
+      row.set_value(model_column, (ColumnType)new_value);
+    }
   }
 }
 
