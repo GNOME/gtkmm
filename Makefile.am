@@ -1,6 +1,6 @@
 
 SUBDIRS		= tools pango atk gdk gtk @EXAMPLE_SUBDIR@ docs demos tests
-DIST_SUBDIRS	= $(SUBDIRS) scripts
+DIST_SUBDIRS	= $(SUBDIRS) MSVC_Net2003 scripts
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_build_gensrc.am_fragment \
