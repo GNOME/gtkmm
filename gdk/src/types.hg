@@ -69,6 +69,7 @@ _WRAP_ENUM(Status, GdkStatus)
 _WRAP_ENUM(InputCondition, GdkInputCondition)
 
 typedef GdkGeometry Geometry; //It's not used enough to justify having a wrapper.
+typedef GdkNativeWindow NativeWindow;
 
 /** This is a simple structure containing an x and y coordinate of a point.
  */
@@ -104,6 +105,29 @@ inline bool operator==(const Point& lhs, const Point& rhs)
 /** @relates Gdk::Point */
 inline bool operator!=(const Point& lhs, const Point& rhs)
   { return !lhs.equal(rhs); }
+
+
+struct AtomStringTraits
+{
+  typedef std::string CppType;
+  typedef GdkAtom     CType;
+  typedef GdkAtom     CTypeNonConst;
+
+  static GdkAtom to_c_type(GdkAtom atom) { return atom; }
+  static void    release_c_type(GdkAtom) {}
+
+  // These aren't worth to be inlined since doing so
+  // would expose way too much of the implementation.
+  static GdkAtom     to_c_type  (const std::string& atom_name);
+  static std::string to_cpp_type(GdkAtom atom);
+};
+
+// I'm typedef'ing this because when we call to_c_type or to_c_type,
+// we don't want it to look like we're calling a template trait, but
+// a utility function. -Bryan
+typedef AtomStringTraits AtomString;
+
+typedef Glib::ArrayHandle<std::string,AtomStringTraits> ArrayHandle_AtomString;
 
 } // namespace Gdk
 

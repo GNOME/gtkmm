@@ -24,6 +24,7 @@ _CONV_ENUM(Gdk,Gravity)
 _CONV_ENUM(Gdk,ImageType)
 _CONV_ENUM(Gdk,InputCondition)
 _CONV_ENUM(Gdk,InputMode)
+_CONV_ENUM(Gdk,InputSource)
 _CONV_ENUM(Gdk,InterpType)
 _CONV_ENUM(Gdk,JoinStyle)
 _CONV_ENUM(Gdk,LineStyle)
@@ -231,7 +232,16 @@ _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 dnl _CONVERSION(GdkPixmap*,Gdk::Pixmap&,`Glib::unwrap_boxed($3)',`$3')
 dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
 
+dnl Atom -> string and vice versa
+_CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomString::to_cpp_type($3)')
+_CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
+_CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomString::to_c_type($3)')
 
+dnl NativeWindow
+_CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`($2)($3)')
+_CONVERSION(`GdkNativeWindow',`NativeWindow',`($2)($3)')
+_CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`($2)($3)')
+_CONVERSION(`NativeWindow',`GdkNativeWindow',`($2)($3)')
 
 # Used by signals:
 # TODO: Have some kind of _CONVERSION_ONLY_FOR_SIGNALS().
