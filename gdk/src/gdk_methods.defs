@@ -49,6 +49,13 @@
   (gtype-id "GDK_TYPE_KEYMAP")
 )
 
+(define-object PangoRenderer
+  (in-module "Gdk")
+  (parent "PangoRenderer")
+  (c-name "GdkPangoRenderer")
+  (gtype-id "GDK_TYPE_PANGO_RENDERER")
+)
+
 (define-object PixmapObject
   (in-module "Gdk")
   (parent "GdkDrawable")
@@ -152,6 +159,7 @@
     '("scroll" "GDK_SCROLL")
     '("window-state" "GDK_WINDOW_STATE")
     '("setting" "GDK_SETTING")
+    '("owner-change" "GDK_OWNER_CHANGE")
   )
 )
 
@@ -266,6 +274,17 @@
     '("new" "GDK_SETTING_ACTION_NEW")
     '("changed" "GDK_SETTING_ACTION_CHANGED")
     '("deleted" "GDK_SETTING_ACTION_DELETED")
+  )
+)
+
+(define-enum OwnerChange
+  (in-module "Gdk")
+  (c-name "GdkOwnerChange")
+  (gtype-id "GDK_TYPE_OWNER_CHANGE")
+  (values
+    '("new-owner" "GDK_OWNER_CHANGE_NEW_OWNER")
+    '("destroy" "GDK_OWNER_CHANGE_DESTROY")
+    '("close" "GDK_OWNER_CHANGE_CLOSE")
   )
 )
 
@@ -763,7 +782,11 @@
 )
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkcolor.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkalias.h
+
+
+
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkcolor.h
 
 (define-function gdk_colormap_get_type
   (c-name "gdk_colormap_get_type")
@@ -980,11 +1003,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkconfig.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkconfig.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkcursor.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkcursor.h
 
 (define-function gdk_cursor_get_type
   (c-name "gdk_cursor_get_type")
@@ -1053,7 +1076,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkdisplay.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkdisplay.h
 
 (define-function gdk_display_get_type
   (c-name "gdk_display_get_type")
@@ -1181,6 +1204,18 @@
   )
 )
 
+(define-method add_client_message_filter_full
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_add_client_message_filter_full")
+  (return-type "none")
+  (parameters
+    '("GdkAtom" "message_type")
+    '("GdkFilterFunc" "func")
+    '("gpointer" "data")
+    '("GDestroyNotify" "destroy")
+  )
+)
+
 (define-method set_double_click_time
   (of-object "GdkDisplay")
   (c-name "gdk_display_set_double_click_time")
@@ -1280,9 +1315,42 @@
   (return-type "GdkWindow*")
 )
 
+(define-method supports_selection_notification
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_supports_selection_notification")
+  (return-type "gboolean")
+)
+
+(define-method request_selection_notification
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_request_selection_notification")
+  (return-type "gboolean")
+  (parameters
+    '("GdkAtom" "selection")
+  )
+)
+
+(define-method supports_clipboard_persistence
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_supports_clipboard_persistence")
+  (return-type "gboolean")
+)
+
+(define-method store_clipboard
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_store_clipboard")
+  (return-type "none")
+  (parameters
+    '("GdkWindow*" "clipboard_window")
+    '("guint32" "time_")
+    '("GdkAtom*" "targets")
+    '("gint" "n_targets")
+  )
+)
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkdisplaymanager.h
+
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkdisplaymanager.h
 
 (define-function gdk_display_manager_get_type
   (c-name "gdk_display_manager_get_type")
@@ -1317,7 +1385,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkdnd.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkdnd.h
 
 (define-function gdk_drag_context_get_type
   (c-name "gdk_drag_context_get_type")
@@ -1468,9 +1536,17 @@
   )
 )
 
+(define-function gdk_drag_drop_succeeded
+  (c-name "gdk_drag_drop_succeeded")
+  (return-type "gboolean")
+  (parameters
+    '("GdkDragContext*" "context")
+  )
+)
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkdrawable.h
+
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkdrawable.h
 
 (define-function gdk_drawable_get_type
   (c-name "gdk_drawable_get_type")
@@ -1814,6 +1890,31 @@
   )
 )
 
+(define-function gdk_draw_glyphs_transformed
+  (c-name "gdk_draw_glyphs_transformed")
+  (return-type "none")
+  (parameters
+    '("GdkDrawable*" "drawable")
+    '("GdkGC*" "gc")
+    '("PangoMatrix*" "matrix")
+    '("PangoFont*" "font")
+    '("gint" "x")
+    '("gint" "y")
+    '("PangoGlyphString*" "glyphs")
+  )
+)
+
+(define-function gdk_draw_trapezoids
+  (c-name "gdk_draw_trapezoids")
+  (return-type "none")
+  (parameters
+    '("GdkDrawable*" "drawable")
+    '("GdkGC*" "gc")
+    '("GdkTrapezoid*" "trapezoids")
+    '("gint" "n_trapezoids")
+  )
+)
+
 (define-method get_image
   (of-object "GdkDrawable")
   (c-name "gdk_drawable_get_image")
@@ -1853,9 +1954,23 @@
   (return-type "GdkRegion*")
 )
 
+(define-function gdk_draw_rectangle_alpha_libgtk_only
+  (c-name "gdk_draw_rectangle_alpha_libgtk_only")
+  (return-type "gboolean")
+  (parameters
+    '("GdkDrawable*" "drawable")
+    '("gint" "x")
+    '("gint" "y")
+    '("gint" "width")
+    '("gint" "height")
+    '("GdkColor*" "color")
+    '("guint16" "alpha")
+  )
+)
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkenumtypes.h
+
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkenumtypes.h
 
 (define-function gdk_cursor_type_get_type
   (c-name "gdk_cursor_type_get_type")
@@ -1919,6 +2034,11 @@
 
 (define-function gdk_setting_action_get_type
   (c-name "gdk_setting_action_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_owner_change_get_type
+  (c-name "gdk_owner_change_get_type")
   (return-type "GType")
 )
 
@@ -2084,7 +2204,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkevents.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkevents.h
 
 (define-function gdk_event_get_type
   (c-name "gdk_event_get_type")
@@ -2245,7 +2365,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkfont.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkfont.h
 
 (define-function gdk_font_get_type
   (c-name "gdk_font_get_type")
@@ -2485,7 +2605,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkgc.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkgc.h
 
 (define-function gdk_gc_get_type
   (c-name "gdk_gc_get_type")
@@ -2753,7 +2873,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdk.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdk.h
 
 (define-function gdk_parse_args
   (c-name "gdk_parse_args")
@@ -2780,6 +2900,19 @@
     '("gint*" "argc")
     '("gchar***" "argv")
   )
+)
+
+(define-function gdk_add_option_entries_libgtk_only
+  (c-name "gdk_add_option_entries_libgtk_only")
+  (return-type "none")
+  (parameters
+    '("GOptionGroup*" "group")
+  )
+)
+
+(define-function gdk_pre_parse_libgtk_only
+  (c-name "gdk_pre_parse_libgtk_only")
+  (return-type "none")
 )
 
 (define-function gdk_exit
@@ -2892,6 +3025,26 @@
     '("GdkWindow*" "window")
     '("gboolean" "owner_events")
     '("guint32" "time_")
+  )
+)
+
+(define-function gdk_pointer_grab_info_libgtk_only
+  (c-name "gdk_pointer_grab_info_libgtk_only")
+  (return-type "gboolean")
+  (parameters
+    '("GdkDisplay*" "display")
+    '("GdkWindow**" "grab_window")
+    '("gboolean*" "owner_events")
+  )
+)
+
+(define-function gdk_keyboard_grab_info_libgtk_only
+  (c-name "gdk_keyboard_grab_info_libgtk_only")
+  (return-type "gboolean")
+  (parameters
+    '("GdkDisplay*" "display")
+    '("GdkWindow**" "grab_window")
+    '("gboolean*" "owner_events")
   )
 )
 
@@ -3053,11 +3206,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdki18n.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdki18n.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkimage.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkimage.h
 
 (define-function gdk_image_get_type
   (c-name "gdk_image_get_type")
@@ -3149,7 +3302,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkinput.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkinput.h
 
 (define-function gdk_device_get_type
   (c-name "gdk_device_get_type")
@@ -3261,7 +3414,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkinternals.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkinternals.h
 
 (define-function gdk_synthesize_window_state
   (c-name "gdk_synthesize_window_state")
@@ -3275,11 +3428,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkintl.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkintl.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkkeys.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkkeys.h
 
 (define-function gdk_keymap_get_type
   (c-name "gdk_keymap_get_type")
@@ -3428,15 +3581,75 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkkeysyms.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkkeysyms.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkmarshalers.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkmarshalers.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkpango.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkpango.h
+
+(define-function gdk_pango_renderer_get_type
+  (c-name "gdk_pango_renderer_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_pango_renderer_new
+  (c-name "gdk_pango_renderer_new")
+  (is-constructor-of "GdkPangoRenderer")
+  (return-type "PangoRenderer*")
+  (parameters
+    '("GdkScreen*" "screen")
+  )
+)
+
+(define-function gdk_pango_renderer_get_default
+  (c-name "gdk_pango_renderer_get_default")
+  (return-type "PangoRenderer*")
+  (parameters
+    '("GdkScreen*" "screen")
+  )
+)
+
+(define-method set_drawable
+  (of-object "GdkPangoRenderer")
+  (c-name "gdk_pango_renderer_set_drawable")
+  (return-type "none")
+  (parameters
+    '("GdkDrawable*" "drawable")
+  )
+)
+
+(define-method set_gc
+  (of-object "GdkPangoRenderer")
+  (c-name "gdk_pango_renderer_set_gc")
+  (return-type "none")
+  (parameters
+    '("GdkGC*" "gc")
+  )
+)
+
+(define-method set_stipple
+  (of-object "GdkPangoRenderer")
+  (c-name "gdk_pango_renderer_set_stipple")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+    '("GdkBitmap*" "stipple")
+  )
+)
+
+(define-method set_override_color
+  (of-object "GdkPangoRenderer")
+  (c-name "gdk_pango_renderer_set_override_color")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+    '("const-GdkColor*" "color")
+  )
+)
 
 (define-function gdk_pango_context_get_for_screen
   (c-name "gdk_pango_context_get_for_screen")
@@ -3504,7 +3717,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkpixbuf.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkpixbuf.h
 
 (define-method render_threshold_alpha
   (of-object "GdkPixbuf")
@@ -3618,7 +3831,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkpixmap.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkpixmap.h
 
 (define-function gdk_pixmap_get_type
   (c-name "gdk_pixmap_get_type")
@@ -3745,11 +3958,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkpoly-generic.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkpoly-generic.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkprivate.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkprivate.h
 
 (define-method destroy_notify
   (of-object "GdkWindow")
@@ -3769,7 +3982,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkproperty.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkproperty.h
 
 (define-function gdk_atom_intern
   (c-name "gdk_atom_intern")
@@ -3952,11 +4165,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkregion-generic.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkregion-generic.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkregion.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkregion.h
 
 (define-function gdk_region_new
   (c-name "gdk_region_new")
@@ -4127,7 +4340,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkrgb.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkrgb.h
 
 (define-function gdk_rgb_init
   (c-name "gdk_rgb_init")
@@ -4325,9 +4538,17 @@
   (return-type "gboolean")
 )
 
+(define-function gdk_rgb_colormap_ditherable
+  (c-name "gdk_rgb_colormap_ditherable")
+  (return-type "gboolean")
+  (parameters
+    '("GdkColormap*" "cmap")
+  )
+)
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkscreen.h
+
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkscreen.h
 
 (define-function gdk_screen_get_type
   (c-name "gdk_screen_get_type")
@@ -4494,7 +4715,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkselection.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkselection.h
 
 (define-function gdk_selection_owner_set
   (c-name "gdk_selection_owner_set")
@@ -4585,7 +4806,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkspawn.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkspawn.h
 
 (define-function gdk_spawn_on_screen
   (c-name "gdk_spawn_on_screen")
@@ -4634,11 +4855,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdktypes.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdktypes.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkvisual.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkvisual.h
 
 (define-function gdk_visual_get_type
   (c-name "gdk_visual_get_type")
@@ -4721,7 +4942,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/gdkwindow.h
+;; From /home/murrayc/cvs/gnome210/gtk+/gdk/gdkwindow.h
 
 (define-function gdk_window_object_get_type
   (c-name "gdk_window_object_get_type")
@@ -4901,6 +5122,15 @@
   (return-type "none")
   (parameters
     '("gboolean" "accept_focus")
+  )
+)
+
+(define-method set_focus_on_map
+  (of-object "GdkWindow")
+  (c-name "gdk_window_set_focus_on_map")
+  (return-type "none")
+  (parameters
+    '("gboolean" "focus_on_map")
   )
 )
 
@@ -5492,16 +5722,6 @@
   )
 )
 
-(define-method invalidate_maybe_recurse
-  (of-object "GdkWindow")
-  (c-name "gdk_window_invalidate_maybe_recurse")
-  (return-type "none")
-  (parameters
-    '("GdkRegion*" "region")
-    '("func_pointer" "child_func")
-  )
-)
-
 (define-method get_update_area
   (of-object "GdkWindow")
   (c-name "gdk_window_get_update_area")
@@ -5566,6 +5786,18 @@
   )
 )
 
+(define-method enable_synchronized_configure
+  (of-object "GdkWindow")
+  (c-name "gdk_window_enable_synchronized_configure")
+  (return-type "none")
+)
+
+(define-method configure_finished
+  (of-object "GdkWindow")
+  (c-name "gdk_window_configure_finished")
+  (return-type "none")
+)
+
 (define-function gdk_set_pointer_hooks
   (c-name "gdk_set_pointer_hooks")
   (return-type "GdkPointerHooks*")
@@ -5578,9 +5810,5 @@
   (c-name "gdk_get_default_root_window")
   (return-type "GdkWindow*")
 )
-
-
-
-;; From /home/murrayc/cvs/gnome26/gtk+/gdk/stamp-gdkenumtypes.h
 
 
