@@ -50,7 +50,7 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup->add( Gtk::Action::create("ContextEdit", "Edit"),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
 
-  m_refActionGroup->add( Gtk::Action::create("ContextProcess", "Process"),
+  m_refActionGroup->add( Gtk::Action::create("ContextProcess", "Process"), Gtk::AccelKey("<control>P"),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
 
   m_refActionGroup->add( Gtk::Action::create("ContextRemove", "Remove"),
@@ -73,13 +73,11 @@ ExampleWindow::ExampleWindow()
   {
     Glib::ustring ui_info = 
         "<ui>"
-        "  <menubar name='MenuBar'>"
-        "    <menu name='ContextMenu'>"
-        "        <menuitem action='ContextEdit'/>"
-        "        <menuitem action='ContextProcess'/>"
-        "        <menuitem action='ContextRemove'/>"
-        "    </menu>"
-        "  </menubar>"
+        "  <popup name='PopupMenu'>"
+        "    <menuitem action='ContextEdit'/>"
+        "    <menuitem action='ContextProcess'/>"
+        "    <menuitem action='ContextRemove'/>"
+        "  </popup>"
         "</ui>";
         
     m_refUIManager->add_ui_from_string(ui_info);
@@ -91,7 +89,9 @@ ExampleWindow::ExampleWindow()
 
 
   //Get the menu:
-  m_pMenuPopup = dynamic_cast<Gtk::Menu*>( m_refUIManager->get_widget("/MenuBar/ContextMenu") ); 
+  m_pMenuPopup = dynamic_cast<Gtk::Menu*>( m_refUIManager->get_widget("/PopupMenu") ); 
+  if(!m_pMenuPopup)
+    g_warning("menu not found");
 
   show_all_children();
 }
