@@ -191,10 +191,7 @@ _CONVERSION(`GdkDevice*',`Glib::RefPtr<Gdk::Device>', `Glib::wrap($3)')
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<const Device>', `Glib::wrap($3)')
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<const Gdk::Device>', `Glib::wrap($3)')
 
-
-
-
-
+_CONVERSION(`gpointer',`const void*', `($2)($3)')
 
 
 # Glib::ListHandle<> (gdkmm) -> GList (gdk)
