@@ -98,24 +98,24 @@ Example_UIManager::Example_UIManager()
   Gtk::RadioAction::Group group_colors;
   m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Red", "_Red", "Blood"),
     Gtk::AccelKey("<control>R"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_RED ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_RED ) );
   m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Green", "_Green", "Grass"),
     Gtk::AccelKey("<control>G"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_GREEN ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_GREEN ) );
   m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Blue", "_Blue", "Sky"),
     Gtk::AccelKey("<control>B"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_BLUE ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_BLUE ) );
 
   Gtk::RadioAction::Group group_shapes;
   m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Square", "_Square", "Square"),
     Gtk::AccelKey("<control>S"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_SQUARE ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_SQUARE ) );
   m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Rectangle", "_Rectangle", "Rectangle"),
     Gtk::AccelKey("<control>R"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_RECTANGLE ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_RECTANGLE ) );
   m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Oval", "_Oval", "Egg"),
     Gtk::AccelKey("<control>O"),
-    sigc::bind( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_OVAL ) );
+    sigc::bind<-1>( sigc::mem_fun(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_OVAL ) );
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);

@@ -47,7 +47,7 @@ HelloWorld::HelloWorld()
 
   // call the same signal handler with a different argument,
   // passing a pointer to "button 2" instead.
-  m_button2.signal_clicked().connect(sigc::bind<Glib::ustring>( sigc::mem_fun(*this, &HelloWorld::on_button_clicked), "button 2") );
+  m_button2.signal_clicked().connect(sigc::bind<-1, Glib::ustring>( sigc::mem_fun(*this, &HelloWorld::on_button_clicked), "button 2") );
 
   m_box1.pack_start(m_button2);
 

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     }
   }
  
-  read_fd = open("testfifo", O_RDONLY | O_NONBLOCK);
+  read_fd = open("testfifo", O_RDONLY);
   if (read_fd == -1)
   {
     std::cerr << "error opening fifo" << std::endl;
