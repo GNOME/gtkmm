@@ -11,6 +11,7 @@ rulers			\
 statusbar		\
 stock			\
 tictactoe		\
+treemodelcustom \
 window
 
 SUBDIRS = $(example_dirs)

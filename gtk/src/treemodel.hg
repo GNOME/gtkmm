@@ -35,7 +35,7 @@ class TreeRowReference;
 _CC_INCLUDE(gtk/gtktypebuiltins.h)
 _WRAP_ENUM(TreeModelFlags, GtkTreeModelFlags)
 
-
+//TODO: Remove any mention of null arguments from the method documentation, by adding overrides in gtk_docs_override.xml.
 /** This class defines a generic tree interface for use by the Gtk::TreeView widget.
  * @ingroup TreeView
  *
@@ -177,18 +177,18 @@ public:
 
   _WRAP_METHOD(void row_changed(const Path& path, const iterator& iter), gtk_tree_model_row_changed)
   _WRAP_METHOD(void row_inserted(const Path& path, const iterator& iter), gtk_tree_model_row_inserted)
-  _WRAP_METHOD(void row_has_child_toggled(const Path& path, const iterator& iter),
-               gtk_tree_model_row_has_child_toggled)
+  _WRAP_METHOD(void row_has_child_toggled(const Path& path, const iterator& iter), gtk_tree_model_row_has_child_toggled)
   _WRAP_METHOD(void row_deleted(const Path& path), gtk_tree_model_row_deleted)
-  _WRAP_METHOD(void rows_reordered(const Path& path, const iterator& iter, int* new_order),
-               gtk_tree_model_rows_reordered)
+
+  //TODO: Use "_const_ int* new_order" here? By the way, the size of the array seems to be based on the known number of children. murrayc.
+  _WRAP_METHOD(void rows_reordered(const Path& path, const iterator& iter, int* new_order), gtk_tree_model_rows_reordered)
 
   _WRAP_METHOD(Glib::ustring get_string(const iterator& iter) const, gtk_tree_model_get_string_from_iter)
 
+#m4 _CONVERSION(`GtkTreeIter*',`const iterator&',`iterator(self, $3)')
 #m4 _CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',`TreeModel::iterator(self, $3)')
   _WRAP_SIGNAL(void row_changed(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_changed")
-  //TODO: re-enable when gtk+ bug 123923 has been dealt with: 
-  //_WRAP_SIGNAL(void row_inserted(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_inserted")
+  _WRAP_SIGNAL(void row_inserted(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_inserted")
   _WRAP_SIGNAL(void row_has_child_toggled(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_has_child_toggled")
   _WRAP_SIGNAL(void row_deleted(const TreeModel::Path& path), "row_deleted")
   _WRAP_SIGNAL(void rows_reordered(const TreeModel::Path& path, const TreeModel::iterator& iter, int* new_order), "rows_reordered")
@@ -198,30 +198,193 @@ protected:
   _WRAP_VFUNC(int get_n_columns() const, get_n_columns)
   _WRAP_VFUNC(GType get_column_type(int index) const, get_column_type)
 
+  //TODO: Use C++ types:
 #m4 _CONVERSION(`const GtkTreeIter*', `GtkTreeIter*', `const_cast<GtkTreeIter*>($3)')
 #m4 _CONVERSION(`GtkTreeIter*', `const GtkTreeIter*', `$3')
   //These are only for deriving new TreeModels, which isn't very common or easy:
-  _WRAP_VFUNC(bool iter_next(GtkTreeIter* iter), iter_next)
-  _WRAP_VFUNC(bool iter_children(GtkTreeIter* iter, const GtkTreeIter* parent), iter_children)
-  _WRAP_VFUNC(bool iter_has_child(const GtkTreeIter* iter) const, iter_has_child)
-  _WRAP_VFUNC(int iter_n_children(const GtkTreeIter* iter) const, iter_n_children)
 
-  _WRAP_VFUNC(bool iter_nth_child(GtkTreeIter* iter, const GtkTreeIter* parent, int n), iter_nth_child)
-  _WRAP_VFUNC(bool iter_parent(GtkTreeIter* iter, const GtkTreeIter* child), iter_parent)
-  _WRAP_VFUNC(void ref_node(GtkTreeIter* iter), ref_node)
-  _WRAP_VFUNC(void unref_node(GtkTreeIter* iter), unref_node)
+  /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter_next to refer to the node following @a iter it at the current level.
+   * If there is no next iter, false is returned and iter_next is set to be invalid.
+   *
+   * @param iter An iterator.
+   * @output iter_next An iterator that will be set to refer to the next node, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool iter_next_vfunc(const iterator& iter, iterator& iter_next) const;
 
+  /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter to a valid iterator pointing to @path
+   *
+   * @param path An path to a node.
+   * @output iter An iterator that will be set to refer to a node to the path, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool get_iter_vfunc(const Path& path, iterator& iter) const;
+
+  /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter to refer to the first child of @a parent. If @parent has no children,
+   * false is returned and @a iter is set to be invalid.
+   *
+   * @param parent An iterator.
+   * @output iter An iterator that will be set to refer to the firt child node, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool iter_children_vfunc(const iterator& parent, iterator& iter) const;
+  
+  /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter to be the parent of @a child. If @a child is at the toplevel, and
+   * doesn't have a parent, then @a iter is set to an invalid iterator and false
+   * is returned.
+   *
+   * @param child An iterator.
+   * @output iter An iterator that will be set to refer to the parent node, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool iter_parent_vfunc(const iterator& child, iterator& iter) const;
+
+  /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter to be the child of @a parent using the given index.  The first
+   * index is 0.  If @a n is too big, or @a parent has no children, @a iter is set
+   * to an invalid iterator and false is returned.
+   * See also iter_nth_root_child_vfunc()
+   *
+   * @param parent An iterator.
+   * @param n The index of the child node to which @a iter should be set.
+   * @output iter An iterator that will be set to refer to the nth node, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool iter_nth_child_vfunc(const iterator& parent, int n, iterator& iter) const;
+
+   /** Override and implement this in a derived TreeModel class.
+   * Sets @a iter to be the child of at the root level using the given index.  The first
+   * index is 0.  If @a n is too big, or if there are no children, @a iter is set
+   * to an invalid iterator and false is returned.
+   * See also iter_nth_child_vfunc().
+   *
+   * @param n The index of the child node to which @a iter should be set.
+   * @output iter An iterator that will be set to refer to the nth node, or will be set as invalid.
+   * @result true if the operation was possible.
+   */
+  virtual bool iter_nth_root_child_vfunc(int n, iterator& iter) const;
+
+  
+    
+#m4begin
+dnl// We want to hand-code these C vfunc callbacks,
+dnl// so that we can do forward them to C++ methods with different parameters and return types.
+dnl
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+    klass->iter_next = &iter_next_vfunc_callback;
+    klass->get_iter = &get_iter_vfunc_callback;
+    klass->iter_children = &iter_children_vfunc_callback;
+    klass->iter_parent = &iter_parent_vfunc_callback;
+    klass->iter_nth_child = &iter_nth_child_vfunc_callback;
+    klass->iter_n_children = &iter_n_children_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+    static gboolean iter_next_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter);
+    static gboolean get_iter_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter, GtkTreePath* path);
+    static gboolean iter_children_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter, GtkTreeIter* parent);
+    static gboolean iter_parent_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter, GtkTreeIter* child);
+    static gboolean iter_nth_child_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter, GtkTreeIter* parent, int n);
+    static int iter_n_children_vfunc_callback(GtkTreeModel* self, GtkTreeIter* iter);
+  _POP()
+#m4end
+
+  /** Override and implement this in a derived TreeModel class.
+   * Returns true if @a iter has children, false otherwise.
+   *
+   * @param iter The iterator to test for children.
+   * @result true if @a iter has children.
+   */
+  _WRAP_VFUNC(bool iter_has_child(const iterator& iter) const, iter_has_child)
+
+  /** Override and implement this in a derived TreeModel class.
+   * Returns the number of children that @a iter has.
+   * See also iter_n_root_children_vfunc().  
+   *
+   * @param iter The iterator to test for children.
+   * @result The number of children of @a iter.
+   */
+  virtual int iter_n_children_vfunc(const iterator& iter) const;
+
+  /** Override and implement this in a derived TreeModel class.
+   * Returns the number of toplevel nodes.
+   * See also iter_n_children().
+   *
+   * @result The number of children at the root level.
+   */
+  virtual int iter_n_root_children_vfunc() const;
+
+  /** Override and implement this in a derived TreeModel class.
+   * Lets the tree ref the node.  This is an optional method for models to
+   * implement.  To be more specific, models may ignore this call as it exists
+   * primarily for performance reasons.
+   *
+   * This function is primarily meant as a way for views to let caching model know
+   * when nodes are being displayed (and hence, whether or not to cache that
+   * node.)  For example, a file-system based model would not want to keep the
+   * entire file-hierarchy in memory, just the sections that are currently being
+   * displayed by every current view.
+   *
+   * A model should be expected to be able to get an iter independent of its
+   * reffed state.
+   *
+   * @path iter the iterator.
+   */
+  _WRAP_VFUNC(void ref_node(const iterator& iter), ref_node)
+
+  /** Override and implement this in a derived TreeModel class.
+   * Lets the tree unref the node.  This is an optional method for models to
+   * implement.  To be more specific, models may ignore this call as it exists
+   * primarily for performance reasons.
+   *
+   * For more information on what this means, see unref_node_vfunc().
+   * Please note that nodes that are deleted are not unreffed.
+   *
+   * @param iter the iterator.
+   */
+  _WRAP_VFUNC(void unref_node(const iterator& iter), unref_node)
+
+  /** Override and implement this in a derived TreeModel class.
+   * Returns a Path referenced by @a iter.
+   *
+   * @param iter The iterator.
+   * @result The path.
+   */
 #m4 _CONVERSION(`TreeModel::Path', `GtkTreePath*', `($3).gobj_copy()')
-  _WRAP_VFUNC(TreeModel::Path get_path(const TreeModel::iterator& iter) const, get_path)
+  _WRAP_VFUNC(TreeModel::Path get_path(const iterator& iter) const, get_path)
 
-  _WRAP_VFUNC(bool get_iter(GtkTreeIter* iter, const TreeModel::Path& path), get_iter)
-  _WRAP_VFUNC(void get_value(const TreeModel::iterator& iter, int column, GValue* value), get_value)
+  /** Override and implement this in a derived TreeModel class.
+   * Initializes and sets @a value to that at @a column.
+   *
+   * @param iter The iterator.
+   * @param column The column to lookup the value at.
+   * @output value An empty Glib:Value to set.
+   */
+  _WRAP_VFUNC(void get_value(const iterator& iter, int column, Glib::ValueBase& value), get_value)
 
   //Called by iterator::operator bool(), which is a friend class:
+  /** Override and implement this in a derived TreeModel class.
+   * Models will mark existing iterators as invalid after an operation which modifies the model.
+   * So this method should test an existing iterator to see whether it is still valid.
+   * TODO: Exactly what modifications will cause the iterators to be invalid?
+   *
+   * @result true if the iterator is valid.
+   */
   virtual bool iter_is_valid(const iterator& iter) const;
 
   //Called by TreeRow, which is a friend class:
+  //The comment about set_row_changed() in the documentation is based on my reading of the source of
+  //gtk_list_store_set_value() and gtk_tree_store_set_value().  
+  /** Override and implement this in a derived TreeModel class, so that Row::operator() and
+   * Row::set_value() work.
+   * You can probably just implement this by calling set_value_vfunc().
+   * Your implementation of set_value_impl() should also call set_row_changed() after changing the value.
+   */
   virtual void set_value_impl(const iterator& row, int column, const Glib::ValueBase& value);
+
+  //This might not need to be virtual, but it's not a big deal. murrayc.
   virtual void get_value_impl(const iterator& row, int column, Glib::ValueBase& value) const;
 
   friend class Gtk::TreeModelSort;
