@@ -33,7 +33,6 @@ namespace Gtk
 ComboBoxEntryText::ComboBoxEntryText()
 {
   set_model( Gtk::ListStore::create(m_text_columns) );
-  pack_start(m_text_columns.m_column);
   set_text_column(m_text_columns.m_column);
 }
 
