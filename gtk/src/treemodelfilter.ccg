@@ -66,7 +66,63 @@ void SignalProxy_Visible::gtk_callback_destroy(void* data)
   delete static_cast<SignalProxy_Visible*>(data);
 }
 
+
+// This Signal Proxy allows the C++ coder to specify
+// a SigC::Slot instead of a static function.
+class SignalProxy_Modify
+{
+public:
+  typedef Gtk::TreeModelFilter::SlotModify SlotType;
+
+  SignalProxy_Modify(const SlotType& slot)
+  : slot_(slot) {}
+
+  ~SignalProxy_Modify();
+
+  static void gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data);
+  static void gtk_callback_destroy(void* data);
+
+private:
+  SlotType slot_;
+};
+
+SignalProxy_Modify::~SignalProxy_Modify()
+{}
+
+void SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data)
+{
+  SignalProxy_Modify *const self = static_cast<SignalProxy_Modify*>(data);
+
+  try
+  {
+    //Initialize the input parameter with the appropriate type for this column.
+    //Then the C++ handler can just use operator== without calling init on the value output arg:
+    Glib::ValueBase cppValue;
+    GType column_type = gtk_tree_model_get_column_type(model, column);
+    cppValue.init(column_type);
+    
+    return (self->slot_)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
+
+    g_value_init(value, column_type);
+
+    //If the C++ handler has inited value with an inappropriate GType, then this will fail,
+    //but they should not do that because it makes no sense.
+    g_value_copy(cppValue.gobj(), value);  
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+void SignalProxy_Modify::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_Modify*>(data);
+}
+
+
 } // anonymous namespace
+
 
 typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
 
@@ -108,6 +164,19 @@ TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& 
       const_cast<GtkTreeIter*>(filter_iter.gobj()));
 
   return child_iter;
+}
+
+void TreeModelFilter::set_modify_func(const TreeModelColumnRecord& columns, const SlotModify& slot)
+{
+  // Create a signal proxy.  A pointer to this will be passed
+  // through the callback's data parameter.  It will be deleted
+  // when SignalProxy_Modify::gtk_callback_destroy() is called.
+  SignalProxy_Modify *const pSignalProxy = new SignalProxy_Modify(slot);
+
+  gtk_tree_model_filter_set_modify_func(gobj(),
+    columns.size(), const_cast<GType*>(columns.types()),
+    &SignalProxy_Modify::gtk_callback, pSignalProxy,
+    &SignalProxy_Modify::gtk_callback_destroy);
 }
 
 } // namespace Gtk

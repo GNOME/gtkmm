@@ -19,11 +19,36 @@
 #include <iostream>
 #include "exampletreemodel.h"
 
+ExampleTreeModel::GlueItem::GlueItem(int row_number)
+: m_row_number(row_number)
+{
+}
+
+int ExampleTreeModel::GlueItem::get_row_number() const
+{
+  return m_row_number;
+}
+
+ExampleTreeModel::GlueList::GlueList()
+{
+}
+
+ExampleTreeModel::GlueList::~GlueList()
+{
+  //Delete each GlueItem in the list:
+  for(type_listOfGlue::iterator iter = m_list.begin(); iter != m_list.end(); ++iter)
+  {
+    ExampleTreeModel::GlueItem* pItem = *iter;
+    delete pItem;
+  }
+}
+     
 
 ExampleTreeModel::ExampleTreeModel()
 : Glib::ObjectBase( typeid(ExampleTreeModel) ), //register a custom GType.
   Glib::Object(), //The custom GType is actually registered here.
-  m_stamp(1) //When the model's stamp != the iterator's stamp then that iterator is invalid and should be ignored. Also, 0=invalid
+  m_stamp(1), //When the model's stamp != the iterator's stamp then that iterator is invalid and should be ignored. Also, 0=invalid
+  m_pGlueList(0)
 {
   
   //We need to specify a particular get_type() from one of the virtual base classes, but they should
@@ -62,6 +87,10 @@ ExampleTreeModel::ExampleTreeModel()
 
 ExampleTreeModel::~ExampleTreeModel()
 {
+  if(m_pGlueList)
+  {
+    delete m_pGlueList;
+  }
 }
 
 //static:
@@ -121,17 +150,24 @@ bool ExampleTreeModel::iter_next_vfunc(const iterator& iter, iterator& iter_next
 { 
   if( check_treeiter_validity(iter) )
   {
-    //Start with an iter to the same row:
-    iter_next = iter;
+    //initialize the iterator:
+    iter_next = iterator();
+    iter_next.set_stamp(m_stamp);
     
-    //Make the GtkTreeIter represent the next row:
-    typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter_next.gobj()->user_data;
+    //Get the current row:
+    const GlueItem* pItem = (const GlueItem*)iter.gobj()->user_data;
+    typeListOfRows::size_type row_index = pItem->get_row_number();
+        
+    //Make the iter_next GtkTreeIter represent the next row:
     row_index++;
     if( row_index < m_rows.size() )
     { 
-      //Put the index of the next row in the iter, replacing the previous row index:
-      //TODO: Discover how to associate more complex data with the iterator. Memory management seems difficult. murrayc
-      iter_next.gobj()->user_data = (void*)row_index;
+      //Put the index of the next row in a GlueItem in iter_next:
+      GlueItem* pItemNew = new GlueItem(row_index);
+      iter_next.gobj()->user_data = (void*)pItemNew;
+
+      remember_glue_item(pItemNew);
+      
       return true; //success
     }
   }
@@ -185,10 +221,14 @@ bool ExampleTreeModel::iter_nth_root_child_vfunc(int n, iterator& iter) const
 
     //Store the row_index in the GtkTreeIter:
     //See also iter_next_vfunc()
-    //TODO: Store a pointer to some more complex data type such as a typeListOfRows::iterator.
 
     unsigned row_index = n;
-    iter.gobj()->user_data = (void*)row_index;
+
+    //This will be deleted in the GlueList destructor, when old iterators are marked as invalid.
+    GlueItem* pItem = new GlueItem(row_index);
+    iter.gobj()->user_data = pItem;
+
+    remember_glue_item(pItem);
    
     return true;
   }
@@ -238,9 +278,17 @@ bool ExampleTreeModel::get_iter_vfunc(const Path& path, iterator& iter) const
    //Store the row_index in the GtkTreeIter:
    //See also iter_next_vfunc()
    //TODO: Store a pointer to some more complex data type such as a typeListOfRows::iterator.
-   
+
    unsigned row_index = path[0];
-   iter.gobj()->user_data = (void*)row_index;
+   GlueItem* pItem = new GlueItem(row_index);
+
+   //Store the GlueItem in the GtkTreeIter.
+   //This will be deleted in the GlueList destructor,
+   //which will be called when the old GtkTreeIters are marked as invalid,
+   //when the stamp value changes. 
+   iter.gobj()->user_data = (void*)pItem;
+
+   remember_glue_item(pItem);
    
    return true;
 }
@@ -252,7 +300,10 @@ Gtk::TreeModelColumn< Glib::ustring >& ExampleTreeModel::get_model_column(int co
 
 ExampleTreeModel::typeListOfRows::iterator ExampleTreeModel::get_data_row_iter_from_tree_row_iter(const iterator& iter)
 {
-  typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter.gobj()->user_data;
+  //Don't call this on an invalid iter.
+  const GlueItem* pItem = (const GlueItem*)iter.gobj()->user_data;
+
+  typeListOfRows::size_type row_index = pItem->get_row_number();
   if( row_index > m_rows.size() )
     return m_rows.end();
   else
@@ -261,7 +312,10 @@ ExampleTreeModel::typeListOfRows::iterator ExampleTreeModel::get_data_row_iter_f
 
 ExampleTreeModel::typeListOfRows::const_iterator ExampleTreeModel::get_data_row_iter_from_tree_row_iter(const iterator& iter) const
 {
-  typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter.gobj()->user_data;
+  //Don't call this on an invalid iter.
+  const GlueItem* pItem = (const GlueItem*)iter.gobj()->user_data;
+  
+  typeListOfRows::size_type row_index = pItem->get_row_number();
   if( row_index > m_rows.size() )
     return m_rows.end();
   else
@@ -282,4 +336,17 @@ bool ExampleTreeModel::iter_is_valid(const iterator& iter) const
 
   return Gtk::TreeModel::iter_is_valid(iter);
 }
+
+void ExampleTreeModel::remember_glue_item(GlueItem* item) const
+{
+  //Add the GlueItem to the model's GlueList, so that
+  //it can be deleted when the old GtkTreeIters are marked as invalid:
+  if(!m_pGlueList)
+  {
+    m_pGlueList = new GlueList();
+  }
+  
+  m_pGlueList->m_list.push_back(item);
+}
+
 

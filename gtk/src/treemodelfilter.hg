@@ -43,22 +43,41 @@ protected:
   _WRAP_CTOR(TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& root), gtk_tree_model_filter_new)
 
 public:
+
+  /** This creates a TreeModelFilter with @a child_model as the child model, and @a root as the virtual root.
+   * You can use set_visible_func(), set_visible_column() and/or set_modify_func() to change the mapping of child
+   * model to parent model.
+   */
   _WRAP_CREATE(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& root)
 
-  /** For instance, bool on_visible(const TreeModel::const_iterator& iter);
+  /** For instance,
+   * bool on_visible(const TreeModel::const_iterator& iter);
    * This should return true if the given row should be visible and false otherwise.
    */                                     
   typedef SigC::Slot1<bool, const TreeModel::const_iterator&> SlotVisible;
 
+  //TODO: Copy the method docs from GTK+ when they are mature: See bug #127727
   /** Sets the "visible" callback used when filtering the filter.
    * The callback function should return true if the given row should be visible and false otherwise.
-   * param slot A callback slot which determines whether the row should be visible.
+   * @param slot A callback slot which determines whether the row should be visible.
    */
   void set_visible_func(const SlotVisible& slot);
   _IGNORE(gtk_tree_model_filter_set_visible_func)
-  
-//TODO:  _WRAP_METHOD(void set_modify_func(int n_columns, GType* types, GtkTreeModelFilterModifyFunc  func, gpointer data, GtkDestroyNotify destroy), gtk_tree_model_filter_set_modify_func)
 
+  //TODO: It would be nicer to use "const TreeModelColumnBase& column" instead of "int column",
+  //but how can we get the TreeModelColumnBase from the int in the SignalProxy?
+  /** For instance,
+   *   void on_modify(const Gtk::TreeModel::iterator& iter, Glib::ValueBase& value, int column);
+   * where iter is an iterator to a row in the child model,
+   * value is an output parameter in which you must store the value to be used in the parent model's row,
+   * column is the column in the parent row whose row value you must provide in the value output paramater.
+   */
+  typedef SigC::Slot3<void, const Gtk::TreeModel::iterator& /* iter */, Glib::ValueBase& /* value */, int /* column */> SlotModify;
+
+  //TODO: Copy the method docs from GTK+ when they are mature: See bug #127727
+  void set_modify_func(const TreeModelColumnRecord& columns, const SlotModify& slot);
+  _IGNORE(gtk_tree_model_filter_set_modify_func)
+ 
   _WRAP_METHOD(void set_visible_column(const TreeModelColumnBase& column), gtk_tree_model_filter_set_visible_column)
   _WRAP_METHOD(void set_visible_column(int column), gtk_tree_model_filter_set_visible_column)
 

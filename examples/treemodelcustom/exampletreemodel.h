@@ -59,10 +59,39 @@ protected:
 private:
    typedef std::vector< Glib::ustring> typeRow; //X columns, all of type string.
    typedef std::vector< typeRow > typeListOfRows; //Y rows.
-   
+
+   //This maps the GtkTreeIters to potential paths:
+   //Each GlueItem might be stored in more than one GtkTreeIter,
+   //but it will be deleted only once, because it is stored
+   //only once in the GlueList.
+   //GtkTreeIter::user_data might contain orphaned GlueList pointers,
+   //but nobody will access them because GtkTreeIter::stamp will have the
+   //wrong value, marking the user_data as invalid.
+   class GlueItem
+   {
+   public:
+     GlueItem(int row_number);
+     int get_row_number() const;
+     
+   protected:
+     int m_row_number;
+   };
+
+   class GlueList
+   {
+   public:
+     GlueList();
+     ~GlueList();
+
+     //This is just a list of stuff to delete later:
+     typedef std::list<GlueItem*> type_listOfGlue;
+     type_listOfGlue m_list;
+   };
+
    typeListOfRows::iterator get_data_row_iter_from_tree_row_iter(const iterator& iter);
    typeListOfRows::const_iterator get_data_row_iter_from_tree_row_iter(const iterator& iter) const;
    bool check_treeiter_validity(const iterator& iter) const;
+   void remember_glue_item(GlueItem* item) const;
 
    //The data:
    typeListOfRows m_rows;
@@ -77,6 +106,7 @@ private:
    typeListOfModelColumns m_listModelColumns;
 
    int m_stamp; //When the model's stamp and the TreeIter's stamp are equal, the TreeIter is valid.
+   mutable GlueList* m_pGlueList;
 };
 
 #endif //GTKMM_EXAMPLETREEMODEL_H
