@@ -85,7 +85,10 @@ public:
   
 #m4 dnl// The ::format_value signal handler should return a newly allocated string.
 #m4 dnl// (which is obviously not a const gchar*)
-#m4 _CONVERSION(`Glib::ustring',`gchar*',`g_strdup($3.c_str())')
+#m4 dnl// Also, ensure that format_value never returns an empty char[],
+#m4 dnl// because that could be caused by an intermediate empty ustring from an initial null char*,
+#m4 dnl//See bug http://bugzilla.gnome.org/show_bug.cgi?id=168747.
+#m4 _CONVERSION(`Glib::ustring',`gchar*',`(strlen($3.c_str()) ? g_strdup($3.c_str()) : 0)')
 
   /** Determines how the value is formatted.
    * 
@@ -94,6 +97,9 @@ public:
    * as a double and should return the representation of it as a Glib::ustring.
    */ 
   _WRAP_SIGNAL(Glib::ustring format_value(double value), "format_value")
+  // TODO: When we can break ABI, this signal needs to be
+  // Glib::ustring format_value(double value, bool& use_default_formatting), 
+  // where use_default_formatting specifies whether the return value will actually be a null char*.
 
   /** Number of displayed decimal digits.
    */
