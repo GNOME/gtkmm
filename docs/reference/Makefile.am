@@ -1,4 +1,3 @@
-
 doxygen_configfile = Doxyfile
 doxygen_configfile_source = $(srcdir)/Doxyfile.in
 beautify_docs = $(srcdir)/beautify_docs.pl
@@ -25,7 +24,11 @@ html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	cd html && ./installdox -l glibmm_doxygen_tags@../../../../glibmm-2.4/docs/reference/html && cd ..
 	$(PERL_PATH) $(beautify_docs) html
 
+
 # DevHelp reference
+devhelp-reference: xml/index.xml
+	xsltproc -o gtkmm2.devhelp doxygen_to_devhelp.xsl xml/index.xml
+
 gtkmm2.devhelp: xml/index.xml
 	xsltproc -o gtkmm2.devhelp doxygen_to_devhelp.xsl xml/index.xml
 
@@ -48,7 +51,7 @@ doc-clean:
 referencedir = $(gtkmm_docdir)/reference/html
 devhelpdir = $(datadir)/devhelp/books/gtkmm-2.4
 
-install-reference: html/index.html
+install-reference: html/index.html gtkmm2.devhelp
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(referencedir)
 	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png $$dir/*.dot ; do \
@@ -78,3 +81,8 @@ maintainer-clean-local: doc-clean
 
 .PHONY: post-html doc-clean install-reference uninstall-reference
 
+
+# Direct all the doxygen console output to a text file, so we can read it later:
+# In doxywizard, disable EXTRACT_ALL to get warnings about undocumented methods.
+doxygen-warnings: 
+	doxygen $(doxygen_configfile) &> doxygen_warnings.txt

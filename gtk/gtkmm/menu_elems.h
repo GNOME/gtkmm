@@ -121,7 +121,7 @@ public:
 
   /** Create a labeled, non-accelerated MenuItem with a SigC::Slot
    * @param label The menu item's name
-   * @param image The image
+   * @param image_widget The image
    * @param slot Use SigC::slot() to specify a signal handler
    */
   ImageMenuElem(const Glib::ustring& label,
@@ -131,7 +131,7 @@ public:
   /** Create a labeled, accelerated MenuItem with a SigC::Slot
    * @param label The menu item's name
    * @param key The accelerator key combination
-   * @param image The image
+   * @param image_widget The image
    * @param slot Use SigC::slot() to specify a signal handler
    */
   ImageMenuElem(const Glib::ustring& label, const AccelKey& key,
@@ -140,6 +140,7 @@ public:
 
   /** Create a labeled, non-accelerated MenuItem with a submenu
    * @param label The menu item's name
+   * @param image_widget The image
    * @param submenu The sub menu
    */
   ImageMenuElem(const Glib::ustring& label,
@@ -149,7 +150,7 @@ public:
   /** Create a labeled, accelerated MenuItem with a submenu
    * @param label The menu item's name
    * @param key The accelerator key combination
-   * @param image The image
+   * @param image_widget The image
    * @param submenu The sub menu
    */
   ImageMenuElem(const Glib::ustring& label, const AccelKey& key,
@@ -200,6 +201,7 @@ public:
 
   /** Create a labeled, non-accelerated MenuItem with a SigC::Slot
    * @param label The menu item's name
+   * @param slot Use SigC::slot() to specify a signal handler
    */
   CheckMenuElem(const Glib::ustring& label, const CallSlot& slot = CallSlot());
 
