@@ -51,7 +51,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorselection.h>
 #include <gtkmm/combo.h> //TODO: Deprecated.
 #include <gtkmm/combobox.h>
-#include <gtkmm/comboboxentry.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/comboboxtext.h>
 #include <gtkmm/container.h>
 #include <gtkmm/curve.h>
 #include <gtkmm/dialog.h>

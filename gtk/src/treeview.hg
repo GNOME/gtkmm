@@ -56,43 +56,11 @@ namespace TreeView_Private
   template <class ColumnType> inline
   void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column);
 
-#ifdef GTKMM_MSC_NET
-/* VisualStudio .NET 2003 workaround
- * The compiler fails to find the the right template specialization
- * of the _auto_store_on_cellrenderer_text_edited_*<> template member method
- * of the Gtk::TreeView. I think this is related to the missing feature
- * of supporting partial template specialization of template member methods
- * in classes (look in the VisualStudio .NET documentation for C++ conformance
- * failures and misbehaviour).
- * 
- * The exact compiler error: 
- * 
- * ..\..\..\gtk\gtkmm\treeview.h(1046) : error C2784: 'SigC::Slot6<R,P1,P2,P3,P4,P5
- * ,P6> SigC::slot(O1 &,R (__thiscall O2::* )(P1,P2,P3,P4,P5,P6) const)' : could not
- * deduce template argument for 'T8 &' from 'Gtk::TreeView'
- * 
- * and lot more for all SigC::slot cases.
- *
- * My solution: Just move the _auto_store_on_cellrenderer_text_edited_*
- * to the TreeView_Private namespace as template function. This work very well.
- * I can't aggree to the above statement that TreeView::_auto_store_on_cellrenderer_text_edited_*
- * *must* be member methods of the Gtk::TreeView. The connection is already vanished
- * as it's instaciated from the append_column_editable template method. This method
- * create the right cellrenderer and connect the signals. So the cellrenderer is a child of the
- * TreeView and destructed if the TreeView is destructed. It doesn't matter if the
- * _auto_store_on_cellrenderer_text_edited_* is a method of TreeView or not.
- * So far, the gtk-demo compiled fine and work absolutly ok.
- *
- * Frank Nauman.
- * 
- * TODO: I suggest to make this change generally in 2.4
- */
   template<class ColumnType> inline
   void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
 
   template <class ColumnType> inline
   void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
-#endif
 }
 
 #endif //DOXYGEN_SHOULD_SKIP_THIS
@@ -434,19 +402,11 @@ _CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',`TreeModel::iterator(gtk
 protected:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#ifndef GTKMM_MSC_NET
-  template <class ColumnType> inline //Must be explicitly specialized.
-  void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column);
-
-  template <class ColumnType> inline //Must be explicitly specialized.
-  void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column);
-#else
   template<class ColumnType> friend
   void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
 
   template <class ColumnType> friend
   void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
-#endif
   
   void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, int model_column);
 
@@ -542,13 +502,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<int>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<int>), model_column.index()) );
-#endif
   }
 }
 
@@ -563,13 +518,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<unsigned int>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<unsigned int>), model_column.index()) );
-#endif
   }
 }
 
@@ -584,13 +534,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<long>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<long>), model_column.index()) );
-#endif
   }
 }
 
@@ -605,13 +550,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<unsigned long>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<unsigned long>), model_column.index()) );
-#endif
   }
 }
 
@@ -626,13 +566,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<float>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<float>), model_column.index()) );
-#endif
   }
 }
 
@@ -647,13 +582,8 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Connect to the appropriate signal, sending the model_column too,
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_numerical<double>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<double>), model_column.index()) );
-#endif
   }
 }
 
@@ -661,50 +591,6 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 } // namespace TreeView_Private
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
-#ifndef GTKMM_MSC_NET
-//This is used on string model columns:
-template <class ColumnType> inline
-void TreeView::_auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column)
-{
-  Gtk::TreePath path(path_string);
-
-  //Get the row from the path:
-  Glib::RefPtr<TreeModel> refModel = get_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
-  {
-      //Store the user's new text in the model:
-      Gtk::TreeRow row = *iter;
-      row.set_value(model_column, (ColumnType)new_text);
-  }
-}
-
-template <class ColumnType> inline
-void TreeView::_auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column)
-{
-  //This is used on numerical model columns:
-
-  Gtk::TreePath path(path_string);
-
-  //Get the row from the path:
-  Glib::RefPtr<TreeModel> refModel = get_model();
-  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
-  if(iter)
-  { 
-    //std::istringstream astream(new_text); //Put it in a stream.
-    //ColumnType new_value = ColumnType();
-    //new_value << astream; //Get it out of the stream as the numerical type.
-    
-    //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-    char* pchEnd = 0;
-    ColumnType new_value = static_cast<ColumnType>( strtod(new_text.c_str(), &pchEnd) );
-
-    //Store the user's new text in the model:
-    Gtk::TreeRow row = *iter;
-    row.set_value(model_column, (ColumnType)new_value);
-  }
-}
-#endif
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace TreeView_Private
@@ -727,17 +613,11 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
   {
     pCellText->property_editable() = true;
 
-#ifdef GTKMM_MSC_NET
     pCellText->signal_edited().connect(
       SigC::bind( SigC::slot(_auto_store_on_cellrenderer_text_edited_string<ColumnType>), model_column.index(), this_p) );
-#else
-    pCellText->signal_edited().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_string<ColumnType>), model_column.index()) );
-#endif
   }
 }
 
-#ifdef GTKMM_MSC_NET
 template <class ColumnType> inline
 void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p)
 {
@@ -779,7 +659,6 @@ void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path
     row.set_value(model_column, (ColumnType)new_value);
   }
 }
-#endif
 
 } // namespace TreeView_Private
 #endif //DOXYGEN_SHOULD_SKIP_THIS
