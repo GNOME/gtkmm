@@ -181,7 +181,7 @@ parse_chars (constpch text,
        bool   start)
 {
   int i = 0;
-  char* next_token = 0;
+  const char* next_token = 0;
 
   /* Handle comments first */
   if(*state == STATE_IN_COMMENT)

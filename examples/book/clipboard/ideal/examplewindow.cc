@@ -177,7 +177,7 @@ void ExampleWindow::update_paste_status()
 void ExampleWindow::on_clipboard_received_targets(const Glib::StringArrayHandle& targets_array)
 {
   // Get the list of available clipboard targets:
-  const std::list<std::string> targets (targets_array);
+  std::list<std::string> targets (targets_array);
 
   const bool bPasteIsPossible =
       std::find(targets.begin(), targets.end(), example_target_custom) != targets.end();

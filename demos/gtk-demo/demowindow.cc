@@ -30,7 +30,11 @@
 #include <vector>
 #include <cctype>
 #include <cerrno>
+#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
 
+//SUN Forte seems to need these:
+void flockfile(FILE*);
+void funlockfile(FILE*);
 
 namespace
 {
@@ -295,7 +299,8 @@ void DemoWindow::load_file(const std::string& filename)
     	    {
     	      Gtk::TextBuffer::iterator end = start;
 
-    	      g_assert (int(strlen(p)) >= (q - p)); //TODO: What is this for?  daniel.
+    	      // The SUN Forte compiler says this is a badly formed expression.
+            //g_assert (int(strlen(p)) >= (q - p)); //TODO: What is this for?  daniel.
 
               const Glib::ustring strTemp (p, q);
     	      end = refBufferInfo->insert(end, strTemp);
@@ -338,7 +343,8 @@ void DemoWindow::load_file(const std::string& filename)
                       start = refBufferInfo->insert(start, " ");
                     }
 
-                  g_assert (int(strlen(p)) >= len); //TODO: What is this for?  daniel.
+                  // The SUN Forte compiler says this is a badly formed expression.
+                  // g_assert (int(strlen(p)) >= len); //TODO: What is this for?  daniel.
 
                   start = refBufferInfo->insert(start, Glib::ustring(p, p + len));
                   in_para = 1;

@@ -307,10 +307,14 @@ TextBuffer::iterator TextBuffer::insert_with_tags(const iterator& pos,
   GtkTextIter range_begin;
   gtk_text_buffer_get_iter_at_offset(gobj(), &range_begin, start_offset);
 
-  GtkTextTag *const *const tags_begin = tags.data();
-  GtkTextTag *const *const tags_end   = tags_begin + tags.size();
+  //This was GtkTextTag* const * const, but the SUN Forte compiler said that it couldn't convert to that. murrayc
+  const GtkTextTag* const* tags_begin = tags.data();
+  const GtkTextTag* const* tags_end   = tags_begin + tags.size();
 
-  for(GtkTextTag *const * ptag = tags_begin; ptag != tags_end; ++ptag)
+  //TODO: Investigate if this const_cast<> is really necessary.
+  //I added it for the SUN Forte compiler. murrayc.
+  for(GtkTextTag *const * ptag = const_cast<GtkTextTag* const *>(tags_begin); ptag != const_cast<GtkTextTag* const *>(tags_end); 
+++ptag)
   {
     gtk_text_buffer_apply_tag(gobj(), *ptag, &range_begin, range_end.gobj());
   }
