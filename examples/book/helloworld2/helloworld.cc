@@ -23,9 +23,7 @@ HelloWorld::HelloWorld()
 : m_button1("Button 1"),
   m_button2("Button 2")
 {
-
-  // this is a new call, this just sets the title of our new window to
-  // "Hello Buttons!"
+  // This just sets the title of our new window.
   set_title("Hello Buttons!");
 
   // sets the border width of the window.
