@@ -37,14 +37,14 @@ namespace Menu_Helpers
 
 Element::Element()
 {
-  //TODO: Can't we avoid using RefPtr<> with a widget. It's not what it's meant for, and apparently it doesn't work well. murrayc.
-  child_ = Glib::RefPtr<MenuItem>(&child);
-  child_->reference(); //It's normally used with a create(), which starts with a refcount of 1.   
 }
 
 Element::Element(MenuItem& child)
-: child_(&child)
-{}
+{
+  //TODO: Can't we avoid using RefPtr<> with a widget. It's not what it's meant for, and apparently it doesn't work well. murrayc.
+  child_ = Glib::RefPtr<MenuItem>(&child);
+  child_->reference(); //It's normally used with a create(), which starts with a refcount of 1.
+}
 
 Element::~Element()
 {}
