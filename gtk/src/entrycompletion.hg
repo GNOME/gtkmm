@@ -71,8 +71,35 @@ public:
 
   //TODO: The C++ iterator needs to know about the model. We need some custom stuff here.
   //but I think I've done it elsewhere. murrayc:
-  //_WRAP_SIGNAL(bool match_selected(const Glib::RefPtr<const TreeModel>& model, const TreeModel::iterator& iter), match_selected)
+  //_WRAP_SIGNAL(bool match_selected(const TreeModel::iterator& iter), match_selected)
   _WRAP_SIGNAL(void action_activated(int index), action_activated)
+
+  //We completely hand-code this signal because we want to change how the parameters are wrapped,
+  //because we need both the iter and the model to make the C++ iter.
+  _IGNORE_SIGNAL(match_selected)
+
+  /**
+   * @par Prototype:
+   * <tt>bool %match_selected(const TreeModel::iterator& iter)</tt>
+   */
+  Glib::SignalProxy1< bool, const TreeModel::iterator& > signal_match_selected();
+
+  #m4begin
+dnl// Hook in custom callback.
+dnl// It will use the callback.
+dnl
+  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
+    klass->match_selected = &match_selected_callback_custom;
+  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
+    static gboolean match_selected_callback_custom(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter);
+  _POP()
+#m4end
+
+protected:
+
+  //Default Signal Handler:
+  virtual bool on_match_selected(const TreeModel::iterator& iter);
+
 
              
 };

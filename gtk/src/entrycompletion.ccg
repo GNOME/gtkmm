@@ -100,5 +100,146 @@ void EntryCompletion::insert_action_markup(const Glib::ustring& markup, int inde
   gtk_entry_completion_insert_action_markup(gobj(), index, markup.c_str());
 }
 
+} //namespace Gtk
+
+
+namespace //anonymous
+{
+
+gboolean Widget_signal_match_selected_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
+{
+  using namespace Gtk;
+  typedef SigC::Slot1< bool, const TreeModel::iterator& > SlotType;
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    try
+    {
+      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        //This conversion is the custom-written part:
+        Gtk::TreeModel::iterator cppIter(c_model, c_iter);
+        
+        return static_cast<int>(((*(SlotType::Proxy)(slot->proxy_))
+            (cppIter, slot)));
+      }
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+gboolean Widget_signal_match_selected_notify_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
+{
+  using namespace Gtk;
+  typedef SigC::Slot1< void, const TreeModel::iterator& > SlotType;
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    try
+    {
+      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        //This conversion is the custom-written part:
+        Gtk::TreeModel::iterator cppIter(c_model, c_iter);
+      
+        (*(SlotType::Proxy)(slot->proxy_))
+            (cppIter, slot);
+      }
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+const Glib::SignalProxyInfo EntryCompletion_signal_match_selected_info =
+{
+  "match_selected",
+  (GCallback) &Widget_signal_match_selected_callback,
+  (GCallback) &Widget_signal_match_selected_notify_callback
+};
+
+} //anonymous namespace
+
+
+namespace Gtk
+{
+
+
+//Hand-coded signal wrapping:
+
+bool Gtk::EntryCompletion::on_match_selected(const TreeModel::iterator& iter)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->match_selected)
+    return (*base->match_selected)(gobj(), iter.get_model_gobject(), const_cast<GtkTreeIter*>(iter.gobj()));
+  else
+  {
+    typedef bool RType;
+    return RType(); //There should always be an implementation in the C object, so this will never happen.
+  }
+}
+
+gboolean EntryCompletion_Class::match_selected_callback_custom(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter)
+{
+  CppObjectType *const obj = dynamic_cast<CppObjectType*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj && obj->is_derived_())
+  {
+    try // Trap C++ exceptions which would normally be lost because this is a C callback.
+    {
+      // Call the virtual member method, which derived classes might override.
+
+      //This conversion is the custom-written part:
+      Gtk::TreeModel::iterator cppIter(c_model, c_iter);
+      return obj->on_match_selected(cppIter);
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+  else
+  {
+    BaseClassType *const base = static_cast<BaseClassType*>(
+        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+    );
+
+    // Call the original underlying C function:
+    if(base && base->match_selected)
+      return (*base->match_selected)(self, c_model, c_iter);
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+Glib::SignalProxy1< bool, const TreeModel::iterator& > EntryCompletion::signal_match_selected()
+{
+  return Glib::SignalProxy1< bool, const TreeModel::iterator& >(this, &EntryCompletion_signal_match_selected_info);
+}
+
+
 } // namespace Gtk
 

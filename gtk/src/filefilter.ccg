@@ -20,9 +20,71 @@
 
 #include <gtk/gtkfilefilter.h>
 
+namespace
+{
+
+//SignalProxy_Custom:
+
+//This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_Custom
+{
+public:
+  typedef Gtk::FileFilter::SlotCustom SlotType;
+
+  SignalProxy_Custom(const SlotType& slot);
+  ~SignalProxy_Custom();
+
+  static gboolean gtk_callback(const GtkFileFilterInfo* filter_info, gpointer data);
+  static void gtk_callback_destroy(void* data);
+  
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_Custom::SignalProxy_Custom(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_Custom::~SignalProxy_Custom()
+{}
+
+gboolean SignalProxy_Custom::gtk_callback(const GtkFileFilterInfo* filter_info, gpointer data)
+{
+  SignalProxy_Custom *const self = static_cast<SignalProxy_Custom*>(data);
+
+  try
+  {
+    return (self->slot_)(filter_info);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+    return false; //arbitrary default;
+  }
+}
+
+void SignalProxy_Custom::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_Custom*>(data);
+}
+
+} //anonymous namespace
 
 namespace Gtk
 {
 
+void FileFilter::add_custom(FileFilterFlags needed, const SlotCustom& slot)
+{
+  //Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when SignalProxy_Custom::gtk_callback_destroy() is called.
+  SignalProxy_Custom *const pSignalProxy = new SignalProxy_Custom(slot);
+      
+  gtk_file_filter_add_custom(gobj(), (GtkFileFilterFlags)needed,
+                             &SignalProxy_Custom::gtk_callback,
+                             pSignalProxy,
+                             &SignalProxy_Custom::gtk_callback_destroy);     
+}
+ 
 } // namespace Gtk
 

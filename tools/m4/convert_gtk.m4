@@ -243,6 +243,7 @@ _CONVERSION(`Gtk::Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Window&',`GtkWindow*',__FR2P)
 _CONVERSION(`CellRenderer&',`GtkCellRenderer*',__FR2P)
+_CONVERSION(`const CellRenderer&',`GtkCellRenderer*',__FCR2P)
 _CONVERSION(`ToolItem&',`GtkToolItem*',__FR2P)
 _CONVERSION(`const ToolItem&',`GtkToolItem*',__FCR2P)
 
