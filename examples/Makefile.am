@@ -7,7 +7,6 @@ cellrenderercustom	\
 dnd			\
 exception		\
 gdk			\
-idle			\
 rulers			\
 statusbar		\
 stock			\

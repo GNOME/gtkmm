@@ -1,6 +1,6 @@
 //$Id$ -*- c++ -*-
 
-/* gtkmm example Copyright (C) 2002 gtkmm development team
+/* gtkmm example Copyright (C) 2003 gtkmm development team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -19,48 +19,37 @@
 #ifndef GTKMM_EXAMPLE_TIMEREXAMPLE_H
 #define GTKMM_EXAMPLE_TIMEREXAMPLE_H
 
-#include <gtkmm/button.h>
-#include <gtkmm/box.h>
-#include <gtkmm/window.h>
+#include <gtkmm.h>
+#include <iostream>
 #include <map>
 
 class TimerExample : public Gtk::Window
 {
 public:
   TimerExample();
-  virtual ~TimerExample();
 
 protected:
-
-  // the callback functions for add & remove button
+  // signal handlers
   void add_timer_pressed();
   void del_timer_pressed();
+  // this is the callback function the timeout will call
+  bool on_timer_callback(int timer_nr);
 
-  // the callback for the timer
-  // note that is not of the type gint callback(void)
-  // since we use bind() to add a data value of type gint to it
-  bool timer_callback(gint timer_nr);
-
-  // the usual stuff - nothing exciting
-  Gtk::HBox   m_box;
+  // member data
+  Gtk::HBox m_box;
+  // Buttons for adding & deleting a timer and quitting the app
   Gtk::Button m_add_timer, m_del_timer, m_quit;
-  gint m_t_nr;
-
-  // the start value for our timer
-  static const gint COUNT_VALUE;
-
-  // the timeout value for the timers in [ms]
-  static const gint TIMEOUT_VALUE;
-
-  // we need this to store our connections
-  std::map<gint, SigC::Connection> m_timers;
-
-  // this is for storing our timer values
-  // each timer countsa back from COUNT_VALUE to 0 and
-  // if removed when it reaches 0
-  std::map<gint,gint> m_counters;
+  // keep track of the timers being added
+  int m_timer_number;
+  // these two constants are initialized in the member initializer
+  const int count_value;
+  const int timeout_value;
+  // STL map for storing our connections
+  std::map<int,SigC::Connection> m_timers;
+  // STL map for storing our timer values
+  // each timer counts back from COUNT_VALUE to 0 and
+  // is removed when it reaches 0
+  std::map<int,int> m_counters;
 };
 
-
 #endif // GTKMM_EXAMPLE_TIMEREXAMPLE_H
-
