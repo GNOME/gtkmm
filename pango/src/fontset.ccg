@@ -19,3 +19,35 @@
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+
+namespace { //anonymous
+
+gboolean fontset_foreach_callback(PangoFontset* /* fontset */, PangoFont* font, gpointer data)
+{
+  try
+  {
+    Pango::Fontset::ForeachSlot& slot = *static_cast<Pango::Fontset::ForeachSlot*>(data);
+    Glib::RefPtr<Pango::Font> cppFont = Glib::wrap(font, true /* take_copy */);
+    
+    return slot(cppFont);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return false; //arbitrary default
+}
+
+
+} //anonymous namespace
+
+namespace Pango
+{
+
+void Fontset::foreach(const ForeachSlot& slot)
+{
+  pango_fontset_foreach(gobj(), &fontset_foreach_callback, (void*)&slot); 
+}
+           
+} //namespace
