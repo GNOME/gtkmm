@@ -1,7 +1,7 @@
 SUBDIRS = alignment aspectframe box buttonbox \
           buttons clipboard combobox drag_and_drop dialogs drawingarea entry eventbox expander frame \
           helloworld helloworld2 \
-          idle label menus notebook paned progressbar range_widgets \
+          idle label menus menus_and_toolbars notebook paned progressbar range_widgets \
           scrolledwindow signals spinbutton table textview timeout toolbar treeview
 
 #deprecated: combo
