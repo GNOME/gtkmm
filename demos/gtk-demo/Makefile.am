@@ -26,11 +26,11 @@ INCLUDES = -I$(top_builddir)/gtk   -I$(top_srcdir)/gtk   \
            $(GTKMM_CFLAGS)
 
 #The libraries that the executable needs to link against:
-LIBS = $(top_builddir)/glib/glibmm/libglibmm-2.0.la \
-       $(top_builddir)/pango/pangomm/libpangomm-1.0.la \
-       $(top_builddir)/atk/atkmm/libatkmm-1.0.la \
-       $(top_builddir)/gdk/gdkmm/libgdkmm-2.0.la \
-       $(top_builddir)/gtk/gtkmm/libgtkmm-2.0.la \
+LIBS = $(top_builddir)/glib/glibmm/libglibmm-2.4.la \
+       $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
+       $(top_builddir)/atk/atkmm/libatkmm-1.4.la \
+       $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
+       $(top_builddir)/gtk/gtkmm/libgtkmm-2.4.la \
        $(GTKMM_LIBS)
 
 #List of source files needed to build the executable:

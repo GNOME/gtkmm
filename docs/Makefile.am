@@ -1,7 +1,7 @@
 ## Copyright (c) 2001
 ## The gtkmm development team.
 
-SUBDIRS = FAQ images tutorial reference internal
+SUBDIRS = FAQ images tutorial reference
 
 EXTRA_DIST = Makefile_web.am_fragment ChangeLog-before20011015.html index.html
 

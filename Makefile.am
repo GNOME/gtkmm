@@ -1,5 +1,5 @@
 
-SUBDIRS		= tools glib pango atk gdk gtk docs
+SUBDIRS		= tools pango atk gdk gtk docs
 DIST_SUBDIRS	= $(SUBDIRS) scripts demos examples tests
 
 EXTRA_DIST	= gtkmm.spec.in \

@@ -12,7 +12,7 @@ files_extra_all_h	=
 dist_sources = $(files_built_all_h) $(files_extra_all_h)
 DISTFILES = $(DIST_COMMON) $(dist_sources)
 
-private_includedir	= $(includedir)/gtkmm-2.0/gdkmm/private
+private_includedir	= $(includedir)/gtkmm-2.4/gdkmm/private
 private_include_HEADERS	= $(files_built_h) $(files_extra_h)
 
 maintainer-clean-local:

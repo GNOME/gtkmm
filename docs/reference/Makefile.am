@@ -13,7 +13,7 @@ EXTRA_DIST = README Doxyfile.in \
 html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	-rm -rf html
 	image_path=""; \
-	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.0`/share/gtk-doc/html/gtk"; \
+	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.4`/share/gtk-doc/html/gtk"; \
 	test -d "$$dir" && image_path="$$dir"; \
 	dir="$(top_srcdir)/../gtk+/gtk/stock-icons"; \
 	test -d "$$dir" && image_path="$$image_path $$dir"; \

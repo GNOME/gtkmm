@@ -18,7 +18,7 @@ AC_PREREQ(2.50)
 #  Version and initialization
 #########################################################################
 GTKMM_MAJOR_VERSION=2
-GTKMM_MINOR_VERSION=2
+GTKMM_MINOR_VERSION=3
 GTKMM_MICRO_VERSION=0
 GTKMM_VERSION=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION.$GTKMM_MICRO_VERSION
 GTKMM_RELEASE=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION
@@ -35,7 +35,7 @@ AC_SUBST(GTKMM_RELEASE)
 #  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
 #                 better
 # CURRENT : REVISION : AGE
-LIBGTKMM_SO_VERSION=6:0:5
+LIBGTKMM_SO_VERSION=1:0:0
 AC_SUBST(LIBGTKMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
@@ -48,7 +48,7 @@ dnl Initialize automake stuff
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
 dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h glib/glibmmconfig.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h)
+AM_CONFIG_HEADER(config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h)
 AM_MAINTAINER_MODE
 AL_ACLOCAL_INCLUDE(scripts)
 
@@ -119,33 +119,24 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked])
 #########################################################################
 #  Dependancy checks
 #########################################################################
-gtkmm_min_sigc_version=1.2.0
-gtkmm_min_glib_version=2.2.0
+gtkmm_min_glibmm_version=2.3.0
 gtkmm_min_gtk_version=2.2.0
 
-PKG_CHECK_MODULES(GLIBMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version})
-AC_SUBST(GLIBMM_CFLAGS)
-AC_SUBST(GLIBMM_LIBS)
 
-# gthread isn't a requirement, but we should use its CFLAGS if available.
-PKG_CHECK_MODULES(GTHREAD, gthread-2.0 >= ${gtkmm_min_glib_version},[],[GTHREAD_CFLAGS=''; GTHREAD_LIBS=''])
-AC_SUBST(GTHREAD_CFLAGS)
-AC_SUBST(GTHREAD_LIBS)
-
-PKG_CHECK_MODULES(ATKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} atk >= 1.0.0)
+PKG_CHECK_MODULES(ATKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} atk >= 1.0.0)
 AC_SUBST(ATKMM_CFLAGS)
 AC_SUBST(ATKMM_LIBS)
 
-PKG_CHECK_MODULES(PANGOMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} pango >= 1.0.0)
+PKG_CHECK_MODULES(PANGOMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} pango >= 1.0.0)
 AC_SUBST(PANGOMM_CFLAGS)
 AC_SUBST(PANGOMM_LIBS)
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-PKG_CHECK_MODULES(GDKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+PKG_CHECK_MODULES(GDKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
 AC_SUBST(GDKMM_CFLAGS)
 AC_SUBST(GDKMM_LIBS)
 
-PKG_CHECK_MODULES(GTKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+PKG_CHECK_MODULES(GTKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
 AC_SUBST(GTKMM_CFLAGS)
 AC_SUBST(GTKMM_LIBS)
 
@@ -209,7 +200,7 @@ GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS()
 GTKMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES()
 
 # Create a list of input directories for Doxygen.
-GTKMM_DOXYGEN_INPUT_SUBDIRS([glib pango atk gdk gtk])
+GTKMM_DOXYGEN_INPUT_SUBDIRS([pango atk gdk gtk])
 
 # Check whether to build the full docs into the generated source.
 # This will be much slower.
@@ -234,41 +225,32 @@ AC_CONFIG_FILES([
   Makefile
   gtkmm.spec
 
-  glib/Makefile
-  glib/glibmm-2.0.pc
-    glib/src/Makefile
-    glib/glibmm/Makefile
-      glib/glibmm/private/Makefile
-
   atk/Makefile
-  atk/atkmm-1.0.pc
+  atk/atkmm-1.4.pc
     atk/src/Makefile
     atk/atkmm/Makefile
       atk/atkmm/private/Makefile
 
   gdk/Makefile
-  gdk/gdkmm-2.0.pc
+  gdk/gdkmm-2.4.pc
     gdk/src/Makefile
     gdk/gdkmm/Makefile
       gdk/gdkmm/private/Makefile
 
   gtk/Makefile
-  gtk/gtkmm-2.0.pc
+  gtk/gtkmm-2.4.pc
     gtk/src/Makefile
     gtk/gtkmm/Makefile
       gtk/gtkmm/private/Makefile
 
   pango/Makefile
-  pango/pangomm-1.0.pc
+  pango/pangomm-1.4.pc
     pango/src/Makefile
     pango/pangomm/Makefile
       pango/pangomm/private/Makefile
 
   tools/Makefile
-  tools/gtkmmproc
-  tools/generate_wrap_init.pl
     tools/m4/Makefile
-    tools/pm/Makefile
     tools/extra_defs_gen/Makefile
 ])
 
@@ -277,8 +259,6 @@ AC_CONFIG_FILES([
     tests/child_widget/Makefile
     tests/child_widget2/Makefile
     tests/child_widget_managed/Makefile
-    tests/dispatcher/Makefile
-    tests/glibmm_value/Makefile
     tests/refcount_dialog/Makefile
     tests/dialog/Makefile
     tests/dialog_deletethis/Makefile
@@ -340,15 +320,11 @@ AC_CONFIG_FILES([
     examples/cellrenderercustom/Makefile
     examples/dnd/Makefile
     examples/exception/Makefile
-    examples/filesel/Makefile
-    examples/fixed/Makefile
     examples/gdk/Makefile
     examples/idle/Makefile
-    examples/markup/Makefile
     examples/rulers/Makefile
     examples/statusbar/Makefile
     examples/stock/Makefile
-    examples/thread/Makefile
     examples/tictactoe/Makefile
     examples/window/Makefile
 
@@ -361,10 +337,9 @@ AC_CONFIG_FILES([
     docs/FAQ/Makefile
     docs/images/Makefile
     docs/tutorial/Makefile
-    docs/tutorial/figures/Makefile
+      docs/tutorial/figures/Makefile
     docs/reference/Makefile
     docs/reference/Doxyfile
-    docs/internal/Makefile
 ])
 
 AC_OUTPUT()
