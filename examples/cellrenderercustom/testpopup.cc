@@ -61,6 +61,7 @@ AppWindow::AppWindow()
   {
     CellRendererList    *const renderer = new CellRendererList();
     Gtk::TreeViewColumn *const column   = new Gtk::TreeViewColumn("Text 2", *Gtk::manage(renderer));
+ 
     tree_view_.append_column(*Gtk::manage(column));
 
     column->add_attribute(renderer->property_text(), list_columns_.text2);

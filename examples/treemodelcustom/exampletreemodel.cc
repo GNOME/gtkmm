@@ -50,10 +50,9 @@ ExampleTreeModel::ExampleTreeModel(unsigned int columns_count)
   m_stamp(1), //When the model's stamp != the iterator's stamp then that iterator is invalid and should be ignored. Also, 0=invalid
   m_pGlueList(0)
 {
-  
-  //We need to specify a particular get_type() from one of the virtual base classes, but they should
-  //both return the same piece of data.
-  Gtk::TreeModel::add_interface( Glib::Object::get_type() );
+  GType gtype = G_OBJECT_TYPE(gobj()); //The custom GType created in the Object constructor, from the typeid.
+  Gtk::TreeModel::add_interface( gtype );
+
    
   
   //Initialize our underlying data:
