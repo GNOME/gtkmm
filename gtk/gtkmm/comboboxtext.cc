@@ -61,6 +61,8 @@ void ComboBoxText::prepend_text(const Glib::ustring& text)
 
 Glib::ustring ComboBoxText::get_active_text() const
 {
+//TODO: Use gtk_combobox_get_active_text() instead.
+
   Glib::ustring result;
 
   //Get the active row:

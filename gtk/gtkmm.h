@@ -30,6 +30,7 @@ extern const int gtkmm_micro_version;
 #include <gdkmm.h>
 
 #include <gtkmm/object.h>
+#include <gtkmm/aboutdialog.h>
 #include <gtkmm/accelkey.h>
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/adjustment.h>
@@ -64,6 +65,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/enums.h>
 #include <gtkmm/eventbox.h>
 #include <gtkmm/filechooser.h>
+#include <gtkmm/filechooserbutton.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/filefilter.h>
 #include <gtkmm/fileselection.h> //TODO: Deprecated.
@@ -76,6 +78,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/iconset.h>
 #include <gtkmm/iconfactory.h>
 #include <gtkmm/iconsource.h>
+#include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
 #include <gtkmm/imagemenuitem.h>
 #include <gtkmm/inputdialog.h>

@@ -21,6 +21,13 @@
   (gtype-id "PANGO_TYPE_ENGINE_SHAPE")
 )
 
+(define-object FcDecoder
+  (in-module "Pango")
+  (parent "GObject")
+  (c-name "PangoFcDecoder")
+  (gtype-id "PANGO_TYPE_FC_DECODER")
+)
+
 (define-object Font
   (in-module "Pango")
   (parent "GObject")
@@ -94,6 +101,7 @@
     '("shape" "PANGO_ATTR_SHAPE")
     '("scale" "PANGO_ATTR_SCALE")
     '("fallback" "PANGO_ATTR_FALLBACK")
+    '("letter-spacing" "PANGO_ATTR_LETTER_SPACING")
   )
 )
 
@@ -210,6 +218,18 @@
   )
 )
 
+(define-enum EllipsizeMode
+  (in-module "Pango")
+  (c-name "PangoEllipsizeMode")
+  (gtype-id "PANGO_TYPE_ELLIPSIZE_MODE")
+  (values
+    '("none" "PANGO_ELLIPSIZE_NONE")
+    '("start" "PANGO_ELLIPSIZE_START")
+    '("middle" "PANGO_ELLIPSIZE_MIDDLE")
+    '("end" "PANGO_ELLIPSIZE_END")
+  )
+)
+
 (define-enum OTTableType
   (in-module "Pango")
   (c-name "PangoOTTableType")
@@ -308,15 +328,15 @@
 )
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/module-defs.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/module-defs.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/modules.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/modules.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-attributes.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-attributes.h
 
 (define-function pango_color_get_type
   (c-name "pango_color_get_type")
@@ -522,6 +542,15 @@
   )
 )
 
+(define-function pango_attr_letter_spacing_new
+  (c-name "pango_attr_letter_spacing_new")
+  (is-constructor-of "PangoAttrLetterSpacing")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("int" "letter_spacing")
+  )
+)
+
 (define-function pango_attr_list_get_type
   (c-name "pango_attr_list_get_type")
   (return-type "GType")
@@ -675,7 +704,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-break.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-break.h
 
 (define-function pango_break
   (c-name "pango_break")
@@ -727,7 +756,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-context.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-context.h
 
 (define-function pango_context_get_type
   (c-name "pango_context_get_type")
@@ -747,6 +776,12 @@
   (parameters
     '("PangoFontMap*" "font_map")
   )
+)
+
+(define-method get_font_map
+  (of-object "PangoContext")
+  (c-name "pango_context_get_font_map")
+  (return-type "PangoFontMap*")
 )
 
 (define-method list_families
@@ -833,6 +868,21 @@
   (return-type "PangoDirection")
 )
 
+(define-method set_matrix
+  (of-object "PangoContext")
+  (c-name "pango_context_set_matrix")
+  (return-type "none")
+  (parameters
+    '("const-PangoMatrix*" "matrix")
+  )
+)
+
+(define-method get_matrix
+  (of-object "PangoContext")
+  (c-name "pango_context_get_matrix")
+  (return-type "const-PangoMatrix*")
+)
+
 (define-function pango_itemize
   (c-name "pango_itemize")
   (return-type "GList*")
@@ -862,7 +912,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-coverage.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-coverage.h
 
 (define-function pango_coverage_new
   (c-name "pango_coverage_new")
@@ -937,7 +987,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-engine.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-engine.h
 
 (define-function pango_engine_get_type
   (c-name "pango_engine_get_type")
@@ -986,11 +1036,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-engine-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-engine-private.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-enum-types.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-enum-types.h
 
 (define-function pango_attr_type_get_type
   (c-name "pango_attr_type_get_type")
@@ -1042,6 +1092,11 @@
   (return-type "GType")
 )
 
+(define-function pango_ellipsize_mode_get_type
+  (c-name "pango_ellipsize_mode_get_type")
+  (return-type "GType")
+)
+
 (define-function pango_script_get_type
   (c-name "pango_script_get_type")
   (return-type "GType")
@@ -1059,19 +1114,35 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangofc-font.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangofc-decoder.h
 
-(define-method lock_face
-  (of-object "PangoFcFont")
-  (c-name "pango_fc_font_lock_face")
-  (return-type "FT_Face")
+(define-function pango_fc_decoder_get_type
+  (c-name "pango_fc_decoder_get_type")
+  (return-type "GType")
 )
 
-(define-method unlock_face
-  (of-object "PangoFcFont")
-  (c-name "pango_fc_font_unlock_face")
-  (return-type "none")
+(define-method get_charset
+  (of-object "PangoFcDecoder")
+  (c-name "pango_fc_decoder_get_charset")
+  (return-type "FcCharSet*")
+  (parameters
+    '("PangoFcFont*" "fcfont")
+  )
 )
+
+(define-method get_glyph
+  (of-object "PangoFcDecoder")
+  (c-name "pango_fc_decoder_get_glyph")
+  (return-type "PangoGlyph")
+  (parameters
+    '("PangoFcFont*" "fcfont")
+    '("guint32" "wc")
+  )
+)
+
+
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangofc-font.h
 
 (define-method has_char
   (of-object "PangoFcFont")
@@ -1114,9 +1185,21 @@
   (return-type "GType")
 )
 
+(define-method lock_face
+  (of-object "PangoFcFont")
+  (c-name "pango_fc_font_lock_face")
+  (return-type "FT_Face")
+)
+
+(define-method unlock_face
+  (of-object "PangoFcFont")
+  (c-name "pango_fc_font_unlock_face")
+  (return-type "none")
+)
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangofc-fontmap.h
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangofc-fontmap.h
 
 (define-method create_context
   (of-object "PangoFcFontMap")
@@ -1141,6 +1224,17 @@
   (return-type "GType")
 )
 
+(define-method add_decoder_find_func
+  (of-object "PangoFcFontMap")
+  (c-name "pango_fc_font_map_add_decoder_find_func")
+  (return-type "none")
+  (parameters
+    '("PangoFcDecoderFindFunc" "findfunc")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "dnotify")
+  )
+)
+
 (define-function pango_fc_font_description_from_pattern
   (c-name "pango_fc_font_description_from_pattern")
   (return-type "PangoFontDescription*")
@@ -1152,11 +1246,23 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangofc-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangofc-private.h
+
+(define-method get_raw_extents
+  (of-object "PangoFcFont")
+  (c-name "pango_fc_font_get_raw_extents")
+  (return-type "none")
+  (parameters
+    '("FT_Int32" "load_flags")
+    '("PangoGlyph" "glyph")
+    '("PangoRectangle*" "ink_rect")
+    '("PangoRectangle*" "logical_rect")
+  )
+)
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-font.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-font.h
 
 (define-function pango_font_description_get_type
   (c-name "pango_font_description_get_type")
@@ -1416,6 +1522,30 @@
   (return-type "int")
 )
 
+(define-method get_underline_position
+  (of-object "PangoFontMetrics")
+  (c-name "pango_font_metrics_get_underline_position")
+  (return-type "int")
+)
+
+(define-method get_underline_thickness
+  (of-object "PangoFontMetrics")
+  (c-name "pango_font_metrics_get_underline_thickness")
+  (return-type "int")
+)
+
+(define-method get_strikethrough_position
+  (of-object "PangoFontMetrics")
+  (c-name "pango_font_metrics_get_strikethrough_position")
+  (return-type "int")
+)
+
+(define-method get_strikethrough_thickness
+  (of-object "PangoFontMetrics")
+  (c-name "pango_font_metrics_get_strikethrough_thickness")
+  (return-type "int")
+)
+
 (define-function pango_font_metrics_new
   (c-name "pango_font_metrics_new")
   (is-constructor-of "PangoFontMetrics")
@@ -1528,7 +1658,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-fontmap.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-fontmap.h
 
 (define-function pango_font_map_get_type
   (c-name "pango_font_map_get_type")
@@ -1574,7 +1704,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-fontset.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-fontset.h
 
 (define-function pango_fontset_get_type
   (c-name "pango_fontset_get_type")
@@ -1637,7 +1767,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangoft2.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangoft2.h
 
 (define-function pango_ft2_render
   (c-name "pango_ft2_render")
@@ -1648,6 +1778,19 @@
     '("PangoGlyphString*" "glyphs")
     '("gint" "x")
     '("gint" "y")
+  )
+)
+
+(define-function pango_ft2_render_transformed
+  (c-name "pango_ft2_render_transformed")
+  (return-type "none")
+  (parameters
+    '("FT_Bitmap*" "bitmap")
+    '("const-PangoMatrix*" "matrix")
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("int" "x")
+    '("int" "y")
   )
 )
 
@@ -1662,8 +1805,30 @@
   )
 )
 
+(define-function pango_ft2_render_layout_line_subpixel
+  (c-name "pango_ft2_render_layout_line_subpixel")
+  (return-type "none")
+  (parameters
+    '("FT_Bitmap*" "bitmap")
+    '("PangoLayoutLine*" "line")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
 (define-function pango_ft2_render_layout
   (c-name "pango_ft2_render_layout")
+  (return-type "none")
+  (parameters
+    '("FT_Bitmap*" "bitmap")
+    '("PangoLayout*" "layout")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-function pango_ft2_render_layout_subpixel
+  (c-name "pango_ft2_render_layout_subpixel")
   (return-type "none")
   (parameters
     '("FT_Bitmap*" "bitmap")
@@ -1773,39 +1938,16 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangoft2-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangoft2-private.h
 
-(define-function pango_ft2_font_get_cache_glyph_data
-  (c-name "pango_ft2_font_get_cache_glyph_data")
-  (return-type "void*")
-  (parameters
-    '("PangoFont*" "font")
-    '("int" "glyph_index")
-  )
-)
-
-(define-function pango_ft2_font_set_cache_glyph_data
-  (c-name "pango_ft2_font_set_cache_glyph_data")
-  (return-type "none")
-  (parameters
-    '("PangoFont*" "font")
-    '("int" "glyph_index")
-    '("void*" "cached_glyph")
-  )
-)
-
-(define-function pango_ft2_font_set_glyph_cache_destroy
-  (c-name "pango_ft2_font_set_glyph_cache_destroy")
-  (return-type "none")
-  (parameters
-    '("PangoFont*" "font")
-    '("GDestroyNotify" "destroy_notify")
-  )
+(define-function pango_ft2_font_get_type
+  (c-name "pango_ft2_font_get_type")
+  (return-type "GType")
 )
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-glyph.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-glyph.h
 
 (define-function pango_glyph_string_new
   (c-name "pango_glyph_string_new")
@@ -1924,7 +2066,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-glyph-item.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-glyph-item.h
 
 (define-method split
   (of-object "PangoGlyphItem")
@@ -1934,6 +2076,12 @@
     '("const-char*" "text")
     '("int" "split_index")
   )
+)
+
+(define-method free
+  (of-object "PangoGlyphItem")
+  (c-name "pango_glyph_item_free")
+  (return-type "none")
 )
 
 (define-method apply_attrs
@@ -1946,17 +2094,32 @@
   )
 )
 
+(define-method letter_space
+  (of-object "PangoGlyphItem")
+  (c-name "pango_glyph_item_letter_space")
+  (return-type "none")
+  (parameters
+    '("const-char*" "text")
+    '("PangoLogAttr*" "log_attrs")
+    '("int" "letter_spacing")
+  )
+)
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango.h
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-glyph-item-private.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-impl-utils.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-item.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-impl-utils.h
+
+
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-item.h
 
 (define-function pango_item_new
   (c-name "pango_item_new")
@@ -1988,7 +2151,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-layout.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-layout.h
 
 (define-function pango_layout_get_type
   (c-name "pango_layout_get_type")
@@ -2213,6 +2376,21 @@
   (return-type "gboolean")
 )
 
+(define-method set_ellipsize
+  (of-object "PangoLayout")
+  (c-name "pango_layout_set_ellipsize")
+  (return-type "none")
+  (parameters
+    '("PangoEllipsizeMode" "ellipsize")
+  )
+)
+
+(define-method get_ellipsize
+  (of-object "PangoLayout")
+  (c-name "pango_layout_get_ellipsize")
+  (return-type "PangoEllipsizeMode")
+)
+
 (define-method context_changed
   (of-object "PangoLayout")
   (c-name "pango_layout_context_changed")
@@ -2403,6 +2581,11 @@
   )
 )
 
+(define-function pango_layout_iter_get_type
+  (c-name "pango_layout_iter_get_type")
+  (return-type "GType")
+)
+
 (define-method get_iter
   (of-object "PangoLayout")
   (c-name "pango_layout_get_iter")
@@ -2530,7 +2713,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-modules.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-layout-private.h
+
+
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-modules.h
 
 (define-function pango_find_map
   (c-name "pango_find_map")
@@ -2572,7 +2759,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-ot.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-ot.h
 
 (define-function pango_ot_info_get
   (c-name "pango_ot_info_get")
@@ -2672,6 +2859,15 @@
   (return-type "none")
 )
 
+(define-method set_rtl
+  (of-object "PangoOTBuffer")
+  (c-name "pango_ot_buffer_set_rtl")
+  (return-type "none")
+  (parameters
+    '("gboolean" "rtl")
+  )
+)
+
 (define-method add_glyph
   (of-object "PangoOTBuffer")
   (c-name "pango_ot_buffer_add_glyph")
@@ -2680,15 +2876,6 @@
     '("guint" "glyph_index")
     '("guint" "properties")
     '("guint" "cluster")
-  )
-)
-
-(define-method set_rtl
-  (of-object "PangoOTBuffer")
-  (c-name "pango_ot_buffer_set_rtl")
-  (return-type "none")
-  (parameters
-    '("gboolean" "rtl")
   )
 )
 
@@ -2708,6 +2895,15 @@
   (return-type "none")
   (parameters
     '("PangoGlyphString*" "glyphs")
+  )
+)
+
+(define-method set_zero_width_marks
+  (of-object "PangoOTBuffer")
+  (c-name "pango_ot_buffer_set_zero_width_marks")
+  (return-type "none")
+  (parameters
+    '("gboolean" "zero_width_marks")
   )
 )
 
@@ -2751,7 +2947,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-script.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-script.h
 
 (define-function pango_script_for_unichar
   (c-name "pango_script_for_unichar")
@@ -2811,15 +3007,15 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-script-lang-table.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-script-lang-table.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-script-table.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-script-table.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-tabs.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-tabs.h
 
 (define-function pango_tab_array_new
   (c-name "pango_tab_array_new")
@@ -2915,7 +3111,62 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-types.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-types.h
+
+(define-function pango_matrix_get_type
+  (c-name "pango_matrix_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_copy")
+  (return-type "PangoMatrix*")
+)
+
+(define-method free
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_free")
+  (return-type "none")
+)
+
+(define-method translate
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_translate")
+  (return-type "none")
+  (parameters
+    '("double" "tx")
+    '("double" "ty")
+  )
+)
+
+(define-method scale
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_scale")
+  (return-type "none")
+  (parameters
+    '("double" "scale_x")
+    '("double" "scale_y")
+  )
+)
+
+(define-method rotate
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_rotate")
+  (return-type "none")
+  (parameters
+    '("double" "degrees")
+  )
+)
+
+(define-method concat
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_concat")
+  (return-type "none")
+  (parameters
+    '("const-PangoMatrix*" "new_matrix")
+  )
+)
 
 (define-function pango_language_get_type
   (c-name "pango_language_get_type")
@@ -2967,7 +3218,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pango-utils.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-utils.h
 
 (define-function pango_split_file_list
   (c-name "pango_split_file_list")
@@ -3116,7 +3367,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangowin32.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangowin32.h
 
 (define-function pango_win32_get_context
   (c-name "pango_win32_get_context")
@@ -3243,7 +3494,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangowin32-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangowin32-private.h
 
 (define-function pango_win32_font_new
   (c-name "pango_win32_font_new")
@@ -3350,7 +3601,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangoxft.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangoxft.h
 
 (define-function pango_xft_get_font_map
   (c-name "pango_xft_get_font_map")
@@ -3493,11 +3744,11 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangoxft-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangoxft-private.h
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangox.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangox.h
 
 (define-function pango_x_get_context
   (c-name "pango_x_get_context")
@@ -3706,7 +3957,7 @@
 
 
 
-;; From /home/murrayc/cvs/gnome26/pango/pango/pangox-private.h
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangox-private.h
 
 (define-function pango_x_font_map_get_type
   (c-name "pango_x_font_map_get_type")

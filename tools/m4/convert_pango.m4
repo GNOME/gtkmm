@@ -13,6 +13,7 @@ _CONV_ENUM(Pango,Alignment)
 _CONV_ENUM(Pango,WrapMode)
 _CONV_ENUM(Pango,TabAlign)
 _CONV_ENUM(Pango,Script)
+_CONV_ENUM(Pango,EllipsizeMode)
 
 # General conversions:
 _CONVERSION(`gchar*',`const char*',`($3)')
