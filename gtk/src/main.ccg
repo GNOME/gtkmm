@@ -380,7 +380,7 @@ void Main::init(int* argc, char*** argv, bool set_locale)
   }
 }
 
-/*void Main::init(int* argc, char*** argv, const std::string& parameter_string, const Glib::ArrayHandle<const Glib::OptionEntry&>& entries, const std::string& translation_domain)
+Main::Main(int& argc, char**& argv, Glib::OptionContext& option_context)
 {
   if(instance_)
   {
@@ -388,12 +388,16 @@ void Main::init(int* argc, char*** argv, bool set_locale)
   }
   else
   {
-    gtk_init_with_args(argc, argv, parameter_string.c_str(), entries.data(), translation_domain.c_str(), NULL);
-
     init_gtkmm_internals();
     instance_ = this;
+
+    //This reimplements some stuff from gtk_init_with_options(),
+    //without calling check_setugid(), because that is not public API.
+
+    add_gtk_option_group(option_context);
+    option_context.parse(argc, argv);
   }
-}*/
+}
 
 // This is a static method so that it can be used before Main is instantiated,
 // for instance in Gnome::canvas_init().  But if you use this method, you
@@ -417,6 +421,15 @@ void Main::init_gtkmm_internals()
 
     init_done = true;
   }
+}
+
+void Main::add_gtk_option_group(Glib::OptionContext& option_context, bool open_default_display)
+{
+  //Get the option group:
+  Glib::OptionGroup gtkgroup( gtk_get_option_group(open_default_display) ); //Takes ownership of the GOptionGroup.
+
+  //Give it to the option_context, which will also then own the underlying GOptionGroup, deleting it when necessary:
+  option_context.add_group(gtkgroup);
 }
 
 

@@ -107,6 +107,30 @@ protected:
 class Main : public sigc::trackable
 {
 public:
+
+  //This offers the same functionality as gtk_init_with_args():
+  /** Scans the argument vector, and strips off all parameters parsed by GTK+ or your @a option_context.
+   * Add a Glib::OptionGroup to the Glib::OptionContext to parse your own command-line arguments.  
+   *
+   * Note:  The argument strings themself won't be modified, although the
+   * pointers to them might change.  This makes it possible to create your
+   * own argv of string literals, which have the type 'const char[]' in
+   * standard C++.  (You might need to use const_cast<>, though.)
+   *
+   * This function automatically generates nicely formatted 
+   * <option>--help</option> output. Note that your program will
+   * be terminated after writing out the help output.
+   *
+   * @param argc a reference to the number of command line arguments.
+   * @param argv a reference to the array of command line arguments.
+   * @parameter_string a string which is displayed in the first line of <option>--help</option> output, 
+   * after <literal><replaceable>programname</replaceable> [OPTION...]</literal>
+   * @param option_context A Glib::OptionContext containing Glib::OptionGroups which described the command-line arguments taken by your program. 
+   *
+   * @throw Glib::OptionError
+   */
+  Main(int& argc, char**& argv, Glib::OptionContext& option_context);
+
   /** Scans the argument vector, and strips off all parameters known to GTK+.
    * Your application may then handle the remaining arguments.
    *
@@ -120,9 +144,7 @@ public:
   /// See Main(int* argc, char*** argv, bool set_locale).
   Main(int& argc, char**& argv, bool set_locale = true);
 
-  // TODO: implement this to use the new Glib::OptionEntry argument parsing classes.
-  //Main(int* argc, char*** argv, const std::string& parameter_string, const Glib::ArrayHandle<const Glib::OptionEntry&>& entries, const std::string& translation_domain);
-
+ 
   virtual ~Main();
 
   /// Access to the one global instance of Gtk::Main.
@@ -148,6 +170,18 @@ public:
   static void quit();
 
   static guint level();
+
+  //This attempts to provide the same functionality as gtk_get_option_group():
+  /** Add a Glib::OptionGroup, for the commandline arguments recognized
+   * by GTK+ and GDK, to a Glib::OptionContext, so that these commandline arguments will 
+   * be processed in addition to the existing commandline arguments specified by the Glib::OptionContext.
+   *
+   * You do not need to use this method if you pass your Glib::OptionContext to the Main constructor, because 
+   * it adds the gtk option group automatically.
+   *
+   * @param open_default_display Whether to open the default display when parsing the commandline arguments.
+   */
+  static void add_gtk_option_group(Glib::OptionContext& option_context, bool open_default_display = true);
 
   /** Runs a single iteration of the main loop.
    * If no events are waiting to be processed GTK+ will block until the next event is noticed.
