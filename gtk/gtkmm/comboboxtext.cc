@@ -36,6 +36,14 @@ ComboBoxText::ComboBoxText()
   pack_start(m_text_columns.m_column);
 }
 
+ComboBoxText::ComboBoxText(GtkComboBox* castitem)
+: Gtk::ComboBox(castitem)
+{
+  set_model( Gtk::ListStore::create(m_text_columns) );
+  pack_start(m_text_columns.m_column);
+}
+
+
 void ComboBoxText::append_text(const Glib::ustring& text)
 {
   gtk_combo_box_append_text(gobj(), text.c_str());

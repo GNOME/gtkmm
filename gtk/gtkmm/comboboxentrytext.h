@@ -1,6 +1,6 @@
 // -*- c++ -*-
-#ifndef _GTKMM_COMBOBOXTEXT_H
-#define _GTKMM_COMBOBOXTEXT_H
+#ifndef _GTKMM_COMBOBOXENTRYTEXT_H
+#define _GTKMM_COMBOBOXENTRYTEXT_H
 
 /* comboboxentrytext.h
  * 
@@ -47,7 +47,7 @@ private:
 
 protected:
   explicit ComboBoxEntryText(const Glib::ConstructParams& construct_params);
-  explicit ComboBoxEntryText(GtkComboBox* castitem);
+  explicit ComboBoxEntryText(GtkComboBoxEntry* castitem);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -82,5 +82,5 @@ protected:
 } // namespace Gtk
 
 
-#endif /* _GTKMM_COMBOBOXTEXT_H */
+#endif /* _GTKMM_COMBOBOXENTRYTEXT_H */
 
