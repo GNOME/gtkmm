@@ -35,11 +35,8 @@ void MyContainer::set_child_widgets(Gtk::Widget& child_one, Gtk::Widget& child_t
   m_child_one = &child_one;
   m_child_two = &child_two;
 
-  //Note that we use gtk_widget_set_parent(),
-  //because Gtk::Widget::set_parent() is protected.
-  //This is a bug that should be fixed in a future version of gtkmm. TODO
-  gtk_widget_set_parent(m_child_one->gobj(), GTK_WIDGET(gobj()));
-  gtk_widget_set_parent(m_child_two->gobj(), GTK_WIDGET(gobj()));
+  m_child_one->set_parent(*this);
+  m_child_two->set_parent(*this);
 }
 
 void MyContainer::on_size_request(Gtk::Requisition* requisition)
@@ -52,11 +49,11 @@ void MyContainer::on_size_request(Gtk::Requisition* requisition)
   
    Gtk::Requisition child_requisition_one, child_requisition_two;
    if(m_child_one && m_child_one->is_visible())
-     gtk_widget_size_request(m_child_one->gobj(), &child_requisition_one);
+     child_requisition_one = m_child_one->size_request();
 
    if(m_child_two && m_child_two->is_visible())
-     gtk_widget_size_request(m_child_two->gobj(), &child_requisition_two);
-   //Note that we use gtk_widget_size_request(), because Gtk::Widget::size_request() is const. This is a bug that will be fixed in a later version of gtkmm.
+     child_requisition_two = m_child_two->size_request();
+
   
   //See which one has the most width:
   int max_width = MAX(child_requisition_one.width, child_requisition_two.width);
@@ -122,15 +119,14 @@ void MyContainer::on_add(Gtk::Widget* child)
   if(!m_child_one)
   {
     m_child_one = child;
-
-    gtk_widget_set_parent(child->gobj(), GTK_WIDGET(gobj()));
-    //This is protected, but should be public: child.set_parent(*this);
+   
+    m_child_one->set_parent(*this);
   }
   else if(!m_child_two)
   {
     m_child_two = child;
 
-    gtk_widget_set_parent(child->gobj(), GTK_WIDGET(gobj()));
+    m_child_two->set_parent(*this);
   }
 }
 
@@ -154,8 +150,8 @@ void MyContainer::on_remove(Gtk::Widget* child)
 
     if(found)
     {
-      gtk_widget_unparent(child->gobj());
-
+      child->unparent();
+     
       if(visible)
         queue_resize();
     }

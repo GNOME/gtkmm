@@ -5,9 +5,9 @@ figuresdir = $(gtkmm_docdir)/tutorial/figures
 figures_DATA = alignment.png aspectframe.png \
 	box_packing1.png box_packing2.png box_packing3.png \
 	buttonbox.png buttons.png checkbutton.png \
-  clipboard_simple.png clipboard_ideal.png \
-	combo.png \
-  dialogs_colorselectiondialog.png dialogs_fileselection.png dialogs_fontselectiondialog.png dialogs_messagedialog.png dialogs_simple.png \
+	clipboard_simple.png clipboard_ideal.png \
+	combo.png custom_container.png \
+	dialogs_colorselectiondialog.png dialogs_fileselection.png dialogs_fontselectiondialog.png dialogs_messagedialog.png dialogs_simple.png \
   drag_and_drop.png drawingarea_lines.png drawingarea_text.png \
   entry.png eventbox.png frame.png \
 	helloworld.png helloworld2.png label.png \
