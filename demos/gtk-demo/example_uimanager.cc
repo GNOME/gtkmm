@@ -72,58 +72,58 @@ Example_UIManager::Example_UIManager()
   //In real life, I don't think that the details would be supplied _as well as_ the stock IDs.
 
   //Add normal Actions:
-  m_refActionGroup->add_action( Gtk::Action::create("FileMenu", "_File") ); 
-  m_refActionGroup->add_action( Gtk::Action::create("PreferencesMenu", "_Preferences") );
-  m_refActionGroup->add_action( Gtk::Action::create("ColorMenu", "_Color") );
-  m_refActionGroup->add_action( Gtk::Action::create("ShapeMenu", "_Shape") );
-  m_refActionGroup->add_action( Gtk::Action::create("HelpMenu", "_Help") );
-  m_refActionGroup->add_action( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
+  m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 
+  m_refActionGroup->add( Gtk::Action::create("PreferencesMenu", "_Preferences") );
+  m_refActionGroup->add( Gtk::Action::create("ColorMenu", "_Color") );
+  m_refActionGroup->add( Gtk::Action::create("ShapeMenu", "_Shape") );
+  m_refActionGroup->add( Gtk::Action::create("HelpMenu", "_Help") );
+  m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
     Gtk::AccelKey("<control>N"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
+  m_refActionGroup->add( Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
     Gtk::AccelKey("<control>O"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
+  m_refActionGroup->add( Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
     Gtk::AccelKey("<control>S"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As...", "Save to a file"),
+  m_refActionGroup->add( Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As...", "Save to a file"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
+  m_refActionGroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
     Gtk::AccelKey("<control>Q"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
-  m_refActionGroup->add_action( Gtk::Action::create("About", "_About", "About"),
+  m_refActionGroup->add( Gtk::Action::create("About", "_About", "About"),
     Gtk::AccelKey("<control>A"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   //TODO: This StockID does not seem to be registered in the C version either, but it is in appwindow.c:
-  m_refActionGroup->add_action( Gtk::Action::create("Logo", Gtk::StockID("demo-gtk-logo"), "", "GTK+"),
+  m_refActionGroup->add( Gtk::Action::create("Logo", Gtk::StockID("demo-gtk-logo"), "", "GTK+"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
 
   //Add Toggle Actions:
-  m_refActionGroup->add_action( Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
+  m_refActionGroup->add( Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
     Gtk::AccelKey("<control>B"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
 
   //Add Radio Actions:
   //TODO: As mentioned above, a list would be good here, so that we can just specify the same slot once:
   Gtk::RadioAction::Group group_colors;
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_colors, "Red", "_Red", "Blood"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Red", "_Red", "Blood"),
     Gtk::AccelKey("<control>R"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_RED ) );
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_colors, "Green", "_Green", "Grass"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Green", "_Green", "Grass"),
     Gtk::AccelKey("<control>G"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_GREEN ) );
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_colors, "Blue", "_Blue", "Sky"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Blue", "_Blue", "Sky"),
     Gtk::AccelKey("<control>B"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_color_activated), COLOR_BLUE ) );
 
   Gtk::RadioAction::Group group_shapes;
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_shapes, "Square", "_Square", "Square"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Square", "_Square", "Square"),
     Gtk::AccelKey("<control>S"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_SQUARE ) );
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_shapes, "Rectangle", "_Rectangle", "Rectangle"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Rectangle", "_Rectangle", "Rectangle"),
     Gtk::AccelKey("<control>R"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_RECTANGLE ) );
-  m_refActionGroup->add_action( Gtk::RadioAction::create(group_shapes, "Oval", "_Oval", "Egg"),
+  m_refActionGroup->add( Gtk::RadioAction::create(group_shapes, "Oval", "_Oval", "Egg"),
     Gtk::AccelKey("<control>O"),
     SigC::bind( SigC::slot(*this, &Example_UIManager::on_radio_action_shape_activated), SHAPE_OVAL ) );
 

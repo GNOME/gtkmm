@@ -270,6 +270,7 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLO
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<FileFilter> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)

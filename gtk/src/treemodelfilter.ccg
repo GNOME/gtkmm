@@ -20,10 +20,95 @@
 
 #include <gtk/gtktreemodelfilter.h>
 
+namespace //anonymous
+{
+
+// This Signal Proxy allows the C++ coder to specify
+// a SigC::Slot instead of a static function.
+class SignalProxy_Visible
+{
+public:
+  typedef Gtk::TreeModelFilter::SlotVisible SlotType;
+
+  SignalProxy_Visible(const SlotType& slot)
+  : slot_(slot) {}
+
+  ~SignalProxy_Visible();
+
+  static gboolean gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data);
+  static void gtk_callback_destroy(void* data);
+
+private:
+  SlotType slot_;
+};
+
+SignalProxy_Visible::~SignalProxy_Visible()
+{}
+
+gboolean SignalProxy_Visible::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
+{
+  SignalProxy_Visible *const self = static_cast<SignalProxy_Visible*>(data);
+
+  try
+  {
+    return (self->slot_)( Gtk::TreeModel::const_iterator(model, iter) );
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return FALSE; //An arbitary default, just to avoid the compiler warning.
+}
+
+void SignalProxy_Visible::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_Visible*>(data);
+}
+
+} // anonymous namespace
+
+typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
 
 namespace Gtk
 {
 
+void TreeModelFilter::set_visible_func(const SlotVisible& slot)
+{
+  // Create a signal proxy.  A pointer to this will be passed
+  // through the callback's data parameter.  It will be deleted
+  // when SignalProxy_Visible::gtk_callback_destroy() is called.
+  SignalProxy_Visible *const pSignalProxy = new SignalProxy_Visible(slot);
+
+  gtk_tree_model_filter_set_visible_func(gobj(),
+      &SignalProxy_Visible::gtk_callback, pSignalProxy,
+      &SignalProxy_Visible::gtk_callback_destroy);
+}
+
+
+TreeModel::iterator TreeModelFilter::convert_child_iter_to_iter(const iterator& child_iter) const
+{
+  TreeIter filter_iter (const_cast<TreeModelFilter*>(this));
+
+  gtk_tree_model_filter_convert_child_iter_to_iter(
+      const_cast<GtkTreeModelFilter*>(gobj()), filter_iter.gobj(),
+      const_cast<GtkTreeIter*>(child_iter.gobj()));
+
+  return filter_iter;
+}
+
+TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& filter_iter) const
+{
+  GtkTreeModel *const child_model = gtk_tree_model_filter_get_model(const_cast<GtkTreeModelFilter*>(gobj()));
+
+  TreeIter child_iter (dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) child_model, false)));
+
+  gtk_tree_model_filter_convert_iter_to_child_iter(
+      const_cast<GtkTreeModelFilter*>(gobj()), child_iter.gobj(),
+      const_cast<GtkTreeIter*>(filter_iter.gobj()));
+
+  return child_iter;
+}
 
 } // namespace Gtk
 
