@@ -44,6 +44,7 @@ _CONV_ENUM(Gdk,WindowTypeHint)
 _CONV_ENUM(Gdk,WMDecoration)
 _CONV_ENUM(Gdk,WMFunction)
 _CONV_ENUM(Gdk,GrabStatus)
+_CONV_ENUM(Gdk,PixbufRotation)
 
 
 _CONVERSION(`Gdk::EventMask',`gint',`$3')
