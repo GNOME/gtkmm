@@ -21,6 +21,7 @@
  */
 
 #include <gtkmm/selectiondata_private.h>
+#include <glibmm/utility.h> //For ScopedPtr<>.
 #include <gtk/gtkclipboard.h>
 
 namespace
@@ -307,13 +308,20 @@ Glib::StringArrayHandle Clipboard::wait_for_targets() const
   GdkAtom* targets = 0;
   gint n_targets = 0;
   gboolean test = gtk_clipboard_wait_for_targets( const_cast<GtkClipboard*>(gobj()), &targets, &n_targets );
+  if(!test)
+    n_targets = 0; //otherwise it will be -1.
 
   //Add the targets to the C++ container:
-  if(test)
+  for(int i = 0; i < n_targets; i++)
   {
-    listTargets = util_convert_atoms_to_strings(targets, n_targets);
+    //Convert the atom to a string:
+    gchar* const atom_name = gdk_atom_name(targets[i]);
 
-    g_free(targets);
+    Glib::ustring target;
+    if(atom_name)
+      target = Glib::ScopedPtr<char>(atom_name).get(); //This frees the gchar*.
+
+    listTargets.push_back(target);
   }
 
   return listTargets;

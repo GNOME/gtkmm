@@ -23,6 +23,7 @@
 #include <gdkmm/window.h>
 #include <gtk/gtkdnd.h>
 #include <gdk/gdkwindow.h>
+#include <glibmm/utility.h> //For ScopedPtr<>.
 
 namespace Gdk
 {
@@ -37,6 +38,29 @@ void DragContext::find_window_for_screen(const Glib::RefPtr<Window>& drag_window
 void DragContext::drag_refuse(guint32 time)
 {
   gdk_drag_status(gobj(), ((GdkDragAction)(0)) /* see GDK docs */, time);
+}
+
+Glib::StringArrayHandle DragContext::get_targets() const
+{
+  std::list<Glib::ustring> listTargets;
+
+  //Get a newly-allocated array of atoms:
+  GList* list = gobj()->targets;
+  while(list)
+  {
+    GdkAtom atom = (GdkAtom)list->data;
+    
+    //Convert the atom to a string:
+    gchar* const atom_name = gdk_atom_name(atom);
+
+    Glib::ustring target;
+    if(atom_name)
+      target = Glib::ScopedPtr<char>(atom_name).get(); //This frees the gchar*.
+      
+    listTargets.push_back(target);
+  }
+
+  return listTargets;
 }
 
 } /* namespace Gdk */

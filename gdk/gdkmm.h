@@ -42,7 +42,7 @@
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/screen.h>
 #include <gdkmm/general.h>
-
+#include <gdkmm/rgb.h>
 
 #endif /* _GDKMM_GDKMM_H_ */
 

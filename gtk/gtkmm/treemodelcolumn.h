@@ -37,8 +37,8 @@ class TreeModelColumnBase;
 /** Typedefed as TreeModel::ColumnRecord.
  * Keeps a record of @link TreeModelColumn TreeModelColumns@endlink.
  * @ingroup TreeView
- * ColumnRecord objects are used to setup a new TreeModel
- * (or rather, an implementation of the model, like Gtk::ListStore
+ * ColumnRecord objects are used to setup a new instance of a TreeModel
+ * (or rather, a new instance of an implementation of the model, such as Gtk::ListStore
  * or Gtk::TreeStore).  It is convenient to do that by deriving from
  * TreeModel::ColumnRecord:
  * @code
@@ -52,15 +52,22 @@ class TreeModelColumnBase;
  *   MyModelColumns() { add(filename); add(description); add(thumbnail); }
  * };
  * @endcode
- * An instance of @c MyModelColumns should be passed to ListStore::create()
- * or TreeStore::create().  The members @c filename, @c description
- * and @c thumbnail can then be used with Gtk::TreeRow::operator[]()
+ *
+ * Whether or not you derive your own ColumnRecord, you need to add the
+ * @link TreeModelColumn TreeModelColumns@endlink to the ColumnRecord with the
+ * add() method.
+ *
+ * A ColumnRecord instance, such as an instance of @c MyModelColumns should then
+ * be passed to ListStore::create() or TreeStore::create().
+ * The @link TreeModelColumn TreeModelColumns@endlink, such as the members
+ * @c filename, @c description and @c thumbnail can then be used with Gtk::TreeRow::operator[]()
  * to specify the column you're interested in.
  *
  * Neither TreeModel::ColumnRecord nor the
  * @link TreeModelColumn TreeModelColumns@endlink contain any real data --
- * it's merely a description of what type is stored in which column
- * of a TreeModel.  Thus it's absolutely legal to use a statically allocated
+ * they merely describe what C++ type is stored in which column
+ * of a TreeModel, and save you from having to repeat that type information in several places.
+ * Thus it's absolutely legal to use a statically allocated
  * TreeModel::ColumnRecord (as long as you make sure it's instantiated after
  * Gtk::Main), even when creating multiple models from it.
  */
@@ -76,7 +83,7 @@ public:
    * you're free to pass it around by value.
    */
   void add(TreeModelColumnBase& column);
-
+  
   unsigned int size()  const;
   const GType* types() const;
 
@@ -117,9 +124,9 @@ inline bool operator!=(const TreeModelColumnBase& lhs, const TreeModelColumnBase
   { return (lhs.index() != rhs.index()); }
 
 
-/** Generic TreeModelColumn template.
+/** A Gtk::TreeModelColumn describes the C++ type of the data in a model column, and identifies that column in the model.
+ * See @link TreeModelColumnRecord Gtk::TreeModel::Columns@endlink for a usage example.
  * @ingroup TreeView
- * See TreeModelColumnRecord for a usage example.
  */
 template <class T>
 class TreeModelColumn : public TreeModelColumnBase

@@ -18,7 +18,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/utility.h> //For ScopedPtr<>.
 #include <gtk/gtkselection.h>
+
 
 
 namespace Gtk
@@ -61,7 +63,7 @@ std::string SelectionData::get_target() const
       gdk_atom_name(const_cast<GtkSelectionData*>(gobj())->target));
 }
 
-Gdk::ArrayHandle_AtomString SelectionData::get_targets() const
+Glib::StringArrayHandle SelectionData::get_targets() const
 {
   GdkAtom* targets = 0;
   int    n_targets = 0;
@@ -69,7 +71,23 @@ Gdk::ArrayHandle_AtomString SelectionData::get_targets() const
   if(!gtk_selection_data_get_targets(const_cast<GtkSelectionData*>(gobj()), &targets, &n_targets))
     n_targets = 0; // it's set to -1 otherwise
 
-  return Gdk::ArrayHandle_AtomString(targets, n_targets, Glib::OWNERSHIP_SHALLOW);
+  //Build a C++ list containing the target names:
+  std::list<Glib::ustring> listTargets;
+  for(int i = 0; i < n_targets; n_targets++)
+  {
+    //Convert the atom to a string:
+    gchar* const atom_name = gdk_atom_name(targets[i]);
+
+    Glib::ustring target;
+    if(atom_name)
+      target = Glib::ScopedPtr<char>(atom_name).get(); //This frees the gchar*.
+
+    listTargets.push_back(target);
+  }
+
+  g_free(targets);
+
+  return listTargets;
 }
 
 std::string SelectionData::get_data_type() const

@@ -38,6 +38,7 @@ _WRAP_ENUM(TreeModelFlags, GtkTreeModelFlags)
 
 /** This class defines a generic tree interface for use by the Gtk::TreeView widget.
  * @ingroup TreeView
+ *
  * It is is designed to be usable with any appropriate data structure. The
  * programmer just has to implement this interface on their own data type for
  * it to be viewable by a Gtk::TreeView widget.
@@ -46,8 +47,7 @@ _WRAP_ENUM(TreeModelFlags, GtkTreeModelFlags)
  * data. In other words, the model can be seen as a tree where every node has
  * different values depending on which column is being queried.  The type of
  * data found in a column is determined by TreeModel::Column<> templates.
- * The types are
- * homogeneous per column across all nodes. It is important to note that this
+ * The types are homogeneous per column across all nodes. It is important to note that this
  * interface only provides a way of examining a model and observing changes.
  * The implementation of each individual model decides how and if changes are
  * made.
@@ -63,34 +63,20 @@ _WRAP_ENUM(TreeModelFlags, GtkTreeModelFlags)
  * Models are accessed on a node/column level of granularity. One can query for
  * the value of a model at a certain node and a certain column on that node.
  * There are two structures used to reference a particular node in a model.
- * They are the Path and the iterator. Most of the interface consists of
- * operations on a iterator.
+ * They are the @link Gtk::TreePath Path@endlink and the iterator. Most of the interface consists of
+ * operations on an @link Gtk::TreeIter iterator@endlink.
  *
- * A path is essentially a potential node. It is a location on a model that may
- * or may not actually correspond to a node on a specific model. A Path can be
- * converted into either an array of unsigned integers or a string. The string
- * form is a list of numbers separated by a colon. Each number refers to the
- * offset at that level. Thus, the path "0" refers to the root node and the
- * path "2:4" refers to the fifth child of the third node.
+ * A @link Gtk::TreePath Gtk::TreeModel::Path@endlink is essentially a potential node. It is a location on a model that may
+ * or may not actually correspond to a node on a specific model.
  *
- * By contrast, a iterator is a reference to a specific node on a specific
- * model. It is a generic structure with an integer and three generic pointers.
- * These are filled in by the model in a model-specific way. One can convert a
- * path to an iterator by calling Gtk::TreeModel::get_iter(). These iterators
- * are the primary way of accessing a model and are similar to the iterators
+ * By contrast, an @link Gtk::TreeIter Gtk::TreeModel::iterator@endlink  is a reference to a specific node on a specific
+ * model. One can convert a path to an @link Gtk::TreeIter iterator@endlink by calling Gtk::TreeModel::get_iter().
+ * These iterators are the primary way of accessing a model and are similar to the iterators
  * used by Gtk::TextBuffer. The model interface defines a set of operations
  * using them for navigating the model.
  *
- * The lifecycle of an iterator can be a little confusing at first. Iterators
- * are expected to always be valid for as long as the model is unchanged (and
- * doesn't emit a signal). The model is considered to own all outstanding
- * iterators and nothing needs to be done to free them from the user's point of
- * view. Additionally, some models guarantee that an iterator is valid for as
- * long as the node it refers to is valid (most notably the Gtk::TreeStore and
- * Gtk::ListStore). Although generally uninteresting, as one always has to
- * allow for the case where iterators do not persist beyond a signal, some very
- * important performance enhancements were made in the sort model. As a result,
- * the GTK_TREE_MODEL_ITERS_PERSIST flag was added to indicate this behavior.
+ * The @link Gtk::TreeRowReference RowReference@endlink is also useful, because it remains
+ * valid as long as there is an existing row pointed to by it's path. You can convert between RowReferences and iterators and @link Gtk::TreePath Path@endlinks.
  */
 class TreeModel : public Glib::Interface
 {
@@ -117,8 +103,19 @@ public:
   //These are part of GtkTreeModelFilter or GtkTreeModelSort, not GtkTreeModel:
   _IGNORE(gtk_tree_model_filter_new, gtk_tree_model_sort_new_with_model, gtk_tree_model_filter_sort_new_with_model)
 
+  /** Returns a valid iterator pointing to @a path.
+   *
+   * @param path The @link Gtk::TreePath Gtk::TreeModel::Path@endlink.
+   * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
+   */
   iterator get_iter(const Path& path);
   //TODO: Implement a const_iterator? const_iterator get_iter(const Path& path) const;
+
+  /** Returns a valid iterator pointing to @a path.
+   *
+   * @param path The path, as a string representation.
+   * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
+   */
   iterator get_iter(const Glib::ustring& path_string);
   //TODO: Implement a const_iterator? const_iterator get_iter(const Glib::ustring& path_string) const;
 
@@ -131,13 +128,46 @@ public:
 
   _IGNORE(gtk_tree_model_foreach)
 
+  /** For example,
+   * void on_foreach(const Gtk::TreeModel::iterator& iter);
+   *
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   */ 
   typedef SigC::Slot1<bool, const TreeModel::iterator&> SlotForeachIter;
+
+  /** Calls a callback slot on each node in the model in a depth-first fashion.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   *
+   * @param slot The function to call for each selected node.
+   */
   void foreach(const SlotForeachIter& slot);
 
+  /** For example,
+   * void on_foreach(const Gtk::TreeModel::Path& path);
+   *
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   */ 
   typedef SigC::Slot1<bool, const TreeModel::Path&> SlotForeachPath;
+
+  /** Calls a callback slot on each node in the model in a depth-first fashion.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   *
+   * @param slot The function to call for each selected node.
+   */
   void foreach(const SlotForeachPath& slot);
 
+  /** For example,
+   * void on_foreach(const Gtk::TreeModel::Path& path, const Gtk::TreeModel::iterator& iter);
+   *
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   */
   typedef SigC::Slot2<bool, const TreeModel::Path&, const TreeModel::iterator&> SlotForeachPathAndIter;
+
+  /** Calls a callback slot on each node in the model in a depth-first fashion.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   *
+   * @param slot The function to call for each selected node.
+   */
   void foreach(const SlotForeachPathAndIter& slot);
 
   _WRAP_METHOD(TreeModelFlags get_flags() const, gtk_tree_model_get_flags)

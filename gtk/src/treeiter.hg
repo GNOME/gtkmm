@@ -65,7 +65,32 @@ class TreeIterBase
 //TODO: Implement a const_iterator too:
 //danielk says that this ConstTreeIter class should return a ConstTreeRow, which would not allow operator=.
 
-/** Typedefed as Gtk::TreeModel::iterator.
+/** A Gtk::TreeModel::iterator is a reference to a specific node on a specific
+ * model.
+ *
+ * It is a generic structure with an integer and three generic pointers.
+ * These are filled in by the model in a model-specific way.
+ *
+ * One can convert a path to an iterator by calling Gtk::TreeModel::get_iter().
+ *
+ * These iterators are the primary way of accessing a model and are similar to the iterators
+ * used by Gtk::TextBuffer. The model interface defines a set of operations
+ * using them for navigating the model.
+ *
+ * The lifecycle of an iterator can be a little confusing at first. Iterators
+ * are expected to always be valid for as long as the model is unchanged (and
+ * doesn't emit a signal).
+ * Additionally, some models guarantee that an iterator is valid for as
+ * long as the node it refers to is valid (most notably the Gtk::TreeStore and
+ * Gtk::ListStore).
+ *
+ * Although generally uninteresting, as one always has to
+ * allow for the case where iterators do not persist beyond a signal, some very
+ * important performance enhancements were made in the sort model. As a result,
+ * the Gtk::TREE_MODEL_ITERS_PERSIST flag was added to indicate this behaviour -
+ * see Gtk::TreeModel::get_flags().
+ *
+ * Typedefed as Gtk::TreeModel::iterator.
  * The Gtk::TreeModel iterator.
  * @ingroup TreeView
  */
@@ -88,8 +113,8 @@ public:
 
   bool equal(const TreeIter& other) const;
 
-  //TODO_API: Add a virtual Model method to use the various GTK+ _iter_is_valid() functions, depending on the model.
-  //instead of the slightly hacky way that we test for validity now. murrayc/danielk.
+  /** Discover whether the iterator is valid, and not equal to end().
+   */
   operator bool() const;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -164,34 +189,85 @@ private:
 
 
 /** Typedefed as TreeModel::Row.
- * Dereference a TreeModel::iterator to get the Row.
+ *
+ * Dereference a TreeModel::iterator to get the Row. Use operator[] or set_value() and get_value() to access the
+ * values in the columns of this row.
+ *
+ * If the model contains a hierarchy of rows (such as Gtk::TreeStore), then you can access the child rows with
+ * children().
+ *
  * You can use a const TreeModel::Row& for any parameter that takes a const TreeModel::iterator&.
  * @ingroup TreeView
  */
 class TreeRow : public TreeIter //We use public inheritance so that we can cast from a TreeRow to a TreeIter.
 {
 public:
+
+  /** Use this to set and get the value of this @a column of this row.
+   * This is a templated method, so the compiler will not allow you to provide an inappropriate type
+   * of data for the model column.
+   *
+   * This is just a more convient syntax that does the same thing as set_value() and get_value().
+   *
+   * @param column The model column..
+   */
   template <class ColumnType> inline
   TreeValueProxy<ColumnType> operator[](const TreeModelColumn<ColumnType>& column) const;
 
+  /** Sets the value of this @a column of this row.
+   * This is a templated method, so the compiler will not allow you to provide an inappropriate type
+   * of @a data for the model column.
+   *
+   * See also operator[].
+   *
+   * @param column The model column.
+   * @param data The new value to use for this column of this row.
+   */
   template <class ColumnType>
   void set_value(const TreeModelColumn<ColumnType>& column, const ColumnType& data) const;
 
   /** Use set_value(const TreeModelColumn<>& column, const ColumnType& data) unless
    * you do not know the column type at compile-time.
+   * If the @a data is of an inappropriate C++ type then this might fail at runtime.
+   * @param column The number of the column whose value you want to change.
+   * @param data The new value to use for this column of this row.
    */
   template <class ColumnType>
   void set_value(int column, const ColumnType& data) const;
 
+  /** Gets the value of this @a column of this row.
+   * This is a templated method, so the compiler will not allow you to provide an inappropriate type
+   * of data for the model column.
+   *
+   * See also operator[].
+   *
+   * @param column The model column.
+   * @result The new value to use for this column of this row.
+   */
   template <class ColumnType>
   ColumnType get_value(const TreeModelColumn<ColumnType>& column) const;
 
+  /** Use get_value(const TreeModelColumn<>& column) unless
+   * you do not know the column type at compile-time.
+   * If the @a data output argument is of an inappropriate C++ type then this might fail at runtime.
+   * @param column The number of the column whose value you want to change.
+   * @retval data An output argument which will contain the value of this column of this row.
+   */
   template <class ColumnType>
   void get_value(int column, ColumnType& data) const;
 
+  /** This returns an STL-like container API, for iterating over the rows.
+   * See also Gtk::TreeModel::children() for the top-level children.
+   */
   const TreeNodeChildren& children() const;
+
+  /** Gets an iterator to the parent row of this row.
+   * @result An itereator to the parent row.
+   */
   TreeIter parent() const;
 
+  /** Discover whether this is a valid row.
+   */
   operator bool() const;
 
   /// Provides access to the underlying C GObject.  
@@ -207,7 +283,9 @@ private:
 };
 
 
-/** typdefed as TreeModel::Children.
+//TODO: Document begin(), end(), size(), etc, in an STL-style way. murrayc.
+
+/** typedefed as TreeModel::Children.
  * Virtual container of TreeModel::Row items.
  * @ingroup TreeView
  */

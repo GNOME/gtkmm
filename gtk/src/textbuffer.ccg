@@ -27,6 +27,8 @@
 namespace Gtk
 {
 
+typedef TextChildAnchor ChildAnchor; //Help the code-generator so that it does not have to fully qualify this type in the .cc file.
+
 TextBuffer::TextBuffer(const Glib::RefPtr<TagTable>& tag_table)
 :
   _CONSTRUCT("tag_table", Glib::unwrap(tag_table))
@@ -37,6 +39,14 @@ Glib::RefPtr<TextBuffer::Tag> TextBuffer::create_tag(const Glib::ustring& tag_na
   //gtk_text_buffer_create_tag takes a varargs list of property names and values.
   //gtkmm coders should use the Tag.set_* method instead.
   return Glib::wrap(gtk_text_buffer_create_tag(gobj(), tag_name.c_str(), (char*)0), true); //true = take_copy.
+  //We have to take a copy because gtk_text_buffer_create_tag() doesn't ref for us, for no real reason.
+}
+
+Glib::RefPtr<TextBuffer::Tag> TextBuffer::create_tag()
+{
+  //gtk_text_buffer_create_tag takes a varargs list of property names and values.
+  //gtkmm coders should use the Tag.set_* method instead.
+  return Glib::wrap(gtk_text_buffer_create_tag(gobj(), (const char*)0, (char*)0), true); //true = take_copy.
   //We have to take a copy because gtk_text_buffer_create_tag() doesn't ref for us, for no real reason.
 }
 
@@ -112,11 +122,13 @@ void TextBuffer::set_text(const char* text_begin, const char* text_end)
   gtk_text_buffer_set_text(gobj(), text_begin, text_end - text_begin);
 }
 
+//deprecated:
 void TextBuffer::assign(const Glib::ustring& text)
 {
   gtk_text_buffer_set_text(gobj(), text.data(), text.bytes());
 }
 
+//deprecated:
 void TextBuffer::assign(const char* text_begin, const char* text_end)
 {
   gtk_text_buffer_set_text(gobj(), text_begin, text_end - text_begin);
@@ -154,7 +166,7 @@ TextBuffer::iterator TextBuffer::insert_pixbuf(const iterator& pos, const Glib::
 }
 
 TextBuffer::iterator TextBuffer::insert_child_anchor(const iterator& pos,
-                                                     const Glib::RefPtr<TextChildAnchor>& anchor)
+                                                     const Glib::RefPtr<ChildAnchor>& anchor)
 {
   // Copy the iterator. It might be changed because it is used as a signal parameter internally.
   iterator iterCopy (pos);
@@ -162,7 +174,7 @@ TextBuffer::iterator TextBuffer::insert_child_anchor(const iterator& pos,
   return iterCopy;
 }
 
-Glib::RefPtr<TextChildAnchor> TextBuffer::create_child_anchor(const iterator& pos)
+Glib::RefPtr<ChildAnchor> TextBuffer::create_child_anchor(const iterator& pos)
 {
   // Copy the iterator. It might be changed because it is used as a signal parameter internally.
   iterator iterCopy (pos);
@@ -410,7 +422,7 @@ void TextBuffer::paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool 
   gtk_text_buffer_paste_clipboard(gobj(), clipboard->gobj(), 0, default_editable);
 }
 
-TextBuffer::iterator TextBuffer::get_iter_at_child_anchor(const Glib::RefPtr<TextChildAnchor>& anchor)
+TextBuffer::iterator TextBuffer::get_iter_at_child_anchor(const Glib::RefPtr<ChildAnchor>& anchor)
 {
   iterator iter;
   gtk_text_buffer_get_iter_at_child_anchor(gobj(), iter.gobj(), anchor->gobj());

@@ -1,6 +1,7 @@
+// -*- c++ -*-
 /* $Id$ */
 
-/* Copyright 2002      The gtkmm Development Team
+/* Copyright 2004      The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,21 +18,26 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef _GDKMM_GENERAL_H
-#define _GDKMM_GENERAL_H
+#include <gdkmm/rgb.h>
+#include <gdk/gdk.h>
 
 namespace Gdk
 {
 
-int screen_width();
-int screen_height();
+Glib::RefPtr<Colormap> rgb_get_colormap()
+{
+  return Glib::wrap( gdk_rgb_get_colormap() );
+}
 
-int screen_width_mm();
-int screen_height_mm();
+Glib::RefPtr<Visual> rgb_get_visual()
+{
+  return Glib::wrap( gdk_rgb_get_visual() );
+}
 
-void flush();
+bool rgb_ditherable()
+{
+  return gdk_rgb_ditherable();
+}
 
 } //namespace Gdk
-
-#endif //_GDKMM_GENERAL_H
 

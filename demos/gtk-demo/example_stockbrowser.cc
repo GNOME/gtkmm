@@ -132,7 +132,7 @@ Example_StockBrowser::~Example_StockBrowser()
 Glib::RefPtr<Gtk::TreeModel> Example_StockBrowser::create_model()
 {
   Glib::RefPtr<Gtk::ListStore> refStore = Gtk::ListStore::create(m_columns);
-  refStore->set_sort_column_id(m_columns.id, Gtk::SORT_ASCENDING);
+  refStore->set_sort_column(m_columns.id, Gtk::SORT_ASCENDING);
 
   // obtain the ids of all stock items
   typedef std::vector<Gtk::StockID> type_vecIDs;
