@@ -91,10 +91,20 @@ class TreeView : public Container
   _IGNORE(gtk_tree_view_get_path_at_pos, gtk_tree_view_set_destroy_count_func, gtk_tree_view_get_cursor
           gtk_tree_view_insert_column_with_data_func, gtk_tree_view_get_drag_dest_row, gtk_tree_view_get_dest_row_at_pos)
 public:
+  /**  A visible column in a Gtk::TreeView widget.
+   */
   typedef TreeViewColumn Column;
+  
+  /** A selection object for Gtk::TreeView.
+   */
   typedef TreeSelection Selection;
-
+  /**
+     Default constructor
+   */
   _CTOR_DEFAULT()
+  /**
+     Constructor that binds to a TreeModel
+   */
   _WRAP_CTOR(TreeView(const Glib::RefPtr<TreeModel>& model), gtk_tree_view_new_with_model)
 
   _WRAP_METHOD(Glib::RefPtr<TreeModel> get_model(), gtk_tree_view_get_model, refreturn)
@@ -105,11 +115,21 @@ public:
   _WRAP_METHOD(Adjustment* get_hadjustment(), gtk_tree_view_get_hadjustment)
   _WRAP_METHOD(const Adjustment* get_hadjustment() const, gtk_tree_view_get_hadjustment)
   _WRAP_METHOD(void set_hadjustment(Adjustment& adjustment), gtk_tree_view_set_hadjustment)
+  
+  /** This method removes the hadjustment.
+   * @see set_hadjustment().
+   */
   void unset_hadjustment();
+  
   _WRAP_METHOD(Adjustment* get_vadjustment(), gtk_tree_view_get_vadjustment)
   _WRAP_METHOD(const Adjustment* get_vadjustment() const, gtk_tree_view_get_vadjustment)
   _WRAP_METHOD(void set_vadjustment(Adjustment& adjustment), gtk_tree_view_set_vadjustment)
+  
+  /** This method removes the vadjustment.
+   * @see set_vadjustment().
+   */
   void unset_vadjustment();
+  
   _WRAP_METHOD(bool get_headers_visible() const, gtk_tree_view_get_headers_visible)
   _WRAP_METHOD(void set_headers_visible(bool headers_visible), gtk_tree_view_set_headers_visible)
   _WRAP_METHOD(void columns_autosize(), gtk_tree_view_columns_autosize)
@@ -202,6 +222,17 @@ public:
   int insert_column_editable(const Glib::ustring& title, const TreeModelColumn<ColumnType>& model_column, int position);
 
   typedef TreeViewColumn::SlotCellData SlotCellData;
+  /**
+     Inserts a new column into the TreeView with the given cell
+     renderer and a SlotCellData to set cell renderer attributes
+     (normally using data from the model). 
+
+     @param position Position to insert, -1 for append
+     @param title column title
+     @param cell cell renderer for column
+     @param slot function to set attributes of cell renderer
+     @return number of columns in the TreeView after the insert
+   */
   int insert_column_with_data_func(int position, const Glib::ustring& title, CellRenderer& cell, const SlotCellData& slot);
 
   _WRAP_METHOD(TreeViewColumn* get_column(int n), gtk_tree_view_get_column)
@@ -230,7 +261,12 @@ public:
   
   _WRAP_METHOD(void move_column_after(TreeViewColumn& column, TreeViewColumn& base_column), gtk_tree_view_move_column_after)
   _WRAP_METHOD(void set_expander_column(TreeViewColumn& column), gtk_tree_view_set_expander_column)
-  void unset_expander_column();
+  
+  /** This method resets the expander arrow to the default - the first visible column.
+   * @See set_expander_column().  
+   */
+  void reset_expander_column();
+  
   _WRAP_METHOD(TreeViewColumn* get_expander_column(), gtk_tree_view_get_expander_column)
   _WRAP_METHOD(const TreeViewColumn* get_expander_column() const, gtk_tree_view_get_expander_column)
 
@@ -366,15 +402,41 @@ public:
   _WRAP_METHOD(bool row_expanded(const TreeModel::Path& path), gtk_tree_view_row_expanded)
   _WRAP_METHOD(void set_reorderable(bool reorderable = true), gtk_tree_view_set_reorderable)
   _WRAP_METHOD(bool get_reorderable() const, gtk_tree_view_get_reorderable)
+    
   _WRAP_METHOD(void set_cursor(const TreeModel::Path& path, TreeViewColumn& focus_column, bool start_editing = false), gtk_tree_view_set_cursor)
+    
   _WRAP_METHOD(void set_cursor(const TreeModel::Path& path, TreeViewColumn& focus_column, CellRenderer& cell, bool start_editing = false), gtk_tree_view_set_cursor_on_cell)
-
+    
+  /**
+     Sets the current keyboard focus to be at path , and selects it.
+     @param path A reference to cursor path.
+   */
   void set_cursor(const TreeModel::Path& path); //TODO: Add bool start_editing = false?, even though a true value doesn't actually start editing?
+
+  /**  Fills in path and focus_column with the current path and focus column.
+
+       @param path A reference to be filled with the current cursor path
+       @param focus_column A reference to be filled with the current focus column
+   */
   void get_cursor(TreeModel::Path& path, TreeViewColumn*& focus_column);
 
 /* Layout information */
   _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_bin_window(), gtk_tree_view_get_bin_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_bin_window() const, gtk_tree_view_get_bin_window, refreturn)
+
+  /** Finds the path at the point (x, y), relative to widget
+     coordinates. It is primarily for things like popup menus.
+     
+     @param x The x position to be identified
+     @param y The y position to be identified
+     @param path A reference to a TreeModel::Path to be filled in
+     @param column A reference to a TreeViewColumn pointer to be filled in
+     @param cell_x A reference where the X coordinate relative to the cell
+       can be placed
+     @param cell_y A reference where the Y coordinate relative to the cell
+       can be placed
+     @return true if a row exists at that coordinate.
+   */
   bool get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColumn*& column, int& cell_x, int& cell_y);
   _WRAP_METHOD(void get_cell_area(const TreeModel::Path& path, TreeViewColumn& column, Gdk::Rectangle&  rect), gtk_tree_view_get_cell_area)
 //We ignore the fact that one of the arguments can be 0 - it does not seem useful.
@@ -388,29 +450,74 @@ public:
 
 /* Drag-and-Drop support */
   _IGNORE(gtk_tree_view_enable_model_drag_source)
-
+  /**
+     Turns *this into a drag source for automatic DND.
+     @param targets Standard container of targets that the drag will support.
+     @param start_button_mask Mask of allowed buttons to start drag.
+     @param actions The bitmask of possible actions for a drag from this widget.
+   */
   void enable_model_drag_source(const ArrayHandle_TargetEntry& targets,
                                 Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
                                 Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
-  // Uses the default "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.                              
+  // Uses the default "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
+  /**
+     Turns *this into a drag source for automatic DND.
+     @param start_button_mask Mask of allowed buttons to start drag.
+     @param actions The bitmask of possible actions for a drag from this widget.
+   */
   void enable_model_drag_source(Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
                                 Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);                                                                                              
 
   _IGNORE(gtk_tree_view_enable_model_drag_dest)
+    
+  /** Turns *this into a drop destination for automatic DND.
+    @param actions The bitmask of possible actions for a drag from this widget.
+   */ 
   void enable_model_drag_dest(const ArrayHandle_TargetEntry& targets, Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
-  // Uses the default "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
+  /** Turns *this into a drop destination for automatic DND.  Uses the default
+      "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
+    @param targets The table of targets that the drag will support.
+    @param actions The bitmask of possible actions for a drag from this widget.
+   */ 
   void enable_model_drag_dest(Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
-    
+  /**
+     Undoes the effect of enable_model_drag_source()
+   */
   _WRAP_METHOD(void unset_rows_drag_source(), gtk_tree_view_unset_rows_drag_source)
+  /**
+     Undoes the effect of enable_model_drag_source()
+   */
   _WRAP_METHOD(void unset_rows_drag_dest(), gtk_tree_view_unset_rows_drag_dest)
 
 
 /* These are useful to implement your own custom stuff. */
+  /**
+     Sets the row that is highlighted for feedback.
+
+     @param path The path of the row to highlight
+     @param pos Specifies whether to drop before, after or into the row
+   */
   _WRAP_METHOD(void set_drag_dest_row(const TreeModel::Path& path, TreeViewDropPosition pos), gtk_tree_view_set_drag_dest_row)
+    
+  /**
+     Gets information about the row that is highlighted for feedback.
+
+     @param path Return location for the path of the highlighted row
+     @param pos Return location for the drop position
+   */
   void get_drag_dest_row(TreeModel::Path& path, TreeViewDropPosition& pos);
+  /**
+     Determines the destination row for a given position.
+
+     @param drag_x The x position to determine the destination row for
+     @param drag_y The y position to determine the destination row for
+     @param path Return location for the path of the highlighted row
+     @param pos Return location for the drop position
+
+   */
   bool get_dest_row_at_pos(int drag_x, int drag_y, TreeModel::Path& path, TreeViewDropPosition& pos);
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixmap> create_row_drag_icon(const TreeModel::Path& path), gtk_tree_view_create_row_drag_icon)
 
@@ -425,6 +532,11 @@ public:
   typedef sigc::slot<bool, const Glib::RefPtr<TreeModel>&, int, const Glib::ustring&, const TreeModel::iterator&> SlotSearchEqual;
   //SlotSearchEqual get_search_equal_func();
   _IGNORE(gtk_tree_view_get_search_equal_func)
+  /**
+     Sets the compare function for the interactive search capabilities.
+
+     @param slot The compare function to use during the search
+   */
   void set_search_equal_func(const SlotSearchEqual& slot);
   _IGNORE(gtk_tree_view_set_search_equal_func)
 
