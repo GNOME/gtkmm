@@ -82,7 +82,7 @@ DemoWindow::DemoWindow()
 
   m_refTreeSelection = m_TreeView.get_selection();
   m_refTreeSelection->set_mode(Gtk::SELECTION_BROWSE);
-  m_refTreeSelection->set_select_function( sigc::mem_fun(*this, &DemoWindow::select_function) );
+  m_refTreeSelection->set_select_function( sigc::ptr_fun(&DemoWindow::select_function) );
 
   m_TreeView.set_size_request(200, -1);
 
@@ -138,7 +138,7 @@ void DemoWindow::fill_tree()
   m_TreeView.append_column(*pColumn);
 
   m_refTreeSelection->signal_changed().connect(sigc::mem_fun(*this, &DemoWindow::on_treeselection_changed));
-  //TODO: m_TreeView.signal_row_activated().connect(sigc::mem_fun(*this, &DemoWindow::on_treeview_row_activated));
+  m_TreeView.signal_row_activated().connect(sigc::mem_fun(*this, &DemoWindow::on_treeview_row_activated));
 
   m_TreeView.expand_all();
 }
