@@ -36,7 +36,7 @@ protected:
   virtual void on_clipboard_clear();
 
   virtual void on_clipboard_received(const Gtk::SelectionData& selection_data);
-  virtual void on_clipboard_received_targets(const Gtk::SelectionData& selection_data);
+  virtual void on_clipboard_received_targets(const Glib::StringArrayHandle& targets_array);
    
   virtual void update_paste_status(); //Disable the paste button if there is nothing to paste.
 

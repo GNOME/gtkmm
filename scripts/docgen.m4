@@ -24,7 +24,7 @@ AC_SUBST(GTKMM_DOXYGEN_INPUT)
 ##
 AC_DEFUN([GTKMM_ARG_ENABLE_FULLDOCS],
 [
-AC_REQUIRE([GTKMM_CHECK_PERL])
+AC_REQUIRE([GLIBMM_CHECK_PERL])
 
 AC_MSG_CHECKING([[whether to merge C reference docs into generated headers]])
 

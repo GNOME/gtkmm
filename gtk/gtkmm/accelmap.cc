@@ -54,6 +54,16 @@ void save(const std::string& filename)
   gtk_accel_map_save(filename.c_str());
 }
 
+void lock_path(const std::string& accel_path)
+{
+  gtk_accel_map_lock_path(accel_path.c_str());
+}
+
+void unlock_path(const std::string& accel_path)
+{
+  gtk_accel_map_unlock_path(accel_path.c_str());
+}
+
 } // namespace AccelMap
 
 } // namespace Gtk

@@ -29,6 +29,15 @@ _CONVERSION(`const Glib::RefPtr<StateSet>&',`AtkStateSet*',`Glib::unwrap($3)')
 _CONVERSION(`AtkGObjectAccessible*',`Glib::RefPtr<ObjectAccessible>',Glib::wrap($3))
 _CONVERSION(`AtkGObjectAccessible*',`Glib::RefPtr<const ObjectAccessible>',Glib::wrap($3))
 
+_CONVERSION(`AtkHyperlink*',`Glib::RefPtr<Hyperlink>',Glib::wrap($3))
+_CONVERSION(`AtkHyperlink*',`Glib::RefPtr<const Hyperlink>',Glib::wrap($3))
+
 _CONVERSION(`AtkAttributeSet*', `AttributeSet', `AttributeSet($3, Glib::OWNERSHIP_DEEP)')
 _CONVERSION(`const AttributeSet&', `AtkAttributeSet*', `($3).data()')
+
+_CONVERSION(`GIOChannel*',`Glib::RefPtr<Glib::IOChannel>',Glib::wrap($3))
+
+# For signals:
+_CONVERSION(`Glib::RefPtr<Hyperlink>',`AtkHyperlink*',`Glib::unwrap($3)')
+
 

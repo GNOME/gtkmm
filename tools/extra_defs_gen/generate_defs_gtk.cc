@@ -29,11 +29,12 @@ int main (int argc, char *argv[])
 
   void *const g_class_atk_no_op_object = g_type_class_ref(ATK_TYPE_NO_OP_OBJECT);
 
-  std::cout << get_defs( ATK_TYPE_HYPERLINK )
-            << get_defs( ATK_TYPE_OBJECT )
+  std::cout << get_defs( ATK_TYPE_OBJECT )
             << get_defs( ATK_TYPE_COMPONENT )
             << get_defs( ATK_TYPE_ACTION )
             << get_defs( ATK_TYPE_EDITABLE_TEXT )
+            << get_defs( ATK_TYPE_HYPERLINK )
+            << get_defs( ATK_TYPE_HYPERTEXT )
             << get_defs( ATK_TYPE_IMAGE )
             << get_defs( ATK_TYPE_SELECTION )
             << get_defs( ATK_TYPE_TABLE )

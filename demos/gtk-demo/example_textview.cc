@@ -121,7 +121,7 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refTag = refBuffer->create_tag("heading");
   refTag->property_weight().set_value(Pango::WEIGHT_BOLD);
   refTag->property_size().set_value(15 * Pango::SCALE);
-		
+
   refBuffer->create_tag("italic")->property_style().set_value(Pango::STYLE_ITALIC);
   refBuffer->create_tag("bold")->property_weight().set_value(Pango::WEIGHT_BOLD);
   refBuffer->create_tag("big")->property_size().set_value(20 * Pango::SCALE);

@@ -1,6 +1,6 @@
 /* $Id$ */
 
-/* accelgroup.h
+/* clipboard.h
  * 
  * Copyright (C) 2002 The gtkmm Development Team
  *
@@ -24,6 +24,7 @@
 #include <gtkmm/targetentry.h>
 #include <gtkmm/selectiondata.h>
 #include <glibmm/object.h>
+#include <glibmm/containers.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -43,10 +44,10 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::Display> get_display(), gtk_clipboard_get_display, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Display> get_display() const, gtk_clipboard_get_display, refreturn)
 
-  /// e.g.: void on_get(Gtk::SelectionData& selection_data, guint info);
+  /// For instance: void on_get(Gtk::SelectionData& selection_data, guint info);
   typedef SigC::Slot2<void, SelectionData&, guint> SlotGet;
 
-  /// e.g.: void on_clear();
+  /// For instance: void on_clear();
   typedef SigC::Slot0<void> SlotClear;
 
  /**
@@ -70,11 +71,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Glib::Object> get_owner() const, gtk_clipboard_get_owner)
 
   /**
-  * Clears the contents of the clipboard. Generally this should only
-  * be called between the time you call set()
-  * and when the slot_clear you supplied is called. Otherwise, the
-  * clipboard may be owned by someone else.
-  */
+   * Clears the contents of the clipboard. Generally this should only
+   * be called between the time you call set()
+   * and when the slot_clear you supplied is called. Otherwise, the
+   * clipboard may be owned by someone else.
+   */
   _WRAP_METHOD(void clear(), gtk_clipboard_clear)
 
   /**
@@ -89,21 +90,69 @@ public:
   void set_text(const Glib::ustring& text);
   _IGNORE(gtk_clipboard_set_text)
 
-  /// e.g.: void on_received(const SelectionData& selection_data);
+  /// For instance: void on_received(const SelectionData& selection_data);
   typedef SigC::Slot1<void, const SelectionData&> SlotReceived;
+
+  /** Requests the contents of clipboard as the given target.
+   * When the results of the result are later received the supplied callback
+   * will be called.
+   *
+   * @param target The form into which the clipboard
+   *             owner should convert the selection.
+   * @param slot  A function to call when the results are received
+   *             (or the retrieval fails). If the retrieval fails
+   *             the length field of selection_data will be
+   *             negative.
+   **/
   void request_contents(const Glib::ustring& target, const SlotReceived& slot);
   _IGNORE(gtk_clipboard_request_contents)
 
   /* This requests the special "TARGETS" target.
    * Call Gtk::SelectionData::get_targets() on the selection_data provided to the callback,
    *  to see what targets are available.
+   *
+   * @deprecated: Use request_targets(const SlotTargetsReceived& slot) instead.
    */
   void request_targets(const SlotReceived& slot);
   
-  /// e.g.: void on_textreceived(const Glib::ustring& text);
+  /// For instance: void on_textreceived(const Glib::ustring& text);
   typedef SigC::Slot1<void, const Glib::ustring&> SlotTextReceived;
+
+  /** Requests the contents of the clipboard as text. When the text is
+   * later received, it will be converted to UTF-8 if necessary, and
+   * slot will be called.
+   *
+   * The text parameter to slot will contain the resulting text if
+   * the request succeeded, or will be empty if it failed. This could happen for
+   * various reasons, in particular if the clipboard was empty or if the
+   * contents of the clipboard could not be converted into text form.
+   *
+   * @param slot:  a function to call when the text is received,
+   *             or the retrieval fails. (It will always be called
+   *             one way or the other.)
+   **/
   void request_text(const SlotTextReceived& slot);
   _IGNORE(gtk_clipboard_request_text)
+
+  /// For instance: void on_targetsreceived(const Glib::StringArrayHandle& targets);
+  typedef SigC::Slot1<void, const Glib::StringArrayHandle&> SlotTargetsReceived;
+
+  /** Requests the contents of the clipboard as list of supported targets.
+   * When the list is later received, callback will be called.
+   *
+   * The targets parameter to slot will contain the resulting targets if
+   * the request succeeded.
+   *
+   * @param slot a function to call when the targets are received,
+   *             or the retrieval fails. (It will always be called
+   *             one way or the other.) Remember that Glib::StringArrayHandle
+   *             is an intermediate type, so you should convert it to a
+   *             standard C++ container.
+   *
+   * Since: 2.4
+   **/
+  void request_targets(const SlotTargetsReceived& slot);
+  _IGNORE(gtk_clipboard_request_targets)
                
   /**
    * Requests the contents of the clipboard using the given target.
@@ -119,6 +168,18 @@ public:
 
   _WRAP_METHOD(Glib::ustring wait_for_text() const, gtk_clipboard_wait_for_text)
   _WRAP_METHOD(bool wait_is_text_available() const, gtk_clipboard_wait_is_text_available)
+
+  /** Returns a list of targets that are present on the clipboard.
+   * This function waits for the data to be received using the main
+   * loop, so events, timeouts, etc, may be dispatched during the wait.
+   *
+   * @result targets: The targets.
+   *
+   * Since: 2.4
+   */
+  Glib::StringArrayHandle wait_for_targets() const;
+  _IGNORE(gtk_clipboard_wait_for_targets)
+           
 };
 
 } /* namespace Gtk */

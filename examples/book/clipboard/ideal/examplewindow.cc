@@ -174,10 +174,10 @@ void ExampleWindow::update_paste_status()
   refClipboard->request_targets( SigC::slot(*this, &ExampleWindow::on_clipboard_received_targets) );
 }
 
-void ExampleWindow::on_clipboard_received_targets(const Gtk::SelectionData& selection_data)
+void ExampleWindow::on_clipboard_received_targets(const Glib::StringArrayHandle& targets_array)
 {
   // Get the list of available clipboard targets:
-  const std::list<std::string> targets (selection_data.get_targets());
+  const std::list<std::string> targets (targets_array);
 
   const bool bPasteIsPossible =
       std::find(targets.begin(), targets.end(), example_target_custom) != targets.end();

@@ -143,9 +143,9 @@ _CONVERSION(`const Glib::RefPtr<const Gdk::Image>&', `GdkImage*',__CONVERT_CONST
 _CONVERSION(`const Glib::RefPtr<const Image>&', `GdkImage*',__CONVERT_CONST_REFPTR_TO_P_SUN(Image))
 _CONVERSION(`const Glib::RefPtr<const Gdk::GC>&', `GdkGC*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::GC))
 _CONVERSION(`const Glib::RefPtr<const GC>&', `GdkGC*',__CONVERT_CONST_REFPTR_TO_P_SUN(GC))
-_CONVERSION(`const Glib::RefPtr<const Gdk::Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Drawable))
-_CONVERSION(`const Glib::RefPtr<const Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
-_CONVERSION(`const Glib::RefPtr<const Display>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
+#_CONVERSION(`const Glib::RefPtr<const Gdk::Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Drawable))
+#_CONVERSION(`const Glib::RefPtr<const Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
+#_CONVERSION(`const Glib::RefPtr<const Display>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
 
 
 _CONVERSION(`GdkWindow*',`Glib::RefPtr<Window>', `Glib::wrap((GdkWindowObject*)($3))')

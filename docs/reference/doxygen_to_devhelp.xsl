@@ -5,12 +5,12 @@
 
 <xsl:output method="xml" version="1.0" indent="yes"/>
 
-<xsl:param name="reference_prefix">reference/html/</xsl:param>
+<xsl:param name="reference_prefix">../../../doc/gtkmm-2.4/docs/reference/html/</xsl:param>
 
 <xsl:template match="/">
-  <book title="gtkmm library Reference Manual"
-        name="gtkmm"
-        link="index.html">
+  <book title="gtkmm 2.4 library Reference Manual"
+        name="gtkmm 2.4"
+        link="{$reference_prefix}../../index.html">
   <chapters>
     <sub name="Classes" link="{$reference_prefix}classes.html">
       <xsl:apply-templates select="doxygenindex/compound[@kind='class']">
