@@ -25,8 +25,10 @@
 #include <gtkmm/container.h>
 #include <gtkmm/stockid.h>
 
+//TODO: Undef and redef it if's it's deprecated.
+//#undef GTK_DISABLE_DEPRECATED
 #include <gtk/gtktoolbar.h> // Needed for GtkToolbarChild (which is deprecated)
-
+//#define GTK_DISABLE_DEPRECATED
 
 namespace Gtk
 {

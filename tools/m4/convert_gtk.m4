@@ -275,7 +275,8 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALL
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<FileFilter> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 

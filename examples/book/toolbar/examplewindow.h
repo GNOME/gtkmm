@@ -19,6 +19,9 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
+//TODO: Update this example:
+#undef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm.h>
 
 class ExampleWindow : public Gtk::Window

@@ -1,3 +1,6 @@
+//TODO: Update this example:
+#undef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm/main.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/button.h>
