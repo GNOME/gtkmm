@@ -44,6 +44,8 @@ ExampleWindow::~ExampleWindow()
 void ExampleWindow::on_button_folder_clicked()
 {
   Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button("Select", Gtk::RESPONSE_OK);
   dialog.set_transient_for(*this);
   dialog.set_folder_mode();
 
@@ -54,7 +56,7 @@ void ExampleWindow::on_button_folder_clicked()
   {
     case(Gtk::RESPONSE_OK):
     {
-      std::cout << "OK clicked." << std::endl;
+      std::cout << "Select clicked." << std::endl;
       std::cout << "Folder selected: " << dialog.get_filename() << std::endl;
       break;
     }
@@ -74,6 +76,8 @@ void ExampleWindow::on_button_folder_clicked()
 void ExampleWindow::on_button_file_clicked()
 {
   Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
   dialog.set_transient_for(*this);
   
   int result = dialog.run();
@@ -83,7 +87,7 @@ void ExampleWindow::on_button_file_clicked()
   {
     case(Gtk::RESPONSE_OK):
     {
-      std::cout << "OK clicked." << std::endl;
+      std::cout << "Open clicked." << std::endl;
 
       std::string filename = dialog.get_filename(); //Notice that it is a std::string, not a Glib::ustring.
       std::cout << "File selected: " <<  filename << std::endl;
