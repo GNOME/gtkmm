@@ -37,11 +37,12 @@ protected:
   public:
 
     ModelColumns()
-    { add(m_col_id); add(m_col_name); add(m_col_number); }
+    { add(m_col_id); add(m_col_name); add(m_col_number); add(m_col_percentage);}
 
     Gtk::TreeModelColumn<unsigned int> m_col_id;
     Gtk::TreeModelColumn<Glib::ustring> m_col_name;
     Gtk::TreeModelColumn<short> m_col_number;
+    Gtk::TreeModelColumn<int> m_col_percentage;
   };
 
   ModelColumns m_Columns;
