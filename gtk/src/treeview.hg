@@ -406,17 +406,21 @@ public:
   _WRAP_METHOD(void set_cursor(const TreeModel::Path& path, TreeViewColumn& focus_column, bool start_editing = false), gtk_tree_view_set_cursor)
     
   _WRAP_METHOD(void set_cursor(const TreeModel::Path& path, TreeViewColumn& focus_column, CellRenderer& cell, bool start_editing = false), gtk_tree_view_set_cursor_on_cell)
-    
-  /**
-     Sets the current keyboard focus to be at path , and selects it.
-     @param path A reference to cursor path.
+
+ 
+  /** Sets the current keyboard focus to be at path , and selects it.
+   * This is useful when you want to focus the user's attention on a particular row.
+   * This function is often followed by Gtk::widget::grab_focus(tree_view)
+   * in order to give keyboard focus to the widget.
+   *
+   *  @param path A reference to cursor path.
    */
-  void set_cursor(const TreeModel::Path& path); //TODO: Add bool start_editing = false?, even though a true value doesn't actually start editing?
+  void set_cursor(const TreeModel::Path& path);
 
   /**  Fills in path and focus_column with the current path and focus column.
-
-       @param path A reference to be filled with the current cursor path
-       @param focus_column A reference to be filled with the current focus column
+   *
+   *  @param path A reference to be filled with the current cursor path
+   *  @param focus_column A reference to be filled with the current focus column
    */
   void get_cursor(TreeModel::Path& path, TreeViewColumn*& focus_column);
 
@@ -425,17 +429,17 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_bin_window() const, gtk_tree_view_get_bin_window, refreturn)
 
   /** Finds the path at the point (x, y), relative to widget
-     coordinates. It is primarily for things like popup menus.
-     
-     @param x The x position to be identified
-     @param y The y position to be identified
-     @param path A reference to a TreeModel::Path to be filled in
-     @param column A reference to a TreeViewColumn pointer to be filled in
-     @param cell_x A reference where the X coordinate relative to the cell
-       can be placed
-     @param cell_y A reference where the Y coordinate relative to the cell
-       can be placed
-     @return true if a row exists at that coordinate.
+   * coordinates. It is primarily for things like popup menus.
+   *  
+   * @param x The x position to be identified
+   * @param y The y position to be identified
+   * @param path A reference to a TreeModel::Path to be filled in
+   * @param column A reference to a TreeViewColumn pointer to be filled in
+   * @param cell_x A reference where the X coordinate relative to the cell
+   *   can be placed
+   * @param cell_y A reference where the Y coordinate relative to the cell
+   *   can be placed
+   * @return true if a row exists at that coordinate.
    */
   bool get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColumn*& column, int& cell_x, int& cell_y);
   _WRAP_METHOD(void get_cell_area(const TreeModel::Path& path, TreeViewColumn& column, Gdk::Rectangle&  rect), gtk_tree_view_get_cell_area)
@@ -450,75 +454,78 @@ public:
 
 /* Drag-and-Drop support */
   _IGNORE(gtk_tree_view_enable_model_drag_source)
+
   /**
-     Turns *this into a drag source for automatic DND.
-     @param targets Standard container of targets that the drag will support.
-     @param start_button_mask Mask of allowed buttons to start drag.
-     @param actions The bitmask of possible actions for a drag from this widget.
+   * Turns the TreeView into a drag source for automatic DND.
+   *
+   * @param targets Standard container of targets that the drag will support.
+   * @param start_button_mask Mask of allowed buttons to start drag.
+   * @param actions The bitmask of possible actions for a drag from this widget.
    */
   void enable_model_drag_source(const ArrayHandle_TargetEntry& targets,
                                 Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
                                 Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
   // Uses the default "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
-  /**
-     Turns *this into a drag source for automatic DND.
-     @param start_button_mask Mask of allowed buttons to start drag.
-     @param actions The bitmask of possible actions for a drag from this widget.
+
+  /** Turns the TreeView into a drag source for automatic DND.
+   *
+   * @param start_button_mask Mask of allowed buttons to start drag.
+   * @param actions The bitmask of possible actions for a drag from this widget.
    */
   void enable_model_drag_source(Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
                                 Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);                                                                                              
 
   _IGNORE(gtk_tree_view_enable_model_drag_dest)
     
-  /** Turns *this into a drop destination for automatic DND.
-    @param actions The bitmask of possible actions for a drag from this widget.
+  /** Turns the TreeViewinto a drop destination for automatic DND.
+   *
+   * @param actions The bitmask of possible actions for a drag from this widget.
    */ 
   void enable_model_drag_dest(const ArrayHandle_TargetEntry& targets, Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
-  /** Turns *this into a drop destination for automatic DND.  Uses the default
-      "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
-    @param targets The table of targets that the drag will support.
-    @param actions The bitmask of possible actions for a drag from this widget.
+  /** Turns the TreeView into a drop destination for automatic DND.  This uses the default
+    *  "GTK_TREE_MODEL_ROW" target, which the TreeView can handle automatically.
+    *
+    * @param targets The table of targets that the drag will support.
+    * @param actions The bitmask of possible actions for a drag from this widget.
    */ 
   void enable_model_drag_dest(Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
 
-  /**
-     Undoes the effect of enable_model_drag_source()
+  /** Undoes the effect of enable_model_drag_source()
    */
   _WRAP_METHOD(void unset_rows_drag_source(), gtk_tree_view_unset_rows_drag_source)
-  /**
-     Undoes the effect of enable_model_drag_source()
+
+  /** Undoes the effect of enable_model_drag_source()
    */
   _WRAP_METHOD(void unset_rows_drag_dest(), gtk_tree_view_unset_rows_drag_dest)
 
 
-/* These are useful to implement your own custom stuff. */
-  /**
-     Sets the row that is highlighted for feedback.
+  /* These are useful to implement your own custom stuff. */
 
-     @param path The path of the row to highlight
-     @param pos Specifies whether to drop before, after or into the row
+  /** Sets the row that is highlighted for feedback.
+   *
+   * @param path The path of the row to highlight
+   * @param pos Specifies whether to drop before, after or into the row
    */
   _WRAP_METHOD(void set_drag_dest_row(const TreeModel::Path& path, TreeViewDropPosition pos), gtk_tree_view_set_drag_dest_row)
     
-  /**
-     Gets information about the row that is highlighted for feedback.
-
-     @param path Return location for the path of the highlighted row
-     @param pos Return location for the drop position
+  /** Gets information about the row that is highlighted for feedback.
+   *
+   * @param path Return location for the path of the highlighted row
+   * @param pos Return location for the drop position
    */
-  void get_drag_dest_row(TreeModel::Path& path, TreeViewDropPosition& pos);
-  /**
-     Determines the destination row for a given position.
+  void get_drag_dest_row(TreeModel::Path& path, TreeViewDropPosition& pos) const;
 
-     @param drag_x The x position to determine the destination row for
-     @param drag_y The y position to determine the destination row for
-     @param path Return location for the path of the highlighted row
-     @param pos Return location for the drop position
-
+  /** Determines the destination row for a given position.
+   *
+   * @param drag_x The x position to determine the destination row for
+   * @param drag_y The y position to determine the destination row for
+   * @param path Return location for the path of the highlighted row
+   * @param pos Return location for the drop position
    */
-  bool get_dest_row_at_pos(int drag_x, int drag_y, TreeModel::Path& path, TreeViewDropPosition& pos);
+  bool get_dest_row_at_pos(int drag_x, int drag_y, TreeModel::Path& path, TreeViewDropPosition& pos) const;
+
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixmap> create_row_drag_icon(const TreeModel::Path& path), gtk_tree_view_create_row_drag_icon)
 
 /* Interactive search */
@@ -532,10 +539,10 @@ public:
   typedef sigc::slot<bool, const Glib::RefPtr<TreeModel>&, int, const Glib::ustring&, const TreeModel::iterator&> SlotSearchEqual;
   //SlotSearchEqual get_search_equal_func();
   _IGNORE(gtk_tree_view_get_search_equal_func)
-  /**
-     Sets the compare function for the interactive search capabilities.
-
-     @param slot The compare function to use during the search
+  
+  /** Sets the compare function for the interactive search capabilities.
+   *
+   * @param slot The compare function to use during the search
    */
   void set_search_equal_func(const SlotSearchEqual& slot);
   _IGNORE(gtk_tree_view_set_search_equal_func)

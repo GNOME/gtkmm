@@ -125,12 +125,20 @@ RC::get_default_files()
       const_cast<const char**>(gtk_rc_get_default_files()), Glib::OWNERSHIP_NONE);
 }
 
-bool
-RC::reparse_all()
+bool RC::reparse_all()
 {
-  return (gtk_rc_reparse_all()) ? true : false;
+  return gtk_rc_reparse_all();
 }
 
+bool RC::reparse_all(const Glib::RefPtr<Settings>& settings, bool force_load)
+{
+  return gtk_rc_reparse_all_for_settings(settings->gobj(), force_load);
+}
+
+void RC::reset_styles(const Glib::RefPtr<Settings>& settings)
+{
+  gtk_rc_reset_styles(settings->gobj());        
+}
 
 Glib::ustring
 RC::find_pixmap_in_path(const Glib::RefPtr<Settings>& context, GScanner *scanner, const Glib::ustring& pixmap_file)
@@ -139,6 +147,12 @@ RC::find_pixmap_in_path(const Glib::RefPtr<Settings>& context, GScanner *scanner
       gtk_rc_find_pixmap_in_path(context->gobj(), scanner, const_cast<char*>(pixmap_file.c_str())));
 }
 
+Glib::ustring
+RC::find_pixmap_in_path(const Glib::RefPtr<Settings>& context, const Glib::ustring& pixmap_file)
+{
+  return Glib::convert_return_gchar_ptr_to_ustring(
+      gtk_rc_find_pixmap_in_path(context->gobj(), 0 /* see C docs */, const_cast<char*>(pixmap_file.c_str())));
+}
 
 Glib::ustring
 RC::find_module_in_path(const Glib::ustring& module_file)

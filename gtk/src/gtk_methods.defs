@@ -525,6 +525,13 @@
   (gtype-id "GTK_TYPE_SOCKET")
 )
 
+(define-object PathBar
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkPathBar")
+  (gtype-id "GTK_TYPE_PATH_BAR")
+)
+
 (define-object Paned
   (in-module "Gtk")
   (parent "GtkContainer")
@@ -1761,6 +1768,8 @@
   (values
     '("open" "GTK_FILE_CHOOSER_ACTION_OPEN")
     '("save" "GTK_FILE_CHOOSER_ACTION_SAVE")
+    '("select-folder" "GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER")
+    '("create-folder" "GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER")
   )
 )
 
@@ -1781,12 +1790,12 @@
   (values
     '("first" "GTK_FILE_CHOOSER_PROP_FIRST")
     '("action" "GTK_FILE_CHOOSER_PROP_ACTION")
-    '("file-system" "GTK_FILE_CHOOSER_PROP_FILE_SYSTEM")
+    '("file-system-backend" "GTK_FILE_CHOOSER_PROP_FILE_SYSTEM_BACKEND")
     '("filter" "GTK_FILE_CHOOSER_PROP_FILTER")
-    '("folder-mode" "GTK_FILE_CHOOSER_PROP_FOLDER_MODE")
     '("local-only" "GTK_FILE_CHOOSER_PROP_LOCAL_ONLY")
     '("preview-widget" "GTK_FILE_CHOOSER_PROP_PREVIEW_WIDGET")
     '("preview-widget-active" "GTK_FILE_CHOOSER_PROP_PREVIEW_WIDGET_ACTIVE")
+    '("use-preview-label" "GTK_FILE_CHOOSER_PROP_USE_PREVIEW_LABEL")
     '("extra-widget" "GTK_FILE_CHOOSER_PROP_EXTRA_WIDGET")
     '("select-multiple" "GTK_FILE_CHOOSER_PROP_SELECT_MULTIPLE")
     '("show-hidden" "GTK_FILE_CHOOSER_PROP_SHOW_HIDDEN")
@@ -1831,6 +1840,7 @@
     '("invalid-uri" "GTK_FILE_SYSTEM_ERROR_INVALID_URI")
     '("bad-filename" "GTK_FILE_SYSTEM_ERROR_BAD_FILENAME")
     '("failed" "GTK_FILE_SYSTEM_ERROR_FAILED")
+    '("already-exists" "GTK_FILE_SYSTEM_ERROR_ALREADY_EXISTS")
   )
 )
 
@@ -3496,8 +3506,8 @@
   )
 )
 
-(define-function _gtk_bindings_activate_event
-  (c-name "_gtk_bindings_activate_event")
+(define-function gtk_bindings_activate_event
+  (c-name "gtk_bindings_activate_event")
   (return-type "gboolean")
   (parameters
     '("GtkObject*" "object")
@@ -5688,6 +5698,11 @@
   (return-type "gint")
 )
 
+(define-function gtk_combo_box_entry_new_text
+  (c-name "gtk_combo_box_entry_new_text")
+  (return-type "GtkWidget*")
+)
+
 
 
 ;; From /home/murrayc/cvs/gnome26/gtk+/gtk/gtkcombobox.h
@@ -5826,6 +5841,18 @@
   (parameters
     '("gint" "position")
   )
+)
+
+(define-method popup
+  (of-object "GtkComboBox")
+  (c-name "gtk_combo_box_popup")
+  (return-type "none")
+)
+
+(define-method popdown
+  (of-object "GtkComboBox")
+  (c-name "gtk_combo_box_popdown")
+  (return-type "none")
 )
 
 
@@ -7254,6 +7281,23 @@
   )
 )
 
+(define-function gtk_drag_source_get_target_list
+  (c-name "gtk_drag_source_get_target_list")
+  (return-type "GtkTargetList*")
+  (parameters
+    '("GtkWidget*" "widget")
+  )
+)
+
+(define-function gtk_drag_source_set_target_list
+  (c-name "gtk_drag_source_set_target_list")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("GtkTargetList*" "target_list")
+  )
+)
+
 (define-function gtk_drag_source_set_icon
   (c-name "gtk_drag_source_set_icon")
   (return-type "none")
@@ -7772,6 +7816,21 @@
   )
 )
 
+(define-method set_alignment
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_set_alignment")
+  (return-type "none")
+  (parameters
+    '("gfloat" "xalign")
+  )
+)
+
+(define-method get_alignment
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_get_alignment")
+  (return-type "gfloat")
+)
+
 (define-method set_completion
   (of-object "GtkEntry")
   (c-name "gtk_entry_set_completion")
@@ -8042,7 +8101,7 @@
   (is-constructor-of "GtkFileChooserDefault")
   (return-type "GtkWidget*")
   (parameters
-    '("GtkFileSystem*" "file_system")
+    '("const-char*" "file_system")
   )
 )
 
@@ -8066,6 +8125,65 @@
     '("const-gchar*" "first_button_text")
   )
   (varargs #t)
+)
+
+(define-function gtk_file_chooser_dialog_new_with_backend
+  (c-name "gtk_file_chooser_dialog_new_with_backend")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "title")
+    '("GtkWindow*" "parent")
+    '("GtkFileChooserAction" "action")
+    '("const-gchar*" "backend")
+    '("const-gchar*" "first_button_text")
+  )
+  (varargs #t)
+)
+
+
+
+;; From /home/murrayc/cvs/gnome26/gtk+/gtk/gtkfilechooserembed.h
+
+(define-function _gtk_file_chooser_embed_get_type
+  (c-name "_gtk_file_chooser_embed_get_type")
+  (return-type "GType")
+)
+
+(define-method _get_default_size
+  (of-object "GtkFileChooserEmbed")
+  (c-name "_gtk_file_chooser_embed_get_default_size")
+  (return-type "none")
+  (parameters
+    '("gint*" "default_width")
+    '("gint*" "default_height")
+  )
+)
+
+(define-method _get_resizable_hints
+  (of-object "GtkFileChooserEmbed")
+  (c-name "_gtk_file_chooser_embed_get_resizable_hints")
+  (return-type "none")
+  (parameters
+    '("gboolean*" "resize_horizontally")
+    '("gboolean*" "resize_vertically")
+  )
+)
+
+(define-function _gtk_file_chooser_embed_delegate_iface_init
+  (c-name "_gtk_file_chooser_embed_delegate_iface_init")
+  (return-type "none")
+  (parameters
+    '("GtkFileChooserEmbedIface*" "iface")
+  )
+)
+
+(define-method _set_delegate
+  (of-object "GtkFileChooserEmbed")
+  (c-name "_gtk_file_chooser_embed_set_delegate")
+  (return-type "none")
+  (parameters
+    '("GtkFileChooserEmbed*" "delegate")
+  )
 )
 
 
@@ -8340,6 +8458,21 @@
   (return-type "gboolean")
 )
 
+(define-method set_use_preview_label
+  (of-object "GtkFileChooser")
+  (c-name "gtk_file_chooser_set_use_preview_label")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use_label")
+  )
+)
+
+(define-method get_use_preview_label
+  (of-object "GtkFileChooser")
+  (c-name "gtk_file_chooser_get_use_preview_label")
+  (return-type "gboolean")
+)
+
 (define-method get_preview_filename
   (of-object "GtkFileChooser")
   (c-name "gtk_file_chooser_get_preview_filename")
@@ -8577,6 +8710,15 @@
   (return-type "GtkWidget*")
   (parameters
     '("GtkFileChooserAction" "action")
+  )
+)
+
+(define-function gtk_file_chooser_widget_new_with_backend
+  (c-name "gtk_file_chooser_widget_new_with_backend")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GtkFileChooserAction" "action")
+    '("const-gchar*" "backend")
   )
 )
 
@@ -9040,12 +9182,13 @@
   )
 )
 
-(define-method add_bookmark
+(define-method insert_bookmark
   (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_add_bookmark")
+  (c-name "gtk_file_system_insert_bookmark")
   (return-type "gboolean")
   (parameters
     '("const-GtkFilePath*" "path")
+    '("gint" "position")
     '("GError**" "error")
   )
 )
@@ -9112,6 +9255,14 @@
   (return-type "none")
   (parameters
     '("GSList*" "paths")
+  )
+)
+
+(define-function _gtk_file_system_create
+  (c-name "_gtk_file_system_create")
+  (return-type "GtkFileSystem*")
+  (parameters
+    '("const-char*" "file_system_name")
   )
 )
 
@@ -13879,6 +14030,26 @@
 
 
 
+;; From /home/murrayc/cvs/gnome26/gtk+/gtk/gtkpathbar.h
+
+(define-function gtk_path_bar_get_type
+  (c-name "gtk_path_bar_get_type")
+  (return-type "GType")
+)
+
+(define-method set_path
+  (of-object "GtkPathBar")
+  (c-name "gtk_path_bar_set_path")
+  (return-type "none")
+  (parameters
+    '("const-GtkFilePath*" "file_path")
+    '("GtkFileSystem*" "file_system")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From /home/murrayc/cvs/gnome26/gtk+/gtk/gtkpixmap.h
 
 (define-function gtk_pixmap_get_type
@@ -14578,6 +14749,30 @@
   )
 )
 
+(define-method new_from_widget
+  (of-object "GtkRadioMenuItem")
+  (c-name "gtk_radio_menu_item_new_from_widget")
+  (return-type "GtkWidget*")
+)
+
+(define-method new_with_mnemonic_from_widget
+  (of-object "GtkRadioMenuItem")
+  (c-name "gtk_radio_menu_item_new_with_mnemonic_from_widget")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "label")
+  )
+)
+
+(define-method new_with_label_from_widget
+  (of-object "GtkRadioMenuItem")
+  (c-name "gtk_radio_menu_item_new_with_label_from_widget")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "label")
+  )
+)
+
 (define-method get_group
   (of-object "GtkRadioMenuItem")
   (c-name "gtk_radio_menu_item_get_group")
@@ -14737,6 +14932,15 @@
   (of-object "GtkRange")
   (c-name "gtk_range_get_value")
   (return-type "gdouble")
+)
+
+(define-method _get_wheel_delta
+  (of-object "GtkRange")
+  (c-name "_gtk_range_get_wheel_delta")
+  (return-type "gdouble")
+  (parameters
+    '("GdkScrollDirection" "direction")
+  )
 )
 
 
@@ -15039,6 +15243,14 @@
   )
 )
 
+(define-function gtk_rc_reset_styles
+  (c-name "gtk_rc_reset_styles")
+  (return-type "none")
+  (parameters
+    '("GtkSettings*" "settings")
+  )
+)
+
 (define-function gtk_rc_find_pixmap_in_path
   (c-name "gtk_rc_find_pixmap_in_path")
   (return-type "gchar*")
@@ -15200,14 +15412,6 @@
 (define-function _gtk_rc_context_get_default_font_name
   (c-name "_gtk_rc_context_get_default_font_name")
   (return-type "const-gchar*")
-  (parameters
-    '("GtkSettings*" "settings")
-  )
-)
-
-(define-function _gtk_rc_reset_styles
-  (c-name "_gtk_rc_reset_styles")
-  (return-type "none")
   (parameters
     '("GtkSettings*" "settings")
   )
@@ -17379,23 +17583,15 @@
   )
 )
 
-(define-function _gtk_get_insertion_cursor_gc
-  (c-name "_gtk_get_insertion_cursor_gc")
-  (return-type "GdkGC*")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("gboolean" "is_primary")
-  )
-)
-
-(define-function _gtk_draw_insertion_cursor
-  (c-name "_gtk_draw_insertion_cursor")
+(define-function gtk_draw_insertion_cursor
+  (c-name "gtk_draw_insertion_cursor")
   (return-type "none")
   (parameters
     '("GtkWidget*" "widget")
     '("GdkDrawable*" "drawable")
-    '("GdkGC*" "gc")
+    '("GdkRectangle*" "area")
     '("GdkRectangle*" "location")
+    '("gboolean" "is_primary")
     '("GtkTextDirection" "direction")
     '("gboolean" "draw_arrow")
   )
@@ -19923,6 +20119,15 @@
   (return-type "none")
   (parameters
     '("GtkTextDirection" "direction")
+  )
+)
+
+(define-method set_keyboard_direction
+  (of-object "GtkTextLayout")
+  (c-name "gtk_text_layout_set_keyboard_direction")
+  (return-type "none")
+  (parameters
+    '("GtkTextDirection" "keyboard_dir")
   )
 )
 
@@ -26665,6 +26870,30 @@
   )
 )
 
+(define-method list_mnemonic_labels
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_list_mnemonic_labels")
+  (return-type "GList*")
+)
+
+(define-method add_mnemonic_label
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_add_mnemonic_label")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "label")
+  )
+)
+
+(define-method remove_mnemonic_label
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_remove_mnemonic_label")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "label")
+  )
+)
+
 (define-function gtk_requisition_get_type
   (c-name "gtk_requisition_get_type")
   (return-type "GType")
@@ -27231,6 +27460,24 @@
   (return-type "GdkModifierType")
 )
 
+(define-method activate_key
+  (of-object "GtkWindow")
+  (c-name "gtk_window_activate_key")
+  (return-type "gboolean")
+  (parameters
+    '("GdkEventKey*" "event")
+  )
+)
+
+(define-method propagate_key_event
+  (of-object "GtkWindow")
+  (c-name "gtk_window_propagate_key_event")
+  (return-type "gboolean")
+  (parameters
+    '("GdkEventKey*" "event")
+  )
+)
+
 (define-method present
   (of-object "GtkWindow")
   (c-name "gtk_window_present")
@@ -27496,15 +27743,6 @@
   (of-object "GtkWindow")
   (c-name "_gtk_window_get_group")
   (return-type "GtkWindowGroup*")
-)
-
-(define-method _activate_key
-  (of-object "GtkWindow")
-  (c-name "_gtk_window_activate_key")
-  (return-type "gboolean")
-  (parameters
-    '("GdkEventKey*" "event")
-  )
 )
 
 (define-method _set_has_toplevel_focus

@@ -2,7 +2,7 @@
 #ifndef _GTKMM_COMBOBOXTEXT_H
 #define _GTKMM_COMBOBOXTEXT_H
 
-/* comboboxtext.h
+/* comboboxentrytext.h
  * 
  * Copyright (C) 2003 The gtkmm Development Team
  *
@@ -21,36 +21,38 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gtkmm/combobox.h>
+#include <gtkmm/comboboxentry.h>
 
 namespace Gtk
 {
 
-//This is a C++ convenience class that is equivalent to the gtk_combo_box_new_text() C convenience function.
+//This is a C++ convenience class that is equivalent to the gtk_combo_box_entry_new_text() C convenience function.
+//This is copy/paste/search/replaced from ComboBoxText, but the only alternative I see is to use multiple inheritance.
+//murrayc.
 
-/** This is a specialisation of the ComboBox which has one column of text (a simple list),
+/** This is a specialisation of the ComboBoxEntry which has one column of text (a simple list),
  * and appropriate methods for setting and getting the text.
  *
  * @ingroup Widgets
  */
 
-class ComboBoxText
-: public ComboBox
+class ComboBoxEntryText
+: public ComboBoxEntry
 {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
   // noncopyable
-  ComboBoxText(const ComboBoxText&);
-  ComboBoxText& operator=(const ComboBoxText&);
+  ComboBoxEntryText(const ComboBoxEntryText&);
+  ComboBoxEntryText& operator=(const ComboBoxEntryText&);
 
 protected:
-  explicit ComboBoxText(const Glib::ConstructParams& construct_params);
-  explicit ComboBoxText(GtkComboBox* castitem);
+  explicit ComboBoxEntryText(const Glib::ConstructParams& construct_params);
+  explicit ComboBoxEntryText(GtkComboBox* castitem);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
-  ComboBoxText();
+  ComboBoxEntryText();
   
   void append_text(const Glib::ustring& text);
   
