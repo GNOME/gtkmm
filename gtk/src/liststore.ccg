@@ -55,10 +55,32 @@ TreeModel::iterator ListStore::insert(const iterator& iter)
   iterator new_pos(this);
 
   // get_gobject_if_not_end() returns 0 if iter is an end iterator, which
-  // is in turn interpreted by gtk_list_store_insert_before() as request to
+  // is in turn interpreted by gtk_list_store_insert_before() as a request to
   // insert at the end of the list.
 
   gtk_list_store_insert_before(
+      gobj(), new_pos.gobj(),
+      const_cast<GtkTreeIter*>(iter.get_gobject_if_not_end()));
+
+  // GtkTreeIter::stamp should always have a value if it's valid.
+  // For end iterators, we need to remember the iter's parent, and
+  // this is what setup_end_iterator() does.
+
+  if(new_pos.gobj()->stamp == 0)
+    new_pos.setup_end_iterator(iter);
+
+  return new_pos;
+}
+
+TreeModel::iterator ListStore::insert_after(const iterator& iter)
+{
+  iterator new_pos(this);
+
+  // get_gobject_if_not_end() returns 0 if iter is an end iterator, which
+  // is in turn interpreted by gtk_list_store_insert_after() as a request to
+  // insert at the beginning of the list.
+
+  gtk_list_store_insert_after(
       gobj(), new_pos.gobj(),
       const_cast<GtkTreeIter*>(iter.get_gobject_if_not_end()));
 

@@ -23,27 +23,27 @@
       <author>
 	<firstname>Bernhard</firstname>
 	<surname>Rieder</surname>
-	<contrib>Chapter on "Timeouts".</contrib>
+	<contrib>Chapter on &quot;Timeouts&quot;.</contrib>
       </author>
       <author>
 	<firstname>Jason</firstname>
 	<surname>M'Sadoques</surname>
-	<contrib>Chapter on "Drawing Area".</contrib>
+	<contrib>Chapter on &quot;Drawing Area&quot;.</contrib>
       </author>
       <author>
 	<firstname>Ole</firstname>
 	<surname>Laursen</surname>
-	<contrib>Parts of chapter on "Internationalization".</contrib>
+	<contrib>Parts of chapter on &quot;Internationalization&quot;.</contrib>
       </author>
 	  <author>
 	<firstname>Gene</firstname>
 	<surname>Ruebsamen</surname>
-	<contrib>Chapter on "Win32 Installation".</contrib>
+	<contrib>Chapter on &quot;Win32 Installation&quot;.</contrib>
       </author>
 	  	  <author>
 	<firstname>Cedric</firstname>
 	<surname>Gustin</surname>
-	<contrib>Chapter on "Win32 Installation".</contrib>
+	<contrib>Chapter on &quot;Win32 Installation&quot;.</contrib>
       </author>
    </authorgroup>
 
@@ -52,7 +52,7 @@
 <para>Not all sections have
 been completed - some have not been started.  Some chapters have been
 written, but not edited or proofread.  Since they do contain helpful
-information, they have been included, and are marked "draft".
+information, they have been included, and are marked &quot;draft&quot;.
 We are working hard to make this helpful and accurate.  We would very much appreciate any reports of
 inaccuracies or other errors in this document.  Contributions are also
 most welcome.  Post your suggestions, critiques or addenda to the <ulink
@@ -3146,8 +3146,77 @@ m_TextView.add_child_at_anchor(m_Button, refAnchor);
 <chapter id="sec-MenusAndToolbars">
 <title>Menus and Toolbars</title>
 
+<para>There are specific APIs for Menus and Toolbars, but you should usually deal with them together, using the <literal>UIManager</literal>,
+which allows you to define <literal>actions</literal> which you can then arrange in menu and toolbars. You can then handle activation of
+the action instead of responding to the menu and toolbar items separately. And you can enable or disable both the menu and toolbar item
+just by changing action.</para>
+
+<sect1>
+<title>Actions</title>
+<para>First, you should create the actions and add them to an <literal>ActionGroup</literal>. The arguments to Action::create()
+specify the action's name and how it will appear in menus and toolbars. Use stock items where possible so that you don't need to
+specify the label, accelerator, icon, and tooltips, and soyou can use pre-existing translations.</para>
+<para>You can specify a signal handler when calling ActionGroup::add(). This signal handler will be called when the action is
+activated via either the menu item or the toolbar.</para>
+<para>Note that you must specify actions for sub menus as well as menu items.</para>
+
+<para>For instance:
+<programlisting>
+m_refActionGroup = Gtk::ActionGroup::create();
+
+m_refActionGroup-&gt;add( Gtk::Action::create(&quot;MenuFile&quot;, &quot;_File&quot;) );
+m_refActionGroup-&gt;add( Gtk::Action::create(&quot;New&quot;, Gtk::Stock::NEW),
+  sigc::mem_fun(*this, &ExampleWindow::on_action_file_new) );
+m_refActionGroup-&gt;add( Gtk::Action::create(&quot;ExportData&quot;, &quot;Export Data&quot;),
+  sigc::mem_fun(*this, &ExampleWindow::on_action_file_open) );
+m_refActionGroup-&gt;add( Gtk::Action::create(&quot;Quit&quot;, Gtk::Stock::QUIT),
+  sigc::mem_fun(*this, &ExampleWindow::on_action_file_quit) );   
+</programlisting&gt;
+</para>
+</sect1>
+
+
+<sect1>
+<title>UIManager</title>
+<para>Next you should create a UIManager and add the ActionGroup to the UIManager with <literal>insert_action_group()</literal>. For instance,
+<programlisting>
+Glib::RefPtr<Gtk::UIManager> m_refUIManager = Gtk::UIManager::create();
+m_refUIManager->insert_action_group(m_refActionGroup);
+add_accel_group(m_refUIManager->get_accel_group());
+</programlisting>
+<para>Then, you can define the actual visible layout of the menus and toolbars, and add the UI layout to the UIManager:
+</para>
+<programlisting>
+    Glib::ustring ui_info =
+        &quot;<ui&gt;&quot;
+        &quot;  &lt;menubar name='MenuBar'&gt;&quot;
+        &quot;    &lt;menu action='MenuFile'&gt;&quot;
+        &quot;      &lt;menuitem action='New'/&gt;&quot;
+        &quot;      &lt;menuitem action='Open'/&gt;&quot;
+        &quot;      &lt;separator/&gt;&quot;
+        &quot;      &lt;menuitem action='Quit'/&gt;&quot;
+        &quot;    &lt;/menu&gt;&quot;
+        &quot;    &lt;menu action='MenuEdit'&gt;&quot;
+        &quot;      &lt;menuitem action='Cut'/&gt;&quot;
+        &quot;      &lt;menuitem action='Copy'/&gt;&quot;
+        &quot;      &lt;menuitem action='Paste'/&gt;&quot;
+        &quot;    &lt;/menu&gt;&quot;
+        &quot;  &lt;/menubar&gt;&quot;
+        &quot;  &lt;toolbar  name='ToolBar'&gt;&quot;
+        &quot;    &lt;toolitem action='Open'/&gt;&quot;
+        &quot;    &lt;toolitem action='Quit'/&gt;&quot;
+        &quot;  &lt;/toolbar&gt;&quot;
+        &quot;&lt;/ui&gt;&quot;;
+
+    m_refUIManager->&gt;add_ui_from_string(ui_info);
+</programlisting>
+</para>
+</sect1>
+
+
 <sect1>
 <title>Menus</title>
+
 
 <sect2><title>The MenuBar</title>
 <para>
