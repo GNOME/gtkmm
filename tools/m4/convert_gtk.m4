@@ -97,6 +97,8 @@ _CONV_ENUM(Gtk,WindowPosition)
 _CONV_ENUM(Gtk,WindowType)
 _CONV_ENUM(Gtk,WrapMode)
 _CONV_ENUM(Gtk,UIManagerItemType)
+_CONV_ENUM(Gtk,FileChooserAction)
+_CONV_ENUM(Gtk,FileFilterFlags)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -248,7 +250,10 @@ _CONVERSION(`const Glib::ListHandle<Window*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::SListHandle< Glib::RefPtr<RadioAction> >&',`GSList*',`$3.data()')
 
 # GList (gtk+) -> Glib::ListHandle<> (gtkmm)
+define(`__FL2H_DEEP',`$`'2($`'3, Glib::OWNERSHIP_DEEP)')
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
+define(`__FL2H_NONE',`$`'2($`'3, Glib::OWNERSHIP_NONE)')
+
 _CONVERSION(`GList*',`Glib::ListHandle<Widget*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const Widget*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<Window*>',__FL2H_SHALLOW)
@@ -265,13 +270,14 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLO
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 
 _CONVERSION(`int&',`int*',`&$3',`*$3')
 
 dnl
-dnl # These are for fixmegtkconst
+dnl # TODO: These are for fixmegtkconst
 _CONVERSION(`gdouble*',`const gdouble*',`const_cast<const gdouble*>($3)',`$3')
 _CONVERSION(`const double*',`gdouble*',`const_cast<gdouble*>($3)',`$3')
 _CONVERSION(`const guchar*',`guchar*',`const_cast<guchar*>($3)',`$3')
@@ -362,7 +368,6 @@ _CONVERSION(`GtkCellEditable*',`CellEditable*',`dynamic_cast<$2>(Glib::wrap_auto
 _CONVERSION(`CellEditable*',`GtkCellEditable*',`Glib::unwrap($3)')
 
 
-
 #_CONVERSION(`Clipboard&',`GtkClipboard*',`($3).gobj()')
 _CONVERSION(`GtkClipboard*',`Glib::RefPtr<Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GtkClipboard*',`Glib::RefPtr<const Clipboard>',`Glib::wrap($3)')
@@ -388,6 +393,10 @@ _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<EntryCompletion>',`Glib::wrap($3
 _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<const EntryCompletion>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<EntryCompletion>&',`GtkEntryCompletion*',__CONVERT_REFPTR_TO_P($3))
 
+_CONVERSION(`GtkFileFilter*',`Glib::RefPtr<FileFilter>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<FileFilter>&',`GtkFileFilter*',__CONVERT_REFPTR_TO_P($3))
+
+
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
 _CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
@@ -396,6 +405,8 @@ _CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
 
 
 # Used by Signals:
+# The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
+# For the return values of methods, we use the optional refreturn parameter instead.
 _CONVERSION(`GtkTextIter*',`const TextIter&',Glib::wrap($3))
 _CONVERSION(`GtkTextIter*',`const TextBuffer::iterator&',Glib::wrap($3))
 _CONVERSION(`const GtkTextIter*',`const TextIter&',Glib::wrap($3))
@@ -414,7 +425,9 @@ _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
 _CONVERSION(`GtkStyle*',`const Glib::RefPtr<Style>&',`Glib::wrap($3, true)')
 _CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
-
+_CONVERSION(`GtkTreeModel*',`const Glib::RefPtr<const TreeModel>&',`Glib::wrap($3, true)')
+_CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CONST_REFPTR_TO_P)
+#_CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',Glib::wrap($3, true))
 
 
 
