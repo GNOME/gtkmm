@@ -30,21 +30,17 @@
 #include <vector>
 #include <cctype>
 #include <cerrno>
-#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
+#include <stdio.h>
 
-//The SUN Forte and Tru64 compilers can't seem to either find the declarations or the implementations,
-//so these are not used on that platform.
-//However, the configure time checks work, so HAVE_FLOCKFILE and HAVE_FUNLOCKFILE are defined.
-//This is a mystery.
-//
-//
-// In bug, #154973, Joel Fredrikson suggests defining _REENTRANT, but that does not make any difference,
-// and it's not clear that it is mean to solve this particular problem anyway.
-//
-//We #undef them so that this builds on non-g++ platforms:
-
-#undef HAVE_FLOCKFILE
-#undef HAVE_FUNLOCKFILE
+#ifdef NEED_FLOCKFILE_PROTO
+extern "C" void flockfile (FILE *);
+#endif
+#ifdef NEED_FUNLOCKFILE_PROTO
+extern "C" void funlockfile (FILE *);
+#endif
+#ifdef NEED_GETC_UNLOCKED_PROTO
+extern "C" int getc_unlocked (FILE *);
+#endif
 
 namespace
 {
