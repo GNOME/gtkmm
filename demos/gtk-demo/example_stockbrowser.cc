@@ -90,11 +90,8 @@ Example_StockBrowser::Example_StockBrowser()
 
     // The icon/symbol column uses two CellRenderers: Here we see why Gtk::TreeView is so good
     // m_columns.icon and m_columns.symbol are columns in the model. pColumn is the column in the TreeView:
-#ifndef GLIBMM_WIN32
-    // Adding the icon to the treeview column generates a bunch of warnings
-    // on win32. As long as a fix has not been found, let's comment this out
+
     pColumn->pack_start(m_columns.icon, false);
-#endif
     pColumn->pack_start(m_columns.symbol);
 
     m_TreeView.append_column(*pColumn);
