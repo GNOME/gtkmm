@@ -17,7 +17,7 @@
  */
 
 #include "examplewindow.h"
-#include <gtkmm/stock.h>
+#include <gtkmm.h>
 #include <iostream>
 
 ExampleWindow::ExampleWindow()
@@ -35,6 +35,11 @@ ExampleWindow::ExampleWindow()
     sigc::mem_fun(*this, &ExampleWindow::on_action_file_new) );
   m_refActionGroup->add( Gtk::Action::create("Open", Gtk::Stock::OPEN),
     sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+
+  register_stock_items(); //Makes the "example_stock_rain" stock item available.
+  m_refActionGroup->add( Gtk::ToggleAction::create("Rain", Gtk::StockID("example_stock_rain") ),
+    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+
   m_refActionGroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT),
     sigc::mem_fun(*this, &ExampleWindow::on_action_file_quit) );
 
@@ -61,6 +66,8 @@ ExampleWindow::ExampleWindow()
         "      <menuitem action='New'/>"
         "      <menuitem action='Open'/>"
         "      <separator/>"
+        "      <menuitem action='Rain'/>"
+        "      <separator/>"
         "      <menuitem action='Quit'/>"
         "    </menu>"
         "    <menu action='MenuEdit'>"
@@ -71,6 +78,7 @@ ExampleWindow::ExampleWindow()
         "  </menubar>"
         "  <toolbar  name='ToolBar'>"
         "    <toolitem action='Open'/>"
+        "    <toolitem action='Rain'/>"
         "    <toolitem action='Quit'/>"
         "  </toolbar>"
         "</ui>";
@@ -116,3 +124,26 @@ void ExampleWindow::on_action_others()
 }
 
 
+void ExampleWindow::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory,
+                      const std::string& filepath,
+                      const Glib::ustring& id, const Glib::ustring& label)
+{
+  Gtk::IconSource source;
+  source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath) );
+  source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
+  source.set_size_wildcarded(); //Icon may be scaled.
+
+  Gtk::IconSet icon_set;
+  icon_set.add_source(source); //More than one source per set is allowed.
+
+  const Gtk::StockID stock_id(id);
+  factory->add(stock_id, icon_set);
+  Gtk::Stock::add(Gtk::StockItem(stock_id, label));
+}
+
+void ExampleWindow::register_stock_items()
+{
+  Glib::RefPtr<Gtk::IconFactory> factory = Gtk::IconFactory::create();
+  add_stock_item(factory, "rain.png", "example_stock_rain", "Stay dry");
+  factory->add_default(); //Add factory to list of factories.
+}
