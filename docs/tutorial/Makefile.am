@@ -4,9 +4,12 @@ gtkmm_tut_path = $(web_path_docs)tutorial
 
 SUBDIRS = figures
 
-EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml html
+DOCBOOK_PHPWEBNOTES_TRANSFORM = docbook_phpwebnotes.xsl
+
+EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml html $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
 
 DOCBOOK_STYLESHEET ?= http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
+
 
 # Create a DocBook source file that doesn't have the examples' comments blocks:
 gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
@@ -14,9 +17,15 @@ gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
 
 # The new XML DocBook way:
 html/index.html: gtkmm-tut-with-examples.xml
-	-rm -rf html
+	rm -rf html
 	$(mkinstalldirs) html
 	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_STYLESHEET) $<
+
+# Create a version of the tutorial that has phpwebnotes code in it.
+html/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
+	rm -rf html
+	$(mkinstalldirs) html
+	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
 
 validate_original: gtkmm-tut.xml
 	xmllint --xinclude --valid --noout --catalogs $<

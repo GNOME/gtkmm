@@ -58,9 +58,7 @@ ExampleWindow::~ExampleWindow()
 
 void ExampleWindow::on_button_clicked()
 {
-  //GtkDialog* cdialog = GTK_DIALOG(gtk_about_dialog_new());
-  //gtk_widget_show(GTK_WIDGET(cdialog));
-  m_Dialog.show(); //TODO: It should hide() when the close button is clicked, but it does not.
+  m_Dialog.show();
   
   //Bring it to the front, in case it was already shown:
   m_Dialog.present();
