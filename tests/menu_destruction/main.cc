@@ -1,12 +1,12 @@
 #include <gtkmm.h>
 #include <iostream>
 
-void on_destroyed_optionmenuderived(GtkWidget* widget, gpointer)
+void on_destroyed_optionmenuderived(GtkWidget*, gpointer)
 {
   std::cout << "on_destroyed_optionmenuderived" << std::endl;
 }
 
-void on_destroyed_menuderived(GtkWidget* widget, gpointer)
+void on_destroyed_menuderived(GtkWidget*, gpointer)
 {
   std::cout << "on_destroyed_menuderived" << std::endl;
 }

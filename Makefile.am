@@ -1,6 +1,6 @@
 
-SUBDIRS		= tools pango atk gdk gtk examples docs
-DIST_SUBDIRS	= $(SUBDIRS) scripts demos tests
+SUBDIRS		= tools pango atk gdk gtk examples docs demos tests
+DIST_SUBDIRS	= $(SUBDIRS) scripts
 
 EXTRA_DIST	= gtkmm.spec.in \
 		  build_shared/Makefile_build.am_fragment \

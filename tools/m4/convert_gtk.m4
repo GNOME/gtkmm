@@ -377,6 +377,8 @@ _CONVERSION(`SelectionData&',`GtkSelectionData*', __FR2P)
 _CONVERSION(`GtkAction*',`Glib::RefPtr<Action>',`Glib::wrap($3)')
 _CONVERSION(`GtkAction*',`Glib::RefPtr<const Action>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Action>&',`GtkAction*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GtkRadioAction*',`const Glib::RefPtr<RadioAction>&',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<RadioAction>&',`GtkRadioAction*',__CONVERT_REFPTR_TO_P($3))
 
 _CONVERSION(`GtkActionGroup*',`Glib::RefPtr<ActionGroup>',`Glib::wrap($3)')
 #_CONVERSION(`GtkActionGroup*',`Glib::RefPtr<const ActionGroup>',`Glib::wrap($3)')
@@ -387,6 +389,11 @@ _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<const EntryCompletion>',`Glib::w
 _CONVERSION(`const Glib::RefPtr<EntryCompletion>&',`GtkEntryCompletion*',__CONVERT_REFPTR_TO_P($3))
 
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
+
+_CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
+_CONVERSION(`Tooltips*',`GtkTooltips*',`Glib::unwrap($3)')
+_CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
+
 
 # Used by Signals:
 _CONVERSION(`GtkTextIter*',`const TextIter&',Glib::wrap($3))
@@ -407,6 +414,7 @@ _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
 _CONVERSION(`GtkStyle*',`const Glib::RefPtr<Style>&',`Glib::wrap($3, true)')
 _CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
+
 
 
 

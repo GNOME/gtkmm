@@ -36,5 +36,5 @@ demo_SOURCES = demowindow.h demowindow.cc main.cc demos.h textwidget.h textwidge
                example_appwindow.cc example_buttonbox.cc example_change_display.cc example_colorsel.cc \
                example_dialog.cc example_drawingarea.cc \
                example_images.cc example_menus.cc example_panes.cc example_pixbufs.cc example_sizegroup.cc \
-               example_stockbrowser.cc example_textview.cc \
+               example_stockbrowser.cc example_uimanager.cc example_textview.cc \
                example_treeview_editable_cells.cc example_treeview_liststore.cc example_treeview_treestore.cc

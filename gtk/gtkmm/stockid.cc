@@ -27,6 +27,9 @@
 namespace Gtk
 {
 
+StockID::StockID()
+{}
+
 StockID::StockID(const BuiltinStockID& id)
 :
   id_ (id.id)

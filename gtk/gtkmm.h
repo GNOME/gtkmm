@@ -93,6 +93,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/optionmenu.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/progressbar.h>
+#include <gtkmm/radioaction.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/range.h>
@@ -117,6 +118,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/texttag.h>
 #include <gtkmm/texttagtable.h>
 #include <gtkmm/textview.h>
+#include <gtkmm/toggleaction.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/tooltips.h>

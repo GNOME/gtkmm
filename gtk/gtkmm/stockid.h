@@ -35,6 +35,7 @@ struct BuiltinStockID;
 class StockID
 {
 public:
+  StockID(); //TODO: This was added for Action::Action, but there might be a better way to do this.
   StockID(const BuiltinStockID& id);
   explicit StockID(const Glib::ustring& id);
   explicit StockID(const char* id); // id can be 0

@@ -116,7 +116,7 @@ void Example_Dialog::on_button_message()
     Glib::ScopedPtr<char> buf (g_strdup_printf("%d", m_count));
     strMessage += buf.get();
   }
-  Gtk::MessageDialog dialog(strMessage, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
+  Gtk::MessageDialog dialog(strMessage, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
   /*int response =*/ dialog.run();
 
   m_count++;

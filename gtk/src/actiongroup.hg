@@ -19,6 +19,7 @@
 
 #include <gtkmm/widget.h>
 #include <gtkmm/action.h>
+#include <gtkmm/accelkey.h>
  
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -26,22 +27,31 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gtk
 {
-
+  
 class ActionGroup : public Glib::Object
 {
-  _CLASS_GOBJECT(ActionGroup, GtkActionGroup, GTK_ACTION_GROUP, Glib::Object, GObject)
-
 public:
+ //TODO Move the original class into the regular Gtk namespace.
+  typedef Menu_Helpers::AccelKey AccelKey;
+private:
+  
+  _CLASS_GOBJECT(ActionGroup, GtkActionGroup, GTK_ACTION_GROUP, Glib::Object, GObject)
   _WRAP_CTOR(ActionGroup(const Glib::ustring& name = Glib::ustring()), gtk_action_group_new)
-
-
+public:
+  _WRAP_CREATE(const Glib::ustring& name = Glib::ustring())
+  
   _WRAP_METHOD(Glib::ustring get_name() const, gtk_action_group_get_name)
   _WRAP_METHOD(Glib::RefPtr<Action> get_action(const Glib::ustring& action_name), gtk_action_group_get_action)
   _WRAP_METHOD(Glib::RefPtr<const Action> get_action(const Glib::ustring& action_name) const, gtk_action_group_get_action)
   //TODO: Const version:
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Action> > list_actions(), gtk_action_group_list_actions)
   _WRAP_METHOD(void add_action(const Glib::RefPtr<Action>& action), gtk_action_group_add_action)
+  
+  void add_action(const Glib::RefPtr<Action>& action, const Action::SlotActivate& slot);
+  void add_action(const Glib::RefPtr<Action>& action, const AccelKey& accel_key, const Action::SlotActivate& slot);
   _WRAP_METHOD(void remove_action(const Glib::RefPtr<Action>& action), gtk_action_group_remove_action)
+
+
 //TODO:  _WRAP_METHOD(void add_actions(GtkActionEntry       *entries, guint n_entries, gpointer user_data), gtk_action_group_add_actions)
 //TODO:  _WRAP_METHOD(void add_toggle_actions(GtkToggleActionEntry *entries, guint n_entries, gpointer user_data), gtk_action_group_add_toggle_actions)
 //TODO:   _WRAP_METHOD(void add_radio_actions(GtkRadioActionEntry  *entries, guint n_entries, int value, GCallback on_change, gpointer user_data), gtk_action_group_add_radio_actions), gtk_action_group_add_radio_actions)

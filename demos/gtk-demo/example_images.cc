@@ -153,7 +153,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Failure reading image file 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog (strMsg, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
 
       m_image_stream.clear();
@@ -170,7 +170,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Failed to load image: ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog (strMsg, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
 
       m_image_stream.clear();
@@ -195,7 +195,7 @@ bool Example_Images::on_timeout()
         Glib::ustring strMsg = "Failed to load image: ";
         strMsg += error.what();
 
-        Gtk::MessageDialog dialog (strMsg, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+        Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
         dialog.run();
 
         m_refPixbufLoader.clear();
@@ -217,7 +217,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Unable to open image file 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog (strMsg, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
 
       return false; // uninstall the timeout

@@ -36,6 +36,8 @@ Gtk::Window* do_treeview_editable_cells();
 Gtk::Window* do_treeview_liststore();
 Gtk::Window* do_treeview_treestore();
 
+Gtk::Window* do_ui_manager();
+
 Demo child0[] = {
   { "Editable Cells", "example_treeview_editable_cells.cc", SigC::slot(&do_treeview_editable_cells), 0 },
   { "List Store", "example_treeview_liststore.cc", do_treeview_liststore, 0 },
@@ -63,6 +65,7 @@ Demo testgtk_demos[] =
   { "Stock Item and Icon Browser", "example_stockbrowser.cc", SigC::slot(&do_stock_browser), 0 },
   { "Text Widget", "example_textview.cc", SigC::slot(&do_textview), 0 },
   { "Tree View", "", type_slotDo(), child0 },
+  { "UI Manager", "example_uimanager.cc", SigC::slot(&do_ui_manager), 0},
   { 0, 0, type_slotDo(), 0 }
 };
 

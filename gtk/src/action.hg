@@ -19,6 +19,7 @@
 
 #include <gtkmm/widget.h>
 #include <gtkmm/accelgroup.h>
+#include <gtkmm/stockid.h>
  
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -30,8 +31,13 @@ namespace Gtk
 class Action : public Glib::Object
 {
   _CLASS_GOBJECT(Action, GtkAction, GTK_ACTION, Glib::Object, GObject)
-
+  _CTOR_DEFAULT
+  explicit Action(const Glib::ustring& name, const StockID& stock_id, const Glib::ustring& label = Glib::ustring(), const Glib::ustring& tooltip = Glib::ustring());
 public:
+  _WRAP_CREATE()
+
+  //TODO: If the stock_id and the other arguments are mutually exclusive, then we should have create() and create_from_stock().
+  _WRAP_CREATE(const Glib::ustring& name, const Gtk::StockID& stock_id = Gtk::StockID(), const Glib::ustring& label = Glib::ustring(), const Glib::ustring& tooltip = Glib::ustring())
 
   _WRAP_METHOD(Glib::ustring name() const, gtk_action_get_name)
   _WRAP_METHOD(void activate(), gtk_action_activate)
@@ -44,6 +50,11 @@ public:
   _WRAP_METHOD(void connect_accelerator(), gtk_action_connect_accelerator)
   _WRAP_METHOD(void disconnect_accelerator(), gtk_action_disconnect_accelerator)
 
+  /// For instance, void on_activate();
+  typedef SigC::Slot0<void> SlotActivate;
+  _WRAP_SIGNAL(void activate(), "activate")
+  //TODO: There are other signals, without default signal handlers.
+   
 protected:
   //For use by child actions:
   
@@ -57,11 +68,7 @@ protected:
   _WRAP_VFUNC(Widget* create_menu_item(), "create_menu_item")
   _WRAP_VFUNC(Widget* create_tool_item(), "create_tool_item")
   _WRAP_VFUNC(void connect_proxy(Widget* proxy), "connect_proxy")
-  _WRAP_VFUNC(void disconnect_proxy(Widget* proxy), "disconnect_proxy")
-
-   _WRAP_SIGNAL(void activate(), "activate")
-   //TODO: There are other signals, without default signal handlers.
-             
+  _WRAP_VFUNC(void disconnect_proxy(Widget* proxy), "disconnect_proxy")            
 };
 
 } // namespace Gtk

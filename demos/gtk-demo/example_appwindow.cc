@@ -13,8 +13,6 @@ public:
 
 protected:
   //Signal handlers:
-  //virtual bool on_delete_event(GdkEventAny* event); //override
-
   virtual void on_menu_item();
   virtual void on_text_changed();
   virtual void on_text_mark_set(const Gtk::TextIter& new_location, const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
@@ -177,17 +175,9 @@ Example_AppWindow::~Example_AppWindow()
 {
 }
 
-/*
-bool Example_AppWindow::on_delete_event(GdkEventAny* event)
-{
-  Gtk::Main::quit(); //Isn't there a cleaner way?
-  return false;
-}
-*/
-
 void Example_AppWindow::on_menu_item()
 {
-  Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item",
+  Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item", false,
                             Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE);
   dialog.run();
 }
