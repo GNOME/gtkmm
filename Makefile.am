@@ -30,13 +30,13 @@ include $(top_srcdir)/docs/Makefile_web.am_fragment
 
 doc_tarball_files = \
 	docs/index.html docs/FAQ/html docs/images/*.gif \
-	docs/internal/*.txt docs/internal/*.dia docs/reference/html \
+	docs/reference/html \
 	docs/tutorial/figures/*.png docs/tutorial/html
 
 # This doesn't work very well in a $(srcdir) != $(builddir) setup,
 # but this target is for maintainer use only anyway.
 
-gtkmm-docs.tar.gz:
+gtkmm-2-4-docs.tar.gz:
 	find examples -name '*.cc' -o -name '*.h' -o -name '*.xpm' -o -name '*.xml' | \
 	tar cf - --files-from - $(doc_tarball_files) | gzip -c --best >$@
 
@@ -47,8 +47,8 @@ post-html-recursive:
 	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
 	done
 
-post-html-local: gtkmm-docs.tar.gz
-	rsync $(rsync_args) gtkmm-docs.tar.gz $$USER@shell.sourceforge.net:$(web_path_gtkmm2)
+post-html-local: gtkmm-2-4-docs.tar.gz
+	rsync $(rsync_args) gtkmm-2-4-docs.tar.gz $$USER@shell.sourceforge.net:$(web_path_gtkmm2)
 
 post-html: post-html-recursive post-html-local
 
