@@ -2,6 +2,12 @@
 #include <fcntl.h>
 #include <iostream>
 
+#include <unistd.h> //The SUN Forte compiler puts F_OK here.
+
+//The SUN Forte compiler needs these for mkfifo:
+#include <sys/types.h>
+#include <sys/stat.h>
+
 int read_fd;
 Glib::RefPtr<Glib::IOChannel> iochannel;
 
