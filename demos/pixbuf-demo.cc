@@ -50,11 +50,11 @@ const double pi = 3.14159265358979323844;
  */
 enum
 {
-  FRAME_DELAY = 50,
-  CYCLE_LEN   = 60
+  FRAME_DELAY = 48,
+  CYCLE_LEN   = 64
 };
 
-const char background_name[] =
+const char * const background_name =
   "background.jpg";
 
 const char * const image_names[] =
@@ -177,7 +177,7 @@ void DemoRenderArea::generate_next_frame()
 
     if(!rect.has_zero_area())
     {
-      const int overall_alpha = std::max(127, std::abs(int(255.0 * depth)));
+      const int overall_alpha = std::max(127, int(std::abs(255.0 * depth)));
 
       images_[i]->composite(
           current_frame_,
