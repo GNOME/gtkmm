@@ -1,11 +1,9 @@
 #include <gtkmm/main.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <iostream>
 
 int read_fd;
+Glib::RefPtr<Glib::IOChannel> iochannel;
 
 /*
   send to the fifo with:
@@ -17,20 +15,21 @@ int read_fd;
 
 // this will be our signal handler for read operations
 // it will print out the message sent to the fifo
-// and quit the program if the message was, or began
-// with, '*'
+// and quit the program if the message was 'Q'.
 bool MyCallback(Glib::IOCondition io_condition)
 {
+  
   if ((io_condition & Glib::IO_IN) == 0) {
     std::cerr << "Invalid fifo response" << std::endl;
   }
   else {
-    char buffer[PIPE_BUF];
-    int result;
-    while ((result = read(read_fd, buffer, PIPE_BUF)) > 0) {
-      if (*buffer == 'Q') Gtk::Main::quit();
-      else write(0, buffer, result);
-    }
+   Glib::ustring buf;
+
+   iochannel->read_line (buf);
+   std::cout << buf;
+   if (buf == "Q\n")
+	   Gtk::Main::quit ();
+
   }
   return true;
 }
@@ -58,6 +57,9 @@ int main(int argc, char *argv[])
 
   // connect the signal handler
   Glib::signal_io().connect(sigc::ptr_fun(MyCallback), read_fd, Glib::IO_IN);
+
+  // Creates a iochannel from the file descriptor
+  iochannel = Glib::IOChannel::create_from_fd(read_fd);
 
   // and last but not least - run the application main loop
   app.run();
