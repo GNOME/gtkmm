@@ -348,6 +348,7 @@ _CONVERSION(`const Glib::RefPtr<TextBuffer::Mark>&',`GtkTextMark*',__CONVERT_REF
 _CONVERSION(`GtkTextTag*',`Glib::RefPtr<TextTag>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextTag*',`Glib::RefPtr<const TextTag>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<TextTag>&',`GtkTextTag*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const TextTag>&',`GtkTextTag*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Tag>&',`GtkTextTag*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<TextBuffer::Tag>&',`GtkTextTag*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkTextBuffer*',`Glib::RefPtr<TextBuffer>',`Glib::wrap($3)')
