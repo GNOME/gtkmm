@@ -77,6 +77,11 @@ private:
      int m_row_number;
    };
 
+   //Allow the GlueList inner class to access the declaration of the GlueItem inner class.
+   //SUN's Forte compiler complains about this.
+   class GlueList;
+   friend class GlueList; 
+   
    class GlueList
    {
    public:
