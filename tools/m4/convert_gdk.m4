@@ -54,8 +54,6 @@ _CONVERSION(`GdkDragProtocol&',`GdkDragProtocol*',`&($3)')
 _CONVERSION(`GdkRectangle&',`GdkRectangle*',`&$3',`*$3')
 _CONVERSION(`GdkRgbCmap&',`GdkRgbCmap*',`&$3',`*$3')
 
-# TODO: Remove this, and use Gdk::Device:
-_CONVERSION(`GdkDevice*',`const GdkDevice*',`$3')
 
 _CONVERSION(`GdkKeymap*',`const GdkKeymap*',`$3')
 
@@ -102,7 +100,7 @@ _CONVERSION(`const Glib::RefPtr<Display>&',`GdkDisplay*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Screen>&',`GdkScreen*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Display>&',`GdkDisplay*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Screen>&',`GdkScreen*',__CONVERT_REFPTR_TO_P)
-
+_CONVERSION(`const Glib::RefPtr<Gdk::Device>&',`GdkDevice*',__CONVERT_REFPTR_TO_P)
 
 
 define(`__CFR2P',`const_cast<$`'2>($`'3.gobj())')
@@ -226,8 +224,10 @@ dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
 
 
 # Used by signals:
+# TODO: Have some kind of _CONVERSION_ONLY_FOR_SIGNALS().
 _CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
 _CONVERSION(`GdkPixbuf*',`const Glib::RefPtr<Gdk::Pixbuf>&', Glib::wrap($3, true))
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
 _CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Display>&', Glib::wrap($3, true))
+_CONVERSION(`GdkDevice*',`const Glib::RefPtr<Gdk::Device>&', `Glib::wrap($3, true)')
 

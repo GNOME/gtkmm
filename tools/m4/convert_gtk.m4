@@ -388,6 +388,8 @@ _CONVERSION(`GtkTreePath*',`const TreeModel::Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`GtkTreePath*',`const Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
 _CONVERSION(`GtkStyle*',`const Glib::RefPtr<Style>&',`Glib::wrap($3, true)')
+_CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
+_CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
 
 
 
