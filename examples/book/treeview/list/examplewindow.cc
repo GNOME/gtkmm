@@ -50,19 +50,23 @@ ExampleWindow::ExampleWindow()
   Gtk::TreeModel::Row row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 1;
   row[m_Columns.m_col_name] = "Billy Bob";
-
+  row[m_Columns.m_col_number] = 10;
+  
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
-
+  row[m_Columns.m_col_number] = 20;
+  
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
+  row[m_Columns.m_col_number] = 30;
 
   //Add the TreeView's view columns:
-  m_TreeView.append_column("ID", m_Columns.m_col_id);
+  m_TreeView.append_column("ID", m_Columns.m_col_id); //This number will be shown with the default numeric formatting.
   m_TreeView.append_column("Name", m_Columns.m_col_name);
-
+  m_TreeView.append_column_numeric("Formatted Number", m_Columns.m_col_number, "%010d" /* 10 digits, using leading zeroes. */);
+  
   //Make all the columns reorderable:
   //This is not necessary, but it's nice to show the feature.
   //You can use TreeView::set_column_drag_function() to more
