@@ -47,33 +47,30 @@ ExampleWindow::ExampleWindow()
 
   m_refTreeModelFilter = Gtk::TreeModelFilter::create( m_refTreeModel, Gtk::TreeModel::Path() );
   //TODO: Do not specify the empty Path, when we have added a suitable constructor to gtkmm.
-  m_refTreeModelFilter->set_visible_func( sigc::mem_fun(*this, &ExampleWindow::on_filter_row_visible) );
+  m_refTreeModelFilter->set_modify_func( m_ColumnsDisplay, sigc::mem_fun(*this, &ExampleWindow::on_filter_modify) );
 
-  //Alternatively, for this simple case, we could just specify the bool model column that determines whether the row should be visible:
-  //m_refTreeModelFilter->set_visible_column(m_Columns.m_col_show);
-
+  
   m_TreeView.set_model(m_refTreeModelFilter);
 
   //Fill the TreeView's model
   Gtk::TreeModel::Row row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 1;
   row[m_Columns.m_col_name] = "Billy Bob";
-  row[m_Columns.m_col_show] = true;
+  row[m_Columns.m_col_something] = true;
 
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
-  row[m_Columns.m_col_show] = true;
+  row[m_Columns.m_col_something] = true;
 
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
-  row[m_Columns.m_col_show] = false; //This should cause this row to be filtered out (now shown).
+  row[m_Columns.m_col_something] = false; //This should cause this row to be filtered out (now shown).
 
   //Add the TreeView's view columns:
-  m_TreeView.append_column("ID", m_Columns.m_col_id);
-  m_TreeView.append_column("Name", m_Columns.m_col_name);
-  m_TreeView.append_column_editable("Show", m_Columns.m_col_show);
+  m_TreeView.append_column("Name", m_ColumnsDisplay.m_col_name_uppercase);
+  m_TreeView.append_column_editable("Something", m_ColumnsDisplay.m_col_something_text);
 
   //Make all the columns reorderable:
   //This is not necessary, but it's nice to show the feature.
@@ -92,20 +89,45 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
-bool ExampleWindow::on_filter_row_visible(const Gtk::TreeModel::const_iterator& iter)
+void ExampleWindow::on_filter_modify(const Gtk::TreeModel::iterator& iter, Glib::ValueBase& value, int column)
 {
-  if(iter)
-  {
-    //iter seems to be an iter to the child model:
-    //Gtk::TreeModel::iterator iter_child = m_refTreeModelFilter->convert_iter_to_child_iter(iter);
-    //if(iter_child)
-    //{
-      Gtk::TreeModel::Row row = *iter;
-      return row[m_Columns.m_col_show];
-    //}
-  }
+  //iter is an iterator to the row in the filter model.
+  //column is the column number in the filter model.
+  //value should be set to the value of that column in this row, to be displayed.
 
-  return true;
+  //Look in the child model, to calculate the model to show in the filter model:
+  Gtk::TreeModel::iterator iter_child = m_refTreeModelFilter->convert_iter_to_child_iter(iter);
+  Gtk::TreeModel::Row row_child = *iter_child;
+  
+  switch(column)
+  {
+    case(0): //name_uppercase
+    {
+      Glib::ustring name = row_child[m_Columns.m_col_name];
+    
+      Glib::Value<Glib::ustring> valString;
+      valString.init( Glib::Value< Glib::ustring >::value_type() ); //TODO: Is there any way to avoid this step? Can't it copy the type as well as the value?
+
+      valString.set(name);
+      value = valString; 
+      break;
+    }
+    case(1):
+    {
+      bool something = row_child[m_Columns.m_col_something];
+    
+      Glib::Value<Glib::ustring> valString;
+      valString.init( Glib::Value< Glib::ustring >::value_type() ); //TODO: Is there any way to avoid this step? Can't it copy the type as well as the value?
+
+      valString.set( (something ? "something" : "notsomething") );
+      value = valString;
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
 }
 
 void ExampleWindow::on_button_quit()

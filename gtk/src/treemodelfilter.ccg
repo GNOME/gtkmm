@@ -96,18 +96,18 @@ void SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GV
   try
   {
     //Initialize the input parameter with the appropriate type for this column.
-    //Then the C++ handler can just use operator== without calling init on the value output arg:
+    //Then the C++ handler can just use operator==() without calling init on the value output arg:
     Glib::ValueBase cppValue;
     GType column_type = gtk_tree_model_get_column_type(model, column);
     cppValue.init(column_type);
     
-    return (self->slot_)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
+    (self->slot_)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
 
-    g_value_init(value, column_type);
+    //GTK+ has already done this for us: g_value_init(value, column_type);
 
     //If the C++ handler has inited value with an inappropriate GType, then this will fail,
     //but they should not do that because it makes no sense.
-    g_value_copy(cppValue.gobj(), value);  
+    g_value_copy(cppValue.gobj() /* source */, value /* destination */);  
   }
   catch(...)
   {
