@@ -30,21 +30,21 @@
 #include <vector>
 #include <cctype>
 #include <cerrno>
+#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
 
-//The SUN Forte compiler can't seem to either find the declarations or the implementations,
+//The SUN Forte and Tru64 compilers can't seem to either find the declarations or the implementations,
 //so these are not used on that platform.
-//#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
-//SUN Forte seems to need these:
-//void flockfile(FILE*);
-//void funlockfile(FILE*);
-// #ifdef GLIBMM_COMPILER_SUN_FORTE //These isn't found even though the configure-time check works.
-// I don't know why. murrayc.
+//However, the configure time checks work, so HAVE_FLOCKFILE and HAVE_FUNLOCKFILE are defined.
+//This is a mystery.
+//
+//
 // In bug, #154973, Joel Fredrikson suggests defining _REENTRANT, but that does not make any difference,
 // and it's not clear that it is mean to solve this particular problem anyway.
-#if defined(__SUNPRO_CC) //But this does work.
-  #undef HAVE_FLOCKFILE
-  #undef HAVE_FUNLOCKFILE
-#endif
+//
+//We #undef them so that this builds on non-g++ platforms:
+
+#undef HAVE_FLOCKFILE
+#undef HAVE_FUNLOCKFILE
 
 namespace
 {
