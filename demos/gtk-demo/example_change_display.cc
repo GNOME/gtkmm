@@ -227,7 +227,7 @@ void Example_ChangeDisplay::initialize_displays()
     row[m_columns_display.m_display] = refDisplay;
 
     refDisplay->signal_closed().connect(
-      sigc::bind( sigc::mem_fun(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
+      sigc::bind<-1>( sigc::mem_fun(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
   }
 
 #endif   
