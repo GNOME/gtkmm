@@ -37,11 +37,11 @@ protected:
   virtual void create_popup();
 
   //Signal handlers:
-  virtual void on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, GtkSelectionData* selection_data, guint info, guint time);
+  virtual void on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
   virtual bool on_label_popup_drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time);
   virtual void on_label_popup_drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time);
 
-  virtual void on_image_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, GtkSelectionData* selection_data, guint info, guint time);
+  virtual void on_image_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
   virtual bool on_image_drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time);
   virtual void on_image_drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time);
   virtual bool on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time);

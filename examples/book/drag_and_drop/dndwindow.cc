@@ -67,14 +67,15 @@ void DnDWindow::on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>&, G
   gtk_selection_data_set (selection_data, selection_data->target, 8, (const guchar*)"I'm Data!", 9);
 }
 
-void DnDWindow::on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int, int, GtkSelectionData* selection_data, guint, guint time)
+void DnDWindow::on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int, int, const Gtk::SelectionData& selection_data, guint, guint time)
 {
   //TODO: The gtkmm API needs to change to use a Gtk::SelectionData instead of a GtkSelectionData.
   //That should happen for gtkmm 2.4.
   
-  if ((selection_data->length >= 0) && (selection_data->format == 8))
+  if ((selection_data.get_length() >= 0) && (selection_data.get_format() == 8))
   {
-    std::cout << "Received \"" << (gchar *)(selection_data->data) << "\" in label " << std::endl;
+    //TODO: Use a get_data_as_string or something like that.
+    std::cout << "Received \"" << (gchar *)(selection_data.get_data()) << "\" in label " << std::endl;
   }
 
   context->drag_finish(false, false, time);
