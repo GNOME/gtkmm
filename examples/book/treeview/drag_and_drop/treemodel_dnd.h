@@ -49,7 +49,7 @@ public:
 protected:
   //Overridden virtual functions:
   virtual bool row_draggable_vfunc(const Gtk::TreeModel::Path& path);
-  virtual bool row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, GtkSelectionData* selection_data);
+  virtual bool row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, const Gtk::SelectionData& selection_data);
   
 };
 

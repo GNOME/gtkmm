@@ -47,7 +47,7 @@ bool TreeModel_Dnd::row_draggable_vfunc(const Gtk::TreeModel::Path& path)
   return Gtk::TreeStore::row_draggable_vfunc(path);
 }
 
-bool TreeModel_Dnd::row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, GtkSelectionData* selection_data)
+bool TreeModel_Dnd::row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, const Gtk::SelectionData& selection_data)
 {
   //Make the value of the "receives drags" column determine whether a row can be dragged into it:
 
