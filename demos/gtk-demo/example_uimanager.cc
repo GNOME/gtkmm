@@ -77,7 +77,7 @@ Example_UIManager::Example_UIManager()
   m_refActionGroup->add( Gtk::Action::create("ColorMenu", "_Color") );
   m_refActionGroup->add( Gtk::Action::create("ShapeMenu", "_Shape") );
   m_refActionGroup->add( Gtk::Action::create("HelpMenu", "_Help") );
-  m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),,
+  m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
