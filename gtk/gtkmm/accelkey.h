@@ -52,8 +52,8 @@ public:
            const Glib::ustring& accel_path = "");
   
   /** AccelKey constructor.
-   * @param accelerator For instance, "<control>q" - Use 
-   *     <control>, <shift>. <alt> and <release>. 
+   * @param accelerator For instance, &quot;&lt;control&gt;q&quot; - Use 
+   *     &lt;control&gt;, &lt;shift&gt;, &lt;alt&gt; and &lt;release&gt;. 
    *     Use F1, F2, etc, for function keys.
    * @param accel_path For instance, "<MainWindow>/File/Open"
    */

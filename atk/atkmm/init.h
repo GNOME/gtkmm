@@ -26,7 +26,7 @@ namespace Atk
 
 /** Initialize atkmm.
  * You may call this more than once.
- * You do nott need to call this if you are using Gtk::Main,
+ * You do not need to call this if you are using Gtk::Main,
  * because it calls this for you.
  */
 void init();
