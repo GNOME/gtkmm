@@ -1,6 +1,3 @@
-//TODO: Update this example:
-#undef GTKMM_DISABLE_DEPRECATED
-
 #include <gtkmm/main.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/button.h>
@@ -9,6 +6,8 @@
 #include <gtkmm/optionmenu.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/toolbutton.h>
+#include <gtkmm/separatortoolitem.h>
 
 #include <stdio.h>
 //#include <glib.h>
@@ -64,38 +63,34 @@ MainWindowClass::MainWindowClass()
     vbox->pack_start (*button);
 
 
-    toolbar->tools ()
-        .push_back (StockElem (Gtk::Stock::NEW,
-                               sigc::bind (sigc::mem_fun (*this,
-                                           &MainWindowClass::toolbar_cb),
-                                     "New Item"),
-                               "New Item"));
-    toolbar->tools ()
-        .push_back (StockElem (Gtk::Stock::OPEN,
-                               sigc::bind (sigc::mem_fun (*this,
-                                           &MainWindowClass::toolbar_cb),
-                                     "Open Item"),
-                               "Open Item"));
-    toolbar->tools ()
-        .push_back (StockElem (Gtk::Stock::SAVE,
-                               sigc::bind (sigc::mem_fun (*this,
-                                           &MainWindowClass::toolbar_cb),
-                                     "Save Item"),
-                               "Save Item"));
-    toolbar->tools ().push_back (Space ());
-    toolbar->tools ()
-        .push_back (StockElem (Gtk::Stock::UNDO,
-                               sigc::bind (sigc::mem_fun (*this,
-                                           &MainWindowClass::toolbar_cb),
-                                     "Undo action"),
-                               "Undo action"));
-    toolbar->tools ()
-        .push_back (StockElem (Gtk::Stock::REDO,
-                               sigc::bind (sigc::mem_fun (*this, 
-                                           &MainWindowClass::toolbar_cb),
-                                     "Redo action"),
-                               "Redo action"));
+    Gtk::ToolButton* toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::NEW));
+    toolbutton->set_label("New Item");
+    toolbutton->set_is_important(); // show the label in both_horiz
+    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "New Item"));
+    toolbar->append(*toolbutton);
 
+    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::OPEN));
+    toolbutton->set_label("Open Item");
+    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Open Item"));
+    toolbar->append(*toolbutton);
+
+    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::SAVE));
+    toolbutton->set_label("Save Item");
+    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Save Item"));
+    toolbar->append(*toolbutton);
+
+    Gtk::SeparatorToolItem *toolitem = manage (new Gtk::SeparatorToolItem());
+    toolbar->append(*toolitem);
+
+    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::UNDO));
+    toolbutton->set_label("Undo action");
+    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Undo action"));
+    toolbar->append(*toolbutton);
+
+    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::REDO));
+    toolbutton->set_label("Redo action");
+    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Redo action"));
+    toolbar->append(*toolbutton);
 
     Gtk::Menu* menu = manage (new Gtk::Menu ());
     optionmenu->set_menu (*menu);
@@ -128,7 +123,7 @@ MainWindowClass::MainWindowClass()
     menu->items ()[0].activate ();
     optionmenu->set_history (0);
 
-    vbox->show_all ();
+    vbox->show_all_children ();
 }
 
 MainWindowClass::~MainWindowClass ()
