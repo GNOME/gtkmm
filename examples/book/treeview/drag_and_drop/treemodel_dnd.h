@@ -24,7 +24,7 @@
 class TreeModel_Dnd : public Gtk::TreeStore
 {
 protected:
-  explicit TreeModel_Dnd(const Gtk::TreeModelColumnRecord& columns);
+  TreeModel_Dnd();
 
 public:
 
@@ -42,7 +42,7 @@ public:
     Gtk::TreeModelColumn<bool> m_col_receivesdrags;
   };
 
-  static ModelColumns m_Columns;
+  ModelColumns m_Columns;
 
   static Glib::RefPtr<TreeModel_Dnd> create();
 

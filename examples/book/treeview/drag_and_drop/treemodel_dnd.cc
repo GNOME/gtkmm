@@ -19,17 +19,19 @@
 #include "treemodel_dnd.h"
 #include <iostream>
 
-//Initialize static data:
-TreeModel_Dnd::ModelColumns TreeModel_Dnd::m_Columns;
-
-TreeModel_Dnd::TreeModel_Dnd(const Gtk::TreeModelColumnRecord& columns)
-: Gtk::TreeStore(columns)
+TreeModel_Dnd::TreeModel_Dnd()
 {
+  //We can't just call Gtk::TreeModel(m_Columns) in the initializer list
+  //because m_Columns does not exist when the base class constructor runs.
+  //And we can't have a static m_Columns instance, because that would be
+  //instantiated before the gtkmm type system.
+  //So, we use this method, which should only be used just after creation:
+  set_column_types(m_Columns);
 }
 
 Glib::RefPtr<TreeModel_Dnd> TreeModel_Dnd::create()
 {
-  return Glib::RefPtr<TreeModel_Dnd>( new TreeModel_Dnd(m_Columns) );
+  return Glib::RefPtr<TreeModel_Dnd>( new TreeModel_Dnd() );
 }
 
 bool TreeModel_Dnd::row_draggable_vfunc(const Gtk::TreeModel::Path& path)
