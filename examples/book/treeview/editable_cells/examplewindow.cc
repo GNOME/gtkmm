@@ -64,8 +64,24 @@ ExampleWindow::ExampleWindow()
   row[m_Columns.m_col_foo] = false;
 
   //Add the TreeView's view columns:
+#ifdef GTKMM_MSC_NET //MSVC++ can not cope with the easy method.
+  {
+     int cols_count = m_TreeView.append_column("ID", m_Columns.m_col_id);
+     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+     Gtk::CellRendererText* pCell = dynamic_cast<Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
+     pCell->property_editable() = true;
+  }
+  {
+     int cols_count = m_TreeView.append_column("Name", m_Columns.m_col_name);
+     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+     Gtk::CellRendererText* pCell = dynamic_cast<Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
+     pCell->property_editable() = true;
+  }
+
+#else //GTKMM_MSC_NET
   m_TreeView.append_column_editable("ID", m_Columns.m_col_id);
   m_TreeView.append_column_editable("Name", m_Columns.m_col_name);
+#endif //GTKMM_MSC_NET
   m_TreeView.append_column_editable("foo", m_Columns.m_col_foo);
 
   show_all_children();

@@ -19,7 +19,6 @@
 #include <gtkmm.h>
 #include <iostream>
 
-using namespace SigC;
 
 enum { DEF_PAD = 10 };
 enum { DEF_PAD_SMALL = 5 };
@@ -133,8 +132,8 @@ void CalendarExample::select_font()
   {
     font_dialog_  = new Gtk::FontSelectionDialog("Font Selection Dialog");
     font_dialog_->set_position(Gtk::WIN_POS_MOUSE);
-    font_dialog_->get_ok_button()->signal_clicked().connect(slot(*this, &CalendarExample::font_selection_ok));
-    //font_dialog_->get_cancel_button()->signal_clicked.connect(bind(slot(this, &CalendarExample::destroy_widget), font_dialog_));
+    font_dialog_->get_ok_button()->signal_clicked().connect(SigC::slot(*this, &CalendarExample::font_selection_ok));
+    //font_dialog_->get_cancel_button()->signal_clicked.connect(SigC::bind(SigC:2:slot(this, &CalendarExample::destroy_widget), font_dialog_));
   }
 
   if (!font_dialog_->is_visible())
@@ -158,42 +157,42 @@ CalendarExample::CalendarExample()
 
   set_resizable(false);
 
-  Gtk::VBox* vbox = manage(new Gtk::VBox(false, DEF_PAD));
+  Gtk::VBox* vbox = Gtk::manage(new Gtk::VBox(false, DEF_PAD));
   add(*vbox);
 
   /*
    * The top part of the CalendarExample, flags and fontsel.
    */
 
-  Gtk::HBox* hbox = manage(new Gtk::HBox(false, DEF_PAD));
+  Gtk::HBox* hbox = Gtk::manage(new Gtk::HBox(false, DEF_PAD));
   vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, DEF_PAD);
-  Gtk::HButtonBox* hbbox = manage(new Gtk::HButtonBox());
+  Gtk::HButtonBox* hbbox = Gtk::manage(new Gtk::HButtonBox());
   hbox->pack_start(*hbbox, Gtk::PACK_SHRINK, DEF_PAD);
   hbbox->set_layout(Gtk::BUTTONBOX_SPREAD);
   hbbox->set_spacing(5);
 
   /* Calendar widget */
-  Gtk::Frame* frame = manage(new Gtk::Frame("Calendar"));
+  Gtk::Frame* frame = Gtk::manage(new Gtk::Frame("Calendar"));
   hbbox->pack_start(*frame, Gtk::PACK_EXPAND_WIDGET, DEF_PAD);
   calendar_ = new Gtk::Calendar();
   set_flags();
   calendar_->mark_day(19);	
   frame->add(*calendar_);
-  calendar_->signal_month_changed().connect(slot(*this, &CalendarExample::month_changed));
-  calendar_->signal_day_selected().connect(slot(*this, &CalendarExample::day_selected));
-  calendar_->signal_day_selected_double_click().connect(slot(*this, &CalendarExample::day_selected_double_click));
+  calendar_->signal_month_changed().connect(SigC::slot(*this, &CalendarExample::month_changed));
+  calendar_->signal_day_selected().connect(SigC::slot(*this, &CalendarExample::day_selected));
+  calendar_->signal_day_selected_double_click().connect(SigC::slot(*this, &CalendarExample::day_selected_double_click));
 
-  Gtk::VSeparator* separator = manage(new Gtk::VSeparator());
+  Gtk::VSeparator* separator = Gtk::manage(new Gtk::VSeparator());
   hbox->pack_start (*separator, Gtk::PACK_SHRINK);
 
-  Gtk::VBox* vbox2 = manage(new Gtk::VBox(false, DEF_PAD));
+  Gtk::VBox* vbox2 = Gtk::manage(new Gtk::VBox(false, DEF_PAD));
   hbox->pack_start(*vbox2, Gtk::PACK_SHRINK, DEF_PAD);
   
   /* Build the Right frame with the flags in */ 
 
-  Gtk::Frame* frameFlags = manage(new Gtk::Frame("Flags"));
+  Gtk::Frame* frameFlags = Gtk::manage(new Gtk::Frame("Flags"));
   vbox2->pack_start(*frameFlags, Gtk::PACK_EXPAND_WIDGET, DEF_PAD);
-  Gtk::VBox* vbox3 = manage(new Gtk::VBox(true, DEF_PAD_SMALL));
+  Gtk::VBox* vbox3 = Gtk::manage(new Gtk::VBox(true, DEF_PAD_SMALL));
   frameFlags->add(*vbox3);
 
   struct {
@@ -210,51 +209,51 @@ CalendarExample::CalendarExample()
   for (int i = 0; i < 5; i++)
   {
     Gtk::CheckButton* toggle = new Gtk::CheckButton(flags[i].label);
-    toggle->signal_toggled().connect(bind(slot(*this, &CalendarExample::toggle_flag), toggle));
+    toggle->signal_toggled().connect(SigC::bind(SigC::slot(*this, &CalendarExample::toggle_flag), toggle));
     vbox3->pack_start(*toggle);
     flag_checkboxes_[i] = toggle;
   }
 
   /* Build the right font-button */ 
-  Gtk::Button* button = manage(new Gtk::Button("Font..."));
-  button->signal_clicked().connect(slot(*this, &CalendarExample::select_font));
+  Gtk::Button* button = Gtk::manage(new Gtk::Button("Font..."));
+  button->signal_clicked().connect(SigC::slot(*this, &CalendarExample::select_font));
   vbox2->pack_start (*button, Gtk::PACK_SHRINK);
 
   /*
    *  Build the Signal-event part.
    */
 
-  frame = manage(new Gtk::Frame("Signal events"));
+  frame = Gtk::manage(new Gtk::Frame("Signal events"));
   vbox->pack_start(*frame, Gtk::PACK_EXPAND_WIDGET, DEF_PAD);
-  vbox2 = manage(new Gtk::VBox(true, DEF_PAD_SMALL));
+  vbox2 = Gtk::manage(new Gtk::VBox(true, DEF_PAD_SMALL));
   frame->add(*vbox2);
   
-  hbox = manage(new Gtk::HBox(false, 5));
+  hbox = Gtk::manage(new Gtk::HBox(false, 5));
   vbox2->pack_start (*hbox, Gtk::PACK_SHRINK);
-  Gtk::Label* label = manage(new Gtk::Label("Day selected:"));
+  Gtk::Label* label = Gtk::manage(new Gtk::Label("Day selected:"));
   hbox->pack_start (*label, Gtk::PACK_SHRINK);
   label_selected_ = new Gtk::Label("");
   hbox->pack_start (*label_selected_, Gtk::PACK_SHRINK);
 
-  hbox = manage(new Gtk::HBox(false, 5));
+  hbox = Gtk::manage(new Gtk::HBox(false, 5));
   vbox2->pack_start (*hbox, Gtk::PACK_SHRINK);
-  label = manage(new Gtk::Label("Day selected double click:"));
+  label = Gtk::manage(new Gtk::Label("Day selected double click:"));
   hbox->pack_start (*label, Gtk::PACK_SHRINK);
   label_selected_double_click_ = new Gtk::Label("");
   hbox->pack_start (*label_selected_double_click_, Gtk::PACK_SHRINK);
 
-  hbox = manage(new Gtk::HBox(false, 5));
+  hbox = Gtk::manage(new Gtk::HBox(false, 5));
   vbox2->pack_start (*hbox, Gtk::PACK_SHRINK);
-  label = manage(new Gtk::Label("Month change:")); 
+  label = Gtk::manage(new Gtk::Label("Month change:")); 
   hbox->pack_start (*label, Gtk::PACK_SHRINK);
   label_month_ = new Gtk::Label("");
   hbox->pack_start(*label_month_, Gtk::PACK_SHRINK);
   
-  Gtk::HButtonBox* bbox = manage(new Gtk::HButtonBox());
+  Gtk::HButtonBox* bbox = Gtk::manage(new Gtk::HButtonBox());
   vbox->pack_start(*bbox, Gtk::PACK_SHRINK);
   bbox->set_layout(Gtk::BUTTONBOX_END);
 
-  button = manage(new Gtk::Button("Close"));
+  button = Gtk::manage(new Gtk::Button("Close"));
   button->signal_clicked().connect(&Gtk::Main::quit);
   bbox->add(*button);
   button->set_flags(Gtk::CAN_DEFAULT);

@@ -16,7 +16,7 @@ public:
 ArrowButton::ArrowButton(Gtk::ArrowType arrow_type,Gtk::ShadowType shadow_type)
   : Gtk::Button()
 {
-  Gtk::Arrow* arrow = manage (new Gtk::Arrow (arrow_type, shadow_type));
+    Gtk::Arrow* arrow = SigC::manage (new Gtk::Arrow (arrow_type, shadow_type));
   add (*arrow);
 }
   
@@ -42,20 +42,20 @@ AppWindow::AppWindow()
   set_border_width (10);
   
   /* Create a box to hold the arrows/buttons */
-  box=manage (new Gtk::HBox (false, 0));
+  box=SigC::manage (new Gtk::HBox (false, 0));
   box->set_border_width (2);
 
   /* Pack and show all our widgets */
-  button = manage (new ArrowButton (Gtk::ARROW_LEFT, Gtk::SHADOW_ETCHED_IN));
+  button = SigC::manage (new ArrowButton (Gtk::ARROW_LEFT, Gtk::SHADOW_ETCHED_IN));
   box->pack_start (*button, Gtk::PACK_SHRINK, 3);
 
-  button = manage(new ArrowButton (Gtk::ARROW_RIGHT, Gtk::SHADOW_ETCHED_IN));
+  button = SigC::manage(new ArrowButton (Gtk::ARROW_RIGHT, Gtk::SHADOW_ETCHED_IN));
   box->pack_start(*button, Gtk::PACK_SHRINK, 3);
 
-  button = manage (new ArrowButton (Gtk::ARROW_LEFT, Gtk::SHADOW_ETCHED_OUT));
+  button = SigC::manage (new ArrowButton (Gtk::ARROW_LEFT, Gtk::SHADOW_ETCHED_OUT));
   box->pack_start (*button, Gtk::PACK_SHRINK, 3);
 
-  button = manage (new ArrowButton (Gtk::ARROW_RIGHT, Gtk::SHADOW_ETCHED_OUT));
+  button = SigC::manage (new ArrowButton (Gtk::ARROW_RIGHT, Gtk::SHADOW_ETCHED_OUT));
   box->pack_start (*button, Gtk::PACK_SHRINK, 3);
  
   add (*box);
@@ -67,8 +67,8 @@ AppWindow::~AppWindow() {};
 int main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  AppWindow arrows;
 
+  AppWindow arrows;
   Gtk::Main::run(arrows);
   return 0;
 }

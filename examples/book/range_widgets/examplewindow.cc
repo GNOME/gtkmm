@@ -100,7 +100,7 @@ ExampleWindow::ExampleWindow()
       list_vpos.push_back(
         MenuElem("Right", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_position), Gtk::POS_RIGHT)) );
 
-      m_VBox2.pack_start( *manage(new LabeledOptionMenu("Scale Value Position:", m_Menu_Position)) );
+      m_VBox2.pack_start( *Gtk::manage(new LabeledOptionMenu("Scale Value Position:", m_Menu_Position)) );
 
 
       MenuList& list_upd = m_Menu_Policy.items();
@@ -111,17 +111,17 @@ ExampleWindow::ExampleWindow()
       list_upd.push_back(
         MenuElem("Delayed", SigC::bind( SigC::slot(*this, &ExampleWindow::on_menu_policy), Gtk::UPDATE_DELAYED)) );
 
-      m_VBox2.pack_start( *manage(new LabeledOptionMenu("Scale Update Policy:", m_Menu_Policy)) );
+      m_VBox2.pack_start( *Gtk::manage(new LabeledOptionMenu("Scale Update Policy:", m_Menu_Policy)) );
   }
 
   //Digits:
-  m_HBox_Digits.pack_start(*manage(new Gtk::Label("Scale Digits:", 0)),  Gtk::PACK_SHRINK);
+  m_HBox_Digits.pack_start(*Gtk::manage(new Gtk::Label("Scale Digits:", 0)),  Gtk::PACK_SHRINK);
   m_Scale_Digits.set_digits(0);
   m_adjustment_digits.signal_value_changed().connect( SigC::slot(*this, &ExampleWindow::on_adjustment1_value_changed) );
   m_HBox_Digits.pack_start(m_Scale_Digits);
 
   //Page Size:
-  m_HBox_PageSize.pack_start(*manage(new Gtk::Label("Scrollbar Page Size:", 0)), Gtk::PACK_SHRINK);
+  m_HBox_PageSize.pack_start(*Gtk::manage(new Gtk::Label("Scrollbar Page Size:", 0)), Gtk::PACK_SHRINK);
   m_Scale_PageSize.set_digits(0);
   m_adjustment_pagesize.signal_value_changed().connect( SigC::slot(*this, &ExampleWindow::on_adjustment2_value_changed) );
   m_HBox_PageSize.pack_start(m_Scale_PageSize);

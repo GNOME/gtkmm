@@ -37,8 +37,8 @@ TicTacToe::TicTacToe ()
       {
 	buttons[i][j] = button = manage( new Gtk::ToggleButton ());
 	table-> attach (*button, i, i+1, j, j+1);
-	button-> signal_toggled().connect ( bind(
-                                     slot(*this, &TicTacToe::toggle), 
+	button-> signal_toggled().connect ( SigC::bind(
+                                     SigC::slot(*this, &TicTacToe::toggle), 
                                      button));
 	button-> set_size_request (20, 20);
       }

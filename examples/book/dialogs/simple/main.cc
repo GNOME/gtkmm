@@ -17,7 +17,7 @@
  */
 
 #include <gtkmm/main.h>
-#include <examplewindow.h>
+#include "examplewindow.h"
 
 int main(int argc, char *argv[])
 {

@@ -16,9 +16,10 @@ figures_DATA = alignment.png aspectframe.png \
 	notebook.png \
 	paned.png progressbar.png radiobuttons.png \
 	range_widgets.png scrolledwindow.png spinbutton.png \
-	table.png toolbar.png \
+	table.png toolbar.png textview.png \
 	treeview_list.png treeview_tree.png treeview_editablecells.png \
-        treeview_draganddrop.png
+        treeview_draganddrop.png \
+        devcpp_project_options.png 
 
 EXTRA_DIST = $(figures_DATA)
 
