@@ -52,7 +52,7 @@ ExampleWindow::ExampleWindow()
     sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
   m_refActionGroup->add( Gtk::Action::create("EditPaste", Gtk::Stock::PASTE),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
-  m_refActionGroup->add( Gtk::Action::create("EditSomething", "Something"),
+  m_refActionGroup->add( Gtk::Action::create("EditSomething", "Something"), Gtk::AccelKey("<control><alt>S"),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
 
   //Help menu:
