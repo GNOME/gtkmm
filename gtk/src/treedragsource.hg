@@ -50,10 +50,21 @@ public:
   _WRAP_METHOD(bool drag_data_delete(const TreeModel::Path& path), gtk_tree_drag_source_drag_data_delete)
 
 protected:
+
+#m4begin
+dnl// We want to hand-code these C vfunc callbacks,
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+    klass->drag_data_get = &drag_data_get_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+    static gboolean drag_data_get_vfunc_callback(GtkTreeDragSource* self, GtkTreePath* path, GtkSelectionData* selection_data);
+  _POP()
+#m4end
+
   _WRAP_VFUNC(bool row_draggable(const TreeModel::Path& path) const, row_draggable)
 
-  //TODO: Use Gtk::SelectionData:
-  _WRAP_VFUNC(bool drag_data_get(const TreeModel::Path& path, GtkSelectionData* selection_data) const, drag_data_get)
+  //We hand-code this so that we can use a temporary instance for teh SelectionData& output parameter:
+  virtual bool drag_data_get_vfunc(const TreeModel::Path& path, SelectionData& selection_data) const;
+   
   _WRAP_VFUNC(bool drag_data_delete(const TreeModel::Path& path), drag_data_delete)
 };
 

@@ -111,6 +111,7 @@ _CONVERSION(`const Glib::RefPtr<const Layout>&',`PangoLayout*',__CONVERT_CONST_R
 
 _CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<Pango::LayoutLine>',`Glib::wrap($3)')
 _CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<LayoutLine>',`Glib::wrap($3)')
+_CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<const LayoutLine>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Pango::LayoutLine>&',`PangoLayoutLine*',__CONVERT_REFPTR_TO_P)
 # Special treatment for the Sun Forte compiler
 _CONVERSION(`const Glib::RefPtr<const Pango::LayoutLine>&',`PangoLayoutLine*',__CONVERT_CONST_REFPTR_TO_P_SUN(Pango::LayoutLine))
@@ -134,4 +135,4 @@ _CONVERSION(`TabAlign&',`PangoTabAlign*',`((PangoTabAlign*) &($3))')
 
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`GSList*',`SListHandle_LayoutLine',__FL2H_SHALLOW)
-
+_CONVERSION(`GSList*',`SListHandle_ConstLayoutLine',__FL2H_SHALLOW)

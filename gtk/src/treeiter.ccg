@@ -20,6 +20,25 @@
 
 #include <gtkmm/treemodel.h>
 
+namespace //anonymous
+{
+
+//This is copied from Totem. In future there might be a version in GTK+ itself - see bug #
+static gboolean gtkmm_gtk_tree_model_iter_previous (GtkTreeModel *tree_model, GtkTreeIter *iter)
+{
+	GtkTreePath *path;
+	gboolean ret;
+
+	path = gtk_tree_model_get_path (tree_model, iter);
+	ret = gtk_tree_path_prev (path);
+	if (ret == TRUE)
+		gtk_tree_model_get_iter (tree_model, iter, path);
+
+	gtk_tree_path_free (path);
+	return ret;
+}
+
+} //anonymous namespace
 
 namespace Gtk
 {
@@ -69,6 +88,36 @@ const TreeIter TreeIter::operator++(int)
   TreeIter previous (*this);
 
   if(!gtk_tree_model_iter_next(model_->gobj(), &gobject_))
+  {
+    is_end_ = true;
+    gtk_tree_model_iter_parent(model_->gobj(), &gobject_, &previous.gobject_);
+  }
+
+  return previous;
+}
+
+TreeIter& TreeIter::operator--()
+{
+  g_assert(!is_end_);
+
+  GtkTreeIter previous = gobject_;
+
+  if(!gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_))
+  {
+    is_end_ = true;
+    gtk_tree_model_iter_parent(model_->gobj(), &gobject_, &previous);
+  }
+
+  return *this;
+}
+
+const TreeIter TreeIter::operator--(int)
+{
+  g_assert(!is_end_);
+
+  TreeIter previous (*this);
+
+  if(!gtkmm_gtk_tree_model_iter_previous(model_->gobj(), &gobject_))
   {
     is_end_ = true;
     gtk_tree_model_iter_parent(model_->gobj(), &gobject_, &previous.gobject_);

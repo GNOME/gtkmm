@@ -23,6 +23,7 @@ _EQUAL(const-char*,const-gchar*)
 _EQUAL(return-char*,return-gchar*)
 _EQUAL(gpointer,void*)
 _EQUAL(gconstpointer,const void*)
+
 #
 # Basic Types
 _CONVERSION(`int',`bool',`$3')
@@ -41,7 +42,8 @@ _CONVERSION(`void*&',`gpointer*',`&($3)')
 
 _CONVERSION(`GError*&',`GError**',`&($3)')
 
-
+_CONVERSION(`ui_merge_id',`guint',`$3')
+_CONVERSION(`guint',`ui_merge_id',`$3')
 
 # Enums: TODO: It would be nice if gmmproc knew about these automatically.
 _CONV_ENUM(Gtk,AccelFlags)
@@ -252,7 +254,9 @@ _CONVERSION(`const Glib::ListHandle<Glib::ustring>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<Widget*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<const Widget*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::ListHandle<Window*>&',`GList*',`$3.data()')
+_CONVERSION(`const Glib::ListHandle<const Window*>&',`GList*',`$3.data()')
 _CONVERSION(`const Glib::SListHandle< Glib::RefPtr<RadioAction> >&',`GSList*',`$3.data()')
+_CONVERSION(`const Glib::SListHandle< Glib::RefPtr<const RadioAction> >&',`GSList*',`$3.data()')
 
 # GList (gtk+) -> Glib::ListHandle<> (gtkmm)
 define(`__FL2H_DEEP',`$`'2($`'3, Glib::OWNERSHIP_DEEP)')
@@ -271,15 +275,25 @@ _CONVERSION(`GList*',`Glib::ListHandle<const CellRenderer*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<TreeModel::Row>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const TreeModel::Row>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Action> >',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Action> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<ActionGroup> >',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const ActionGroup> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Tag> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextTag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextMark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextBuffer::Mark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const RadioAction> >',__FL2H_SHALLOW)
+
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<FileFilter> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const FileFilter> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
@@ -347,6 +361,7 @@ _CONVERSION(`const Glib::RefPtr<ChildAnchor>&',`GtkTextChildAnchor*',__CONVERT_R
 _CONVERSION(`const Glib::RefPtr<TextBuffer::ChildAnchor>&',`GtkTextChildAnchor*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<ChildAnchor>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<TextChildAnchor>',`Glib::wrap($3)')
+_CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<const TextChildAnchor>',`Glib::wrap($3)')
 
 # Tree:
 _CONVERSION(`const TreeIter&',`const GtkTreeIter*',__FR2P)
@@ -445,7 +460,8 @@ _CONVERSION(`GtkTreeModel*',`const Glib::RefPtr<const TreeModel>&',`Glib::wrap($
 _CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',Glib::wrap($3, true))
 _CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true)')
-
+_CONVERSION(`CellRenderer*',`GtkCellRenderer*',__FP2P)
+_CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
 
 _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 

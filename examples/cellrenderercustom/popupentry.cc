@@ -120,6 +120,8 @@ void PopupEntry::start_editing_vfunc(GdkEvent*)
 
   entry_->select_region(0, -1);
 
+  // TODO: This is a key-binding signal. Investigate whether we really need to use a keybinding signal
+  // when creating a derived CellRenderer.
   entry_->signal_activate().connect(slot(*this, &Self::on_entry_activate));
   entry_->signal_key_press_event().connect(slot(*this, &Self::on_entry_key_press_event));
 
