@@ -19,9 +19,7 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm/window.h>
-#include <gtkmm/box.h>
-#include <gtkmm/uimanager.h>
+#include <gtkmm.h>
 
 class ExampleWindow : public Gtk::Window
 {
@@ -35,11 +33,15 @@ protected:
   virtual void on_menu_file_quit();
   virtual void on_menu_others();
 
+  virtual void on_menu_choices_one();
+  virtual void on_menu_choices_two();
+
   //Child widgets:
   Gtk::VBox m_Box;
 
   Glib::RefPtr<Gtk::UIManager> m_refUIManager;
   Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+  Glib::RefPtr<Gtk::RadioAction> m_refChoiceOne, m_refChoiceTwo;
 };
 
 #endif //GTKMM_EXAMPLEWINDOW_H

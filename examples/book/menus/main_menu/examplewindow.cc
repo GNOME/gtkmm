@@ -55,6 +55,18 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup->add( Gtk::Action::create("EditSomething", "Something"), Gtk::AccelKey("<control><alt>S"),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
 
+
+  //Choices menu, to demonstrate Radio items
+  m_refActionGroup->add( Gtk::Action::create("ChoicesMenu", "Choices") );
+  Gtk::RadioAction::Group group_userlevel;
+  m_refChoiceOne = Gtk::RadioAction::create(group_userlevel, "ChoiceOne", "One");
+  m_refActionGroup->add(m_refChoiceOne,
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_choices_one) );
+  m_refChoiceTwo = Gtk::RadioAction::create(group_userlevel, "ChoiceTwo", "Two");
+  m_refActionGroup->add(m_refChoiceTwo,
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_choices_two) );
+
+
   //Help menu:
   m_refActionGroup->add( Gtk::Action::create("HelpMenu", "Help") );
   m_refActionGroup->add( Gtk::Action::create("HelpAbout", Gtk::Stock::HELP),
@@ -84,6 +96,10 @@ ExampleWindow::ExampleWindow()
         "      <menuitem action='EditCopy'/>"
         "      <menuitem action='EditPaste'/>"
         "      <menuitem action='EditSomething'/>"
+        "    </menu>"
+        "    <menu action='ChoicesMenu'>"
+        "      <menuitem action='ChoiceOne'/>"
+        "      <menuitem action='ChoiceTwo'/>"
         "    </menu>"
         "    <menu action='HelpMenu'>"
         "      <menuitem action='HelpAbout'/>"
@@ -134,4 +150,25 @@ void ExampleWindow::on_menu_others()
   std::cout << "A menu item was selected." << std::endl;
 }
 
+void ExampleWindow::on_menu_choices_one()
+{
+  Glib::ustring message;
+  if(m_refChoiceOne->get_active())
+    message = "Choice 1 was selected.";
+  else
+    message = "Choice 1 was deselected";
+
+  std::cout << message << std::endl;
+}
+
+void ExampleWindow::on_menu_choices_two()
+{
+  Glib::ustring message;
+  if(m_refChoiceTwo->get_active())
+    message = "Choice 2 was selected.";
+  else
+    message = "Choice 2 was deselected";
+
+  std::cout << message << std::endl;
+}
 
