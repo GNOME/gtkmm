@@ -22,12 +22,12 @@ sublib_files_extra_general_h = list.h general.h
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 
-lib_LTLIBRARIES		= libgdkmm-2.4.la
+lib_LTLIBRARIES		= libgdkmm-2.3.la
 if OS_WIN32
-libgdkmm_2_4_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
+libgdkmm_2_3_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
 else
-libgdkmm_2_4_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
+libgdkmm_2_3_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
 endif 
-libgdkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgdkmm_2_4_la_LIBADD	= $(win32_dlls_extra_libs) $(GDKMM_LIBS)
+libgdkmm_2_3_la_LDFLAGS	= $(common_ldflags)
+libgdkmm_2_3_la_LIBADD	= $(win32_dlls_extra_libs) $(GDKMM_LIBS)
 

@@ -25,12 +25,12 @@ sublib_files_extra_general_h = accelkey.h accelmap.h base.h menu_elems.h selecti
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 
-lib_LTLIBRARIES		= libgtkmm-2.4.la
+lib_LTLIBRARIES		= libgtkmm-2.3.la
 if OS_WIN32
-libgtkmm_2_4_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
+libgtkmm_2_3_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
 else
-libgtkmm_2_4_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
+libgtkmm_2_3_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
 endif
-libgtkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgtkmm_2_4_la_LIBADD	= $(win32_dlls_extra_libs) $(GTKMM_LIBS)
+libgtkmm_2_3_la_LDFLAGS	= $(common_ldflags)
+libgtkmm_2_3_la_LIBADD	= $(win32_dlls_extra_libs) $(GTKMM_LIBS)
 

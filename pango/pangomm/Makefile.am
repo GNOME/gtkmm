@@ -22,12 +22,12 @@ sublib_files_extra_general_h =
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 
-lib_LTLIBRARIES = libpangomm-1.4.la
+lib_LTLIBRARIES = libpangomm-1.3.la
 if PLATFORM_WIN32
-libpangomm_1_4_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
+libpangomm_1_3_la_SOURCES	= $(files_all_general_cc) $(files_all_win32_cc)
 else
-libpangomm_1_4_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
+libpangomm_1_3_la_SOURCES	= $(files_all_general_cc) $(files_all_posix_cc)
 endif
-libpangomm_1_4_la_LDFLAGS	= $(common_ldflags)
-libpangomm_1_4_la_LIBADD	= $(win32_dlls_extra_libs) $(PANGOMM_LIBS)
+libpangomm_1_3_la_LDFLAGS	= $(common_ldflags)
+libpangomm_1_3_la_LIBADD	= $(win32_dlls_extra_libs) $(PANGOMM_LIBS)
 
