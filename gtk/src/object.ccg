@@ -45,10 +45,10 @@ Object::Object(GtkObject* castitem)
 void Object::_init_unmanage(bool /* is_toplevel = false */)
 {
   //GTKMM_LIFECYCLE
-  referenced_ = true; //Not managed.
 
   //g_warning("Object::_init_unmanage(): %s\n", G_OBJECT_TYPE_NAME(gobject_));
-
+  referenced_ = true; //Not managed.
+  
   if(gobject_)
   {
     //Glib::Object::Object has already stored a pointer to this C++ instance in the underlying C instance,
@@ -75,9 +75,9 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
        //This widget is already not floating. It's probably already been added to a GTK+ container, and has just had Glib::wrap() called on it.
        //It's not floating because containers call gtk_object_sink() on child widgets to take control of them.
        //We just ref() it so that we can unref it later.
+       GLIBMM_DEBUG_REFERENCE(this, gobject_);
        g_object_ref(gobject_);
-       //This has the added side-effect that, because the refcount is now >1, the refcount check in set_manage() prevents us from refloating a widget that's been sunk when added to a container.
-
+    
        //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
        //We do an extra unref() in Window::_destroy_c_instance() to take care of that.
     }
@@ -278,11 +278,15 @@ void Object::set_manage()
     //g_warning("Object::set_manage(), making object floating: %s\n", G_OBJECT_TYPE_NAME(gobject_));
 
     // Cowardly refuse to remove last reference make floating instead. //TODO: What does that comment mean?
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+      g_warning("Object::set_manage(): setting GTK_FLOATING: gobject_ = %p", (void*) gobj());
+      g_warning("  gtypename=%s\n", G_OBJECT_TYPE_NAME(gobj()));
+    #endif
     GTK_OBJECT_SET_FLAGS(gobj(), GTK_FLOATING);
   }
   else
   {
-    //g_warning("Object::set_manage(), not sinking, just unrefing: %s\n", G_OBJECT_TYPE_NAME(gobject_));
+    g_warning("Object::set_manage(). Refcount seems to be 0. %s\n", G_OBJECT_TYPE_NAME(gobject_));
 
     //DEF_GLIBMM_DEBUG_UNREF(this, gobj())
     //g_object_unref(gobj());
