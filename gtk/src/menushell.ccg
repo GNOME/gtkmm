@@ -19,6 +19,7 @@
  */
 
 #include <gtk/gtkmenuitem.h>
+#include <gtk/gtkaccellabel.h>
 
 
 namespace Gtk
@@ -113,6 +114,7 @@ namespace Menu_Helpers
 
 // List implementation:
 
+
 MenuList::iterator MenuList::insert(MenuList::iterator position, const Element& element)
 {
   const Glib::RefPtr<Gtk::MenuItem> item = element.get_child();
@@ -128,6 +130,65 @@ MenuList::iterator MenuList::insert(MenuList::iterator position, const Element& 
   gtk_menu_shell_insert(gparent(), item->Widget::gobj(), pos);
 
   return --position;
+}
+
+void MenuList::remove(const_reference child)
+{
+  const Widget& widget = child;
+  remove(const_cast<Widget&>(widget));
+}
+
+void MenuList::remove(Widget& widget)
+{
+  //This is the same as the standard implementation,
+  //but we also unset the accel_label to avoid leaking its reference.
+
+  //If it is a Bin, (actually we're looking for a MenuItem):
+  if(GTK_IS_BIN(widget.gobj()))
+  {
+    //TODO: There is duplication here, with erase().
+    //If the child's child is an AccelLabel then unset it's accel widget:
+    //This can't catch every possible AccelLabel in the hierarchy, but it
+    //will catch the ones that we create in MenuItem::MenuItem() without
+    //people being aware of it. People can take care of their own ones themselves.
+    Gtk::AccelLabel* pAccelLabel = dynamic_cast<Gtk::AccelLabel*>(dynamic_cast<Gtk::Bin&>(widget).get_child());
+    if(pAccelLabel) //If the child is an AccelLabel.
+    {
+      //The unset_accel_widget() method is not implemented in gtkmm until 2.4:
+      gtk_accel_label_set_accel_widget(pAccelLabel->gobj(), 0);
+    }
+  }
+
+  gtk_container_remove(GTK_CONTAINER(gparent_),
+                       (GtkWidget*)(widget.gobj()));
+}
+
+MenuList::iterator MenuList::erase(iterator position)
+{
+  //Check that it is a valid iterator, to a real item:
+  if ( !position.node_|| (position == end()) )
+    return end();
+
+  //Get an iterator the the next item, to return:
+  iterator next = position;
+  next++;
+
+  GtkWidget* pChild = (GtkWidget*)(position->gobj());
+  if(GTK_IS_BIN(pChild)) //A MenuItem is a Bin.
+  {  
+    //If the child's child is an AccelLabel then unset it's accel widget:
+    //This can't catch every possible AccelLabel in the hierarchy, but it
+    //will catch the ones that we create in MenuItem::MenuItem() without
+    //people being aware of it. People can take care of their own ones themselves.
+    GtkWidget* pChildOfChild = (GtkWidget*)gtk_bin_get_child(GTK_BIN(pChild));
+    if(GTK_IS_ACCEL_LABEL(pChildOfChild))
+       gtk_accel_label_set_accel_widget(GTK_ACCEL_LABEL(pChildOfChild), 0);
+  }
+  
+  //Use GTK+ C function to remove it, by providing the GtkWidget*:
+  gtk_container_remove( GTK_CONTAINER(gparent_), pChild );
+  
+  return next;
 }
 
 } // namespace Menu_Helpers
