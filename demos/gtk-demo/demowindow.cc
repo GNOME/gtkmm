@@ -41,7 +41,7 @@
   //These don't wotk even though the configure-time check works.
   #undef HAVE_FLOCKFILE
   #undef HAVE_FUNLOCKFILE
-#endif.
+#endif
 
 namespace
 {
