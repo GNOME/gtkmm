@@ -5,13 +5,21 @@
 ## Included by Makefile_build_gensrc.am_fragment
 ##
 
+include $(srcdir)/../src/Makefile_list_of_hg.am_fragment
 
-#These are used in e.g. gtk/gtkmm/Makefile.am to build the library:
-files_all_general_cc =  $(files_built_cc) $(sublib_files_extra_general_cc)
-files_all_posix_cc = $(sublib_files_extra_posix_cc)
-files_all_win32_cc = $(sublib_files_extra_win32_cc)
+# Support for DLL on mingw using libtool > 1.4
+# When creating DLLs on win32, we need to explicitly add a few extra
+# libraries at link time to resolve symbols (remember a dll is like an
+# executable).
+if OS_WIN32
+no_undefined = -no-undefined -Wl,--export-all-symbols
+win32_dlls_extra_libs = $(sublib_win32_dlls_libs)
+else
+no_undefined =
+win32_dlls_extra_libs =
+endif
 
-common_ldflags	= -version-info $(sublib_libversion)
+common_ldflags	= -version-info $(sublib_libversion) $(no_undefined)
 
 # All modules can include all other modules,
 # for instance, so that gdkmm can use headers in pangomm.
@@ -22,7 +30,7 @@ all_includes	= -I$(top_builddir)/$(sublib_topdir)		-I$(top_srcdir)/$(sublib_topd
 		  -I$(top_builddir)/gtk		-I$(top_srcdir)/gtk	\
 		  $(sublib_cflags)
 
-dist_sources	= $(files_built_cc) $(files_extra_cc) $(files_built_h) $(files_extra_h)
+dist_sources	= $(files_all_built_cc) $(files_all_extra_cc) $(files_all_built_h) $(files_all_extra_h)
 DISTFILES	= $(DIST_COMMON) $(dist_sources) $(TEXINFOS) $(EXTRA_DIST)
 
 
@@ -33,9 +41,9 @@ DEFAULT_INCLUDES	=
 INCLUDES = $(strip $(all_includes)) $(DISABLE_DEPRECATED_CFLAGS)
 
 sublib_includedir	= $(includedir)/$(sublib_libname)/$(sublib_name)
-sublib_include_HEADERS	= $(files_built_h) $(files_extra_h)
+sublib_include_HEADERS	= $(files_all_built_h) $(files_all_extra_h)
 
 maintainer-clean-local:
-	(cd $(srcdir) && rm -f $(files_built_cc) $(files_built_h))
+	(cd $(srcdir) && rm -f $(files_all_built_cc) $(files_all_built_h))
 
 
