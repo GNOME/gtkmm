@@ -21,8 +21,7 @@
 
 #include <gtkmm/window.h>
 #include <gtkmm/box.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/menu.h>
+#include <gtkmm/uimanager.h>
 
 class ExampleWindow : public Gtk::Window
 {
@@ -38,10 +37,9 @@ protected:
 
   //Child widgets:
   Gtk::VBox m_Box;
-  Gtk::MenuBar m_MenuBar;
-  Gtk::Menu m_Menu_File, m_Menu_Edit;
-  Gtk::Menu m_Menu_File_New; //submenu.
-  Gtk::Menu m_Menu_Help;
+
+  Glib::RefPtr<Gtk::UIManager> m_refUIManager;
+  Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
 };
 
 #endif //GTKMM_EXAMPLEWINDOW_H

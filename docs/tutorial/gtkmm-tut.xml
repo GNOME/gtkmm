@@ -3146,18 +3146,19 @@ m_TextView.add_child_at_anchor(m_Button, refAnchor);
 <chapter id="sec-MenusAndToolbars">
 <title>Menus and Toolbars</title>
 
-<para>There are specific APIs for Menus and Toolbars, but you should usually deal with them together, using the <literal>UIManager</literal>,
-which allows you to define <literal>actions</literal> which you can then arrange in menu and toolbars. You can then handle activation of
-the action instead of responding to the menu and toolbar items separately. And you can enable or disable both the menu and toolbar item
-just by changing action.</para>
+<para>There are specific APIs for Menus and toolbars, but you should usually deal with them together, using the <literal>UIManager</literal> to define <literal>actions</literal> which you can then arrange in menu and toolbars. In this way you can handle activation of
+the action instead of responding to the menu and toolbar items separately. And you can enable or disable both the menu and toolbar item via the action.</para>
+<para>This involves the use of the <literal>Gtk::ActionGroup</literal>, <literal>Gtk::Action</literal>, and <literal>UIManager</literal> classes, all of which should be instantiated via their <literal>create()</literal> methods, which return <literal>RefPtr</literal>s.</para>
 
 <sect1>
 <title>Actions</title>
-<para>First, you should create the actions and add them to an <literal>ActionGroup</literal>. The arguments to Action::create()
+<para>First create the <literal>Action</literal>s and add them to an <literal>ActionGroup</literal>, with <literal>ActionGroup::add()</literal>.</para>
+
+<para>The arguments to <literal>Action::create()</literal>
 specify the action's name and how it will appear in menus and toolbars. Use stock items where possible so that you don't need to
-specify the label, accelerator, icon, and tooltips, and soyou can use pre-existing translations.</para>
-<para>You can specify a signal handler when calling ActionGroup::add(). This signal handler will be called when the action is
-activated via either the menu item or the toolbar.</para>
+specify the label, accelerator, icon, and tooltips, and so you can use pre-existing translations.</para>
+<para>You can also specify a signal handler when calling <literal>ActionGroup::add()</literal>. This signal handler will be called when the action is
+activated via either a menu item or a toolbar button.</para>
 <para>Note that you must specify actions for sub menus as well as menu items.</para>
 
 <para>For instance:
@@ -3178,14 +3179,16 @@ m_refActionGroup-&gt;add( Gtk::Action::create(&quot;Quit&quot;, Gtk::Stock::QUIT
 
 <sect1>
 <title>UIManager</title>
-<para>Next you should create a UIManager and add the ActionGroup to the UIManager with <literal>insert_action_group()</literal>. For instance,
+<para>Next you should create a UIManager and add the ActionGroup to the UIManager with <literal>insert_action_group()</literal> At this point is also a good idea to tell the parent window to respond to the specified keyboard shortcuts, by using <literal>add_accel_group</literal>.</para>  
+
+<para>For instance,
 <programlisting>
 Glib::RefPtr&lt;Gtk::UIManager&gt; m_refUIManager = Gtk::UIManager::create();
 m_refUIManager-&gt;insert_action_group(m_refActionGroup);
 add_accel_group(m_refUIManager-&gt;get_accel_group());
 </programlisting>
-<para>Then, you can define the actual visible layout of the menus and toolbars, and add the UI layout to the UIManager:
 </para>
+<para>Then, you can define the actual visible layout of the menus and toolbars, and add the UI layout to the UIManager. This &quot;ui string&quot; uses an XML format, in which you should mention the names of the actions that you have already created. For instance:
 <programlisting>
     Glib::ustring ui_info =
         &quot;&lt;ui&gt;&quot;
@@ -3211,86 +3214,19 @@ add_accel_group(m_refUIManager-&gt;get_accel_group());
     m_refUIManager-&gt;&gt;add_ui_from_string(ui_info);
 </programlisting>
 </para>
+<para>To instantiate a Gtk::MenuBar or Gtk::Toolbar which you can actually show, you should use the <literal>UIManager::get_widget()</literal> method, and then add the widget to a container. For instance:
+<programlisting>
+Gtk::Widget* pMenubar = m_refUIManager-&gt;get_widget(&quot;/MenuBar&quot;);
+pBox-&gt;add(*pMenuBard, Gtk::PACK_SHRINK);
+</programlisting> 
+</para>
+
 </sect1>
 
 
-<sect1>
-<title>Menus</title>
-
-
-<sect2><title>The MenuBar</title>
+<sect1 id="sec-menus-popup"><title>Popup Menus</title>
 <para>
-<literal>Gtk::MenuBar</literal> is a container that holds child <literal>Gtk::Menu</literal>s.
-</para>
-
-<para>
-Actually, it contains child <literal>Gtk::MenuItem</literal>, which contain <literal>Gtk::Menu</literal>s in turn, but that uninteresting detail is hidden when using the STL-style interface. You may choose to use the non-STL-interface, using methods such as <literal>Gtk::MenuShell::append())</literal>, but that would be much more tedious.
-</para>
-
-<figure id="figure-menus-menubar">
-  <title>MenuBar</title>
-  <screenshot>
-    <graphic format="PNG" fileref="&url_figures_base;menus_menubar.png"/>
-  </screenshot>
-</figure>
-
-<para>
-The child items of both <literal>MenuBar</literal>s and <literal>Menu</literal>s can be accessed via the <literal>items()</literal> method, defined in their common base class, <literal>Gtk::MenuShell</literal>. Use the <literal>Gtk::Menu_Helpers::MenuElem</literal> helper class to add menus to the menu bar. For instance,
-<programlisting>
-Gtk::MenuBar m_MenuBar;
-Gtk::Menu m_Menu_File, m_Menu_Edit;
-...
-m_MenuBar.items().push_back( Gtk::Menu_Helpers::MenuElem("_File", m_Menu_File) );
-m_MenuBar.items().push_back( Gtk::Menu_Helpers::MenuElem("_Edit", m_Menu_Edit) );
-</programlisting>
-</para>
-
-<para>
-You can add stock menus by using the <literal>StockElem</literal> helper, like so:
-<programlisting>
-m_MenuBar.items().push_back( Gtk::Menu_Helpers::StockMenuElem(Gtk::Stock::HELP, m_Menu_Help) )
-</programlisting>
-</para>
-
-<para><ulink url="&url_refdocs_base_gtk;MenuBar.html">Reference</ulink></para>
-
-</sect2>
-
-<sect2><title>Menus and Menu Items</title>
-<para>
-<literal>Gtk::Menu</literal> contain child <literal>Gtk::MenuItem</literal>s. MenuItems can, in turn, contain child Menus, to create sub menus.
-</para>
-
-<figure id="figure-menus-menu">
-  <title>Menu</title>
-  <screenshot>
-    <graphic format="PNG" fileref="&url_figures_base;menus_menu.png"/>
-  </screenshot>
-</figure>
-
-<para>
-As when adding menus to the menu bar, use the STL-style interface and the <literal>Gtk::Menu_Helpers</literal> to add the menu items. You may specify the signal handler to be called when the user chooses the menu item. For instance: 
-<programlisting>
- Gtk::Menu::MenuList&amp; menulist = m_Menu_Edit.items();
-
- menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Copy",
-  sigc::mem_fun(*this, &amp;ExampleWindow::on_menu_others) ) );
-
- menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Paste",
-  sigc::mem_fun(*this, &amp;ExampleWindow::on_menu_others) ) );
-</programlisting>
-</para>
-
-<para>You may also specify stock items (StockMenuElem), radio button items (RadioMenuElem), check button items (CheckMenuElem) or separators (SeparatorMenuElem). Stock menu items will use standard text, with translations in many languages, standard icons, and standard keyboard accelerators and shortcuts.</para> 
-
-<para><ulink url="&url_refdocs_base_gtk;Menu.html">Menu reference</ulink></para>
-<para><ulink url="&url_refdocs_base_gtk_namespace;Menu__Helpers.html">Menu_Helpers reference</ulink></para>
-
-</sect2>
-
-<sect2 id="sec-menus-popup"><title>Popup Menus</title>
-<para>
-Menus are normally just added to a window, but they can also be displayed temporarily as the result of a mouse button click. For instance, a context menu might be diplayed when the user clicks their right mouse button. You can use <literal>Gtk::Menu</literal>'s <literal>popup()</literal> method, but you need to provide a button identifier and the time of activation. This information is provided by the <literal>button_press_event</literal> signal, which you will need to handle anyway. For instance:
+TODO: Update for UIManager API. Menus are normally just added to a window, but they can also be displayed temporarily as the result of a mouse button click. For instance, a context menu might be diplayed when the user clicks their right mouse button. You can use <literal>Gtk::Menu</literal>'s <literal>popup()</literal> method, but you need to provide a button identifier and the time of activation. This information is provided by the <literal>button_press_event</literal> signal, which you will need to handle anyway. For instance:
 <programlisting>
 bool ExampleWindow::on_button_press_event(GdkEventButton* event)
 {
@@ -3305,11 +3241,11 @@ bool ExampleWindow::on_button_press_event(GdkEventButton* event)
 </programlisting>
 </para>
 
-</sect2>
+</sect1>
 
-<sect2><title>Examples</title>
+<sect1><title>Examples</title>
 
-<sect3><title>Main Menu example</title>
+<sect2><title>Main Menu example</title>
 
 <figure id="figure-menus-mainmenu">
   <title>Main Menu</title>
@@ -3320,9 +3256,9 @@ bool ExampleWindow::on_button_press_event(GdkEventButton* event)
 
 <para><ulink url="&url_examples_base;menus/main_menu/">Source Code</ulink></para>
 
-</sect3>
+</sect2>
 
-<sect3><title>Popup Menu example</title>
+<sect2><title>Popup Menu example</title>
 
 <figure id="figure-menus-popup">
   <title>Popup Menu</title>
@@ -3332,192 +3268,6 @@ bool ExampleWindow::on_button_press_event(GdkEventButton* event)
 </figure>
 
 <para><ulink url="&url_examples_base;menus/popup/">Source Code</ulink></para>
-
-</sect3>
-
-</sect2>
-
-</sect1>
-
-<sect1 id="sec-Toolbars">
-<title>Toolbars </title>
-
-<para>
-Applications often use <literal>Toolbar</literal>s to provide shortcuts to commonly-used menu items, such as File|Open or File|Save. They contain
-a row of buttons, usually with an icon. Each toolbar item can have an icon, a label, and a tooltip. You will often be able to reuse standard gtkmm stock items such as <literal>Gtk::Stock::SAVE</literal>.
-</para>
-
-<para>
-Elements are inserted by using classes from the <literal>Gtk::Toolbar&lowbar;Helpers</literal> namespace.
-The various helper objects are:
-
-<itemizedlist>
-<listitem>
-
-<para>
-<literal>Element</literal> - used for inserting arbitrary widgets
-</para>
-</listitem>
-<listitem>
-
-<para>
-<literal>Space</literal> - a blank spot, used to separate groups of elements
-</para>
-</listitem>
-
-<listitem>
-<para>
-<literal>ButtonElem</literal> - a regular button element
-</para>
-</listitem>
-
-<listitem>
-<para>
-<literal>ToggleElem</literal> - a toggle-button element
-</para>
-</listitem>
-
-<listitem>
-<para>
-<literal>RadioElem</literal> - a radio-button element
-</para>
-</listitem>
-
-</itemizedlist>
-
-</para>
-
-<para>
-Here's the constructor for <literal>Element</literal>:
-</para>
-
-<para>
-<programlisting>
-Element(Widget&#38; w,
-        const Glib::ustring&amp; tooltip_text=0,
-        const Glib::ustring&amp; tooltip_private_text=0);
-</programlisting>
-</para>
-
-<para>
-<literal>w</literal> is the widget to insert, and <literal>tooltip&lowbar;text</literal> is the text for the
-element's tooltip.  You can ignore <literal>tooltip&lowbar;private&lowbar;text</literal>.
-</para>
-
-<para>
-The constructors for <literal>ButtonElem</literal> and <literal>ToggleElem</literal> are exactly
-alike; each has three forms.  Here are the <literal>ButtonElem</literal>
-constructors:
-</para>
-
-<para>
-<programlisting>
-// text + icon
-ButtonElem(const Glib::ustring&amp; text,
-           Widget        &amp; content,
-           sigc::slot&#60;void&#62;        callback,
-           const Glib::ustring&amp; tooltip_text=0,
-           const Glib::ustring&amp; tooltip_private_text=0);
-
-// icon only
-ButtonElem(Widget        &amp; content,
-           sigc::slot&#60;void&#62;        callback,
-           const Glib::ustring&amp; tooltip_text=0,
-           const Glib::ustring&amp; tooltip_private_text=0);
-
-// text only
-ButtonElem(const Glib::ustring&amp; text,
-           sigc::slot&#60;void&#62;        callback,
-           const Glib::ustring&amp; tooltip_text=0,
-           const Glib::ustring&amp; tooltip_private_text=0);
-</programlisting>
-</para>
-
-<para>
-The only difference between these is whether they take an icon, text,
-or both as arguments. <literal>text</literal> is the text to display below the
-icon.  <literal>content</literal> is the icon; note that any widget can be inserted
-here, but generally this will be a pixmap or other display widget.
-<literal>callback</literal> is the signal handler to use for the button.
-<literal>tooltip&lowbar;text</literal> will be displayed in the button's tooltip, and you
-can safely ignore <literal>tooltip&lowbar;private&lowbar;text</literal>.
-</para>
-
-<para>
-The <literal>RadioElem</literal> constructors are the same as those for
-<literal>ButtonElem</literal> and <literal>RadioElem</literal>, but they take an additional
-argument specifying the group for the radio button.  Here they are:
-</para>
-
-<para>
-<programlisting>
-// text + icon
-RadioElem(Gtk::RadioButton_Helpers::Group&amp; group,
-          const Glib::ustring&amp;      text,
-          Widget&amp;             content,
-          sigc::slot&#60;void&#62;   callback=0,
-          const Glib::ustring&amp;      tooltip_text=0,
-          const Glib::ustring&amp;      tooltip_private_text=0);
-
-// icon only
-RadioElem(Gtk::RadioButton_Helpers::Group&amp; group,
-          Widget&amp;             content,
-          sigc::slot&#60;void&#62;   callback=0,
-          const Glib::ustring&amp;      tooltip_text=0,
-          const Glib::ustring&amp;      tooltip_private_text=0);
-
-// text only
-RadioElem(Gtk::RadioButton_Helpers::Group&amp; group,
-          const Glib::ustring&amp;      text,
-          sigc::slot&#60;void&#62;   callback=0,
-          const Glib::ustring&amp;      tooltip_text=0,
-          const Glib::ustring&amp;      tooltip_private_text=0);
-</programlisting>
-</para>
-
-<para>
-The <literal>group</literal> argument is the only addition here; it works exactly
-like the <literal>group</literal> argument for normal radio buttons.  See the
-<link linkend="sec-Radio-Buttons">Radio Buttons</link> section for details.
-</para>
-
-<para>
-The toolbar's contents are manipulated through an STL-like list, which
-you can obtain using the <literal>tools()</literal> method:
-</para>
-
-<para>
-<programlisting>
-ToolList&amp; tools();
-</programlisting>
-</para>
-
-<para>
-For example, to add a text-only button tool to the toolbar, we could write
-<programlisting>
-toolbar.tools().push_back(Gtk::Toolbar_Helpers::ButtonElem(
-        "Crash", sigc::mem_fun(*this, &amp;crash_cb), "Causes the program to dump core");
-</programlisting>
-</para>
-
-<para>
-Since it is inconvenient to type <literal>Gtk::Toolbar&lowbar;Helpers</literal> all
-the time, you might want to add a <literal>using</literal> declaration.  However,
-don't add a global <literal>using namespace Gtk::Toolbar&lowbar;Helpers</literal>
-declaration; place this only in some localised scope, to avoid clashes
-with other <literal>Helpers</literal> namespaces.
-</para>
-
-<sect2><title>Example</title>
-
-<figure id="figure-toolbar">
-  <title>Toolbar</title>
-  <screenshot>
-    <graphic format="PNG" fileref="&url_figures_base;toolbar.png"/>
-  </screenshot>
-</figure>
-
-<para><ulink url="&url_examples_base;toolbar/">Source Code</ulink></para>
 
 </sect2>
 

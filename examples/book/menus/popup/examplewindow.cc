@@ -22,7 +22,8 @@
 
 ExampleWindow::ExampleWindow()
 : m_Label("Right-click to see the popup menu."),
-  m_Image(Gtk::Stock::DIALOG_QUESTION, Gtk::ICON_SIZE_MENU)
+  m_pMenuPopup(0)
+  /* m_Image(Gtk::Stock::DIALOG_QUESTION, Gtk::ICON_SIZE_MENU) */
 {
   set_title("popup example");
   set_default_size(200, 200);
@@ -35,25 +36,62 @@ ExampleWindow::ExampleWindow()
 
   m_EventBox.add(m_Label);
 
+  //Create actions:
 
   //Fill menu:
-  {
-    Gtk::Menu::MenuList& menulist = m_Menu_Popup.items();
 
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Edit",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::AccelKey("<control>p"),
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
+  m_refActionGroup = Gtk::ActionGroup::create();
 
+  //File|New sub menu:
+  //These menu actions would normally already exist for a main menu, because a context menu
+  //should not normally contain menu items that are only available via a context menu.
+  m_refActionGroup->add( Gtk::Action::create("ContextMenu", "Context Menu") );
+
+  m_refActionGroup->add( Gtk::Action::create("ContextEdit", "Edit"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+
+  m_refActionGroup->add( Gtk::Action::create("ContextProcess", "Process"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+
+  m_refActionGroup->add( Gtk::Action::create("ContextRemove", "Remove"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+
+  //TODO:
+  /*
     //Add a ImageMenuElem:
     menulist.push_back( Gtk::Menu_Helpers::ImageMenuElem("_Something", m_Image,
       sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) ) ;
+  */
 
+  m_refUIManager = Gtk::UIManager::create();
+  m_refUIManager->insert_action_group(m_refActionGroup);
+ 
+  add_accel_group(m_refUIManager->get_accel_group());
 
+  //Layout the actions in a menubar and toolbar:
+  try
+  {
+    Glib::ustring ui_info = 
+        "<ui>"
+        "  <menubar name='MenuBar'>"
+        "    <menu name='ContextMenu'>"
+        "        <menuitem action='ContextEdit'/>"
+        "        <menuitem action='ContextProcess'/>"
+        "        <menuitem action='ContextRemove'/>"
+        "    </menu>"
+        "  </menubar>"
+        "</ui>";
+        
+    m_refUIManager->add_ui_from_string(ui_info);
   }
-  m_Menu_Popup.accelerate(*this);
+  catch(const Glib::Error& ex)
+  {
+    std::cerr << "building menus failed: " <<  ex.what();
+  }
+
+
+  //Get the menu:
+  m_pMenuPopup = dynamic_cast<Gtk::Menu*>( m_refUIManager->get_widget("/MenuBar/ContextMenu") ); 
 
   show_all_children();
 }
@@ -71,7 +109,9 @@ bool ExampleWindow::on_button_press_event(GdkEventButton* event)
 {
   if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
   {
-    m_Menu_Popup.popup(event->button, event->time);
+    if(m_pMenuPopup)
+      m_pMenuPopup->popup(event->button, event->time);
+
     return true; //It has been handled.
   }
   else
