@@ -32,9 +32,12 @@
 #include <cerrno>
 #include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
 
-//SUN Forte seems to need these:
+//SUN Forte seems to need these, though the configure check says they are present,
+//and the man page says they should be in stdio.h:
+#ifdef GLIBMM_COMPILER_SUN_FORTE
 void flockfile(FILE*);
 void funlockfile(FILE*);
+#endif //GLIBMM_COMPILER_SUN_FORTE
 
 namespace
 {
