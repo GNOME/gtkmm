@@ -20,7 +20,8 @@
 #include <glibmm/helperlist.h>
 #include <gtkmm/container.h>
 #include <gtkmm/stockid.h>
-#include <gtk/gtktoolbar.h> /* Needed for GtkToolbarChild */
+
+#include <gtk/gtktoolbar.h> // Needed for GtkToolbarChild 
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/container_p.h)
@@ -62,6 +63,9 @@ namespace Toolbar_Helpers
 
 typedef SigC::Slot0<void> Callback0;
 
+#ifndef GTKMM_DISABLE_DEPRECATED
+
+
 // Tool is the output class (very thin wrapper)
 class Tool : private GtkToolbarChild
 {
@@ -79,6 +83,8 @@ public:
   friend class Dummy_; // silence the compiler (Child has only private ctors)
 #endif
 };
+
+#endif //GTKMM_DISABLE_DEPRECATED
 
 // Element is the input class
 class ToolList;
@@ -215,6 +221,11 @@ struct RadioElem : public Element
 ***** List properties
 *********************************************************************/
 #m4 include(list.m4)
+
+//TODO: I think that we must deprecate ToolList because we must deprecate Tool because it
+//derives from the deprecated GtkToolBarChild. Or maybe we can reimplement it in another way.
+//murrayc
+#ifndef GTKMM_DISABLE_DEPRECATED
   GP_LIST(ToolList,Toolbar,GtkToolbar,Tool,children)
   //The standard iterator, instead of List_Cpp_Iterator,
   //only works because Child is derived from GtkToolbarChild.
@@ -222,6 +233,7 @@ struct RadioElem : public Element
   virtual void remove(Widget& widget);
   GP_LIST_FIND(get_widget)
   GP_LIST_END()
+#endif //GTKMM_DISABLE_DEPRECATED
 
 } /* namespace Toolbar_Helpers */
 
@@ -236,7 +248,10 @@ class Toolbar : public Container
 {
   _CLASS_GTKOBJECT(Toolbar,GtkToolbar,GTK_TOOLBAR,Gtk::Container,GtkContainer)
 public:
+
+#ifndef GTKMM_DISABLE_DEPRECATED
   typedef Toolbar_Helpers::ToolList ToolList;
+#endif //GTKMM_DISABLE_DEPRECATED
 
   _CTOR_DEFAULT
 
@@ -260,12 +275,15 @@ public:
   _WRAP_SIGNAL(void orientation_changed(Orientation orientation), "orientation_changed")
   _WRAP_SIGNAL(void toolbar_style_changed(ToolbarStyle style),"style_changed")
 
+  #ifndef GTKMM_DISABLE_DEPRECATED
+
   ///STL-style container.
   ToolList& tools();
   
   ///STL-style container.
   const ToolList& tools() const;
 
+  #endif //#GTKMM_DISABLE_DEPRECATED
 
   typedef Toolbar_Helpers::Callback0 Callback0;
   Gtk::Widget* append_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
@@ -312,7 +330,7 @@ public:
 protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   mutable ToolList tools_proxy_;
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 };
 
 } // namespace Gtk
