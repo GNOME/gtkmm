@@ -16,28 +16,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GTKMM_EXAMPLEWINDOW_H
-#define GTKMM_EXAMPLEWINDOW_H
+#include <iostream>
+#include "examplewindow.h"
 
-#include <gtkmm.h>
-#include "mycontainer.h"
-
-class ExampleWindow : public Gtk::Window
+ExampleWindow::ExampleWindow()
+: m_Button_Quit("Quit")
 {
-public:
-  ExampleWindow();
-  virtual ~ExampleWindow();
+  set_title("Custom Widget example");
+  set_border_width(6);
+  set_default_size(400, 200);
 
-protected:
-  //Signal handlers:
-  virtual void on_button_quit();
+  add(m_VBox);
+  m_VBox.pack_start(m_MyWidget, Gtk::PACK_EXPAND_WIDGET);
+  m_MyWidget.show();
 
-  //Child widgets:
-  Gtk::VBox m_VBox;
-  MyContainer m_MyContainer;
-  Gtk::Button m_Button_One, m_Button_Two;
-  Gtk::HButtonBox m_ButtonBox;
-  Gtk::Button m_Button_Quit;
-};
+  m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
 
-#endif //GTKMM_EXAMPLEWINDOW_H
+  m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
+  m_ButtonBox.set_border_width(6);
+  m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+
+  show_all_children();
+}
+
+ExampleWindow::~ExampleWindow()
+{
+}
+
+void ExampleWindow::on_button_quit()
+{
+  hide();
+}
+
+

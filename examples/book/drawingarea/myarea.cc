@@ -48,7 +48,7 @@ void MyArea::on_realize()
   gc_->set_foreground(blue_);
 }
 
-bool MyArea::on_expose_event(GdkEventExpose*)
+bool MyArea::on_expose_event(GdkEventExpose* /* event */)
 {
   // This is where we draw on the window
   Glib::RefPtr<Gdk::Window> window = get_window();

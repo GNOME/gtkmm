@@ -4328,7 +4328,7 @@ void ExampleWindow::on_clipboard_received_targets(const Gtk::SelectionData&amp; 
 
 </sect1>
 
-<sect1><title>Examples</title>
+o<sect1><title>Examples</title>
 
 <sect2><title>Simple</title>
 <para>This example allows copy and pasting of application-specific data, using the standard text target. Although this is simple, it's not ideal because
@@ -5219,6 +5219,75 @@ for even native speakers to understand. For instance, prefer &quot;application&q
     </sect1>
 </chapter>
 
+<chapter id="sec-customwidgets">
+    <title>Custom Widgets</title>
+
+    <para><literal>gtkmm</literal> makes it very easy to derive new widgets by inheriting from an existing widget class, either by deriving from a container and adding child widgets, or by deriving from a single-item widget, and changing its behaviour. But you might occasionally find that no suitable starting point already exists. In this case, you can implement a widget from scratch.</para>
+    <sect1>
+    <title>Custom Containers</title>
+    <para>When deriving from Gtk::Container, you should override the following virtual methods:
+    <itemizedlist>
+      <listitem><para><literal>on_size_request()</literal>: Calculate the minimum height and width needed by the container.</para></listitem>
+      <listitem><para><literal>on_size_allocate()</literal>: Position the child widgets, given the height and width that the container has actually been given.</para></listitem>
+      <listitem><para><literal>forall_vfunc()</literal>: Call the same callback for each of the children.</para></listitem>
+      <listitem><para><literal>on_add()</literal>: </para></listitem>
+      <listitem><para><literal>on_remove()</literal>: </para></listitem>
+      <listitem><para><literal>child_type_vfunc()</literal>: Return what type of child can be added.</para></listitem>
+    </itemizedlist>
+    </para>
+
+    <para>The <literal>on_size_request()</literal> and <literal>on_size_allocate()</literal> virtual methods control the layout of the child widgets. For instance, if your container has 2 child widgets, with one below the other, your <literal>on_size_request()</literal> might report the maximum of their widths and the sum of their heights. If you want padding between the child widgets then you would add that to the width and height too. Your widget's container will use this result to ensure that your widget gets enough space, and not less. By examining each widget's parent, and its parent, this logic will eventually decide the size of the top-level window.</para>
+
+   <para><literal>on_size_allocate()</literal>, however, receives the actual height and width that the parent container has decided to give to your widget. This might be more than the minimum, for instance if the top-level window has been expanded. You might choose to ignore the extra space and leave a blank area, or you might choose to expand your child widgets to fill the space, or you might choose to expand the padding between your widgets. Its your container, so you decide. Don't forget to call <literal>set_allocation</literal> inside your <literal>on_size_allocate()</literal> implementation to actually use the allocated space that has been offered by the parent container.</para>
+
+  <para>Unless your container is a top-level window that derives from Gtk::Window, you should also call <literal>Gtk::Container::set_flags(Gtk::NO_WINDOW)</literal> in your constructor. Otherwise, your container will appear in its own window, regardless of what container you put it in. And unless your container draws directly onto the underlying Gdk::Window, you should probably call <literal>set_redraw_on_allocate(false)</literal> to improve performance.</para>
+
+  <para>By overriding <literal>forall_vfunc()</literal> you can allow applications to operate on all of the container's child widgets. For instance, <literal>show_all_children</literal> uses this to find all the child widgets and show them.</para>
+ 
+  <para>Although your container might have its own method to set the child widgets, you should still provide an implementation for the virtual <literal>on_add()</literal> and <literal>on_remove()</literal> methods from the base class, so that the add() and remove() methods will do something appropriate if they are called.</para>
+
+  <para>Your implementation of the <literal>child_type_vfunc()</literal> method should report the type of widget that may be added to your container, if it is not yet full. This is usually Gtk::Widget::get_type() to indicate that the container may contain any class derived from Gtk::Widget. If the container may not contain any more widgets, then this method should return G_TYPE_NONE.</para> 
+
+
+<sect2><title>Example</title>
+
+<para>This example implements a container with two child widgets, one above the other. Of course, in this case it would be far simpler just to use a Gtk::VBox.</para>
+
+<figure id="figure-custom-container">
+  <title>Custom Container</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;custom_container.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;custom/custom_container/">Source Code</ulink></para>
+</sect2>
+
+    </sect1>  
+
+    <sect1>
+    <title>Custom Widgets</title>
+    <para>By deriving directly from <literal>Gtk::Widget</literal> you can do all the drawing for your widget directly, instead of just arranging child widgets. For instance, a Gtk::Label draws the text of the label, but does not do this by using other widgets.</para>
+
+<sect2><title>Example</title>
+
+<para>This example implements a widget which draws a square.</para>
+
+<figure id="figure-custom-widget">
+  <title>Custom Widget</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;custom_widget.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;custom/custom_widget/">Source Code</ulink></para>
+</sect2>
+
+    </sect1>
+
+
+
+</chapter>
   
 <chapter id="sec-gathering">
 <title>Recommended Techniques</title>
@@ -5250,6 +5319,7 @@ portability..
 
 <para>
 Our examples all tend to have the same structure. They follow these steps for using a Widget:
+
 </para>
 
 <para>

@@ -16,28 +16,30 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GTKMM_EXAMPLEWINDOW_H
-#define GTKMM_EXAMPLEWINDOW_H
+#ifndef GTKMM_CUSTOM_WIDGET_MYWIDGET_H
+#define GTKMM_CUSTOM_WIDGET_MYWIDGET_H
 
-#include <gtkmm.h>
-#include "mycontainer.h"
+#include <gtkmm/widget.h>
 
-class ExampleWindow : public Gtk::Window
+class MyWidget : public Gtk::Widget
 {
 public:
-  ExampleWindow();
-  virtual ~ExampleWindow();
+  MyWidget();
+  virtual ~MyWidget();
 
 protected:
-  //Signal handlers:
-  virtual void on_button_quit();
 
-  //Child widgets:
-  Gtk::VBox m_VBox;
-  MyContainer m_MyContainer;
-  Gtk::Button m_Button_One, m_Button_Two;
-  Gtk::HButtonBox m_ButtonBox;
-  Gtk::Button m_Button_Quit;
+  //Overrides:
+  virtual void on_size_request(Gtk::Requisition* requisition);
+  virtual void on_size_allocate(Gtk::Allocation& allocation);
+  virtual void on_map();
+  virtual void on_unmap();
+  virtual void on_realize();
+  virtual void on_unrealize();
+  virtual bool on_expose_event(GdkEventExpose* event);
+
+  Glib::RefPtr<Gdk::Window> m_refGdkWindow;
+  Glib::RefPtr<Gdk::GC> m_refGC;
 };
 
-#endif //GTKMM_EXAMPLEWINDOW_H
+#endif //GTKMM_CUSTOM_WIDGET_MYWIDGET_H

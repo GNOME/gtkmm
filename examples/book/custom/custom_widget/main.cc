@@ -16,28 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GTKMM_EXAMPLEWINDOW_H
-#define GTKMM_EXAMPLEWINDOW_H
+#include <gtkmm/main.h>
+#include "examplewindow.h"
 
-#include <gtkmm.h>
-#include "mycontainer.h"
-
-class ExampleWindow : public Gtk::Window
+int main(int argc, char *argv[])
 {
-public:
-  ExampleWindow();
-  virtual ~ExampleWindow();
+  Gtk::Main kit(argc, argv);
 
-protected:
-  //Signal handlers:
-  virtual void on_button_quit();
+  ExampleWindow window;
+  Gtk::Main::run(window); //Shows the window and returns when it is closed.
 
-  //Child widgets:
-  Gtk::VBox m_VBox;
-  MyContainer m_MyContainer;
-  Gtk::Button m_Button_One, m_Button_Two;
-  Gtk::HButtonBox m_ButtonBox;
-  Gtk::Button m_Button_Quit;
-};
-
-#endif //GTKMM_EXAMPLEWINDOW_H
+  return 0;
+}

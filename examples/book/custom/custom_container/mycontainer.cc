@@ -71,9 +71,11 @@ void MyContainer::on_size_request(Gtk::Requisition* requisition)
 
 void MyContainer::on_size_allocate(Gtk::Allocation& allocation)
 {
-g_warning("on_size_allocate(): %d, %d, %d, %d", allocation.get_x(), allocation.get_y(), allocation.get_width(), allocation.get_height());
   //Do something with the space that we have actually been given:
   //(We will not be given heights or widths less than we have requested, though we might get more)
+
+  //Use the offered allocation for this container:
+  set_allocation(allocation);
 
   //Assign sign space to the child:
   Gtk::Allocation child_allocation_one, child_allocation_two;
@@ -86,14 +88,10 @@ g_warning("on_size_allocate(): %d, %d, %d, %d", allocation.get_x(), allocation.g
   child_allocation_one.set_width( allocation.get_width() );
 
   //Make it take up half the height available:
-  child_allocation_one.set_height( allocation.get_height() /2);
+  child_allocation_one.set_height( allocation.get_height() / 2);
 
   if(m_child_one && m_child_one->is_visible())
-  {
     m_child_one->size_allocate(child_allocation_one);
-    g_warning("size_allocate one(): %d, %d, %d, %d", child_allocation_one.get_x(), child_allocation_one.get_y(), child_allocation_one.get_width(), child_allocation_one.get_height());
-
-  }
 
   
   //Place the second child below the first child:
@@ -121,10 +119,19 @@ void MyContainer::forall_vfunc(gboolean /* include_internals */, GtkCallback cal
 
 void MyContainer::on_add(Gtk::Widget* child)
 {
-  m_child_one = child;
+  if(!m_child_one)
+  {
+    m_child_one = child;
 
-  gtk_widget_set_parent(child->gobj(), GTK_WIDGET(gobj()));
-  //This is protected, but should be public: child.set_parent(*this);
+    gtk_widget_set_parent(child->gobj(), GTK_WIDGET(gobj()));
+    //This is protected, but should be public: child.set_parent(*this);
+  }
+  else if(!m_child_two)
+  {
+    m_child_two = child;
+
+    gtk_widget_set_parent(child->gobj(), GTK_WIDGET(gobj()));
+  }
 }
 
 void MyContainer::on_remove(Gtk::Widget* child)
@@ -158,10 +165,13 @@ void MyContainer::on_remove(Gtk::Widget* child)
 
 GtkType MyContainer::child_type_vfunc() const
 {
-  //TODO: What is this for?
-  if(m_child_one || m_child_two)
-    return GTK_TYPE_WIDGET;
+  //If there is still space for one widget, then report the type of widget that may be added.
+  if(!m_child_one || !m_child_two)
+    return Gtk::Widget::get_type();
   else
+  {
+    //No more widgets may be added.
     return G_TYPE_NONE;
+  }
 }
 
