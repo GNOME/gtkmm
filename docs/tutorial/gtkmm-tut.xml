@@ -11,7 +11,7 @@
 
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<bookinfo>
+<bookinfo>d
 
 <title>Programming with gtkmm2</title>
 
@@ -313,7 +313,7 @@ After putting the source code in <literal>simple.cc</literal> you can compile th
 <programlisting>
 g++ simple.cc -o simple `pkg-config gtkmm-2.0 --cflags --libs`
 </programlisting>
-Note that you must surround 
+Note that you must surround
 the <literal>pkg-config</literal> invocation with backquotes.  
 Backquotes cause the shell to execute the command inside them, and to use 
 the command's output as part of the command line.
@@ -1359,7 +1359,7 @@ configurable text string within its trough, using the <literal>set_text()</liter
 
 <para>
 <literal>Tooltips</literal> are the little text strings that pop up when you leave your
-pointer over a widget for a few seconds and the <literal>Gtk::Tooltips</literal> object is a group of these tooltips. After creating a <literal>Gtk::Tooltips</literal> instance, you can use the <literal>set_tip()</literal> method to associate some descriptive text with a <literal>Widget</literal>.  
+pointer over a widget for a few seconds and the <literal>Gtk::Tooltips</literal> object is a group of these tooltips. After creating a <literal>Gtk::Tooltips</literal> instance, you can use the <literal>set_tip()</literal> method to associate some descriptive text with a <literal>Widget</literal>.
 </para>
 
 <para>The <literal>enable()</literal> and <literal>disable()</literal> methods allow you to turn a whole group of tooltips on and off.</para>
@@ -2876,6 +2876,19 @@ if(iter)
 
 </sect1>
 
+<sect1 id="sec-treeview-contextmenu">
+<title>Popup Context Menu</title>
+<para>Lots of people need to implement right-click context menus for <literal>TreeView</literal>'s so we will explain how to do that  here to save you some time. Apart from one or two points, it's  much the same as a normal context menu, as described in the <link linkend="sec-menus-popup">menus chapter</link>.
+</para>
+
+<sect2>
+<title>Handling <literal>button_press_event</literal></title>
+<para>To detect a click of the right mouse button, you need to handle the <literal>button_press_event</literal> signal, and check exactly which button was pressed. Because the <literal>TreeView</literal> normally handles this signal completely, you need to either override the default signal handler in a derived <literal>TreeView</literal> class, or use <literal>connect_nofify()</literal> insted of <literal>connect()</literal>. You probably also want to call the default handler before doing anything else, so that the right-click will cause the row to be selected first.</para>
+<para>This is demonstrated in the Popup Custom Menu example.</para>
+</sect2>
+
+</sect1>
+
 <sect1><title>Examples</title>
 
 <sect2><title>ListStore</title>
@@ -2939,6 +2952,23 @@ This example is much like the TreeStore example, but has 2 extra columns to indi
 </figure>
 
 <para><ulink url="&url_examples_base;treeview/drag_and_drop/">Source Code</ulink></para>
+
+</sect2>
+
+<sect2><title>Popup Context Menu</title>
+
+<para>
+This example is much like the ListStore example, but derives a custom TreeView in order to override the <literal>button_press_event</literal>, and also to encapsulate the tree model code in our derived class. See the <link linkend="sec-treeview-contextmenu">TreeView Popup Context Menu</link> section.
+</para>
+
+<figure id="figure-treeview-popup">
+  <title>TreeView - Popup Context Menu</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;treeview_popup.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;treeview/popup/">Source Code</ulink></para>
 
 </sect2>
 
@@ -3185,7 +3215,7 @@ As when adding menus to the menu bar, use the STL-style interface and the <liter
 
 </sect2>
 
-<sect2><title>Popup Menus</title>
+<sect2 id="sec-menus-popup"><title>Popup Menus</title>
 <para>
 Menus are normally just added to a window, but they can also be displayed temporarily as the result of a mouse button click. For instance, a context menu might be diplayed when the user clicks their right mouse button. You can use <literal>Gtk::Menu</literal>'s <literal>popup()</literal> method, but you need to provide a button identifier and the time of activation. This information is provided by the <literal>button_press_event</literal> signal, which you will need to handle anyway. For instance:
 <programlisting>
@@ -3840,89 +3870,40 @@ some_gc.set_foreground(some_color);
       Gdk::Drawable::draw_points()</function>. All drawing methods take a <classname>Gdk::GC</classname> as their first
       argument, except where noted. The other two arguments to <function>draw_point()</function> are the x coordinate
       (horizontal position relative to the left edge of the widget, starting at 0), and the y coordinate (vertical position
-      relative to the top of the widget, starting at 0). <function>draw_points()</function> takes two or three arguments,
-      either a <classname>Gdk::Points</classname> or a <classname>Gdk::Point</classname> and a size.
-      The first is of course the <classname>Gdk::GC</classname>.
-      gtkmm gives you a variety of ways to construct a <classname>Gdk::Points</classname>, from using a
-      <parameter>vector&lt;Gdk::Point>
-      </parameter>to a simple <parameter>Gdk::Point *</parameter> and a size. So for example <function>draw_point()
-      </function> could be used  like this:
+      relative to the top of the widget, starting at 0). <function>draw_points()</function> takes two arguments, the
+      <classname>Gdk::GC</classname> and a collection of <classname>Gdk::Points</classname>. The second argument can be any kind
+      of standard container, such as a <classname>std::vector&lt;Gdk::Point&gt;</classname>. So for example
+      <function>draw_point()</function> could be used like this:
     </para>
-    <programlisting>get_window().draw_point(some_gc, 20, 20);</programlisting>
+    <programlisting>get_window()-&gt;draw_point(some_gc, 20, 20);</programlisting>
     <para>
-      But a <function>draw_points()</function> is a bit more complicated and might be used like this:
+      But <function>draw_points()</function> is a bit more complicated and might be used like this:
     </para>
     <programlisting>
-Gdk::point *points_array=new Gdk::point[2];
-points_array[0]=Gdk::point(10, 10);
-points_array[1]=Gdk::point(20, 20);
-draw_points(some_gc, points_array, 2); //One way to draw the two points.
-
-Gdk::points some_points(points_array, 2);
-draw_points(some_gc, some_points); //The same drawing as the line above.
+std::vector&lt;Gdk::Point&gt; points_array;
+points_array.push_back(Gdk::Point(10, 10));
+points_array.push_back(Gdk::Point(20, 20));
+draw_points(some_gc, points_array); //One way to draw the two points.
 
     </programlisting>
   </sect1>
   <sect1>
     <title>Drawing Lines</title>
+    <sect2><title>Example</title>
     <para>
     Drawing lines is more interesting than just points, so here is a complete program:
     </para>
-    <programlisting>
-#include &lt;gtkmm/main.h&gt;
-#include &lt;gtkmm/window.h&gt;
-#include &lt;gtkmm/drawingarea.h&gt;
-#include &lt;gtkmm/style.h&gt;
 
-//Custom drawing area with modified expose_event.
-class cust_draw_area: public Gtk::DrawingArea
-{
-  int width, height;
-  public:
-    cust_draw_area(int x_size = 0, int y_size = 0);
-    int on_expose_event(GdkEventExpose*);
-};
 
-//Constructor.
-cust_draw_area::cust_draw_area(int x_size, int y_size)
-: DrawingArea(), width(x_size), height(y_size)
-{
-  size(width, height);
-}
+    <figure id="figure-drawingarea-lines">
+      <title>Drawing Area - Lines</title>
+      <screenshot>
+        <graphic format="PNG" fileref="&url_figures_base;drawingarea_lines.png"/>
+      </screenshot>
+    </figure>
 
-//Expose_event method.
-int cust_draw_area::on_expose_event(GdkEventExpose *event)
-{
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 5, 2, 5, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 5, 11, 10, 11);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 10, 2, 10, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 15, 2, 21, 2);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 18, 2, 18, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 15, 20, 21, 20);
-}
+    <para><ulink url="&url_examples_base;drawingarea_lines">Source Code</ulink></para>
 
-class test_window : public Gtk::Window
-{
-  cust_draw_area some_draw_area;
-  public:
-    test_window();
-};
-
-test_window::test_window()
-:  some_draw_area(50, 50)
-{
-  add(some_draw_area);
-  show_all();
-}
-
-int main(int argc, char *argv[])
-{
-  Gtk::Main main_runner(argc, argv);
-  test_window foo;
-  main_runner.run();
-  return(0);
-}
-    </programlisting>
     <para>
       This program contains two classes. The first is a subclass of <classname>Gtk::DrawingArea</classname> and contains an
       <function>on_expose_event</function> member function. This method is called whenever the image in the drawing
@@ -3931,10 +3912,11 @@ int main(int argc, char *argv[])
       coordinates for the start and end of the line.
     </para>
     <para>
-      The <classname>test_window</classname> class contains a drawing area. When it is created, it creates a drawing area
+      The <classname>TestWindow</classname> class contains a drawing area. When it is created, it creates a drawing area
       of 50 pixels across by 50 pixels tall. If the window is resized, the graphic drawn is kept in the top left corner of the
       larger window. The drawing area is created with a default grey background.
     </para>
+    </sect2>
   </sect1>
   <sect1>
     <title>Drawing Rectangles and Polygons</title>
@@ -3950,18 +3932,20 @@ int main(int argc, char *argv[])
       Otherwise the filled rectangle will obscure the top and left edges of the outline rectangle. You may need to subtract one pixel from the  width and height of the outline rectangle to get the size you expect.
     </para>
     <para>
-      The <function>draw_polygon()</function> method can take either a <classname>Gdk::Points</classname> or a pointer to an
-      array of <classname>Gdk::Point</classname> and an int holding the number of points in the array. The first argument is
-      the <classname>Gdk::GC</classname> and the second argument determines if the polygon is a filled one or an outline, just
-      like for the <function>draw_rectangle()</function>. The polygon's shape is taken by drawing a line from the first point
-      to the second, and so on to the last point in the list, and from there a line is drawn back to the first point. This
-      of course implies that you do not need to repeat the first point as the last point.
+      The <function>draw_polygon()</function> method takes a <classname>Glib::ArrayHandle&lt;Gdk::Point&gt;</classname>, which is
+      another way of saying a standard container of <classname>Gdk::Point</classname>, just like we saw in
+      <function>draw_points()</function> above.
+      The first argument is the <classname>Gdk::GC</classname> and the second argument determines if the polygon is a filled one or
+      an outline, just like for the <function>draw_rectangle()</function>. The polygon's shape is taken by drawing a line from the
+      first point to the second, and so on to the last point in the list, and from there a line is drawn back to the first point.
+      This of course implies that you do not need to repeat the first point as the last point.
     </para>
   </sect1>
   <sect1>
     <title>Drawing Ellipses and Arcs</title>
     <para>
-      The <function>draw_arc()</function> has a lot of parameters. The second one is again for the choice of filled or unfilled arc. The next two arguments are the x and y coordinates of the upper left corner of the circle. Imagine a
+      The <function>draw_arc()</function> has a lot of parameters. The second one is again for the choice of filled or unfilled arc.
+      The next two arguments are the x and y coordinates of the upper left corner of the circle. Imagine a
       rectangle surrounding the circle, and just touching it at the top, bottom, and sides. The upper left corner of this box
       is the point specified by the x and y coordinates. The width and height of this box are the next two arguments. A wide
       box will make a wide elliptical shape.
@@ -3974,109 +3958,30 @@ int main(int argc, char *argv[])
   <sect1>
     <title>Drawing Text</title>
     <para>
-      The two methods <function>draw_string()</function> and <function>draw_text()</function> are nearly the same. The
-      first argument is the <classname>Gdk::Font</classname> with which to render the text. The second argument is our regular
-      <classname>Gdk::GC</classname>. The third argument is the far left edge of the first character, and the fourth argument
-      is the baseline of the string of text. This means that 'g's, 'p's, 'y's and other low-hanging characters will fall
-      below the pixel location specified in the fourth argument. The fifth argument is the text to be rendered. The
-      difference between <function>draw_string()</function> and <function>draw_text()</function> is that the latter has an
-      extra argument to set the number of characters to actually be rendered. <function>draw_string()</function> will always
-      draw all of the string.
+      Text is drawn via Pango Layouts. The easiest way to create a <classname>Pango::Layout</classname> is to use
+      <function>create_pango_layout</function>. Once created, the layout can be manipulated in various ways, including changing
+      the text, font, etc. Finally, the layout can be rendered using the <function>draw_layout</function> method of <classname>Gdk::Drawable</classname>, which takes the usual <classname>Gdk::GC</classname>, an x-position, a y-position and the layout itself.
     </para>
+
+    <sect2><title>Example</title>
     <para>
       Here's a sample program using all of the drawing methods shown so far:
     </para>
-    <programlisting>
-#include &lt;gtkmm/main.h&gt;
-#include &lt;gtkmm/window.h&gt;
-#include &lt;gtkmm/drawingarea.h&gt;
-#include &lt;gtkmm/style.h&gt;
-#include &lt;gdk--/colormap.h&gt;
-#include &lt;gdk--/color.h&gt;
-#include &lt;gdk--/gc.h&gt;
-#include &lt;gdk--/types.h&gt;
-#include &lt;stdio.h&gt;
 
-//Custom drawing area with modified expose_event.
-class cust_draw_area: public Gtk::DrawingArea
-{
-  int width, height;
-  public:
-    cust_draw_area(int x_size = 0, int y_size = 0);
-    int on_expose_event(GdkEventExpose *event);
-};
+    <figure id="figure-drawingarea-text">
+      <title>Drawing Area - Text</title>
+      <screenshot>
+        <graphic format="PNG" fileref="&url_figures_base;drawingarea_text.png"/>
+      </screenshot>
+    </figure>
 
-//Constructor.
-cust_draw_area::cust_draw_area(int x_size, int y_size)
-: DrawingArea(), width(x_size), height(y_size)
-{
-  size(width, height);
-}
+    <para><ulink url="&url_examples_base;drawingarea_text">Source Code</ulink></para>
 
-//Expose_event method.
-int cust_draw_area::on_expose_event(GdkEventExpose *event)
-{
-  Gdk::GC some_gc;
-  some_gc.create(get_window());
-  Gdk::Color some_color;
-  Gdk::Colormap some_colormap(Gdk::Colormap::get_system());
-  some_color.set_red(65535);
-  some_color.set_green(65535);
-  some_color.set_blue(0);
-  some_colormap.alloc(some_color);
-  some_gc.set_foreground(some_color);
-
-  //Draw pac-man.
-  get_window().draw_arc(some_gc, true, 30, 100, 50, 50, 2880, 17280); //2880==45*64, 17280==270*64
-
-  //Draw pellets.
-  get_window().draw_rectangle(this-&gt;get_style()-&gt;get_white_gc(), true, 80, 120, 15, 10);
-  get_window().draw_rectangle(this-&gt;get_style()-&gt;get_white_gc(), true, 110, 120, 15, 10);
-  get_window().draw_rectangle(this-&gt;get_style()-&gt;get_white_gc(), true, 140, 120, 15, 10);
-
-  //Draw some lines.
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 5, 2, 5, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 5, 11, 10, 11);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 10, 2, 10, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 15, 2, 21, 2);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 18, 2, 18, 20);
-  get_window().draw_line(this-&gt;get_style()-&gt;get_black_gc(), 15, 20, 21, 20);
-
-  //Draw a diamond.
-  GdkPoint some_point[]={{100, 10}, {50, 60}, {100, 110}, {150, 60}};
-  get_window().draw_polygon(this-&gt;get_style()-&gt;get_black_gc(), true, some_point, 4);
-
-  //Draw some text.
-  Gdk::Font text_font("10x20");
-  get_window().draw_string(text_font, this-&gt;get_style()-&gt;get_black_gc(), 30, 170, "Hello, World!");
-}
-
-class test_window : public Gtk::Window
-{
-  cust_draw_area some_draw_area;
-  public:
-    test_window();
-};
-
-test_window::test_window()
-:  some_draw_area(200, 200)
-{
-  add(some_draw_area);
-  show_all();
-}
-
-int main(int argc, char *argv[])
-{
-  Gtk::Main main_runner(argc, argv);
-  test_window foo;
-  main_runner.run();
-  return(0);
-}
-    </programlisting>
     <para>
       The structure of the program is the same as the first one, except that this one includes examples of the drawing elements
       discussed up to now.
     </para>
+    </sect2>
   </sect1>
   <sect1>
     <title>Draw Images</title>
@@ -4094,60 +3999,30 @@ int main(int argc, char *argv[])
       copy.
     </para>
     <para>
-      There is also a method in GTK+ for drawing from a <classname>GdkRGB</classname>. A <classname>GdkRGB</classname>
-      buffer is an array of characters. Every three
-      elements in the array define a color, the first element being the red component, the second green and the last blue.
-      3*width*height defines the number of elements needed for an rgb buffer of a given size. The rgb buffer is useful where
-      pixel manipulation is needed.
+      There is also a method for drawing from a <classname>Gdk::Pixbuf</classname>. A <classname>Gdk::Pixbuf</classname>
+      buffer is a useful wrapper around a collection of pixels, which can be read from files, and manipulated in various ways.
     </para>
     <para>
-      The methods for manipulating the <classname>GdkRGB</classname> are not included in gtkmm, so the GTK+ methods are used directly. First off, if you use this construct directly, you must call <function>gdk_rgb_init()</function> before using any
-      other methods, or the program will crash. Then construct your array. To draw it into a drawing area use
-      <function>gdk_draw_rgb_image()</function>. Being a GTK+ function, it needs more arguments. The first argument is the
-      <classname>GdkDrawable</classname> which you can get from your drawing area with the call
-      <function>draw_area-&gt;get_window()</function>. Next is the <classname>GdkGC</classname>. A suitable
-      <classname>GdkGC</classname> can be obtained from a call to
-      <function>draw_area-&gt;get_style()-&gt;get_fg_gc(GTK_STATE_NORMAL)</function>. The next two arguments are the x and y points
-      within the drawing area at which to draw the rgb buffer, and then come the width and height of the area to draw.
+      Probably the most common way of creating <classname>Gdk::Pixbuf</classname>s is to use
+      <function>Gdk::Pixbuf::create_from_file()</function>, which can read an image file, such as a png file into a pixbuf ready
+      for rendering.
     </para>
     <para>
-      The next
-      argument is a <classname>GdkRgbDither</classname> specifying the amount of dither to use. Dithering is an effect which causes
-      colors close to each other to be blended by intermixing pixels from each color along the border of the two colors.
-      If you've already calculated dither into your rgb buffer, then you will specify GDK_RGB_DITHER_NONE. Otherwise you can
-      specify GDK_RGB_DITHER_NORMAL for dithering an image at 8 bits per pixel or lower, or GDK_RGB_DITHER_MAX for dithering
-      an image at 16 bits per pixel or lower.
+      The <classname>Gdk::Pixbuf</classname> can be rendered with <function>render_to_drawable</function>, which takes quite a few parameters. The <function>render_to_drawable</function> is a member of <classname>Gdk::Pixbuf</classname> rather than <classname>Gdk::Drawable</classname>, which is unlike the <function>draw_*</function> functions described earlier. As such, its first parameter is the drawable to render to. The second parameter is still the <classname>Gdk::GC</classname>. The next two parameters are the point in the pixbuf to start drawing from. This is followed by the point in the drawable to draw it at, and by the width and height to actually draw (which may not be the whole image, especially if you're only responding to an expose event for part of the window). Finally, there are the dithering parameters. If you use Gdk::RGB_DITHER_NONE as the dither type, then the dither offset parameters can both be 0.
     </para>
     <para>
-      The next argument is the character array holding the rgb color information. The final argument is called rowstride. It is
-      the number of elements in the array that compose one horizontal line of the array. From this number it is possible to
-      draw a subset of the rgb buffer into the drawing area, knowing how wide the buffer is.
-    </para>
-    <para>
-      Here is a small bit of code to tie it all together:
+      Here is a small bit of code to tie it all together: (Note that usually you wouldn't load the image every time in the expose event handler! It's just shown here to keep it all together)
     </para>
     <programlisting>
-int rgb_draw_area::on_expose_event(GdkEventExpose *event)
+bool myarea::on_expose_event(GdkEventExpose* ev)
 {
-  gdk_draw_rgb_image(this-&gt;get_window(), this-&gt;get_style()-&gt;get_fg_gc(GTK_STATE_NORMAL), 0, 0, this-&gt;width, this-&gt;height,
-                     GDK_RGB_DITHER_MAX, this-&gt;rgbbuff, (this-&gt;width)*3);
+  Glib::RefPtr&lt;Gdk::PixBuf&gt; image = Gdk::PixBuf::create_from_file("myimage.png");
+  image-&gt;render_to_drawable(get_window(), get_style()-&gt;get_black_gc(),
+    0, 0, 100, 80, image-&gt;get_width(), image-&gt;get_height(), // draw the whole image (from 0,0 to the full width,height) at 100,80 in the window
+    Gdk::RGB_DITHER_NONE, 0, 0);
+  return true;
 }
-    </programlisting>
-    <para>
-      In this example the custom drawing area contains additional members holding the width, height, and the character array
-      that contains the rgb buffer information. Here is the class's definition:
-    </para>
-    <programlisting>
-//Custom drawing area with modified expose_event.
-class rgb_draw_area: public Gtk::DrawingArea
-{
-  int width, height;
-  guchar *rgbbuff;
-  public:
-    rgb_draw_area(int x_size = 0, int y_size = 0);
-    int on_expose_event(GdkEventExpose*);
-    guchar *get_buffer() const;
-};
+
     </programlisting>
   </sect1>
 </chapter>
@@ -4842,13 +4717,13 @@ has been delegated to MyWidget.
 </para>
 
 <para>
-gtkmm also provides the set&lowbar;dynamic() method for all widgets.
-set&lowbar;dynamic() can be used to generate the same result as manage(), but
+gtkmm also provides the set&lowbar;manage() method for all widgets.
+This can be used to generate the same result as manage(), but
 is more tedious: 
 </para>
 
 <para>
-foo.add( (w=new Gtk::Label("Hello"), w-&gt;set&lowbar;dynamic(), &amp;w) );
+foo.add( (w=new Gtk::Label("Hello"), w-&gt;set&lowbar;manage(), &amp;w) );
 </para>
 
 <para>
@@ -4945,30 +4820,88 @@ This has the following advantages:
 <para>
 <literal>Gnome::Glade::Xml</literal> must be used via a <literal>Glib::RefPtr</literal>. Like all such classes, you need to use create() method to instantiate it. 
 <programlisting>
-Glib::RefPtr&lt;Gnome::Glade::Xml&gt; refXml = Gnome::Glade::Xml::create("basic.glade");
+Glib::RefPtr&lt;Gnome::Glade::Xml&gt; refXml = Gnome::Glade::Xml::create(&quot;basic.glade&quot;);
 </programlisting>
-This will instantiate the windows defined in the .glade file, though they will not be shown immediately unless you have specified that via the Properties window in Glade.
+This will instantiate the windows defined in the .glade file, though they will not be shown immediately unless you have specified that via the Properties window in Glade. The widgets are ownedg by the <literal>Gnome::Glade::Xml</literal> instance, and will be deleted automatically when it is deleted, when the last copy of the smartpointer goes out of scope.
+</para>
+
+<para>To instantiate just one window, or just one of the child widgets, you can specify the name of a widget as the second parameter. For instance,
+<programlisting>
+Glib::RefPtr&lt;Gnome::Glade::Xml&gt; refXml = Gnome::Glade::Xml::create(&quot;basic.glade&quot;, &quot;treeview_products&quot;);
+</programlisting>
 </para>
 
 </sect1>
 
 <sect1>
 <title>Accessing widgets</title>
+
 <para>
 To access a widget, for instance to <literal>show()</literal> a dialog, use the <literal>get_widget()</literal> method, providing the widget's name. This name should be specified in the Glade Properties window. If the widget could not be found, or is of the wrong type, then the pointer will be set to 0.
 <programlisting>
 Gtk::Dialog* pDialog = 0;
-refXml-&gt;get_widget("DialogBasic", pDialog);
+refXml-&gt;get_widget(&quot;DialogBasic&quot;, pDialog);
 </programlisting>
-
 </para>
+
+<para>libglademm checks for a null pointer, and checks that the widget is of the expected type, and will show warnings on the command line about these.</para>
+
+<para>Remember that you are not instantiating a widget with <literal>get_widget()</literal>, you are just obtaining a pointer to one that already exists. You will always receive a pointer to the same instance when you call <literal>get_widget</literal> on the same <literal>Gnome::Glade::Xml</literal>, with the same widget name. The widgets are instantiated during <literal>Glade::Xml::create()</literal>. 
+</para>
+
+<sect2>
+<title>Example</title>
+<para>The <literal>basic</literal> example in the <literal>libglademm</literal> package shows how to load a Glade file at runtime and access the widgets with libglademm.
+</para>
+</sect2>
 
 </sect1>
 
 <sect1>
-<title>Example</title>
-<para>The <literal>basic</literal> example in the <literal>libglademm</literal> package shows how to load a Glade file at runtime and access the widgets with libglademm.
+<title>Using derived widgets</title>
+<para>
+You can use Glade to layout your own custom widgets derived from gtkmm widget classes. This keeps your code organised and encapsulated. Of course you won't see the exact appearance and properties of your derived widget in Glade, but you can specify its location and child widgets and the properties of its gtkmm base class.
 </para>
+
+<para>Use <literal>Glade::Xml::get_widget_derived()</literal> like so: 
+<programlisting>
+DerivedDialog* pDialog = 0;
+refXml->get_widet_derived(&quot;DialogBasic&quot;, pDialog);
+</programlisting>
+</para>
+
+<para>Your derived class must have a constructor that takes a pointer to the underlying C type (there is a typedef for this), and the Gnome::Glade::Xml instance. You must call the base class's constructor in the initialization list, providing the C pointer. For instance,
+<programlisting>
+DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnome::Glade::Xml&gt;&amp; refGlade)
+: Gtk::Dialog(cobject)
+{
+}
+</programlisting>
+</para>
+ 
+<para>You could then encapsulate the manipulation of the child widgets in the constructor of the derived class, maybe using get_widget() or get_widget_derived() again. For instance,
+<programlisting>
+DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnome::Glade::Xml&gt;&amp; refGlade)
+: Gtk::Dialog(cobject),
+  m_refGlade(refGlade),
+  m_pButton(0)
+{
+  //Get the Glade-instantiated Button, and connect a signal handler:
+  m_refGlade-&gt;get_widget(&quot;quit_button&quot;, m_pButton);
+  if(m_pButton)
+  {
+    m_pButton-&gt;signal_clicked().connect( SigC::slot(*this, &amp;DerivedDialog::on_button_quit) );
+  }
+}
+</programlisting>
+</para>
+
+<sect2>
+<title>Example</title>
+<para>The <literal>derived</literal> example in the <literal>libglademm</literal> package shows how to load a Glade file at runtime and access a widgets via a derived class.
+</para>
+</sect2>
+
 </sect1>
 
 </chapter>

@@ -8,7 +8,7 @@ figures_DATA = alignment.png aspectframe.png \
   clipboard_simple.png clipboard_ideal.png \
 	combo.png \
   dialogs_colorselectiondialog.png dialogs_fileselection.png dialogs_fontselectiondialog.png dialogs_messagedialog.png dialogs_simple.png \
-  drag_and_drop.png \
+  drag_and_drop.png drawingarea_lines.png drawingarea_text.png \
   entry.png eventbox.png frame.png \
 	helloworld.png helloworld2.png label.png \
 	main_menu.png menu_popup.png \
@@ -18,7 +18,7 @@ figures_DATA = alignment.png aspectframe.png \
 	range_widgets.png scrolledwindow.png spinbutton.png \
 	table.png toolbar.png textview.png \
 	treeview_list.png treeview_tree.png treeview_editablecells.png \
-        treeview_draganddrop.png \
+        treeview_draganddrop.png treeview_popup.png \
         devcpp_project_options.png 
 
 EXTRA_DIST = $(figures_DATA)

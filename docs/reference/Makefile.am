@@ -8,18 +8,21 @@ web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
              gtkmm_header.html_fragment gtkmm_footer.html_fragment beautify_docs.pl \
-             html gtkmm_doxygen_tags
+             html gtkmm_doxygen_tags doxygen_to_devhelp.xsl
 
+# The html is genereated by doxygen. We generate xml also, but we are not distributing it yet.
 html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	-rm -rf html
 	image_path=""; \
-	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.4`/share/gtk-doc/html/gtk"; \
+	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.0`/share/gtk-doc/html/gtk"; \
 	test -d "$$dir" && image_path="$$dir"; \
 	dir="$(top_srcdir)/../gtk+/gtk/stock-icons"; \
 	test -d "$$dir" && image_path="$$image_path $$dir"; \
 	DOXYGEN_IMAGE_PATH="$${DOXYGEN_IMAGE_PATH:=$$image_path}" doxygen $(doxygen_configfile)
 	$(PERL_PATH) $(beautify_docs) html
-
+	
+devhelp-reference: html/index.xml
+	xsltproc -o html/gtkmm2.devhelp doxygen_to_devhelp.xsl xml/index.xml
 
 gtkmm-reference-html.tar.gz: html/index.html
 	tar cf - html | gzip -c --best >$@
@@ -32,6 +35,7 @@ post-html: html/index.html
 
 doc-clean:
 	-rm -rf html
+	-rm -rf xml
 	-rm -f gtkmm_doxygen_tags
 	-rm -f gtkmm-reference-html.tar.gz gtkmm-reference-html.tar.bz2
 
