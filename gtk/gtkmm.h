@@ -99,6 +99,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/radioaction.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/radiomenuitem.h>
+#include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
 #include <gtkmm/ruler.h>
 #include <gtkmm/scale.h>
@@ -106,6 +107,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/separatormenuitem.h>
+#include <gtkmm/separatortoolitem.h>
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/statusbar.h>
@@ -124,6 +126,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toggleaction.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/toolbar.h>
+#include <gtkmm/toolitem.h>
+#include <gtkmm/toolbutton.h>
+#include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treepath.h>

@@ -260,6 +260,8 @@ define(`__FL2H_NONE',`$`'2($`'3, Glib::OWNERSHIP_NONE)')
 
 _CONVERSION(`GList*',`Glib::ListHandle<Widget*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const Widget*>',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle<Widget*>',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle<const Widget*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<Window*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<TreeViewColumn*>',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle<const TreeViewColumn*>',__FL2H_SHALLOW)
@@ -275,6 +277,7 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALL
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<FileFilter> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
 

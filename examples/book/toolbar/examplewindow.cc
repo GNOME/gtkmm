@@ -23,6 +23,7 @@ ExampleWindow::ExampleWindow()
 : m_Button_Close("Close")
 {
   set_title("Gtk::Toolbar example");
+  set_size_request(300, 300); //The toolbar will not demand any size, because it has an overflow menu.
 
   add(m_VBox);
 
@@ -38,20 +39,33 @@ ExampleWindow::ExampleWindow()
 
   //Add the toolbar items:
   {
-    using namespace Gtk::Toolbar_Helpers;
+    //You would normally use the UIManager, and Actions, to create the menus and toolbars together,
+    //because toolbar items should just be a way to do what is also in a menu.
+    //TODO: Use UIManager instead here. See the demo for an example.:
 
-    m_Toolbar.tools().push_back( ButtonElem("Click me", SigC::slot(*this, &ExampleWindow::on_toolbar_item), "Toolbar item") );
+    //Gtk::Tooltips* tooltips = 0; //We need the Gtk::Tooltips from the Toolbar, I think. I filed a GTK+ bug about this. murrayc.
+    
+    Gtk::ToolButton* item = Gtk::manage(new Gtk::ToolButton("Click me"));
+    //item.set_tooltips(*tooltips, "Toolbar item");
+    m_Toolbar.append(*item);
+    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
 
-    m_Toolbar.tools().push_back( Space() );
+    m_Toolbar.append( *(Gtk::manage(new Gtk::SeparatorToolItem)) );
+    
+    item = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::SAVE));
+    m_Toolbar.append(*item);
+    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
 
-    m_Toolbar.tools().push_back( StockElem(Gtk::Stock::SAVE, SigC::slot(*this, &ExampleWindow::on_toolbar_item)) );
+    item = Gtk::manage(new Gtk::ToggleToolButton("Toggle me"));
+    //item.set_tooltips(*tooltips, "toggle duh");
+    m_Toolbar.append(*item);
+    item->signal_clicked().connect( SigC::slot(*this, &ExampleWindow::on_toolbar_item) );
 
-    m_Toolbar.tools().push_back( ToggleElem("Toggle me", SigC::slot(*this, &ExampleWindow::on_toolbar_item), "toggle duh") );
-
-    Gtk::RadioButton::Group group;
-    m_Toolbar.tools().push_back( RadioElem(group, "Radio 1") );
-    m_Toolbar.tools().push_back( RadioElem(group, "Radio 2") );
-    m_Toolbar.tools().push_back( RadioElem(group, "Radio 3") );
+    //TODO: These don't actually seem to work:
+    Gtk::RadioButtonGroup group;
+    m_Toolbar.append( *Gtk::manage(new Gtk::RadioToolButton(group, "Radio 1")) );
+    m_Toolbar.append( *Gtk::manage(new Gtk::RadioToolButton(group, "Radio 2")) );
+    m_Toolbar.append( *Gtk::manage(new Gtk::RadioToolButton(group, "Radio 3")) );
   }
 
   show_all_children();
