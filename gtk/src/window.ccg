@@ -111,19 +111,84 @@ void Window::_destroy_c_instance()
     //This prevents us from unref-ing it again, or destroying it again after GTK+ has told us that it has been disposed.
     if (!gobject_disposed_)
     {
-        //Windows can not be unrefed. They are "self-owning".
-        #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("Gtk::Window::_destroy_c_instance(): Calling gtk_object_destroy(): gobject_=%10X\n", object);
-        #endif
-        g_object_unref(object); //We ref()ed it one too many times to simplify our _init_unmanage() code.
-
-        if(!gobject_disposed_) //Just in case that unref() really destroyed it, in which case our dispose callack would have just been called.
-          gtk_object_destroy(object);
-      }
+      //Windows can not be unrefed. They are "self-owning".
+      gtk_object_destroy(object);
+    }
 
     //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
   }
 }
+ 
+void Window_Class::dispose_vfunc_callback(GObject* self)
+{
+  //Avoid disposal of Windows on delete_event (window close) signal.
+  
+  #ifdef GLIBMM_DEBUG_REFCOUNTING
+  g_warning("Window_Class::dispose_vfunc_callback(): gobject_: %p\n", (void*)self);
+  #endif
 
+  Widget *const obj = dynamic_cast<Widget*>(
+      Glib::ObjectBase::_get_current_wrapper(self));
+
+  // This function might be invoked recursively because we're triggering
+  // several signal emissions, particularly signal_hide().  Therefore we
+  // have to test for cpp_destruction_in_progress_ at this point.
+
+  if(obj && !obj->_cpp_destruction_is_in_progress()) //When it should really be destroyed, we zero gobj_.
+  {
+    GtkWidget* const pWidget = obj->gobj();
+    g_return_if_fail(pWidget == GTK_WIDGET(self));
+
+    // Abort dispose if the widget isn't managed, in order to prevent
+    // the nasty self-destroying behaviour of GTK+.  This applies to:
+    //
+    // - GtkWindow, if it received "delete_event"
+    // - GtkDialog, which destroys on "response" by default
+
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Window_Class::dispose_vfunc_callback(): before gtk_widget_hide().");
+    #endif
+
+    // Now hide the widget.  The C++ object must _not_ be accessed anymore
+    // after this call, because a signal_hide() handler might delete it.
+    gtk_widget_hide(pWidget);
+
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Window_Class::dispose_vfunc_callback(): after gtk_widget_hide().");
+    #endif
+
+    // GTKMM_LIFECYCLE
+    return; // Prevent calling of normal C dispose vfunc (see below)
+  }
+  else
+  {
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");
+    #endif
+
+    // Always hide widgets on gtk_object_destroy(), regardless of whether
+    // the widget is managed or not.  This is done for consistency so that
+    // connecting to signal_hide() is guaranteed to work.
+    //gtk_widget_hide(pWidget);
+
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced:  after gtk_widget_hide().");
+    #endif
+  
+    GObjectClass *const base = static_cast<GObjectClass*>(
+        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
+
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Window_Class::dispose_vfunc_callback(): before calling base->dispose.");
+    #endif
+
+    if(base->dispose)
+      (*base->dispose)(self);
+
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Window_Class::dispose_vfunc_callback(): after calling base->dispose.");
+    #endif
+  }
+}
 } /* namespace Gtk */
 

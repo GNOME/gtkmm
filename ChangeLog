@@ -1,3 +1,20 @@
+2003-07-05  Murray Cumming  <murrayc@usa.net>
+ 
+ 	* gtk/src/object.ccg Object::_init_unmanage(): 
+ 	Don't g_object_ref() objects that are already not managed, such as 
+ 	stuff used with Glib::Wrap() which is already in a container 
+ 	(Containers sink (unfloat) child widgets after they are added). Also, 
+ 	don't mark it as not manage()d, (!referenced_) of course. This was 
+ 	doing one-too-many refs, so sometimes the objects would not be 
+ 	finalized even if they were destroyed. Daniel Elstner found this 
+ 	potential problem months ago and I should have listened to him.
+ 	This seems to fix the lifetime bug shown in tests/wrap_existing. I think this
+   fixes the get_toplevel_windows() leak shown in tests/refcount_dialog also.
+   Thanks to Harold Hopfes for doing _lots_ of investigation work on this bug.
+ 	* gtk/src/window.ccg: Window::_destroy_c_instance():
+ 	Remove the g_object_unref() that was a window-specific fix for the
+ 	extra g_object_ref() in gtk/src/object.ccg above.
+
 2003-07-12  Murray Cumming  <murrayc@usa.net>
 
 	* pango/src/pango_docs_override.xml,

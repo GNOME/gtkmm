@@ -46,9 +46,6 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
 {
   //GTKMM_LIFECYCLE
 
-  //g_warning("Object::_init_unmanage(): %s\n", G_OBJECT_TYPE_NAME(gobject_));
-  referenced_ = true; //Not managed.
-  
   if(gobject_)
   {
     //Glib::Object::Object has already stored a pointer to this C++ instance in the underlying C instance,
@@ -59,27 +56,29 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
     // We'll change this:
     if(GTK_OBJECT_FLOATING (gobject_)) //Top-level Windows and Dialogs can not be manag()ed, so there is no need to do this.
     {
-      //g_warning("Object::_init_unmanage(), object was floating: %s\n", G_OBJECT_TYPE_NAME(gobject_));
-
       GLIBMM_DEBUG_REFERENCE(this, gobject_);
       g_object_ref(gobject_);  //Increase ref by 1 so that it doesn't get deleted when we sink() it (sink()ing does an unref)
       gtk_object_sink((GtkObject*)gobject_); //Stops it from being floating - we will make this optional ( see Gtk::manage() ),
 
       #ifdef GLIBMM_DEBUG_REFCOUNTING
-      g_warning("gtkmm after sink: C++ instance: %10X, C instance: %10X, refcount=%d\n", (Glib::ObjectBase*)this, gobject_, G_OBJECT(gobject_)->ref_count);
+      g_warning("gtkmm after sink: C++ instance: %p, C instance: %p, refcount=%d\n", (void*)(Glib::ObjectBase*)this, (void*)gobject_, G_OBJECT(gobject_)->ref_count);
       g_warning("    c instance gtype: %s\n", G_OBJECT_TYPE_NAME(gobject_));
       #endif
+
+     referenced_ = true; //Not managed.
     }
     else
     {
        //This widget is already not floating. It's probably already been added to a GTK+ container, and has just had Glib::wrap() called on it.
        //It's not floating because containers call gtk_object_sink() on child widgets to take control of them.
        //We just ref() it so that we can unref it later.
-       GLIBMM_DEBUG_REFERENCE(this, gobject_);
-       g_object_ref(gobject_);
+       //GLIBMM_DEBUG_REFERENCE(this, gobject_);
+       //g_object_ref(gobject_);
     
        //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
        //We do an extra unref() in Window::_destroy_c_instance() to take care of that.
+
+       referenced_ = false; //Managed. We should not try to unfloat GtkObjects that we did not instantiate.
     }
   }
 }
@@ -96,14 +95,16 @@ void Object::_destroy_c_instance()
 
   // remove our hook.
   GtkObject* object = gobj();
+
   if (object)
-  {
+  { 
     g_assert(GTK_IS_OBJECT(object));
 
     disconnect_cpp_wrapper();
     //Unfortunately this means that our dispose callback will not be called, because the qdata has been removed.
     //So we'll connect the callback again, just so that gobject_disposed_ gets set for use later in this same method.
     //See below:
+   
 
     //This probably isn't a problem now:
     //If we are killing the C++ instance before the C instance, then this might lead to strange behaviour.
@@ -163,7 +164,7 @@ void Object::_destroy_c_instance()
     }
 
     //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
-  }
+  }  
 }
 
 Object::~Object()
@@ -299,7 +300,7 @@ void Object::set_manage()
 }
 
 void Object::callback_destroy_(GObject*, void* data) //static
-{
+{ 
   //This is only used for a short time, then disconnected.
 
   Object* cppObject = static_cast<Object*>(data);
