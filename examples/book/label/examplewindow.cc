@@ -53,7 +53,7 @@ ExampleWindow::ExampleWindow()
   m_Frame_Left.add(m_Label_Left);
   m_VBox.pack_start(m_Frame_Left, Gtk::PACK_SHRINK);
 
-  m_Label_Right.set_justify(Gtk::JUSTIFY_LEFT);
+  m_Label_Right.set_justify(Gtk::JUSTIFY_RIGHT);
   m_Frame_Right.add(m_Label_Right);
   m_VBox.pack_start(m_Frame_Right, Gtk::PACK_SHRINK);
 
