@@ -19,11 +19,7 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm/window.h>
-#include <gtkmm/box.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/uimanager.h>
+#include <gtkmm.h>
 
 class ExampleWindow : public Gtk::Window
 {
@@ -32,6 +28,11 @@ public:
   virtual ~ExampleWindow();
 
 protected:
+  virtual void register_stock_items();
+  virtual void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory,
+                      const std::string& filepath,
+                      const Glib::ustring& id, const Glib::ustring& label);
+
   //Signal handlers:
   virtual void on_action_file_new();
   virtual void on_action_file_quit();
