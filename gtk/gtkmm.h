@@ -47,18 +47,23 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cellrendererpixbuf.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrenderertoggle.h>
+#include <gtkmm/colorbutton.h>
 #include <gtkmm/colorselection.h>
-#include <gtkmm/combo.h>
+#include <gtkmm/combo.h> //TODO: Deprecated.
+#include <gtkmm/combobox.h>
+#include <gtkmm/comboboxentry.h>
 #include <gtkmm/container.h>
 #include <gtkmm/curve.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/editable.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/eventbox.h>
 #include <gtkmm/fileselection.h>
 #include <gtkmm/fixed.h>
+#include <gtkmm/fontbutton.h>
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
 //#include <gtkmm/rc.h>
@@ -121,6 +126,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/uimanager.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/window.h>

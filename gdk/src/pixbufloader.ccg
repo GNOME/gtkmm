@@ -28,10 +28,15 @@ namespace
 /* We use this helper function in the constructor to be able to throw
  * before the base class' (Glib::Object) constructor is called.
  */
-GdkPixbufLoader* pixbuf_loader_create_with_type(const Glib::ustring& image_type)
+GdkPixbufLoader* pixbuf_loader_create_with_type(const Glib::ustring& image_type, bool mime_type)
 {
   GError* error = 0;
-  GdkPixbufLoader *const loader = gdk_pixbuf_loader_new_with_type(image_type.c_str(), &error);
+  GdkPixbufLoader *const loader = 0;
+  
+  if(mime_type)
+    gdk_pixbuf_loader_new_with_mime_type(image_type.c_str(), &error);
+  else
+    gdk_pixbuf_loader_new_with_type(image_type.c_str(), &error);
 
   if(error)
     Glib::Error::throw_exception(error);
@@ -45,10 +50,10 @@ GdkPixbufLoader* pixbuf_loader_create_with_type(const Glib::ustring& image_type)
 namespace Gdk
 {
 
-PixbufLoader::PixbufLoader(const Glib::ustring& image_type)
+PixbufLoader::PixbufLoader(const Glib::ustring& image_type, bool mime_type)
 :
   Glib::ObjectBase(0),
-  Glib::Object((GObject*) pixbuf_loader_create_with_type(image_type))
+  Glib::Object((GObject*) pixbuf_loader_create_with_type(image_type, mime_type))
 {}
 
 void PixbufLoader::write(const guint8* buf, gsize count)

@@ -99,7 +99,7 @@ void CalendarExample::set_flags()
   }
 
   if (calendar_)
-    calendar_->display_options((Gtk::CalendarDisplayOptions)options);
+    calendar_->set_display_options((Gtk::CalendarDisplayOptions)options);
 }
 
 void CalendarExample::toggle_flag(Gtk::CheckButton *toggle)
