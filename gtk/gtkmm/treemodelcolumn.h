@@ -25,7 +25,7 @@
 #include <vector>
 #include <gtkmmconfig.h>
 
-GTKMM_USING_STD(vector)
+GLIBMM_USING_STD(vector)
 
 
 namespace Gtk

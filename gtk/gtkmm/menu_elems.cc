@@ -25,9 +25,9 @@
 #include <gtkmm/menu_elems.h>
 #include <gtkmm/label.h>
 
-#ifndef GTKMM_WIN32
+#ifndef GLIBMM_WIN32
 #include <strings.h>
-#endif // GTKMM_WIN32
+#endif // GLIBMM_WIN32
 
 namespace Gtk
 {
