@@ -33,7 +33,7 @@ public:
 
 protected:
   //Signal handlers:
-  virtual void on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, GtkSelectionData* selection_data, guint info, guint time);
+  virtual void on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, Gtk::SelectionData& selection_data, guint info, guint time);
   virtual void on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
 
   //Member widgets:

@@ -46,7 +46,7 @@ protected:
   virtual void on_image_drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time);
   virtual bool on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time);
 
-  virtual void on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, GtkSelectionData* selection_data, guint info, guint time);
+  virtual void on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, Gtk::SelectionData& selection_data, guint info, guint time);
   virtual void on_button_drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context);
 
   virtual bool on_popdown_timeout();

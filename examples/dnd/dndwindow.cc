@@ -191,14 +191,13 @@ bool DnDWindow::on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context
 }
 
 
-void DnDWindow::on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>&, GtkSelectionData* selection_data, guint info, guint)
+void DnDWindow::on_button_drag_data_get(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& selection_data, guint info, guint)
 {
   if (info == TARGET_ROOTWIN)
     g_print ("I was dropped on the rootwin\n");
   else
-    gtk_selection_data_set (selection_data,
-                            selection_data->target,
-                            8, (const guchar*)"I'm Data!", 9);
+    selection_data.set(selection_data.get_target(),
+                       8 /* 8-bits format */, (const guchar*)"I'm Data!", 9 /* The length of I'm Data in bytes */);
 }
 
 void DnDWindow::on_button_drag_data_delete(const Glib::RefPtr<Gdk::DragContext>&)
