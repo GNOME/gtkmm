@@ -25,10 +25,12 @@ class ExampleTreeModel
   : public Glib::Object,
     public Gtk::TreeModel
 {
-public:
-  ExampleTreeModel();
+protected:
+  //Create a TreeModel with @a columns_count number of columns, each of type Glib::ustring.
+  ExampleTreeModel(unsigned int columns_count = 10);
   virtual ~ExampleTreeModel();
-
+  
+public:
   static Glib::RefPtr<ExampleTreeModel> create();
 
   Gtk::TreeModelColumn< Glib::ustring >& get_model_column(int column);

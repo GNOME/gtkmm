@@ -44,7 +44,7 @@ ExampleTreeModel::GlueList::~GlueList()
 }
      
 
-ExampleTreeModel::ExampleTreeModel()
+ExampleTreeModel::ExampleTreeModel(unsigned int columns_count)
 : Glib::ObjectBase( typeid(ExampleTreeModel) ), //register a custom GType.
   Glib::Object(), //The custom GType is actually registered here.
   m_stamp(1), //When the model's stamp != the iterator's stamp then that iterator is invalid and should be ignored. Also, 0=invalid
@@ -55,9 +55,9 @@ ExampleTreeModel::ExampleTreeModel()
   //both return the same piece of data.
   Gtk::TreeModel::add_interface( Glib::Object::get_type() );
    
+  
   //Initialize our underlying data:
   const typeListOfRows::size_type rows_count = 100;
-  const typeRow::size_type columns_count = 10;
   m_rows.resize(rows_count); //100 rows.
   for(unsigned int row_number = 0; row_number < rows_count; ++row_number)
   {
