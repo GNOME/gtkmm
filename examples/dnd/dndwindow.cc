@@ -180,10 +180,16 @@ bool DnDWindow::on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context
 
   m_Image.set(m_trashcan_closed, m_trashcan_closed_mask);
 
+     
+
+
   if (context->gobj()->targets)
   {
-    Glib::ustring temp = Gdk::AtomString::to_cpp_type(GDK_POINTER_TO_ATOM (context->gobj()->targets->data));
-    drag_get_data( context, temp, (uint)(time) );
+    std::vector<Glib::ustring> targets = context->get_targets();
+    if(targets.size())
+    {
+      drag_get_data( context, targets[0], time );
+    }
 
     return true;
   }

@@ -76,6 +76,7 @@ _CONVERSION(`GlyphGeometry',`PangoGlyphGeometry',`*($3).gobj()')
 
 _CONVERSION(`PangoGlyphString*',`GlyphString',`GlyphString(($3))')
 _CONVERSION(`PangoGlyphString*',`const GlyphString',`GlyphString(($3))')
+_CONVERSION(`const Pango::GlyphString&',`PangoGlyphString*',const_cast<PangoGlyphString*>($3.gobj()))
 
 _CONVERSION(`PangoFont*',`Glib::RefPtr<Font>',Glib::wrap($3))
 _CONVERSION(`PangoFont*',`Glib::RefPtr<Pango::Font>',Glib::wrap($3))

@@ -76,7 +76,7 @@ int PopupEntry::get_button_width()
   window.move(-500, -500);
   window.show_all();
 
-  Gtk::Requisition requisition = { 0, 0 };
+  Gtk::Requisition requisition;
   window.size_request(requisition);
 
   return requisition.width;
@@ -106,7 +106,7 @@ bool PopupEntry::on_key_press_event(GdkEventKey* event)
   GdkEvent synth_event;
   synth_event.key = *event;
 
-  synth_event.key.window = Glib::unwrap(entry_->get_window()); // XXX
+  synth_event.key.window = Glib::unwrap(entry_->get_window()); // TODO: Use a C++ Gdk::Event.
   synth_event.key.send_event = true;
 
   entry_->event(&synth_event);

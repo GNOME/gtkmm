@@ -440,6 +440,32 @@ _CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
 _CONVERSION(`Tooltips*',`GtkTooltips*',`Glib::unwrap($3)')
 _CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
 
+_CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
+
+#TargetList
+_CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GtkTargetList*',`Glib::RefPtr<TargetList>',`Glib::wrap($3)')
+_CONVERSION(`GtkTargetList*',`Glib::RefPtr<const TargetList>',`Glib::wrap($3)')
+
+#IconInfo
+_CONVERSION(`GtkIconInfo*',`IconInfo',`Glib::wrap($3)')
+
+_CONVERSION(`Requisition&', `GtkRequisition*', `($2)(&$3)')
+_CONVERSION(`const Requisition&', `GtkRequisition*', `($2)(&$3)')
+_CONVERSION(`GtkRequisition*', `Requisition&', `($2)(*$3)')
+_CONVERSION(`GtkRequisition*', `Requisition*', `($2)($3)')
+_CONVERSION(`Requisition*', `GtkRequisition*', `($2)($3)')
+_CONVERSION(`GtkRequisition', `Requisition', `($2)($3)')
+
+_CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+_CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+_CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&$3))')
+_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
+_CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
+
+
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
@@ -468,13 +494,7 @@ _CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CON
 _CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true)')
 _CONVERSION(`CellRenderer*',`GtkCellRenderer*',__FP2P)
 _CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
+_CONVERSION(`GtkAction*',`const Glib::RefPtr<Action>&',`Glib::wrap($3, true)')
 
 _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 
-#TargetList
-_CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
-_CONVERSION(`Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_REFPTR_TO_P($3))
-_CONVERSION(`GtkTargetList*',`Glib::RefPtr<TargetList>',`Glib::wrap($3, true)')
-
-#IconInfo
-_CONVERSION(`GtkIconInfo*',`IconInfo',`Glib::wrap($3)')
