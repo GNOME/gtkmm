@@ -103,7 +103,7 @@ class TreeModelColumnBase
 {
 public:
   GType type()  const { return type_;  }
-  int   index() const { return index_; }
+  int index() const { return index_; }
 
 protected:
   explicit TreeModelColumnBase(GType type);
