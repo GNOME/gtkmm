@@ -42,8 +42,7 @@ protected:
   bool read_line (FILE *stream, GString *str);
 
   //Signal handlers:
-  static  bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path,
-                               bool currently_selected);
+  virtual bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path, bool currently_selected);
   virtual void on_treeselection_changed();
   virtual void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
   virtual void on_example_window_hide();
