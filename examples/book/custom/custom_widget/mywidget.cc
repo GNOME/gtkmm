@@ -22,6 +22,7 @@
 MyWidget::MyWidget()
 {
   set_flags(Gtk::NO_WINDOW);
+  //add_events(Gdk::EXPOSURE_MASK);
 }
 
 MyWidget::~MyWidget()
