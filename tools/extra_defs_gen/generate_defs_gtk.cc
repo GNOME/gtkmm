@@ -81,6 +81,7 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_CHECK_BUTTON )
             << get_defs( GTK_TYPE_CHECK_MENU_ITEM )
             << get_defs( GTK_TYPE_CLIST ) /* Deprecated */
+            << get_defs( GTK_TYPE_CELL_LAYOUT )
             << get_defs( GTK_TYPE_CELL_RENDERER )
             << get_defs( GTK_TYPE_CELL_RENDERER_COMBO )
 	    << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )	    
