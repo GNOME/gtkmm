@@ -1,0 +1,159 @@
+/* $Id$ */
+
+/* generate_defs_gtk.cc
+ *
+ * Copyright (C) 2001 The Free Software Foundation
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include "generate_extra_defs.h"
+#include <gdk/gdk.h>
+#include <gtk/gtk.h>
+
+int main (int argc, char *argv[])
+{
+  gtk_init(&argc, &argv);
+
+  void *const g_class_atk_no_op_object = g_type_class_ref(ATK_TYPE_NO_OP_OBJECT);
+
+  std::cout << get_defs( ATK_TYPE_HYPERLINK )
+            << get_defs( ATK_TYPE_OBJECT )
+            << get_defs( ATK_TYPE_COMPONENT )
+            << get_defs( ATK_TYPE_ACTION )
+            << get_defs( ATK_TYPE_EDITABLE_TEXT )
+            << get_defs( ATK_TYPE_IMAGE )
+            << get_defs( ATK_TYPE_SELECTION )
+            << get_defs( ATK_TYPE_TABLE )
+            << get_defs( ATK_TYPE_TEXT )
+            << get_defs( ATK_TYPE_VALUE )
+            << get_defs( ATK_TYPE_REGISTRY )
+            << get_defs( ATK_TYPE_RELATION )
+            << get_defs( ATK_TYPE_RELATION_SET )
+            << get_defs( ATK_TYPE_STATE_SET );
+
+  g_type_class_unref(g_class_atk_no_op_object);
+
+  std::cout << get_defs( GDK_TYPE_COLORMAP )
+            << get_defs( GDK_TYPE_DRAG_CONTEXT )
+            << get_defs( GDK_TYPE_DISPLAY )
+            << get_defs( GDK_TYPE_DISPLAY_MANAGER )
+            << get_defs( GDK_TYPE_DRAWABLE )
+            << get_defs( GDK_TYPE_GC )
+            << get_defs( GDK_TYPE_IMAGE )
+            << get_defs( GDK_TYPE_PIXBUF )
+            << get_defs( GDK_TYPE_PIXBUF_ANIMATION )
+            << get_defs( GDK_TYPE_PIXBUF_LOADER )
+            << get_defs( GDK_TYPE_PIXMAP )
+            << get_defs( GDK_TYPE_SCREEN )
+            << get_defs( GDK_TYPE_VISUAL )
+            << get_defs( GDK_TYPE_WINDOW )
+
+            << get_defs( GTK_TYPE_ACCEL_GROUP )
+            << get_defs( GTK_TYPE_ACCEL_LABEL )
+            << get_defs( GTK_TYPE_ADJUSTMENT )
+            << get_defs( GTK_TYPE_ALIGNMENT)
+            << get_defs( GTK_TYPE_ARROW )
+            << get_defs( GTK_TYPE_ASPECT_FRAME )
+            << get_defs( GTK_TYPE_BIN )
+            << get_defs( GTK_TYPE_BOX )
+            << get_defs( GTK_TYPE_BUTTON )
+            << get_defs( GTK_TYPE_BUTTON_BOX )
+            << get_defs( GTK_TYPE_CALENDAR )
+            << get_defs( GTK_TYPE_CHECK_BUTTON )
+            << get_defs( GTK_TYPE_CHECK_MENU_ITEM )
+            << get_defs( GTK_TYPE_CLIST )
+            << get_defs( GTK_TYPE_CELL_RENDERER )
+            << get_defs( GTK_TYPE_CELL_RENDERER_TEXT )
+            << get_defs( GTK_TYPE_CELL_RENDERER_TOGGLE )
+            << get_defs( GTK_TYPE_CELL_RENDERER_PIXBUF )
+            << get_defs( GTK_TYPE_COLOR_SELECTION )
+            << get_defs( GTK_TYPE_COMBO )
+            << get_defs( GTK_TYPE_CONTAINER )
+            << get_defs( GTK_TYPE_CTREE )
+            << get_defs( GTK_TYPE_CURVE )
+            << get_defs( GTK_TYPE_DIALOG )
+            << get_defs( GTK_TYPE_DRAWING_AREA )
+            << get_defs( GTK_TYPE_ENTRY )
+            << get_defs( GTK_TYPE_EVENT_BOX )
+            << get_defs( GTK_TYPE_FILE_SELECTION )
+            << get_defs( GTK_TYPE_FIXED )
+            << get_defs( GTK_TYPE_FONT_SELECTION )
+            << get_defs( GTK_TYPE_FONT_SELECTION_DIALOG )
+            << get_defs( GTK_TYPE_FRAME )
+            << get_defs( GTK_TYPE_HANDLE_BOX )
+            << get_defs( GTK_TYPE_IMAGE )
+            << get_defs( GTK_TYPE_INPUT_DIALOG )
+            << get_defs( GTK_TYPE_INVISIBLE )
+            << get_defs( GTK_TYPE_ITEM )
+            << get_defs( GTK_TYPE_LABEL )
+            << get_defs( GTK_TYPE_LAYOUT )
+            << get_defs( GTK_TYPE_LIST )
+            << get_defs( GTK_TYPE_LIST_ITEM )
+            << get_defs( GTK_TYPE_MENU )
+            << get_defs( GTK_TYPE_MENU_BAR )
+            << get_defs( GTK_TYPE_MENU_ITEM )
+            << get_defs( GTK_TYPE_MENU_SHELL )
+            << get_defs( GTK_TYPE_MESSAGE_DIALOG )
+            << get_defs( GTK_TYPE_MISC )
+            << get_defs( GTK_TYPE_NOTEBOOK )
+            << get_defs( GTK_TYPE_OBJECT )
+            << get_defs( GTK_TYPE_OPTION_MENU )
+            << get_defs( GTK_TYPE_PANED )
+            << get_defs( GTK_TYPE_PIXMAP )
+#if !defined(_WIN32)
+            << get_defs( GTK_TYPE_PLUG )
+#endif
+            << get_defs( GTK_TYPE_PREVIEW )
+            << get_defs( GTK_TYPE_PROGRESS )
+            << get_defs( GTK_TYPE_PROGRESS_BAR )
+            << get_defs( GTK_TYPE_RADIO_BUTTON )
+            << get_defs( GTK_TYPE_RADIO_MENU_ITEM )
+            << get_defs( GTK_TYPE_RANGE )
+            << get_defs( GTK_TYPE_RULER )
+            << get_defs( GTK_TYPE_SCALE )
+            << get_defs( GTK_TYPE_SCROLLBAR )
+            << get_defs( GTK_TYPE_SCROLLED_WINDOW )
+            << get_defs( GTK_TYPE_SEPARATOR )
+            << get_defs( GTK_TYPE_SETTINGS )
+            << get_defs( GTK_TYPE_SIZE_GROUP )
+#if !defined(_WIN32)
+            << get_defs( GTK_TYPE_SOCKET )
+#endif
+            << get_defs( GTK_TYPE_SPIN_BUTTON )
+            << get_defs( GTK_TYPE_STATUSBAR )
+            << get_defs( GTK_TYPE_STYLE )
+            << get_defs( GTK_TYPE_TABLE )
+            << get_defs( GTK_TYPE_TEAROFF_MENU_ITEM )
+            << get_defs( GTK_TYPE_TIPS_QUERY )
+            << get_defs( GTK_TYPE_TOGGLE_BUTTON )
+            << get_defs( GTK_TYPE_TOOLBAR )
+            << get_defs( GTK_TYPE_TEXT_BUFFER )
+            << get_defs( GTK_TYPE_TEXT_MARK )
+            << get_defs( GTK_TYPE_TEXT_TAG )
+            << get_defs( GTK_TYPE_TEXT_TAG_TABLE )
+            << get_defs( GTK_TYPE_TEXT_VIEW )
+            << get_defs( GTK_TYPE_TOOLTIPS )
+            << get_defs( GTK_TYPE_TREE_SELECTION )
+            << get_defs( GTK_TYPE_TREE_STORE )
+            << get_defs( GTK_TYPE_TREE_VIEW )
+            << get_defs( GTK_TYPE_TREE_VIEW_COLUMN )
+            << get_defs( GTK_TYPE_VIEWPORT )
+            << get_defs( GTK_TYPE_WIDGET )
+            << get_defs( GTK_TYPE_WINDOW );
+
+
+  return 0;
+}

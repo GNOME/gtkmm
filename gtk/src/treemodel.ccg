@@ -1,0 +1,138 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtkmm/treeiter.h>
+#include <gtkmm/treepath.h>
+#include <gtk/gtktreestore.h>
+#include <gtk/gtktreemodel.h>
+
+namespace
+{
+
+gboolean proxy_foreach_iter_callback(GtkTreeModel* model, GtkTreePath*, GtkTreeIter* iter, void* data)
+{
+  typedef Gtk::TreeModel::SlotForeachIter SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    return slot(Gtk::TreeModel::iterator(model, iter));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 1;
+}
+
+gboolean proxy_foreach_path_callback(GtkTreeModel*, GtkTreePath* path, GtkTreeIter*, void* data)
+{
+  typedef Gtk::TreeModel::SlotForeachPath SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    return slot(Gtk::TreeModel::Path(path, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 1;
+}
+
+gboolean proxy_foreach_path_and_iter_callback(GtkTreeModel* model, GtkTreePath* path,
+                                              GtkTreeIter* iter, void* data)
+{
+  typedef Gtk::TreeModel::SlotForeachPathAndIter SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    return slot(Gtk::TreeModel::Path(path, true), Gtk::TreeModel::iterator(model, iter));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 1;
+}
+
+} //anonymous namespace
+
+
+namespace Gtk
+{
+
+TreeModel::iterator TreeModel::get_iter(const Path& path)
+{
+  iterator iter (this);
+  gtk_tree_model_get_iter(gobj(), iter.gobj(), const_cast<GtkTreePath*>(path.gobj()));
+  return iter;
+}
+
+TreeModel::iterator TreeModel::get_iter(const Glib::ustring& path_string)
+{
+  iterator iter (this);
+  gtk_tree_model_get_iter_from_string(gobj(), iter.gobj(), path_string.c_str());
+  return iter;
+}
+
+TreeModel::Children TreeModel::children()
+{
+  return TreeNodeChildren(this);
+}
+
+void TreeModel::set_value_impl(const iterator&, int, const Glib::ValueBase&)
+{
+  g_assert_not_reached();
+}
+
+void TreeModel::get_value_impl(const iterator& row, int column, Glib::ValueBase& value) const
+{
+  gtk_tree_model_get_value(
+      const_cast<GtkTreeModel*>(gobj()),
+      const_cast<GtkTreeIter*>(row.gobj()),
+      column, value.gobj());
+}
+
+void TreeModel::foreach(const SlotForeachIter& slot)
+{
+  SlotForeachIter slot_copy (slot);
+  gtk_tree_model_foreach(gobj(), &proxy_foreach_iter_callback, &slot_copy);
+}
+
+void TreeModel::foreach(const SlotForeachPath& slot)
+{
+  SlotForeachPath slot_copy (slot);
+  gtk_tree_model_foreach(gobj(), &proxy_foreach_path_callback, &slot_copy);
+}
+
+void TreeModel::foreach(const SlotForeachPathAndIter& slot)
+{
+  SlotForeachPathAndIter slot_copy (slot);
+  gtk_tree_model_foreach(gobj(), &proxy_foreach_path_and_iter_callback, &slot_copy);
+}
+
+} // namespace Gtk
+

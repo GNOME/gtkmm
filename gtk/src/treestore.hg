@@ -1,0 +1,97 @@
+/* $Id$ */
+
+/* Copyright(C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or(at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtkmm/treeiter.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treesortable.h>
+#include <gtkmm/treedragdest.h>
+#include <gtkmm/treedragsource.h>
+// We couldn't include it in treemodel.h, but doing it here makes it easier for people.
+#include <gtkmm/treepath.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+/**
+ * @ingroup TreeView
+ */
+class TreeStore :
+  public Glib::Object,
+  public Gtk::TreeModel,
+  public TreeSortable,
+  public TreeDragSource,
+  public TreeDragDest
+{
+  _CLASS_GOBJECT(TreeStore, GtkTreeStore, GTK_TREE_STORE, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(TreeModel)
+  _IMPLEMENTS_INTERFACE(TreeSortable)
+  _IMPLEMENTS_INTERFACE(TreeDragSource)
+  _IMPLEMENTS_INTERFACE(TreeDragDest)
+  _IGNORE(gtk_tree_store_set, gtk_tree_store_set_valist, gtk_tree_store_insert_after,
+          gtk_tree_store_set_column_types, gtk_tree_store_insert_before,
+          gtk_tree_store_insert, gtk_tree_store_append, gtk_tree_store_prepend,
+          gtk_tree_store_reorder, gtk_tree_store_move_after, gtk_tree_store_move_before,
+          gtk_tree_store_remove)
+
+protected:
+  explicit TreeStore(const TreeModelColumnRecord& columns);
+
+public:
+  _WRAP_CREATE(const TreeModelColumnRecord& columns)
+
+  iterator erase(const iterator& iter);
+  iterator insert(const iterator& iter);
+
+  iterator prepend();
+  iterator prepend(const TreeNodeChildren& node);
+
+  iterator append();
+  iterator append(const TreeNodeChildren& node);
+
+  _WRAP_METHOD(void iter_swap(const iterator& a, const iterator& b), gtk_tree_store_swap)
+
+  /** Moves @a source to the position at @a destination.
+   * @a source and @a destination should be at the same level.
+   * Note that this function only works with unsorted stores.
+   * @param source The row that should be moved.
+   * @param destination The position to move to.
+   */
+  void move(const iterator& source, const iterator& destination);
+
+  /** Reorders the children of @a node to follow the order indicated by @a new_order.
+   * Note that this function only works with unsorted stores.
+   */
+  void reorder(const TreeNodeChildren& node, const Glib::ArrayHandle<int>& new_order);
+
+  _WRAP_METHOD(void clear(), gtk_tree_store_clear)
+  _WRAP_METHOD(bool is_ancestor(const iterator& iter, const iterator& descendant) const, gtk_tree_store_is_ancestor)
+  _WRAP_METHOD(int iter_depth(const iterator& iter) const, gtk_tree_store_iter_depth)
+
+  _WRAP_METHOD(bool iter_is_valid(const iterator& iter) const, gtk_tree_store_iter_is_valid)
+
+protected:
+  virtual void set_value_impl(const iterator& row, int column, const Glib::ValueBase& value);
+  _IGNORE(gtk_tree_store_set_value)
+};
+
+} // namespace Gtk
+

@@ -1,0 +1,174 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <sigc++/method_slot.h>
+#include <gtkmm/adjustment.h>
+#include <gtk/gtkcontainer.h>
+
+
+namespace
+{
+
+
+void container_foreach_callback(GtkWidget* widget_gobj, void* data)
+{
+  try
+  {
+    Gtk::Container::ForeachSlot& slot = *static_cast<Gtk::Container::ForeachSlot*>(data);
+    Gtk::Widget *const widget = Glib::wrap(widget_gobj);
+
+    g_return_if_fail(widget != 0);
+
+    slot(*widget);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+} // anonymous namespace
+
+
+namespace Gtk
+{
+
+void Container_Class::remove_callback_custom(GtkContainer* self, GtkWidget* p0)
+{
+  //GTKMM_LIFECYCLE
+  //Don't call wrap() on a GTK+ instance whose gtkmm instance has been deleted - just call the original C callback.
+  bool gtkmm_child_already_deleted = Glib::_gobject_cppinstance_already_deleted((GObject*)p0);
+
+  if(!gtkmm_child_already_deleted)
+  {
+    //Call the regular, generated callback:
+    Container_Class::remove_callback(self, p0);
+  }
+  else
+  {
+    BaseClassType *const base = static_cast<BaseClassType*>(
+        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+    );
+
+    //Call the original underlying C function:
+    if(base && base->remove)
+      (*base->remove)(self, p0);
+  }
+}
+
+void Container::foreach(const Container::ForeachSlot& slot)
+{
+  ForeachSlot slot_copy (slot);
+  gtk_container_foreach(gobj(), &container_foreach_callback, &slot_copy);
+}
+
+void  Container::add(Widget& widget)
+{
+  gtk_container_add(gobj(), widget.gobj());
+}
+
+bool Container::has_focus_chain() const
+{
+  return gtk_container_get_focus_chain(const_cast<GtkContainer*>(gobj()), 0);
+}
+
+Glib::ListHandle<Widget*> Container::get_focus_chain()
+{
+  GList* list = 0;
+  gtk_container_get_focus_chain(gobj(), &list);
+
+  return Glib::ListHandle<Widget*>(list, Glib::OWNERSHIP_SHALLOW);
+}
+
+void Container::show_all_children(bool recursive)
+{
+  // Plain C version if this turns out to be performance-critical:
+  //GtkCallback callback = (GtkCallback) ((recursive) ? &gtk_widget_show_all : &gtk_widget_show);
+  //gtk_container_foreach(gobj(), callback, 0);
+
+  // This could also be done with get_children() and an explicit loop,
+  // if any problems should arise.  In gtkmm-1.2, foreach() is known to
+  // cause segfaults eventually, but it seems to work now.
+
+  foreach(SigC::slot((recursive) ? &Widget::show_all : &Widget::show));
+}
+
+// static
+void Container_Class::destroy_callback(GtkObject* self)
+{
+#ifdef GTKMM_DEBUG_REFCOUNTING
+  g_warning("Container_Class::destroy_callback() gobject_=%10X\n", self);
+  if(self)
+    g_warning("gtypename: %s\n", G_OBJECT_TYPE_NAME(G_OBJECT(self)));
+#endif
+
+  /*  This happens in Gtk::Widget::dispose_vfunc() instead
+
+  //GTKMM_LIFECYCLE
+  // We need to remove non-manage()ed widgets to prevent gtk_container_destroy() from destroying them.
+  // Contary to what we thought once, even non-floating (sunk) widgets are destroyed by gtk_container_destroy().
+
+  // foreach() probably can't cope well with the removal of children, so we'll
+  // store the list and iterate over it: foreach(SigC::slot(&Widget::unparent));
+  {
+    GList* const children = gtk_container_get_children((GtkContainer*)self);
+
+    for(GList* node = children; node != 0; node = node->next)
+    {
+      GtkWidget* cwidget = static_cast<GtkWidget*>(node->data);
+
+      //It is not managed()ed, then remove it, so that gtk_container_destroy() will not call gtk_widget_destroy() on it later.
+      Widget *const cppChild = dynamic_cast<Widget*>(
+          Glib::ObjectBase::_get_current_wrapper((GObject*)cwidget));
+
+      // cppChild might even be 0 if the object isn't wrapped by C++.
+      if(cppChild && !cppChild->is_managed_())
+      {
+        // Normally, we'd have to ref the child widget because
+        // gtk_container_remove() unrefs it.  But since we only remove
+        // non-managed objects here, the container just releases the
+        // reference it has acquired before in gtk_container_add().
+
+#ifdef GTKMM_DEBUG_REFCOUNTING
+        g_warning("Container_Class::destroy_callback() removing child: gobject_=%10X\n", cwidget);
+        if(cwidget)
+          g_warning("gtypename: %s\n", G_OBJECT_TYPE_NAME(G_OBJECT(cwidget)));
+#endif
+
+        gtk_container_remove((GtkContainer*) self, cwidget);
+      }
+    }
+
+    g_list_free(children);
+  }
+
+  */
+
+  //Call the normal C destroy implementation, such as gtk_button_destroy:
+  //This will chain to gtk_container_destroy(), which will gtk_widget_destroy() any remaining child widgets.
+  GtkObjectClass *const base = static_cast<GtkObjectClass*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
+
+  if(base->destroy)
+    (*base->destroy)(self);
+}
+
+} // namespace Gtk
+

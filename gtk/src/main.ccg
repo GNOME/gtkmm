@@ -1,0 +1,515 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* 
+ *
+ * Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glib.h>
+#include <gtkmmconfig.h>
+#include <gtkmm/main.h>
+#include <gtkmm/window.h>
+#include <glibmm/error.h>
+#include <pangomm/wrap_init.h>
+#include <atkmm/wrap_init.h>
+#include <gdkmm/wrap_init.h>
+#include <gtkmm/wrap_init.h>
+
+// This is a bug in the win32 port of gtk+-2.0. gtk_init, called in 
+// Main::init, is a macro that calls gtk_init_abi_check whose fourth 
+// argument is sizeof(GtkWindow). Because GtkWindow has not been declared
+// yet, we have to do it explicitly. 
+#ifdef GTKMM_WIN32
+#include <gtk/gtkwindow.h>
+#include <gtk/gtkbox.h>
+#endif /* GTKMM_WIN32 */
+
+namespace
+{
+
+/* This class tells sigc++ how to break GTK+ main signal connections.  Since
+ * the gtk_*_remove() functions have the same signature, all main signals can
+ * be handled by a single class.  Special handling is needed for signals that
+ * don't support destroy notification; see the comment on connection_list_.
+ */
+class GtkMainSigConnectionNode : public SigC::ConnectionNode
+{
+public:
+  // A function taking a connection id, e.g. gtk_timeout_remove().
+  typedef void (*RemoveFunc) (guint);
+
+  explicit GtkMainSigConnectionNode(const SigC::SlotBase& slot);
+  virtual ~GtkMainSigConnectionNode();
+
+  virtual void notify(bool from_child);
+  static  void destroy_notify_handler(gpointer data);
+
+  // Call this after installing the GTK+ callback.
+  void install(guint conn_id, RemoveFunc remove_func);
+  void install_no_notify(guint conn_id, RemoveFunc remove_func);
+
+  inline SigC::SlotNode* get_slot_node();
+
+  static bool list_remove(GtkMainSigConnectionNode* conn_node);
+  static void list_notify_all();
+
+private:
+  static GSList*  connection_list_;
+
+  guint           conn_id_;
+  RemoveFunc      remove_func_;
+};
+
+
+/* The global connection_list_ is needed to deal with GTK+ main signals
+ * that don't support destroy notification.  This applies only to
+ * gtk_key_snooper_install() and gtk_init_add().
+ *
+ * The list is static and not a member of Gtk::Main, in order to support
+ * connection to Gtk::Main::signal_run() before Gtk::Main is instantiated.
+ * Thus, it's possible to install initialization hooks in global constructors,
+ * for instance.
+ */
+// static
+GSList* GtkMainSigConnectionNode::connection_list_ = 0;
+
+GtkMainSigConnectionNode::GtkMainSigConnectionNode(const SigC::SlotBase& slot)
+:
+  SigC::ConnectionNode (static_cast<SigC::SlotNode*>(slot.impl())),
+  conn_id_             (0),
+  remove_func_         (0)
+{}
+
+GtkMainSigConnectionNode::~GtkMainSigConnectionNode()
+{}
+
+void GtkMainSigConnectionNode::notify(bool from_child)
+{
+  SigC::ConnectionNode::notify(from_child);
+
+  if(conn_id_ != 0)
+  {
+    (*remove_func_)(conn_id_);
+    conn_id_ = 0;
+  }
+}
+
+// static
+void GtkMainSigConnectionNode::destroy_notify_handler(gpointer data)
+{
+  try
+  {
+    GtkMainSigConnectionNode *const self =
+        static_cast<GtkMainSigConnectionNode*>(data);
+
+    // The GTK+ side is disconnected now, thus the ID is no longer valid.
+    self->conn_id_ = 0;
+
+    if(!self->notified_)
+      self->notify(false);
+
+    // Undo the reference made by install().
+    self->unreference();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+void GtkMainSigConnectionNode::install(
+    guint conn_id, GtkMainSigConnectionNode::RemoveFunc remove_func)
+{
+  conn_id_     = conn_id;
+  remove_func_ = remove_func;
+  reference();
+}
+
+void GtkMainSigConnectionNode::install_no_notify(
+    guint conn_id, GtkMainSigConnectionNode::RemoveFunc remove_func)
+{
+  install(conn_id, remove_func);
+  connection_list_ = g_slist_prepend(connection_list_, this);
+}
+
+inline
+SigC::SlotNode* GtkMainSigConnectionNode::get_slot_node()
+{
+  return static_cast<SigC::SlotNode*>(slot().impl());
+}
+
+// static
+bool GtkMainSigConnectionNode::list_remove(GtkMainSigConnectionNode* conn_node)
+{
+  // The conn_node pointer is only valid if we still hold
+  // a reference of the ConnectionNode in our global list.
+  //
+  if(GSList *const link = g_slist_find(connection_list_, conn_node))
+  {
+    connection_list_ = g_slist_delete_link(connection_list_, link);
+    return true;
+  }
+
+  return false;
+}
+
+/* Cleanup function to be called by the Gtk::Main destructor.  The elements
+ * are removed prior to notification, in order to avoid invalid elements in
+ * the container.
+ */
+// static
+void GtkMainSigConnectionNode::list_notify_all()
+{
+  while(connection_list_ != 0)
+  {
+    GtkMainSigConnectionNode *const conn_node =
+        static_cast<GtkMainSigConnectionNode*>(connection_list_->data);
+
+    connection_list_ = g_slist_delete_link(connection_list_, connection_list_);
+
+    if(conn_node->get_slot_node())
+      conn_node->notify(false);
+
+    conn_node->unreference();
+  }
+}
+
+} // anonymous namespace
+
+
+namespace Gtk
+{
+
+/**** Gtk::RunSig **********************************************************/
+
+SigC::Connection RunSig::connect(const RunSig::SlotType& slot)
+{
+  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
+  const SigC::Connection connection (conn_node);
+
+  // The callback will be invoked the next time gtk_main() is called.
+  gtk_init_add(&RunSig::gtk_callback, conn_node);
+
+  conn_node->install_no_notify(0, 0); // there's no gtk_init_remove()
+  return connection;
+}
+
+// static
+gboolean RunSig::gtk_callback(gpointer data)
+{
+  GtkMainSigConnectionNode *const conn_node =
+      static_cast<GtkMainSigConnectionNode*>(data);
+
+  if(GtkMainSigConnectionNode::list_remove(conn_node))
+  {
+    // Explicitely check wether disconnect() has been called,
+    // because gtk_init_add() actually doesn't support disconnection.
+    //
+    if(!conn_node->notified_)
+    {
+      try
+      {
+        // Recreate the specific SlotType from the generic SlotNode.
+        SlotType slot (conn_node->get_slot_node());
+        slot();
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+
+    // We don't need it anymore, since RunSig is a one-shot signal.
+    GtkMainSigConnectionNode::destroy_notify_handler(conn_node);
+  }
+
+  return 0;
+}
+
+
+/**** Gtk::QuitSig *********************************************************/
+
+SigC::Connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_level)
+{
+  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
+  const SigC::Connection connection (conn_node);
+
+  const guint conn_id = gtk_quit_add_full(
+      main_level, &QuitSig::gtk_callback, 0 /* marshaller */,
+      conn_node, &GtkMainSigConnectionNode::destroy_notify_handler);
+
+  conn_node->install(conn_id, &gtk_quit_remove);
+  return connection;
+}
+
+// static
+gboolean QuitSig::gtk_callback(gpointer data)
+{
+  try
+  {
+    // Recreate the specific SlotType from the generic slot node.
+    SlotType slot (static_cast<GtkMainSigConnectionNode*>(data)->get_slot_node());
+    return slot();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0;
+}
+
+
+/**** Gtk::KeySnooperSig ***************************************************/
+
+SigC::Connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
+{
+  GtkMainSigConnectionNode *const conn_node = new GtkMainSigConnectionNode(slot);
+  const SigC::Connection connection (conn_node);
+
+  const guint conn_id = gtk_key_snooper_install(&KeySnooperSig::gtk_callback, conn_node);
+
+  conn_node->install_no_notify(conn_id, &gtk_key_snooper_remove);
+  return connection;
+}
+
+// static
+gint KeySnooperSig::gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer data)
+{
+  try
+  {
+    // Recreate the specific SlotType from the generic slot node.
+    SlotType slot (static_cast<GtkMainSigConnectionNode*>(data)->get_slot_node());
+    return slot(Glib::wrap(widget), event);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0;
+}
+
+
+/**** Gtk::Main -- static data *********************************************/
+
+RunSig        Main::signal_run_;
+QuitSig       Main::signal_quit_;
+KeySnooperSig Main::signal_key_snooper_;
+Main*         Main::instance_ = 0;
+
+
+/**** Gtk::Main -- construction/destruction ********************************/
+
+Main::Main(int& argc, char**& argv, bool set_locale)
+{
+  init(&argc, &argv, set_locale);
+}
+
+Main::Main(int* argc, char*** argv, bool set_locale)
+{ 
+  init(argc, argv, set_locale);
+}
+
+// Default ctor only used by subclasses:
+Main::Main()
+{
+  if(instance_ == 0)
+  {
+    init_gtkmm_internals();
+    instance_ = this;
+  }
+  else
+  {
+    //TODO: Use g_error instead, to stop the application?
+    g_warning("Gtk::Main instantiated twice");
+  }
+}
+
+Main::~Main()
+{
+  // A second Gtk::Main will produce a warning, but
+  // Main::~Main would still run. So this prevents the crash.
+  if(instance_ == this)
+  {
+    instance_ = 0;
+    GtkMainSigConnectionNode::list_notify_all();
+
+    Glib::wrap_register_cleanup();
+    Glib::Error::register_cleanup();
+  }
+}
+
+// protected
+void Main::init(int* argc, char*** argv, bool set_locale)
+{
+  if(instance_)
+  {
+    //TODO: Use g_error instead, to stop the application?
+    g_warning("Gtk::Main::init() called twice");
+  }
+  else
+  {
+    if(!set_locale)
+      gtk_disable_setlocale();
+
+    //TODO: Add support for gtk_init_check().
+    gtk_init(argc, argv);
+
+    init_gtkmm_internals();
+    instance_ = this;
+  }
+}
+
+// This is a static method so that it can be used before Main is instantiated,
+// for instance in Gnome::canvas_init().  But if you use this method, you
+// _must_ have a Gtk::Main, so that Main::~Main() is called to clean this up
+// later.  Of course I can't imagine any situation in which you wouldn't have
+// a Gtk::Main.
+//
+void Main::init_gtkmm_internals()
+{
+  static bool init_done = false;
+
+  if(!init_done)
+  {
+    Glib::Error::register_init();
+    Glib::wrap_register_init();
+
+    // Populate the map of GTypes to C++ wrap_new() functions.
+    Pango::wrap_init();
+    Atk::wrap_init();
+    Gdk::wrap_init();
+    Gtk::wrap_init();
+
+    init_done = true;
+  }
+}
+
+
+/**** Gtk::Main -- static forwarder methods ********************************/
+
+Main* Main::instance()
+{
+  return instance_;
+}
+
+void Main::run()
+{
+  instance_->run_impl();
+}
+
+void Main::run(Gtk::Window& window)
+{
+  window.show();
+  window.signal_hide().connect(SigC::slot(*instance_, &Main::on_window_hide));
+  instance_->run_impl();
+}
+
+void Main::quit()
+{
+  instance_->quit_impl();
+}
+
+guint Main::level()
+{
+  return instance_->level_impl();
+}
+
+void Main::iteration(bool blocking)
+{
+  instance_->iteration_impl(blocking);
+}
+
+bool Main::events_pending()
+{
+  return instance_->events_pending_impl();
+}
+
+
+/**** Gtk::Main -- static signal accessors *********************************/
+
+RunSig& Main::signal_run()
+{
+  return signal_run_;
+}
+
+QuitSig& Main::signal_quit()
+{
+  return signal_quit_;
+}
+
+KeySnooperSig& Main::signal_key_snooper()
+{
+  return signal_key_snooper_;
+}
+
+
+/**** Gtk::Main -- protected virtuals **************************************/
+
+void Main::run_impl()
+{
+  gtk_main();
+}
+
+void Main::quit_impl()
+{
+  gtk_main_quit();
+}
+
+guint Main::level_impl()
+{
+  return gtk_main_level();
+}
+
+void Main::iteration_impl(bool blocking)
+{
+  gtk_main_iteration_do(blocking);
+}
+
+bool Main::events_pending_impl()
+{
+  // GTK+ declares it as gint, but it's really a boolean.
+  return gtk_events_pending() != 0;
+}
+
+void Main::on_window_hide()
+{
+  quit_impl();
+}
+
+/*
+void
+Main::grab_add(Widget &widget)
+{
+  gtk_grab_add(widget.gobj());
+}
+
+void
+Main::grab_remove(Widget &widget)
+{
+  gtk_grab_remove(widget.gobj());
+}
+
+Widget*
+Main::grab_get_current()
+{
+  return Glib::wrap(gtk_grab_get_current());
+}
+*/
+
+} /* namespace Gtk */
+

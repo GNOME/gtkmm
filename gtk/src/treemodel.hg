@@ -1,0 +1,190 @@
+/* $Id$ */
+
+/* Copyright (C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtktreemodel.h>
+#include <glibmm/interface.h>
+#include <gtkmm/treeiter.h>
+#include <gtkmm/treemodelcolumn.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+namespace Gtk
+{
+
+class TreeModelSort;
+class TreePath;
+class TreeRowReference;
+
+_CC_INCLUDE(gtk/gtktypebuiltins.h)
+_WRAP_ENUM(TreeModelFlags, GtkTreeModelFlags)
+
+
+/** This class defines a generic tree interface for use by the Gtk::TreeView widget.
+ * @ingroup TreeView
+ * It is is designed to be usable with any appropriate data structure. The
+ * programmer just has to implement this interface on their own data type for
+ * it to be viewable by a Gtk::TreeView widget.
+ *
+ * The model is represented as a hierarchical tree of strongly-typed, columned
+ * data. In other words, the model can be seen as a tree where every node has
+ * different values depending on which column is being queried.  The type of
+ * data found in a column is determined by TreeModel::Column<> templates.
+ * The types are
+ * homogeneous per column across all nodes. It is important to note that this
+ * interface only provides a way of examining a model and observing changes.
+ * The implementation of each individual model decides how and if changes are
+ * made.
+ *
+ * In order to make life simpler for programmers who do not need to write their
+ * own specialized model, two generic models are provided - the Gtk::TreeStore
+ * and the Gtk::ListStore. To use these, the developer simply pushes data into
+ * these models as necessary. These models provide the data structure as well
+ * as all appropriate tree interfaces. As a result, implementing drag and drop,
+ * sorting, and storing data is trivial. For the vast majority of trees and
+ * lists, these two models are sufficient.
+ *
+ * Models are accessed on a node/column level of granularity. One can query for
+ * the value of a model at a certain node and a certain column on that node.
+ * There are two structures used to reference a particular node in a model.
+ * They are the Path and the iterator. Most of the interface consists of
+ * operations on a iterator.
+ *
+ * A path is essentially a potential node. It is a location on a model that may
+ * or may not actually correspond to a node on a specific model. A Path can be
+ * converted into either an array of unsigned integers or a string. The string
+ * form is a list of numbers separated by a colon. Each number refers to the
+ * offset at that level. Thus, the path "0" refers to the root node and the
+ * path "2:4" refers to the fifth child of the third node.
+ *
+ * By contrast, a iterator is a reference to a specific node on a specific
+ * model. It is a generic structure with an integer and three generic pointers.
+ * These are filled in by the model in a model-specific way. One can convert a
+ * path to an iterator by calling Gtk::TreeModel::get_iter(). These iterators
+ * are the primary way of accessing a model and are similar to the iterators
+ * used by Gtk::TextBuffer. The model interface defines a set of operations
+ * using them for navigating the model.
+ *
+ * The lifecycle of an iterator can be a little confusing at first. Iterators
+ * are expected to always be valid for as long as the model is unchanged (and
+ * doesn't emit a signal). The model is considered to own all outstanding
+ * iterators and nothing needs to be done to free them from the user's point of
+ * view. Additionally, some models guarantee that an iterator is valid for as
+ * long as the node it refers to is valid (most notably the Gtk::TreeStore and
+ * Gtk::ListStore). Although generally uninteresting, as one always has to
+ * allow for the case where iterators do not persist beyond a signal, some very
+ * important performance enhancements were made in the sort model. As a result,
+ * the GTK_TREE_MODEL_ITERS_PERSIST flag was added to indicate this behavior.
+ */
+class TreeModel : public Glib::Interface
+{
+  _CLASS_INTERFACE(TreeModel, GtkTreeModel, GTK_TREE_MODEL, GtkTreeModelIface)
+  _IGNORE(
+      gtk_tree_model_iter_parent, gtk_tree_model_get_iter, gtk_tree_model_get,
+      gtk_tree_model_get_iter_from_string, gtk_tree_model_get_string_from_iter, 
+      gtk_tree_model_iter_nth_child,
+      gtk_tree_model_ref_node, gtk_tree_model_get_valist,
+      gtk_tree_model_iter_next, gtk_tree_model_iter_has_child,
+      gtk_tree_model_unref_node, gtk_tree_model_iter_children,
+      gtk_tree_model_iter_n_children, gtk_tree_model_get_iter_first,
+      gtk_tree_model_get_value)
+
+public:
+  typedef TreeModelColumnRecord ColumnRecord;
+  typedef TreeIter iterator;
+  typedef const TreeIter const_iterator;
+  typedef TreeRow Row;
+  typedef TreePath Path;
+  typedef TreeRowReference RowReference;
+  typedef TreeNodeChildren Children;
+
+  iterator get_iter(const Path& path);
+  //TODO: Implement a const_iterator? const_iterator get_iter(const Path& path) const;
+  iterator get_iter(const Glib::ustring& path_string);
+  //TODO: Implement a const_iterator? const_iterator get_iter(const Glib::ustring& path_string) const;
+
+  ///This returns an STL-like container API, for iterating over the rows.
+  Children children();
+
+  _IGNORE(gtk_tree_model_foreach)
+
+  typedef SigC::Slot1<bool, const TreeModel::iterator&> SlotForeachIter;
+  void foreach(const SlotForeachIter& slot);
+
+  typedef SigC::Slot1<bool, const TreeModel::Path&> SlotForeachPath;
+  void foreach(const SlotForeachPath& slot);
+
+  typedef SigC::Slot2<bool, const TreeModel::Path&, const TreeModel::iterator&> SlotForeachPathAndIter;
+  void foreach(const SlotForeachPathAndIter& slot);
+
+  _WRAP_METHOD(TreeModelFlags get_flags() const, gtk_tree_model_get_flags)
+  _WRAP_METHOD(int get_n_columns() const, gtk_tree_model_get_n_columns)
+  _WRAP_METHOD(GType get_column_type(int index) const, gtk_tree_model_get_column_type)
+  _WRAP_METHOD(TreeModel::Path get_path(const iterator& iter) const, gtk_tree_model_get_path)
+
+  _WRAP_METHOD(void row_changed(const Path& path, const iterator& iter), gtk_tree_model_row_changed)
+  _WRAP_METHOD(void row_inserted(const Path& path, const iterator& iter), gtk_tree_model_row_inserted)
+  _WRAP_METHOD(void row_has_child_toggled(const Path& path, const iterator& iter),
+               gtk_tree_model_row_has_child_toggled)
+  _WRAP_METHOD(void row_deleted(const Path& path), gtk_tree_model_row_deleted)
+  _WRAP_METHOD(void rows_reordered(const Path& path, const iterator& iter, int* new_order),
+               gtk_tree_model_rows_reordered)
+
+  _WRAP_METHOD(Glib::ustring get_string(const iterator& iter) const, gtk_tree_model_get_string_from_iter)
+
+#m4 _CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',`TreeModel::iterator(self, $3)')
+  _WRAP_SIGNAL(void row_changed(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_changed")
+  _WRAP_SIGNAL(void row_inserted(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_inserted")
+  _WRAP_SIGNAL(void row_has_child_toggled(const TreeModel::Path& path, const TreeModel::iterator& iter), "row_has_child_toggled")
+  _WRAP_SIGNAL(void row_deleted(const TreeModel::Path& path), "row_deleted")
+  _WRAP_SIGNAL(void rows_reordered(const TreeModel::Path& path, const TreeModel::iterator& iter, int* new_order), "rows_reordered")
+
+protected:
+  _WRAP_VFUNC(TreeModelFlags get_flags() const, get_flags)
+  _WRAP_VFUNC(int get_n_columns() const, get_n_columns)
+  _WRAP_VFUNC(GType get_column_type(int index) const, get_column_type)
+
+#m4 _CONVERSION(`const GtkTreeIter*', `GtkTreeIter*', `const_cast<GtkTreeIter*>($3)')
+#m4 _CONVERSION(`GtkTreeIter*', `const GtkTreeIter*', `$3')
+  //These are only for deriving new TreeModels, which isn't very common or easy:
+  _WRAP_VFUNC(bool iter_next(GtkTreeIter* iter), iter_next)
+  _WRAP_VFUNC(bool iter_children(GtkTreeIter* iter, const GtkTreeIter* parent), iter_children)
+  _WRAP_VFUNC(bool iter_has_child(const GtkTreeIter* iter) const, iter_has_child)
+  _WRAP_VFUNC(int iter_n_children(const GtkTreeIter* iter) const, iter_n_children)
+
+  _WRAP_VFUNC(bool iter_nth_child(GtkTreeIter* iter, const GtkTreeIter* parent, int n), iter_nth_child)
+  _WRAP_VFUNC(bool iter_parent(GtkTreeIter* iter, const GtkTreeIter* child), iter_parent)
+  _WRAP_VFUNC(void ref_node(GtkTreeIter* iter), ref_node)
+  _WRAP_VFUNC(void unref_node(GtkTreeIter* iter), unref_node)
+
+#m4 _CONVERSION(`TreeModel::Path', `GtkTreePath*', `($3).gobj_copy()')
+  _WRAP_VFUNC(TreeModel::Path get_path(const TreeModel::iterator& iter) const, get_path)
+
+  _WRAP_VFUNC(bool get_iter(GtkTreeIter* iter, const TreeModel::Path& path), get_iter)
+  _WRAP_VFUNC(void get_value(const TreeModel::iterator& iter, int column, GValue* value), get_value)
+
+  virtual void set_value_impl(const iterator& row, int column, const Glib::ValueBase& value);
+  virtual void get_value_impl(const iterator& row, int column, Glib::ValueBase& value) const;
+
+  friend class Gtk::TreeModelSort;
+  friend class Gtk::TreeRow;
+};
+
+} // namespace Gtk
+

@@ -1,0 +1,110 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* 
+ *
+ * Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtkradiobutton.h>
+#include <gtkmm/radiomenuitem.h>
+#include <gtk/gtkradiomenuitem.h>
+
+typedef Gtk::RadioButton::Group Group;
+namespace Gtk
+{
+
+RadioButton::RadioButton()
+:
+  _CONSTRUCT()
+{}
+
+RadioButton::RadioButton(const Glib::ustring& label, bool mnemonic)
+:
+  _CONSTRUCT("label", label.c_str(), "use_underline", gboolean(mnemonic))
+{}
+
+RadioButton::RadioButton(Group& group)
+:
+  _CONSTRUCT()
+{
+  group.add(*this);
+}
+
+RadioButton::RadioButton(Group& group, const Glib::ustring& label, bool mnemonic)
+:
+  _CONSTRUCT("label", label.c_str(), "use_underline", gboolean(mnemonic))
+{
+  group.add(*this);
+}
+
+void RadioButton::set_group(Group& group)
+{
+  gtk_radio_button_set_group(gobj(), group.group_);
+
+  //The group will be updated, ready for use with the next radiobutton:
+  group = get_group();
+}
+
+void RadioButton::reset_group()
+{
+  gtk_radio_button_set_group(gobj(), 0);
+}
+
+namespace RadioButton_Helpers
+{
+
+Group::Group()
+: group_(0)
+{}
+
+Group::Group(GSList* group)
+ : group_(group)
+{
+}
+
+Group::Group(const Group& src)
+ : group_(src.group_)
+{
+}
+
+Group& Group::operator=(const Group& src)
+{
+  group_ = src.group_;
+  return *this;
+}
+
+void Group::add(RadioButton& item)
+{
+  item.set_group(*this);
+
+  //probably not necessary:
+  group_ = gtk_radio_button_get_group(item.gobj());
+}
+
+void Group::add(RadioMenuItem& item)
+{
+  item.set_group(*this);
+
+  //probably not necessary:
+  group_ = item.gobj()->group;
+}
+
+} //namespace RadioButton_Helpers
+
+} /* namespace Gtk */
+

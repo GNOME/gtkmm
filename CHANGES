@@ -1,0 +1,116 @@
+*** #Include "gtkmm/something.h" instead of "gtk--/something.h"
+
+As well as using the new gtkmm name, this means that we don't need to move
+the old gtk-- 1.2 headers into a version-specific directory. However, the
+new gtkmm 2.0 headers are in a version-specific directory, so this won't
+happen again for gtkmm 2.2.
+
+*** Glib::ustring:
+
+glib::ustring has much the same interface as std::string,
+but contains UTF8 strings.
+Note that a normal ANSI string is also a UTF8 string, so,
+if you want to, you can use this class without every thinking about UTF8.
+
+Also, this class has conversions to and from std::string,
+so you can use a std::string instead of a glib::ustring -
+However, this will not work with multi-byte translations,
+just as normal C char* code wouldn't.
+
+In a perfect world the C++ Standard Library would contain a
+a UTF8 string, but it doesn't. 
+
+*** The main window concept
+
+In gtkmm 1.2 you had to worry about the Window's delete_event signal to make your application quit properly. If you didn't or if you got it wrong then your Window would self-destruct and cause a segfault. This was tedious and difficult, and nobody really understood it.
+
+We've made life simpler by preventing Window from self-destructing, and adding the Gtk::Main::run(window) override. It shows the window, starts the event loop, and stops the event loop when the window is closed. You can think of it as a way to say 'This is the main application window.' or 'The window and the application have the same lifetime. The examples now demonstrate this simpler technique.
+
+*** Glib::RefPtr<>:
+
+Most of the GDK objects are now based on GObject,
+so we now have auto-generated classes for them. However, GObject is a bit
+stricter than GtkObject about how we can manage it's memory. We can only
+unref() a GObject, we can never destroy it. Therefore our C++ wrapper (which
+is used by the C GObject) must remain alive as long as the C instance. But of
+course it should be deleted when glib tells us that the C instance has died. 
+
+Of course you don't want to worry about all that, so we've created RefPtr<> 
+which does all that for you. Objects such as Gdk::Bitmap can now only be
+instantiated with a create() function. For instance,
+
+Glib::RefPtr<Gdk::Bitmap> bitmap
+  = Gdk::Bitmap::create(window, data, width, height);
+
+You have no way of getting a bare Gdk::Bitmap.
+
+bitmap is then a smart pointer, so you can do this, much like a normal
+pointer:
+
+if(bitmap)
+{
+  int depth = bitmap->get_depth().
+}
+
+When bitmap goes out of scope an unref() will happen in the background and you
+don't need to worry about it anymore.
+
+This should mean that you *never* need to ref()/unref() a Gdk
+object again. GTK+ is a little inconsistent about it's refcounting, though there
+are a loose set of rules. All gtkmm methods do any extra referencing for you, so
+you don't need to worry about that.
+
+*** Re-written GDK wrappers
+
+The GDK wrappers are now auto-generated and are in the Gdk namespace. With the use of Glib::RefPtr<> you no longer need to worry about ref-counting issues.
+
+*** Clearly-named default signal handlers
+
+Default signal handlers were previously suffixed with _impl - for instance, Button::clicked_impl(). Now that they are prefixed with on_ - for instance, Button::on_clicked() is is much easier to see that they are signal handlers that are worthwhile to override in derived classes.
+
+*** signals prefixed by signal_
+
+For instance, Button::clicked is now Button::signal_clicked. This makes the API and your code clearer, while also avoiding clashes with methods of the same name - for instance, Button::clicked().
+
+*** signals connected via signal accessors.
+
+For instance,
+  gtkmm 1.2: button.clicked.connect(SigC::slot(this, &Something::somemethod));
+  gtkmm 1.3: button.signal_clicked().connect(SigC::slot(*this, &Something::somemethod));
+
+*** C++ types used in signal handlers
+
+Signal handlers now use C++ types, just like other C++ methods.
+
+*** Signals do not have slots.
+
+In gtkmm1.2, you could connect a Signal to the 'Slot' of another signal, for instance Gtk::Main::quit.slot(). The actual action that then happened when the signal was emitted was quite arbitrary. These slots did not have any consistent connection with the signal. Therefore we have removed this idea.
+
+*** Namespaced enums:
+
+gtkmm interfaces now use C++ enums rather than the original GTK+ enums. 
+
+*** properties:
+
+GTK+ properties can be used like so:
+
+someobject.property_something().set_value(2);
+int value = someobject.property_something().get_value();
+
+or alternatively:
+
+someobject.property_something() = 2;
+int value = someobject.property_something();
+
+*** GTK+ changes:
+
+Methods and classes that are now deprecated in GTK+ 2.0 are not wrapped in gtkmm 2.0.
+
+
+Implementation Changes:
+
+*** Much clearer, better documented, more maintainable code-generating code.
+*** Use of gtk+'s .defs C interface-definition format, parsed by perl.
+*** Seperate .hg/.ccg files parsed by perl.
+*** Wrappers for GObject, GtkObject, and Boxed Types.
+

@@ -1,0 +1,429 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* Copyright 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtktreeview.h>
+#include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/treeview_private.h>
+#include <gtkmm/treemodel.h>
+
+namespace
+{
+
+//This target name is used in the GTK+ implementation:
+const char treeview_target_row[]   = "GTK_TREE_MODEL_ROW";
+
+} // anonymous namespace
+
+namespace
+{
+
+//SignalProxy_Mapping:
+
+//This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_Mapping
+{
+public:
+  typedef Gtk::TreeView::SlotMapping SlotType;
+
+  SignalProxy_Mapping(const SlotType& slot);
+  ~SignalProxy_Mapping();
+
+  static void gtk_callback(GtkTreeView* tree_view, GtkTreePath* path, void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_Mapping::SignalProxy_Mapping(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_Mapping::~SignalProxy_Mapping()
+{}
+
+void SignalProxy_Mapping::gtk_callback(GtkTreeView* tree_view, GtkTreePath* path, void* data)
+{
+  SignalProxy_Mapping *const self = static_cast<SignalProxy_Mapping*>(data);
+
+  try
+  {
+    (self->slot_)(Glib::wrap(tree_view), Gtk::TreePath(path, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+
+//SignalProxy_SearchEqual:
+
+//This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_SearchEqual
+{
+public:
+  typedef Gtk::TreeView::SlotSearchEqual SlotType;
+
+  SignalProxy_SearchEqual(const SlotType& slot);
+  ~SignalProxy_SearchEqual();
+
+  static gboolean gtk_callback(GtkTreeModel* model, int column, const char* key,
+                               GtkTreeIter* iter, void* data);
+  static void gtk_callback_destroy(void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_SearchEqual::SignalProxy_SearchEqual(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_SearchEqual::~SignalProxy_SearchEqual()
+{}
+
+gboolean SignalProxy_SearchEqual::gtk_callback(GtkTreeModel* model, int column, const char* key,
+                                               GtkTreeIter* iter, void* data)
+{
+  SignalProxy_SearchEqual *const self = static_cast<SignalProxy_SearchEqual*>(data);
+
+  try
+  {
+    return (self->slot_)(Glib::wrap(model, true), column, key, Gtk::TreeIter(model, iter));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+}
+
+void SignalProxy_SearchEqual::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_SearchEqual*>(data);
+}
+
+
+//SignalProxy_ColumnDrop:
+
+//This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_ColumnDrop
+{
+public:
+  typedef Gtk::TreeView::SlotColumnDrop SlotType;
+
+  SignalProxy_ColumnDrop(const SlotType& slot);
+  ~SignalProxy_ColumnDrop();
+
+  static gboolean gtk_callback(GtkTreeView* tree_view, GtkTreeViewColumn* column,
+                               GtkTreeViewColumn* prev_column, GtkTreeViewColumn* next_column,
+                               void* data);
+  static void gtk_callback_destroy(void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_ColumnDrop::SignalProxy_ColumnDrop(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_ColumnDrop::~SignalProxy_ColumnDrop()
+{}
+
+gboolean SignalProxy_ColumnDrop::gtk_callback(GtkTreeView* tree_view, GtkTreeViewColumn* column,
+                                              GtkTreeViewColumn* prev_column,
+                                              GtkTreeViewColumn* next_column, void* data)
+{
+  SignalProxy_ColumnDrop *const self = static_cast<SignalProxy_ColumnDrop*>(data);
+
+  try
+  {
+    return (self->slot_)(Glib::wrap(tree_view), Glib::wrap(column),
+                         Glib::wrap(prev_column), Glib::wrap(next_column));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+}
+
+void SignalProxy_ColumnDrop::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_ColumnDrop*>(data);
+}
+
+} // anonymous namespace
+
+
+namespace Gtk
+{
+
+void TreeView::unset_hadjustment()
+{
+  gtk_tree_view_set_hadjustment(gobj(), 0);
+}
+
+void TreeView::unset_vadjustment()
+{
+  gtk_tree_view_set_vadjustment(gobj(), 0);
+}
+
+int TreeView::insert_column_with_data_func(int position, const Glib::ustring& title, CellRenderer& cell, const SlotCellData& slot)
+{
+  //Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when TreeView_Private::SignalProxy_CellData::gtk_callback_destroy() is called.
+  TreeView_Private::SignalProxy_CellData *const pSignalProxy =
+      new TreeView_Private::SignalProxy_CellData(slot);
+
+  return gtk_tree_view_insert_column_with_data_func(
+      gobj(), position, title.c_str(), cell.gobj(),
+      &TreeView_Private::SignalProxy_CellData::gtk_callback, pSignalProxy,
+      &TreeView_Private::SignalProxy_CellData::gtk_callback_destroy);
+}
+
+void TreeView::set_cursor(const TreeModel::Path& path)
+{
+  gtk_tree_view_set_cursor(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, false);
+}
+
+void TreeView::get_cursor(TreeModel::Path& path, TreeViewColumn*& focus_column)
+{
+  GtkTreePath* pTreePath = 0;
+  GtkTreeViewColumn* pTreeViewColumn = 0;
+  gtk_tree_view_get_cursor(gobj(), &pTreePath, &pTreeViewColumn);
+
+  path = TreeModel::Path(pTreePath, true);
+  focus_column = Glib::wrap(pTreeViewColumn);
+}
+
+void TreeView::enable_model_drag_source(Gdk::ModifierType start_button_mask,
+                                        const ArrayHandle_TargetEntry& targets,
+                                        Gdk::DragAction actions)
+{
+  gtk_tree_view_enable_model_drag_source(
+      gobj(), (GdkModifierType) start_button_mask,
+      targets.data(), targets.size(), (GdkDragAction) actions);
+}
+
+void TreeView::enable_model_drag_source(const ArrayHandle_TargetEntry& targets,
+                              Gdk::ModifierType start_button_mask,
+                              Gdk::DragAction actions)
+{
+  gtk_tree_view_enable_model_drag_source(
+      gobj(), (GdkModifierType) start_button_mask,
+      targets.data(), targets.size(), (GdkDragAction) actions);
+}
+
+void TreeView::enable_model_drag_source(Gdk::ModifierType start_button_mask, Gdk::DragAction actions)
+{
+  std::list<TargetEntry> listTargets;
+  listTargets.push_back(TargetEntry(treeview_target_row));
+  enable_model_drag_source(listTargets, start_button_mask, actions);
+}    
+
+void TreeView::enable_model_drag_dest(const ArrayHandle_TargetEntry& targets, Gdk::DragAction actions)
+{
+  gtk_tree_view_enable_model_drag_dest(
+      gobj(), targets.data(), targets.size(), (GdkDragAction) actions);
+}
+
+void TreeView::enable_model_drag_dest(Gdk::DragAction actions)
+{
+  std::list<TargetEntry> listTargets;
+  listTargets.push_back(TargetEntry(treeview_target_row));
+  enable_model_drag_dest(listTargets, actions);
+}
+
+bool TreeView::get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColumn*& column, int& cell_x, int& cell_y)
+{
+  GtkTreePath* pTreePath = 0;
+  GtkTreeViewColumn* pTreeViewColumn = 0;
+  bool result = gtk_tree_view_get_path_at_pos(gobj(), x, y, &pTreePath, &pTreeViewColumn, &cell_x, &cell_y);
+
+  path = TreeModel::Path(pTreePath, true);
+  column = Glib::wrap(pTreeViewColumn);
+  return result;
+}
+
+int TreeView::insert_column(const Glib::ustring& title, CellRenderer& cell, int position)
+{
+  return gtk_tree_view_insert_column_with_attributes(
+      gobj(), position, const_cast<char*>(title.c_str()), cell.gobj(), 0);
+}
+
+int TreeView::append_column(const Glib::ustring& title, CellRenderer& cell)
+{
+  return insert_column(title, cell, -1 /* at the end */);
+}
+
+void TreeView::get_drag_dest_row(TreeModel::Path& path, TreeViewDropPosition& pos)
+{
+  GtkTreePath* pTreePath = 0;
+  gtk_tree_view_get_drag_dest_row(gobj(), &pTreePath, (GtkTreeViewDropPosition*) &pos);
+  path = TreeModel::Path(pTreePath, true); //true = take_copy.
+}
+
+bool TreeView::get_dest_row_at_pos(int drag_x, int drag_y, TreeModel::Path& path, TreeViewDropPosition& pos)
+{
+  GtkTreePath* pTreePath = 0;
+  const bool bResult = gtk_tree_view_get_dest_row_at_pos(
+      gobj(), drag_x, drag_y, &pTreePath, (GtkTreeViewDropPosition*) &pos);
+
+  path = TreeModel::Path(pTreePath, true); //true = take_copy.
+  return bResult;
+}
+
+void TreeView::map_expanded_rows(const SlotMapping& slot)
+{
+  //Create a signal proxy.
+  SignalProxy_Mapping signalProxy (slot); //It only needs to live as long as this method call.
+
+  gtk_tree_view_map_expanded_rows(gobj(), &SignalProxy_Mapping::gtk_callback, &signalProxy);
+}
+
+void TreeView::set_search_equal_func(const SlotSearchEqual& slot)
+{
+  //Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when SignalProxy_SearchEqual::gtk_callback_destroy() is called.
+  SignalProxy_SearchEqual *const pSignalProxy = new SignalProxy_SearchEqual(slot);
+
+  gtk_tree_view_set_search_equal_func(gobj(),
+      &SignalProxy_SearchEqual::gtk_callback, pSignalProxy,
+      &SignalProxy_SearchEqual::gtk_callback_destroy);
+}
+
+void TreeView::set_column_drag_function(const SlotColumnDrop& slot)
+{
+  //Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when SignalProxy_ColumnDrop::gtk_callback_destroy() is called.
+  SignalProxy_ColumnDrop *const pSignalProxy = new SignalProxy_ColumnDrop(slot);
+
+  gtk_tree_view_set_column_drag_function(gobj(),
+      &SignalProxy_ColumnDrop::gtk_callback, pSignalProxy,
+      &SignalProxy_ColumnDrop::gtk_callback_destroy);
+
+}
+
+void TreeView::scroll_to_cell(const TreeModel::Path& path, TreeViewColumn& column, float row_align, float col_align)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), column.gobj(), TRUE, row_align, col_align);
+}
+
+void TreeView::scroll_to_cell(const TreeModel::Path& path, TreeViewColumn& column)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), column.gobj(), FALSE, 0.0, 0.0);
+}
+
+void TreeView::scroll_to_row(const TreeModel::Path& path, float row_align)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, TRUE, row_align, 0.0);
+}
+
+void TreeView::scroll_to_row(const TreeModel::Path& path)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, FALSE, 0.0, 0.0);
+}
+
+void TreeView::scroll_to_column(TreeViewColumn& column, float col_align)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), 0, column.gobj(), TRUE, 0.0, col_align);
+}
+
+void TreeView::scroll_to_column(TreeViewColumn& column)
+{
+  gtk_tree_view_scroll_to_cell(gobj(), 0, column.gobj(), FALSE, 0.0, 0.0);
+}
+
+void TreeView::remove_all_columns()
+{
+  //This method is not in GTK+, but it seems useful.
+
+  //Remove all View columns:
+  typedef std::list< Gtk::TreeView::Column* > type_vecViewColumns;
+  type_vecViewColumns vecViewColumns = get_columns();
+  for(type_vecViewColumns::iterator iter = vecViewColumns.begin(); iter != vecViewColumns.end(); ++iter)
+  {
+    Gtk::TreeView::Column* pViewColumn = *iter;
+    if(pViewColumn)
+      remove_column(*pViewColumn);
+  }
+}
+
+
+CellRenderer* TreeView::get_column_cell_renderer(int n)
+{
+  TreeViewColumn* pColumn = get_column(n);
+  if(pColumn)
+    return pColumn->get_first_cell_renderer();
+  else
+    return 0;
+}
+
+
+const CellRenderer* TreeView::get_column_cell_renderer(int n) const
+{
+   //Do some const_cast-ing to avoid repetition of code:
+  CellRenderer* pRenderer = const_cast<TreeView*>(this)->get_column_cell_renderer(n);
+  return pRenderer;
+}
+
+void TreeView::unset_expander_column()
+{
+  gtk_tree_view_set_expander_column(gobj(), 0);
+}
+
+
+void TreeView::_auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string,
+                                                         const Gtk::CellRendererToggle*,
+                                                         int model_column)
+{
+  //TODO_API: Remove the CellRendererToggle* parameter - we don't use it.
+
+  Gtk::TreePath path (path_string);
+
+  //Get the row from the path:
+  Glib::RefPtr<TreeModel> refModel = get_model();
+  Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+  if(iter)
+  {
+      Gtk::TreeRow row = *iter;
+      
+      //Get the new value:
+      //This seems to get the old value, not the new one,
+      //so we will just NOT the model value ourselves.
+      //bool bActive = cell_renderer->get_active();
+      bool bActive = false;
+      row.get_value(model_column, bActive);
+      bActive = !bActive;
+      
+      //Store the user's new text in the model: 
+      row.set_value(model_column, bActive);
+  }
+}
+
+} // namespace Gtk
+

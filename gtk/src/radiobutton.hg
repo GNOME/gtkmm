@@ -1,0 +1,104 @@
+/* $Id$ */
+
+/* radiobutton.h
+ * 
+ * Copyright (C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtkmm/checkbutton.h>
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/checkbutton_p.h)
+
+
+namespace Gtk
+{
+
+class RadioButton;
+class RadioMenuItem;
+
+namespace RadioButton_Helpers
+{
+  /** Group identifier for RadioButtons
+   * To set up this group, construct a Group and then pass it
+   * to the constructor of all radio items.  You do not need
+   * to keep the group beyond the initial construction.
+   * It should not be instantiated with new, and it will be invalid after the RadioButtons have been deleted.
+   */
+  class Group
+  {
+  public:
+    Group();
+    Group(const Group& src);
+
+    Group& operator=(const Group& src);
+
+  protected:
+    explicit Group(GSList* group);
+
+    friend class Gtk::RadioButton;
+    friend class Gtk::RadioMenuItem;
+
+    void add(RadioButton& item);
+    void add(RadioMenuItem& item);
+
+    void* operator new(size_t); // not implemented
+
+    GSList* group_;
+  };
+}
+
+/** A single radio button performs the same basic function as a Gtk::CheckButton, as its position in the object hierarchy reflects. It is only when multiple radio buttons are grouped together that they become a different user interface component in their own right.
+ * Every radio button is a member of some group of radio buttons. When one is selected, all other radio buttons in the same group are deselected. A Gtk::RadioButton gives the user a choice from many options.
+ * After constructing the first RadioButton in a group, use get_group() and provide this Group to the constructors ot the other RadioButtons in the same group.
+ * To remove a Gtk::RadioButton from one group and make it part of a new one, use set_group().
+ *
+ * @ingroup Widgets
+ */
+class RadioButton : public CheckButton
+{
+  _CLASS_GTKOBJECT(RadioButton,GtkRadioButton,GTK_RADIO_BUTTON,Gtk::CheckButton,GtkCheckButton)
+  _IGNORE(gtk_radio_button_group, gtk_radio_button_new_from_widget, gtk_radio_button_new_with_mnemonic_from_widget, gtk_radio_button_new_with_label_from_widget)
+public:
+  typedef RadioButton_Helpers::Group Group;
+
+  RadioButton();
+  RadioButton(const Glib::ustring& label, bool mnemonic = false);
+
+  /** Create an empty RadioButton belonging to the specified group,
+   * into which you can add() a widget.
+   * If you wish to add a Gtk::Label,
+   * you may want to
+   * use the Gtk::RadioButton(const Group& group, const Glib::ustring& label, bool mnemonic)
+   * constructor directly instead.
+   */
+  RadioButton(Group& group);
+
+  /** Create a button belonging to the specified group, with a label inside.
+   * You won't be able to add a widget to this button
+   * since it already contains a Gtk::Label.
+   */
+  RadioButton(Group& group, const Glib::ustring& label, bool mnemonic = false);
+  
+
+  _WRAP_METHOD(Group get_group(), gtk_radio_button_get_group)
+  void set_group(Group& group);
+  void reset_group();
+  _IGNORE(gtk_radio_button_set_group)
+};
+
+} /* namespace Gtk */
+

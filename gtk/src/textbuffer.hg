@@ -1,0 +1,221 @@
+/* $Id$ */
+
+/* Copyright(C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or(at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+#include <gtkmm/object.h>
+#include <gtkmm/texttagtable.h>
+#include <gtkmm/textchildanchor.h>
+#include <gtkmm/textmark.h>
+#include <gtkmm/textiter.h>
+#include <gtkmm/clipboard.h>
+#include <gdkmm/pixbuf.h>
+#include <gtkmmconfig.h>
+#include <utility>
+
+GTKMM_USING_STD(pair)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+class TextMark;
+class TextIter;
+
+/** Multi-line text that can be displayed by one or more Gtk::TextView widgets.
+ * @ingroup TextView
+ */
+class TextBuffer : public Glib::Object
+{
+   _CLASS_GOBJECT(TextBuffer, GtkTextBuffer, GTK_TEXT_BUFFER, Glib::Object, GObject)
+   _IGNORE(gtk_text_buffer_create_tag, gtk_text_buffer_get_iter_at_line_offset, gtk_text_buffer_get_iter_at_line_index,
+           gtk_text_buffer_get_iter_at_offset, gtk_text_buffer_get_iter_at_line, gtk_text_buffer_get_start_iter,
+           gtk_text_buffer_get_end_iter, gtk_text_buffer_get_bounds, gtk_text_buffer_get_iter_at_mark,
+           gtk_text_buffer_get_selection_bounds, gtk_text_buffer_set_text, gtk_text_buffer_insert_interactive,
+           gtk_text_buffer_insert, gtk_text_buffer_insert_at_cursor, gtk_text_buffer_insert_interactive_at_cursor,
+           gtk_text_buffer_insert_with_tags, gtk_text_buffer_insert_with_tags_by_name,
+           gtk_text_buffer_get_iter_at_child_anchor)
+public:
+  typedef TextIter iterator;
+  typedef TextTag Tag;
+  typedef TextTagTable TagTable;
+  typedef TextMark Mark;
+
+protected:
+  _CTOR_DEFAULT()
+  explicit TextBuffer(const Glib::RefPtr<TagTable>& tag_table);
+
+public:
+  _WRAP_CREATE()
+  _WRAP_CREATE(const Glib::RefPtr<TagTable>& tag_table)
+
+  _WRAP_METHOD(int get_line_count() const, gtk_text_buffer_get_line_count)
+  _WRAP_METHOD(int get_char_count() const, gtk_text_buffer_get_char_count)
+  int size() const;
+
+  _WRAP_METHOD(Glib::RefPtr<TextBuffer::TagTable> get_tag_table(), gtk_text_buffer_get_tag_table, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const TextBuffer::TagTable> get_tag_table() const, gtk_text_buffer_get_tag_table, refreturn)
+
+  void set_text(const Glib::ustring& text);
+  void set_text(const char* text_begin, const char* text_end);
+
+  /** Alias for set_text(). */
+  void assign(const Glib::ustring& text);
+  /** Alias for set_text(). */
+  void assign(const char* text_begin, const char* text_end);
+
+  iterator insert(const iterator& pos, const Glib::ustring& text);
+  iterator insert(const iterator& pos, const char* text_begin, const char* text_end);
+
+  void insert_at_cursor(const Glib::ustring& text);
+  void insert_at_cursor(const char* text_begin, const char* text_end);
+
+  std::pair<iterator,bool> insert_interactive(
+      const iterator& pos, const Glib::ustring& text, bool default_editable = true);
+
+  std::pair<iterator,bool> insert_interactive(
+      const iterator& pos, const char* text_begin, const char* text_end, bool default_editable = true);
+
+  bool insert_interactive_at_cursor(const Glib::ustring& text, bool default_editable = true);
+  bool insert_interactive_at_cursor(const char* text_begin, const char* text_end,
+                                    bool default_editable = true);
+
+  iterator insert(const iterator& pos, const iterator& range_begin, const iterator& range_end);
+  _IGNORE(gtk_text_buffer_insert_range)
+
+  std::pair<iterator,bool> insert_interactive(const iterator& pos, const iterator& range_begin, const iterator& range_end, bool default_editable = true);
+  _IGNORE(gtk_text_buffer_insert_range_interactive)
+
+  iterator insert_with_tag(const iterator& pos, const Glib::ustring& text, const Glib::RefPtr<Tag>& tag);
+  iterator insert_with_tag(const iterator& pos, const char* text_begin, const char* text_end, const Glib::RefPtr<Tag>& tag);
+
+  iterator insert_with_tag(const iterator& pos, const Glib::ustring& text, const Glib::ustring& tag_name);
+  iterator insert_with_tag(const iterator& pos, const char* text_begin, const char* text_end, const Glib::ustring& tag_name);
+
+  iterator insert_with_tags(const iterator& pos, const Glib::ustring& text,
+                            const Glib::ArrayHandle< Glib::RefPtr<Tag> >& tags);
+  iterator insert_with_tags(const iterator& pos, const char* text_begin, const char* text_end,
+                            const Glib::ArrayHandle< Glib::RefPtr<Tag> >& tags);
+
+  iterator insert_with_tags_by_name(const iterator& pos, const Glib::ustring& text,
+                                    const Glib::StringArrayHandle& tag_names);
+  iterator insert_with_tags_by_name(const iterator& pos, const char* text_begin, const char* text_end,
+                                    const Glib::StringArrayHandle& tag_names);
+
+  ///Returns the iterator where the deletion occured.
+  iterator erase(const iterator& range_begin, const iterator& range_end);
+  _IGNORE(gtk_text_buffer_delete)
+
+  ///Returns the iterator where the deletion occured or end() if no text was deleted.
+  std::pair<iterator,bool> erase_interactive(const iterator& range_begin, const iterator& range_end, bool default_editable = true);
+  _IGNORE(gtk_text_buffer_delete_interactive)
+
+  _WRAP_METHOD(Glib::ustring get_text(const iterator& range_begin, const iterator& range_end, bool include_hidden_chars = true), gtk_text_buffer_get_text)
+  Glib::ustring get_text(bool include_hidden_chars = true);
+
+  _WRAP_METHOD(Glib::ustring get_slice(const iterator& range_begin, const iterator& range_end, bool include_hidden_chars = true), gtk_text_buffer_get_slice)
+
+  iterator insert_pixbuf(const iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
+  _IGNORE(gtk_text_buffer_insert_pixbuf)
+
+  iterator insert_child_anchor(const iterator& pos, const Glib::RefPtr<TextChildAnchor>& anchor);
+  _IGNORE(gtk_text_buffer_insert_child_anchor)
+
+  Glib::RefPtr<TextChildAnchor> create_child_anchor(const iterator& pos);
+  _IGNORE(gtk_text_buffer_create_child_anchor)
+
+  _WRAP_METHOD(Glib::RefPtr<TextBuffer::Mark> create_mark(const Glib::ustring& mark_name, const iterator& where, bool left_gravity = true), gtk_text_buffer_create_mark, refreturn)
+
+  /** Create an anonymous mark. */
+  Glib::RefPtr<Mark> create_mark(const iterator& where, bool left_gravity = true);
+
+  _WRAP_METHOD(void move_mark(const Glib::RefPtr<Mark>& mark, const iterator& where), gtk_text_buffer_move_mark)
+  _WRAP_METHOD(void delete_mark(const Glib::RefPtr<Mark>& mark), gtk_text_buffer_delete_mark)
+  _WRAP_METHOD(Glib::RefPtr<TextBuffer::Mark> get_mark(const Glib::ustring& name), gtk_text_buffer_get_mark, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const TextBuffer::Mark> get_mark(const Glib::ustring& name) const, gtk_text_buffer_get_mark, refreturn)
+
+  _WRAP_METHOD(void move_mark_by_name(const Glib::ustring& name, const iterator& where), gtk_text_buffer_move_mark_by_name)
+  _WRAP_METHOD(void delete_mark_by_name(const Glib::ustring& name), gtk_text_buffer_delete_mark_by_name)
+
+  _WRAP_METHOD(Glib::RefPtr<TextBuffer::Mark> get_insert(), gtk_text_buffer_get_insert, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<TextBuffer::Mark> get_selection_bound(), gtk_text_buffer_get_selection_bound, refreturn)
+
+  _WRAP_METHOD(void place_cursor(const iterator& where), gtk_text_buffer_place_cursor)
+  _WRAP_METHOD(void apply_tag(const Glib::RefPtr<Tag>& tag, const iterator& range_begin, const iterator& range_end), gtk_text_buffer_apply_tag)
+  _WRAP_METHOD(void remove_tag(const Glib::RefPtr<Tag>& tag, const iterator& range_begin, const iterator& range_end), gtk_text_buffer_remove_tag)
+  _WRAP_METHOD(void apply_tag_by_name(const Glib::ustring& name, const iterator& range_begin, const iterator& range_end), gtk_text_buffer_apply_tag_by_name)
+  _WRAP_METHOD(void remove_tag_by_name(const Glib::ustring& name, const iterator& range_begin, const iterator& range_end), gtk_text_buffer_remove_tag_by_name)
+  _WRAP_METHOD(void remove_all_tags(const iterator& range_begin, const iterator& range_end), gtk_text_buffer_remove_all_tags)
+
+  Glib::RefPtr<Tag> create_tag(const Glib::ustring& tag_name);
+
+  iterator get_iter_at_line_offset(int line_number, int char_offset);
+  iterator get_iter_at_line_index(int line_number, int byte_index);
+  iterator get_iter_at_offset(int char_offset);
+  iterator get_iter_at_line(int line_number);
+  iterator begin();
+  iterator end();
+  void get_bounds(iterator& range_begin, iterator& range_end);
+
+  iterator get_iter_at_mark(const Glib::RefPtr<Mark>& mark);
+  iterator get_iter_at_child_anchor(const Glib::RefPtr<TextChildAnchor>& anchor);
+
+  _WRAP_METHOD(bool get_modified() const, gtk_text_buffer_get_modified)
+  _WRAP_METHOD(void set_modified(bool setting = true), gtk_text_buffer_set_modified)
+
+  //TODO_API: Use Glib::RefPtr<Clipboard>
+  _WRAP_METHOD(void add_selection_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_add_selection_clipboard)
+  _WRAP_METHOD(void remove_selection_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_remove_selection_clipboard)
+  _WRAP_METHOD(void cut_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable = true), gtk_text_buffer_cut_clipboard)
+  _WRAP_METHOD(void copy_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_copy_clipboard)
+  void paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, const iterator& override_location, bool default_editable = true);
+  void paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable = true);
+  _IGNORE(gtk_text_buffer_paste_clipboard)
+
+  void get_selection_bounds(iterator& range_begin, iterator& range_end);
+  _IGNORE(gtk_text_buffer_get_selection_bounds)
+
+  _WRAP_METHOD(bool erase_selection(bool interactive = true, bool default_editable = true), gtk_text_buffer_delete_selection)
+
+/* Called to specify atomic user actions, used to implement undo */
+  _WRAP_METHOD(void begin_user_action(), gtk_text_buffer_begin_user_action)
+  _WRAP_METHOD(void end_user_action(), gtk_text_buffer_end_user_action)
+
+#m4begin
+dnl // HACK: Override the default conversion to deal correctly
+dnl // with non-0-terminated strings in insert_text_callback().
+_CONVERSION(`const char*',`const Glib::ustring&',`Glib::ustring(p1, p1 + p2)')
+#m4end
+  _WRAP_SIGNAL(void insert(const TextBuffer::iterator& pos, const Glib::ustring& text, int bytes), "insert_text")
+  _WRAP_SIGNAL(void insert_pixbuf(const TextBuffer::iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), "insert_pixbuf")
+  _WRAP_SIGNAL(void insert_child_anchor(const TextBuffer::iterator& pos, const Glib::RefPtr<TextChildAnchor>& anchor), "insert_child_anchor")
+  _WRAP_SIGNAL(void erase(const TextBuffer::iterator& range_begin, const TextBuffer::iterator& range_end), "delete_range")
+  _WRAP_SIGNAL(void changed(), "changed")
+  _WRAP_SIGNAL(void modified_changed(), "modified_changed")
+  _WRAP_SIGNAL(void mark_set(const TextBuffer::iterator& location, const Glib::RefPtr<TextBuffer::Mark>& mark), "mark_set")
+  _WRAP_SIGNAL(void mark_deleted(const Glib::RefPtr<TextBuffer::Mark>& mark), "mark_deleted")
+  _WRAP_SIGNAL(void apply_tag(const Glib::RefPtr<TextBuffer::Tag>& tag, const TextBuffer::iterator& range_begin, const TextBuffer::iterator& range_end), "apply_tag")
+  _WRAP_SIGNAL(void remove_tag(const Glib::RefPtr<TextBuffer::Tag>& tag, const TextBuffer::iterator& range_begin, const TextBuffer::iterator& range_end), "remove_tag")
+  _WRAP_SIGNAL(void begin_user_action(), "begin_user_action")
+  _WRAP_SIGNAL(void end_user_action(), "end_user_action")
+};
+
+} // namespace Gtk
+

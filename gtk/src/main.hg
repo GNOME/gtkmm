@@ -1,0 +1,221 @@
+/* $Id$ */
+
+/* main.h
+ * 
+ * Copyright (C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+#include <gtk/gtkmain.h>
+
+#include <sigc++/sigc++.h>
+#include <gdkmm/types.h>
+
+_DEFS(gtkmm,gtk)
+
+namespace Gtk
+{
+
+class Widget;
+class Window;
+
+//**********************************************************************
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+//Actually, I'd like to just keep these out of the alphabetical list. murrayc.
+
+/// Run Signal Class (internal)
+class RunSig
+{
+public:
+  typedef SigC::Slot0<void> SlotType;
+
+  SigC::Connection connect(const SlotType& slot);
+
+protected:
+  static gboolean gtk_callback(gpointer data);
+};
+
+
+/// Quit Signal Class (internal)
+class QuitSig
+{
+public:
+  typedef SigC::Slot0<bool> SlotType;
+
+  SigC::Connection connect(const SlotType& slot, guint main_level = 0);
+
+protected:
+  static gboolean gtk_callback(gpointer data); //gtk+ calls this, which then calls our slot.
+};
+
+
+/// KeySnooper Signal Class (internal)
+class KeySnooperSig
+{
+public:
+  typedef SigC::Slot2<int, Widget*, GdkEventKey*> SlotType;
+
+  SigC::Connection connect(const SlotType& slot);
+
+protected:
+  static int gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer data);
+};
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+
+//**********************************************************************
+
+/** Main application class
+ * Every application must have one of these objects.
+ * It may not be global and must be the first Gtk object created.
+ * It is a singleton so declaring more than one will simply access the first
+ * created.
+ *
+ * Normal use of this class is in the main() function to give argc and argv
+ * to the gtk initialization. Widgets can use Gtk::Main::quit()
+ * to exit from the application.
+ *
+ * The internals of the widget have been disguised as signals
+ * so that the user can easily connect using the same methods
+ * used throughout the widget interface.
+ *
+ * Minimal gtkmm application is something like this:
+ * @code
+ * int main(int argc, char *argv[]) {
+ *     Gtk::Main kit(argc, argv);
+ *     ... create some widgets ...
+ *     kit.run();
+ * }
+ * @endcode
+ */
+class Main : public SigC::Object
+{
+public:
+  /** Scans the argument vector, and strips off all parameters known to GTK+.
+   * Your application may then handle the remaining arguments.
+   *
+   * Note:  The argument strings themself won't be modified, although the
+   * pointers to them might change.  This makes it possible to create your
+   * own argv of string literals, which have the type 'const char[]' in
+   * standard C++.  (You might need to use const_cast<>, though.)
+   */
+  Main(int* argc, char*** argv, bool set_locale = true);
+  Main(int& argc, char**& argv, bool set_locale = true);
+
+  virtual ~Main();
+
+  /// Access to one global instance of Gtk::Main.
+  static Gtk::Main* instance();
+
+  /** Start the event loop.
+   * This begins the event loop which handles events.  No
+   * events propagate until this has been called.  It may be
+   * called recursively to popup dialogs
+   */
+  static void run();
+
+  /** Returns from the main loop when the window is closed.
+   * When using this override, you should not use Gtk::Main::quit() to close
+   * the application, but just call hide() on your Window class.
+   */
+  static void run(Window& window);
+
+  static void quit();
+
+  static guint level();
+
+  static void iteration(bool blocking = true);
+  static bool events_pending();
+
+  /* Grabs events to a widget modal
+   * Prevents events to everything else than given widget and its
+   * children. This way you can create modal dialogs(not recommended).
+   */
+  //static void grab_add(Widget &widget);
+
+  /// Removes event grab
+  //static void grab_remove(Widget &widget);
+
+  /// Returns the widget which is grabbing events
+  //static Widget* grab_get_current();
+
+  /** Run signal
+   * @return void
+   */
+  static RunSig& signal_run();
+
+  /** Quit signal
+   * You can connect signal handlers to invoke actions when Gtk::Main::quit()
+   * has been called.  Note that main loops can be nested by calling
+   * Gtk::Main::run() recursively, therefore receiving this signal doesn't
+   * necessarily mean the application is about to be terminated.  If you want
+   * to receive a signal only when the last main loop quits, call connect()
+   * with <tt>main_level&nbsp;=&nbsp;1</tt>.
+   * @code
+   * bool thisclass::mymethod() { return false; }
+   * Gtk::Main::signal_quit().connect(SigC::slot(this, &thisclass::mymethod));
+   * @endcode
+   * @return bool - @c false means callback is removed, @c true means
+   * it'll be called again the next the main loop quits.
+   */
+  static QuitSig& signal_quit();
+
+  /** KeySnooper signal
+   * Allows you to channel keypresses to a signal handler
+   * without registering with the widget.
+   *
+   * @param GtkWidget* widget.
+   * @param GdkEventAny& event
+   * @return int
+   *
+   * It is the responsibility of the snooper to pass the keypress
+   * to the widget, however, care must be taken that the keypress is
+   * not passed twice.
+   */
+  static KeySnooperSig& signal_key_snooper();
+
+  // Initialize table of wrap_new functions.
+  // Doesn't need an instance of Gtk::Main.
+  static void init_gtkmm_internals();
+
+protected:
+  Main();
+
+  void init(int* argc, char*** argv, bool set_locale);
+
+  virtual void run_impl();
+  virtual void quit_impl();
+  virtual guint level_impl();
+  virtual void iteration_impl(bool blocking);
+  virtual bool events_pending_impl();
+
+  // Signal handlers:
+  virtual void on_window_hide();
+
+  // Signal proxies:
+  static RunSig         signal_run_;
+  static QuitSig        signal_quit_;
+  static KeySnooperSig  signal_key_snooper_;
+
+private:
+  static Main* instance_;
+};
+
+} // namespace Gtk
+

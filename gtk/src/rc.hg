@@ -1,0 +1,127 @@
+/* $Id$ */
+
+/* Copyright (C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#m4begin
+
+m4_define(`_RCSTYLE_MEMBER_COLOR',`dnl
+void set_$1(StateType state, const Gdk::Color& color);
+  Gdk::Color get_$1(StateType state) const;
+_PUSH(SECTION_CC)
+void RcStyle::set_$1(StateType state, const Gdk::Color& color)
+{
+  gobj()->$1[state] = *color.gobj();
+}
+
+Gdk::Color RcStyle::get_$1(StateType state) const
+{
+  return Gdk::Color(const_cast<GdkColor*>(&gobj()->$1[state]), true);
+}
+
+_POP()
+')dnl
+
+#m4end
+
+//#include <gtkmm/settings.h>
+#include <gtkmm/style.h>
+
+
+namespace Gtk
+{
+
+class Widget;
+class Settings;
+class Style;
+
+_CC_INCLUDE(gtk/gtktypebuiltins.h)
+_WRAP_ENUM(RcFlags, GtkRcFlags)
+
+
+class RcStyle : public Glib::Object
+{
+  _CLASS_GOBJECT(RcStyle, GtkRcStyle, GTK_RC_STYLE, Glib::Object, GObject)
+  _IGNORE(gtk_rc_style_ref, gtk_rc_style_unref)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_CREATE()
+  _WRAP_METHOD(Glib::RefPtr<RcStyle> copy() const, gtk_rc_style_copy)
+
+  void set_name(const Glib::ustring& name);
+  _MEMBER_GET(name, name, Glib::ustring, const char*)
+
+  void set_bg_pixmap_name(StateType state, const Glib::ustring& name);
+  Glib::ustring get_bg_pixmap_name(StateType state) const;
+
+  void set_font(const Pango::FontDescription& font_desc);
+  Pango::FontDescription get_font() const;
+ 
+  void set_color_flags(StateType state, RcFlags flags);
+  void unset_color_flags(StateType state, RcFlags flags);
+  RcFlags get_color_flags(StateType state) const;
+
+  _RCSTYLE_MEMBER_COLOR(fg)
+  _RCSTYLE_MEMBER_COLOR(bg)
+  _RCSTYLE_MEMBER_COLOR(text)
+  _RCSTYLE_MEMBER_COLOR(base)
+
+  void set_xthickness(int xthickness);
+  _MEMBER_GET(xthickness, xthickness, int, gint)
+
+  void set_ythickness(int ythickness);
+  _MEMBER_GET(ythickness, ythickness, int, gint)
+};
+
+
+class RC
+{
+public:
+  RC(const Glib::ustring& filename);
+
+  static Glib::RefPtr<Style> get_style(const Widget& widget);
+
+  static void parse_string(const Glib::ustring &rc_string);
+  
+  static void add_default_file(const Glib::ustring& filename);
+  static void set_default_files(const Glib::StringArrayHandle& filenames);
+
+  static Glib::StringArrayHandle get_default_files();
+
+  // deprecated:
+  //static void add_widget_name_style(const Glib::RefPtr<const RcStyle>& style, const Glib::ustring& pattern);
+  //static void add_widget_class_style(const Glib::RefPtr<const RcStyle>& style, const Glib::ustring& pattern);
+  //static void add_class_style(const Glib::RefPtr<const RcStyle>& style, const Glib::ustring& pattern);
+
+  static bool reparse_all();
+
+  static Glib::ustring find_pixmap_in_path(const Glib::RefPtr<Settings>& settings, GScanner* scanner, const Glib::ustring& pixmap_file);
+  static Glib::ustring find_module_in_path(const Glib::ustring& pixmap_file);
+
+  static Glib::ustring get_theme_dir();
+  static Glib::ustring get_module_dir();
+  
+};
+
+} // namespace Gtk
+

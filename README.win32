@@ -1,0 +1,92 @@
+Building gtkmm on Win32
+===========================
+
+Currently, only the mingw (native win32) gcc compiler is supported
+through the gnu autotools (automake, autoconf, libtool). As explicitly
+stated in the gtk+ for win32 distribution (http://www.gimp.org/win32),
+the gcc compiler provided by the cygwin distribution should not be
+used to build gtk+/gtkmm libraries and/or applications (see the
+README.win32 that comes with the gtk+ DLLs). This MIGHT cause
+conflicts between the cygwin and msvcrt runtime environments.
+
+1. Mingw
+
+The mingw distribution which has been tested with this release is the following
+
+MinGW-1.1 as the base distribution plus the update packages :
+mingw-runtime-1.3
+binutils-2_12_90-20020518-1
+w32api-1.4-2
+
+The bare mingw distribution does not provide the necessary tools (sh, perl, m4
+, autoconf, automake, ..) to run the provided configure script "as is". One 
+(currently non supported) solution is to use mingw in conjunction with msys,
+which is readily available on the mingw website (http://www.mingw.org/).
+
+The preferred method is to combine the cygwin distribution (for the unix tools
+that were mentioned above) with mingw by making sure that the mingw
+tools (gcc, ld, dlltool, ..) are called first.
+
+First, make sure that you have working distribution of the native port
+of both libsigc++-1.1.x gtk+-2.0 on win32 (see
+http://www.gimp.org/win32). If you can't compile a simple gtk+ example
+using gcc and `pkg-config --cflags --libs`, you should not even think
+about trying to compile gtkmm, let alone using precompiled libgtkmm
+DLLs to port your gtkmm application !
+
+The configure script can then be called using (as an example) the
+following options
+
+./configure --prefix=/target --build=i386-pc-mingw32 --disable-static
+
+then
+
+make
+make check
+make install
+
+Because Dll support with libtool on the mingw32 platform is fairly recent, it 
+requires developement version of autoconf/automake and libtool, as provided by
+the autotools-devel package in the cygwin distribution. Currently, this means
+
+libtool : 1.4.2
+automake : 1.5b
+autoconf : 2.52
+
+IMPORTANT WARNING : the libtool scripts contained in the source distribution
+of the library might not be recent enough to support dll creation. It will 
+create a static library instead. The main reason for this situation
+comes from the fact that the gnome distribution uses the last stable
+releases of the autotools, as opposed to their development (cvs)
+versions. Therefore, it is recommended to always checked the version
+of libtool that is being used when compiling libsigc++ on win32 by calling
+
+libtool --version 
+
+once it has be created by the configure script.
+
+If libtool is too old, it will be necessary to overwrite it using 
+
+libtoolize --force 
+
+from the cygwin autotools-devel package (usually located on 
+/usr/autotools/devel), followed by
+
+aclocal
+automake
+autoconf
+
+before running the configure script again.
+
+In the future, a specially tuned source distribution along with a binary 
+package might be provided for mingw.
+
+3. Oher compilers (MSVC, borland)
+
+While some compiler options are present in sigc++/config/sigcconfig.h.in,
+other compilers are currently not supported but anyone is free to give it 
+a try ! 
+
+
+
+

@@ -1,0 +1,102 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace
+{
+
+// This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_Compare
+{
+public:
+  typedef Gtk::TreeSortable::SlotCompare SlotType;
+
+  explicit SignalProxy_Compare(const SlotType& slot);
+  ~SignalProxy_Compare();
+
+  static int  gtk_callback(GtkTreeModel* model, GtkTreeIter* lhs, GtkTreeIter* rhs, void* data);
+  static void gtk_callback_destroy(void* data);
+
+private:
+  SlotType slot_;
+};
+
+SignalProxy_Compare::SignalProxy_Compare(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_Compare::~SignalProxy_Compare()
+{}
+
+int SignalProxy_Compare::gtk_callback(GtkTreeModel* model, GtkTreeIter* lhs, GtkTreeIter* rhs, void* data)
+{
+  SignalProxy_Compare *const self = static_cast<SignalProxy_Compare*>(data);
+
+  try
+  {
+    // use Slot::operator()
+    return (self->slot_)(Gtk::TreeIter(model, lhs), Gtk::TreeIter(model, rhs));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0;
+}
+
+void SignalProxy_Compare::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_Compare*>(data);
+}
+
+} // anonymous namespace
+
+
+namespace Gtk
+{
+
+void TreeSortable::set_sort_func(int sort_column_id, const SlotCompare& slot)
+{
+  SignalProxy_Compare *const pSignalProxy = new SignalProxy_Compare(slot);
+
+  gtk_tree_sortable_set_sort_func(
+      gobj(), sort_column_id,
+      &SignalProxy_Compare::gtk_callback, pSignalProxy,
+      &SignalProxy_Compare::gtk_callback_destroy);
+}
+
+void TreeSortable::set_sort_func(const Gtk::TreeModelColumnBase& sort_column_id, const SlotCompare& slot)
+{
+  set_sort_func(sort_column_id.index(), slot);
+}
+
+void TreeSortable::set_default_sort_func(const SlotCompare& slot)
+{
+  SignalProxy_Compare *const pSignalProxy = new SignalProxy_Compare(slot);
+
+  return gtk_tree_sortable_set_default_sort_func(
+      gobj(),
+      &SignalProxy_Compare::gtk_callback, pSignalProxy,
+      &SignalProxy_Compare::gtk_callback_destroy);
+}
+
+} // namespace Gtk
+

@@ -1,0 +1,371 @@
+# Configure.in
+#
+#  This file tests for various compiler features needed to configure 
+#  the gtkmm package.  Original skeleton was provided by Stephan Kulow.
+#  All tests were written by Tero Pulkkinen, Mirko Streckenbach, and 
+#  Karl Nelson.
+#
+#  NOTE! IF YOU DO CHANGES HERE, CHECK IF YOU NEED TO MODIFY .m4 TOO!!!
+#
+#  Copyright 2001 Free Software Foundation
+#  Copyright 1999 gtkmm Development Team
+#  Copyright 1998 Stephan Kulow 
+#
+AC_INIT(gtk/gtkmmconfig.h.in)
+AC_PREREQ(2.50)
+
+#########################################################################
+#  Version and initialization
+#########################################################################
+GTKMM_MAJOR_VERSION=2
+GTKMM_MINOR_VERSION=2
+GTKMM_MICRO_VERSION=0
+GTKMM_VERSION=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION.$GTKMM_MICRO_VERSION
+GTKMM_RELEASE=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION
+AC_DEFINE_UNQUOTED(GTKMM_MAJOR_VERSION, $GTKMM_MAJOR_VERSION)
+AC_DEFINE_UNQUOTED(GTKMM_MINOR_VERSION, $GTKMM_MINOR_VERSION)
+AC_DEFINE_UNQUOTED(GTKMM_MICRO_VERSION, $GTKMM_MICRO_VERSION)
+AC_SUBST(GTKMM_VERSION)
+AC_SUBST(GTKMM_RELEASE)
+
+#
+# +1 : ? : +1  == new interface that does not break old one
+# +1 : ? : 0   == new interface that breaks old one
+#  ? : ? : 0   == no new interfaces, but breaks apps
+#  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
+#                 better
+# CURRENT : REVISION : AGE
+LIBGTKMM_SO_VERSION=6:0:5
+AC_SUBST(LIBGTKMM_SO_VERSION)
+
+AC_CONFIG_AUX_DIR(scripts)
+
+dnl For automake.
+VERSION=$GTKMM_VERSION
+PACKAGE=gtkmm
+
+dnl Initialize automake stuff
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+dnl Specify a configuration file (no autoheader)
+AM_CONFIG_HEADER(config.h glib/glibmmconfig.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h)
+AM_MAINTAINER_MODE
+AL_ACLOCAL_INCLUDE(scripts)
+
+
+#########################################################################
+#  Configure arguments 
+#########################################################################
+
+#########################################################################
+#  Environment Checks
+#########################################################################
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_MAKE_SET
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+
+dnl Used for enabling the "-no-undefined" flag while generating DLLs
+dnl Copied from the official gtk+-2 configure.in
+AC_MSG_CHECKING([for some Win32 platform])
+case "$host" in
+  *-*-mingw*|*-*-cygwin*)
+    platform_win32=yes
+    ;;
+  *)
+    platform_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$platform_win32])
+AM_CONDITIONAL(PLATFORM_WIN32, test "$platform_win32" = "yes")
+
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    os_win32=yes
+    LIBSTDCPP_LIBS=-lstdc++
+    ;;
+  *)
+    os_win32=no
+    LIBSTDCPP_LIBS=
+    ;;
+esac
+AC_SUBST(LIBSTDCPP_LIBS)
+AC_MSG_RESULT([$os_win32])
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+
+AC_DISABLE_STATIC
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
+SUN m4 does not work for building gtkmm. 
+Please install GNU m4.]))
+
+AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
+SUN make does not work for building gtkmm.
+Please install GNU make.]))
+
+GTKMM_CHECK_PERL([5.6.0])
+
+#########################################################################
+#  Function checks
+#########################################################################
+
+# functions used in demos/gtk-demo. Undefined in config.h !
+AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked])
+
+#########################################################################
+#  Dependancy checks
+#########################################################################
+gtkmm_min_sigc_version=1.2.0
+gtkmm_min_glib_version=2.2.0
+gtkmm_min_gtk_version=2.2.0
+
+PKG_CHECK_MODULES(GLIBMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version})
+AC_SUBST(GLIBMM_CFLAGS)
+AC_SUBST(GLIBMM_LIBS)
+
+# gthread isn't a requirement, but we should use its CFLAGS if available.
+PKG_CHECK_MODULES(GTHREAD, gthread-2.0 >= ${gtkmm_min_glib_version},[],[GTHREAD_CFLAGS=''; GTHREAD_LIBS=''])
+AC_SUBST(GTHREAD_CFLAGS)
+AC_SUBST(GTHREAD_LIBS)
+
+PKG_CHECK_MODULES(ATKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} atk >= 1.0.0)
+AC_SUBST(ATKMM_CFLAGS)
+AC_SUBST(ATKMM_LIBS)
+
+PKG_CHECK_MODULES(PANGOMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} pango >= 1.0.0)
+AC_SUBST(PANGOMM_CFLAGS)
+AC_SUBST(PANGOMM_LIBS)
+
+# gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
+PKG_CHECK_MODULES(GDKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+AC_SUBST(GDKMM_CFLAGS)
+AC_SUBST(GDKMM_LIBS)
+
+PKG_CHECK_MODULES(GTKMM, sigc++-1.2 >= ${gtkmm_min_sigc_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+AC_SUBST(GTKMM_CFLAGS)
+AC_SUBST(GTKMM_LIBS)
+
+#########################################################################
+#  C++ checks
+#########################################################################
+AC_PROG_CXX
+
+# Ensure MSVC-compatible struct packing convention is used when
+# compiling for Win32 with gcc.
+# What flag to depends on gcc version: gcc3 uses "-mms-bitfields", while
+# gcc2 uses "-fnative-struct".
+if test x"$os_win32" = xyes; then
+  if test x"$GCC" = xyes -a x"$GXX" = xyes; then
+    msnative_struct=''
+    AC_MSG_CHECKING([how to get MSVC-compatible struct packing])
+    if test -z "$ac_cv_prog_CC"; then
+      our_gcc="$CC"
+    else
+      our_gcc="$ac_cv_prog_CC"
+    fi
+    case `$our_gcc --version | sed -e 's,\..*,.,' -e q` in
+      2.)
+	if $our_gcc -v --help 2>/dev/null | grep fnative-struct >/dev/null; then
+	  msnative_struct='-fnative-struct'
+	fi
+	;;
+      *)
+	if $our_gcc -v --help 2>/dev/null | grep ms-bitfields >/dev/null; then
+	  msnative_struct='-mms-bitfields'
+	fi
+	;;
+    esac
+    if test x"$msnative_struct" = x ; then
+      AC_MSG_RESULT([no way])
+      AC_MSG_WARN([produced libraries might be incompatible with MSVC-compiled code])
+    else
+      CXXFLAGS="$CXXFLAGS $msnative_struct"
+      AC_MSG_RESULT([${msnative_struct}])
+    fi
+  fi
+fi
+
+AC_LANG_CPLUSPLUS
+
+AC_CXX_BOOL(,config_error=yes)
+AC_CXX_NAMESPACES(,config_error=yes)
+AC_CXX_MUTABLE(,config_error=yes)
+
+AC_MSG_CHECKING(if C++ environment provides all required features)
+if test "x$config_error" = xyes ; then
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Your compiler is not powerful enough to compile gtkmm. If it should be, see config.log for more information of why it failed.])
+fi
+AC_MSG_RESULT([yes])
+
+GTKMM_CXX_HAS_NAMESPACE_STD()
+GTKMM_CXX_HAS_STD_ITERATOR_TRAITS()
+GTKMM_CXX_HAS_SUN_REVERSE_ITERATOR()
+GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS()
+GTKMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES()
+
+# Create a list of input directories for Doxygen.
+GTKMM_DOXYGEN_INPUT_SUBDIRS([glib pango atk gdk gtk])
+
+# Check whether to build the full docs into the generated source.
+# This will be much slower.
+GTKMM_ARG_ENABLE_FULLDOCS()
+
+# Check whether --enable-debug-refcounting was given.
+GTKMM_ARG_ENABLE_DEBUG_REFCOUNTING()
+
+# Evaluate the --enable-warnings=level option.
+GTKMM_ARG_ENABLE_WARNINGS()
+
+# Dummy conditional just to make automake-1.4 happy.
+# We need an always-false condition in docs/Makefile.am.
+AM_CONDITIONAL(GTKMM_FALSE,[false])
+
+# HACK:  Assign a dummy in order to prevent execution of autoheader by the
+# maintainer-mode rules.  That would fail since we aren't using autoheader.
+AUTOHEADER=':'
+
+
+AC_CONFIG_FILES([
+  Makefile
+  gtkmm.spec
+
+  glib/Makefile
+  glib/glibmm-2.0.pc
+    glib/src/Makefile
+    glib/glibmm/Makefile
+      glib/glibmm/private/Makefile
+
+  atk/Makefile
+  atk/atkmm-1.0.pc
+    atk/src/Makefile
+    atk/atkmm/Makefile
+      atk/atkmm/private/Makefile
+
+  gdk/Makefile
+  gdk/gdkmm-2.0.pc
+    gdk/src/Makefile
+    gdk/gdkmm/Makefile
+      gdk/gdkmm/private/Makefile
+
+  gtk/Makefile
+  gtk/gtkmm-2.0.pc
+    gtk/src/Makefile
+    gtk/gtkmm/Makefile
+      gtk/gtkmm/private/Makefile
+
+  pango/Makefile
+  pango/pangomm-1.0.pc
+    pango/src/Makefile
+    pango/pangomm/Makefile
+      pango/pangomm/private/Makefile
+
+  tools/Makefile
+  tools/gtkmmproc
+  tools/generate_wrap_init.pl
+    tools/m4/Makefile
+    tools/pm/Makefile
+    tools/extra_defs_gen/Makefile
+])
+
+AC_CONFIG_FILES([
+  tests/Makefile
+    tests/child_widget/Makefile
+    tests/child_widget2/Makefile
+    tests/child_widget_managed/Makefile
+    tests/dispatcher/Makefile
+    tests/glibmm_value/Makefile
+    tests/refcount_dialog/Makefile
+    tests/dialog/Makefile
+    tests/dialog_deletethis/Makefile
+    tests/delete_cpp_child/Makefile
+    tests/scrolledwindow/Makefile
+
+  examples/Makefile
+    examples/arrow/Makefile
+    examples/base/Makefile
+    examples/book/Makefile
+      examples/book/alignment/Makefile
+      examples/book/aspectframe/Makefile
+      examples/book/box/Makefile
+      examples/book/buttonbox/Makefile
+      examples/book/buttons/Makefile
+        examples/book/buttons/button/Makefile
+        examples/book/buttons/checkbutton/Makefile
+        examples/book/buttons/radiobutton/Makefile
+        examples/book/buttons/togglebutton/Makefile
+    examples/book/clipboard/Makefile
+      examples/book/clipboard/simple/Makefile
+      examples/book/clipboard/ideal/Makefile
+    examples/book/combo/Makefile
+    examples/book/dialogs/Makefile
+        examples/book/dialogs/colorselectiondialog/Makefile
+        examples/book/dialogs/fileselection/Makefile
+        examples/book/dialogs/fontselectiondialog/Makefile
+        examples/book/dialogs/messagedialog/Makefile
+        examples/book/dialogs/simple/Makefile
+      examples/book/drag_and_drop/Makefile
+      examples/book/drawingarea/Makefile
+      examples/book/entry/Makefile
+      examples/book/eventbox/Makefile
+      examples/book/frame/Makefile
+      examples/book/helloworld/Makefile
+      examples/book/helloworld2/Makefile
+      examples/book/label/Makefile
+      examples/book/menus/Makefile
+        examples/book/menus/main_menu/Makefile
+        examples/book/menus/popup/Makefile
+      examples/book/notebook/Makefile
+      examples/book/paned/Makefile
+      examples/book/progressbar/Makefile
+      examples/book/range_widgets/Makefile
+      examples/book/scrolledwindow/Makefile
+      examples/book/signals/Makefile
+        examples/book/signals/custom/Makefile
+      examples/book/spinbutton/Makefile
+      examples/book/table/Makefile
+      examples/book/textview/Makefile
+      examples/book/timeout/Makefile
+      examples/book/toolbar/Makefile
+      examples/book/treeview/Makefile
+        examples/book/treeview/editable_cells/Makefile
+        examples/book/treeview/list/Makefile
+        examples/book/treeview/tree/Makefile
+        examples/book/treeview/drag_and_drop/Makefile
+    examples/calendar/Makefile
+    examples/cellrenderercustom/Makefile
+    examples/dnd/Makefile
+    examples/exception/Makefile
+    examples/filesel/Makefile
+    examples/fixed/Makefile
+    examples/gdk/Makefile
+    examples/idle/Makefile
+    examples/markup/Makefile
+    examples/rulers/Makefile
+    examples/statusbar/Makefile
+    examples/stock/Makefile
+    examples/thread/Makefile
+    examples/tictactoe/Makefile
+    examples/window/Makefile
+
+  demos/Makefile
+    demos/gtk-demo/Makefile
+
+  scripts/Makefile
+
+  docs/Makefile
+    docs/FAQ/Makefile
+    docs/images/Makefile
+    docs/tutorial/Makefile
+    docs/tutorial/figures/Makefile
+    docs/reference/Makefile
+    docs/reference/Doxyfile
+    docs/internal/Makefile
+])
+
+AC_OUTPUT()
+

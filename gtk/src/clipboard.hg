@@ -1,0 +1,126 @@
+/* $Id$ */
+
+/* accelgroup.h
+ * 
+ * Copyright (C) 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+ 
+#include <gdkmm/display.h>
+#include <gtkmm/targetentry.h>
+#include <gtkmm/selectiondata.h>
+#include <glibmm/object.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+
+namespace Gtk
+{
+
+class Clipboard : public Glib::Object
+{
+   _CLASS_GOBJECT(Clipboard, GtkClipboard, GTK_CLIPBOARD, Glib::Object, GObject)
+
+public:
+
+  _WRAP_METHOD(static Glib::RefPtr<Clipboard> get(GdkAtom selection = GDK_SELECTION_CLIPBOARD), gtk_clipboard_get, refreturn)
+  _WRAP_METHOD(static Glib::RefPtr<Clipboard> get_for_display(const Glib::RefPtr<Gdk::Display>& display, GdkAtom selection = GDK_SELECTION_CLIPBOARD), gtk_clipboard_get_for_display, refreturn)
+
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Display> get_display(), gtk_clipboard_get_display, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Display> get_display() const, gtk_clipboard_get_display, refreturn)
+
+  /// e.g.: void on_get(Gtk::SelectionData& selection_data, guint info);
+  typedef SigC::Slot2<void, SelectionData&, guint> SlotGet;
+
+  /// e.g.: void on_clear();
+  typedef SigC::Slot0<void> SlotClear;
+
+ /**
+  * Virtually sets the contents of the specified clipboard by providing
+  * a list of supported formats for the clipboard data and a function
+  * to call to get the actual data when it is requested.
+  *
+  * @param targets Information about the available forms for the clipboard data.
+  * @param slot_get method to call to get the actual clipboard data.
+  * @param slot_clear When the clipboard contents are set again, this method will
+  *              be called, and slot_get will not be subsequently called.
+  *
+  * @return true if setting the clipboard data succeeded. If setting
+  *               the clipboard data failed then the provided callback methods
+  *               will be ignored.
+  */
+  bool set(const ArrayHandle_TargetEntry& targets, const SlotGet& slot_get, const SlotClear& slot_clear);
+  _IGNORE(gtk_clipboard_set_with_owner, gtk_clipboard_set_with_data)
+  
+  _WRAP_METHOD(Glib::RefPtr<Glib::Object> get_owner(), gtk_clipboard_get_owner)
+  _WRAP_METHOD(Glib::RefPtr<const Glib::Object> get_owner() const, gtk_clipboard_get_owner)
+
+  /**
+  * Clears the contents of the clipboard. Generally this should only
+  * be called between the time you call set()
+  * and when the slot_clear you supplied is called. Otherwise, the
+  * clipboard may be owned by someone else.
+  */
+  _WRAP_METHOD(void clear(), gtk_clipboard_clear)
+
+  /**
+   * Sets the contents of the clipboard to the given UTF-8 string. GTK+ will
+   * make a copy of the text and take responsibility for responding
+   * for requests for the text, and for converting the text into
+   * the requested format.
+   *
+   * @param text  A UTF-8 string.
+   *
+   */
+  void set_text(const Glib::ustring& text);
+  _IGNORE(gtk_clipboard_set_text)
+
+  /// e.g.: void on_received(const SelectionData& selection_data);
+  typedef SigC::Slot1<void, const SelectionData&> SlotReceived;
+  void request_contents(const Glib::ustring& target, const SlotReceived& slot);
+  _IGNORE(gtk_clipboard_request_contents)
+
+  /* This requests the special "TARGETS" target.
+   * Call Gtk::SelectionData::get_targets() on the selection_data provided to the callback,
+   *  to see what targets are available.
+   */
+  void request_targets(const SlotReceived& slot);
+  
+  /// e.g.: void on_textreceived(const Glib::ustring& text);
+  typedef SigC::Slot1<void, const Glib::ustring&> SlotTextReceived;
+  void request_text(const SlotTextReceived& slot);
+  _IGNORE(gtk_clipboard_request_text)
+               
+  /**
+   * Requests the contents of the clipboard using the given target.
+   * This function waits for the data to be received using the main
+   * loop, so events, timeouts, etc, may be dispatched during the wait.
+   *
+   * @param target The form into which the clipboard owner should convert the selection.
+   *
+   * @return A GtkSelectionData object, which will be invalid if retrieving the given target failed. 
+   **/
+  SelectionData wait_for_contents(const Glib::ustring& target) const;
+  _IGNORE(gtk_clipboard_wait_for_contents)
+
+  _WRAP_METHOD(Glib::ustring wait_for_text() const, gtk_clipboard_wait_for_text)
+  _WRAP_METHOD(bool wait_is_text_available() const, gtk_clipboard_wait_is_text_available)
+};
+
+} /* namespace Gtk */
+

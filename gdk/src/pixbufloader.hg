@@ -1,0 +1,103 @@
+/* $Id$ */
+
+/* Copyright (C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <gdkmm/pixbuf.h>
+#include <gdkmm/pixbufanimation.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+
+namespace Gdk
+{
+
+class PixbufLoader : public Glib::Object
+{
+  _CLASS_GOBJECT(PixbufLoader, GdkPixbufLoader, GDK_PIXBUF_LOADER, Glib::Object, GObject)
+protected:
+
+  /** Constructs a pixbuf loader object.
+   */
+  _CTOR_DEFAULT()
+
+  /** Constructs a pixbuf loader object for a specific image type.
+   * Constructs a new pixbuf loader object that always attempts to parse image
+   * data as if it were an image of type @a image_type, instead of identifying
+   * the type automatically. Useful if you want an error if the image isn't the
+   * expected type, for loading image formats that can't be reliably identified
+   * by looking at the data, or if the user manually forces a specific type.
+   * @param image_type Name of the image format to be loaded with the image.
+   * @throw Gdk::PixbufError
+   */
+  explicit PixbufLoader(const Glib::ustring& image_type);
+
+public:
+
+  /** Creates a new pixbuf loader object.
+   * @return A newly-created pixbuf loader.
+   */
+  _WRAP_CREATE()
+
+  /** Creates a new pixbuf loader object for a specific image type.
+   * Creates a new pixbuf loader object that always attempts to parse image
+   * data as if it were an image of type @a image_type, instead of identifying
+   * the type automatically. Useful if you want an error if the image isn't the
+   * expected type, for loading image formats that can't be reliably identified
+   * by looking at the data, or if the user manually forces a specific type.
+   * @param image_type Name of the image format to be loaded with the image.
+   * @return A newly-created pixbuf loader.
+   * @throw Gdk::PixbufError
+   */
+  _WRAP_CREATE(const Glib::ustring& image_type)
+
+  /** Causes the pixbuf loader to parse the next @a count bytes of an image.
+   * It will return if the data was loaded successfully, and throw an exception
+   * if an error occurred. In the latter case, the loader will be closed, and
+   * will not accept further writes.
+   * @param buf Pointer to image data.
+   * @param count Length of the @a buf buffer in bytes.
+   * @throw Gdk::PixbufError
+   * @throw Glib::FileError
+   */
+  void write(const guint8* buf, gsize count);
+  _IGNORE(gdk_pixbuf_loader_write)
+
+  /** Informs a pixbuf loader that no further writes with PixbufLoader::write()
+   * will occur, so that it can free its internal loading structures.  Also,
+   * tries to parse any data that hasn't yet been parsed; if the remaining data
+   * is partial or corrupt, an exception will be thrown. If you're just
+   * cancelling a load rather than expecting it to be finished, writing an
+   * empty <tt>catch()</tt> block to ignore errors is reasonable.
+   * @throw Gdk::PixbufError
+   * @throw Glib::FileError
+   */
+  void close();
+  _IGNORE(gdk_pixbuf_loader_close)
+
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(), gdk_pixbuf_loader_get_pixbuf, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::PixbufAnimation> get_animation(), gdk_pixbuf_loader_get_animation, refreturn)
+
+  _WRAP_SIGNAL(void area_prepared(), "area_prepared")
+  _WRAP_SIGNAL(void area_updated(int x, int y, int width, int height), "area_updated")
+  _WRAP_SIGNAL(void closed(), "closed")
+};
+
+} // namespace Gdk
+

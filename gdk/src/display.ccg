@@ -1,0 +1,83 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/*
+ *
+ * Copyright 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gdkmm/window.h>
+#include <gdk/gdkdisplay.h>
+
+namespace Gdk
+{
+
+bool Display::set_selection_owner(const Glib::RefPtr<Window>& owner, GdkAtom selection, guint32 time_, bool send_event)
+{
+  return gdk_selection_owner_set_for_display(gobj(), owner->gobj(), selection, time_, (gboolean)send_event);
+}
+
+Glib::RefPtr<Window> Display::get_selection_owner(GdkAtom selection)
+{
+  return Glib::wrap( (GdkWindowObject*)gdk_selection_owner_get_for_display(gobj(), selection) , true);
+}
+
+void Display::selection_send_notify(guint32 requestor, GdkAtom selection, GdkAtom target, GdkAtom property, guint32 time_)
+{
+  gdk_selection_send_notify_for_display(gobj(), requestor, selection, target, property, time_);
+}
+
+void Display::get_pointer(Glib::RefPtr<Screen>& screen, int& x, int& y, ModifierType& mask)
+{
+  GdkScreen* cScreen = 0;
+  GdkModifierType cMask = (GdkModifierType)mask;
+  gdk_display_get_pointer(gobj(), &cScreen, &x, &y, &cMask);
+  screen = Glib::wrap(cScreen);
+  mask = (ModifierType)cMask;
+}
+
+void Display::get_pointer(int& x, int& y, ModifierType& mask)
+{
+  GdkModifierType cMask = (GdkModifierType)mask;
+  gdk_display_get_pointer(gobj(), 0, &x, &y, &cMask);
+  mask = (ModifierType)cMask;
+}
+
+
+Glib::RefPtr<Window> Display::get_window_at_pointer()
+{
+
+  Glib::RefPtr<Window> retvalue = Glib::wrap((GdkWindowObject*)(gdk_display_get_window_at_pointer(gobj(), 0, 0)));
+
+  if(!(retvalue.is_null()))
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+Glib::RefPtr<const Window> Display::get_window_at_pointer() const
+{
+
+  Glib::RefPtr<const Window> retvalue = Glib::wrap((GdkWindowObject*)(gdk_display_get_window_at_pointer(const_cast<GdkDisplay*>(gobj()), 0, 0)));
+
+  if(!(retvalue.is_null()))
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+} //Gdk
+
+

@@ -1,0 +1,52 @@
+This should help people with some of the first problems that they are likely
+to find when porting apps from gtkmm 1.2 to gtkmm 2:
+
+Some of these are explained in more details in the CHANGES file.
+
+* Use pkg-config checks instead of the various old .m4 macros:
+  See the gtkmm_hello package:
+  http://cvs.gnome.org/lxr/source/gnomemm/gtkmm_hello/configure.in#29
+* Replace gtk-- 1.2 includes with gtkmm2 includes:
+  e.g. #include <gtkmm/button.h> instead of <gtk--/button.h>
+* Use new signal connection syntax:
+   e.g. change
+   button.clicked.connect(
+   to
+   button.signal_clicked().connect(
+* Use new SigC::slot() syntax:
+   e.g. change
+   button.signal_clicked().connect(SigC::slot(this
+   to
+   button.signal_clicked().connect(SigC::slot(*this
+                                              ^^^^^
+* Change virtual methods overrides used for signal handling from
+  signalname_impl() to on_signalname().
+* Do not connect to a Gtk::Window's "destroy" signal.
+* You do not need to connect to Gtk::Window's "delete_event" signal just to
+  prevent self-destruction of the window, or to quit the application 
+  appropriately. In most cases you should just use the new 
+  Gtk::Main::run(window) override that shows the window and quits when it
+  is hidden.
+* Change Gtk::Widget::set_usize() to Gtk::Widget::set_size_request() or Gtk::Window::set_default_size().
+* Change Gtk::Window::set_policy() to set_resizable().
+* Change Gtk::wrap() to Glib::wrap(), and gtkobj() to gobj().
+* Change Gtk::Pixmap to Gtk::Image
+* Change enums from GTK_FOO to Gtk::FOO and GDK_FOO to Gdk::FOO.
+* Gtk::Notebook: Change set_page() to set_current_page()
+* Container STL-style interfaces: items are now references rather than pointers.
+    For instance, change
+      menuList[i]->somemethod() to
+      menuList[i[.somemethod()
+
+* Replace Gtk::Text with Gtk::TextView.
+* Replace Gtk::CList and Gtk::CTree with Gtk::TreeView.
+* See the GTK+ 2 C porting guide:
+    http://developer.gnome.org/doc/API/2.0/gtk/gtk-changes-2-0.html
+  amd the GNOME2 C porting guide:
+    http://developer.gnome.org/dotplan/porting/
+
+
+gnomemm:
+* Replace use of Gnome::Dialog with Gtk::MessageDialog.
+* Replace use of Gnome::PropertyBox with a similar, but custom Window
+  class.

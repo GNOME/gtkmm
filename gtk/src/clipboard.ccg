@@ -1,0 +1,236 @@
+// -*- c++ -*-
+/* $Id$ */
+
+/* 
+ *
+ * Copyright 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtkmm/selectiondata_private.h>
+#include <gtk/gtkclipboard.h>
+
+namespace
+{
+
+// SignalProxy_GetClear:
+// This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_GetClear
+{
+public:
+  SignalProxy_GetClear(const Gtk::Clipboard::SlotGet& slot_get,
+                       const Gtk::Clipboard::SlotClear& slot_clear);
+  ~SignalProxy_GetClear();
+
+  static void gtk_callback_get(GtkClipboard* clipboard, GtkSelectionData* selection_data,
+                               unsigned int info, void* data);
+  static void gtk_callback_clear(GtkClipboard* clipboard, void* data);
+
+protected:
+  Gtk::Clipboard::SlotGet   slot_get_;
+  Gtk::Clipboard::SlotClear slot_clear_;
+};
+
+SignalProxy_GetClear::SignalProxy_GetClear(const Gtk::Clipboard::SlotGet& slot_get,
+                                           const Gtk::Clipboard::SlotClear& slot_clear)
+:
+  slot_get_   (slot_get),
+  slot_clear_ (slot_clear)
+{}
+
+SignalProxy_GetClear::~SignalProxy_GetClear()
+{}
+
+void SignalProxy_GetClear::gtk_callback_get(GtkClipboard*, GtkSelectionData* selection_data,
+                                            unsigned int info, void* data)
+{
+  SignalProxy_GetClear *const self = static_cast<SignalProxy_GetClear*>(data);
+
+  try
+  {
+    Gtk::SelectionData_WithoutOwnership cppSelectionData(selection_data);
+    (self->slot_get_)(cppSelectionData, info);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+void SignalProxy_GetClear::gtk_callback_clear(GtkClipboard*, void* data)
+{
+  SignalProxy_GetClear *const self = static_cast<SignalProxy_GetClear*>(data);
+
+  try
+  {
+    (self->slot_clear_)();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete self; // After this callback has been called, none of the 2 callbacks will be called again.
+
+  //This might leak the last SignalProxy_GetClear(), but only the last one,
+  //because clear() is called when set() is called again.
+}
+
+
+// SignalProxy_Received:
+// This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_Received
+{
+public:
+  typedef Gtk::Clipboard::SlotReceived SlotType;
+
+  SignalProxy_Received(const SlotType& slot);
+  ~SignalProxy_Received();
+
+  static void gtk_callback(GtkClipboard* clipboard, GtkSelectionData* selection_data, gpointer data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_Received::SignalProxy_Received(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_Received::~SignalProxy_Received()
+{}
+
+void SignalProxy_Received::gtk_callback(GtkClipboard*, GtkSelectionData* selection_data, void* data)
+{
+  SignalProxy_Received *const self = static_cast<SignalProxy_Received*>(data);
+
+  try
+  {
+    Gtk::SelectionData cppSelectionData(selection_data, true /*take_copy=true*/); 
+    (self->slot_)(cppSelectionData);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete self;
+}
+
+
+// SignalProxy_TextReceived:
+// This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+class SignalProxy_TextReceived
+{
+public:
+  typedef Gtk::Clipboard::SlotTextReceived SlotType;
+
+  SignalProxy_TextReceived(const SlotType& slot);
+  ~SignalProxy_TextReceived();
+
+  static void gtk_callback(GtkClipboard* clipboard, const char* text, void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_TextReceived::SignalProxy_TextReceived(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_TextReceived::~SignalProxy_TextReceived()
+{}
+
+void SignalProxy_TextReceived::gtk_callback(GtkClipboard*, const char* text, void* data)
+{
+  SignalProxy_TextReceived *const self = static_cast<SignalProxy_TextReceived*>(data);
+
+  try
+  {
+    (self->slot_)((text) ? Glib::ustring(text) : Glib::ustring());
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete self; // the callback is only used once
+}
+
+} // anonymous namespace
+
+
+namespace Gtk
+{
+
+bool Clipboard::set(const ArrayHandle_TargetEntry& targets,
+                    const SlotGet& slot_get, const SlotClear& slot_clear)
+{
+  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  SignalProxy_GetClear *const pSignalProxy = new SignalProxy_GetClear(slot_get, slot_clear);
+
+  return gtk_clipboard_set_with_data(
+      gobj(), targets.data(), targets.size(),
+      &SignalProxy_GetClear::gtk_callback_get,
+      &SignalProxy_GetClear::gtk_callback_clear,
+      pSignalProxy);
+}
+
+void Clipboard::set_text(const Glib::ustring& text)
+{
+  gtk_clipboard_set_text(gobj(), text.c_str(), text.bytes());
+}
+
+
+void Clipboard::request_contents(const Glib::ustring& target, const SlotReceived& slot)
+{
+  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  SignalProxy_Received *const pSignalProxy = new SignalProxy_Received(slot);
+
+  gtk_clipboard_request_contents(gobj(), gdk_atom_intern(target.c_str(), FALSE),
+      &SignalProxy_Received::gtk_callback, pSignalProxy);
+}
+
+void Clipboard::request_targets(const SlotReceived& slot)
+{
+  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  SignalProxy_Received *const pSignalProxy = new SignalProxy_Received(slot);
+
+  gtk_clipboard_request_contents(gobj(), gdk_atom_intern("TARGETS" /* see the comment in the .hg file */, FALSE),
+      &SignalProxy_Received::gtk_callback, pSignalProxy);
+}
+
+void Clipboard::request_text(const SlotTextReceived& slot)
+{
+  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  SignalProxy_TextReceived *const pSignalProxy = new SignalProxy_TextReceived(slot);
+
+  gtk_clipboard_request_text(gobj(),
+      &SignalProxy_TextReceived::gtk_callback, pSignalProxy);
+}
+
+SelectionData Clipboard::wait_for_contents(const Glib::ustring& target) const
+{
+  //gtk_clipboard_wait_for_contents returns a newly-allocated GtkSelectionData, or NULL.
+  GtkSelectionData* cData = gtk_clipboard_wait_for_contents( const_cast<GtkClipboard*>(gobj()), gdk_atom_intern(target.c_str(), FALSE) );
+  return SelectionData(cData, false /* take_copy */);
+}
+ 
+
+} //namespace Gtk
+

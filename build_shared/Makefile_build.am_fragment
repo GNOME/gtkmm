@@ -1,0 +1,95 @@
+## Copyright (c) 2001
+## The gtkmm development team.
+##
+## **** Common rules for inclusion in Makefile.am ****
+##
+##
+## Used variable:		Example content:
+##
+## sublib_name			= glibmm
+## sublib_cflags		= $(GLIBMM_CFLAGS)
+## files_built_*_cc		=
+## files_built_*_h		= proxy.h
+## files_extra_cc		= array.cc class.cc closure.cc
+## files_extra_h		= array.h boxedtype.h class.h
+## files_extra_all_cc		= array.cc class.cc closure.cc
+## files_extra_all_h		= array.h boxedtype.h class.h
+##
+## Returned variable:		Usage example:
+##
+## files_all_*_cc		libglibmm_la_SOURCES = $(files_all_*_cc)
+## common_ldflags		libglibmm_la_LDFLAGS = $(common_ldflags)
+
+files_all_general_cc	= $(files_built_general_cc) $(files_extra_cc)
+files_all_posix_cc	= $(files_built_posix_cc)
+files_all_win32_cc	= $(files_built_win32_cc)
+
+# Support for DLL on mingw using libtool > 1.4
+# When creating DLLs on win32, we need to explicitly add a few extra 
+# libraries at link time to resolve symbols (remember a dll is like an
+# executable).
+if OS_WIN32
+no_undefined = -no-undefined
+win32_dlls_extra_libs = $(sublib_win32_dlls_libs)
+else
+no_undefined =
+win32_dlls_extra_libs =
+endif
+
+common_ldflags	= -version-info $(LIBGTKMM_SO_VERSION) $(no_undefined) $(LIBSTDCPP_LIBS)
+
+all_includes	= -I$(top_builddir)/glib	-I$(top_srcdir)/glib	\
+		  -I$(top_builddir)/pango	-I$(top_srcdir)/pango	\
+		  -I$(top_builddir)/atk		-I$(top_srcdir)/atk	\
+		  -I$(top_builddir)/gdk		-I$(top_srcdir)/gdk	\
+		  -I$(top_builddir)/gtk		-I$(top_srcdir)/gtk	\
+		  $(sublib_cflags) $(GTHREAD_CFLAGS)
+
+extra_defines	= -DG_LOG_DOMAIN=\"$(sublib_name)\"	\
+		  -D$(sublib_name)_COMPILATION		\
+		  -DG_DISABLE_DEPRECATED		\
+		  -DGDK_DISABLE_DEPRECATED		\
+		  -DGDK_PIXBUF_DISABLE_DEPRECATED	\
+		  -DGTK_DISABLE_DEPRECATED
+
+dist_sources	= $(files_built_all_cc) $(files_extra_all_cc) \
+		  $(files_built_all_h) $(files_extra_all_h)
+DISTFILES	= $(DIST_COMMON) $(dist_sources) $(TEXINFOS) $(EXTRA_DIST)
+
+DEFS			= @DEFS@ $(strip $(extra_defines))
+DEFAULT_INCLUDES	=
+INCLUDES		= $(strip $(all_includes))
+
+sublib_includedir	= $(includedir)/gtkmm-2.0/$(sublib_name)
+if OS_WIN32
+sublib_include_HEADERS	= $(files_built_general_h) \
+			  $(files_built_win32_h) \
+			  $(files_extra_h)
+else
+sublib_include_HEADERS	= $(files_built_general_h) \
+			  $(files_built_posix_h) \
+			  $(files_extra_h)
+endif
+
+maintainer-clean-local:
+	(cd $(srcdir) && rm -f $(files_built_all_cc) $(files_built_all_h))
+
+if OS_WIN32
+libtool_import_libs = $(lib_LTLIBRARIES:.la=.dll.a)
+install-libtool-import-lib:
+	@for import_lib in $(libtool_import_libs); do \
+	  $(INSTALL) .libs/$$import_lib $(DESTDIR)$(libdir); \
+	done
+uninstall-libtool-import-lib:
+	@for import_lib in $(libtool_import_libs); do \
+	  -rm $(DESTDIR)$(libdir)/$$import_lib; \
+	done
+else
+install-libtool-import-lib:
+uninstall-libtool-import-lib:
+endif
+
+install-data-local: install-libtool-import-lib
+
+uninstall-local: uninstall-libtool-import-lib
+
