@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <sigc++/sigc++.h>
-#include <sigc++/bind_return.h>
 #include <glibmm/main.h>
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/rectangle.h>
@@ -85,7 +84,7 @@ private:
   std::vector< Glib::RefPtr<const Gdk::Pixbuf> >  images_;
   Glib::RefPtr<Gdk::Pixbuf>                       current_frame_;
   unsigned int                                    frame_num_;
-  SigC::Connection                                conn_timeout_;
+  sigc::connection                                conn_timeout_;
 
   void generate_next_frame_();
 };
@@ -115,7 +114,7 @@ DemoRenderArea::DemoRenderArea()
   add_events(Gdk::EXPOSURE_MASK);
 
   conn_timeout_ = Glib::signal_timeout().connect(
-      SigC::bind_return(sigc::mem_fun(*this, &DemoRenderArea::generate_next_frame_), true),
+      sigc::bind_return(sigc::mem_fun(*this, &DemoRenderArea::generate_next_frame_), true),
       FRAME_DELAY);
 }
 

@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <sigc++/class_slot.h>
 #include <glibmm/convert.h>
 #include <glibmm/exceptionhandler.h>
 #include <gtkmm/main.h>
@@ -46,7 +45,7 @@ void global_on_clicked()
 void global_on_clicked_throw_glib_error()
 {
   std::cout << "The Button was clicked.\n";
-  Glib::locale_from_utf8("Und tschÃ¼ss!"); // invalid UTF-8
+  Glib::locale_from_utf8("Und tschüss!"); // invalid UTF-8
 }
 
 void global_on_clicked_throw_std_exception()

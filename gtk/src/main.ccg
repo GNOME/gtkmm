@@ -54,14 +54,12 @@ public:
   typedef void (*RemoveFunc) (guint);
 
   explicit GtkMainConnectionNode(const sigc::slot_base& slot);
-  virtual ~GtkMainConnectionNode();
 
   static void* notify(void* data);
   static void destroy_notify_handler(void* data);
 
   // Call this after installing the GTK+ callback.
-  void install(guint conn_id, RemoveFunc remove_func);
-  void install_no_notify(guint conn_id, RemoveFunc remove_func);
+  void install(guint conn_id, RemoveFunc remove_func, bool has_destroy_notify);
 
   inline sigc::slot_base* get_slot();
 
@@ -74,6 +72,8 @@ private:
 
   guint           conn_id_;
   RemoveFunc      remove_func_;
+  bool            has_destroy_notify_;
+  bool            destroyed_;
 };
 
 
@@ -93,24 +93,36 @@ GtkMainConnectionNode::GtkMainConnectionNode(const sigc::slot_base& slot)
 :
   slot_(slot),
   conn_id_             (0),
-  remove_func_         (0)
-{}
-
-GtkMainConnectionNode::~GtkMainConnectionNode()
-{}
+  remove_func_         (0),
+  has_destroy_notify_          (false),
+  destroyed_           (false)
+{
+  slot_.set_parent(this, &GtkMainConnectionNode::notify);
+}
 
 //static:
 void* GtkMainConnectionNode::notify(void* data)
 {
+  // notification from the sigc++ side ...
+
   GtkMainConnectionNode *const self = static_cast<GtkMainConnectionNode*>(data);
-  if(self)
+
+  // this call might be triggered from destroy_notify_handler().
+  if(!self->destroyed_)
   {
-    if(self->conn_id_ != 0)
-    {
-      (*(self->remove_func_))(self->conn_id_);
-      self->conn_id_ = 0;
-      delete self;
-    }
+    // during (*remove_func_)() destroy_notify_handler() might get called.
+    // This must not lead to the destruction of the object!
+    self->destroyed_ = true;
+
+    // disconnect from the gtk+ side.
+    (*(self->remove_func_))(self->conn_id_);
+
+    // remove self from global list.
+    if (!self->has_destroy_notify_)
+      list_remove(self);
+
+    // destruction of slot_ notifies all objects referring to it.
+    delete self;
   }
 
   return 0;
@@ -119,28 +131,36 @@ void* GtkMainConnectionNode::notify(void* data)
 // static
 void GtkMainConnectionNode::destroy_notify_handler(void* data)
 {
+  // notification from the gtk+ side ...
+
   GtkMainConnectionNode *const self = static_cast<GtkMainConnectionNode*>(data);
-  if(self)
+
+  // this call might be triggered from notify().
+  if(!self->destroyed_)
   {
+    self->destroyed_ = true;
+
     // The GTK+ side is disconnected now, thus the ID is no longer valid.
     self->conn_id_ = 0;
 
+    // remove self from global list.
+    if (!self->has_destroy_notify_)
+      list_remove(self);
+
+    // destruction of slot_ notifies all objects referring to it.
     delete self;
   }
 }
 
 void GtkMainConnectionNode::install(
-    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func)
+    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func, bool has_destroy_notify)
 {
   conn_id_     = conn_id;
   remove_func_ = remove_func;
-}
+  has_destroy_notify_  = has_destroy_notify;
 
-void GtkMainConnectionNode::install_no_notify(
-    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func)
-{
-  install(conn_id, remove_func);
-  connection_list_ = g_slist_prepend(connection_list_, this);
+  if (!has_destroy_notify_)
+    connection_list_ = g_slist_prepend(connection_list_, this);
 }
 
 inline
@@ -178,10 +198,11 @@ void GtkMainConnectionNode::list_notify_all()
 
     connection_list_ = g_slist_delete_link(connection_list_, connection_list_);
 
-    if(conn_node->get_slot())
-      notify(conn_node);
+    // no need to search the list in notify().
+    conn_node->has_destroy_notify_ = true;
 
-    delete conn_node;
+    // conn_node gets destroyed from notify().
+    notify(conn_node);
   }
 }
 
@@ -201,7 +222,7 @@ sigc::connection RunSig::connect(const RunSig::SlotType& slot)
   // The callback will be invoked the next time gtk_main() is called.
   gtk_init_add(&RunSig::gtk_callback, conn_node);
 
-  conn_node->install_no_notify(0, 0); // there's no gtk_init_remove()
+  conn_node->install(0, 0, false); // there's no gtk_init_remove()
   return connection;
 }
 
@@ -213,22 +234,16 @@ gboolean RunSig::gtk_callback(gpointer data)
 
   if(GtkMainConnectionNode::list_remove(conn_node))
   {
-    // TODO: Explicitely check wether disconnect() has been called?,
-    // because gtk_init_add() actually doesn't support disconnection.
-    //
-    //if(!conn_node->notified_)
-    //{
-      try
-      {
-        // Recreate the specific SlotType from the generic slot_base.
-        SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
-        (*pSlot)();
-      }
-      catch(...)
-      {
-        Glib::exception_handlers_invoke();
-      }
-    //}
+    try
+    {
+      // Recreate the specific SlotType from the generic slot_base.
+      SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
+      (*pSlot)();
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
 
     // We don't need it anymore, since RunSig is a one-shot signal.
     GtkMainConnectionNode::destroy_notify_handler(conn_node);
@@ -249,7 +264,7 @@ sigc::connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_leve
       main_level, &QuitSig::gtk_callback, 0 /* marshaller */,
       conn_node, &GtkMainConnectionNode::destroy_notify_handler);
 
-  conn_node->install(conn_id, &gtk_quit_remove);
+  conn_node->install(conn_id, &gtk_quit_remove, true);
   return connection;
 }
 
@@ -280,7 +295,7 @@ sigc::connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
 
   const guint conn_id = gtk_key_snooper_install(&KeySnooperSig::gtk_callback, conn_node);
 
-  conn_node->install_no_notify(conn_id, &gtk_key_snooper_remove);
+  conn_node->install(conn_id, &gtk_key_snooper_remove, false);
   return connection;
 }
 

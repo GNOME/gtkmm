@@ -62,7 +62,7 @@ protected:
   Glib::RefPtr<Gdk::Pixbuf> m_images[N_IMAGES];
   Gtk::DrawingArea m_DrawingArea;
 
-  SigC::Connection m_TimeoutConnection;
+  sigc::connection m_TimeoutConnection;
   guint m_back_width, m_back_height;
   gint m_frame_num;
 };

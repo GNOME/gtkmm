@@ -31,7 +31,7 @@ namespace Gtk
 namespace TreeView_Private
 {
 
-//This Signal Proxy allows the C++ coder to specify a SigC::Slot instead of a static function.
+//This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
 class SignalProxy_CellData
 {
 public:

@@ -78,13 +78,13 @@ public:
 
   MenuElem(MenuItem& child);
 
-  /** Create a labeled, non-accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, non-accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param slot Use sigc::mem_fun() to specify a signal handler
    */
   MenuElem(const Glib::ustring& label, const CallSlot& slot = CallSlot());
 
-  /** Create a labeled, accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param key The accelerator key combination
    * @param slot Use sigc::mem_fun() to specify a signal handler
@@ -119,7 +119,7 @@ class ImageMenuElem : public Element
 public:
   ImageMenuElem(ImageMenuItem& child);
 
-  /** Create a labeled, non-accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, non-accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param image_widget The image
    * @param slot Use sigc::mem_fun() to specify a signal handler
@@ -128,7 +128,7 @@ public:
                 Gtk::Widget& image_widget,
                 const CallSlot& slot = CallSlot());
 
-  /** Create a labeled, accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param key The accelerator key combination
    * @param image_widget The image
@@ -199,13 +199,13 @@ class CheckMenuElem : public Element
 public:
   CheckMenuElem(CheckMenuItem& child);
 
-  /** Create a labeled, non-accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, non-accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param slot Use sigc::mem_fun() to specify a signal handler
    */
   CheckMenuElem(const Glib::ustring& label, const CallSlot& slot = CallSlot());
 
-  /** Create a labeled, accelerated CheckMenuItem with a sigc::Slot
+  /** Create a labeled, accelerated CheckMenuItem with a sigc::slot
    * @param label The menu item's name
    * @param key The accelerator key combination
    * @param slot Use sigc::mem_fun() to specify a signal handler
@@ -220,14 +220,14 @@ class RadioMenuElem : public Element
 public:
   RadioMenuElem(RadioMenuItem& child);
 
-  /** Create a labeled, non-accelerated MenuItem with a sigc::Slot
+  /** Create a labeled, non-accelerated MenuItem with a sigc::slot
    * @param label The menu item's name
    * @param slot Use sigc::mem_fun() to specify a signal handler
    */
   RadioMenuElem(RadioMenuItem::Group&, const Glib::ustring& label,
                 const CallSlot& slot = CallSlot());
 
-  /** Create a labeled, accelerated CheckMenuItem with a sigc::Slot
+  /** Create a labeled, accelerated CheckMenuItem with a sigc::slot
    * @param group The RadioMenuItem group in which to put this.
    * @param label The menu item's name
    * @param key The accelerator key combination
@@ -246,12 +246,12 @@ class TearoffMenuElem : public Element
 public:
   TearoffMenuElem(TearoffMenuItem& child);
 
-  /** Create a non-accelerated TearoffMenuItem with a sigc::Slot
+  /** Create a non-accelerated TearoffMenuItem with a sigc::slot
    * @param slot Use sigc::mem_fun() to specify a signal handler
    */
   TearoffMenuElem(const CallSlot& slot = CallSlot());
 
-  /** Create accelerated TearoffMenuItem with a sigc::Slot
+  /** Create accelerated TearoffMenuItem with a sigc::slot
    * @param key The accelerator key combination
    * @param slot Use sigc::mem_fun() to specify a signal handler
    */
