@@ -29,13 +29,13 @@ TicTacToe::TicTacToe ()
   Gtk::ToggleButton *button;
   int i,j;
   
-  table = manage( new Gtk::Table (3, 3, true) );
+  table = Gtk::manage( new Gtk::Table (3, 3, true) );
   add ( *table);
 
   for (i=0;i<3; i++)
     for (j=0;j<3; j++)
       {
-	buttons[i][j] = button = manage( new Gtk::ToggleButton ());
+	buttons[i][j] = button = Gtk::manage( new Gtk::ToggleButton ());
 	table-> attach (*button, i, i+1, j, j+1);
 	button-> signal_toggled().connect ( sigc::bind(
                                      sigc::mem_fun(*this, &TicTacToe::toggle), 

@@ -2,13 +2,12 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h> //For Glib::build_filename().
 
-/* //I get a warning/error about an "unterminated #ifdef". murrayc.
-#ifdef G_OS_WIN32
+#ifdef GLIBMM_WIN32
 
 #undef DEMOCODEDIR
 
 static char *
-get_democodedir (void)
+get_democodedir(void)
 {
   static char *result = NULL;
 
@@ -18,16 +17,15 @@ get_democodedir (void)
       if (result == NULL)
 	result = "unknown-location";
 
-      result = g_strconcat (result, "\\share\\gtk-2.0\\demo", NULL);
+      result = g_strconcat (result, "\\share\\gtkmm-2.4\\demo", NULL);
     }
 
   return result;
 }
 
-#define DEMOCODEDIR get_democodedir ()
+#define DEMOCODEDIR get_democodedir()
 
-#undef //G_OS_WIN32
-*/
+#endif // GLIBMM_WIN32
 
 /**
  * demo_find_file:
