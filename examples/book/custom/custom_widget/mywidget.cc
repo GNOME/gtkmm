@@ -75,7 +75,6 @@ void MyWidget::on_realize()
   GtkWidget* cWidget = (GtkWidget*)gobj();
   cWidget->style = gtk_style_attach(cWidget->style, get_window()->gobj());
 
- 
   if(!m_refGdkWindow)
   {
     //Create the GdkWindow:
@@ -93,11 +92,12 @@ void MyWidget::on_realize()
 
     attributes.window_type = GDK_WINDOW_CHILD;
     attributes.wclass = GDK_INPUT_OUTPUT;
+ 
+//    m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, 
+//                       &attributes, 
+//                       GDK_WA_X | GDK_WA_Y);
 
-    m_refGdkWindow = Gdk::Window::create(
-      get_window() /* parent */,
-      &attributes,
-      GDK_WA_X | GDK_WA_Y);
+    m_refGdkWindow = get_window();
 
     //Allocate a GC for use in on_expose_event():
     m_refGC = Gdk::GC::create(m_refGdkWindow);
