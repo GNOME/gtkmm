@@ -136,7 +136,7 @@ Glib::RefPtr<Gtk::TreeModel> Example_StockBrowser::create_model()
 
   // obtain the ids of all stock items
   typedef std::vector<Gtk::StockID> type_vecIDs;
-  const type_vecIDs vecIDs = Gtk::Stock::get_ids();
+  type_vecIDs vecIDs = Gtk::Stock::get_ids();
 
   // iterate through them, populating the ListStore as appropriate
   for(type_vecIDs::const_iterator iterIDs = vecIDs.begin(); iterIDs != vecIDs.end(); ++iterIDs)
@@ -240,7 +240,7 @@ void Example_StockBrowser::on_selection_changed()
       const Gtk::IconSet iconset = Gtk::IconSet::lookup_default(stockid);
 
       typedef std::vector<Gtk::IconSize> type_vecSizes;
-      const type_vecSizes sizes = iconset.get_sizes();
+      type_vecSizes sizes = iconset.get_sizes();
 
       Gtk::IconSize best_size = Gtk::ICON_SIZE_INVALID;
       int biggest_pixelcount = 0;

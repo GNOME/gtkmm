@@ -37,8 +37,11 @@
 //SUN Forte seems to need these:
 //void flockfile(FILE*);
 //void funlockfile(FILE*);
-#ifdef GLIBMM_COMPILER_SUN_FORTE
-  //These don't wotk even though the configure-time check works.
+// #ifdef GLIBMM_COMPILER_SUN_FORTE //These isn't found even though the configure-time check works.
+// I don't know why. murrayc.
+// In bug, #154973, Joel Fredrikson suggests defining _REENTRANT, but that does not make any difference,
+// and it's not clear that it is mean to solve this particular problem anyway.
+#if defined(__SUNPRO_CC) //But this does work.
   #undef HAVE_FLOCKFILE
   #undef HAVE_FUNLOCKFILE
 #endif
