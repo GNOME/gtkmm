@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <iostream>
 #include "mywidget.h"
 
 MyWidget::MyWidget()
@@ -69,12 +68,6 @@ void MyWidget::on_realize()
   //Call base class:
   Gtk::Widget::on_realize();
 
-  //TODO: Not sure whether this is necessary:
-  set_flags(Gtk::REALIZED);
-  set_window( get_parent_window() );
-  GtkWidget* cWidget = (GtkWidget*)gobj();
-  cWidget->style = gtk_style_attach(cWidget->style, get_window()->gobj());
-
   if(!m_refGdkWindow)
   {
     //Create the GdkWindow:
@@ -90,15 +83,22 @@ void MyWidget::on_realize()
     attributes.width = allocation.get_width();
     attributes.height = allocation.get_height();
 
+    attributes.event_mask = get_events () | Gdk::EXPOSURE_MASK; 
     attributes.window_type = GDK_WINDOW_CHILD;
     attributes.wclass = GDK_INPUT_OUTPUT;
- 
-//    m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, 
-//                       &attributes, 
-//                       GDK_WA_X | GDK_WA_Y);
 
-    m_refGdkWindow = get_window();
+    
+    m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, &attributes, GDK_WA_X | GDK_WA_Y);
+    unset_flags(Gtk::NO_WINDOW);
+    set_window(m_refGdkWindow);
 
+    //set colors
+    modify_bg(Gtk::STATE_NORMAL , Gdk::Color("red"));
+    modify_fg(Gtk::STATE_NORMAL , Gdk::Color("blue"));
+
+    //make the widget receive expose events
+    m_refGdkWindow->set_user_data(gobj());
+    
     //Allocate a GC for use in on_expose_event():
     m_refGC = Gdk::GC::create(m_refGdkWindow);
   }
@@ -118,18 +118,22 @@ bool MyWidget::on_expose_event(GdkEventExpose* /* event */)
   if(m_refGdkWindow)
   {
     //Draw on the Gdk::Window:
-
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap ();
-    Gdk::Color color_blue("blue");
-    Gdk::Color color_red("red");
-    colormap->alloc_color(color_blue);
-    colormap->alloc_color(color_red);
-
-    m_refGdkWindow->set_background( color_red );
     m_refGdkWindow->clear();
-    m_refGC->set_foreground( color_blue );
-    m_refGdkWindow->draw_line(m_refGC, 1, 1, 100, 100);
-  }
+    double scale_x = (double)get_allocation().get_width() /1000;
+    double scale_y = (double)get_allocation().get_height() /1000;
 
+    m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(165*scale_y), (int)(155*scale_x), (int)(838*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(838*scale_y), (int)(265*scale_x), (int)(900*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(900*scale_y), (int)(849*scale_x), (int)(564*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(849*scale_x), (int)(564*scale_y), (int)(849*scale_x), (int)(438*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(849*scale_x), (int)(438*scale_y), (int)(265*scale_x), (int)(100*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(100*scale_y), (int)(155*scale_x), (int)(165*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(100*scale_y), (int)(265*scale_x), (int)(652*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(652*scale_y), (int)(526*scale_x), (int)(502*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(411*scale_y), (int)(633*scale_x), (int)(564*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(286*scale_y), (int)(369*scale_x), (int)(592*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(286*scale_y), (int)(849*scale_x), (int)(564*scale_y));
+    m_refGdkWindow->draw_line(m_refGC, (int)(633*scale_x), (int)(564*scale_y), (int)(155*scale_x), (int)(838*scale_y));
+  }
   return true;
 }
