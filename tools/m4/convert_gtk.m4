@@ -505,3 +505,5 @@ _CONVERSION(`GtkAction*',`const Glib::RefPtr<Action>&',`Glib::wrap($3, true)')
 
 _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 
+# Used by AboutDialog:
+_CONVERSION(`const Glib::StringArrayHandle&',`gchar**',`const_cast<char**>(($3).data())')
