@@ -3,7 +3,7 @@
 
 SUBDIRS = FAQ images tutorial reference
 
-EXTRA_DIST = Makefile_web.am_fragment ChangeLog-before20011015.html index.html
+EXTRA_DIST = Makefile_web.am_fragment index.html
 
 gtkmm_doc_DATA = index.html
 

@@ -6,8 +6,7 @@ EXTRA_DIST	= gtkmm.spec.in \
 		  build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_build_gensrc.am_fragment \
 		  build_shared/Makefile_gensrc.am_fragment \
-		  build_shared/Makefile_gensrc_platform.am_fragment \
-		  build_shared/Makefile_build_extra.am_fragment \
+		  build_shared/Makefile_conditional.am_fragment \
 		  CHANGES README.win32 PORTING
 
 
