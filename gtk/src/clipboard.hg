@@ -19,8 +19,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- 
-#include <gdkmm/display.h>
+#include <gdkmm/display.h> 
+#include <gdkmm/pixbuf.h>
 #include <gtkmm/targetentry.h>
 #include <gtkmm/selectiondata.h>
 #include <glibmm/object.h>
@@ -88,6 +88,8 @@ public:
    */
   void set_text(const Glib::ustring& text);
   _IGNORE(gtk_clipboard_set_text)
+  
+  _WRAP_METHOD(void set_image(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_clipboard_set_image)
 
   /// For instance: void on_received(const SelectionData& selection_data);
   typedef sigc::slot<void, const SelectionData&> SlotReceived;
@@ -106,7 +108,7 @@ public:
   void request_contents(const Glib::ustring& target, const SlotReceived& slot);
   _IGNORE(gtk_clipboard_request_contents)
   
-  /// For instance: void on_textreceived(const Glib::ustring& text);
+  /// For instance: void on_text_received(const Glib::ustring& text);
   typedef sigc::slot<void, const Glib::ustring&> SlotTextReceived;
 
   /** Requests the contents of the clipboard as text. When the text is
@@ -121,9 +123,30 @@ public:
    * @param slot:  a function to call when the text is received,
    *             or the retrieval fails. (It will always be called
    *             one way or the other.)
-   **/
+   */
   void request_text(const SlotTextReceived& slot);
   _IGNORE(gtk_clipboard_request_text)
+  
+  
+  /// For instance: void on_image_received(const Glib::RefPtr<Gdk::Pixbuf>& text);
+  typedef sigc::slot<void, const Glib::RefPtr<Gdk::Pixbuf>&> SlotImageReceived;
+  
+  /** Requests the contents of the clipboard as image. When the image is
+   * later received, it will be converted to a Gdk::Pixbuf. 
+   * This function waits for
+   * the data to be received using the main loop, so events,
+   * timeouts, etc, may be dispatched during the wait.
+   *
+   * The pixbuf parameter to slot will contain the resulting pixbuf if
+   * the request succeeded, or will be empty if it failed. This could happen for
+   * various reasons, in particular if the clipboard was empty or if the
+   * contents of the clipboard could not be converted into image form.
+   *
+   * @param slot:  a function to call when the text is received,
+   *             or the retrieval fails. (It will always be called
+   *             one way or the other.)
+   */
+  void request_image(const SlotImageReceived& slot);
 
   /// For instance: void on_targetsreceived(const Glib::StringArrayHandle& targets);
   typedef sigc::slot<void, const Glib::StringArrayHandle&> SlotTargetsReceived;
@@ -158,7 +181,12 @@ public:
   _IGNORE(gtk_clipboard_wait_for_contents)
 
   _WRAP_METHOD(Glib::ustring wait_for_text() const, gtk_clipboard_wait_for_text)
+  
+  //Maybe the result should be const, but constness is not so clear-cut here. murrayc
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> wait_for_image() const, gtk_clipboard_wait_for_image)
+  
   _WRAP_METHOD(bool wait_is_text_available() const, gtk_clipboard_wait_is_text_available)
+  _WRAP_METHOD(bool wait_is_image_available() const, gtk_clipboard_wait_is_image_available)  
   _WRAP_METHOD(bool wait_is_target_available(const Glib::ustring& target), gtk_clipboard_wait_is_target_available)
 
   /** Returns a list of targets that are present on the clipboard.

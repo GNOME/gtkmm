@@ -233,6 +233,47 @@ void SignalProxy_TextReceived::gtk_callback(GtkClipboard*, const char* text, voi
   delete self; // the callback is only used once
 }
 
+
+// SignalProxy_ImageReceived:
+// This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
+class SignalProxy_ImageReceived
+{
+public:
+  typedef Gtk::Clipboard::SlotImageReceived SlotType;
+
+  SignalProxy_ImageReceived(const SlotType& slot);
+  ~SignalProxy_ImageReceived();
+
+  static void gtk_callback(GtkClipboard* clipboard, GdkPixbuf* image, void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_ImageReceived::SignalProxy_ImageReceived(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_ImageReceived::~SignalProxy_ImageReceived()
+{}
+
+void SignalProxy_ImageReceived::gtk_callback(GtkClipboard*, GdkPixbuf* image, void* data)
+{
+  SignalProxy_ImageReceived *const self = static_cast<SignalProxy_ImageReceived*>(data);
+
+  try
+  {
+    (self->slot_)(Glib::wrap(image, true /* take_ref */));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete self; // the callback is only used once
+}
+
 } // anonymous namespace
 
 
@@ -274,6 +315,15 @@ void Clipboard::request_text(const SlotTextReceived& slot)
 
   gtk_clipboard_request_text(gobj(),
       &SignalProxy_TextReceived::gtk_callback, pSignalProxy);
+}
+
+void Clipboard::request_image(const SlotImageReceived& slot)
+{
+  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  SignalProxy_ImageReceived *const pSignalProxy = new SignalProxy_ImageReceived(slot);
+
+  gtk_clipboard_request_image(gobj(),
+      &SignalProxy_ImageReceived::gtk_callback, pSignalProxy);
 }
 
 void Clipboard::request_targets(const SlotTargetsReceived& slot)
