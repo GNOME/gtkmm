@@ -101,27 +101,6 @@ AC_DEFUN([AL_ACLOCAL_INCLUDE],
 ])
 
 
-## GTKMM_ARG_ENABLE_DEBUG_REFCOUNTING()
-##
-## Provide the --enable-debug-refcounting configure argument, disabled
-## by default.  If enabled, #define GTKMM_DEBUG_REFCOUNTING.
-##
-AC_DEFUN([GTKMM_ARG_ENABLE_DEBUG_REFCOUNTING],
-[
-  AC_ARG_ENABLE([debug-refcounting],
-      [  --enable-debug-refcounting  Print a debug message on every ref/unref.
-                              [[default=disabled]]],
-      [gtkmm_debug_refcounting="$enableval"],
-      [gtkmm_debug_refcounting='no'])
-
-  if test "x$gtkmm_debug_refcounting" = "xyes"; then
-  {
-    AC_DEFINE([GTKMM_DEBUG_REFCOUNTING],[1])
-  }
-  fi
-])
-
-
 ## GTKMM_ARG_ENABLE_WARNINGS()
 ##
 ## Provide the --enable-warnings configure argument, set to 'minimum'

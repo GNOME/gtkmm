@@ -299,6 +299,12 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
     GtkWidget *const pWidget = obj->gobj();
     g_return_if_fail(pWidget == GTK_WIDGET(self));
 
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Widget_Class::dispose_vfunc_callback(): C++ instance: %10X, C instance: %10X, refcount=%d\n", (Glib::ObjectBase*)obj, pWidget, G_OBJECT(pWidget)->ref_count);
+    g_warning("    c instance gtype: %s\n", G_OBJECT_TYPE_NAME(pWidget));
+    #endif
+
+
     // Abort dispose if the widget isn't managed, in order to prevent
     // the nasty self-destroying behaviour of GTK+.  This applies to:
     //
@@ -308,6 +314,11 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
 
     if(obj->referenced_)
     {
+      #ifdef GLIBMM_DEBUG_REFCOUNTING
+      g_warning("Widget_Class::dispose_vfunc_callback(): removing the widget from it's parent container.");
+      #endif
+
+      
       // GTKMM_LIFECYCLE
       // Remove the widget from its parent container so that it
       // won't be destroyed later by gtk_container_destroy().
