@@ -45,7 +45,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/checkmenuitem.h>
 #include <gtkmm/cellrenderer.h>
+#include <gtkmm/cellrenderercombo.h>
 #include <gtkmm/cellrendererpixbuf.h>
+#include <gtkmm/cellrendererprogress.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrenderertoggle.h>
 #include <gtkmm/colorbutton.h>

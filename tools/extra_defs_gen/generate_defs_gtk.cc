@@ -82,9 +82,12 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_CHECK_MENU_ITEM )
             << get_defs( GTK_TYPE_CLIST ) /* Deprecated */
             << get_defs( GTK_TYPE_CELL_RENDERER )
+            << get_defs( GTK_TYPE_CELL_RENDERER_COMBO )
+	    << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )	    
             << get_defs( GTK_TYPE_CELL_RENDERER_TEXT )
             << get_defs( GTK_TYPE_CELL_RENDERER_TOGGLE )
             << get_defs( GTK_TYPE_CELL_RENDERER_PIXBUF )
+            << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )	    
             << get_defs( GTK_TYPE_COLOR_BUTTON )   
             << get_defs( GTK_TYPE_COLOR_SELECTION )
             << get_defs( GTK_TYPE_COMBO ) /* Deprecated */

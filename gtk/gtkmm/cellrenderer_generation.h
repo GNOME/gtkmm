@@ -24,6 +24,7 @@
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrendererpixbuf.h>
 #include <gtkmm/cellrenderertoggle.h>
+#include <gtkmm/cellrenderercombo.h>
 
 namespace Gtk
 {
@@ -50,6 +51,9 @@ CellRenderer* generate_cellrenderer<bool>(bool editable);
 
 template<>
 CellRenderer* generate_cellrenderer< Glib::RefPtr<Gdk::Pixbuf> >(bool editable);
+
+template<>
+CellRenderer* generate_cellrenderer< Glib::RefPtr<Gtk::TreeModel> >(bool editable);
 #endif
 
 } //CellRenderer_Generation
