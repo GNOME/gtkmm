@@ -114,23 +114,24 @@ void MyWidget::on_unrealize()
   Gtk::Widget::on_unrealize();
 }
 
-bool MyWidget::on_expose_event(GdkEventExpose* /* event */)
+bool MyWidget::on_expose_event(GdkEventExpose* event)
 {
   if(m_refGdkWindow)
   {
     //Draw on the Gdk::Window:
+    Gtk::Allocation allocation = get_allocation();
 
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap ();
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     Gdk::Color color_blue("blue");
-    Gdk::Color color_red("red");
+    //Gdk::Color color_red("red");
     colormap->alloc_color(color_blue);
-    colormap->alloc_color(color_red);
+    //colormap->alloc_color(color_red);
 
-    m_refGdkWindow->set_background( color_red );
-    m_refGdkWindow->clear();
+    //m_refGdkWindow->set_background( color_red );
+    //m_refGdkWindow->clear();
     m_refGC->set_foreground( color_blue );
-    m_refGdkWindow->draw_line(m_refGC, 1, 1, 100, 100);
+    m_refGdkWindow->draw_line(m_refGC, allocation.get_x(), allocation.get_y(), allocation.get_x() + 100, allocation.get_y() + 100);
   }
-
-  return true;
+  
+  return Gtk::Widget::on_expose_event(event);
 }
