@@ -22,10 +22,9 @@ html/index.html: gtkmm-tut-with-examples.xml
 	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_STYLESHEET) $<
 
 # Create a version of the tutorial that has phpwebnotes code in it.
-html/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
-	rm -rf html
-	$(mkinstalldirs) html
-	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
+html_withcomments/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
+	rm -rf html_withcomments
+	xsltproc -o html_withcomments/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
 
 validate_original: gtkmm-tut.xml
 	xmllint --xinclude --valid --noout --catalogs $<
@@ -42,6 +41,7 @@ post-html: html/index.html
 
 doc-clean:
 	-rm -rf html
+	-rm -rf html_withcomments
 	-rm -f gtkmm-tut-with-examples.xml gtkmm-tut-html.tar.gz
 
 tutorialdir = $(gtkmm_docdir)/tutorial/html
