@@ -70,6 +70,15 @@ private:
 };
 
 
+class ModelColumns : public Gtk::TreeModel::ColumnRecord
+{
+public:
+  Gtk::TreeModelColumn<Glib::ustring> text;
+  Gtk::TreeModelColumn<bool>          active;
+
+  ModelColumns() { add(text); add(active); }
+};
+
 class AppWindow : public Gtk::Window
 {
 public:
@@ -77,15 +86,6 @@ public:
   virtual ~AppWindow();
 
 private:
-  class ModelColumns : public Gtk::TreeModel::ColumnRecord
-  {
-  public:
-    Gtk::TreeModelColumn<Glib::ustring> text;
-    Gtk::TreeModelColumn<bool>          active;
-
-    ModelColumns() { add(text); add(active); }
-  };
-
   ModelColumns                  list_columns_;
   Glib::RefPtr<Gtk::ListStore>  list_store_;
   Gtk::TreeView                 tree_view_;
