@@ -110,7 +110,7 @@ _CONVERSION(`PolicyType&',`GtkPolicyType*',`(($2) &($3))')
 _CONVERSION(`SortType&',`GtkSortType*',`(($2) &($3))')
 _CONVERSION(`SortType*',`GtkSortType*',`(($2) ($3))')
 _CONVERSION(`GtkSortType*',`SortType*',`(($2) ($3))')
-_CONVERSION(`guint8',`StateType',`static_cast<StateType>($3)')
+_CONVERSION(`guint8',`Gtk::StateType',`static_cast<StateType>($3)')
 
 
 

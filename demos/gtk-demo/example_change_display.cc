@@ -233,7 +233,7 @@ void Example_ChangeDisplay::initialize_displays()
 #endif   
 }
 
-void Example_ChangeDisplay::on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display)
+void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<Gdk::Display> display)
 {
   Gtk::TreeModel::Children children = m_refListStore_Display->children();
   for(Gtk::TreeModel::iterator iter = children.begin(); iter != children.end(); ++iter)
@@ -434,7 +434,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
 }
 
 
-bool Example_ChangeDisplay::on_popup_button_release_event(GdkEventButton* event)
+bool Example_ChangeDisplay::on_popup_button_release_event(GdkEventButton* /* event */)
 {
   m_popup_clicked = true;
   return true;
