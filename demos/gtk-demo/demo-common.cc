@@ -50,7 +50,7 @@ std::string demo_find_file(const std::string& base)
     std::string filename = Glib::build_filename(DEMOCODEDIR, base);
     if(!Glib::file_test(filename, Glib::FILE_TEST_EXISTS))
     {
-      Glib::ustring msg = "Cannot find demo data file " + base; //TODO: i18n. 
+      Glib::ustring msg = "Cannot find demo data file " + base;  
       throw Glib::FileError(Glib::FileError::NO_SUCH_ENTITY, msg);
       return Glib::ustring();
     }

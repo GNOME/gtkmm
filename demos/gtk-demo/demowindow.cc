@@ -304,9 +304,6 @@ void DemoWindow::load_file(const std::string& filename)
     	    {
     	      Gtk::TextBuffer::iterator end = start;
 
-    	      // The SUN Forte compiler says this is a badly formed expression.
-            //g_assert (int(strlen(p)) >= (q - p)); //TODO: What is this for?  daniel.
-
               const Glib::ustring strTemp (p, q);
     	      end = refBufferInfo->insert(end, strTemp);
     	      start = end;
@@ -347,9 +344,6 @@ void DemoWindow::load_file(const std::string& filename)
                     {
                       start = refBufferInfo->insert(start, " ");
                     }
-
-                  // The SUN Forte compiler says this is a badly formed expression.
-                  // g_assert (int(strlen(p)) >= len); //TODO: What is this for?  daniel.
 
                   start = refBufferInfo->insert(start, Glib::ustring(p, p + len));
                   in_para = 1;
