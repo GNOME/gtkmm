@@ -30,14 +30,18 @@
 #include <vector>
 #include <cctype>
 #include <cerrno>
-#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
 
-//SUN Forte seems to need these, though the configure check says they are present,
-//and the man page says they should be in stdio.h:
+//The SUN Forte compiler can't seem to either find the declarations or the implementations,
+//so these are not used on that platform.
+//#include <stdio.h> //Needed by the SUN Forte compiler, for flockfile().
+//SUN Forte seems to need these:
+//void flockfile(FILE*);
+//void funlockfile(FILE*);
 #ifdef GLIBMM_COMPILER_SUN_FORTE
-void flockfile(FILE*);
-void funlockfile(FILE*);
-#endif //GLIBMM_COMPILER_SUN_FORTE
+  //These don't wotk even though the configure-time check works.
+  #undef HAVE_FLOCKFILE
+  #undef HAVE_FUNLOCKFILE
+#endif.
 
 namespace
 {

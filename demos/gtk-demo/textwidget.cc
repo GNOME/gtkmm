@@ -102,14 +102,14 @@ enum enumStates
   STATE_IN_COMMENT
 };
 
-static char* tokens[] =
+static const char* tokens[] =
 {
   "/*",
   "\"",
   NULL
 };
 
-static char* types[] =
+static const char* types[] =
 {
   "static",
   "const ",
@@ -157,7 +157,7 @@ static char* types[] =
   0
 };
 
-static char* control[] =
+static const char* control[] =
 {
   " if ",
   " while ",

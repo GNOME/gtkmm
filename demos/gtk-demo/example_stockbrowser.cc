@@ -183,7 +183,20 @@ Glib::ustring Example_StockBrowser::id_to_symbol(const Gtk::StockID& stockid)
   if((id.length() >= prefix_length) && (id.compare(0, prefix_length, prefix) == 0))
   {
     scope = "Gtk::Stock::";
-    std::advance(id_pos, prefix_length);
+
+    // This does not work with the SUN Forte compiler:
+    // "/opt/SUNWspro/WS6U2/include/CC/Cstd/rw/iterator", 
+    // line 331: Error: Could not find a match for 
+    // std::__iterator_category<std::T>(Glib::ustring_Iterator<const char*>).
+    // "example_stockbrowser.cc", line 186:     Where: While instantiating 
+    // "std::advance<Glib::ustring_Iterator<const char*>, unsigned>(Glib::ustring_Iterator<const char*>&, unsigned)".
+    // "example_stockbrowser.cc", line 186:     Where: Instantiated from non-template code.
+    //
+    // std::advance(id_pos, prefix_length);
+    //
+    // So we do this instead:
+    for(Glib::ustring::size_type i = 0; i < prefix_length; ++i)
+      ++id_pos;
   }
 
   Glib::ustring symbol;
