@@ -138,11 +138,6 @@ void PaneOptions::on_checkbutton1()
 
   Gtk::Widget *const pChild = m_pPaned->get_child1();
 
-  // TODO: That's a hack!  And it shows perfectly why we need proper RefPtr<Gtk::Object> support.
-  // What exactly would you like to see here instead? murrayc.
-  // Ensure that it stays alive while it's unparented.
-  const Glib::RefPtr<Gtk::Widget> refChild (pChild);   refChild->reference(); //Start with an extra ref. That's just one ref() and one unref().
-
   m_pPaned->remove(*pChild);
   m_pPaned->pack1(*pChild, options);
 }

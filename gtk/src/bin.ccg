@@ -33,8 +33,20 @@ namespace Gtk
 void 
 Bin::remove()
 {
-  if (gobj()->child)
-    gtk_container_remove(Container::gobj(), gobj()->child);
+  if(gobj()->child)
+  {
+    Gtk::Widget* cppChild = Glib::wrap(gobj()->child);
+    
+    //If this is a managed widget,
+    //then do an extra ref so that it will
+    //not be destroyed when adding to another container
+    //This should leave it in much the same state as when it was instantiated,
+    //before being added to the first container.
+    if(cppChild->is_managed_())
+      cppChild->reference();
+     
+    gtk_container_remove(Container::gobj(), cppChild->gobj());
+  }
 }
 
 void 
