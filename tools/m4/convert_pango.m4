@@ -14,6 +14,7 @@ _CONV_ENUM(Pango,WrapMode)
 _CONV_ENUM(Pango,TabAlign)
 _CONV_ENUM(Pango,Script)
 _CONV_ENUM(Pango,EllipsizeMode)
+_CONV_ENUM(Pango,RenderPart)
 
 # General conversions:
 _CONVERSION(`gchar*',`const char*',`($3)')
@@ -78,6 +79,7 @@ _CONVERSION(`GlyphGeometry',`PangoGlyphGeometry',`*($3).gobj()')
 _CONVERSION(`PangoGlyphString*',`GlyphString',`GlyphString(($3))')
 _CONVERSION(`PangoGlyphString*',`const GlyphString',`GlyphString(($3))')
 _CONVERSION(`const Pango::GlyphString&',`PangoGlyphString*',const_cast<PangoGlyphString*>($3.gobj()))
+_CONVERSION(`const GlyphString&',`PangoGlyphString*',const_cast<PangoGlyphString*>($3.gobj()))
 
 _CONVERSION(`PangoFont*',`Glib::RefPtr<Font>',Glib::wrap($3))
 _CONVERSION(`PangoFont*',`Glib::RefPtr<Pango::Font>',Glib::wrap($3))
@@ -116,6 +118,7 @@ _CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<Pango::LayoutLine>',`Glib::wrap($3)
 _CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<LayoutLine>',`Glib::wrap($3)')
 _CONVERSION(`PangoLayoutLine*',`Glib::RefPtr<const LayoutLine>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Pango::LayoutLine>&',`PangoLayoutLine*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<LayoutLine>&',`PangoLayoutLine*',__CONVERT_REFPTR_TO_P)
 # Special treatment for the Sun Forte compiler
 _CONVERSION(`const Glib::RefPtr<const Pango::LayoutLine>&',`PangoLayoutLine*',__CONVERT_CONST_REFPTR_TO_P_SUN(Pango::LayoutLine))
 _CONVERSION(`const Glib::RefPtr<const LayoutLine>&',`PangoLayoutLine*',__CONVERT_CONST_REFPTR_TO_P_SUN(LayoutLine))
@@ -135,6 +138,9 @@ _CONVERSION(`TabArray&',`PangoTabArray*',($3).gobj())
 _CONVERSION(`PangoTabAlign&',`PangoTabAlign*',`&$3',`*$3')
 _CONVERSION(`Pango::TabAlign&',`PangoTabAlign*',`((PangoTabAlign*) &($3))')
 _CONVERSION(`TabAlign&',`PangoTabAlign*',`((PangoTabAlign*) &($3))')
+
+_CONVERSION(`const Matrix&',`const PangoMatrix*',`&($3)')
+#_CONVERSION(`const Matrix&',`PangoMatrix*',`const_cast<PangoMatrix*>(&($3))')
 
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`GSList*',`SListHandle_LayoutLine',__FL2H_SHALLOW)

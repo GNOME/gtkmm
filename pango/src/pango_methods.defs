@@ -77,6 +77,20 @@
   (gtype-id "PANGO_TYPE_FONTSET")
 )
 
+(define-object Renderer
+  (in-module "Pango")
+  (parent "GObject")
+  (c-name "PangoRenderer")
+  (gtype-id "PANGO_TYPE_RENDERER")
+)
+
+(define-object XftRenderer
+  (in-module "Pango")
+  (parent "PangoRenderer")
+  (c-name "PangoXftRenderer")
+  (gtype-id "PANGO_TYPE_XFT_RENDERER")
+)
+
 ;; Enumerations and flags ...
 
 (define-enum AttrType
@@ -102,6 +116,8 @@
     '("scale" "PANGO_ATTR_SCALE")
     '("fallback" "PANGO_ATTR_FALLBACK")
     '("letter-spacing" "PANGO_ATTR_LETTER_SPACING")
+    '("underline-color" "PANGO_ATTR_UNDERLINE_COLOR")
+    '("strikethrough-color" "PANGO_ATTR_STRIKETHROUGH_COLOR")
   )
 )
 
@@ -237,6 +253,18 @@
   (values
     '("sub" "PANGO_OT_TABLE_GSUB")
     '("pos" "PANGO_OT_TABLE_GPOS")
+  )
+)
+
+(define-enum RenderPart
+  (in-module "Pango")
+  (c-name "PangoRenderPart")
+  (gtype-id "PANGO_TYPE_RENDER_PART")
+  (values
+    '("foreground" "PANGO_RENDER_PART_FOREGROUND")
+    '("background" "PANGO_RENDER_PART_BACKGROUND")
+    '("underline" "PANGO_RENDER_PART_UNDERLINE")
+    '("strikethrough" "PANGO_RENDER_PART_STRIKETHROUGH")
   )
 )
 
@@ -496,6 +524,17 @@
   )
 )
 
+(define-function pango_attr_underline_color_new
+  (c-name "pango_attr_underline_color_new")
+  (is-constructor-of "PangoAttrUnderlineColor")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("guint16" "red")
+    '("guint16" "green")
+    '("guint16" "blue")
+  )
+)
+
 (define-function pango_attr_strikethrough_new
   (c-name "pango_attr_strikethrough_new")
   (is-constructor-of "PangoAttrStrikethrough")
@@ -505,22 +544,23 @@
   )
 )
 
+(define-function pango_attr_strikethrough_color_new
+  (c-name "pango_attr_strikethrough_color_new")
+  (is-constructor-of "PangoAttrStrikethroughColor")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("guint16" "red")
+    '("guint16" "green")
+    '("guint16" "blue")
+  )
+)
+
 (define-function pango_attr_rise_new
   (c-name "pango_attr_rise_new")
   (is-constructor-of "PangoAttrRise")
   (return-type "PangoAttribute*")
   (parameters
     '("int" "rise")
-  )
-)
-
-(define-function pango_attr_shape_new
-  (c-name "pango_attr_shape_new")
-  (is-constructor-of "PangoAttrShape")
-  (return-type "PangoAttribute*")
-  (parameters
-    '("const-PangoRectangle*" "ink_rect")
-    '("const-PangoRectangle*" "logical_rect")
   )
 )
 
@@ -548,6 +588,28 @@
   (return-type "PangoAttribute*")
   (parameters
     '("int" "letter_spacing")
+  )
+)
+
+(define-function pango_attr_shape_new
+  (c-name "pango_attr_shape_new")
+  (is-constructor-of "PangoAttrShape")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("const-PangoRectangle*" "ink_rect")
+    '("const-PangoRectangle*" "logical_rect")
+  )
+)
+
+(define-function pango_attr_shape_new_with_data
+  (c-name "pango_attr_shape_new_with_data")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("const-PangoRectangle*" "ink_rect")
+    '("const-PangoRectangle*" "logical_rect")
+    '("gpointer" "data")
+    '("PangoAttrDataCopyFunc" "copy_func")
+    '("GDestroyNotify" "destroy_func")
   )
 )
 
@@ -1094,6 +1156,11 @@
 
 (define-function pango_ellipsize_mode_get_type
   (c-name "pango_ellipsize_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function pango_render_part_get_type
+  (c-name "pango_render_part_get_type")
   (return-type "GType")
 )
 
@@ -1942,6 +2009,11 @@
 
 (define-function pango_ft2_font_get_type
   (c-name "pango_ft2_font_get_type")
+  (return-type "GType")
+)
+
+(define-function pango_ft2_renderer_get_type
+  (c-name "pango_ft2_renderer_get_type")
   (return-type "GType")
 )
 
@@ -2947,6 +3019,156 @@
 
 
 
+;; From /home/murrayc/cvs/gnome210/pango/pango/pango-renderer.h
+
+(define-function pango_renderer_get_type
+  (c-name "pango_renderer_get_type")
+  (return-type "GType")
+)
+
+(define-method draw_layout
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_layout")
+  (return-type "none")
+  (parameters
+    '("PangoLayout*" "layout")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-method draw_layout_line
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_layout_line")
+  (return-type "none")
+  (parameters
+    '("PangoLayoutLine*" "line")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-method draw_glyphs
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_glyphs")
+  (return-type "none")
+  (parameters
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-method draw_rectangle
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_rectangle")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+    '("int" "x")
+    '("int" "y")
+    '("int" "width")
+    '("int" "height")
+  )
+)
+
+(define-method draw_error_underline
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_error_underline")
+  (return-type "none")
+  (parameters
+    '("int" "x")
+    '("int" "y")
+    '("int" "width")
+    '("int" "height")
+  )
+)
+
+(define-method draw_trapezoid
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_trapezoid")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+    '("double" "y1")
+    '("double" "x11")
+    '("double" "x21")
+    '("double" "y2")
+    '("double" "x12")
+    '("double" "x22")
+  )
+)
+
+(define-method draw_glyph
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_draw_glyph")
+  (return-type "none")
+  (parameters
+    '("PangoFont*" "font")
+    '("PangoGlyph" "glyph")
+    '("double" "x")
+    '("double" "y")
+  )
+)
+
+(define-method activate
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_activate")
+  (return-type "none")
+)
+
+(define-method deactivate
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_deactivate")
+  (return-type "none")
+)
+
+(define-method part_changed
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_part_changed")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+  )
+)
+
+(define-method set_color
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_set_color")
+  (return-type "none")
+  (parameters
+    '("PangoRenderPart" "part")
+    '("const-PangoColor*" "color")
+  )
+)
+
+(define-method get_color
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_get_color")
+  (return-type "PangoColor*")
+  (parameters
+    '("PangoRenderPart" "part")
+  )
+)
+
+(define-method set_matrix
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_set_matrix")
+  (return-type "none")
+  (parameters
+    '("const-PangoMatrix*" "matrix")
+  )
+)
+
+(define-method get_matrix
+  (of-object "PangoRenderer")
+  (c-name "pango_renderer_get_matrix")
+  (return-type "const-PangoMatrix*")
+)
+
+
+
 ;; From /home/murrayc/cvs/gnome210/pango/pango/pango-script.h
 
 (define-function pango_script_for_unichar
@@ -3408,6 +3630,19 @@
   )
 )
 
+(define-function pango_win32_render_transformed
+  (c-name "pango_win32_render_transformed")
+  (return-type "none")
+  (parameters
+    '("HDC" "hdc")
+    '("const-PangoMatrix*" "matrix")
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
 (define-function pango_win32_get_unknown_glyph
   (c-name "pango_win32_get_unknown_glyph")
   (return-type "PangoGlyph")
@@ -3630,33 +3865,6 @@
   )
 )
 
-(define-function pango_xft_render
-  (c-name "pango_xft_render")
-  (return-type "none")
-  (parameters
-    '("XftDraw*" "draw")
-    '("XftColor*" "color")
-    '("PangoFont*" "font")
-    '("PangoGlyphString*" "glyphs")
-    '("gint" "x")
-    '("gint" "y")
-  )
-)
-
-(define-function pango_xft_picture_render
-  (c-name "pango_xft_picture_render")
-  (return-type "none")
-  (parameters
-    '("Display*" "display")
-    '("Picture" "src_picture")
-    '("Picture" "dest_picture")
-    '("PangoFont*" "font")
-    '("PangoGlyphString*" "glyphs")
-    '("gint" "x")
-    '("gint" "y")
-  )
-)
-
 (define-function pango_xft_set_default_substitute
   (c-name "pango_xft_set_default_substitute")
   (return-type "none")
@@ -3676,6 +3884,11 @@
     '("Display*" "display")
     '("int" "screen")
   )
+)
+
+(define-function pango_xft_font_map_get_type
+  (c-name "pango_xft_font_map_get_type")
+  (return-type "GType")
 )
 
 (define-function pango_xft_font_get_type
@@ -3745,6 +3958,108 @@
 
 
 ;; From /home/murrayc/cvs/gnome210/pango/pango/pangoxft-private.h
+
+
+
+;; From /home/murrayc/cvs/gnome210/pango/pango/pangoxft-render.h
+
+(define-function pango_xft_renderer_get_type
+  (c-name "pango_xft_renderer_get_type")
+  (return-type "GType")
+)
+
+(define-function pango_xft_renderer_new
+  (c-name "pango_xft_renderer_new")
+  (is-constructor-of "PangoXftRenderer")
+  (return-type "PangoRenderer*")
+  (parameters
+    '("Display*" "display")
+    '("int" "screen")
+  )
+)
+
+(define-method set_draw
+  (of-object "PangoXftRenderer")
+  (c-name "pango_xft_renderer_set_draw")
+  (return-type "none")
+  (parameters
+    '("XftDraw*" "draw")
+  )
+)
+
+(define-method set_default_color
+  (of-object "PangoXftRenderer")
+  (c-name "pango_xft_renderer_set_default_color")
+  (return-type "none")
+  (parameters
+    '("PangoColor*" "default_color")
+  )
+)
+
+(define-function pango_xft_render
+  (c-name "pango_xft_render")
+  (return-type "none")
+  (parameters
+    '("XftDraw*" "draw")
+    '("XftColor*" "color")
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("gint" "x")
+    '("gint" "y")
+  )
+)
+
+(define-function pango_xft_picture_render
+  (c-name "pango_xft_picture_render")
+  (return-type "none")
+  (parameters
+    '("Display*" "display")
+    '("Picture" "src_picture")
+    '("Picture" "dest_picture")
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("gint" "x")
+    '("gint" "y")
+  )
+)
+
+(define-function pango_xft_render_transformed
+  (c-name "pango_xft_render_transformed")
+  (return-type "none")
+  (parameters
+    '("XftDraw*" "draw")
+    '("XftColor*" "color")
+    '("PangoMatrix*" "matrix")
+    '("PangoFont*" "font")
+    '("PangoGlyphString*" "glyphs")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-function pango_xft_render_layout_line
+  (c-name "pango_xft_render_layout_line")
+  (return-type "none")
+  (parameters
+    '("XftDraw*" "draw")
+    '("XftColor*" "color")
+    '("PangoLayoutLine*" "line")
+    '("int" "x")
+    '("int" "y")
+  )
+)
+
+(define-function pango_xft_render_layout
+  (c-name "pango_xft_render_layout")
+  (return-type "none")
+  (parameters
+    '("XftDraw*" "draw")
+    '("XftColor*" "color")
+    '("PangoLayout*" "layout")
+    '("int" "x")
+    '("int" "y")
+  )
+)
 
 
 

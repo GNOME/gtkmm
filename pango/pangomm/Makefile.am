@@ -19,7 +19,7 @@ sublib_files_extra_general_deprecated_cc =
 
 sublib_files_extra_posix_h =
 sublib_files_extra_win32_h =
-sublib_files_extra_general_h = init.h
+sublib_files_extra_general_h = init.h types.h
 sublib_files_extra_general_deprecated_h = 
 
 include $(top_srcdir)/build_shared/Makefile_build.am_fragment
