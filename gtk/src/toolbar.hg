@@ -22,49 +22,12 @@
 #include <gtkmm/container.h>
 #include <gtkmm/stockid.h>
 
-#include <gtkmm/toolbar_elements.h> //deprecated helper API
-
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/container_p.h)
 
 
 namespace Gtk
 {
-
-_CC_INCLUDE(gtk/gtktypebuiltins.h)
-
-/** @defgroup Toolbars Toolbar classes
- */
-
-class Toolbar;
-class RadioButtonGroup;
-
-namespace Toolbar_Helpers
-{
-
-//Forward declaration, needed when GTKMM_DISABLE_DEPRECATED is defined.
-class ToolList;
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-
-#m4 include(list.m4)
-
-//TODO: I think that we must deprecate ToolList because we must deprecate Tool because it
-//derives from the deprecated GtkToolBarChild. Or maybe we can reimplement it in another way.
-//murrayc
-  GP_LIST(ToolList,Toolbar,GtkToolbar,Tool,children)
-  //The standard iterator, instead of List_Cpp_Iterator,
-  //only works because Child is derived from GtkToolbarChild.
-
-  virtual void remove(Widget& widget);
-  GP_LIST_FIND(get_widget)
-  GP_LIST_END()
-
-#endif //GTKMM_DISABLE_DEPRECATED
-
-} //namespace Toolbar_Helpers
-
-
 
 /** Bars of buttons and other widgets.
  * The STL-style container is available via the tools() method.
@@ -76,12 +39,7 @@ class Toolbar : public Container
 {
   _CLASS_GTKOBJECT(Toolbar,GtkToolbar,GTK_TOOLBAR,Gtk::Container,GtkContainer)
 public:
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  typedef Toolbar_Helpers::ToolList ToolList;
-#endif //GTKMM_DISABLE_DEPRECATED
-
-  _CTOR_DEFAULT
+  _CTOR_DEFAULT()
 
   //TODO: Add sigc::slot<> parameter as well?
   _WRAP_METHOD(void insert(ToolItem& item, int pos), gtk_toolbar_insert)
@@ -106,69 +64,23 @@ public:
   _WRAP_METHOD(void set_tooltips(bool enable = true), gtk_toolbar_set_tooltips)
   _WRAP_METHOD(bool get_tooltips() const, gtk_toolbar_get_tooltips)
 
-  _WRAP_METHOD(void set_icon_size(IconSize icon_size), gtk_toolbar_set_icon_size)
-  _WRAP_METHOD(IconSize get_icon_size() const, gtk_toolbar_get_icon_size)
-
   _WRAP_METHOD(void unset_toolbar_style(), gtk_toolbar_unset_style)
-  _WRAP_METHOD(void unset_icon_size(), gtk_toolbar_unset_icon_size)
+  
+  //Note that gtk_toolbar_set_icon_size() is deprecated, bug gtk_toolbar_get_icon_size() is not.
+  _WRAP_METHOD(IconSize get_icon_size() const, gtk_toolbar_get_icon_size);
  
   _WRAP_METHOD(ReliefStyle get_relief_style() const, gtk_toolbar_get_relief_style)
-  _WRAP_METHOD(int get_drop4_index(int x, int y) const, gtk_toolbar_get_drop_index)
+  _WRAP_METHOD(int get_drop_index(int x, int y) const, gtk_toolbar_get_drop_index)
   _WRAP_METHOD(void set_drop_highlight_item(ToolItem& tool_item, int index), gtk_toolbar_set_drop_highlight_item)
   void unset_drop_highlight_item();
 
+  _WRAP_SIGNAL(void orientation_changed(Orientation orientation), "orientation_changed")
+  _WRAP_SIGNAL(void toolbar_style_changed(ToolbarStyle style), "style_changed")
+  _WRAP_SIGNAL(bool popup_context_menu(int x, int y, int button_number), "popup_context_menu")
+  _IGNORE_SIGNAL("move_focus")
+  _IGNORE_SIGNAL("focus_home_or_end")
 
-
-  #ifndef GTKMM_DISABLE_DEPRECATED
-
-  ///STL-style container.
-  ToolList& tools();
-  
-  ///STL-style container.
-  const ToolList& tools() const;
-
-  typedef Toolbar_Helpers::Callback0 Callback0;
-  Gtk::Widget* append_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Gtk::Widget& icon, Callback0 slot);
-  Gtk::Widget* append_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Callback0 slot);
-  _IGNORE(gtk_toolbar_append_item)
-    
-  Gtk::Widget* prepend_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Gtk::Widget& icon, Callback0 slot);
-  Gtk::Widget* prepend_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Callback0 slot);
-  _IGNORE(gtk_toolbar_prepend_item)
-    
-  Gtk::Widget* insert_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Gtk::Widget& icon, Callback0 slot,
-    int position);
-  Gtk::Widget* insert_item(const Glib::ustring& text, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Callback0 slot,
-    int position);
-  _IGNORE(gtk_toolbar_insert_item)
-
-  Gtk::Widget* insert_stock(const Gtk::StockID& stock_id, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text,
-    Callback0 slot,
-    int position);
-  _IGNORE(gtk_toolbar_insert_stock)
-
-
-  _WRAP_METHOD(void append_space(), gtk_toolbar_append_space)
-  _WRAP_METHOD(void prepend_space(), gtk_toolbar_prepend_space)
-  _WRAP_METHOD(void insert_space(int position), gtk_toolbar_insert_space)
-  _WRAP_METHOD(void remove_space(int position), gtk_toolbar_remove_space)
-
-  _WRAP_METHOD(void append_widget(Gtk::Widget& widget, const Glib::ustring& tooltip_text = Glib::ustring(), const Glib::ustring& tooltip_private_text = Glib::ustring()), gtk_toolbar_append_widget)
-  _WRAP_METHOD(void prepend_widget(Gtk::Widget& widget, const Glib::ustring& tooltip_text = Glib::ustring(), const Glib::ustring& tooltip_private_text = Glib::ustring()), gtk_toolbar_prepend_widget)
-  _WRAP_METHOD(void insert_widget(Gtk::Widget& widget, const Glib::ustring& tooltip_text, const Glib::ustring& tooltip_private_text, int position), gtk_toolbar_insert_widget)
-
-  //Let's not wrap gtk_toolbar_*_element(), because they don't do anything extra, and it's an unclear API.
-  _IGNORE(gtk_toolbar_append_element, gtk_toolbar_prepend_element, gtk_toolbar_insert_element)
-
-  #endif //GTKMM_DISABLE_DEPRECATED
-
-  //TODO: Is this the same as Container::children().size()?
+  //This is probably the same as Container::children().size(), which is deprecated anyway?
   //_MEMBER_GET(num_children, num_children, int, gint)
 
   //There is already set/get_orientation():
@@ -180,22 +92,18 @@ public:
   //There is already set/get_icon_size():
   //_MEMBER_GET(icon_size, icon_size, int, gint)
 
-  _WRAP_SIGNAL(void orientation_changed(Orientation orientation), "orientation_changed")
-  _WRAP_SIGNAL(void toolbar_style_changed(ToolbarStyle style), "style_changed")
-  _WRAP_SIGNAL(bool popup_context_menu(int x, int y, int button_number), "popup_context_menu")
-  _IGNORE_SIGNAL("move_focus)
-  _IGNORE_SIGNAL("focus_home_or_end)
+  //Ignore deprecated GtkToolbarAPI:
+  //Normally we just deprecate it in gtkmm too,
+  //but the GtkToolbar compatibility system is particularly unpleasant, so we just removed it in gtkmm 2.4. murrayc.
+  _IGNORE(gtk_toolbar_set_icon_size, gtk_toolbar_unset_icon_size,
+          gtk_toolbar_append_item, gtk_toolbar_prepend_item, gtk_toolbar_insert_item, gtk_toolbar_insert_stock
+          gtk_toolbar_append_space, gtk_toolbar_prepend_space, gtk_toolbar_insert_space, gtk_toolbar_remove_space
+          gtk_toolbar_append_element, gtk_toolbar_prepend_element, gtk_toolbar_insert_element,
+          gtk_toolbar_append_widget, gtk_toolbar_repend_widget, gtk_toolbar_insert_widget)
     
   _WRAP_PROPERTY("orientation", Orientation)
   _WRAP_PROPERTY("toolbar_style", ToolbarStyle)
   _WRAP_PROPERTY("show_arrow", bool)
-
-protected:
-  //deprecated:
-  //We use a pointer, because that allows us only to declare the type
-  //with a prototype, so we can deprecate the type.
-  typedef std::auto_ptr<Toolbar_Helpers::ToolList> tools_proxy_ptr_type;
-  mutable tools_proxy_ptr_type tools_proxy_;
 };
 
 } // namespace Gtk

@@ -15,7 +15,7 @@
 //#include <gtk/gtk.h>
 
 class MainWindowClass 
-    : public Gtk::Window
+  : public Gtk::Window
 {
 public:
     MainWindowClass ();
@@ -43,7 +43,6 @@ MainWindowClass::toolbar_item_cb (Gtk::Toolbar* toolbar,
 
 MainWindowClass::MainWindowClass()
 {
-    using namespace Gtk::Toolbar_Helpers;
     using namespace Gtk::Menu_Helpers;
 
     set_size_request (350,100);
@@ -63,33 +62,33 @@ MainWindowClass::MainWindowClass()
     vbox->pack_start (*button);
 
 
-    Gtk::ToolButton* toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::NEW));
+    Gtk::ToolButton* toolbutton = manage(new Gtk::ToolButton(Gtk::Stock::NEW));
     toolbutton->set_label("New Item");
-    toolbutton->set_is_important(); // show the label in both_horiz
-    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "New Item"));
+    toolbutton->set_is_important();
+    toolbutton->signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "New Item") );
     toolbar->append(*toolbutton);
 
-    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::OPEN));
+    toolbutton = manage(new Gtk::ToolButton(Gtk::Stock::OPEN));
     toolbutton->set_label("Open Item");
-    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Open Item"));
+    toolbutton->signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "Open Item") );
     toolbar->append(*toolbutton);
 
-    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::SAVE));
+    toolbutton = manage(new Gtk::ToolButton(Gtk::Stock::SAVE));
     toolbutton->set_label("Save Item");
-    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Save Item"));
+    toolbutton->signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "Save Item") );
     toolbar->append(*toolbutton);
 
-    Gtk::SeparatorToolItem *toolitem = manage (new Gtk::SeparatorToolItem());
-    toolbar->append(*toolitem);
+    Gtk::SeparatorToolItem* separator = manage(new Gtk::SeparatorToolItem());
+    toolbar->append(*separator);
 
-    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::UNDO));
-    toolbutton->set_label("Undo action");
-    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Undo action"));
+    toolbutton = manage(new Gtk::ToolButton(Gtk::Stock::UNDO));
+    toolbutton->set_label("Undo Item");
+    toolbutton->signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "Undo Item") );
     toolbar->append(*toolbutton);
 
-    toolbutton = manage (new Gtk::ToolButton(Gtk::Stock::REDO));
-    toolbutton->set_label("Redo action");
-    toolbutton->signal_clicked().connect(sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_cb), "Redo action"));
+    toolbutton = manage(new Gtk::ToolButton(Gtk::Stock::REDO));
+    toolbutton->set_label("Redo Item");
+    toolbutton->signal_clicked().connect( sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "Redo Item") );
     toolbar->append(*toolbutton);
 
     Gtk::Menu* menu = manage (new Gtk::Menu ());
@@ -97,33 +96,29 @@ MainWindowClass::MainWindowClass()
 
     menu->items ()
         .push_back (MenuElem ("Icons",
-                              sigc::bind (sigc::mem_fun (*this, 
-                                          &MainWindowClass::toolbar_item_cb),
+                              sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_ICONS)));
     menu->items ()
         .push_back (MenuElem ("Text",
-                              sigc::bind (sigc::mem_fun (*this, 
-                                          &MainWindowClass::toolbar_item_cb),
+                              sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_TEXT)));
     menu->items ()
         .push_back (MenuElem ("Both",
-                              sigc::bind (sigc::mem_fun (*this, 
-                                          &MainWindowClass::toolbar_item_cb),
+                              sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_BOTH)));
     menu->items ()
         .push_back (MenuElem ("Both (horiz)",
-                              sigc::bind (sigc::mem_fun (*this, 
-                                          &MainWindowClass::toolbar_item_cb),
+                              sigc::bind (sigc::mem_fun (*this, &MainWindowClass::toolbar_item_cb),
                                     toolbar,
                                     Gtk::TOOLBAR_BOTH_HORIZ)));
     
     menu->items ()[0].activate ();
     optionmenu->set_history (0);
 
-    vbox->show_all_children ();
+    show_all_children();
 }
 
 MainWindowClass::~MainWindowClass ()

@@ -102,8 +102,6 @@ Example_AppWindow::Example_AppWindow()
 */
   //Toolbar:
   {
-    using namespace Gtk::Toolbar_Helpers;
-
     m_Table.attach(m_Toolbar,
                    /* X direction */       /* Y direction */
                    0, 1,                   1, 2,
