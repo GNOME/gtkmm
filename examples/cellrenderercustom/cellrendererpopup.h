@@ -18,8 +18,11 @@ public:
   void set_focus_widget(Gtk::Widget& focus_widget);
   Gtk::Widget* get_focus_widget();
 
-  SigC::Signal5<void,const Glib::ustring&,int,int,int,int>& signal_show_popup();
-  SigC::Signal0<void>&                                      signal_hide_popup();
+  typedef SigC::Signal5<void,const Glib::ustring&,int,int,int,int> SignalShowPopup;
+  SignalShowPopup& signal_show_popup();
+
+  typedef SigC::Signal0<void> SignalHidePopup;
+  SignalHidePopup& signal_hide_popup();
 
   void hide_popup();
 
@@ -27,7 +30,7 @@ protected:
   virtual void get_size_vfunc(Gtk::Widget& widget,
                               const Gdk::Rectangle* cell_area,
                               int* x_offset, int* y_offset,
-                              int* width,    int* height);
+                              int* width,    int* height) const;
 
   virtual Gtk::CellEditable* start_editing_vfunc(GdkEvent* event,
                                                  Gtk::Widget& widget,
@@ -42,10 +45,10 @@ protected:
 private:
   typedef CellRendererPopup Self;
 
-  SigC::Signal5<void,const Glib::ustring&,int,int,int,int>  signal_show_popup_;
-  SigC::Signal0<void>                                       signal_hide_popup_;
+  SignalShowPopup  signal_show_popup_;
+  SignalHidePopup signal_hide_popup_;
 
-  int           button_width_;
+  mutable int   button_width_; //mutable because it is just a cache.
   Gtk::Window   popup_window_;
   Gtk::Widget*  focus_widget_;
   PopupEntry*   popup_entry_;

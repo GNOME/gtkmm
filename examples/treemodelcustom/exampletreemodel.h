@@ -36,22 +36,22 @@ public:
 protected:
 
    // Overrides:
-   virtual Gtk::TreeModelFlags get_flags_vfunc();
-   virtual int get_n_columns_vfunc();
-   virtual GType get_column_type_vfunc(int index);
-   virtual void get_value_vfunc(const TreeModel::iterator& iter, int column, Glib::ValueBase& value);
+   virtual Gtk::TreeModelFlags get_flags_vfunc() const;
+   virtual int get_n_columns_vfunc() const;
+   virtual GType get_column_type_vfunc(int index) const;
+   virtual void get_value_vfunc(const TreeModel::iterator& iter, int column, Glib::ValueBase& value) const;
   
    bool iter_next_vfunc(const iterator& iter, iterator& iter_next) const;
 
    //TODO: Make sure that we make all of these const when we have made them all const in the TreeModel:
-   virtual bool iter_children_vfunc(const iterator& parent, iterator& iter);
+   virtual bool iter_children_vfunc(const iterator& parent, iterator& iter) const;
    virtual bool iter_has_child_vfunc(const iterator& iter) const;
    virtual int iter_n_children_vfunc(const iterator& iter) const;
    virtual int iter_n_root_children_vfunc() const;
    virtual bool iter_nth_child_vfunc(const iterator& parent, int n, iterator& iter) const;
    virtual bool iter_nth_root_child_vfunc(int n, iterator& iter) const;
    virtual bool iter_parent_vfunc(const iterator& child, iterator& iter) const;
-   virtual Path get_path_vfunc(const iterator& iter);
+   virtual Path get_path_vfunc(const iterator& iter) const;
    virtual bool get_iter_vfunc(const Path& path, iterator& iter) const;
 
    virtual bool iter_is_valid(const iterator& iter) const;
@@ -61,6 +61,7 @@ private:
    typedef std::vector< typeRow > typeListOfRows; //Y rows.
    
    typeListOfRows::iterator get_data_row_iter_from_tree_row_iter(const iterator& iter);
+   typeListOfRows::const_iterator get_data_row_iter_from_tree_row_iter(const iterator& iter) const;
    bool check_treeiter_validity(const iterator& iter) const;
 
    //The data:

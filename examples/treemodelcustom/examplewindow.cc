@@ -22,7 +22,7 @@
 ExampleWindow::ExampleWindow()
 : m_Button_Quit("Quit")
 {
-  set_title("Gtk::TreeView (TreeStore) example");
+  set_title("Gtk::TreeView (custom TreeModel) example");
   set_border_width(5);
   set_default_size(400, 200);
 

@@ -70,17 +70,17 @@ Glib::RefPtr<ExampleTreeModel> ExampleTreeModel::create()
   return Glib::RefPtr<ExampleTreeModel>( new ExampleTreeModel );
 }
 
-Gtk::TreeModelFlags ExampleTreeModel::get_flags_vfunc()
+Gtk::TreeModelFlags ExampleTreeModel::get_flags_vfunc() const
 {
    return Gtk::TreeModelFlags(0);
 }
 
-int ExampleTreeModel::get_n_columns_vfunc()
+int ExampleTreeModel::get_n_columns_vfunc() const
 {
    return m_rows[0].size(); //The number of columns in the first (same as every one) row.
 }
 
-GType ExampleTreeModel::get_column_type_vfunc(int index)
+GType ExampleTreeModel::get_column_type_vfunc(int index) const
 {
   if(index <= (int)m_listModelColumns.size())
     return m_listModelColumns[index].type();
@@ -88,10 +88,10 @@ GType ExampleTreeModel::get_column_type_vfunc(int index)
     return 0;
 }
 
-void ExampleTreeModel::get_value_vfunc(const TreeModel::iterator& iter, int column, Glib::ValueBase& value)
+void ExampleTreeModel::get_value_vfunc(const TreeModel::iterator& iter, int column, Glib::ValueBase& value) const
 {
   if(check_treeiter_validity(iter))
-  {  
+  {
     if(column <= (int)m_listModelColumns.size())
     {
       //Get the correct ValueType from the Gtk::TreeModel::Column's type, so we don't have to repeat it here:
@@ -101,11 +101,11 @@ void ExampleTreeModel::get_value_vfunc(const TreeModel::iterator& iter, int colu
       //Or, instead of asking the compiler for the TreeModelColumn's ValueType:
       //Glib::Value< Glib::ustring > value_specific;
       //value_specific.init( Glib::Value< Glib::ustring >::value_type() ); //TODO: Is there any way to avoid this step?
-
-      typeListOfRows::iterator dataRowIter = get_data_row_iter_from_tree_row_iter(iter);
+      
+      typeListOfRows::const_iterator dataRowIter = get_data_row_iter_from_tree_row_iter(iter);
       if(dataRowIter != m_rows.end())
       {
-        typeRow& dataRow = *dataRowIter;
+        const typeRow& dataRow = *dataRowIter;
 
         Glib::ustring result = dataRow[column];
 
@@ -118,7 +118,7 @@ void ExampleTreeModel::get_value_vfunc(const TreeModel::iterator& iter, int colu
 }
 
 bool ExampleTreeModel::iter_next_vfunc(const iterator& iter, iterator& iter_next) const
-{
+{ 
   if( check_treeiter_validity(iter) )
   {
     //Start with an iter to the same row:
@@ -128,7 +128,7 @@ bool ExampleTreeModel::iter_next_vfunc(const iterator& iter, iterator& iter_next
     typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter_next.gobj()->user_data;
     row_index++;
     if( row_index < m_rows.size() )
-    {
+    { 
       //Put the index of the next row in the iter, replacing the previous row index:
       //TODO: Discover how to associate more complex data with the iterator. Memory management seems difficult. murrayc
       iter_next.gobj()->user_data = (void*)row_index;
@@ -141,7 +141,7 @@ bool ExampleTreeModel::iter_next_vfunc(const iterator& iter, iterator& iter_next
   return false; //There is no next row.
 }
 
-bool ExampleTreeModel::iter_children_vfunc(const iterator& parent, iterator& iter)
+bool ExampleTreeModel::iter_children_vfunc(const iterator& parent, iterator& iter) const
 {
   return iter_nth_child_vfunc(parent, 0, iter);
 }
@@ -161,7 +161,7 @@ int ExampleTreeModel::iter_n_children_vfunc(const iterator& iter) const
 
 int ExampleTreeModel::iter_n_root_children_vfunc() const
 {
-  return 0; //There are no children
+  return m_rows.size();
 }
 
 bool ExampleTreeModel::iter_nth_child_vfunc(const iterator& parent, int /* n */, iterator& iter) const
@@ -176,9 +176,23 @@ bool ExampleTreeModel::iter_nth_child_vfunc(const iterator& parent, int /* n */,
   return false; //There are no children.
 }
 
-bool ExampleTreeModel::iter_nth_root_child_vfunc(int /* n */, iterator& iter) const
+bool ExampleTreeModel::iter_nth_root_child_vfunc(int n, iterator& iter) const
 {
-  iter = iterator(); //Set is as invalid, as the TreeModel documentation says that it should be.
+  if(n < (int)m_rows.size())
+  {
+    iter = iterator(); //clear the input parameter.
+    iter.set_stamp(m_stamp);
+
+    //Store the row_index in the GtkTreeIter:
+    //See also iter_next_vfunc()
+    //TODO: Store a pointer to some more complex data type such as a typeListOfRows::iterator.
+
+    unsigned row_index = n;
+    iter.gobj()->user_data = (void*)row_index;
+   
+    return true;
+  }
+  
   return false; //There are no children.  
 }
   
@@ -195,7 +209,7 @@ bool ExampleTreeModel::iter_parent_vfunc(const iterator& child, iterator& iter) 
   return false; //There are no children, so no parents.
 }
 
-Gtk::TreeModel::Path ExampleTreeModel::get_path_vfunc(const iterator& /* iter */)
+Gtk::TreeModel::Path ExampleTreeModel::get_path_vfunc(const iterator& /* iter */) const
 {
    //TODO:
    return Path();
@@ -237,6 +251,15 @@ Gtk::TreeModelColumn< Glib::ustring >& ExampleTreeModel::get_model_column(int co
 }
 
 ExampleTreeModel::typeListOfRows::iterator ExampleTreeModel::get_data_row_iter_from_tree_row_iter(const iterator& iter)
+{
+  typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter.gobj()->user_data;
+  if( row_index > m_rows.size() )
+    return m_rows.end();
+  else
+    return m_rows.begin() + row_index; //TODO: Performance.
+}
+
+ExampleTreeModel::typeListOfRows::const_iterator ExampleTreeModel::get_data_row_iter_from_tree_row_iter(const iterator& iter) const
 {
   typeListOfRows::size_type row_index = (typeListOfRows::size_type)iter.gobj()->user_data;
   if( row_index > m_rows.size() )

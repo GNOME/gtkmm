@@ -20,15 +20,16 @@ public:
   Glib::PropertyProxy<bool> property_active();
   Glib::PropertyProxy<bool> property_radio();
 
-  SigC::Signal1<void, const Glib::ustring&>& signal_toggled();
+  typedef SigC::Signal1<void, const Glib::ustring&> SignalToggled;
+  SignalToggled& signal_toggled();
 
 protected:
   virtual void get_size_vfunc(Gtk::Widget& widget,
                               const Gdk::Rectangle* cell_area,
                               int* x_offset, int* y_offset,
-                              int* width,    int* height);
+                              int* width,    int* height) const;
 
-  virtual void render_vfunc(const Glib::RefPtr<Gdk::Window>& window,
+  virtual void render_vfunc(const Glib::RefPtr<Gdk::Drawable>& window,
                             Gtk::Widget& widget,
                             const Gdk::Rectangle& background_area,
                             const Gdk::Rectangle& cell_area,
@@ -47,7 +48,7 @@ private:
   Glib::Property<bool> property_active_;
   Glib::Property<bool> property_radio_;
 
-  SigC::Signal1<void, const Glib::ustring&> signal_toggled_;
+  SignalToggled signal_toggled_;
 };
 
 
@@ -58,8 +59,9 @@ public:
   virtual ~AppWindow();
 
 private:
-  struct ModelColumns : public Gtk::TreeModel::ColumnRecord
+  class ModelColumns : public Gtk::TreeModel::ColumnRecord
   {
+  public:
     Gtk::TreeModelColumn<Glib::ustring> text;
     Gtk::TreeModelColumn<bool>          active;
 
@@ -105,7 +107,7 @@ Glib::PropertyProxy<bool> MyCellRendererToggle::property_radio()
   return property_radio_.get_proxy();
 }
 
-SigC::Signal1<void, const Glib::ustring&>& MyCellRendererToggle::signal_toggled()
+MyCellRendererToggle::SignalToggled& MyCellRendererToggle::signal_toggled()
 {
   return signal_toggled_;
 }
@@ -113,7 +115,7 @@ SigC::Signal1<void, const Glib::ustring&>& MyCellRendererToggle::signal_toggled(
 void MyCellRendererToggle::get_size_vfunc(Gtk::Widget&,
                                           const Gdk::Rectangle* cell_area,
                                           int* x_offset, int* y_offset,
-                                          int* width,    int* height)
+                                          int* width,    int* height) const
 {
   enum { TOGGLE_WIDTH = 12 };
 
@@ -142,7 +144,7 @@ void MyCellRendererToggle::get_size_vfunc(Gtk::Widget&,
   }
 }
 
-void MyCellRendererToggle::render_vfunc(const Glib::RefPtr<Gdk::Window>& window,
+void MyCellRendererToggle::render_vfunc(const Glib::RefPtr<Gdk::Drawable>& window,
                                         Gtk::Widget& widget,
                                         const Gdk::Rectangle&,
                                         const Gdk::Rectangle& cell_area,
@@ -171,23 +173,28 @@ void MyCellRendererToggle::render_vfunc(const Glib::RefPtr<Gdk::Window>& window,
 
   const Gtk::ShadowType shadow = (property_active_) ? Gtk::SHADOW_IN : Gtk::SHADOW_OUT;
 
-  if(property_radio_)
+  //Cast the drawable to a Window. TODO: Maybe paint_option() should take a Drawable? murrayc.
+  Glib::RefPtr<Gdk::Window> window_casted = Glib::RefPtr<Gdk::Window>::cast_dynamic<>(window);
+  if(window_casted)
   {
-    widget.get_style()->paint_option(
-        window, state, shadow,
-        cell_area, widget, "cellradio",
-        cell_area.get_x() + x_offset + cell_xpad,
-        cell_area.get_y() + y_offset + cell_ypad,
-        width - 1, height - 1);
-  }
-  else
-  {
-    widget.get_style()->paint_check(
-        window, state, shadow,
-        cell_area, widget, "cellcheck",
-        cell_area.get_x() + x_offset + cell_xpad,
-        cell_area.get_y() + y_offset + cell_ypad,
-        width - 1, height - 1);
+    if(property_radio_)
+    {
+      widget.get_style()->paint_option(
+          window_casted, state, shadow,
+          cell_area, widget, "cellradio",
+          cell_area.get_x() + x_offset + cell_xpad,
+          cell_area.get_y() + y_offset + cell_ypad,
+          width - 1, height - 1);
+    }
+    else
+    {
+      widget.get_style()->paint_check(
+          window_casted, state, shadow,
+          cell_area, widget, "cellcheck",
+          cell_area.get_x() + x_offset + cell_xpad,
+          cell_area.get_y() + y_offset + cell_ypad,
+          width - 1, height - 1);
+    }
   }
 }
 

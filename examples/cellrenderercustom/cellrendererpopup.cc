@@ -74,12 +74,12 @@ Gtk::Widget* CellRendererPopup::get_focus_widget()
   return focus_widget_;
 }
 
-SigC::Signal5<void,const Glib::ustring&,int,int,int,int>& CellRendererPopup::signal_show_popup()
+CellRendererPopup::SignalShowPopup& CellRendererPopup::signal_show_popup()
 {
   return signal_show_popup_;
 }
 
-SigC::Signal0<void>& CellRendererPopup::signal_hide_popup()
+CellRendererPopup::SignalHidePopup& CellRendererPopup::signal_hide_popup()
 {
   return signal_hide_popup_;
 }
@@ -92,11 +92,11 @@ void CellRendererPopup::hide_popup()
 void CellRendererPopup::get_size_vfunc(Gtk::Widget& widget,
                                        const Gdk::Rectangle* cell_area,
                                        int* x_offset, int* y_offset,
-                                       int* width,    int* height)
+                                       int* width,    int* height) const
 {
   Gtk::CellRendererText::get_size_vfunc(widget, cell_area, x_offset, y_offset, width, height);
 
-  // We cache this becuase it takes really long to get the width.
+  // We cache this because it takes a really long time to get the width.
   if(button_width_ < 0)
     button_width_ = PopupEntry::get_button_width();
 
