@@ -116,11 +116,13 @@ public:
    * standard C++.  (You might need to use const_cast<>, though.)
    */
   Main(int* argc, char*** argv, bool set_locale = true);
+
+  /// See Main(int* argc, char*** argv, bool set_locale).
   Main(int& argc, char**& argv, bool set_locale = true);
 
   virtual ~Main();
 
-  /// Access to one global instance of Gtk::Main.
+  /// Access to the one global instance of Gtk::Main.
   static Gtk::Main* instance();
 
   /** Start the event loop.
@@ -133,14 +135,40 @@ public:
   /** Returns from the main loop when the window is closed.
    * When using this override, you should not use Gtk::Main::quit() to close
    * the application, but just call hide() on your Window class.
+   *
+   * @param window The window to show. This method will return when the window is hidden.
    */
   static void run(Window& window);
 
+  /** Makes the innermost invocation of the main loop return when it regains control.
+   */
   static void quit();
 
   static guint level();
 
-  static void iteration(bool blocking = true);
+  /** Runs a single iteration of the main loop.
+   * If no events are waiting to be processed GTK+ will block until the next event is noticed.
+   * If you don't want to block then pass false for @a blocking or check if any events are pending with
+   * pending() first.
+   *
+   * @param blocking Whether the caller must wait until the next event is noticed, or return immediately if there are no events.
+   * @result true if quit() has been called for the innermost main loop.
+   */
+  static bool iteration(bool blocking = true);
+
+  /** Checks if any events are pending. This can be used to update the GUI and invoke timeouts etc. while doing some time intensive computation.
+   *
+   * Example: Updating the GUI during a long computation.
+   * @code
+   * // computation going on
+   * while( Gtk::Main::events_pending() )
+   *   Gtk::Main::iteration();
+   *
+   * // computation continued
+   * @endcode
+   *
+   * @result true if any events are pending, false otherwise.
+   */
   static bool events_pending();
 
   /** Run signal
@@ -168,7 +196,7 @@ public:
    * Allows you to channel keypresses to a signal handler
    * without registering with the widget.
    *
-   * @param widget GtkWidget*
+   * @param widget Widget*
    * @param event GdkEventAny& 
    * @return int
    *
@@ -190,7 +218,7 @@ protected:
   virtual void run_impl();
   virtual void quit_impl();
   virtual guint level_impl();
-  virtual void iteration_impl(bool blocking);
+  virtual bool iteration_impl(bool blocking);
   virtual bool events_pending_impl();
 
   // Signal handlers:

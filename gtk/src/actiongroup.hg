@@ -40,8 +40,18 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Action> get_action(const Glib::ustring& action_name) const, gtk_action_group_get_action)
   //TODO: Const version:
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Action> > get_actions(), gtk_action_group_list_actions)
-  _WRAP_METHOD(void add(const Glib::RefPtr<Action>& action), gtk_action_group_add_action)
+  
+  void add(const Glib::RefPtr<Action>& action);
+  _IGNORE(gtk_action_group_add_action)
+  //We want it to always try to use the stock accelerator,
+  //so we use gtk_action_group_add_action_with_accel(), instead of gtk_action_group_add_action(),
+  //passing null for the accelerator.
 
+  void add(const Glib::RefPtr<Action>& action, const AccelKey& accel_key);
+  _IGNORE(gtk_action_group_add_action_with_accel)
+  //We need to duplicate the gtk_action_group_add_action_with_accel() implementation, because we want to
+  //use AccelKey, not just the accelerator string format that is _one_ of the ways to create an AccelKey.
+   
   //TODO: Could this whole class have an STL-style interface?
   //TODO: rename to push_back() instead?
   void add(const Glib::RefPtr<Action>& action, const Action::SlotActivate& slot);

@@ -25,6 +25,42 @@
 namespace Gtk
 {
 
+void ActionGroup::add(const Glib::RefPtr<Action>& action)
+{
+  gtk_action_group_add_action_with_accel(gobj(), Glib::unwrap(action),
+    0 /* accelerator=0 means use the stock accelerator if this is a stock item */ );
+}
+
+void ActionGroup::add(const Glib::RefPtr<Action>& action, const AccelKey& accel_key)
+{
+  // We need to half-duplicate the gtk_action_group_add_action_with_accel() implementation, because we want to
+  // use AccelKey, not just the accelerator string format that is _one_ of the ways to create an AccelKey. murrayc.
+
+  //The AccelKey might have been constructed from key+mod or from an accelerator string,
+  //but it the end that just produces a key+mod.
+  guint key = accel_key.get_key();
+  Gdk::ModifierType mod = accel_key.get_mod();
+  if(key)
+  {
+    // The AccelKey constructor can take an accel path, so I suppose we should not ignore it,
+    // but I can't imagine how it would be useful with the UIManager. murrayc.
+    Glib::ustring accel_path = accel_key.get_path();
+    if(accel_path.empty())
+    {
+      //Copied from the gtk_action_group_add_action_with_accel() implementation:
+      accel_path =  "<Actions>/" + get_name() + "/" + action->property_name();
+    }
+    
+    AccelMap::add_entry(accel_path, key, mod);
+
+    action->set_accel_path(accel_path);
+  }
+
+  gtk_action_group_add_action(gobj(), action->gobj());
+}
+
+  
+
 void ActionGroup::add(const Glib::RefPtr<Action>& action, const Action::SlotActivate& slot)
 {
   //This is meant to be similar to the gtk_action_group_add_actions() convenience method that is used from C.
@@ -42,8 +78,10 @@ void ActionGroup::add(const Glib::RefPtr<Action>& action, const AccelKey& accel_
   //This also does the work of gtk_action_group_add_toggle_actions() and gtk_action_group_add_radio_actions_full(),
   //because the extra stuff there is already done when the Action (or a derived type, such as ToggleAction) is create()ed.
 
-  add(action, slot);
+  action->signal_activate().connect(slot);
+  add(action, accel_key);
 
+  /*
   //Create the accel path (a kind of unique key):
   Glib::ustring accel_path = "<Actions>/" + get_name() + "/" + action->get_name();
 
@@ -52,6 +90,7 @@ void ActionGroup::add(const Glib::RefPtr<Action>& action, const AccelKey& accel_
 
   //USe the accel path:
   action->set_accel_path(accel_path);
+  */
 }  
 
 

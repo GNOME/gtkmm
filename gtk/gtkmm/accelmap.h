@@ -95,7 +95,7 @@ void save(const std::string& filename);
 
 /** Locks the given accelerator path.
  *
- * Locking an accelerator path prevents its accelerator to be changed
+ * Locking an accelerator path prevents its accelerator from being changed
  * during runtime. A locked accelerator path can be unlocked by
  * unlock_path(). Refer to change_entry()
  * about runtime accelerator changes.

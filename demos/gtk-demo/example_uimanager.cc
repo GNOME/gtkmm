@@ -77,19 +77,15 @@ Example_UIManager::Example_UIManager()
   m_refActionGroup->add( Gtk::Action::create("ColorMenu", "_Color") );
   m_refActionGroup->add( Gtk::Action::create("ShapeMenu", "_Shape") );
   m_refActionGroup->add( Gtk::Action::create("HelpMenu", "_Help") );
-  m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
-    Gtk::AccelKey("<control>N"),
+  m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),,
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
-    Gtk::AccelKey("<control>O"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
-    Gtk::AccelKey("<control>S"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As...", "Save to a file"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
-    Gtk::AccelKey("<control>Q"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
   m_refActionGroup->add( Gtk::Action::create("About", "_About", "About"),
     Gtk::AccelKey("<control>A"),
@@ -100,7 +96,6 @@ Example_UIManager::Example_UIManager()
 
   //Add Toggle Actions:
   m_refActionGroup->add( Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
-    Gtk::AccelKey("<control>B"),
     SigC::slot(*this, &Example_UIManager::on_action_activated) );
 
   //Add Radio Actions:
