@@ -89,6 +89,11 @@ private:
 };
 
 
+Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
+{
+  return Gdk::Pixbuf::create_from_file(name);
+}
+
 /*
  * Load all image files, create an empty buffer for storing the current frame,
  * and install a timeout handler that will be called periodically.  The show
@@ -102,7 +107,7 @@ DemoRenderArea::DemoRenderArea()
   std::transform(
       &image_names[0], &image_names[G_N_ELEMENTS(image_names)],
       std::back_inserter(images_),
-      &Gdk::Pixbuf::create_from_file);
+      &create_pixbuf);
 
   const int back_width  = background_->get_width();
   const int back_height = background_->get_height();
