@@ -7,7 +7,7 @@
 /* version numbers */
 #define GTKMM_MAJOR_VERSION 2
 #define GTKMM_MINOR_VERSION 4
-#define GTKMM_MICRO_VERSION 7
+#define GTKMM_MICRO_VERSION 8
 
 #ifdef GLIBMM_CONFIGURE
 /* compiler feature tests that are used during compile time and run-time
