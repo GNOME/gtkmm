@@ -4147,7 +4147,7 @@ the clipboard</simpara></listitem>
 <title>Timeouts</title>
 
 <para>
- You may be wondering how to make gtkmm do useful work while it's
+You may be wondering how to make gtkmm do useful work while it's
 idling along (well, sleeping actually) in <literal>Gtk::Main::run()</literal>.  Happily,
 you have several options. Using the following methods you can create
 a timeout method that will be called every few milliseconds.
@@ -4169,7 +4169,7 @@ used to deactivate the connection.
 <para>
 
 <programlisting>
-my_onnection.disconnect();
+my_connection.disconnect();
 </programlisting>
 </para>
 
@@ -4186,7 +4186,7 @@ definition of a sample method might look like this:
 
 
 <programlisting>
-bool MyCallback() { std::cout &#60;&#60; "Hello World!\n"; return true; }
+bool MyCallback() { std::cout &lt;&lt; "Hello World!\n" &lt;&lt; std::endl; return true; }
 </programlisting>
 
 
@@ -4211,7 +4211,9 @@ Here's an example of this technique:
 <title>Monitoring I/O</title>
 
 <para>
- A nifty feature of GDK (one of the libraries underlying
+TODO: This is now in Glib, not Gdk. 
+
+A nifty feature of GDK (one of the libraries underlying
 gtkmm) is the ability to have it check for data on a file descriptor
 for you.  This is especially useful for networking applications. The
 following method is used to do this:
@@ -4219,8 +4221,8 @@ following method is used to do this:
 
 <para>
 <programlisting>
-sigc::connection Gtk::Main::input.connect(const SlotType&amp; sd, int source,
-                                    GdkInputCondition condition);
+sigc::connection Glib::Main::SignalInput::connect(const SlotType&amp; sd, int source,
+                                    Glib::InputCondition condition);
 </programlisting>
 </para>
 
@@ -4288,80 +4290,7 @@ directory. Then start another shell and execute <literal>cat
 type <literal>quit</literal>.
 </para>
 
-<para>
-<emphasis>Source location: examples/input/input.cc</emphasis>
-
-<programlisting>
-#include &lt;gtkmm/main.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/stat.h&gt;
-#include &lt;fstream&gt;
-#include &lt;iostream&gt;
-#include &lt;memory&gt;
-
-using std::istream;
-
-using std::auto_ptr;
-
-auto_ptr&lt;istream&gt; input;
-
-
-// this will be our signal handler for read operations
-// there is not much to say. just read a string,
-// print it and quit the application if the string was quit
-void MyCallback(int, GdkInputCondition) {
-  Gtk::string dummy;
-  do {
-    (*input) &gt;&gt; dummy;
-    cout &lt;&lt; dummy &lt;&lt; endl;
-    if(dummy == "quit") Gtk::Main::quit();
-  } while(input-&gt;fail());
-}
-
-
-int main (int argc, char *argv[])
-{
-  // the usual Gtk::Main object
-  Gtk::Main app(argc, argv);
-
-  // create a fifo for testing purposes
-  if (mkfifo("testfifo",0666) != 0) {
-    cerr &lt;&lt; "error creating fifo" &lt;&lt; endl;
-    return -1;
-  }
-
-  // open the fifo
-  input=new ifstream("testfifo");
-
-//    int fd = open("testfifo", 0);
-//    if (fd == -1) {
-//      cerr &lt;&lt; "error opening fifo" &lt;&lt; endl;
-//      return -1;
-//    }
-
-  // assign the fifo's filedescriptor to our ifstream object
-  //This sucks; it will only ever work with libstdc++-v3, as
-  //  both istream::__filebuf_type and the basic_filebuf contructor
-  //  that takes an fd are libstdc++-v3 specific.
-  //input=new istream(new ifstream::__filebuf_type(fd,"testfifo"));
-
-  // connect the signal handler
-  app.input.connect(sigc::ptr_fun(MyCallback), fd, GDK_INPUT_READ);
-
-  // and last but not least - run the application main loop
-  app.run();
-
-  // now remove the temporary fifo
-  if(unlink("testfifo"))
-    cerr &lt;&lt; "error removing fifo" &lt;&lt; endl;
-
-  return 0;
-}
-
-</programlisting>
-</para>
+<para><ulink url="&url_examples_base;input/">Source Code</ulink></para>
 
 </sect1>
 
@@ -4374,7 +4303,7 @@ If you want to specify a method that gets called when nothing else is happening,
 
 <para>
 <programlisting>
-sigc::connection  Gtk::Main::idle.connect(Slot&lt;int&gt; idlefunc, int priority);
+sigc::connection  Glib::Main::SignalIdle::connect(const Slot&lt;int&gt;&amp; idlefunc, int priority);
 </programlisting>
 </para>
 
