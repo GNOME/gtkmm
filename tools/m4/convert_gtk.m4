@@ -439,7 +439,7 @@ _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnershi
 _CONVERSION(`GtkTreeModel*',`const Glib::RefPtr<const TreeModel>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',Glib::wrap($3, true))
-
+_CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true)')
 
 
 _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
