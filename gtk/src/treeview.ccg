@@ -22,6 +22,7 @@
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/treeview_private.h>
 #include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelfilter.h>
 
 namespace
 {
@@ -394,6 +395,22 @@ void TreeView::reset_expander_column()
   gtk_tree_view_set_expander_column(gobj(), 0 /* see C docs */);
 }
 
+Glib::RefPtr<Gtk::TreeModel> TreeView::_get_base_model()
+{
+  Glib::RefPtr<TreeModel> refModel = get_model();
+
+  bool get_child = true;
+  while(get_child && refModel)
+  {
+    Glib::RefPtr<Gtk::TreeModelFilter> refModelFilter = Glib::RefPtr<Gtk::TreeModelFilter>::cast_dynamic(refModel);
+    if(refModelFilter)
+      refModel = refModelFilter->get_model();
+    else
+      get_child = false;
+  }
+
+  return refModel;
+}
 
 void TreeView::_auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string,
                                                          int model_column)
@@ -401,7 +418,8 @@ void TreeView::_auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& pa
   Gtk::TreePath path (path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<TreeModel> refModel = get_model();
+  Glib::RefPtr<TreeModel> refModel = _get_base_model();
+
   Gtk::TreeModel::iterator iter = refModel->get_iter(path);
   if(iter)
   {
