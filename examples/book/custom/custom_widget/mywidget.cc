@@ -46,7 +46,7 @@ void MyWidget::on_size_allocate(Gtk::Allocation& allocation)
   //Do something with the space that we have actually been given:
   //(We will not be given heights or widths less than we have requested, though we might get more)
 
-  //Use the offered allocation for this container:
+  //Use the offered allocation:
   set_allocation(allocation);
 
   if(m_refGdkWindow)
