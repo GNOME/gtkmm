@@ -56,12 +56,10 @@ Glib::ustring ComboBoxText::get_active_text() const
   Glib::ustring result;
 
   //Get the active row:
-  unsigned int active_row = get_active();
-  Glib::RefPtr<const Gtk::TreeModel> model = get_model();
-  const Gtk::TreeModel::Children& children = model->children();
-  if(active_row < children.size())
+  TreeModel::iterator active_row = get_active();
+  if(active_row)
   {
-    Gtk::TreeModel::Row row = children[active_row];
+    Gtk::TreeModel::Row row = *active_row;
     result = row[m_text_columns.m_column];
   }
 
