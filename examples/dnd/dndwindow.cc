@@ -152,14 +152,12 @@ bool DnDWindow::on_image_drag_motion(const Glib::RefPtr<Gdk::DragContext>& conte
            GTK_OBJECT_TYPE_NAME (source_widget) :
            "NULL");
 
-  //TODO: Wrap the GList.
-  GList* tmp_list = context->gobj()->targets;
-  while(tmp_list)
+  typedef std::list<Glib::ustring> type_targets;
+  type_targets targets = context->get_targets();
+  for(type_targets::iterator iter = targets.begin(); iter != targets.end(); ++iter)
   {
-    Glib::ustring name = gdk_atom_name (GDK_POINTER_TO_ATOM (tmp_list->data));
+    Glib::ustring name = *iter;
     g_print ("%s\n", name.c_str());
-
-    tmp_list = tmp_list->next;
   }
 
   context->drag_status(context->get_suggested_action(), time);
@@ -181,8 +179,6 @@ bool DnDWindow::on_image_drag_drop(const Glib::RefPtr<Gdk::DragContext>& context
   m_Image.set(m_trashcan_closed, m_trashcan_closed_mask);
 
      
-
-
   if (context->gobj()->targets)
   {
     std::vector<Glib::ustring> targets = context->get_targets();

@@ -206,22 +206,20 @@ bool PPI::on_expose_event(GdkEventExpose*)
 
   // "RADAR DEMO!" text
    gc_->set_foreground(white_);  
-   Glib::ustring us1("RADAR");
-   Glib::ustring us2(" DEMO!");
+   Glib::ustring us1 = "RADAR";
+   Glib::ustring us2 = " DEMO!";
    Glib::ustring us3 = us1 + us2;
    Glib::RefPtr<Pango::Layout> pl1 = create_pango_layout(us3);
-   
-     // TODO: FontDescription   
-     Pango::FontDescription fd;
-     fd.set_size(1000);
-     pl1->set_font_description(/* const FontDescription& desc */ fd);
-     // TODO END
+     
+   Pango::FontDescription fd;
+   fd.set_size(1000);
+   pl1->set_font_description(/* const FontDescription& desc */ fd);
 
-     window->draw_layout(gc_, 0, 0, pl1);
+   window->draw_layout(gc_, 0, 0, pl1);
 
   // "Loop = " text
    gc_->set_foreground(white_);  
-   Glib::ustring us4("Loop=");
+   Glib::ustring us4 = "Loop=";
  
    // 21.5.3 TCPL 3eme ed. 
    std::ostringstream ost;

@@ -68,8 +68,7 @@ void DnDWindow::on_label_drop_drag_data_received(const Glib::RefPtr<Gdk::DragCon
 { 
   if ((selection_data.get_length() >= 0) && (selection_data.get_format() == 8))
   {
-    //TODO: Use a get_data_as_string or something like that.
-    std::cout << "Received \"" << (gchar *)(selection_data.get_data()) << "\" in label " << std::endl;
+    std::cout << "Received \"" << selection_data.get_data_as_string() << "\" in label " << std::endl;
   }
 
   context->drag_finish(false, false, time);

@@ -55,13 +55,13 @@ bool TreeModel_Dnd::row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, co
 
   //dest is the path of the row after which the dragged path would be dropped.
   //But in this case we are more interested in the parent row:
-  const_iterator iter = get_iter(dest);
-  if(iter)
+  const_iterator iter_dest = get_iter(dest);
+  if(iter_dest)
   {
-    const_iterator iter_parent = iter->parent();
-    if(iter_parent)
+    const_iterator iter_dest_parent = iter_dest->parent();
+    if(iter_dest_parent)
     {
-      Row row = *iter_parent;
+      Row row = *iter_dest_parent;
       bool receives_drags = row[m_Columns.m_col_receivesdrags];
       return receives_drags;
     }
@@ -69,8 +69,11 @@ bool TreeModel_Dnd::row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, co
 
   //You could also examine the row being dragged (via selection_data)
   //if you must look at both rows to see whether a drop should be allowed.
-  //TODO: Demonstrate this when the API has been corrected to use Gtk::SelectionData instead of GtkSelectionData,
-  //and use Gtk::TreeModel::Path::get_from_selection_data(selection_data, model, path)
+  //You could use
+  Glib::RefPtr<Gtk::TreeModel> refThis = Glib::RefPtr<Gtk::TreeModel>(this);
+  refThis->reference(); //, true /* take_copy */)
+  Gtk::TreeModel::Path path_dragged_row;
+  Gtk::TreeModel::Path::get_from_selection_data(selection_data, refThis, path_dragged_row);
 
   return Gtk::TreeStore::row_drop_possible_vfunc(dest, selection_data);
 }
