@@ -47,7 +47,7 @@ void ExampleWindow::on_button_folder_clicked()
   dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   dialog.add_button("Select", Gtk::RESPONSE_OK);
   dialog.set_transient_for(*this);
-  dialog.set_folder_mode();
+  dialog.set_action(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
   int result = dialog.run();
 
