@@ -1,2 +1,2 @@
-SUBDIRS = simple colorselectiondialog filechooserdialog fileselection fontselectiondialog messagedialog
+SUBDIRS = aboutdialog simple colorselectiondialog filechooserdialog fileselection fontselectiondialog messagedialog
 
