@@ -1,8 +1,8 @@
-BUILT_SOURCES = gdkmmconfig.h
+BUILT_SOURCES = gdkmmconfig.h gdkmm-2.4.rc
 
 MAINTAINERCLEANFILES = $(built_sources)
 
-EXTRA_DIST = gdkmmconfig.h gdkmm.vcproj
+EXTRA_DIST = gdkmmconfig.h gdkmm.vcproj gdkmm-2.4.rc
 
 gdkmmconfig.h: $(top_builddir)/gdk/gdkmmconfig.h
 	cp -f $< $@
