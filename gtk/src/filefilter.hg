@@ -33,6 +33,7 @@ namespace Gtk
 
 _WRAP_ENUM(FileFilterFlags, GtkFileFilterFlags)
 
+
 class FileFilter : public Gtk::Object
 {
   _CLASS_GTKOBJECT(FileFilter, GtkFileFilter, GTK_FILE_FILTER, Gtk::Object, GtkObject)
@@ -45,17 +46,27 @@ public:
   _WRAP_METHOD(void add_mime_type(const Glib::ustring& mime_type), gtk_file_filter_add_mime_type)
   _WRAP_METHOD(void add_pattern(const Glib::ustring& pattern), gtk_file_filter_add_pattern)
 
-  //TODO: Use C++ type:
-  /// For instance, bool on_custom(const GtkFileFilterInfo* filter_info);
-  typedef sigc::slot<bool, const GtkFileFilterInfo*> SlotCustom;
+  class Info
+  {
+  public:
+    FileFilterFlags contains;
+    Glib::ustring filename;
+    Glib::ustring uri;
+    Glib::ustring display_name;
+    Glib::ustring mime_type;
+  };
+
+  /// For instance, bool on_custom(const Gtk::FileFilter::Info& filter_info);
+  typedef sigc::slot<bool, const Info&> SlotCustom;
+  
   void add_custom(FileFilterFlags needed, const SlotCustom& slot);
   _IGNORE(gtk_file_filter_add_custom)
 
   _WRAP_METHOD(FileFilterFlags get_needed() const, gtk_file_filter_get_needed)
 
-  //TODO: This method is used by FileChooser implementors, so we might not need to wrap it properly.
-  //GtkFileFilterInfo is not a registered GType. It has gchar* members but does not seem to take ownership of those strings.
-  _WRAP_METHOD(bool filter(const GtkFileFilterInfo* filter_info), gtk_file_filter_filter)
+  //TODO: This method is used by FileChooser implementors, so we don't need to wrap it.
+  _IGNORE(gtk_file_filter_filter)
+  //_WRAP_METHOD(bool filter(const GtkFileFilterInfo* filter_info), gtk_file_filter_filter)
 };
 
 } // namespace Gtk
