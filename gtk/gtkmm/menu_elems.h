@@ -55,9 +55,11 @@ public:
 
 protected:
 
+  void set_child(MenuItem* pChild);
   void set_accel_key(const AccelKey& accel_key);
 
   //We use a RefPtr to avoid leaks when the manage()d widget never gets added to a container.
+  //TODO: RefPtr is probably meant only for use with a create() method - see the extra reference() in set_child().
   Glib::RefPtr<MenuItem> child_;
 };
 

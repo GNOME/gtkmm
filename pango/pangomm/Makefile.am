@@ -4,12 +4,12 @@
 SUBDIRS			= private
 
 sublib_name		= pangomm
-sublib_libname		= pangomm-1.4
+sublib_libname		= pangomm-1.3
 sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Pango
 sublib_cflags		= $(PANGOMM_CFLAGS)
-sublib_topdir = pangomm
-sublib_win32_dlls_libs	= $(top_builddir)/glib/glibmm/libglibmm-2.4.la
+sublib_topdir = pango
+sublib_win32_dlls_libs	= $(top_builddir)/glib/glibmm/libglibmm-2.3.la
 
 
 sublib_files_extra_posix_cc =

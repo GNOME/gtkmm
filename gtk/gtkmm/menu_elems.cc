@@ -46,6 +46,12 @@ Element::Element(MenuItem& child)
 Element::~Element()
 {}
 
+void Element::set_child(MenuItem* pChild)
+{
+  child_ = Glib::RefPtr<MenuItem>(pChild);
+  child_->reference(); //TODO. We used to use the old RefPtr::operator=(), and this is what it did.
+}
+
 void Element::set_accel_key(const AccelKey& accel_key)
 {
   if(child_)
@@ -64,7 +70,7 @@ MenuElem::MenuElem(MenuItem& child)
 MenuElem::MenuElem(const Glib::ustring& label, 
                    const CallSlot& slot)
 {
-  child_ = manage(new MenuItem(label, true));
+  set_child( manage(new MenuItem(label, true)) );
   if(slot)
     child_->signal_activate().connect(slot);
   child_->show();
@@ -74,7 +80,7 @@ MenuElem::MenuElem(const Glib::ustring& label,
                    const AccelKey& accel_key,
                    const CallSlot& slot)
 {
-  child_ = manage(new MenuItem(label, true));
+  set_child( manage(new MenuItem(label, true)) );
   if(slot)
     child_->signal_activate().connect(slot);
   set_accel_key(accel_key);
@@ -83,7 +89,7 @@ MenuElem::MenuElem(const Glib::ustring& label,
 
 MenuElem::MenuElem(const Glib::ustring& label, Menu& submenu)
 {
-  child_ = manage(new MenuItem(label, true));
+  set_child( manage(new MenuItem(label, true)) );
   child_->set_submenu(submenu);
   child_->show();
 }
@@ -92,7 +98,7 @@ MenuElem::MenuElem(const Glib::ustring& label,
                    const AccelKey& accel_key,
                    Gtk::Menu& submenu)
 {
-  child_ = manage(new MenuItem(label, true));
+  set_child( manage(new MenuItem(label, true)) );
   child_->set_submenu(submenu);
   set_accel_key(accel_key);
   child_->show();
@@ -100,7 +106,7 @@ MenuElem::MenuElem(const Glib::ustring& label,
 
 SeparatorElem::SeparatorElem()
 {
-  child_ = manage(new SeparatorMenuItem());
+  set_child( manage(new SeparatorMenuItem()) );
   child_->show();
 }
 
@@ -113,7 +119,7 @@ ImageMenuElem::ImageMenuElem(const Glib::ustring& label,
                              const CallSlot& slot)
 {
   image_widget.show(); //We assume that the coder wants to actually show the widget.
-  child_ = manage(new ImageMenuItem(image_widget, label, true));
+  set_child( manage(new ImageMenuItem(image_widget, label, true)) );
   if(slot)
     child_->signal_activate().connect(slot);
   child_->show();
@@ -125,7 +131,7 @@ ImageMenuElem::ImageMenuElem(const Glib::ustring& label,
                              const CallSlot& slot)
 {
   image_widget.show(); //We assume that the coder wants to actually show the widget.
-  child_ = manage(new ImageMenuItem(image_widget, label, true));
+  set_child( manage(new ImageMenuItem(image_widget, label, true)) );
   if(slot)
     child_->signal_activate().connect(slot);
   set_accel_key(accel_key);
@@ -137,7 +143,7 @@ ImageMenuElem::ImageMenuElem(const Glib::ustring& label,
                              Gtk::Menu& submenu)
 {
   image_widget.show(); //We assume that the coder wants to actually show the widget.
-  child_ = manage(new ImageMenuItem(image_widget, label, true));
+  set_child( manage(new ImageMenuItem(image_widget, label, true)) );
   child_->set_submenu(submenu);
   child_->show();
 }
@@ -148,7 +154,7 @@ ImageMenuElem::ImageMenuElem(const Glib::ustring& label,
                              Gtk::Menu& submenu)
 {
   image_widget.show(); //We assume that the coder wants to actually show the widget.
-  child_ = manage(new ImageMenuItem(image_widget, label, true));
+  set_child( manage(new ImageMenuItem(image_widget, label, true)) );
   set_accel_key(accel_key);
   child_->set_submenu(submenu);
   child_->show();
@@ -157,7 +163,7 @@ ImageMenuElem::ImageMenuElem(const Glib::ustring& label,
 StockMenuElem::StockMenuElem(const Gtk::StockID& stock_id,
                              const CallSlot& slot)
 {
-  child_ = manage(new ImageMenuItem(stock_id));
+  set_child( manage(new ImageMenuItem(stock_id)) );
   if(slot)
     child_->signal_activate().connect(slot);
   child_->show();
@@ -167,7 +173,7 @@ StockMenuElem::StockMenuElem(const Gtk::StockID& stock_id,
                              const AccelKey& accel_key,
                              const CallSlot& slot)
 {
-  child_ = manage(new ImageMenuItem(stock_id));
+  set_child( manage(new ImageMenuItem(stock_id)) );
   if(slot)
     child_->signal_activate().connect(slot);
   set_accel_key(accel_key);
@@ -177,7 +183,7 @@ StockMenuElem::StockMenuElem(const Gtk::StockID& stock_id,
 StockMenuElem::StockMenuElem(const Gtk::StockID& stock_id,
                              Gtk::Menu& submenu)
 {
-  child_ = manage(new ImageMenuItem(stock_id));
+  set_child( manage(new ImageMenuItem(stock_id)) );
   child_->set_submenu(submenu);
   child_->show();
 }
@@ -186,7 +192,7 @@ StockMenuElem::StockMenuElem(const Gtk::StockID& stock_id,
                              const AccelKey& accel_key,
                              Gtk::Menu& submenu)
 {
-  child_ = manage(new ImageMenuItem(stock_id));
+  set_child( manage(new ImageMenuItem(stock_id)) );
   set_accel_key(accel_key);
   child_->set_submenu(submenu);
   child_->show();
@@ -200,7 +206,7 @@ CheckMenuElem::CheckMenuElem(const Glib::ustring& label,
                              const CallSlot& slot)
 {
   CheckMenuItem* item = manage(new CheckMenuItem(label, true));
-  child_ = item;
+  set_child( item );
   if(slot)
     item->signal_toggled().connect(slot);
   child_->show();
@@ -211,7 +217,7 @@ CheckMenuElem::CheckMenuElem(const Glib::ustring& label,
                              const CallSlot& slot)
 {
   CheckMenuItem* item = manage(new CheckMenuItem(label, true));
-  child_ = item;
+  set_child( item );
   set_accel_key(accel_key);
   if(slot)
     item->signal_toggled().connect(slot);
@@ -229,7 +235,7 @@ RadioMenuElem::RadioMenuElem(RadioMenuItem::Group& group,
   : gr_(&group)
 {
   CheckMenuItem* item = manage(new RadioMenuItem(*gr_, label, true));
-  child_ = item;
+  set_child( item );
   if(slot)
     item->signal_toggled().connect(slot);
   child_->show();
@@ -242,7 +248,7 @@ RadioMenuElem::RadioMenuElem(RadioMenuItem::Group& gr,
   : gr_(&gr)
 {
   CheckMenuItem* item = manage(new RadioMenuItem(*gr_, label, true));
-  child_ = item;
+  set_child( item );
   set_accel_key(accel_key);
   if(slot)
     item->signal_toggled().connect(slot);
@@ -255,7 +261,7 @@ TearoffMenuElem::TearoffMenuElem(TearoffMenuItem& child)
 
 TearoffMenuElem::TearoffMenuElem(const CallSlot& slot)
 {
-  child_ = manage(new TearoffMenuItem());
+  set_child( manage(new TearoffMenuItem()) );
   if(slot)
     child_->signal_activate().connect(slot);
   child_->show();
@@ -264,7 +270,7 @@ TearoffMenuElem::TearoffMenuElem(const CallSlot& slot)
 TearoffMenuElem::TearoffMenuElem(const AccelKey& accel_key,
                                  const CallSlot& slot)
 {
-  child_ = manage(new TearoffMenuItem());
+  set_child( manage(new TearoffMenuItem()) );
   set_accel_key(accel_key);
   if(slot)
     child_->signal_activate().connect(slot);
