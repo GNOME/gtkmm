@@ -698,10 +698,15 @@ int TreeView::append_column_numeric(const Glib::ustring& title, const TreeModelC
   CellRenderer* pCellRenderer = manage( new CellRendererText() );
   pViewColumn->pack_start(*pCellRenderer);
   
+
+  //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
+  typedef void (*type_fptr)(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter, int model_column, const Glib::ustring& format);
+  type_fptr fptr = TreeView_Private::_auto_cell_data_func<ColumnType>;
+
   //Connect a cell_data callback, to show the number's text representation in the specified format:
   //We use sigc::bind<-1> twice here, instead of sigc::bind() once, because some compilers need the extra hint.
   Gtk::TreeViewColumn::SlotCellData slot = sigc::bind<-1>(
-    sigc::bind<-1>( sigc::ptr_fun(&TreeView_Private::_auto_cell_data_func<ColumnType>), format),
+    sigc::bind<-1>( sigc::ptr_fun(fptr), format),
     model_column.index()
   );
     
@@ -978,13 +983,20 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
   {
     pCellText->property_editable() = true;
    
+    //Some compilers (IRIX MipsPro) don't like us to give the pointer to a template function directly to sigc::ptr_fun():
+    typedef void (*type_func)(const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*);
+    type_func func = &(_auto_store_on_cellrenderer_text_edited_string<ColumnType>);
+    sigc::slot<void, const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*> theslot  =
+      sigc::ptr_fun(func);
+
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect( 
-      sigc::bind<-1>( 
-        sigc::bind<-1>( sigc::ptr_fun(_auto_store_on_cellrenderer_text_edited_string<ColumnType>), this_p), 
+    pCellText->signal_edited().connect(
+      sigc::bind<-1>(
+        sigc::bind<-1>( theslot, this_p),
         model_column.index()
       )
     );
+
     
   }
 }
