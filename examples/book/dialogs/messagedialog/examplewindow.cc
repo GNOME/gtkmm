@@ -45,12 +45,16 @@ ExampleWindow::~ExampleWindow()
 void ExampleWindow::on_button_info_clicked()
 {
   Gtk::MessageDialog dialog(*this, "This is an INFO MessageDialog");
+  dialog.set_secondary_text("And this is the secondary text that explains things.");
+
   dialog.run();
 }
 
 void ExampleWindow::on_button_question_clicked()
 {
   Gtk::MessageDialog dialog(*this, "This is a QUESTION MessageDialog", false /* use_markup */, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL);
+  dialog.set_secondary_text("And this is the secondary text that explains things.");
+
   int result = dialog.run();
 
   //Handle the response:
