@@ -21,9 +21,11 @@ html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	test -d "$$dir" && image_path="$$dir"; \
 	dir="$(top_srcdir)/../gtk+/gtk/stock-icons"; \
 	test -d "$$dir" && image_path="$$image_path $$dir"; \
-	DOXYGEN_IMAGE_PATH="$${DOXYGEN_IMAGE_PATH:=$$image_path}" doxygen $(doxygen_configfile)
-	cd html && ./installdox -l glibmm_doxygen_tags@../../../../glibmm-2.4/docs/reference/html && cd ..
-	$(beautify_docs) html
+	DOXYGEN_IMAGE_PATH="$${DOXYGEN_IMAGE_PATH:=$$image_path}" doxygen $(doxygen_configfile) \
+	2> doxygen-warnings.txt | tee doxygen-output.txt && cat doxygen-warnings.txt
+	cd html && ./installdox -l glibmm_doxygen_tags@../../../../glibmm-2.4/docs/reference/html \
+	2>> doxygen-warnings.txt | tee -a doxygen-output.txt && cd ..
+	$(beautify_docs) html 2>> doxygen-warnings.txt | tee -a doxygen-output.txt
 
 
 # DevHelp reference
@@ -39,12 +41,14 @@ gtkmm-reference-html.tar.bz2: html/index.html
 post-html: html/index.html
 	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(web_path_reference)/html/
 
-doc-clean:
-	-rm -rf html
+doc-clean: html-clean
 	-rm -rf xml
 	-rm -f gtkmm_doxygen_tags
 	-rm -f $(devhelp_file)  
 	-rm -f gtkmm-reference-html.tar.gz gtkmm-reference-html.tar.bz2
+
+html-clean:
+	-rm -rf html
 
 referencedir = $(gtkmm_docdir)/reference/html
 devhelpdir = $(datadir)/devhelp/books/gtkmm-2.4
@@ -77,10 +81,9 @@ uninstall-local: uninstall-reference
 
 maintainer-clean-local: doc-clean
 
-.PHONY: post-html doc-clean install-reference uninstall-reference
+.PHONY: post-html doc-clean install-reference uninstall-reference html-clean
 
 
 # Direct all the doxygen console output to a text file, so we can read it later:
 # In doxywizard, disable EXTRACT_ALL to get warnings about undocumented methods.
-doxygen-warnings: 
-	doxygen $(doxygen_configfile) &> doxygen_warnings.txt
+doxygen-warnings: html-clean html/index.html
