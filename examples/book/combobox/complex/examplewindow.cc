@@ -27,7 +27,7 @@ ExampleWindow::ExampleWindow()
   //Create the Tree model:
   //m_refTreeModel = Gtk::TreeStore::create(m_Columns);
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
-  m_pCombo = new Gtk::ComboBox(m_refTreeModel);
+  m_Combo.set_model(m_refTreeModel);
 
   //Fill the ComboBox's Tree Model:
   Gtk::TreeModel::Row row = *(m_refTreeModel->append());
@@ -60,14 +60,14 @@ ExampleWindow::ExampleWindow()
   
   //Add the model columns to the Combo (which is a kind of view),
   //rendering them in the default way:
-  m_pCombo->pack_start(m_Columns.m_col_id);
-  m_pCombo->pack_start(m_Columns.m_col_name); 
+  m_Combo.pack_start(m_Columns.m_col_id);
+  m_Combo.pack_start(m_Columns.m_col_name); 
 
   //Add the ComboBox to the window.
-  add(*m_pCombo);
+  add(m_Combo);
 
   //Connect signal handler:
-  m_pCombo->signal_changed().connect( SigC::slot(*this, &ExampleWindow::on_combo_changed) );
+  m_Combo.signal_changed().connect( SigC::slot(*this, &ExampleWindow::on_combo_changed) );
 
   show_all_children();
 }
@@ -78,7 +78,7 @@ ExampleWindow::~ExampleWindow()
 
 void ExampleWindow::on_combo_changed()
 {
-  Gtk::TreeModel::iterator iter = m_pCombo->get_active();
+  Gtk::TreeModel::iterator iter = m_Combo.get_active();
   if(iter)
   { 
     Gtk::TreeModel::Row row = *iter;

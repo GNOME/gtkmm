@@ -71,7 +71,7 @@ protected:
     Gtk::TreeModelColumn<Glib::ustring> m_column;
   };
 
-  std::auto_ptr<TextModelColumns> m_text_columns;
+  TextModelColumns m_text_columns;
 };
 
 

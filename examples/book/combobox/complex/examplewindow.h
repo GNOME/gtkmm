@@ -48,7 +48,7 @@ protected:
   ModelColumns m_Columns;
 
   //Child widgets:
-  Gtk::ComboBox* m_pCombo;
+  Gtk::ComboBox m_Combo;
   Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 };
 
