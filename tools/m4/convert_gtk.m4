@@ -292,8 +292,8 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextBuffer::Mark> >
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RadioAction> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const RadioAction> >',__FL2H_SHALLOW)
 
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<FileFilter> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const FileFilter> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< FileFilter* >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< const FileFilter* >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const PixbufFormat> >',__FL2H_SHALLOW)
@@ -429,9 +429,9 @@ _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<EntryCompletion>',`Glib::wrap($3
 _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<const EntryCompletion>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<EntryCompletion>&',`GtkEntryCompletion*',__CONVERT_REFPTR_TO_P($3))
 
-_CONVERSION(`GtkFileFilter*',`Glib::RefPtr<FileFilter>',`Glib::wrap($3)')
-_CONVERSION(`GtkFileFilter*',`Glib::RefPtr<const FileFilter>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<FileFilter>&',`GtkFileFilter*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GtkFileFilter*',`FileFilter*',`Glib::wrap($3)')
+_CONVERSION(`GtkFileFilter*',`const FileFilter*',`Glib::wrap($3)')
+_CONVERSION(`const FileFilter&',`GtkFileFilter*',__FCR2P)
 
 _CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 

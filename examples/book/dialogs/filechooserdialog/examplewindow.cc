@@ -43,11 +43,13 @@ ExampleWindow::~ExampleWindow()
 
 void ExampleWindow::on_button_folder_clicked()
 {
-  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  dialog.set_transient_for(*this);
+    
+  //Add response buttons the the dialog:
   dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   dialog.add_button("Select", Gtk::RESPONSE_OK);
-  dialog.set_transient_for(*this);
-  dialog.set_action(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  
 
   int result = dialog.run();
 
@@ -76,10 +78,32 @@ void ExampleWindow::on_button_folder_clicked()
 void ExampleWindow::on_button_file_clicked()
 {
   Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.set_transient_for(*this);
+
+  //Add response buttons the the dialog:
   dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-  dialog.set_transient_for(*this);
+
+  //Add filters, so that only certain file types can be selected:
+
+  Gtk::FileFilter filter_text;
+  filter_text.set_name("Text files");
+  filter_text.add_mime_type("text/plain");
+  dialog.add_filter(filter_text);
+
+  Gtk::FileFilter filter_cpp;
+  filter_cpp.set_name("C/C++ files");
+  filter_cpp.add_mime_type("text/x-c");
+  filter_cpp.add_mime_type("text/x-c++");
+  filter_cpp.add_mime_type("text/x-c-header");
+  dialog.add_filter(filter_cpp);
   
+  Gtk::FileFilter filter_any;
+  filter_any.set_name("Any files");
+  filter_any.add_pattern("*");
+  dialog.add_filter(filter_any);
+
+  //Show the dialog and wait for a user response:
   int result = dialog.run();
 
   //Handle the response:
