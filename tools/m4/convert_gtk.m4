@@ -439,12 +439,13 @@ _CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
-_CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
+#_CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
+_CONVERSION(`GtkTooltips*',`Tooltips*', `Glib::wrap($3)')
 _CONVERSION(`Tooltips*',`GtkTooltips*',`Glib::unwrap($3)')
 _CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
-_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
+#_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 
 #TargetList
 _CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
