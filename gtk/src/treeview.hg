@@ -57,10 +57,10 @@ namespace TreeView_Private
   void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column);
 
   template<class ColumnType> inline
-  void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
+  void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
   template <class ColumnType> inline
-  void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*); 
+  void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model); 
   
   template <class ColumnType> inline
   void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter, int model_column, const Glib::ustring& format);
@@ -657,12 +657,12 @@ protected:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template<class ColumnType> friend
-  void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
+  void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
   template <class ColumnType> friend
-  void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView*);
+  void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
-  void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, int model_column);
+  void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
   template<class ColumnType> friend
   void TreeView_Private::_connect_auto_store_editable_signal_handler(TreeView*, CellRenderer*, const TreeModelColumn<ColumnType>&);
@@ -785,17 +785,29 @@ namespace TreeView_Private
 
 //bool specialization:
 template<> inline
-void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<bool>& model_column)
+void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<bool>& model_column)
 {
   Gtk::CellRendererToggle* pCellToggle = dynamic_cast<Gtk::CellRendererToggle*>(pCellRenderer);
   if(pCellToggle)
   {
     //Set the appropriate property,
     pCellToggle->property_activatable() = true;
-  
-    //Connect to the appropriate signal, sending the model_column too,
+
+    //Connect to the appropriate signal, sending the model_column too
+    
+    sigc::slot<void, const Glib::ustring&, int> slot_temp = 
+      sigc::bind<-1>(
+        sigc::mem_fun(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_toggle_edited), 
+        this_p->_get_base_model()
+      );
+          
     pCellToggle->signal_toggled().connect(
-      sigc::bind<-1>( sigc::mem_fun(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_toggle_edited), model_column.index()) );
+      sigc::bind<-1>( 
+        slot_temp,
+        model_column.index()
+      )
+    );
+
     //We use bind<1> instead of bind because some compilers need the extra hint.
   }
 }
@@ -811,14 +823,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<int>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -837,14 +851,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<unsigned int>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -863,14 +879,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
      
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<long>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -889,14 +907,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
   
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<unsigned long>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -915,14 +935,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<float>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -940,14 +962,16 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
 
     //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p);
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
     type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<double>;
 
     //Connect to the appropriate signal, sending the model_column too,
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( sigc::ptr_fun(fptr), this_p),
+        sigc::bind<-1>( 
+          sigc::ptr_fun(fptr),
+          this_p->_get_base_model() ),
         model_column.index()
       )
     );
@@ -967,7 +991,7 @@ namespace TreeView_Private
 #ifdef GTKMM_HAVE_SIGC_BIND
 
 template <class ColumnType> inline
-void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<ColumnType>& model_column)
+void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column)
 {
   g_assert(model_column.type() != 0);
 
@@ -984,15 +1008,15 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->property_editable() = true;
    
     //Some compilers (IRIX MipsPro) don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_func)(const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*);
+    typedef void (*type_func)(const Glib::ustring&, const Glib::ustring&, int, const Glib::RefPtr<Gtk::TreeModel>&);
     type_func func = &(_auto_store_on_cellrenderer_text_edited_string<ColumnType>);
-    sigc::slot<void, const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*> theslot  =
+    sigc::slot<void, const Glib::ustring&, const Glib::ustring&, int, const Glib::RefPtr<Gtk::TreeModel>&> theslot  =
       sigc::ptr_fun(func);
 
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
-        sigc::bind<-1>( theslot, this_p),
+        sigc::bind<-1>( theslot, this_p->_get_base_model()),
         model_column.index()
       )
     );
@@ -1004,15 +1028,14 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 #endif //GTKMM_HAVE_SIGC_BIND
 
 template <class ColumnType> inline
-void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p)
+void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model)
 {
   Gtk::TreePath path(path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<TreeModel> refModel = this_p->_get_base_model();
-  if(refModel)
+  if(model)
   {
-    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    Gtk::TreeModel::iterator iter = model->get_iter(path);
     if(iter)
     {
         //Store the user's new text in the model:
@@ -1023,17 +1046,16 @@ void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_st
 }
 
 template <class ColumnType> inline
-void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, Gtk::TreeView* this_p)
+void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model)
 {
   //This is used on numerical model columns:
 
   Gtk::TreePath path(path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<TreeModel> refModel = this_p->_get_base_model();
-  if(refModel)
+  if(model)
   {
-    Gtk::TreeModel::iterator iter = refModel->get_iter(path);
+    Gtk::TreeModel::iterator iter = model->get_iter(path);
     if(iter)
     {
       //std::istringstream astream(new_text); //Put it in a stream.
