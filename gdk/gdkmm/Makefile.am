@@ -4,7 +4,7 @@
 SUBDIRS			= private
 
 sublib_name		= gdkmm
-sublib_libname		= gdkmm-1.3
+sublib_libname		= gdkmm-2.3
 sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gdk
 sublib_cflags		= $(GDKMM_CFLAGS)

@@ -4,7 +4,7 @@
 include $(srcdir)/../../src/Makefile_list_of_hg.am_fragment
 files_built_h = $(files_hg:.hg=_p.h)
 
-private_includedir	= $(includedir)/gtkmm-2.4/gtkmm/private
+private_includedir	= $(includedir)/gtkmm-2.3/gtkmm/private
 private_include_DATA	= $(files_built_h)
 
 maintainer-clean-local:
