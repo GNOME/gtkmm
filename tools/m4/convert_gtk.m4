@@ -115,6 +115,7 @@ _CONVERSION(`guint8',`StateType',`static_cast<StateType>($3)')
 
 
 # StockID:
+_CONVERSION(`const StockID&',`const char*',`($3).get_c_str()')
 _CONVERSION(`const Gtk::StockID&',`const char*',`($3).get_c_str()')
 _CONVERSION(`char*',`StockID',`StockID($3)') # the StockID ctor handles 0
 
@@ -172,6 +173,8 @@ _CONVERSION(`GtkWidget*',`HBox*',`Glib::wrap((GtkHBox*)($3))')
 _CONVERSION(`GtkWidget*',`VBox*',`Glib::wrap((GtkVBox*)($3))')
 _CONVERSION(`GtkWidget*',`ColorSelection*',`Glib::wrap((GtkColorSelection*)($3))')
 _CONVERSION(`GtkWidget*',`Gtk::CheckButton*',__RP2PD)
+_CONVERSION(`GtkWidget*',`Container*',`Glib::wrap((GtkContainer*)($3))')
+_CONVERSION(`GtkWidget*',`const Container*',`Glib::wrap((GtkContainer*)($3))')
 _CONVERSION(`GtkWidget*',`Entry*',`Glib::wrap((GtkEntry*)($3))')
 _CONVERSION(`GtkWidget*',`FontSelection*',`Glib::wrap((GtkFontSelection*)($3))')
 _CONVERSION(`GtkWidget*',`Label*',`Glib::wrap((GtkLabel*)($3))')

@@ -187,7 +187,9 @@ _CONVERSION(`GdkScreen*',`Glib::RefPtr<Gdk::Screen>', `Glib::wrap($3)')
 _CONVERSION(`GdkScreen*',`Glib::RefPtr<const Gdk::Screen>', `Glib::wrap($3)')
 
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<Device>', `Glib::wrap($3)')
+_CONVERSION(`GdkDevice*',`Glib::RefPtr<Gdk::Device>', `Glib::wrap($3)')
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<const Device>', `Glib::wrap($3)')
+_CONVERSION(`GdkDevice*',`Glib::RefPtr<const Gdk::Device>', `Glib::wrap($3)')
 
 
 

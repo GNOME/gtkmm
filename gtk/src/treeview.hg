@@ -294,11 +294,6 @@ public:
 /* Drag-and-Drop support */
   _IGNORE(gtk_tree_view_enable_model_drag_source)
 
-  //TODO: Remove this override. The other one allows more default args.
-  void enable_model_drag_source(Gdk::ModifierType start_button_mask,
-                                const ArrayHandle_TargetEntry& targets,
-                                Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
-
   void enable_model_drag_source(const ArrayHandle_TargetEntry& targets,
                                 Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
                                 Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
@@ -355,15 +350,15 @@ _CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',`TreeModel::iterator(gtk
   _WRAP_SIGNAL(void cursor_changed(), "cursor-changed")
   _WRAP_SIGNAL(void columns_changed(), "columns-changed")
 
-  //TODO: Don't wrap these in future. They are keybinding signals, and their API broke for GTK+ 2.2.
-  _WRAP_SIGNAL(bool move_cursor(MovementStep step, int count), "move-cursor")
-  _WRAP_SIGNAL(bool select_all(), "select-all")
-  _WRAP_SIGNAL(bool unselect_all(), "unselect-all")
-  _WRAP_SIGNAL(bool select_cursor_row(bool start_editing), "select-cursor-row")
-  _WRAP_SIGNAL(bool toggle_cursor_row(), "toggle-cursor-row")
-  _WRAP_SIGNAL(bool expand_collapse_cursor_row(bool logical, bool expand, bool open_all), "expand-collapse-cursor-row")
-  _WRAP_SIGNAL(bool select_cursor_parent(), "select-cursor-parent")
-  _WRAP_SIGNAL(bool start_interactive_search(), "start-interactive-search")
+  //Don't wrap these. They are keybinding signals, and their API broke for GTK+ 2.2.
+  _IGNORE_SIGNAL("move-cursor")
+  _IGNORE_SIGNAL("select-all")
+  _IGNORE_SIGNAL("unselect-all")
+  _IGNORE_SIGNAL("select-cursor-row")
+  _IGNORE_SIGNAL("toggle-cursor-row")
+  _IGNORE_SIGNAL("expand-collapse-cursor-row")
+  _IGNORE_SIGNAL("select-cursor-parent")
+  _IGNORE_SIGNAL("start-interactive-search")
 
 
   _WRAP_PROPERTY("model", Glib::RefPtr<TreeModel>)
@@ -386,7 +381,7 @@ protected:
   template <class ColumnType> inline //Must be explicitly specialized.
   void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column);
   
-  void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, const Gtk::CellRendererToggle* cell_renderer, int model_column);
+  void _auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string, int model_column);
 
   template<class ColumnType> friend
   void TreeView_Private::_connect_auto_store_editable_signal_handler(TreeView*, CellRenderer*, const TreeModelColumn<ColumnType>&);
@@ -465,7 +460,7 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 
     //Connect to the appropriate signal, sending the model_column too,
     pCellToggle->signal_toggled().connect(
-      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_toggle_edited), pCellToggle, model_column.index()) );
+      SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_toggle_edited), model_column.index()) );
   }
 }
 
@@ -533,7 +528,6 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
   }
 }
 
-/* TODO: We would like to add these specializations, but it's an API/ABI issue
 //unsigned long specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<float>& model_column)
@@ -565,7 +559,6 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
       SigC::bind( SigC::slot(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_text_edited_numerical<double>), model_column.index()) );
   }
 }
-*/
 
 
 
