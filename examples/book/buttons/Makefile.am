@@ -1,2 +1,2 @@
-SUBDIRS = button checkbutton radiobutton togglebutton
+SUBDIRS = button checkbutton filechooserbutton radiobutton togglebutton
 
