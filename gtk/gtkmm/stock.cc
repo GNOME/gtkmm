@@ -20,6 +20,7 @@
 
 #include <gtkmm/stock.h>
 #include <gtkmm/stockitem.h>
+#include <gtk/gtkstock.h>
 
 // Get rid of macro DELETE (from winnt.h).  We have some macro
 // shadowing magic in stock.h, but it's safer to get rid of it

@@ -20,7 +20,7 @@
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/menushell_p.h)
 
-#include <gtk/gtkmenu.h>
+//#include <gtk/gtkmenu.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/menuitem.h>
 
@@ -49,10 +49,13 @@ public:
 
 /* append, prepend, and insert are defined in MenuShell */
 
-  _WRAP_METHOD(void popup(MenuShell& parent_menu_shell, MenuItem& parent_menu_item, GtkMenuPositionFunc func, gpointer data, guint button, guint32 activate_time), gtk_menu_popup)
-
-  ///void on_menu_position(int&, int&, bool& push_in);
+  /** For instance,
+   * void on_popup_menu_position(int& x, int& y, bool& push_in);
+   */
   typedef sigc::slot<void, int&, int&, bool&> SlotPositionCalc;
+             
+  void popup(MenuShell& parent_menu_shell, MenuItem& parent_menu_item, const SlotPositionCalc& slot, guint button, guint32 activate_time);
+  _IGNORE(gtk_menu_popup);
 
   /** Displays a menu and makes it available for selection.  Applications can use
    * this function to display context-sensitive menus.
@@ -116,6 +119,9 @@ public:
   _WRAP_PROPERTY("tearoff-title", Glib::ustring)
 
 protected:
+
+  //We can not wrap this as a slot because there is no data parameter, and no destroy callback to destroy that data.
+  typedef void (*GtkMenuDetachFunc)   (GtkWidget *attach_widget, GtkMenu   *menu);
   _WRAP_METHOD(void attach_to_widget(Widget& widget, GtkMenuDetachFunc detacher), gtk_menu_attach_to_widget)
 };
 

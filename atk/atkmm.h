@@ -27,6 +27,7 @@
 #include <atkmm/document.h>
 #include <atkmm/editabletext.h>
 #include <atkmm/image.h>
+#include <atkmm/implementor.h>
 #include <atkmm/object.h>
 #include <atkmm/objectaccessible.h>
 #include <atkmm/relation.h>

@@ -4,7 +4,7 @@
 SUBDIRS			= private
 
 sublib_name		= pangomm
-sublib_libname		= pangomm-1.3
+sublib_libname		= pangomm-1.4
 sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Pango
 sublib_cflags		= $(PANGOMM_CFLAGS)
@@ -24,8 +24,8 @@ sublib_files_extra_general_deprecated_h =
 
 include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 
-lib_LTLIBRARIES = libpangomm-1.3.la
-libpangomm_1_3_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
-libpangomm_1_3_la_LDFLAGS	= $(common_ldflags)
-libpangomm_1_3_la_LIBADD	= $(win32_dlls_extra_libs) $(PANGOMM_LIBS)
+lib_LTLIBRARIES = libpangomm-1.4.la
+libpangomm_1_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
+libpangomm_1_4_la_LDFLAGS	= $(common_ldflags)
+libpangomm_1_4_la_LIBADD	= $(win32_dlls_extra_libs) $(PANGOMM_LIBS)
 

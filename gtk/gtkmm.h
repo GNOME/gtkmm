@@ -132,6 +132,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/treemodel.h>
+#include <gtkmm/treemodelfilter.h>
+#include <gtkmm/treemodelsort.h>
 #include <gtkmm/treepath.h>
 #include <gtkmm/treerowreference.h>
 #include <gtkmm/treeselection.h>

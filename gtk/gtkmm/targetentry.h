@@ -26,8 +26,15 @@
 #include <glibmm/utility.h>
 #include <glibmm/ustring.h>
 #include <glibmm/arrayhandle.h>
-#include <gtk/gtkselection.h> //For GtkTargetEntry.
 #include <gtkmm/enums.h>
+#include <gtk/gtkselection.h> //For GtkTargetEntry.
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+  typedef struct _GtkTargetEntry GtkTargetEntry;
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 namespace Gtk
 {
