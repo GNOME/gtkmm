@@ -24,6 +24,7 @@ Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
 Gtk::Window* do_images();
+Gtk::Window* do_iconview();
 //Gtk::Window* do_item_factory();
 Gtk::Window* do_menus();
 Gtk::Window* do_pixbufs();
@@ -54,6 +55,7 @@ Demo testgtk_demos[] =
   { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), 0 },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
+  { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
 /*
   { "Item Factory", "example_item_factory.cc", sigc::ptr_fun(&do_item_factory), 0 },

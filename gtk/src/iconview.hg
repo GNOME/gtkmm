@@ -47,12 +47,14 @@ public:
   _WRAP_METHOD(Glib::RefPtr<TreeModel> get_model(), gtk_icon_view_get_model)
   _WRAP_METHOD(Glib::RefPtr<const TreeModel> get_model() const, gtk_icon_view_get_model)
 
-//TODO: Add overrides with ModelColumn:
   _WRAP_METHOD(void set_text_column(int column), gtk_icon_view_set_text_column)
+  _WRAP_METHOD(void set_text_column(const TreeModelColumnBase& model_column), gtk_icon_view_set_text_column)
   _WRAP_METHOD(int get_text_column() const, gtk_icon_view_get_text_column)
   _WRAP_METHOD(void set_markup_column(int column), gtk_icon_view_set_markup_column)
+  _WRAP_METHOD(void set_markup_column(const TreeModelColumnBase& column), gtk_icon_view_set_markup_column) 
   _WRAP_METHOD(int get_markup_column() const, gtk_icon_view_get_markup_column )
   _WRAP_METHOD(void set_pixbuf_column(int column), gtk_icon_view_set_pixbuf_column)
+  _WRAP_METHOD(void set_pixbuf_column(const TreeModelColumnBase& column), gtk_icon_view_set_pixbuf_column)  
   _WRAP_METHOD(int get_pixbuf_column() const, gtk_icon_view_get_pixbuf_column)
 
 //TODO: Add default value?:
@@ -62,11 +64,20 @@ public:
 
   _WRAP_METHOD(TreeModel::Path get_path_at_pos(int x, int y) const, gtk_icon_view_get_path_at_pos )
 
-/* TODO:
-  _WRAP_METHOD(void             gtk_icon_view_selected_foreach   (
-						   GtkIconViewForeachFunc  func,
-						   gpointer                data);
-*/
+  /** For instance, 
+   * void on_foreach(const Gtk::TreeModel::Path& path);
+   */
+  typedef sigc::slot<void, const TreeModel::Path&> SlotForeach;
+
+  /** Calls a function for each selected icon. Note that the model or
+  * selection cannot be modified from within this function.
+  *
+  * Since: 2.6 
+  *
+  * @param slot The callback to call for each selected icon.
+  */
+  void selected_foreach(const SlotForeach& slot);
+  _IGNORE(gtk_icon_view_selected_foreach)
 
 //Default value?:
   _WRAP_METHOD(void set_selection_mode(SelectionMode mode), gtk_icon_view_set_selection_mode)
@@ -79,6 +90,18 @@ public:
   _WRAP_METHOD(void unselect_all(), gtk_icon_view_unselect_all)
   _WRAP_METHOD(void item_activated(const TreeModel::Path& path),  gtk_icon_view_item_activated)
 
+  
+  _WRAP_SIGNAL(void set_scroll_adjustments(Adjustment* hadjustment, Adjustment* vadjustment), set_scroll_adjustments) 
+  _WRAP_SIGNAL(void item_activated(const TreeModel::Path& path), item_activated)
+  _WRAP_SIGNAL(void selection_changed(), selection_changed)
+
+  /* Key binding signals */
+  _IGNORE_SIGNAL(select_all)
+  _IGNORE_SIGNAL(unselect_all)
+  _IGNORE_SIGNAL(select_cursor_item)
+  _IGNORE_SIGNAL(toggle_cursor_item)
+  _IGNORE_SIGNAL(move_cursor)
+  _IGNORE_SIGNAL(activate_cursor_item)
 };
 
 } // namespace Gtk

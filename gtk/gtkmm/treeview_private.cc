@@ -57,6 +57,37 @@ void SignalProxy_CellData::gtk_callback_destroy(void* data)
 }
 
 
+
+SignalProxy_RowSeparator::SignalProxy_RowSeparator(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_RowSeparator::~SignalProxy_RowSeparator()
+{}
+
+gboolean SignalProxy_RowSeparator::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data)
+{
+  SignalProxy_RowSeparator *const self = static_cast<SignalProxy_RowSeparator*>(data);
+
+  try
+  {
+    return (self->slot_)(Glib::wrap(model, true), Gtk::TreeIter(model, iter));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+}
+
+void SignalProxy_RowSeparator::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_RowSeparator*>(data);
+}
+
+
 } // namespace TreeView_Private
 
 } // namespace Gtk

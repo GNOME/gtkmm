@@ -18,12 +18,38 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gtkmm/adjustment.h> 
 #include <gtk/gtkiconview.h>
+
+namespace //anonymous namespace
+{
+
+void proxy_foreach_callback(GtkIconView* /* icon_view */, GtkTreePath* path, void* data)
+{
+  typedef Gtk::IconView::SlotForeach SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    slot(Gtk::TreeModel::Path(path, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+} //anonymous namespace
 
 namespace Gtk
 {
 
-
+void IconView::selected_foreach(const SlotForeach& slot)
+{
+  SlotForeach slot_copy(slot);
+  gtk_icon_view_selected_foreach(const_cast<GtkIconView*>(gobj()), &proxy_foreach_callback, &slot_copy);
+}
+  
 
 } // namespace Gtk
 

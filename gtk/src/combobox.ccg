@@ -22,6 +22,7 @@
  
 #include <gtkmm/liststore.h>
 #include <gtkmm/cellrenderertext.h>
+#include <gtkmm/treeview_private.h> //For SignalProxy_RowSeparator.
 #include <gtk/gtkcombobox.h>
 #include <gtk/gtkcelllayout.h>
 
@@ -63,6 +64,18 @@ TreeModel::const_iterator ComboBox::get_active() const
   }
 
   return iter;
+}
+
+
+void ComboBox::set_row_separator_func(const SlotRowSeparator& slot)
+{
+  //Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when SignalProxy_RowSeparator::gtk_callback_destroy() is called.
+  TreeView_Private::SignalProxy_RowSeparator *const pSignalProxy = new TreeView_Private::SignalProxy_RowSeparator(slot);
+
+  gtk_combo_box_set_row_separator_func(gobj(),
+      &TreeView_Private::SignalProxy_RowSeparator::gtk_callback, pSignalProxy,
+      &TreeView_Private::SignalProxy_RowSeparator::gtk_callback_destroy);
 }
 
 } // namespace Gtk
