@@ -885,13 +885,20 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
   {
     pCellText->property_editable() = true;
    
+    //Some compilers (IRIX MipsPro) don't like us to give the pointer to a template function directly to sigc::ptr_fun():
+    typedef void (*type_func)(const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*);
+    type_func func = &(_auto_store_on_cellrenderer_text_edited_string<ColumnType>);
+    sigc::slot<void, const Glib::ustring&, const Glib::ustring&, int, Gtk::TreeView*> theslot  =
+      sigc::ptr_fun(func);
+
     //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect( 
-      sigc::bind<-1>( 
-        sigc::bind<-1>( sigc::ptr_fun(_auto_store_on_cellrenderer_text_edited_string<ColumnType>), this_p), 
+    pCellText->signal_edited().connect(
+      sigc::bind<-1>(
+        sigc::bind<-1>( theslot, this_p),
         model_column.index()
       )
     );
+
     
   }
 }
