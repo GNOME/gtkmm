@@ -45,17 +45,50 @@ ComboBoxEntryText::ComboBoxEntryText(GtkComboBoxEntry* castitem)
 
 void ComboBoxEntryText::append_text(const Glib::ustring& text)
 {
-  gtk_combo_box_append_text(GTK_COMBO_BOX(gobj()), text.c_str());
+  //We can not use gtk_combo_box_append_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
+
+  //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
+  Glib::RefPtr<Gtk::TreeModel> model = get_model();
+  Glib::RefPtr<Gtk::ListStore> list_model = Glib::RefPtr<ListStore>::cast_dynamic(model);
+  
+  if(list_model)
+  {
+    Gtk::TreeModel::iterator iter = list_model->append();
+    Gtk::TreeModel::Row row = *iter;
+    row[m_text_columns.m_column] = text;
+  }
 }
 
 void ComboBoxEntryText::insert_text(int position, const Glib::ustring& text)
 {
+  //TODO: We should not use gtk_combo_box_insert_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
   gtk_combo_box_insert_text(GTK_COMBO_BOX(gobj()), position, text.c_str());
 }
 
 void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
 {
-  gtk_combo_box_prepend_text(GTK_COMBO_BOX(gobj()), text.c_str());
+  //We can not use gtk_combo_box_prepend_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
+
+  //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
+  Glib::RefPtr<Gtk::TreeModel> model = get_model();
+  Glib::RefPtr<Gtk::ListStore> list_model = Glib::RefPtr<ListStore>::cast_dynamic(model);
+  
+  if(list_model)
+  {
+    Gtk::TreeModel::iterator iter = list_model->prepend();
+    Gtk::TreeModel::Row row = *iter;
+    row[m_text_columns.m_column] = text;
+  }
+}
+
+void ComboBoxEntryText::clear()
+{
+  //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
+  Glib::RefPtr<Gtk::TreeModel> model = get_model();
+  Glib::RefPtr<Gtk::ListStore> list_model = Glib::RefPtr<ListStore>::cast_dynamic(model);
+  
+  if(list_model)  
+    list_model->clear();
 }
 
 Glib::ustring ComboBoxEntryText::get_active_text() const
@@ -71,6 +104,28 @@ Glib::ustring ComboBoxEntryText::get_active_text() const
   }
 
   return result;
+}
+
+void ComboBoxEntryText::set_active_text(const Glib::ustring& text)
+{
+  //Look for the row with this text, and activate it:
+  Glib::RefPtr<Gtk::TreeModel> model = get_model();
+  if(model)
+  {
+    for(Gtk::TreeModel::iterator iter = model->children().begin(); iter != model->children().end(); ++iter)
+    {
+      const Glib::ustring& this_text = (*iter)[m_text_columns.m_column];
+
+      if(this_text == text)
+      {
+        set_active(iter);
+        return; //success
+      }
+    }
+  }
+
+  //Not found, so mark it as blank:
+  unset_active();
 }
 
 

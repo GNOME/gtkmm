@@ -59,6 +59,9 @@ public:
   void prepend_text(const Glib::ustring& text);
 
   Glib::ustring get_active_text() const;
+  void set_active_text(const Glib::ustring& text);
+
+  void clear();
 
 protected:
 
