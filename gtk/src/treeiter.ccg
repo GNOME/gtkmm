@@ -244,9 +244,9 @@ TreeRow::operator bool() const
 
 /**** Gtk::TreeNodeChildren ************************************************/
 
-TreeNodeChildren::iterator TreeNodeChildren::begin() const
+TreeNodeChildren::iterator TreeNodeChildren::begin()
 {
-  TreeIter iter (model_);
+  iterator iter (model_);
 
   // If the iterator is invalid (stamp == 0), assume a 'virtual' toplevel
   // node.  This behaviour is needed to implement Gtk::TreeModel::children().
@@ -272,17 +272,55 @@ TreeNodeChildren::iterator TreeNodeChildren::begin() const
   return iter;
 }
 
-TreeNodeChildren::iterator TreeNodeChildren::end() const
+TreeNodeChildren::const_iterator TreeNodeChildren::begin() const
+{
+  //TODO: Reduce the copy/paste from the non-const begin()?
+  
+  const_iterator iter (model_);
+
+  // If the iterator is invalid (stamp == 0), assume a 'virtual' toplevel
+  // node.  This behaviour is needed to implement Gtk::TreeModel::children().
+
+  if(gobject_.stamp != 0)
+  {
+    if(!gtk_tree_model_iter_children(model_->gobj(), iter.gobj(), const_cast<GtkTreeIter*>(&gobject_)))
+    {
+      // Assign the already known parent, in order to create an end iterator.
+      iter.gobject_ = gobject_;
+      iter.is_end_ = true;
+    }
+  }
+  else
+  {
+    if(!gtk_tree_model_get_iter_first(model_->gobj(), iter.gobj()))
+    {
+      // No need to copy the GtkTreeIter, since iter.gobject_ is already empty.
+      iter.is_end_ = true;
+    }
+  }
+
+  return iter;
+}
+
+TreeNodeChildren::iterator TreeNodeChildren::end()
 {
   // Just copy the parent, and turn it into an end iterator.
-  TreeIter iter (*this);
+  iterator iter (*this);
+  iter.is_end_ = true;
+  return iter;
+}
+
+TreeNodeChildren::const_iterator TreeNodeChildren::end() const
+{
+  // Just copy the parent, and turn it into an end iterator.
+  const_iterator iter (*this);
   iter.is_end_ = true;
   return iter;
 }
 
 TreeNodeChildren::value_type TreeNodeChildren::operator[](TreeNodeChildren::size_type index) const
 {
-  TreeIter iter (model_);
+  iterator iter (model_);
 
   GtkTreeIter *const parent = const_cast<GtkTreeIter*>(get_parent_gobject());
 

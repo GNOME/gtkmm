@@ -243,6 +243,7 @@ _CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`($2)($3)')
 _CONVERSION(`GdkNativeWindow',`NativeWindow',`($2)($3)')
 _CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`($2)($3)')
 _CONVERSION(`NativeWindow',`GdkNativeWindow',`($2)($3)')
+_CONVERSION(`GdkEvent*',`const GdkEvent*',`($2)($3)')
 
 # Used by signals:
 # TODO: Have some kind of _CONVERSION_ONLY_FOR_SIGNALS().

@@ -80,6 +80,9 @@ ExampleWindow::ExampleWindow()
   m_TreeView.append_column("ID", m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_Columns.m_col_name);
 
+  //Connect signal:
+  m_TreeView.signal_row_activated().connect( sigc::mem_fun(*this, &ExampleWindow::on_treeview_row_activated) );
+
   show_all_children();
 }
 
@@ -90,6 +93,16 @@ ExampleWindow::~ExampleWindow()
 void ExampleWindow::on_button_quit()
 {
   hide();
+}
+
+void ExampleWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* column */)
+{
+  Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
+  if(iter)
+  {
+    Gtk::TreeModel::Row row = *iter;
+    std::cout << "Row activated: ID=" << row[m_Columns.m_col_id] << ", Name=" << row[m_Columns.m_col_name] << std::endl;
+  }
 }
 
 

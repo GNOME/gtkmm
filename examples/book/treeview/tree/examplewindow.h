@@ -30,7 +30,8 @@ public:
 protected:
   //Signal handlers:
   virtual void on_button_quit();
-
+  virtual void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
+   
   //Tree model columns:
   class ModelColumns : public Gtk::TreeModel::ColumnRecord
   {

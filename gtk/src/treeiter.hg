@@ -97,7 +97,7 @@ class TreeIterBase
 class TreeIter : public TreeIterBase
 {
 public:
-  typedef std::forward_iterator_tag iterator_category;
+  typedef std::bidirectional_iterator_tag iterator_category;
   typedef Gtk::TreeRow              value_type;
   typedef int                       difference_type;
   typedef const Gtk::TreeRow&       reference;
@@ -319,10 +319,21 @@ public:
   typedef unsigned int  size_type;
   typedef int           difference_type;
   typedef Gtk::TreeIter iterator;
-  typedef Gtk::TreeIter const_iterator;
+  typedef std::reverse_iterator<iterator> reverse_iterator;
+  typedef Gtk::TreeIter const_iterator; //TODO: Make it a real const_iterator.
+  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-  iterator begin() const;
-  iterator end()   const;
+  iterator begin();
+  const_iterator begin() const;
+  iterator end();
+  const_iterator end()   const;
+
+  // Note: there is no advantage in not inlining these methods.
+  // We can't change them without breaking ABI anyway.
+  reverse_iterator       rbegin()       { return reverse_iterator(end());         }
+  reverse_iterator       rend()         { return reverse_iterator(begin());       }
+  const_reverse_iterator rbegin() const { return const_reverse_iterator(end());   }
+  const_reverse_iterator rend()   const { return const_reverse_iterator(begin()); }
 
   value_type operator[](size_type index) const;
 

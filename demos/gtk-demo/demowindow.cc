@@ -137,7 +137,7 @@ DemoWindow::~DemoWindow()
   on_example_window_hide(); //delete the example window if there is one.
 }
 
-void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn*)
+void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* model */)
 {
   m_TreePath = path;
 
