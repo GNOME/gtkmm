@@ -202,6 +202,8 @@ _CONVERSION(`GtkWidget*',`Window*',`Glib::wrap((GtkWindow*)($3))')
 _CONVERSION(`GtkWidget*',`TreeView*',`Glib::wrap((GtkTreeView*)($3))')
 _CONVERSION(`GtkWidget*',`HButtonBox*',`Glib::wrap((GtkHButtonBox*)($3))')
 _CONVERSION(`GtkWidget*',`ComboDropDown*',`Glib::wrap((GtkList*)($3))')
+_CONVERSION(`GtkWidget*',`Image*',`Glib::wrap((GtkImage*)($3))')
+_CONVERSION(`GtkWidget*',`ToolItem*',`Glib::wrap((GtkToolItem*)($3))')
 
 # Ptr (gtk+) -> const Ptr (gtkmm) (downcast)
 _CONVERSION(`GtkWidget*',`const Button*',`Glib::wrap((GtkButton*)($3))')
