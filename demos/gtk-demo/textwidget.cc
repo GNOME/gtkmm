@@ -102,14 +102,14 @@ enum enumStates
   STATE_IN_COMMENT
 };
 
-static gchar *tokens[] =
+static char* tokens[] =
 {
   "/*",
   "\"",
   NULL
 };
 
-static gchar *types[] =
+static char* types[] =
 {
   "static",
   "const ",
@@ -154,10 +154,10 @@ static gchar *types[] =
   "GdkPixbuf ",
   "GError",
   "size_t",
-  NULL
+  0
 };
 
-static gchar *control[] =
+static char* control[] =
 {
   " if ",
   " while ",
@@ -168,146 +168,150 @@ static gchar *control[] =
   ":",
   "return ",
   "goto ",
-  NULL
+  0
 };
 
 typedef const char* constpch;
 
 void
 parse_chars (constpch text,
-	     constpch* end_ptr,
-	     enumStates* state,
-	     constpch* tag,
-	     bool   start)
+       constpch* end_ptr,
+       enumStates* state,
+       constpch* tag,
+       bool   start)
 {
-  gint i;
-  gchar *next_token;
+  int i = 0;
+  char* next_token = 0;
 
   /* Handle comments first */
-  if (*state == STATE_IN_COMMENT)
+  if(*state == STATE_IN_COMMENT)
+  {
+    *end_ptr = strstr (text, "*/");
+    if (*end_ptr)
     {
-      *end_ptr = strstr (text, "*/");
-      if (*end_ptr)
-	{
-	  *end_ptr += 2;
-	  *state = STATE_NORMAL;
-	  *tag = "comment";
-	}
-      return;
+      *end_ptr += 2;
+      *state = STATE_NORMAL;
+      *tag = "comment";
     }
+    
+    return;
+  }
 
-  *tag = NULL;
-  *end_ptr = NULL;
+  *tag = 0;
+  *end_ptr = 0;
 
   /* check for comment */
   if (!strncmp (text, "/*", 2))
-    {
-      *end_ptr = strstr (text, "*/");
+  {
+    *end_ptr = strstr (text, "*/");
 
-      if (*end_ptr)
-	      *end_ptr += 2;
-      else
-	      *state = STATE_IN_COMMENT;
-      *tag = "comment";
+    if (*end_ptr)
+      *end_ptr += 2;
+    else
+      *state = STATE_IN_COMMENT;
+    *tag = "comment";
 
-      return;
-    }
+    return;
+  }
 
   /* check for preprocessor defines */
   if (*text == '#' && start)
-    {
-      *end_ptr = NULL;
-      *tag = "preprocessor";
-      return;
-    }
+  {
+    *end_ptr = 0;
+    *tag = "preprocessor";
+    return;
+  }
 
   /* functions */
   if (start && * text != '\t' && *text != ' ' && *text != '{' && *text != '}')
+  {
+    if (strstr (text, "("))
     {
-      if (strstr (text, "("))
-	{
-	  *end_ptr = strstr (text, "(");
-	  *tag = "function";
-	  return;
-	}
+      *end_ptr = strstr (text, "(");
+      *tag = "function";
+      return;
     }
+  }
+  
   /* check for types */
-  for (i = 0; types[i] != NULL; i++)
+  for (i = 0; types[i] != 0; i++)
     if (!strncmp (text, types[i], strlen (types[i])))
-      {
-	*end_ptr = text + strlen (types[i]);
-	*tag = "type";
-	return;
-      }
-
-  /* check for control */
-  for (i = 0; control[i] != NULL; i++)
-    if (!strncmp (text, control[i], strlen (control[i])))
-      {
-	*end_ptr = text + strlen (control[i]);
-	*tag = "control";
-	return;
-      }
-
-  /* check for string */
-  if (text[0] == '"')
     {
-      gint maybe_escape = false;
-
-      *end_ptr = text + 1;
-      *tag = "string";
-      while (**end_ptr != '\000')
-	{
-	  if (**end_ptr == '\"' && !maybe_escape)
-	    {
-	      *end_ptr += 1;
-	      return;
-	    }
-	  if (**end_ptr == '\\')
-	    maybe_escape = true;
-	  else
-	    maybe_escape = false;
-	  *end_ptr += 1;
-	}
+      *end_ptr = text + strlen (types[i]);
+      *tag = "type";
       return;
     }
 
+  /* check for control */
+  for (i = 0; control[i] != 0; i++)
+    if (!strncmp (text, control[i], strlen (control[i])))
+    {
+      *end_ptr = text + strlen (control[i]);
+      *tag = "control";
+      return;
+    }
+
+  /* check for string */
+  if (text[0] == '"')
+  {
+    int maybe_escape = false;
+
+    *end_ptr = text + 1;
+    *tag = "string";
+      
+    while (**end_ptr != '\000')
+    {
+      if (**end_ptr == '\"' && !maybe_escape)
+      {
+        *end_ptr += 1;
+        return;
+      }
+      
+      if (**end_ptr == '\\')
+        maybe_escape = true;
+      else
+        maybe_escape = false;
+      *end_ptr += 1;
+    }
+    return;
+  }
+
   /* not at the start of a tag.  Find the next one. */
-  for (i = 0; tokens[i] != NULL; i++)
+  for (i = 0; tokens[i] != 0; i++)
+  {
+    next_token = strstr (text, tokens[i]);
+    if (next_token)
     {
-      next_token = strstr (text, tokens[i]);
-      if (next_token)
-	{
-	  if (*end_ptr)
-	    *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
-	  else
-	    *end_ptr = next_token;
-	}
+      if (*end_ptr)
+        *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
+      else
+        *end_ptr = next_token;
     }
+  }
 
-  for (i = 0; types[i] != NULL; i++)
+  for (i = 0; types[i] != 0; i++)
+  {
+    next_token = strstr (text, types[i]);
+    if (next_token)
     {
-      next_token = strstr (text, types[i]);
-      if (next_token)
-	{
-	  if (*end_ptr)
-	    *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
-	  else
-	    *end_ptr = next_token;
-	}
+      if (*end_ptr)
+        *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
+      else
+        *end_ptr = next_token;
     }
+  }
 
-  for (i = 0; control[i] != NULL; i++)
+  for (i = 0; control[i] != 0; i++)
+  {
+    next_token = strstr (text, control[i]);
+    if (next_token)
     {
-      next_token = strstr (text, control[i]);
-      if (next_token)
-	{
-	  if (*end_ptr)
-	    *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
-	  else
-	    *end_ptr = next_token;
-	}
+      if (*end_ptr)
+        *end_ptr = (*end_ptr<next_token)?*end_ptr:next_token;
+      else
+        *end_ptr = next_token;
     }
+  }
 
 }
 
@@ -330,27 +334,27 @@ void TextWidget::fontify()
     const gchar* tag = 0;
 
     do
-  	{
-  	  parse_chars (start_ptr, &end_ptr, &state, &tag, start);
+    {
+      parse_chars (start_ptr, &end_ptr, &state, &tag, start);
 
-  	  start = false;
+      start = false;
       Gtk::TextIter iterTmp;
-  	  if(end_ptr)
- 	    {
- 	      iterTmp = iterStart;
- 	      iterTmp.forward_chars(end_ptr - start_ptr);
- 	    }
-  	  else
- 	    {
- 	      iterTmp = iterNext;
- 	    }
+      if(end_ptr)
+      {
+        iterTmp = iterStart;
+        iterTmp.forward_chars(end_ptr - start_ptr);
+      }
+      else
+      {
+        iterTmp = iterNext;
+      }
 
-  	  if(tag)
-  	    m_refTextBuffer->apply_tag_by_name(tag, iterStart, iterTmp);
+      if(tag)
+        m_refTextBuffer->apply_tag_by_name(tag, iterStart, iterTmp);
 
-  	  iterStart = iterTmp;
-  	  start_ptr = end_ptr;
-  	}
+      iterStart = iterTmp;
+      start_ptr = end_ptr;
+    }
     while(end_ptr);
 
     iterStart = iterNext;

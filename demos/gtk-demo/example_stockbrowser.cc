@@ -90,7 +90,6 @@ Example_StockBrowser::Example_StockBrowser()
 
     // The icon/symbol column uses two CellRenderers: Here we see why Gtk::TreeView is so good
     // m_columns.icon and m_columns.symbol are columns in the model. pColumn is the column in the TreeView:
-
     pColumn->pack_start(m_columns.icon, false);
     pColumn->pack_start(m_columns.symbol);
 

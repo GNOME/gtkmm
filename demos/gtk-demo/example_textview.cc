@@ -99,14 +99,13 @@ Example_TextView::~Example_TextView()
 void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
   /* Create a bunch of tags. Note that it's also possible to
-   * create tags with gtk_text_tag_new() then add them to the
+   * create tags with Gtk::TextTag::create() then add them to the
    * tag table for the buffer, refBuffer->create_tag() is
    * just a convenience function. Also note that you don't have
-   * to give tags a name; pass NULL for the name to create an
-   * anonymous tag.
+   * to give tags a name.
    *
    * In any real app, another useful optimization would be to create
-   * a GtkTextTagTable in advance, and reuse the same tag table for
+   * a Gtk::TextTagTable in advance, and reuse the same tag table for
    * all the buffers with the same tag set, instead of creating
    * new copies of the same tags for every buffer.
    *
@@ -114,7 +113,7 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
    * tag table.	 That is, tags created later that affect the same text
    * property affected by an earlier tag will override the earlier
    * tag.  You can modify tag priorities with
-   * gtk_text_tag_set_priority().
+   * Gtk::TextTag::set_priority().
    */
 
   Glib::RefPtr<Gtk::TextBuffer::Tag> refTag;
@@ -345,7 +344,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
   Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = refBuffer->create_child_anchor(iter);
   iter = refBuffer->insert(refBuffer->end(), " and a menu: ");
-  refAnchor = refBuffer->create_child_anchor(iter);
+  refAnchor = refBuffer->create_child_anchor(iter); //TODO: Maybe this should be a method of the Iterator.
   iter = refBuffer->insert(refBuffer->end(), " and a scale: ");
   refAnchor = refBuffer->create_child_anchor(iter);
   iter = refBuffer->insert(refBuffer->end(), " and an animation: ");
@@ -378,7 +377,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
   Gtk::TextIter iter = refBuffer->begin();
 
   int i = 0;
-  while(find_anchor(iter))
+  while(find_anchor(iter)) //previously created with create_child_anchor().
   {
     Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = iter.get_child_anchor();
     Gtk::Widget* pWidget = 0;

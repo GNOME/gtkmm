@@ -31,11 +31,6 @@ protected:
   virtual void on_button_add_clicked();
   virtual void on_button_remove_clicked();
 
-  #ifdef GTKMM_MSC_NET  //MSVC++ can't cope with the easy method.
-  virtual void on_cell_edited_number(const Glib::ustring& path_string, const Glib::ustring& new_text);
-  virtual void on_cell_edited_product(const Glib::ustring& path_string, const Glib::ustring& new_text);
-  #endif //GTKMM_MSC_NET
-  
   virtual void create_model();
   virtual void add_columns();
   virtual void add_items();
@@ -192,32 +187,10 @@ void Example_TreeView_EditableCells::add_columns()
 {
 
   /* number column */
-#ifdef GTKMM_MSC_NET //MSVC++ can not cope with the easy method:
-  {
-     int cols_count = m_TreeView.append_column("Number", m_columns.number);
-     Gtk::TreeViewColumn* pColumn =m_TreeView.get_column(cols_count-1);
-     Gtk::CellRendererText* pCell = static_cast<Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
-     pCell->set_property("editable", true);
-     pCell->signal_edited().connect(
-        SigC::slot(*this, &Example_TreeView_EditableCells::on_cell_edited_number));
-  }
-#else //GTKMM_MSC_NET
   m_TreeView.append_column_editable("Number", m_columns.number);
-#endif //GTKMM_MSC_NET
 
   /* product column */
-#ifdef GTKMM_MSC_NET  //See comment above.
-  {
-     int cols_count = m_TreeView.append_column("Product", m_columns.product);
-     Gtk::TreeViewColumn* pColumn =m_TreeView.get_column(cols_count-1);
-     Gtk::CellRendererText* pCell = static_cast<Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
-     pCell->set_property("editable", true);
-     pCell->signal_edited().connect(
-        SigC::slot(*this, &Example_TreeView_EditableCells::on_cell_edited_product));
-  }
-#else //GTKMM_MSC_NET
   m_TreeView.append_column_editable("Product", m_columns.product);
-#endif //GTKMM_MSC_NET
 }
 
 
@@ -248,29 +221,3 @@ void Example_TreeView_EditableCells::on_button_remove_clicked()
       m_vecItems.erase(m_vecItems.begin() + index);
   }
 }
-
-#ifdef GTKMM_MSC_NET  //See comment above.
-void Example_TreeView_EditableCells::on_cell_edited_number(const Glib::ustring& path_string, const Glib::ustring& new_text)
-{
-  const Gtk::TreePath path (path_string);
-  const int i = path.front();
-
-  const int new_number = atoi(new_text.c_str());
-
-  m_vecItems[i].m_number = new_number;
-
-  Gtk::TreeRow row = *(m_refListStore->get_iter(path));
-  row[m_columns.number] = new_number;
-}
-
-void Example_TreeView_EditableCells::on_cell_edited_product(const Glib::ustring& path_string, const Glib::ustring& new_text)
-{
-  const Gtk::TreePath path (path_string);
-  const int i = path.front();
-
-  m_vecItems[i].m_product = new_text;
-
-  Gtk::TreeRow row = *(m_refListStore->get_iter(path));
-  row[m_columns.product] = new_text;
-}
-#endif //GTKMM_MSC_NET
