@@ -42,16 +42,26 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
   m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
 
-  //Create and fill the combo model
-  //You could also use set_cell_data_func() to choose or fill this later. 
-  m_refTreeModelCombo = Gtk::ListStore::create(m_ColumnsCombo);
+  //Create and fill the combo models
+  //You could also use set_cell_data_func() to choose or fill these later.
+  m_refTreeModelCombo1 = Gtk::ListStore::create(m_ColumnsCombo);
   
-  Gtk::TreeModel::Row row = *(m_refTreeModelCombo->append());
+  Gtk::TreeModel::Row row = *(m_refTreeModelCombo1->append());
+  row[m_ColumnsCombo.m_col_choice] = "abc";
+  row = *(m_refTreeModelCombo1->append());
+  row[m_ColumnsCombo.m_col_choice] = "def";
+  
+  m_refTreeModelCombo2 = Gtk::ListStore::create(m_ColumnsCombo);
+  
+  row = *(m_refTreeModelCombo2->append());
   row[m_ColumnsCombo.m_col_choice] = "foo"; //The value that can be chosen from the combo, to use in the model.
-  row = *(m_refTreeModelCombo->append());
+  row[m_ColumnsCombo.m_col_description] = "The Foo item"; //A description, to help the user to choose the value from the combo.
+  row = *(m_refTreeModelCombo2->append());
   row[m_ColumnsCombo.m_col_choice] = "bar";
-  row = *(m_refTreeModelCombo->append());
+  row[m_ColumnsCombo.m_col_description] = "The item known as bar";
+  row = *(m_refTreeModelCombo2->append());
   row[m_ColumnsCombo.m_col_choice] = "goo";
+  row[m_ColumnsCombo.m_col_description] = "goo, goo, goo, goo";
   
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
@@ -62,17 +72,17 @@ ExampleWindow::ExampleWindow()
   row[m_Columns.m_col_id] = 1;
   row[m_Columns.m_col_name] = "Billy Bob";
   row[m_Columns.m_col_itemchosen] = "click to choose";
-  //row[m_Columns.m_col_choices] = m_refTreeModelCombo1; //Choose from this list to set the value in m_col_itemchosen.
+  row[m_Columns.m_col_choices] = m_refTreeModelCombo1; //Choose from this list to set the value in m_col_itemchosen.
   
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
-  //row[m_Columns.m_col_choices] = m_refTreeModelCombo;
+  row[m_Columns.m_col_choices] = m_refTreeModelCombo2;
 
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
-  //row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
+  row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
 
   //Add the TreeView's view columns:
   m_TreeView.append_column("ID", m_Columns.m_col_id);
@@ -88,9 +98,12 @@ ExampleWindow::ExampleWindow()
   pColumn->add_attribute(pRenderer->property_text(), m_Columns.m_col_itemchosen);
   
   //Allow the user to choose from this list to set the value in m_col_itemchosen:
-  //pColumn->add_attribute(pRenderer->property_model(), m_Columns.m_col_choices);
-  pRenderer->property_model() = m_refTreeModelCombo;
-  pRenderer->property_text_column() = 0; //This must be a text column, in m_refTreeModelCombo1.
+  pColumn->add_attribute(pRenderer->property_model(), m_Columns.m_col_choices);
+  
+  //Alternatively, you could use just one combo model, in all rows, instead of mapping it to a model column:
+  //pRenderer->property_model() = m_refTreeModelCombo1;
+
+  pRenderer->property_text_column() = 0; //This must be a text column, in m_refTreeModelCombo1, or m_refTreeModelCombo;
   
   //Allow the user to edit the column:
   //This is done automatically when we use View::append_column(model_column),

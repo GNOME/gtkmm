@@ -70,7 +70,7 @@ protected:
   Gtk::TreeView m_TreeView;
   Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 
-  Glib::RefPtr<Gtk::ListStore> m_refTreeModelCombo;
+  Glib::RefPtr<Gtk::ListStore> m_refTreeModelCombo1, m_refTreeModelCombo2;
     
   Gtk::HButtonBox m_ButtonBox;
   Gtk::Button m_Button_Quit;
