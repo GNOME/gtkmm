@@ -208,9 +208,9 @@ void Example_TreeView_EditableCells::on_button_remove_clicked()
 {
   Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView.get_selection();
 
-  if(const Gtk::TreeIter iter = refSelection->get_selected())
+  if(const Gtk::TreeModel::iterator iter = refSelection->get_selected())
   {
-    const Gtk::TreePath path (iter);
+    const Gtk::TreeModel::Path path(iter);
     const unsigned int index = path.front();
 
     // Remove item from ListStore:

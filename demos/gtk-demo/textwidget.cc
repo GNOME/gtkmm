@@ -81,7 +81,7 @@ Glib::RefPtr<Gtk::TextBuffer> TextWidget::get_buffer()
 
 void TextWidget::wipe()
 {
-  Gtk::TextIter start, end;
+  Gtk::TextBuffer::iterator start, end;
   m_refTextBuffer->get_bounds(start, end);
   m_refTextBuffer->erase(start, end);
 }
@@ -321,9 +321,9 @@ void TextWidget::fontify()
 {
   enumStates state = STATE_NORMAL;
 
-  Gtk::TextIter iterStart = m_refTextBuffer->get_iter_at_offset(0);
+  Gtk::TextBuffer::iterator iterStart = m_refTextBuffer->get_iter_at_offset(0);
 
-  Gtk::TextIter iterNext = iterStart;
+  Gtk::TextBuffer::iterator iterNext = iterStart;
   while(iterNext.forward_line())
   {
     bool start = true;
@@ -338,7 +338,7 @@ void TextWidget::fontify()
       parse_chars (start_ptr, &end_ptr, &state, &tag, start);
 
       start = false;
-      Gtk::TextIter iterTmp;
+      Gtk::TextBuffer::iterator iterTmp;
       if(end_ptr)
       {
         iterTmp = iterStart;

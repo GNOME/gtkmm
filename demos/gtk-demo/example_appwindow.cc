@@ -15,7 +15,7 @@ protected:
   //Signal handlers:
   virtual void on_menu_item();
   virtual void on_text_changed();
-  virtual void on_text_mark_set(const Gtk::TextIter& new_location, const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
+  virtual void on_text_mark_set(const Gtk::TextBuffer::iterator& new_location, const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
 
   //Member widgets:
   Gtk::Table m_Table;
@@ -189,7 +189,7 @@ void Example_AppWindow::on_text_changed()
   Glib::RefPtr<Gtk::TextBuffer> refBuffer = m_TextView.get_buffer();
   gint count = refBuffer->get_char_count();
 
-  Gtk::TextIter iter = refBuffer->get_iter_at_mark(refBuffer->get_insert());
+  Gtk::TextBuffer::iterator iter = refBuffer->get_iter_at_mark(refBuffer->get_insert());
 
   gint row = iter.get_line();
   gint col = iter.get_line_offset();
@@ -201,7 +201,7 @@ void Example_AppWindow::on_text_changed()
 }
 
 
-void Example_AppWindow::on_text_mark_set(const Gtk::TextIter&, const Glib::RefPtr<Gtk::TextBuffer::Mark>&)
+void Example_AppWindow::on_text_mark_set(const Gtk::TextBuffer::iterator&, const Glib::RefPtr<Gtk::TextBuffer::Mark>&)
 {
   on_text_changed();
 }

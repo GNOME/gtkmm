@@ -68,7 +68,7 @@ bool TreeModel_Dnd::row_drop_possible_vfunc(const Gtk::TreeModel::Path& dest, co
   //You could also examine the row being dragged (via selection_data)
   //if you must look at both rows to see whether a drop should be allowed.
   //TODO: Demonstrate this when the API has been corrected to use Gtk::SelectionData instead of GtkSelectionData,
-  //and use Gtk::TreePath::get_from_selection_data(selection_data, model, path)
+  //and use Gtk::TreeModel::Path::get_from_selection_data(selection_data, model, path)
 
   return Gtk::TreeStore::row_drop_possible_vfunc(dest, selection_data);
 }

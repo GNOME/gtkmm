@@ -31,20 +31,20 @@ ExampleWindow::ExampleWindow()
 
   //File|New sub menu:
   {
-  	Gtk::Menu::MenuList& menulist = m_Menu_File_New.items();
+    Gtk::Menu::MenuList& menulist = m_Menu_File_New.items();
 
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New Foo",  Gtk::Menu::AccelKey("<control>n"),
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New Foo", Gtk::AccelKey("<control>n"),
       SigC::slot(*this, &ExampleWindow::on_menu_file_new_generic) ) );
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("New _Goo",
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("New _Goo",
       SigC::slot(*this, &ExampleWindow::on_menu_file_new_generic) ) );
   }
 
   //File menu:
   {
-  	Gtk::Menu::MenuList& menulist = m_Menu_File.items();
+    Gtk::Menu::MenuList& menulist = m_Menu_File.items();
 
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New", m_Menu_File_New) ); //Add sub menu.
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Quit",  Gtk::Menu::AccelKey("<control>q"),
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New", m_Menu_File_New) ); //Add sub menu.
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::AccelKey("<control>q"),
       SigC::slot(*this, &ExampleWindow::on_menu_file_quit) ) );
   }
 

@@ -137,15 +137,15 @@ DemoWindow::~DemoWindow()
   on_example_window_hide(); //delete the example window if there is one.
 }
 
-void DemoWindow::on_treeview_row_activated(const Gtk::TreePath& path, Gtk::TreeViewColumn*)
+void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn*)
 {
   m_TreePath = path;
 
   if(m_pWindow_Example == 0) //Don't open a second window.
   {
-    if(const Gtk::TreeIter iter = m_TreeView.get_model()->get_iter(m_TreePath))
+    if(const Gtk::TreeModel::iterator iter = m_TreeView.get_model()->get_iter(m_TreePath))
     {
-      Gtk::TreeRow row = *iter;
+      Gtk::TreeModel::Row row = *iter;
       const DemoColumns& columns = demo_columns();
 
       type_slotDo slot = row[columns.slot];
@@ -163,7 +163,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreePath& path, Gtk::TreeV
 
 // static
 bool DemoWindow::select_function(const Glib::RefPtr<Gtk::TreeModel>& model,
-                                 const Gtk::TreePath& path, bool)
+                                 const Gtk::TreeModel::Path& path, bool)
 {
   const Gtk::TreeModel::iterator iter = model->get_iter(path);
   return iter->children().empty(); // only allow leaf nodes to be selected
@@ -171,7 +171,7 @@ bool DemoWindow::select_function(const Glib::RefPtr<Gtk::TreeModel>& model,
 
 void DemoWindow::on_treeselection_changed()
 {
-  if(const Gtk::TreeIter iter = m_refTreeSelection->get_selected())
+  if(const Gtk::TreeModel::iterator iter = m_refTreeSelection->get_selected())
   {
     const Glib::ustring filename = (*iter)[demo_columns().filename];
     load_file(Glib::filename_from_utf8(filename));
@@ -265,7 +265,7 @@ void DemoWindow::load_file(const std::string& filename)
     GString *buffer = g_string_new (NULL);
     int state = 0;
     bool in_para = false;
-    Gtk::TextIter start = refBufferInfo->get_iter_at_offset(0);
+    Gtk::TextBuffer::iterator start = refBufferInfo->get_iter_at_offset(0);
     while (read_line (file, buffer))
     {
       gchar *p = buffer->str;
@@ -293,7 +293,7 @@ void DemoWindow::load_file(const std::string& filename)
 
       	  if (q > p)
     	    {
-    	      Gtk::TextIter end = start;
+    	      Gtk::TextBuffer::iterator end = start;
 
     	      g_assert (int(strlen(p)) >= (q - p)); //TODO: What is this for?  daniel.
 
@@ -382,7 +382,7 @@ void DemoWindow::on_example_window_hide()
 {
   if(m_pWindow_Example)
   {
-    if(const Gtk::TreeIter iter = m_refTreeStore->get_iter(m_TreePath))
+    if(const Gtk::TreeModel::iterator iter = m_refTreeStore->get_iter(m_TreePath))
     {
       (*iter)[demo_columns().italic] = false;
 

@@ -275,11 +275,11 @@ void Example_TreeView_TreeStore::create_model()
 
   Gtk::TreeIterChildren children = m_refTreeStore->children();
 
-  for(Gtk::TreeIter node = children.begin(); node != children.end(); ++node)
+  for(Gtk::TreeModel::iterarator node = children.begin(); node != children.end(); ++node)
   {
     g_print("outer loop\n");
 
-    for(Gtk::TreeIter row = node.children().begin(); row != node.children().end(); )
+    for(Gtk::TreeModel::iterarator row = node.children().begin(); row != node.children().end(); )
     {
       g_print("inner loop\n");
       row = m_refTreeStore->erase(row);

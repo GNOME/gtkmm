@@ -42,10 +42,10 @@ protected:
   bool read_line (FILE *stream, GString *str);
 
   //Signal handlers:
-  static  bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreePath& path,
+  static  bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path,
                                bool currently_selected);
   virtual void on_treeselection_changed();
-  virtual void on_treeview_row_activated(const Gtk::TreePath& path, Gtk::TreeViewColumn* column);
+  virtual void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
   virtual void on_example_window_hide();
 
   //Member widgets:
@@ -55,7 +55,7 @@ protected:
   Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
   Gtk::TreeView m_TreeView;
   Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
-  Gtk::TreePath m_TreePath;
+  Gtk::TreeModel::Path m_TreePath;
 
   TextWidget m_TextWidget_Info, m_TextWidget_Source;
 

@@ -21,13 +21,36 @@
 #include <gtk/gtkradioaction.h>
 
 
+typedef Gtk::RadioAction::Group Group; //So that the generate get_group return type is parsed.
+
 namespace Gtk
 {
 
-RadioAction::RadioAction(const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip)
+RadioAction::RadioAction(Group& group, const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip)
 :
   _CONSTRUCT("name", name.c_str(), "stock_id", stock_id.get_c_str(), "label", label.c_str(), "tooltip", tooltip.c_str())
-{}
+{
+  set_group(group);
+}
+
+Glib::RefPtr<RadioAction> RadioAction::create(Group& group, const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip)
+{
+  return Glib::RefPtr<RadioAction>( new RadioAction(group, name, Gtk::StockID(), label, tooltip) );
+}
+
+Glib::RefPtr<RadioAction> RadioAction::create_from_stock(Group& group, const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip)
+{
+  return Glib::RefPtr<RadioAction>( new RadioAction(group, name, stock_id, label, tooltip) );
+}
+
+void RadioAction::set_group(Group& group)
+{
+  gtk_radio_action_set_group(gobj(), group.group_);
+
+  //The group will be updated, ready for use with the next radio action:
+  group = get_group();
+}
+
 
 
 } // namespace Gtk

@@ -28,15 +28,12 @@
 namespace Gtk
 {
 
-namespace Menu_Helpers
-{
-
 /** Defines accelerator key combinations.
  * For instance, pressing Control-Q to activate the File|Quit menu item.
  * Typedefed as Gtk::Menu::AccelKey
  *
- * By defining accelerator paths you can allow users of your application
- * to change accelerators himself. An example of an accelerator may be
+ * By defining accelerator paths you can allow the user of your application
+ * to change accelerators himself. An example of an accelerator might be
  * "<MainWindow>/File/Open". Modified accelerators may be saved 
  * @see Gtk::AccelMap
  * @ingroup Menus
@@ -61,7 +58,7 @@ public:
    * @param accel_path For instance, "<MainWindow>/File/Open"
    */
   AccelKey(const Glib::ustring& accelerator, 
-           const Glib::ustring& accel_path = "");
+           const Glib::ustring& accel_path = Glib::ustring());
 
   AccelKey(const AccelKey& src);
 
@@ -91,8 +88,6 @@ protected:
   Gdk::ModifierType mod_;
   Glib::ustring path_;
 };
-
-} /* namespace Menu_Helpers */
 
 } /* namespace Gtk */
 

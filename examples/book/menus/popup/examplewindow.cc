@@ -42,7 +42,7 @@ ExampleWindow::ExampleWindow()
 
   	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Edit",
       SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
-	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::Menu::AccelKey("<control>p"),
+	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::AccelKey("<control>p"),
       SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
   	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
       SigC::slot(*this, &ExampleWindow::on_menu_file_popup_generic) ) );

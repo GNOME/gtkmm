@@ -19,6 +19,7 @@
  */
 
 #include <gtk/gtkactiongroup.h>
+#include <gtkmm/accelmap.h>
 
 
 namespace Gtk
@@ -35,14 +36,22 @@ void ActionGroup::add_action(const Glib::RefPtr<Action>& action, const Action::S
   add_action(action);
 }
 
-void ActionGroup::add_action(const Glib::RefPtr<Action>& action, const AccelKey& /* accel_key */, const Action::SlotActivate& slot)
+void ActionGroup::add_action(const Glib::RefPtr<Action>& action, const AccelKey& accel_key, const Action::SlotActivate& slot)
 {
   //This is meant to be similar to the gtk_action_group_add_actions() convenience method that is used from C.
   //This also does the work of gtk_action_group_add_toggle_actions() and gtk_action_group_add_radio_actions_full(),
   //because the extra stuff there is already done when the Action (or a derived type, such as ToggleAction) is create()ed.
 
   add_action(action, slot);
-  //TODO: Add the accellerator.
+
+  //Create the accel path (a kind of unique key):
+  Glib::ustring accel_path = "<Actions>/" + get_name() + "/" + action->get_name();
+
+  //Register the accel path:
+  Gtk::AccelMap::add_entry(accel_path, accel_key.get_key(), accel_key.get_mod());
+
+  //USe the accel path:
+  action->set_accel_path(accel_path);
 }  
 
 

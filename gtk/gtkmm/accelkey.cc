@@ -26,9 +26,6 @@
 namespace Gtk
 {
 
-namespace Menu_Helpers
-{
-
 AccelKey::AccelKey()
 : key_(GDK_VoidSymbol),
   mod_((Gdk::ModifierType)0)
@@ -91,7 +88,6 @@ Glib::ustring AccelKey::get_abbrev() const
   return AccelGroup::name (key_, mod_);
 }
 
-} /* namespace Menu_Helpers */
 
-} /* namespace Gtk */
+} // namespace
 

@@ -100,7 +100,7 @@ Example_Menus::Example_Menus()
     MenuList items = pMenu->items();
 
     items.push_back(SeparatorElem());
-    items.push_back( CheckMenuElem("Accelerate Me", AccelKey(GDK_F1, Gdk::ModifierType(0))) );
+    items.push_back( CheckMenuElem("Accelerate Me", Gtk::AccelKey(GDK_F1, Gdk::ModifierType(0))) );
     items.push_back( CheckMenuElem("Accelerator Locked") );
     items.back().add_accelerator("activate", get_accel_group(), GDK_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
     items.push_back( CheckMenuElem("Accelerator Frozen") );
