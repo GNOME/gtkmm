@@ -38,13 +38,13 @@ ExampleWindow::ExampleWindow()
 
   //Fill menu:
   {
-  	Gtk::Menu::MenuList& menulist = m_Menu_Popup.items();
+    Gtk::Menu::MenuList& menulist = m_Menu_Popup.items();
 
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Edit",
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Edit",
       sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
-	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::AccelKey("<control>p"),
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Process", Gtk::AccelKey("<control>p"),
       sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
-  	menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
+    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
       sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) ) );
 
     //Add a ImageMenuElem:

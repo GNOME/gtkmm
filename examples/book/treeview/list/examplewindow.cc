@@ -26,7 +26,6 @@ ExampleWindow::ExampleWindow()
   set_border_width(5);
   set_default_size(400, 200);
 
-
   add(m_VBox);
 
   //Add the TreeView, inside a ScrolledWindow, with the button underneath:
@@ -64,6 +63,16 @@ ExampleWindow::ExampleWindow()
   m_TreeView.append_column("ID", m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_Columns.m_col_name);
 
+  //Make all the columns reorderable:
+  //This is not necessary, but it's nice to show the feature.
+  //You can use TreeView::set_column_drag_function() to more
+  //finely control column drag and drop.
+  for(guint i = 0; i < 2; i++)
+  {
+    Gtk::TreeView::Column* pColumn = m_TreeView.get_column(i);
+    pColumn->set_reorderable();
+  }
+
   show_all_children();
 }
 
@@ -75,6 +84,5 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
 
 
