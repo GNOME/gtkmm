@@ -8,7 +8,7 @@ web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
              gtkmm_header.html_fragment gtkmm_footer.html_fragment beautify_docs.pl \
-             html
+             html gtkmm_doxygen_tags
 
 html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	-rm -rf html
