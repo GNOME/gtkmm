@@ -11,16 +11,30 @@
 #  Copyright 1999 gtkmm Development Team
 #  Copyright 1998 Stephan Kulow 
 #
-AC_INIT(gtk/gtkmmconfig.h.in)
-AC_PREREQ(2.50)
+
+#We use pushdef here because we can't use shell variables before AC_INIT, but we want to use a variable with AC_INIT:
+pushdef([GTKMM_MAJOR_VERSION],     [2])
+pushdef([GTKMM_MINOR_VERSION],     [5])
+pushdef([GTKMM_MICRO_VERSION],     [2])
+pushdef([GTKMM_EXTRA_VERSION],     [])
+pushdef([GTKMM_VERSION], GTKMM_MAJOR_VERSION.GTKMM_MINOR_VERSION.GTKMM_MICRO_VERSION[]GTKMM_EXTRA_VERSION)
+AC_INIT([gtkmm], GTKMM_VERSION, [gtkmm-list@gnome.org])
+AC_CONFIG_SRCDIR([gtk/gtkmmconfig.h.in])
+AC_PREREQ(2.59)
 
 #########################################################################
 #  Version and initialization
 #########################################################################
-GTKMM_MAJOR_VERSION=2
-GTKMM_MINOR_VERSION=5
-GTKMM_MICRO_VERSION=1
-GTKMM_VERSION=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION.$GTKMM_MICRO_VERSION
+[GTKMM_MAJOR_VERSION]=GTKMM_MAJOR_VERSION
+[GTKMM_MINOR_VERSION]=GTKMM_MINOR_VERSION
+[GTKMM_MICRO_VERSION]=GTKMM_MICRO_VERSION
+[GTKMM_EXTRA_VERSION]=GTKMM_EXTRA_VERSION
+[GTKMM_VERSION]=GTKMM_VERSION
+popdef([GTKMM_MAJOR_VERSION])
+popdef([GTKMM_MINOR_VERSION])
+popdef([GTKMM_MICRO_VERSION])
+popdef([GTKMM_EXTRA_VERSION])
+popdef([GTKMM_VERSION])
 GTKMM_RELEASE=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION
 AC_DEFINE_UNQUOTED(GTKMM_MAJOR_VERSION, $GTKMM_MAJOR_VERSION, [Major version of gtkmm])
 AC_DEFINE_UNQUOTED(GTKMM_MINOR_VERSION, $GTKMM_MINOR_VERSION, [Minor version of gtkmm])
@@ -35,17 +49,14 @@ AC_SUBST(GTKMM_RELEASE)
 #  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
 #                 better
 # CURRENT : REVISION : AGE
-LIBGTKMM_SO_VERSION=1:11:0
+LIBGTKMM_SO_VERSION=1:12:0
 AC_SUBST(LIBGTKMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
 
-dnl For automake.
-VERSION=$GTKMM_VERSION
-PACKAGE=gtkmm
-
-dnl Initialize automake stuff
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+# Initialize automake stuff
+# tar-ustar asks it to use a sensible tar format that can handle long filenames.
+AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
 dnl Specify a configuration file (no autoheader)
 AM_CONFIG_HEADER(config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h)
@@ -119,7 +130,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked])
 #  Dependancy checks
 #########################################################################
 gtkmm_min_glibmm_version=2.5.0
-gtkmm_min_gtk_version=2.5.5
+gtkmm_min_gtk_version=2.5.6
 
 
 GLIBMM_PREFIX=`pkg-config --variable=prefix glibmm-2.4`
