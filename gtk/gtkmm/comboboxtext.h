@@ -31,6 +31,11 @@ namespace Gtk
 /** This is a specialisation of the ComboBox which has one column of text (a simple list),
  * and appropriate methods for setting and getting the text.
  *
+ * Note that you can not use this class with Gnome::Glade::Xml::get_widget_derived() to wrap a GtkComboBox added 
+ * in the Glade user interface designer, because Glade adds its own TreeModel instead of using the TreeModel from 
+ * this class. You could use a normal Gtk::ComboBox instead, though you can not use Glade to add rows to a TreeModel 
+ * that is defined in your C++ code.
+ *
  * @ingroup Widgets
  */
 
