@@ -39,7 +39,9 @@
 #include <pangomm/fontdescription.h>
 
 const double DEG2RAD = 3.1415928 / 180.0;
-
+#ifndef M_PI
+#define M_PI 3.14159265359
+#endif /* M_PI */
 
 // PPI Plan Position Indicator: radar screen
 class PPI : public Gtk::DrawingArea

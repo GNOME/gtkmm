@@ -211,6 +211,8 @@ void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treevi
 
 void Example_ChangeDisplay::initialize_displays()
 {
+
+#ifndef G_OS_WIN32
   Glib::RefPtr<Gdk::DisplayManager> refDisplayManager = Gdk::DisplayManager::get();
 
   typedef std::list< Glib::RefPtr<Gdk::Display> > type_listDisplays;
@@ -226,7 +228,9 @@ void Example_ChangeDisplay::initialize_displays()
 
     refDisplay->signal_closed().connect(
       SigC::bind( SigC::slot(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
-  }   
+  }
+
+#endif   
 }
 
 void Example_ChangeDisplay::on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display)

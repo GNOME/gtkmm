@@ -9,6 +9,8 @@ DOCBOOK_STYLESHEET ?= http://docbook.sourceforge.net/release/xsl/current/html/ch
 
 # The new XML DocBook way:
 html/index.html: $(docbook_docs)
+	-rm -rf html
+	$(mkinstalldirs) html
 	xsltproc -o html/ --catalogs $(DOCBOOK_STYLESHEET) $<
 
 post-html: html/index.html
@@ -21,5 +23,32 @@ all-local: html/index.html
 
 maintainer-clean-local: doc-clean
 
-.PHONY: post-html doc-clean
+faqdir = $(gtkmm_docdir)/FAQ/html
+
+install-faq: html/index.html
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(faqdir)
+	@dir='$(<D)'; for p in $$dir/*.html ; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(faqdir)/$$f"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(faqdir)/$$f; \
+	done
+
+uninstall-faq: html/index.html
+	@$(NORMAL_UNINSTALL)
+	@dir='$(<D)'; for p in $$dir/*.html ; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(faqdir)/$$f"; \
+	  rm -f $(DESTDIR)$(faqdir)/$$f; \
+	done
+
+all-local: html/index.html
+
+install-data-local: install-faq
+
+uninstall-local: uninstall-faq
+
+maintainer-clean-local: doc-clean
+
+.PHONY: post-html doc-clean install-faq uninstall-faq
 

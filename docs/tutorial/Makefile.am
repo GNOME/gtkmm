@@ -15,6 +15,7 @@ gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
 # The new XML DocBook way:
 html/index.html: gtkmm-tut-with-examples.xml
 	-rm -rf html
+	$(mkinstalldirs) html
 	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_STYLESHEET) $<
 
 validate_original: gtkmm-tut.xml
