@@ -129,6 +129,18 @@ typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations
 namespace Gtk
 {
 
+TreeModelFilter::TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model)
+:
+  _CONSTRUCT("child_model", child_model->gobj())
+{
+}
+
+TreeModelFilter::TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& virtual_root)
+:
+  _CONSTRUCT("child_model", child_model->gobj(), "virtual_root", (virtual_root.empty() ? 0 : const_cast<GtkTreePath*>((virtual_root).gobj())) )
+{
+}
+
 void TreeModelFilter::set_visible_func(const SlotVisible& slot)
 {
   // Create a signal proxy.  A pointer to this will be passed
@@ -178,6 +190,12 @@ void TreeModelFilter::set_modify_func(const TreeModelColumnRecord& columns, cons
     &SignalProxy_Modify::gtk_callback, pSignalProxy,
     &SignalProxy_Modify::gtk_callback_destroy);
 }
+
+void TreeModelFilter::set_value_impl(const iterator& /* row */, int /* column */, const Glib::ValueBase& /* value */)
+{
+  g_warning("Attempt to set a value of a row in a TreeModelFilter instead of in the child model.");
+}
+
 
 } // namespace Gtk
 

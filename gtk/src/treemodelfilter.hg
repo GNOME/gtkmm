@@ -40,15 +40,25 @@ class TreeModelFilter :
   _IMPLEMENTS_INTERFACE(TreeModel)
 
 protected:
-  _WRAP_CTOR(TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& virtual_root), gtk_tree_model_filter_new)
+
+  explicit TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model);
+  explicit TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& virtual_root);
+  _IGNORE(gtk_tree_model_filter_new)
 
 public:
+
+  /** This creates a TreeModelFilter with @a child_model as the child model.
+   * You can use set_visible_func(), set_visible_column() and/or set_modify_func() to change the mapping of child
+   * model to parent model.
+   */
+  _WRAP_CREATE(const Glib::RefPtr<TreeModel>& child_model)
 
   /** This creates a TreeModelFilter with @a child_model as the child model, and @a root as the virtual root.
    * You can use set_visible_func(), set_visible_column() and/or set_modify_func() to change the mapping of child
    * model to parent model.
    */
-  _WRAP_CREATE(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& root)
+  _WRAP_CREATE(const Glib::RefPtr<TreeModel>& child_model, const TreeModel::Path& virtual_root)
+
 
   /** For instance,
    * bool on_visible(const TreeModel::const_iterator& iter);
@@ -99,11 +109,18 @@ public:
    */
   iterator convert_iter_to_child_iter(const iterator& filter_iter) const;
 
+  //TODO: Remove these deprecated non-const versions when we can break ABI:
   _WRAP_METHOD(Path convert_child_path_to_path(const Path& child_path), gtk_tree_model_filter_convert_child_path_to_path)
-  _WRAP_METHOD(Path convert_path_to_child_path (const Path& filter_path), gtk_tree_model_filter_convert_path_to_child_path)
+  _WRAP_METHOD(Path convert_path_to_child_path(const Path& filter_path), gtk_tree_model_filter_convert_path_to_child_path)
+
+  _WRAP_METHOD(Path convert_child_path_to_path(const Path& child_path) const, gtk_tree_model_filter_convert_child_path_to_path)
+  _WRAP_METHOD(Path convert_path_to_child_path(const Path& filter_path) const, gtk_tree_model_filter_convert_path_to_child_path)
 
   _WRAP_METHOD(void refilter(), gtk_tree_model_filter_refilter)
   _WRAP_METHOD(void clear_cache(), gtk_tree_model_filter_clear_cache)
+
+protected:
+  virtual void set_value_impl(const iterator& row, int column, const Glib::ValueBase& value);
 };
 
 } // namespace Gtk
