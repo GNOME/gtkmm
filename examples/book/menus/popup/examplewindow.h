@@ -36,8 +36,11 @@ protected:
   Gtk::VBox m_Box;
   Gtk::EventBox m_EventBox;
   Gtk::Label m_Label;
-  Gtk::Menu m_Menu_Popup;
-  Gtk::Image m_Image;
+
+  Glib::RefPtr<Gtk::UIManager> m_refUIManager;
+  Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+
+  Gtk::Menu* m_pMenuPopup;
 };
 
 #endif //GTKMM_EXAMPLEWINDOW_H

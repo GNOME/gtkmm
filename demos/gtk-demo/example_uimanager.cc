@@ -65,7 +65,7 @@ Example_UIManager::Example_UIManager()
   //Define the actions:
   m_refActionGroup = Gtk::ActionGroup::create("Actions"); //It also works with no name, which is probably better if there is only one.
 
-  //In real life, the details would not be supplied _as well as_ the stock IDs.
+  //In real life, the details would not be supplied _in addition _ the stock IDs.
 
   //Add normal Actions:
   m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 

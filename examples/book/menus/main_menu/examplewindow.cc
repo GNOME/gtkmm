@@ -22,61 +22,95 @@
 
 ExampleWindow::ExampleWindow()
 {
-  set_title("main_menu example");
+  set_title("main menu example");
   set_default_size(200, 200);
 
   add(m_Box); //We can put a MenuBar at the top of the box and other stuff below it.
 
-  //Fill menus:
+  //Create actions for menus and toolbars:
+  m_refActionGroup = Gtk::ActionGroup::create();
 
   //File|New sub menu:
-  {
-    Gtk::Menu::MenuList& menulist = m_Menu_File_New.items();
+  m_refActionGroup->add( Gtk::Action::create("FileNewStandard", Gtk::Stock::NEW, "_New", "Create a new file"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) );
 
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New Foo", Gtk::AccelKey("<control>n"),
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) ) );
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("New _Goo",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) ) );
-  }
+  m_refActionGroup->add( Gtk::Action::create("FileNewFoo", Gtk::Stock::NEW, "New Foo", "Create a new foo"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) );
+
+  m_refActionGroup->add( Gtk::Action::create("FileNewGoo", Gtk::Stock::NEW, "_New Goo", "Create a new goo"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new_generic) );
 
   //File menu:
-  {
-    Gtk::Menu::MenuList& menulist = m_Menu_File.items();
-
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_New", m_Menu_File_New) ); //Add sub menu.
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::AccelKey("<control>q"),
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) ) );
-  }
+  m_refActionGroup->add( Gtk::Action::create("FileMenu", "File") );
+  m_refActionGroup->add( Gtk::Action::create("FileNew", Gtk::Stock::NEW) ); //Sub-menu.
+  m_refActionGroup->add( Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
 
   //Edit menu:
+  m_refActionGroup->add( Gtk::Action::create("EditMenu", "Edit") );
+  m_refActionGroup->add( Gtk::Action::create("EditCopy", Gtk::Stock::COPY),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
+  m_refActionGroup->add( Gtk::Action::create("EditPaste", Gtk::Stock::PASTE),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
+  m_refActionGroup->add( Gtk::Action::create("EditSomething", "Something"),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
+
+  //Help menu:
+  m_refActionGroup->add( Gtk::Action::create("HelpMenu", "Help") );
+  m_refActionGroup->add( Gtk::Action::create("HelpAbout", Gtk::Stock::HELP),
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_others) );
+
+  m_refUIManager = Gtk::UIManager::create();
+  m_refUIManager->insert_action_group(m_refActionGroup);
+ 
+  add_accel_group(m_refUIManager->get_accel_group());
+
+  //Layout the actions in a menubar and toolbar:
+  try
   {
-    Gtk::Menu::MenuList& menulist = m_Menu_Edit.items();
-
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Copy",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
-
-    menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Paste",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
-
-    menulist.push_back( Gtk::Menu_Helpers::CheckMenuElem("Something",
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
+    Glib::ustring ui_info = 
+        "<ui>"
+        "  <menubar name='MenuBar'>"
+        "    <menu action='FileMenu'>"
+        "      <menu action='FileNew'>"
+        "        <menuitem action='FileNewStandard'/>"
+        "        <menuitem action='FileNewFoo'/>"
+        "        <menuitem action='FileNewGoo'/>"
+        "      </menu>"
+        "      <separator/>"
+        "      <menuitem action='FileQuit'/>"
+        "    </menu>"
+        "    <menu action='EditMenu'>"
+        "      <menuitem action='EditCopy'/>"
+        "      <menuitem action='EditPaste'/>"
+        "      <menuitem action='EditSomething'/>"
+        "    </menu>"
+        "    <menu action='HelpMenu'>"
+        "      <menuitem action='HelpAbout'/>"
+        "    </menu>"
+        "  </menubar>"
+        "  <toolbar  name='ToolBar'>"
+        "    <toolitem action='FileNewStandard'/>"
+        "    <toolitem action='FileQuit'/>"
+        "  </toolbar>"
+        "</ui>";
+        
+    m_refUIManager->add_ui_from_string(ui_info);
   }
-  
-  //Help menu: (exercise stock items)
+  catch(const Glib::Error& ex)
   {
-    Gtk::Menu::MenuList& menulist = m_Menu_Help.items();
-    
-    menulist.push_back( Gtk::Menu_Helpers::StockMenuElem(Gtk::Stock::CDROM,
-      sigc::mem_fun(*this, &ExampleWindow::on_menu_others) ) );
+    std::cerr << "building menus failed: " <<  ex.what();
   }
 
-  //Add the menus to the MenuBar:
-  m_MenuBar.items().push_back( Gtk::Menu_Helpers::MenuElem("_File", m_Menu_File) );
-  m_MenuBar.items().push_back( Gtk::Menu_Helpers::MenuElem("_Edit", m_Menu_Edit) );
-  m_MenuBar.items().push_back( Gtk::Menu_Helpers::StockMenuElem(Gtk::Stock::HELP, m_Menu_Help) );
+ 
+  //Get the menubar and toolbar widgets, and add them to a container widget:
+  Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
+  if(pMenubar)
+    m_Box.pack_start(*pMenubar, Gtk::PACK_SHRINK);
 
-  //Add the MenuBar to the window:
-  m_Box.pack_start(m_MenuBar, Gtk::PACK_SHRINK);
+  Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
+  if(pToolbar)
+    m_Box.pack_start(*pToolbar, Gtk::PACK_SHRINK);
 
   show_all_children();
 }
