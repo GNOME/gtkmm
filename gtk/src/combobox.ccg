@@ -35,20 +35,34 @@ void ComboBox::unset_active()
 
 TreeModel::iterator ComboBox::get_active()
 {
-  GtkTreeIter cIter;
-  gtk_combo_box_get_active_iter(gobj(), &cIter);
- 
-  //It must be given the model in the constructor, because the C++ wrapper has extra information.
-  return TreeModel::iterator(get_model()->gobj(), &cIter /* copies it */);
+  Gtk::TreeModel::iterator iter;
+
+  Glib::RefPtr<Gtk::TreeModel> model = get_model();
+  if(model)
+  {
+    gtk_combo_box_get_active_iter(gobj(), iter.gobj());
+
+    //It must be given the model, because the C++ wrapper has extra information.
+    iter.set_model_gobject(model->gobj());
+  }
+  
+  return iter;
 }
 
 TreeModel::const_iterator ComboBox::get_active() const
 {
-  GtkTreeIter cIter;
-  gtk_combo_box_get_active_iter(const_cast<GtkComboBox*>(gobj()), &cIter);
+  Gtk::TreeModel::iterator iter;
 
-  //It must be given the model in the constructor, because the C++ wrapper has extra information.
-  return TreeModel::const_iterator(const_cast<GtkTreeModel*>(get_model()->gobj()), &cIter /* copies it */);
+  Glib::RefPtr<const Gtk::TreeModel> model = get_model();
+  if(model)
+  {
+    gtk_combo_box_get_active_iter(const_cast<GtkComboBox*>(gobj()), iter.gobj());
+
+    //It must be given the model, because the C++ wrapper has extra information.
+    iter.set_model_gobject(const_cast<GtkTreeModel*>(model->gobj()));
+  }
+
+  return iter;
 }
 
 } // namespace Gtk
