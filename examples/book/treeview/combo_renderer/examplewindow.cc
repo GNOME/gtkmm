@@ -42,24 +42,16 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
   m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
 
-  //Create and fill the combo models
-  //You could also use set_cell_data_func() to choose or fill these later.
-  m_refTreeModelCombo1 = Gtk::ListStore::create(m_ColumnsCombo);
+  //Create and fill the combo model
+  //You could also use set_cell_data_func() to choose or fill this later. 
+  m_refTreeModelCombo = Gtk::ListStore::create(m_ColumnsCombo);
   
-  Gtk::TreeModel::Row row = *(m_refTreeModelCombo1->append());
-  row[m_ColumnsCombo.m_col_choice] = "abc";
-  row = *(m_refTreeModelCombo1->append());
-  row[m_ColumnsCombo.m_col_choice] = "def";
-  
-  m_refTreeModelCombo2 = Gtk::ListStore::create(m_ColumnsCombo);
-  
-  row = *(m_refTreeModelCombo2->append());
-  row[m_ColumnsCombo.m_col_choice] = "foo";
-  row = *(m_refTreeModelCombo2->append());
+  Gtk::TreeModel::Row row = *(m_refTreeModelCombo->append());
+  row[m_ColumnsCombo.m_col_choice] = "foo"; //The value that can be chosen from the combo, to use in the model.
+  row = *(m_refTreeModelCombo->append());
   row[m_ColumnsCombo.m_col_choice] = "bar";
-  row = *(m_refTreeModelCombo2->append());
+  row = *(m_refTreeModelCombo->append());
   row[m_ColumnsCombo.m_col_choice] = "goo";
-
   
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
@@ -69,38 +61,44 @@ ExampleWindow::ExampleWindow()
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 1;
   row[m_Columns.m_col_name] = "Billy Bob";
+  row[m_Columns.m_col_itemchosen] = "click to choose";
+  //row[m_Columns.m_col_choices] = m_refTreeModelCombo1; //Choose from this list to set the value in m_col_itemchosen.
   
-  //This doesn't actually work yet:
-  row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
-
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
-  row[m_Columns.m_col_choices] = m_refTreeModelCombo2;
+  //row[m_Columns.m_col_choices] = m_refTreeModelCombo;
 
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
-  row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
+  //row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
 
   //Add the TreeView's view columns:
   m_TreeView.append_column("ID", m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_Columns.m_col_name);
-  m_TreeView.append_column("Choices", m_Columns.m_col_choices);
   
-  //Make all the columns reorderable:
-  //This is not necessary, but it's nice to show the feature.
-  //You can use TreeView::set_column_drag_function() to more
-  //finely control column drag and drop.
-  for(guint i = 0; i < 2; i++)
-  {
-    Gtk::TreeView::Column* pColumn = m_TreeView.get_column(i);
-    pColumn->set_reorderable();
-  }
+  //Create a Combo CellRenderer, instead of the default Text CellRenderer:
+  Gtk::TreeView::Column* pColumn = Gtk::manage( new Gtk::TreeView::Column("Item Chosen") ); 
+  Gtk::CellRendererCombo* pRenderer = Gtk::manage(new Gtk::CellRendererCombo);
+  pColumn->pack_start(*pRenderer);
+  m_TreeView.append_column(*pColumn);
   
+  //Make this View column represent the m_col_itemchosen model column:
+  pColumn->add_attribute(pRenderer->property_text(), m_Columns.m_col_itemchosen);
   
+  //Allow the user to choose from this list to set the value in m_col_itemchosen:
+  //pColumn->add_attribute(pRenderer->property_model(), m_Columns.m_col_choices);
+  pRenderer->property_model() = m_refTreeModelCombo;
+  pRenderer->property_text_column() = 0; //This must be a text column, in m_refTreeModelCombo1.
   
+  //Allow the user to edit the column:
+  //This is done automatically when we use View::append_column(model_column),
+  //but that uses a simple Text CellRenderer.
+  pRenderer->property_editable() = true;
 
+  pRenderer->signal_edited().connect( sigc::mem_fun(*this, &ExampleWindow::on_cellrenderer_choice_edited) );
+      
   show_all_children();
 }
 
@@ -111,6 +109,20 @@ ExampleWindow::~ExampleWindow()
 void ExampleWindow::on_button_quit()
 {
   hide();
+}
+
+void ExampleWindow::on_cellrenderer_choice_edited(const Glib::ustring& path_string, const Glib::ustring& new_text)
+{
+  Gtk::TreePath path(path_string);
+
+  //Get the row from the path:
+  Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
+  if(iter)
+  {
+      //Store the user's new text in the model:
+      Gtk::TreeRow row = *iter;
+      row[m_Columns.m_col_itemchosen] = new_text;
+  }
 }
 
 

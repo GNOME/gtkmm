@@ -31,16 +31,19 @@ protected:
   //Signal handlers:
   virtual void on_button_quit();
 
+  virtual void on_cellrenderer_choice_edited(const Glib::ustring& path_string, const Glib::ustring& new_text);
+ 
   //Tree model columns for the TreeView:
   class ModelColumns : public Gtk::TreeModel::ColumnRecord
   {
   public:
 
     ModelColumns()
-    { add(m_col_id); add(m_col_name); add(m_col_choices); }
+    { add(m_col_id); add(m_col_name); add(m_col_itemchosen), add(m_col_choices); }
 
     Gtk::TreeModelColumn<unsigned int> m_col_id;
     Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+    Gtk::TreeModelColumn<Glib::ustring> m_col_itemchosen;
     Gtk::TreeModelColumn< Glib::RefPtr<Gtk::TreeModel> > m_col_choices;
   };
 
@@ -52,9 +55,10 @@ protected:
   public:
 
     ModelColumnsCombo()
-    { add(m_col_choice); }
+    { add(m_col_choice); add(m_col_description); }
 
-    Gtk::TreeModelColumn<Glib::ustring> m_col_choice;
+    Gtk::TreeModelColumn<Glib::ustring> m_col_choice; //The values from which the user may choose.
+    Gtk::TreeModelColumn<Glib::ustring> m_col_description; //Extra information to help the user to choose.
   };
   
   ModelColumnsCombo m_ColumnsCombo;
@@ -66,7 +70,7 @@ protected:
   Gtk::TreeView m_TreeView;
   Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 
-  Glib::RefPtr<Gtk::ListStore> m_refTreeModelCombo1, m_refTreeModelCombo2;
+  Glib::RefPtr<Gtk::ListStore> m_refTreeModelCombo;
     
   Gtk::HButtonBox m_ButtonBox;
   Gtk::Button m_Button_Quit;

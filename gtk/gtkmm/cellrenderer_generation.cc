@@ -46,14 +46,6 @@ CellRenderer* generate_cellrenderer<bool>(bool editable)
   return pCellRenderer;
 }
 
-template<>
-CellRenderer* generate_cellrenderer< Glib::RefPtr<Gtk::TreeModel> >(bool /*editable*/)
-{
-  //Ignore editable because there is no way for the user to edit the TreeModel.
-  return new CellRendererCombo();
-}
-
-
 } //CellRenderer_Generation
 
 
