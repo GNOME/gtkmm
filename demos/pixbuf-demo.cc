@@ -37,14 +37,14 @@
 #include <gtkmm/style.h>
 #include <gtkmm/window.h>
 
-#ifndef M_PI
-#define M_PI 3.14159265359
-#endif /* M_PI */
 
 namespace
 {
 
-/* These values control the smoothness and speed of the animation.
+const double pi = 3.14159265358979323844;
+
+/*
+ * These values control the smoothness and speed of the animation.
  * For instance, FRAME_DELAY=25 and CYCLE_LEN=90 looks much better
  * to me (and also wastes more CPU cycles, of course).
  */
@@ -84,13 +84,13 @@ private:
   std::vector< Glib::RefPtr<const Gdk::Pixbuf> >  images_;
   Glib::RefPtr<Gdk::Pixbuf>                       current_frame_;
   unsigned int                                    frame_num_;
-  sigc::connection                                conn_timeout_;
 
-  void generate_next_frame_();
+  void generate_next_frame();
 };
 
 
-/* Load all image files, create an empty buffer for storing the current frame,
+/*
+ * Load all image files, create an empty buffer for storing the current frame,
  * and install a timeout handler that will be called periodically.  The show
  * will start as soon as Gtk::Main::run() is invoked.
  */
@@ -113,17 +113,16 @@ DemoRenderArea::DemoRenderArea()
   set_size_request(back_width, back_height);
   add_events(Gdk::EXPOSURE_MASK);
 
-  conn_timeout_ = Glib::signal_timeout().connect(
-      sigc::bind_return(sigc::mem_fun(*this, &DemoRenderArea::generate_next_frame_), true),
+  Glib::signal_timeout().connect(
+      sigc::bind_return(sigc::mem_fun(*this, &DemoRenderArea::generate_next_frame), true),
       FRAME_DELAY);
 }
 
 DemoRenderArea::~DemoRenderArea()
-{
-  conn_timeout_.disconnect();
-}
+{}
 
-/* Expose event handler of the widget.  Just fill the exposed
+/*
+ * Expose event handler of the widget.  Just fill the exposed
  * area with the corresponding pixmap data from current_frame_.
  */
 bool DemoRenderArea::on_expose_event(GdkEventExpose* event)
@@ -141,10 +140,11 @@ bool DemoRenderArea::on_expose_event(GdkEventExpose* event)
   return true; // stop signal emission
 }
 
-/* Generate the next frame of the animation and store it into current_frame_.
+/*
+ * Generate the next frame of the animation and store it into current_frame_.
  * The expose_event handler accesses that buffer to do the actual drawing.
  */
-void DemoRenderArea::generate_next_frame_()
+void DemoRenderArea::generate_next_frame()
 {
   const int back_width  = background_->get_width();
   const int back_height = background_->get_height();
@@ -154,14 +154,14 @@ void DemoRenderArea::generate_next_frame_()
   const double xmid = back_width  / 2.0;
   const double ymid = back_height / 2.0;
 
-  const double f = 2.0 * M_PI * double(frame_num_) / CYCLE_LEN;
+  const double f = 2.0 * pi * double(frame_num_) / CYCLE_LEN;
 
   double r = std::min(xmid, ymid) / 2.0;
   r += (r / 3.0) * std::sin(f);
 
   for(unsigned i = 0; i < images_.size(); ++i)
   {
-    const double ang = 2.0 * M_PI * double(i) / images_.size() - f;
+    const double ang = 2.0 * pi * double(i) / images_.size() - f;
 
     const double iw = images_[i]->get_width();
     const double ih = images_[i]->get_height();
@@ -169,7 +169,7 @@ void DemoRenderArea::generate_next_frame_()
     const int xpos = int(std::floor(xmid + r * std::cos(ang) - iw / 2.0 + 0.5));
     const int ypos = int(std::floor(ymid + r * std::sin(ang) - ih / 2.0 + 0.5));
 
-    const double depth = (i & 1) ? std::sin(f) : std::cos(f);
+    const double depth = ((i % 2) != 0) ? std::sin(f) : std::cos(f);
     const double scale = std::max(0.25, 2.0 * depth * depth);
 
     Gdk::Rectangle rect (xpos, ypos, int(iw * scale), int(ih * scale));
