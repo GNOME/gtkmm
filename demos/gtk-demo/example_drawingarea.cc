@@ -141,11 +141,11 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpos
 
   gint xcount = 0;
   gint i = SPACING;
-  while (i < m_DrawingArea_Checkerboard.get_allocation().width)
+  while (i < m_DrawingArea_Checkerboard.get_allocation().get_width())
   {
     gint j = SPACING;
     gint ycount = xcount % 2; /* start with even/odd depending on row */
-    while (j < m_DrawingArea_Checkerboard.get_allocation().height)
+    while (j < m_DrawingArea_Checkerboard.get_allocation().get_height())
     {
       Glib::RefPtr<Gdk::GC> refGC;
     	
@@ -198,8 +198,8 @@ bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfig
 {
   m_refPixmap_Scribble = Gdk::Pixmap::create(
       m_DrawingArea_Scribble.get_window(),
-      m_DrawingArea_Scribble.get_allocation().width,
-      m_DrawingArea_Scribble.get_allocation().height,
+      m_DrawingArea_Scribble.get_allocation().get_width(),
+      m_DrawingArea_Scribble.get_allocation().get_height(),
       -1);
 
   /* Initialize the pixmap to white */
@@ -207,8 +207,8 @@ bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfig
       m_DrawingArea_Scribble.get_style()->get_white_gc(),
       true,
       0, 0,
-      m_DrawingArea_Scribble.get_allocation().width,
-      m_DrawingArea_Scribble.get_allocation().height);
+      m_DrawingArea_Scribble.get_allocation().get_width(),
+      m_DrawingArea_Scribble.get_allocation().get_height());
 
   /* We've handled the configure event, no need for further processing. */
   return true;

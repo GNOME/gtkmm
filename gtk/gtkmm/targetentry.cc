@@ -30,7 +30,7 @@ TargetEntry::TargetEntry()
   memset(&gobject_, 0, sizeof(gobject_));
 }
 
-TargetEntry::TargetEntry(const Glib::ustring& target, guint flags, guint info)
+TargetEntry::TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags, guint info)
 {
   set_target(target);
   set_flags(flags);
@@ -41,7 +41,7 @@ TargetEntry::TargetEntry(const GtkTargetEntry& gobject)
 {
   set_target(gobject.target);
   set_info(gobject.info);
-  set_flags(gobject.flags);
+  set_flags(TargetFlags(gobject.flags));
 }
 
 TargetEntry::TargetEntry(const TargetEntry& src)
@@ -78,14 +78,14 @@ void TargetEntry::set_target(const Glib::ustring& target)
   gobject_.target = g_strdup(target.c_str());
 }
 
-guint TargetEntry::get_flags() const
+Gtk::TargetFlags TargetEntry::get_flags() const
 {
-  return gobject_.flags;
+  return (Gtk::TargetFlags)(gobject_.flags);
 }
 
-void TargetEntry::set_flags(guint flags)
+void TargetEntry::set_flags(Gtk::TargetFlags flags)
 {
-  gobject_.flags = flags;
+  gobject_.flags = (guint)(flags);
 }
 
 guint TargetEntry::get_info() const

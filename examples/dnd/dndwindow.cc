@@ -38,9 +38,9 @@ DnDWindow::DnDWindow()
   m_trashcan_closed = Gdk::Pixmap::create_from_xpm(get_colormap(), m_trashcan_closed_mask, trashcan_closed_xpm);
 
   //Targets:
-  m_listTargets.push_back( Gtk::TargetEntry("STRING", 0, TARGET_STRING) );
-  m_listTargets.push_back( Gtk::TargetEntry("text/plain", 0, TARGET_STRING) );
-  m_listTargets.push_back( Gtk::TargetEntry("application/x-rootwin-drop", 0, TARGET_ROOTWIN) );
+  m_listTargets.push_back( Gtk::TargetEntry("STRING", Gtk::TargetFlags(0), TARGET_STRING) );
+  m_listTargets.push_back( Gtk::TargetEntry("text/plain", Gtk::TargetFlags(0), TARGET_STRING) );
+  m_listTargets.push_back( Gtk::TargetEntry("application/x-rootwin-drop", Gtk::TargetFlags(0), TARGET_ROOTWIN) );
 
   //Targets without rootwin:
   m_listTargetsNoRoot.assign(m_listTargets.begin(), --m_listTargets.end());

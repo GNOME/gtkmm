@@ -135,7 +135,7 @@ void CellRendererPopup::on_show_popup(const Glib::ustring&, int, int y1, int x2,
   popup_window_.move(-500, -500);
   popup_window_.show();
 
-  const GtkAllocation alloc = popup_window_.get_allocation();
+  const Gtk::Allocation alloc = popup_window_.get_allocation();
 
   int x = x2;
   int y = y2;
@@ -146,14 +146,14 @@ void CellRendererPopup::on_show_popup(const Glib::ustring&, int, int y1, int x2,
   const int screen_width  = Gdk::screen_width();
 
   // Check if it fits in the available height.
-  if(alloc.height > screen_height)
+  if(alloc.get_height() > screen_height)
   {
     // It doesn't fit, so we see if we have the minimum space needed.
-    if((alloc.height > screen_height) && (y - button_height > screen_height))
+    if((alloc.get_height() > screen_height) && (y - button_height > screen_height))
     {
       // We don't, so we show the popup above the cell instead of below it.
       screen_height = y - button_height;
-      y -= (alloc.height + button_height);
+      y -= (alloc.get_height() + button_height);
       y = std::max(0, y);
     }
   }
@@ -162,7 +162,7 @@ void CellRendererPopup::on_show_popup(const Glib::ustring&, int, int y1, int x2,
   // want it to go off the edges of the screen.
   x = std::min(x, screen_width);
 
-  x -= alloc.width;
+  x -= alloc.get_width();
   x = std::max(0, x);
 
   popup_window_.add_modal_grab();
@@ -209,15 +209,15 @@ bool CellRendererPopup::on_button_press_event(GdkEventButton* event)
   int xoffset = 0, yoffset = 0;
   popup_window_.get_window()->get_root_origin(xoffset, yoffset);
 
-  const GtkAllocation alloc = popup_window_.get_allocation();
+  const Gtk::Allocation alloc = popup_window_.get_allocation();
 
-  xoffset += alloc.x;
-  yoffset += alloc.y;
+  xoffset += alloc.get_x();
+  yoffset += alloc.get_y();
 
-  const int x1 = alloc.x + xoffset;
-  const int y1 = alloc.y + yoffset;
-  const int x2 = x1 + alloc.width;
-  const int y2 = y1 + alloc.height;
+  const int x1 = alloc.get_x() + xoffset;
+  const int y1 = alloc.get_y() + yoffset;
+  const int x2 = x1 + alloc.get_width();
+  const int y2 = y1 + alloc.get_height();
 
   if(x > x1 && x < x2 && y > y1 && y < y2)
     return false;
@@ -281,9 +281,9 @@ void CellRendererPopup::on_popup_arrow_clicked()
   int x = 0, y = 0;
   popup_entry_->get_window()->get_origin(x, y);
 
-  const GtkAllocation alloc = popup_entry_->get_allocation();
+  const Gtk::Allocation alloc = popup_entry_->get_allocation();
 
-  signal_show_popup_(popup_entry_->get_path(), x, y, x + alloc.width, y + alloc.height);
+  signal_show_popup_(popup_entry_->get_path(), x, y, x + alloc.get_width(), y + alloc.get_height());
 }
 
 void CellRendererPopup::on_popup_hide()

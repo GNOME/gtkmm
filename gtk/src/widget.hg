@@ -29,7 +29,7 @@
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
 //#include <gtkmm/style.h>
-#include <gtkmm/targetentry.h>
+#include <gtkmm/targetlist.h>
 #include <gtkmm/rc.h>
 #include <gtkmm/object.h>
 #include <gtkmm/clipboard.h>
@@ -61,6 +61,23 @@ class Adjustment;
 class Window;
 class Container;
 class Settings;
+
+typedef GtkRequisition Requisition;
+#m4 _CONVERSION(`Requisition&', `GtkRequisition*', `($2)(&$3)')
+#m4 _CONVERSION(`const Requisition&', `GtkRequisition*', `($2)(&$3)')
+#m4 _CONVERSION(`GtkRequisition*', `Requisition&', `($2)(*$3)')
+#m4 _CONVERSION(`GtkRequisition*', `Requisition*', `($2)($3)')
+#m4 _CONVERSION(`Requisition*', `GtkRequisition*', `($2)($3)')
+#m4 _CONVERSION(`GtkRequisition', `Requisition', `($2)($3)')
+
+// Gtk::Allocation is a typedef of Gdk::Rectangle because GtkAllocation is
+// a typedef of GdkRectangle.
+typedef Gdk::Rectangle Allocation;
+#m4 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+#m4 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+#m4 _CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&$3))')
+#m4 _CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
+#m4 _CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
 
 
 /** @defgroup Widgets Widgets
@@ -112,8 +129,8 @@ public:
   _WRAP_METHOD(void queue_draw_area(int x, int y, int width, int height), gtk_widget_queue_draw_area)
   _WRAP_METHOD(void queue_resize(), gtk_widget_queue_resize)
 
-  _WRAP_METHOD(void size_request(GtkRequisition* requisition),gtk_widget_size_request)
-  _WRAP_METHOD(void size_allocate(GtkAllocation* allocation), gtk_widget_size_allocate)
+  _WRAP_METHOD(void size_request(const Requisition& requisition),gtk_widget_size_request)
+  _WRAP_METHOD(void size_allocate(const Allocation& allocation), gtk_widget_size_allocate)
 
 
   _WRAP_METHOD(void add_accelerator(const Glib::ustring& accel_signal, const Glib::RefPtr<AccelGroup>& accel_group,
@@ -222,8 +239,8 @@ public:
   
   _WRAP_METHOD(Glib::RefPtr<Settings> get_settings(), gtk_widget_get_settings, refreturn)
 
-  _WRAP_METHOD(Glib::RefPtr<Clipboard> get_clipboard(GdkAtom selection), gtk_widget_get_clipboard, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Clipboard> get_clipboard(GdkAtom selection) const, gtk_widget_get_clipboard, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<Clipboard> get_clipboard(const Glib::ustring& selection), gtk_widget_get_clipboard, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Clipboard> get_clipboard(const Glib::ustring& selection) const, gtk_widget_get_clipboard, refreturn)
 
   //TODO: This probably needs a special conversion to do an extra ref (take_copy=true) for the returned instance:
   _WRAP_METHOD(Glib::RefPtr<Atk::Object> get_accessible(), gtk_widget_get_accessible, refreturn)
@@ -380,7 +397,7 @@ public:
   void class_path(Glib::ustring& path, Glib::ustring& path_reversed);
   _IGNORE(gtk_widget_path, gtk_widget_class_path)
 
-  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::DragContext>& context, GdkAtom target, guint32 time), gtk_drag_get_data)		
+  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::DragContext>& context, Glib::ustring& target, guint32 time), gtk_drag_get_data)		
   _WRAP_METHOD(void drag_highlight(), gtk_drag_highlight)
   _WRAP_METHOD(void drag_unhighlight(), gtk_drag_unhighlight)
 
@@ -390,11 +407,11 @@ public:
 
   _WRAP_METHOD(void drag_dest_set_proxy(const Glib::RefPtr<Gdk::Window>& proxy_window, Gdk::DragProtocol protocol, bool use_coordinates), gtk_drag_dest_set_proxy)
   _WRAP_METHOD(void drag_dest_unset(), gtk_drag_dest_unset)
-  _WRAP_METHOD(GdkAtom drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context, GtkTargetList* target_list), gtk_drag_dest_find_target)
-  GdkAtom drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context);
+  _WRAP_METHOD(Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::RefPtr<TargetList>& target_list), gtk_drag_dest_find_target)
+  Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context);
 
-  _WRAP_METHOD(GtkTargetList* drag_dest_get_target_list(), gtk_drag_dest_get_target_list)
-  _WRAP_METHOD(void drag_dest_set_target_list(GtkTargetList* target_list), gtk_drag_dest_set_target_list)
+  _WRAP_METHOD(Glib::RefPtr<TargetList> drag_dest_get_target_list(), gtk_drag_dest_get_target_list)
+  _WRAP_METHOD(void drag_dest_set_target_list(const Glib::RefPtr<TargetList>& target_list), gtk_drag_dest_set_target_list)
 
   void drag_source_set(const ArrayHandle_TargetEntry& targets, Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK, Gdk::DragAction actions = Gdk::ACTION_COPY);
   _IGNORE(gtk_drag_source_set)
@@ -405,7 +422,7 @@ public:
   _WRAP_METHOD(void drag_source_set_icon(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_drag_source_set_icon_pixbuf)
   _WRAP_METHOD(void drag_source_set_icon(const StockID& stock_id), gtk_drag_source_set_icon_stock)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(GtkTargetList* targets, Gdk::DragAction actions, gint button, GdkEvent* event), gtk_drag_begin)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(Glib::RefPtr<TargetList>& targets, Gdk::DragAction actions, int button, GdkEvent* event), gtk_drag_begin)
   _WRAP_METHOD(bool drag_check_threshold(int start_x, int start_y, int current_x, int current_y), gtk_drag_check_threshold)
   _IGNORE(_gtk_drag_source_handle_event, _gtk_drag_dest_handle_event)
 
@@ -465,8 +482,8 @@ public:
 
   _MEMBER_GET(state, state, Gtk::StateType, guint8)
   _MEMBER_GET(saved_state, saved_state, Gtk::StateType, guint8)
-  _MEMBER_GET(requisition, requisition, GtkRequisition, GtkRequisition)
-  _MEMBER_GET(allocation, allocation, GtkAllocation, GtkAllocation)
+  _MEMBER_GET(requisition, requisition, Requisition, GtkRequisition)
+  _MEMBER_GET(allocation, allocation, Allocation, GtkAllocation)
   _MEMBER_GET_GOBJECT(window, window, Gdk::Window, GdkWindow*)
 
 
@@ -491,8 +508,8 @@ public:
   //_WRAP(meth|sig|impl,void unrealize_(),gtk_widget_unrealize,"unrealize")
   _WRAP_SIGNAL(void unrealize(),"unrealize")
 
-  _WRAP_SIGNAL(void size_request(GtkRequisition* requisition), "size_request")
-  _WRAP_SIGNAL(void size_allocate(GtkAllocation* allocation), "size_allocate")
+  _WRAP_SIGNAL(void size_request(Requisition* requisition), "size_request")
+  _WRAP_SIGNAL(void size_allocate(Allocation& allocation), "size_allocate")
 
 // Changed signals -- inform widget of internal changes.
 // We rename parent_set => parent_changed 
@@ -660,7 +677,7 @@ protected:
   _WRAP_METHOD(void set_parent(Widget& parent), gtk_widget_set_parent)
   _WRAP_METHOD(void unparent(), gtk_widget_unparent)
 
-  _WRAP_METHOD(void get_child_requisition(GtkRequisition* requisition), gtk_widget_get_child_requisition)
+  _WRAP_METHOD(void get_child_requisition(Requisition& requisition) const, gtk_widget_get_child_requisition)
 
   _WRAP_METHOD(void get_style_property_value(
                    const Glib::ustring& the_property_name, Glib::ValueBase& value) const,
@@ -668,7 +685,7 @@ protected:
 
   void realize_if_needed();
 
-  _MEMBER_SET(allocation, allocation, GtkAllocation, GtkAllocation)
+  _MEMBER_SET(allocation, allocation, Allocation, GtkAllocation)
   _MEMBER_SET_GOBJECT(window, window, Gdk::Window, GdkWindow*)
 
 #m4begin

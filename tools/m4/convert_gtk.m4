@@ -84,6 +84,7 @@ _CONV_ENUM(Gtk,SortType)
 _CONV_ENUM(Gtk,SpinButtonUpdatePolicy)
 _CONV_ENUM(Gtk,SpinType)
 _CONV_ENUM(Gtk,StateType)
+_CONV_ENUM(Gtk,TargetFlags)
 _CONV_ENUM(Gtk,TextDirection)
 _CONV_ENUM(Gtk,TextSearchFlags)
 _CONV_ENUM(Gtk,TextWindowType)
@@ -101,6 +102,8 @@ _CONV_ENUM(Gtk,WrapMode)
 _CONV_ENUM(Gtk,UIManagerItemType)
 _CONV_ENUM(Gtk,FileChooserAction)
 _CONV_ENUM(Gtk,FileFilterFlags)
+_CONV_ENUM(Gtk,IconLookupFlags)
+_CONV_ENUM(Gtk,IconThemeError)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -323,6 +326,9 @@ _CONVERSION(`IconSource&',`GtkIconSource*',__FR2P)
 _CONVERSION(`const IconSource&',`const GtkIconSource*',__FR2P)
 _CONVERSION(`const GtkIconSource*',`const IconSource&',`Glib::wrap(const_cast<GtkIconSource*>($3), true)')
 
+_CONVERSION(`GtkIconTheme*',`Glib::RefPtr<IconTheme>',`Glib::wrap($3)')
+_CONVERSION(`GList*',`Glib::ListHandle<Glib::ustring>',__FL2H_SHALLOW)
+
 # gpointer conversions:
 # There's doesn't seem to be a way to tell g_signal_new that it's a pointer to a gint, for instance:
 #_CONVERSION(`int*',`gpointer',`($1)$3')
@@ -465,5 +471,7 @@ _CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
 
 _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 
-
-
+#TargetList
+_CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GtkTargetList*',`Glib::RefPtr<TargetList>',`Glib::wrap($3, true)')

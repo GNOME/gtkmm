@@ -27,6 +27,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/arrayhandle.h>
 #include <gtk/gtkselection.h> //For GtkTargetEntry.
+#include <gtkmm/enums.h>
 
 namespace Gtk
 {
@@ -35,7 +36,7 @@ class TargetEntry
 {
 public:
   TargetEntry();
-  explicit TargetEntry(const Glib::ustring& target, guint flags = 0, guint info = 0);
+  explicit TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags = Gtk::TargetFlags(0), guint info = 0);
   explicit TargetEntry(const GtkTargetEntry& gobject);
   TargetEntry(const TargetEntry& src);
   virtual ~TargetEntry();
@@ -45,8 +46,8 @@ public:
   Glib::ustring get_target() const;
   void set_target(const Glib::ustring& target);
 
-  guint get_flags() const;
-  void set_flags(guint flags);
+  Gtk::TargetFlags get_flags() const;
+  void set_flags(Gtk::TargetFlags flags);
 
   guint get_info() const;
   void set_info(guint info);
