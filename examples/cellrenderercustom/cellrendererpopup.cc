@@ -169,7 +169,7 @@ void CellRendererPopup::on_show_popup(const Glib::ustring&, int, int y1, int x2,
   x -= alloc.width;
   x = std::max(0, x);
 
-  gtk_grab_add(popup_window_.Gtk::Widget::gobj());
+  popup_window_.add_modal_grab();
 
   popup_window_.move(x, y);
   popup_window_.show();
@@ -184,7 +184,7 @@ void CellRendererPopup::on_show_popup(const Glib::ustring&, int, int y1, int x2,
 
 void CellRendererPopup::on_hide_popup()
 {
-  gtk_grab_remove(popup_window_.Gtk::Widget::gobj());
+  popup_window_.remove_modal_grab();
   popup_window_.hide();
 
   if(popup_entry_)
