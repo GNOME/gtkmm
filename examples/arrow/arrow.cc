@@ -62,7 +62,8 @@ AppWindow::AppWindow()
   show_all ();
 }
 
-AppWindow::~AppWindow() {};
+AppWindow::~AppWindow()
+{}
 
 int main (int argc, char *argv[])
 {

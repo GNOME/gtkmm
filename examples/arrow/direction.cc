@@ -22,7 +22,8 @@ ArrowButton::ArrowButton(Gtk::ArrowType arrow_type,Gtk::ShadowType shadow_type)
   add (*arrow);
 }
   
-ArrowButton::~ArrowButton() {};
+ArrowButton::~ArrowButton()
+{}
 
 /* We will derive our new application window from window */
 class AppWindow : public Gtk::Window
@@ -34,8 +35,8 @@ public:
 
 AppWindow::AppWindow()
 {
-  ArrowButton *button;
-  Gtk::Table   *table;
+  ArrowButton* button = 0;
+  Gtk::Table* table = 0;
 
   set_title ("Arrow Buttons");
 
@@ -43,7 +44,7 @@ AppWindow::AppWindow()
   set_border_width (10);
   
   /* Create a box to hold the arrows/buttons */
-  table= Gtk::manage (new Gtk::Table (3,3,true));
+  table= Gtk::manage (new Gtk::Table (3, 3, true));
   table->set_border_width (2);
 
   /* Pack and show all our widgets */
@@ -59,17 +60,18 @@ AppWindow::AppWindow()
   button = Gtk::manage (new ArrowButton (Gtk::ARROW_DOWN, Gtk::SHADOW_ETCHED_IN));
   table->attach (*button, 1, 2, 2, 3);
 
-  table->set_row_spacing(0,5);
-  table->set_row_spacing(1,5);
+  table->set_row_spacing(0, 5);
+  table->set_row_spacing(1, 5);
 
-  table->set_col_spacing(0,5);
-  table->set_col_spacing(1,5);
+  table->set_col_spacing(0, 5);
+  table->set_col_spacing(1, 5);
  
   add (*table);
   show_all ();
 }
 
-AppWindow::~AppWindow() {};
+AppWindow::~AppWindow()
+{}
 
 int main (int argc, char *argv[])
 {
