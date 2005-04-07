@@ -558,8 +558,6 @@ public:
 //  and      style_set  => style_changed 
 //  to avoid confusion with set_parent and set_style.
 
-  //: Informs objects that their state has changed.
-  //- The old state is passed as the argument.
   _WRAP_SIGNAL(void state_changed(Gtk::StateType previous_state), "state_changed")
 
   //: Informs objects that their parent changed.
@@ -569,14 +567,24 @@ public:
 
   _WRAP_SIGNAL(void hierarchy_changed(Widget* previous_toplevel), "hierarchy_changed")
 
-  //: Informs objects that their style has been changed.
-  //- The former style is passed as the argument. (was style_set in gtk+)
+  /** The style-set signal is emitted when a new style has been set 
+   * on a widget. Note that style-modifying functions like 
+   * modify_base() also cause this signal to be emitted.
+   *
+   * @param previous_style  the previous style, or an empty RefPtr if the widget 
+   * just got its initial style. 
+   */
   _WRAP_SIGNAL(void style_changed(const Glib::RefPtr<Style>& previous_style), "style_set")
 
   _WRAP_SIGNAL(void direction_changed(TextDirection direction), "direction_changed")
 
   _WRAP_SIGNAL(void grab_notify(bool was_grabbed), "grab_notify")
 
+ /** The ::child-notify signal is emitted for each child property that has 
+  * changed on an object. The signal's detail holds the property name. 
+  *
+  * @param pspec The GParamSpec of the changed child property.
+  */
   _WRAP_SIGNAL(void child_notify(GParamSpec* pspec), "child_notify")
 
   //_WRAP_SIGNAL(void add_accelerator(guint, GtkAccelGroup*, guint accel_key, Gdk::ModifierType, AccelFlags), "add-accelerator")
@@ -598,7 +606,14 @@ public:
   //: Event triggered by user moving pointer.
   _WRAP_SIGNAL(bool motion_notify_event(GdkEventMotion* event), "motion_notify_event")
 
-  //: Event triggered by window being closed.
+ /** The delete_event signal is emitted if a user requests that
+  * a toplevel window is closed. The default handler for this signal
+  * hides the window.
+  *
+  * @param event the event which triggered this signal.
+  * @result true to stop other handlers from being invoked for the event, 
+  * or false to propagate the event. further.
+  */
   _WRAP_SIGNAL(bool delete_event(GdkEventAny* event), "delete_event")
 
 #m4begin
@@ -658,14 +673,111 @@ dnl
   _WRAP_SIGNAL(void selection_get(SelectionData& selection_data, guint info, guint time), "selection_get", custom_c_callback)
   _WRAP_SIGNAL(void selection_received(const SelectionData& selection_data, guint time), "selection_received")
   
+  /** THe drag_begin signal is emitted on the drag source when a drag is started. 
+   * A typical reason to connect to this signal is to set up a custom drag icon with
+   * drag_source_set_icon().
+   *
+   * @param context the drag context
+   */
   _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::DragContext>& context), "drag_begin")
+  
+  /** The drag_end signal is emitted on the drag source when a drag is finished. 
+   * A typical reason to connect to this signal is to undo things done in the drag-begin 
+   * signal handler.
+   *
+   * @param context the drag context.
+   */
   _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::DragContext>& context), "drag_end")
 
+  /** The drag_data_get signal is emitted on the drag source when the drop site requests
+   * the data which is dragged. It is the responsibility of the signal handler to fill @a data
+   * with the data in the format which is indicated by @a info. See SelectionData::set() and 
+   * SelectionData::set_text().
+   *
+   * @param context: the drag context.
+   * @param selection_data the SelectionData to be filled with the dragged data.
+   * @param info the info that has been registered with the target in the TargetList.
+   * @param time the timestamp at which the data was requested.
+   */
   _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data, guint info, guint time), "drag_data_get", custom_c_callback)
+  
+  /**  The drag_data_delete signal is emitted on the drag source when a drag with the action
+   * Gdk::ACTION_MOVE is successfully completed. The signal handler is responsible for deleting
+   * the data that has been dropped. What "delete" means, depends on the context of the drag
+   * operation. 
+   *
+   * @param context the drag context.
+   */
   _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
+  
+  /**  The drag_leave signal is emitted on the drop site when the cursor leaves the widget.
+   * A typical reason to connect to this signal is to undo things done in the drag_motion signal handler, 
+   *  e.g. undo highlighting with drag_unhighlight().
+   *
+   * @param context the drag context.
+   * @param time the timestamp of the motion event.
+   */
   _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time), "drag_leave")
+  
+  /** The drag_motion signal is emitted on the drop site when the user moves the cursor over
+   * the widget during a drag. The signal handler must determine whether the cursor position is in 
+   * a drop zone or not. If it is not in a drop zone, it returns false and no further processing is
+   * necessary. Otherwise, the handler returns true. In this case, the handler is responsible for
+   * providing the necessary information for displaying feedback to the user, by calling
+   * drag_status(). If the decision whether the drop will be accepted or rejected can't be made
+   * based solely on the cursor position and the type of the data, the handler may inspect the dragged 
+   * data by calling drag_get_data() and defer the drag_status() call to the drag_data_received 
+   * handler. 
+   *
+   * Note that there is no drag_enter signal. The drag receiver has to keep track of whether
+   * he has received any drag_motion signals since the last drag_leave and if not, treat the
+   * drag_motion signal as an "enter" signal. Upon an "enter", the handler will typically highlight 
+   * the drop site with drag_highlight().
+   * 
+   * @param context the drag context.
+   * @param x the x coordinate of the current cursor position.
+   * @param y the y coordinate of the current cursor position.
+   * @param time the timestamp of the motion event.
+   * @result whether the cursor position is in a drop zone.
+   */
   _WRAP_SIGNAL(bool drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_motion")
+  
+  /** The drag_drop signal is emitted on the drop site when the user drops the data
+   * onto the widget. The signal handler must determine whether the cursor position is in 
+   * a drop zone or not. If it is not in a drop zone, it returns false and no further 
+   * processing is necessary. Otherwise, the handler returns true. In this case, the handler 
+   * must ensure that gtk_drag_finish() is called to let the source know that the drop is done.
+   * The call to gtk_drag_finish() can be done either directly or in a drag_data_received handler
+   * which gets triggered by calling drop_get_data() to receive the data for one or more of the 
+   * supported targets.
+   *
+   * @param context the drag context.
+   * @param x the x coordinate of the current cursor position.
+   * @param y the y coordinate of the current cursor position.
+   * @param time: the timestamp of the motion event.
+   * @result whether the cursor position is in a drop zone
+   */
   _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_drop")
+  
+  
+  /** The drag_data_received signal is emitted on the drop site when the dragged data has been 
+   * received. If the data was received in order to determine whether the drop will be accepted, 
+   * the handler is expected to call drag_status() and <emphasis>not</emphasis> finish the drag. 
+   * If the data was received in response to a drag_drop signal (and this is the last target to be 
+   * received), the handler for this signal is expected to process the received data and then call 
+   * drag_finish(), setting the @a success parameter depending on whether the data was processed 
+   * successfully.
+   *
+   * The handler may inspect and modify @drag_context->action before calling gtk_drag_finish(), 
+   * e.g. to implement %Gdk::ACTION_ASK.
+   *
+   * @param drag_context the drag context
+   * @param x where the drop happened
+   * @param y where the drop happened
+   * @param data the received data
+   * @param info the info that has been registered with the target in the TargetList.
+   * @param time the timestamp at which the data was received.
+   */
   _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint info, guint time), "drag_data_received")
 
   
@@ -677,7 +789,7 @@ dnl
   //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
   
   //Keybinding signals:
-  _IGNORE_SIGNAL("popup_menu")
+  _IGNORE_SIGNAL("popup_menu") //TODO: This might actually be useful. See the C docs.
   _IGNORE_SIGNAL("show_help")
 
   _IGNORE_SIGNAL("destroy-event")
