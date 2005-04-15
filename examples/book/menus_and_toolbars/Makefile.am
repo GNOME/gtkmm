@@ -4,3 +4,6 @@ include $(top_srcdir)/examples/Makefile.am_fragment
 noinst_PROGRAMS = example
 example_SOURCES = examplewindow.h examplewindow.cc main.cc
 
+EXTRA_DIST = rain.png
+
+

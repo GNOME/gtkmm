@@ -129,7 +129,16 @@ void ExampleWindow::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory
                       const Glib::ustring& id, const Glib::ustring& label)
 {
   Gtk::IconSource source;
-  source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath) );
+  try
+  {
+    //This throws an exception if the file is not found:
+    source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath) );
+  }
+  catch(const Glib::Exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
   source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
   source.set_size_wildcarded(); //Icon may be scaled.
 
