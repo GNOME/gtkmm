@@ -60,6 +60,7 @@ public:
   
   void prepend_text(const Glib::ustring& text);
 
+  //TODO: Deprecate these: Only get_entry()->get_text() can give the actual entered text.
   Glib::ustring get_active_text() const;
   void set_active_text(const Glib::ustring& text);
 
