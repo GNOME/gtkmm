@@ -9,10 +9,7 @@ sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gtk
 sublib_cflags		= $(GTKMM_CFLAGS)
 sublib_topdir = gtk
-sublib_win32_dlls_libs	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
-	               	  $(top_builddir)/atk/atkmm/libatkmm-1.6.la \
-			  $(top_builddir)/pango/pangomm/libpangomm-1.4.la
-
+sublib_win32_dlls_libs	=
 
 sublib_files_extra_posix_cc = 
 sublib_files_extra_win32_cc =
@@ -33,5 +30,8 @@ include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 lib_LTLIBRARIES		= libgtkmm-2.4.la
 libgtkmm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
 libgtkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgtkmm_2_4_la_LIBADD	= $(win32_dlls_extra_libs) $(GTKMM_LIBS)
+libgtkmm_2_4_la_LIBADD	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
+			  $(top_builddir)/atk/atkmm/libatkmm-1.6.la \
+			  $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
+			  $(GTKMM_LIBS)
 

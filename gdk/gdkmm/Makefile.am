@@ -9,7 +9,7 @@ sublib_libversion = $(LIBGTKMM_SO_VERSION)
 sublib_namespace	= Gdk
 sublib_cflags		= $(GDKMM_CFLAGS)
 sublib_topdir = gdk
-sublib_win32_dlls_libs	= $(top_builddir)/pango/pangomm/libpangomm-1.4.la
+sublib_win32_dlls_libs	=
 
 sublib_files_extra_posix_cc =
 sublib_files_extra_win32_cc =
@@ -26,5 +26,6 @@ include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 lib_LTLIBRARIES		= libgdkmm-2.4.la
 libgdkmm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
 libgdkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgdkmm_2_4_la_LIBADD	= $(win32_dlls_extra_libs) $(GDKMM_LIBS)
+libgdkmm_2_4_la_LIBADD	= $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
+			  $(GDKMM_LIBS)
 
