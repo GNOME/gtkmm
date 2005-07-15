@@ -262,6 +262,17 @@ bool TreeView::get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColu
   return result;
 }
 
+bool TreeView::get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColumn*& column, int& cell_x, int& cell_y) const
+{
+  GtkTreePath* pTreePath = 0;
+  GtkTreeViewColumn* pTreeViewColumn = 0;
+  bool result = gtk_tree_view_get_path_at_pos(const_cast<GtkTreeView*>(gobj()), x, y, &pTreePath, &pTreeViewColumn, &cell_x, &cell_y);
+
+  path = TreeModel::Path(pTreePath, false /* don't take a copy, because the gtk_tree_view_get_path_at_pos() docs say that we must free the path */ );
+  column = Glib::wrap(pTreeViewColumn);
+  return result;
+}
+
 int TreeView::insert_column(const Glib::ustring& title, CellRenderer& cell, int position)
 {
   return gtk_tree_view_insert_column_with_attributes(
@@ -460,6 +471,19 @@ void TreeView::set_row_separator_func(const SlotRowSeparator& slot)
       &TreeView_Private::SignalProxy_RowSeparator::gtk_callback, pSignalProxy,
       &TreeView_Private::SignalProxy_RowSeparator::gtk_callback_destroy);
 }
+
+bool TreeView::get_visible_range(TreeModel::Path& start_path, TreeModel::Path& end_path) const
+{
+  GtkTreePath* pTreePathStart = 0;
+  GtkTreePath* pTreePathEnd = 0;
+  bool result = gtk_tree_view_get_visible_range(const_cast<GtkTreeView*>(gobj()), &pTreePathStart, &pTreePathEnd);
+
+  start_path = TreeModel::Path(pTreePathStart, false /* don't take a copy, because the gtk_tree_view_get_visible_range() docs say that we must free the path */ );
+  end_path = TreeModel::Path(pTreePathEnd, false /* don't take a copy, because the gtk_tree_view_get_visible_range() docs say that we must free the path */ );
+  return result;
+}
+
+
 
 } // namespace Gtk
 

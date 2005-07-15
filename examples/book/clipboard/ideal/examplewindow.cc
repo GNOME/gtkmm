@@ -23,6 +23,7 @@
 namespace
 {
 
+//These should usually be MIME types.
 const char example_target_custom[] = "gtkmmclipboardexample";
 const char example_target_text[]   = "UTF8_STRING";
 
