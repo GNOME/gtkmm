@@ -263,6 +263,28 @@ coordinates (origin at top left of the entire layout).
 </return>
 </function>
 
+<function name="pango_cairo_layout_path">
+<description>
+Adds the text in a #PangoLayoutLine to the current path in the
+specified cairo context.  The top-left corner of the #PangoLayout
+will be at the current point of the cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="layout">
+<parameter_description> a Pango layout
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="pango_layout_get_pixel_extents">
 <description>
 Computes the logical and ink extents of @layout in device units.
@@ -529,8 +551,11 @@ individual families.
 </parameter>
 <parameter name="language">
 <parameter_description> language tag used to determine which script to get the metrics
-for, or %NULL to indicate to get the metrics for the entire
-font.
+for. %NULL means that the language tag from the context will
+be used. If no language tag is set on the ccontext, metrics
+large enough to cover a range of languages will be returned.
+The process of determining such metrics is slow, so it is best
+to always make sure some real language tag will be used.
 </parameter_description>
 </parameter>
 </parameters>
@@ -563,6 +588,32 @@ lines will use the foreground color.
 </parameters>
 <return> the new #PangoAttribute.
 </return>
+</function>
+
+<function name="pango_matrix_translate">
+<description>
+Changes the transformation represented by @matrix to be the
+transformation given by first translating by (@tx, @ty)
+then applying the original transformation.
+
+Since: 1.6
+
+</description>
+<parameters>
+<parameter name="matrix">
+<parameter_description> a #PangoMatrix
+</parameter_description>
+</parameter>
+<parameter name="tx">
+<parameter_description> amount to translate in the X direction
+</parameter_description>
+</parameter>
+<parameter name="ty">
+<parameter_description> amount to translate in the Y direction
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_layout_get_spacing">
@@ -627,7 +678,7 @@ Since: 1.8
 <parameter_description> type of object this trapezoid is part of
 </parameter_description>
 </parameter>
-<parameter name="y1">
+<parameter name="y1_">
 <parameter_description> Y coordinate of top of trapezoid
 </parameter_description>
 </parameter>
@@ -839,6 +890,25 @@ Render a #PangoLayout onto a FreeType2 bitmap
 <return></return>
 </function>
 
+<function name="_pango_cairo_font_install">
+<description>
+Makes @font the current font for rendering in the specified
+Cairo context.
+
+</description>
+<parameters>
+<parameter name="font">
+<parameter_description> a #PangoCairoFont
+</parameter_description>
+</parameter>
+<parameter name="cr">
+<parameter_description> a #cairo_t
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="pango_layout_xy_to_index">
 <description>
 Converts from X and Y position within a layout to the byte 
@@ -1022,7 +1092,7 @@ in only a substring of the item from pango_itemize().
 </parameter_description>
 </parameter>
 <parameter name="analysis">
-<parameter_description>  #PangoAnalysis structure from PangoItemize
+<parameter_description>  #PangoAnalysis structure from pango_itemize()
 </parameter_description>
 </parameter>
 <parameter name="glyphs">
@@ -1061,7 +1131,7 @@ Gets the logical and ink extents of a glyph within a font. The
 coordinate system for each rectangle has its origin at the
 base line and horizontal origin of the character with increasing
 coordinates extending to the right and down. The macros PANGO_ASCENT(),
-PANGO_DESCENT(), PANGO_LBEARING(), and PANGO_RBEARING can be used to convert
+PANGO_DESCENT(), PANGO_LBEARING(), and PANGO_RBEARING() can be used to convert
 from the extents rectangle to more traditional font metrics. The units
 of the rectangles are in 1/PANGO_SCALE of a device unit.
 
@@ -1564,16 +1634,18 @@ specifies how narrow or wide the font should be.
 <return></return>
 </function>
 
-<function name="pango_item_new">
+<function name="pango_win32_font_done_font">
 <description>
-Creates a new #PangoItem structure initialized to default values.
-
+Releases any resources allocated by pango_win32_font_done_font()
 
 </description>
 <parameters>
+<parameter name="font">
+<parameter_description> a #PangoFont from the win32 backend
+</parameter_description>
+</parameter>
 </parameters>
-<return> the new #PangoItem
-</return>
+<return></return>
 </function>
 
 <function name="pango_attribute_destroy">
@@ -1605,6 +1677,28 @@ Moves the iterator to the preceding cluster in the glyph item.
 <return> %TRUE if the iterator was movedn, %FALSE if we were already on the
 first cluster.
 </return>
+</function>
+
+<function name="pango_cairo_show_layout_line">
+<description>
+Draws a #PangoLayoutLine in the specified cairo context.
+The origin of the glyphs (the left edge of the line) will
+be drawn at the current point of the cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="line">
+<parameter_description> a #PangoLayoutLine
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_renderer_set_matrix">
@@ -1778,6 +1872,28 @@ Create a new foreground color attribute.
 </parameters>
 <return> the new #PangoAttribute.
 </return>
+</function>
+
+<function name="pango_cairo_update_layout">
+<description>
+Updates the private #PangoContext of a #PangoLayout created with
+pango_cairo_create_layout() to match the current transformation
+and target surface of a Cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="layout">
+<parameter_description> a #PangoLayout, from pango_cairo_create_layout()
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_x_font_cache_free">
@@ -1966,6 +2082,32 @@ For every character in @text, it puts the Unknown glyph.
 </parameter>
 <parameter name="n_chars">
 <parameter_description> Number of UTF-8 seqs in @text.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="pango_cairo_glyph_string_path">
+<description>
+Adds the glyphs in @glyphs to the current path in the specified
+cairo context. The origin of the glyphs (the left edge of the baseline)
+will be at the current point of the cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="font">
+<parameter_description> a #PangoFont
+</parameter_description>
+</parameter>
+<parameter name="glyphs">
+<parameter_description> a #PangoGlyphString
 </parameter_description>
 </parameter>
 </parameters>
@@ -2296,6 +2438,30 @@ last word of the list is a valid style option.
 </return>
 </function>
 
+<function name="pango_cairo_font_map_set_resolution">
+<description>
+Sets the resolution for the fontmap. This is a scale factor between
+points specified in a #PangoFontDescription and Cairo units. The
+default value is 96, meaning that a 10 point font will be 13
+units high. (10 * 96. / 72. = 13.3).
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="fontmap">
+<parameter_description> a #PangoCairoFontMap 
+</parameter_description>
+</parameter>
+<parameter name="dpi">
+<parameter_description> the resolution in &quot;dots per inch&quot;. (Physical inches aren&apos;t actually
+involved; the terminology is conventional.)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="pango_font_description_get_variant">
 <description>
 Gets the variant field of a #PangoFontDescription. See
@@ -2401,24 +2567,6 @@ value of 10 * PANGO_SCALE gives a 10 pixel font.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="pango_attr_size_absolute_new">
-<description>
-Create a new font-size attribute in device units.
-
-
-</description>
-<parameters>
-<parameter name="size">
-<parameter_description> the font size, in #PANGO_SCALE&amp;lt;!-- --&amp;gt;ths of a device units.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the new #PangoAttribute.
-
-Since: 1.8
-</return>
 </function>
 
 <function name="pango_color_free">
@@ -3061,23 +3209,20 @@ literal @accel_marker character.
 <return></return>
 </function>
 
-<function name="pango_font_metrics_get_strikethrough_position">
+<function name="pango_cairo_context_get_hinting">
 <description>
-Gets the suggested position to draw the strikethrough.
-The value returned is the distance &amp;lt;emphasis&amp;gt;above&amp;lt;/emphasis&amp;gt; the
-baseline of the top of the strikethrough.
+Gets whether hinting is enabled for this context. See
+pango_cairo_context_set_hinting()
 
 
 </description>
 <parameters>
-<parameter name="metrics">
-<parameter_description> a #PangoFontMetrics structure
+<parameter name="context">
+<parameter_description> a #PangoContext, from pango_cairo_font_map_create_context()
 </parameter_description>
 </parameter>
 </parameters>
-<return> the suggested strikethrough position, in Pango units.
-
-Since: 1.6
+<return> %TRUE if hinting is enabled.
 </return>
 </function>
 
@@ -3096,6 +3241,30 @@ This will return any custom decoder set on this font.
 <return> The custom decoder
 
 Since: 1.6
+</return>
+</function>
+
+<function name="pango_cairo_font_map_new">
+<description>
+Creates a new #PangoCairoFontMap object; a fontmap is used
+to cache information about available fonts, and holds
+certain global parameters such as the resolution.
+In most cases, you can use pango_cairo_font_map_get_default()
+instead.
+
+Note that the type of the returned object will depend
+on the particular font backend Cairo was compiled to use;
+You generally should only use the #PangoFontMap and
+#PangoCairoFontMap interfaces on the returned object.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the newly created fontmap object. Free
+with g_object_unref().
+
+Since: 1.10
 </return>
 </function>
 
@@ -4347,14 +4516,14 @@ Since: 1.8
 
 <function name="pango_attr_iterator_get_attrs">
 <description>
-Gets a list all attributes a the current position of the
+Gets a list of all attributes at the current position of the
 iterator.
 
 
 </description>
 <parameters>
 <parameter name="iterator">
-<parameter_description> a #PangAttrIterator
+<parameter_description> a #PangoAttrIterator
 </parameter_description>
 </parameter>
 </parameters>
@@ -4390,6 +4559,28 @@ on #FcPattern objects.
 </parameter>
 <parameter name="notify">
 <parameter_description> function to call when @data is no longer used.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="pango_cairo_layout_line_path">
+<description>
+Adds the text in #PangoLayoutLine to the current path in the
+specified cairo context.  The origin of the glyphs (the left edge
+of the line) will be at the current point of the cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="line">
+<parameter_description> a #PangoLayoutLine
 </parameter_description>
 </parameter>
 </parameters>
@@ -4634,6 +4825,26 @@ Since: 1.8
 </return>
 </function>
 
+<function name="pango_font_metrics_get_strikethrough_position">
+<description>
+Gets the suggested position to draw the strikethrough.
+The value returned is the distance &amp;lt;emphasis&amp;gt;above&amp;lt;/emphasis&amp;gt; the
+baseline of the top of the strikethrough.
+
+
+</description>
+<parameters>
+<parameter name="metrics">
+<parameter_description> a #PangoFontMetrics structure
+</parameter_description>
+</parameter>
+</parameters>
+<return> the suggested strikethrough position, in Pango units.
+
+Since: 1.6
+</return>
+</function>
+
 <function name="pango_break">
 <description>
 Determines possible line, word, and character breaks
@@ -4790,6 +5001,22 @@ Sets the text attributes for a layout object.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="_pango_cairo_font_map_get_renderer">
+<description>
+Gets the singleton PangoCairoRenderer for this fontmap.
+
+
+</description>
+<parameters>
+<parameter name="fontmap">
+<parameter_description> a #PangoCairoFontmap
+</parameter_description>
+</parameter>
+</parameters>
+<return> the singleton renderer
+</return>
 </function>
 
 <function name="pango_font_metrics_get_approximate_digit_width">
@@ -5388,7 +5615,7 @@ white space and subsituting ~/ with $HOME/.
 </description>
 <parameters>
 <parameter name="str">
-<parameter_description> a comma separated list of filenames
+<parameter_description> a G_SEARCHPATH_SEPARATOR separated list of filenames
 </parameter_description>
 </parameter>
 </parameters>
@@ -5457,7 +5684,7 @@ This value must not be modified or freed.
 <function name="pango_script_iter_get_range">
 <description>
 Gets information about the range to which @iter currently points.
-The range is the is the set of locations p where *start &amp;lt;= p &amp;lt; *end.
+The range is the set of locations p where *start &amp;lt;= p &amp;lt; *end.
 (That is, it doesn&apos;t include the character stored at *end)
 
 </description>
@@ -5516,6 +5743,32 @@ the language, or %NULL.
 </parameters>
 <return> %TRUE if the language was found.
 </return>
+</function>
+
+<function name="pango_cairo_show_glyph_string">
+<description>
+Draws the glyphs in @glyphs in the specified cairo context.
+The origin of the glyphs (the left edge of the baseline) will
+be drawn at the current point of the cairo context.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="font">
+<parameter_description> a #PangoFont
+</parameter_description>
+</parameter>
+<parameter name="glyphs">
+<parameter_description> a #PangoGlyphString
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_ft2_font_get_coverage">
@@ -6036,6 +6289,24 @@ between 0 and pango_layout_get_line_count(layout) - 1)
 <return></return>
 </function>
 
+<function name="pango_attr_size_new_absolute">
+<description>
+Create a new font-size attribute in device units.
+
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> the font size, in #PANGO_SCALE&amp;lt;!-- --&amp;gt;ths of a device unit.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #PangoAttribute.
+
+Since: 1.8
+</return>
+</function>
+
 <function name="pango_win32_font_cache_free">
 <description>
 Frees a #PangoWin32FontCache and all associated memory. All fonts loaded
@@ -6065,6 +6336,24 @@ Make a copy of a #PangoFontDescription.
 </parameters>
 <return> a newly-allocated #PangoFontDescription. This value
 must be freed using pango_font_description_free().
+</return>
+</function>
+
+<function name="pango_cairo_font_map_create_context">
+<description>
+Create a #PangoContext for the given fontmap.
+
+
+</description>
+<parameters>
+<parameter name="fontmap">
+<parameter_description> a #PangoCairoFontMap
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created context; free with g_object_unref().
+
+Since: 1.10
 </return>
 </function>
 
@@ -6325,6 +6614,53 @@ in Pango units.
 </return>
 </function>
 
+<function name="pango_cairo_create_layout">
+<description>
+Creates a layout object set up to match the current transformation
+and target surface of the Cairo context.  This layout can then be
+used for text measurement with functions like
+pango_layout_get_size() or drawing with functions like
+pango_cairo_show_layout(). If you change the transformation
+or target surface for @cr, you need to call pango_cairo_update_layout()
+
+This function is the most convenient way to use Cairo with Pango,
+however it is slightly inefficient since it creates a separate
+#PangoContext object for each layout. This might matter in an
+application that was laying out large amounts of text.
+
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #PangoLayout. Free with
+g_object_unref().
+
+Since: 1.10
+</return>
+</function>
+
+<function name="pango_cairo_font_map_get_resolution">
+<description>
+Gets the resolutions for the fontmap. See pango_cairo_font_map_set_resolution.
+
+
+</description>
+<parameters>
+<parameter name="fontmap">
+<parameter_description> a #PangoCairoFontMap 
+</parameter_description>
+</parameter>
+</parameters>
+<return> the resolution in &quot;dots per inch&quot;
+
+Since: 1.10
+</return>
+</function>
+
 <function name="pango_xft_render">
 <description>
 Renders a #PangoGlyphString onto an &amp;lt;type&amp;gt;XftDraw&amp;lt;/type&amp;gt; object wrapping an X drawable.
@@ -6453,30 +6789,31 @@ Make a copy of an attribute.
 </return>
 </function>
 
-<function name="pango_matrix_translate">
+<function name="pango_win32_font_select_font">
 <description>
-Changes the transformation represented by @matrix to be the
-transformation given by first translating by (@tx, @ty)
-then applying the original transformation.
+Selects the font into the specified DC and changes the mapping mode
+and world transformation of the DC appropriately for the font.
+You may want to surround the use of this function with calls
+to SaveDC and RestoreDC. Call pango_win32_font_done_font() when
+you are done using the DC to release allocated resources.
 
-Since: 1.6
+See 
+
 
 </description>
 <parameters>
-<parameter name="matrix">
-<parameter_description> a #PangoMatrix
+<parameter name="font">
+<parameter_description> a #PangoFont from the Win32 backend
 </parameter_description>
 </parameter>
-<parameter name="tx">
-<parameter_description> amount to translate in the X direction
-</parameter_description>
-</parameter>
-<parameter name="ty">
-<parameter_description> amount to translate in the Y direction
+<parameter name="scale">
+<parameter_description> location to store a scale factor from Windows
+units to Pango Units.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the operation succeeded.
+</return>
 </function>
 
 <function name="pango_fontset_get_font">
@@ -6693,6 +7030,21 @@ Since: 1.6
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="pango_cairo_font_map_get_default">
+<description>
+Gets a default font map to use with Cairo. 
+
+
+</description>
+<parameters>
+</parameters>
+<return> the default Cairo fontmap for Pango. This
+object is owned by Pango and must not be freed.
+
+Since: 1.10
+</return>
 </function>
 
 <function name="pango_attr_list_insert_before">
@@ -7056,6 +7408,51 @@ instead.
 </return>
 </function>
 
+<function name="pango_cairo_context_set_hinting">
+<description>
+Sets whether outlines and font metrics should be hinted for this
+context. Hinting is the process of adjusting outlines so that they
+render better when drawn onto a pixel grid. When hinting is
+enabled, font metrics such as character widths and font ascent and
+descent are quantized to integer pixel values.
+
+If layouts have been previously created for this context, it is
+necessary to call pango_layout_context_changed() in order to update
+the layouts.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #PangoContext, from pango_cairo_font_map_create_context()
+</parameter_description>
+</parameter>
+<parameter name="hinting">
+<parameter_description> %TRUE if hinting should be enabled.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="pango_win32_font_get_metrics_factor">
+<description>
+Returns the scale factor from logical units in the coordinate
+space used by pango_win32_font_select_font() to Pango units
+in user space.
+
+
+</description>
+<parameters>
+<parameter name="font">
+<parameter_description> a #PangoFont from the win32 backend
+</parameter_description>
+</parameter>
+</parameters>
+<return> factor to multiply logical units by to get Pango
+units.
+</return>
+</function>
+
 <function name="pango_xft_font_lock_face">
 <description>
 Gets the FreeType FT_Face associated with a font,
@@ -7117,6 +7514,53 @@ already on the last line, returns %FALSE.
 </parameters>
 <return> whether motion was possible
 </return>
+</function>
+
+<function name="pango_xft_render_transformed">
+<description>
+Renders a #PangoGlyphString onto a #XftDraw, possibly
+transforming the layed-out coordinates through a transformation
+matrix. Note that the transformation matrix for @font is not
+changed, so to produce correct rendering results, the @font
+must have been loaded using a #PangoContext with an identical
+transformation matrix to that passed in to this function.
+
+Since: 1.8
+
+</description>
+<parameters>
+<parameter name="draw">
+<parameter_description>    an #XftDraw
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description>   the color in which to draw the glyphs
+</parameter_description>
+</parameter>
+<parameter name="font">
+<parameter_description>    the font in which to draw the string
+</parameter_description>
+</parameter>
+<parameter name="matrix">
+<parameter_description> a #PangoMatrix, or %NULL to use an identity transformation
+</parameter_description>
+</parameter>
+<parameter name="glyphs">
+<parameter_description>  the glyph string to draw
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description>       the x position of the start of the string (in Pango
+units in user space coordinates)
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description>       the y position of the baseline (in Pango units
+in user space coordinates)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_layout_iter_get_cluster_extents">
@@ -7537,9 +7981,9 @@ subfont. This string must be freed with g_free().
 <description>
 This function splices attribute list @other into @list.
 This operation is equivalent to stretching every attribute
-applies at position @pos in @list by an amount @len,
+that applies at position @pos in @list by an amount @len,
 and then calling pango_attr_list_change() with a copy
-of each attributes in @other in sequence (offset in position by @pos).
+of each attribute in @other in sequence (offset in position by @pos).
 
 This operation proves useful for, for instance, inserting
 a preedit string in the middle of an edit buffer.
@@ -7948,6 +8392,18 @@ Returns the XftFont of a font.
 </parameter>
 </parameters>
 <return> the XftFont associated to @font.
+</return>
+</function>
+
+<function name="pango_item_new">
+<description>
+Creates a new #PangoItem structure initialized to default values.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the new #PangoItem
 </return>
 </function>
 
@@ -8613,6 +9069,22 @@ Create a new font slant style attribute.
 </return>
 </function>
 
+<function name="pango_font_get_font_map">
+<description>
+Gets the font map for which the font was created.
+
+
+</description>
+<parameters>
+<parameter name="font">
+<parameter_description> a #PangoFont
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #PangoFontMap for the font
+</return>
+</function>
+
 <function name="pango_layout_iter_next_run">
 <description>
 Moves @iter forward to the next run in visual order. If @iter was
@@ -8628,6 +9100,30 @@ already at the end of the layout, returns %FALSE.
 </parameters>
 <return> whether motion was possible
 </return>
+</function>
+
+<function name="pango_cairo_update_context">
+<description>
+Updates a #PangoContext previously created for use with Cairo to
+match the current transformation and target surface of a Cairo
+context. If any layouts have been created for the context,
+it&apos;s necessary to call pango_layout_context_changed() on those
+layouts.
+
+Since: 1.10
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description> a #PangoContext, from pango_cairo_font_map_create_context()
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="pango_layout_get_context">
@@ -8777,47 +9273,22 @@ when it is no longer needed.
 <return></return>
 </function>
 
-<function name="pango_xft_render_transformed">
+<function name="pango_cairo_show_layout">
 <description>
-Renders a #PangoGlyphString onto a #XftDraw, possibly
-transforming the layed-out coordinates through a transformation
-matrix. Note that the transformation matrix for @font is not
-changed, so to produce correct rendering results, the @font
-must have been loaded using a #PangoContext with an identical
-transformation matrix to that passed in to this function.
+Draws a #PangoLayoutLine in the specified cairo context.
+The top-left corner of the #PangoLayout will be drawn
+at the current point of the cairo context.
 
-Since: 1.8
+Since: 1.10
 
 </description>
 <parameters>
-<parameter name="draw">
-<parameter_description>    an #XftDraw
+<parameter name="cr">
+<parameter_description> a Cairo context
 </parameter_description>
 </parameter>
-<parameter name="color">
-<parameter_description>   the color in which to draw the glyphs
-</parameter_description>
-</parameter>
-<parameter name="font">
-<parameter_description>    the font in which to draw the string
-</parameter_description>
-</parameter>
-<parameter name="matrix">
-<parameter_description> a #PangoMatrix, or %NULL to use an identity transformation
-</parameter_description>
-</parameter>
-<parameter name="glyphs">
-<parameter_description>  the glyph string to draw
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description>       the x position of the start of the string (in Pango
-units in user space coordinates)
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description>       the y position of the baseline (in Pango units
-in user space coordinates)
+<parameter name="layout">
+<parameter_description> a Pango layout
 </parameter_description>
 </parameter>
 </parameters>

@@ -1,20 +1,35 @@
 <root>
-<function name="atk_object_set_description">
+<function name="atk_text_get_selection">
 <description>
-Sets the accessible description of the accessible.
+Gets the text from the specified selection.
+
 
 </description>
 <parameters>
-<parameter name="accessible">
-<parameter_description> an #AtkObject
+<parameter name="text">
+<parameter_description> an #AtkText
 </parameter_description>
 </parameter>
-<parameter name="description">
-<parameter_description> a character string to be set as the accessible description
+<parameter name="selection_num">
+<parameter_description> The selection number.  The selected regions are
+assigned numbers that correspond to how far the region is from the
+start of the text.  The selected region closest to the beginning
+of the text region is assigned the number 0, etc.  Note that adding,
+moving or deleting a selected region can change the numbering.
+</parameter_description>
+</parameter>
+<parameter name="start_offset">
+<parameter_description> passes back the start position of the selected region
+</parameter_description>
+</parameter>
+<parameter name="end_offset">
+<parameter_description> passes back the end position of (e.g. offset immediately past) 
+the selected region
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the selected text.
+</return>
 </function>
 
 <function name="atk_image_get_image_position">
@@ -46,26 +61,6 @@ or to the components top level window
 <return></return>
 </function>
 
-<function name="atk_text_set_caret_offset">
-<description>
-Sets the caret (cursor) position to the specified @offset.
-
-
-</description>
-<parameters>
-<parameter name="text">
-<parameter_description> an #AtkText
-</parameter_description>
-</parameter>
-<parameter name="offset">
-<parameter_description> position
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if success, %FALSE otherwise.
-</return>
-</function>
-
 <function name="atk_table_is_row_selected">
 <description>
 Gets a boolean value indicating whether the specified @row
@@ -88,22 +83,21 @@ if value does not implement this interface.
 </return>
 </function>
 
-<function name="atk_object_set_role">
+<function name="atk_table_get_n_rows">
 <description>
-Sets the role of the accessible.
+Gets the number of rows in the table.
+
 
 </description>
 <parameters>
-<parameter name="accessible">
-<parameter_description> an #AtkObject
-</parameter_description>
-</parameter>
-<parameter name="role">
-<parameter_description> an #AtkRole to be set as the role
+<parameter name="table">
+<parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a gint representing the number of rows, or 0
+if value does not implement this interface.
+</return>
 </function>
 
 <function name="atk_object_ref_state_set">
@@ -124,52 +118,43 @@ set of the accessible
 </return>
 </function>
 
-<function name="atk_hyperlink_get_n_anchors">
+<function name="atk_object_connect_property_change_handler">
 <description>
-Gets the number of anchors associated with this hyperlink.
+Specifies a function to be called when a property changes value.
 
 
 </description>
 <parameters>
-<parameter name="link_">
-<parameter_description> an #AtkHyperlink
+<parameter name="accessible">
+<parameter_description> an #AtkObject
+</parameter_description>
+</parameter>
+<parameter name="handler">
+<parameter_description> a function to be called when a property changes its value
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of anchors associated with this hyperlink
+<return> a #guint which is the handler id used in 
+atk_object_remove_property_change_handler()
 </return>
 </function>
 
-<function name="atk_text_get_selection">
+<function name="atk_object_set_description">
 <description>
-Gets the text from the specified selection.
-
+Sets the accessible description of the accessible.
 
 </description>
 <parameters>
-<parameter name="text">
-<parameter_description> an #AtkText
+<parameter name="accessible">
+<parameter_description> an #AtkObject
 </parameter_description>
 </parameter>
-<parameter name="selection_num">
-<parameter_description> The selection number.  The selected regions are
-assigned numbers that correspond to how far the region is from the
-start of the text.  The selected region closest to the beginning
-of the text region is assigned the number 0, etc.  Note that adding,
-moving or deleting a selected region can change the numbering.
-</parameter_description>
-</parameter>
-<parameter name="start_offset">
-<parameter_description> passes back the start position of the selected region
-</parameter_description>
-</parameter>
-<parameter name="end_offset">
-<parameter_description> passes back the end position of the selected region
+<parameter name="description">
+<parameter_description> a character string to be set as the accessible description
 </parameter_description>
 </parameter>
 </parameters>
-<return> the selected text.
-</return>
+<return></return>
 </function>
 
 <function name="atk_state_type_register">
@@ -228,24 +213,20 @@ or 0 if value does not implement this interface.
 </return>
 </function>
 
-<function name="atk_image_set_image_description">
+<function name="atk_no_op_object_new">
 <description>
-Sets the textual description for this image.
+Provides a default (non-functioning stub) #AtkObject.
+Application maintainers should not use this method. 
 
 
 </description>
 <parameters>
-<parameter name="image">
-<parameter_description> a #GObject instance that implements AtkImageIface
-</parameter_description>
-</parameter>
-<parameter name="description">
-<parameter_description> a string description to set for @image
+<parameter name="obj">
+<parameter_description> a #GObject
 </parameter_description>
 </parameter>
 </parameters>
-<return> boolean TRUE, or FALSE if operation could
-not be completed.
+<return> a default (non-functioning stub) #AtkObject
 </return>
 </function>
 
@@ -284,7 +265,6 @@ Gets the index with the hypertext document at which this link begins.
 <function name="atk_object_get_layer">
 <description>
 Gets the layer of the accessible.
-DEPRECATED: use atk_component_get_layer instead!
 
 
 </description>
@@ -295,6 +275,8 @@ DEPRECATED: use atk_component_get_layer instead!
 </parameter>
 </parameters>
 <return> an #AtkLayer which is the layer of the accessible
+
+@Deprecated: Use atk_component_get_layer instead.
 </return>
 </function>
 
@@ -416,8 +398,10 @@ occurred.
 Creates an #AtkAttributeSet which consists of the attributes explicitly
 set at the position @offset in the text. @start_offset and @end_offset are
 set to the start and end of the range around @offset where the attributes are
-invariant. See the enum AtkTextAttribute for types of text attributes that 
-can be returned. Note that other attributes may also be returned.
+invariant. Note that @end_offset is the offset of the first character
+after the range.  See the enum AtkTextAttribute for types of text 
+attributes that can be returned. Note that other attributes may also be 
+returned.
 
 
 </description>
@@ -523,20 +507,6 @@ Sets the summary description of the table.
 <parameter name="accessible">
 <parameter_description> an #AtkObject representing the summary description
 to set for @table
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="atk_remove_global_event_listener">
-<description>
-Removes the specified event listener
-
-</description>
-<parameters>
-<parameter name="listener_id">
-<parameter_description> the id of the event listener to remove
 </parameter_description>
 </parameter>
 </parameters>
@@ -673,32 +643,6 @@ atk_attribute_set_free().
 </return>
 </function>
 
-<function name="atk_table_get_row_extent_at">
-<description>
-Gets the number of rows occupied by the accessible object
-at a specified @row and @column in the @table.
-
-
-</description>
-<parameters>
-<parameter name="table">
-<parameter_description> a GObject instance that implements AtkTableIface
-</parameter_description>
-</parameter>
-<parameter name="row">
-<parameter_description> a #gint representing a row in @table
-</parameter_description>
-</parameter>
-<parameter name="column">
-<parameter_description> a #gint representing a column in @table
-</parameter_description>
-</parameter>
-</parameters>
-<return> a gint representing the row extent at specified position, or 0
-if value does not implement this interface.
-</return>
-</function>
-
 <function name="atk_text_set_selection">
 <description>
 Changes the start and end offset of the specified selection.
@@ -723,7 +667,8 @@ moving or deleting a selected region can change the numbering.
 </parameter_description>
 </parameter>
 <parameter name="end_offset">
-<parameter_description> the new end position of the selection
+<parameter_description> the new end position of (e.g. offset immediately past) 
+the selection
 </parameter_description>
 </parameter>
 </parameters>
@@ -819,21 +764,36 @@ index @link_index
 </return>
 </function>
 
-<function name="atk_table_get_n_rows">
+<function name="atk_text_get_range_extents">
 <description>
-Gets the number of rows in the table.
-
+Get the bounding box for text within the specified range.
 
 </description>
 <parameters>
-<parameter name="table">
-<parameter_description> a GObject instance that implements AtkTableIface
+<parameter name="text">
+<parameter_description> an #AtkText
+</parameter_description>
+</parameter>
+<parameter name="start_offset">
+<parameter_description> The offset of the first text character for which boundary 
+information is required.
+</parameter_description>
+</parameter>
+<parameter name="end_offset">
+<parameter_description> The offset of the text character after the last character 
+for which boundary information is required.
+</parameter_description>
+</parameter>
+<parameter name="coord_type">
+<parameter_description> Specify whether coordinates are relative to the screen or widget window.
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> A pointer to a AtkTextRectangle which is filled in by this function.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a gint representing the number of rows, or 0
-if value does not implement this interface.
-</return>
+<return></return>
 </function>
 
 <function name="atk_table_get_column_at_index">
@@ -914,7 +874,7 @@ Adds a selection bounded by the specified offsets.
 </parameter_description>
 </parameter>
 <parameter name="end_offset">
-<parameter_description> the end position of the selected region
+<parameter_description> the offset of the first character after the selected region.
 </parameter_description>
 </parameter>
 </parameters>
@@ -992,47 +952,58 @@ Gets the GObject for which @obj is the accessible object.
 </return>
 </function>
 
-<function name="atk_action_get_name">
+<function name="atk_relation_set_new">
 <description>
-Returns the name of the specified action of the object.
+Creates a new empty relation set.
 
 
 </description>
 <parameters>
-<parameter name="action">
-<parameter_description> a #GObject instance that implements AtkActionIface
-</parameter_description>
-</parameter>
-<parameter name="i">
-<parameter_description> the action index corresponding to the action to be performed 
-</parameter_description>
-</parameter>
 </parameters>
-<return>a name string, or %NULL
-if @action does not implement this interface.
+<return> a new #AtkRelationSet 
 </return>
 </function>
 
-<function name="atk_text_attribute_register">
+<function name="atk_relation_add_target">
 <description>
-Associate @name with a new #AtkTextAttribute
+Adds the specified AtkObject to the target for the relation, if it is
+not already present.
+
+Since: 1.9
+
+</description>
+<parameters>
+<parameter name="relation">
+<parameter_description> an #AtkRelation
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> an #AtkObject
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="atk_hyperlink_get_n_anchors">
+<description>
+Gets the number of anchors associated with this hyperlink.
 
 
 </description>
 <parameters>
-<parameter name="name">
-<parameter_description> a name string
+<parameter name="link_">
+<parameter_description> an #AtkHyperlink
 </parameter_description>
 </parameter>
 </parameters>
-<return> an #AtkTextAttribute associated with @name
+<return> the number of anchors associated with this hyperlink
 </return>
 </function>
 
-<function name="atk_object_connect_property_change_handler">
+<function name="atk_object_set_name">
 <description>
-Specifies a function to be called when a property changes value.
-
+Sets the accessible name of the accessible.
 
 </description>
 <parameters>
@@ -1040,51 +1011,27 @@ Specifies a function to be called when a property changes value.
 <parameter_description> an #AtkObject
 </parameter_description>
 </parameter>
-<parameter name="handler">
-<parameter_description> a function to be called when a property changes its value
+<parameter name="name">
+<parameter_description> a character string to be set as the accessible name
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #guint which is the handler id used in 
-atk_object_remove_property_change_handler()
-</return>
+<return></return>
 </function>
 
-<function name="atk_table_get_summary">
+<function name="atk_hyperlink_is_selected_link">
 <description>
-Gets the summary description of the table.
+Determines whether this AtkHyperlink is selected
 
 
 </description>
 <parameters>
-<parameter name="table">
-<parameter_description> a GObject instance that implements AtkTableIface
+<parameter name="link_">
+<parameter_description> an #AtkHyperlink
 </parameter_description>
 </parameter>
 </parameters>
-<return> a AtkObject* representing a summary description of the table,
-or zero if value does not implement this interface.
-</return>
-</function>
-
-<function name="atk_table_get_column_header">
-<description>
-Gets the column header of a specified column in an accessible table.
-
-
-</description>
-<parameters>
-<parameter name="table">
-<parameter_description> a GObject instance that implements AtkTableIface
-</parameter_description>
-</parameter>
-<parameter name="column">
-<parameter_description> a #gint representing a column in the table
-</parameter_description>
-</parameter>
-</parameters>
-<return> a AtkObject* representing the specified column header, or
-%NULL if value does not implement this interface.
+<return> True is the AtkHyperlink is selected, False otherwise
 </return>
 </function>
 
@@ -1152,23 +1099,23 @@ the selection, or 0 if value does not implement this interface.
 </return>
 </function>
 
-<function name="atk_state_set_remove_state">
+<function name="atk_text_set_caret_offset">
 <description>
-Removes the state for the specified type from the state set.
+Sets the caret (cursor) position to the specified @offset.
 
 
 </description>
 <parameters>
-<parameter name="set">
-<parameter_description> an #AtkStateSet
+<parameter name="text">
+<parameter_description> an #AtkText
 </parameter_description>
 </parameter>
-<parameter name="type">
-<parameter_description> an #AtkType
+<parameter name="offset">
+<parameter_description> position
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @type was the state type is in @set.
+<return> %TRUE if success, %FALSE otherwise.
 </return>
 </function>
 
@@ -1298,20 +1245,31 @@ Associate @name with a new #AtkRelationType
 </return>
 </function>
 
-<function name="atk_component_get_layer">
+<function name="atk_relation_set_add_relation_by_type">
 <description>
-Gets the layer of the component.
+Add a new relation of the specified type with the specified target to 
+the current relation set if the relation set does not contain a relation
+of that type. If it is does contain a relation of that typea the target
+is added to the relation.
 
+Since: 1.9
 
 </description>
 <parameters>
-<parameter name="component">
-<parameter_description> an #AtkComponent
+<parameter name="set">
+<parameter_description> an #AtkRelationSet
+</parameter_description>
+</parameter>
+<parameter name="relationship">
+<parameter_description> an #AtkRelationType
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> an #AtkObject
 </parameter_description>
 </parameter>
 </parameters>
-<return> an #AtkLayer which is the layer of the component
-</return>
+<return></return>
 </function>
 
 <function name="atk_object_get_role">
@@ -1353,25 +1311,26 @@ along with the event notification, when it occurs.
 </return>
 </function>
 
-<function name="atk_action_get_localized_name">
+<function name="atk_object_notify_state_change">
 <description>
-Returns the localized name of the specified action of the object.
-
+Emits a state-change signal for the specified state. 
 
 </description>
 <parameters>
-<parameter name="action">
-<parameter_description> a #GObject instance that implements AtkActionIface
+<parameter name="accessible">
+<parameter_description> an #AtkObject
 </parameter_description>
 </parameter>
-<parameter name="i">
-<parameter_description> the action index corresponding to the action to be performed 
+<parameter name="state">
+<parameter_description> an #AtkState whose state is changed
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a gboolean which indicates whether the state is being set on or off
 </parameter_description>
 </parameter>
 </parameters>
-<return>a name string, or %NULL
-if @action does not implement this interface.
-</return>
+<return></return>
 </function>
 
 <function name="atk_focus_tracker_notify">
@@ -1405,20 +1364,24 @@ Gets a string indicating the document type.
 </return>
 </function>
 
-<function name="atk_no_op_object_new">
+<function name="atk_image_set_image_description">
 <description>
-Provides a default (non-functioning stub) #AtkObject.
-Application maintainers should not use this method. 
+Sets the textual description for this image.
 
 
 </description>
 <parameters>
-<parameter name="obj">
-<parameter_description> a #GObject
+<parameter name="image">
+<parameter_description> a #GObject instance that implements AtkImageIface
+</parameter_description>
+</parameter>
+<parameter name="description">
+<parameter_description> a string description to set for @image
 </parameter_description>
 </parameter>
 </parameters>
-<return> a default (non-functioning stub) #AtkObject
+<return> boolean TRUE, or FALSE if operation could
+not be completed.
 </return>
 </function>
 
@@ -1612,11 +1575,12 @@ the offset.
 </parameter_description>
 </parameter>
 <parameter name="start_offset">
-<parameter_description> the start offset of the returned string.
+<parameter_description> the start offset of the returned string
 </parameter_description>
 </parameter>
 <parameter name="end_offset">
-<parameter_description> the end offset of the returned string.
+<parameter_description> the offset of the first character after the 
+returned substring
 </parameter_description>
 </parameter>
 </parameters>
@@ -1715,6 +1679,26 @@ Removes a relationship of the specified type with the specified target.
 </return>
 </function>
 
+<function name="atk_state_set_remove_state">
+<description>
+Removes the state for the specified type from the state set.
+
+
+</description>
+<parameters>
+<parameter name="set">
+<parameter_description> an #AtkStateSet
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> an #AtkType
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @type was the state type is in @set.
+</return>
+</function>
+
 <function name="atk_text_attribute_get_value">
 <description>
 Gets the value for the index of the #AtkTextAttribute
@@ -1766,25 +1750,42 @@ the extent of the @component or not
 </return>
 </function>
 
-<function name="atk_relation_set_contains">
+<function name="atk_component_get_layer">
 <description>
-Determines whether the relation set contains a relation that matches the
-specified type.
+Gets the layer of the component.
 
 
 </description>
 <parameters>
-<parameter name="set">
-<parameter_description> an #AtkRelationSet
-</parameter_description>
-</parameter>
-<parameter name="relationship">
-<parameter_description> an #AtkRelationType
+<parameter name="component">
+<parameter_description> an #AtkComponent
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @relationship is the relationship type of a relation
-in @set, %FALSE otherwise
+<return> an #AtkLayer which is the layer of the component
+</return>
+</function>
+
+<function name="atk_component_add_focus_handler">
+<description>
+Add the specified handler to the set of functions to be called 
+when this object receives focus events (in or out). If the handler is
+already added it is not added again
+
+
+</description>
+<parameters>
+<parameter name="component">
+<parameter_description> The #AtkComponent to attach the @handler to
+</parameter_description>
+</parameter>
+<parameter name="handler">
+<parameter_description> The #AtkFocusHandler to be attached to @component
+</parameter_description>
+</parameter>
+</parameters>
+<return> a handler id which can be used in atk_component_remove_focus_handler
+or zero if the handler was already added.
 </return>
 </function>
 
@@ -1868,28 +1869,24 @@ of the accessible.
 </return>
 </function>
 
-<function name="atk_state_set_contains_states">
+<function name="atk_table_get_column_header">
 <description>
-Checks whether the states for all the specified types are in the 
-specified set.
+Gets the column header of a specified column in an accessible table.
 
 
 </description>
 <parameters>
-<parameter name="set">
-<parameter_description> an #AtkStateSet
+<parameter name="table">
+<parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
-<parameter name="types">
-<parameter_description> an array of #AtkStateType
-</parameter_description>
-</parameter>
-<parameter name="n_types">
-<parameter_description> The number of elements in the array
+<parameter name="column">
+<parameter_description> a #gint representing a column in the table
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if all the states for @type are in @set.
+<return> a AtkObject* representing the specified column header, or
+%NULL if value does not implement this interface.
 </return>
 </function>
 
@@ -2086,19 +2083,29 @@ by this function will be NULL.
 </return>
 </function>
 
-<function name="atk_state_type_for_name">
+<function name="atk_table_get_row_extent_at">
 <description>
-Gets the #AtkStateType corresponding to the description string @name.
+Gets the number of rows occupied by the accessible object
+at a specified @row and @column in the @table.
 
 
 </description>
 <parameters>
-<parameter name="name">
-<parameter_description> a character string state name
+<parameter name="table">
+<parameter_description> a GObject instance that implements AtkTableIface
+</parameter_description>
+</parameter>
+<parameter name="row">
+<parameter_description> a #gint representing a row in @table
+</parameter_description>
+</parameter>
+<parameter name="column">
+<parameter_description> a #gint representing a column in @table
 </parameter_description>
 </parameter>
 </parameters>
-<return> an #AtkStateType corresponding to @name 
+<return> a gint representing the row extent at specified position, or 0
+if value does not implement this interface.
 </return>
 </function>
 
@@ -2196,9 +2203,11 @@ or #ATK_RELATION_NULL if no matching relation type is found.
 </return>
 </function>
 
-<function name="atk_table_set_caption">
+<function name="atk_table_get_selected_columns">
 <description>
-Sets the caption for the table.
+Gets the selected columns of the table by initializing **selected with 
+the selected column numbers. This array should be freed by the caller.
+
 
 </description>
 <parameters>
@@ -2206,32 +2215,34 @@ Sets the caption for the table.
 <parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
-<parameter name="caption">
-<parameter_description> a #AtkObject representing the caption to set for @table
+<parameter name="selected">
+<parameter_description> a #gint** that is to contain the selected columns numbers
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a gint representing the number of selected columns,
+or %0 if value does not implement this interface.
+</return>
 </function>
 
-<function name="atk_table_get_row_header">
+<function name="atk_object_get_mdi_zorder">
 <description>
-Gets the row header of a specified row in an accessible table.
+Gets the zorder of the accessible. The value G_MININT will be returned 
+if the layer of the accessible is not ATK_LAYER_MDI.
 
 
 </description>
 <parameters>
-<parameter name="table">
-<parameter_description> a GObject instance that implements AtkTableIface
-</parameter_description>
-</parameter>
-<parameter name="row">
-<parameter_description> a #gint representing a row in the table
+<parameter name="accessible">
+<parameter_description> an #AtkObject
 </parameter_description>
 </parameter>
 </parameters>
-<return> a AtkObject* representing the specified row header, or
-%NULL if value does not implement this interface.
+<return> a gint which is the zorder of the accessible, i.e. the depth at 
+which the component is shown in relation to other components in the same 
+container.
+
+@Deprecated: Use atk_component_get_mdi_zorder instead.
 </return>
 </function>
 
@@ -2284,38 +2295,46 @@ type.
 </return>
 </function>
 
-<function name="atk_component_add_focus_handler">
+<function name="atk_relation_set_contains">
 <description>
-Add the specified handler to the set of functions to be called 
-when this object receives focus events (in or out). If the handler is
-already added it is not added again
+Determines whether the relation set contains a relation that matches the
+specified type.
 
 
 </description>
 <parameters>
-<parameter name="component">
-<parameter_description> The #AtkComponent to attach the @handler to
+<parameter name="set">
+<parameter_description> an #AtkRelationSet
 </parameter_description>
 </parameter>
-<parameter name="handler">
-<parameter_description> The #AtkFocusHandler to be attached to @component
+<parameter name="relationship">
+<parameter_description> an #AtkRelationType
 </parameter_description>
 </parameter>
 </parameters>
-<return> a handler id which can be used in atk_component_remove_focus_handler
-or zero if the handler was already added.
+<return> %TRUE if @relationship is the relationship type of a relation
+in @set, %FALSE otherwise
 </return>
 </function>
 
-<function name="atk_relation_set_new">
+<function name="atk_action_get_name">
 <description>
-Creates a new empty relation set.
+Returns the name of the specified action of the object.
 
 
 </description>
 <parameters>
+<parameter name="action">
+<parameter_description> a #GObject instance that implements AtkActionIface
+</parameter_description>
+</parameter>
+<parameter name="i">
+<parameter_description> the action index corresponding to the action to be performed 
+</parameter_description>
+</parameter>
 </parameters>
-<return> a new #AtkRelationSet 
+<return>a name string, or %NULL
+if @action does not implement this interface.
 </return>
 </function>
 
@@ -2331,11 +2350,9 @@ Creates a new empty state set.
 </return>
 </function>
 
-<function name="atk_table_get_selected_columns">
+<function name="atk_table_set_caption">
 <description>
-Gets the selected columns of the table by initializing **selected with 
-the selected column numbers. This array should be freed by the caller.
-
+Sets the caption for the table.
 
 </description>
 <parameters>
@@ -2343,13 +2360,27 @@ the selected column numbers. This array should be freed by the caller.
 <parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
-<parameter name="selected">
-<parameter_description> a #gint** that is to contain the selected columns numbers
+<parameter name="caption">
+<parameter_description> a #AtkObject representing the caption to set for @table
 </parameter_description>
 </parameter>
 </parameters>
-<return> a gint representing the number of selected columns,
-or %0 if value does not implement this interface.
+<return></return>
+</function>
+
+<function name="atk_text_attribute_register">
+<description>
+Associate @name with a new #AtkTextAttribute
+
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> a name string
+</parameter_description>
+</parameter>
+</parameters>
+<return> an #AtkTextAttribute associated with @name
 </return>
 </function>
 
@@ -2488,19 +2519,32 @@ to set for the specified @column of the @table
 <return></return>
 </function>
 
-<function name="atk_hyperlink_is_selected_link">
+<function name="atk_component_set_position">
 <description>
-Determines whether this AtkHyperlink is selected
+Sets the postition of @component.
 
 
 </description>
 <parameters>
-<parameter name="link_">
-<parameter_description> an #AtkHyperlink
+<parameter name="component">
+<parameter_description> an #AtkComponent
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> x coordinate
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> y coordinate
+</parameter_description>
+</parameter>
+<parameter name="coord_type">
+<parameter_description> specifies whether the coordinates are relative to the screen
+or to the components top level window
 </parameter_description>
 </parameter>
 </parameters>
-<return> True is the AtkHyperlink is selected, False otherwise
+<return> %TRUE or %FALSE whether or not the position was set or not
 </return>
 </function>
 
@@ -2565,6 +2609,24 @@ is another reference to it.
 <return></return>
 </function>
 
+<function name="atk_object_set_role">
+<description>
+Sets the role of the accessible.
+
+</description>
+<parameters>
+<parameter name="accessible">
+<parameter_description> an #AtkObject
+</parameter_description>
+</parameter>
+<parameter name="role">
+<parameter_description> an #AtkRole to be set as the role
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="atk_role_register">
 <description>
 Registers the role specified by @name.
@@ -2597,11 +2659,11 @@ a particular text offset.
 </parameter_description>
 </parameter>
 <parameter name="x">
-<parameter_description> Pointer for the x cordinate of the bounding box.
+<parameter_description> Pointer for the x cordinate of the bounding box
 </parameter_description>
 </parameter>
 <parameter name="y">
-<parameter_description> Pointer for the y cordinate of the bounding box.
+<parameter_description> Pointer for the y cordinate of the bounding box
 </parameter_description>
 </parameter>
 <parameter name="width">
@@ -2609,7 +2671,7 @@ a particular text offset.
 </parameter_description>
 </parameter>
 <parameter name="height">
-<parameter_description> Pointer for the height of the bounding box.
+<parameter_description> Pointer for the height of the bounding box
 </parameter_description>
 </parameter>
 <parameter name="coords">
@@ -2644,28 +2706,25 @@ Gets the specified text.
 </return>
 </function>
 
-<function name="atk_image_get_image_size">
+<function name="atk_table_get_row_header">
 <description>
-Get the width and height in pixels for the specified image.
-The values of @width and @height are returned as -1 if the
-values cannot be obtained.
+Gets the row header of a specified row in an accessible table.
+
 
 </description>
 <parameters>
-<parameter name="image">
-<parameter_description> a #GObject instance that implements AtkImageIface
+<parameter name="table">
+<parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
-<parameter name="width">
-<parameter_description> filled with the image width
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> filled with the image height
+<parameter name="row">
+<parameter_description> a #gint representing a row in the table
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a AtkObject* representing the specified row header, or
+%NULL if value does not implement this interface.
+</return>
 </function>
 
 <function name="atk_state_set_contains_state">
@@ -2688,47 +2747,41 @@ Checks whether the state for the specified type is in the specified set.
 </return>
 </function>
 
-<function name="atk_state_set_add_state">
+<function name="atk_hyperlink_get_end_index">
 <description>
-Add a new state for the specified type to the current state set if
-it is not already present.
+Gets the index with the hypertext document at which this link ends.
 
 
 </description>
 <parameters>
-<parameter name="set">
-<parameter_description> an #AtkStateSet
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> an #AtkStateType
+<parameter name="link_">
+<parameter_description> an #AtkHyperlink
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if  the state for @type is not already in @set.
+<return> the index with the hypertext document at which this link ends
 </return>
 </function>
 
-<function name="atk_object_notify_state_change">
+<function name="atk_action_get_localized_name">
 <description>
-Emits a state-change signal for the specified state. 
+Returns the localized name of the specified action of the object.
+
 
 </description>
 <parameters>
-<parameter name="accessible">
-<parameter_description> an #AtkObject
+<parameter name="action">
+<parameter_description> a #GObject instance that implements AtkActionIface
 </parameter_description>
 </parameter>
-<parameter name="state">
-<parameter_description> an #AtkState whose state is changed
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> a gboolean which indicates whether the state is being set on or off
+<parameter name="i">
+<parameter_description> the action index corresponding to the action to be performed 
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>a name string, or %NULL
+if @action does not implement this interface.
+</return>
 </function>
 
 <function name="atk_registry_set_factory_type">
@@ -2892,11 +2945,12 @@ line end before the offset.
 </parameter_description>
 </parameter>
 <parameter name="start_offset">
-<parameter_description> the start offset of the returned string.
+<parameter_description> the start offset of the returned string
 </parameter_description>
 </parameter>
 <parameter name="end_offset">
-<parameter_description> the end offset of the returned string.
+<parameter_description> the offset of the first character after the 
+returned substring
 </parameter_description>
 </parameter>
 </parameters>
@@ -3079,6 +3133,29 @@ appropriate for @type.
 </parameters>
 <return> an #AtkObjectFactory appropriate for creating #AtkObjects
 appropriate for @type.
+</return>
+</function>
+
+<function name="atk_state_set_xor_sets">
+<description>
+Constructs the exclusive-or of the two sets, returning %NULL is empty.
+The set returned by this operation contains the states in exactly
+one of the two sets.
+
+
+</description>
+<parameters>
+<parameter name="set">
+<parameter_description> an #AtkStateSet
+</parameter_description>
+</parameter>
+<parameter name="compare_set">
+<parameter_description> another #AtkStateSet
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #AtkStateSet which contains the states which are 
+in exactly one of the two sets.
 </return>
 </function>
 
@@ -3331,33 +3408,18 @@ Sets the value of this object.
 </return>
 </function>
 
-<function name="atk_component_set_position">
+<function name="atk_remove_global_event_listener">
 <description>
-Sets the postition of @component.
-
+Removes the specified event listener
 
 </description>
 <parameters>
-<parameter name="component">
-<parameter_description> an #AtkComponent
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> x coordinate
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> y coordinate
-</parameter_description>
-</parameter>
-<parameter name="coord_type">
-<parameter_description> specifies whether the coordinates are relative to the screen
-or to the components top level window
+<parameter name="listener_id">
+<parameter_description> the id of the event listener to remove
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE or %FALSE whether or not the position was set or not
-</return>
+<return></return>
 </function>
 
 <function name="atk_add_global_event_listener">
@@ -3439,22 +3501,21 @@ Removes a property change handler.
 <return></return>
 </function>
 
-<function name="atk_object_set_name">
+<function name="atk_table_get_summary">
 <description>
-Sets the accessible name of the accessible.
+Gets the summary description of the table.
+
 
 </description>
 <parameters>
-<parameter name="accessible">
-<parameter_description> an #AtkObject
-</parameter_description>
-</parameter>
-<parameter name="name">
-<parameter_description> a character string to be set as the accessible name
+<parameter name="table">
+<parameter_description> a GObject instance that implements AtkTableIface
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a AtkObject* representing a summary description of the table,
+or zero if value does not implement this interface.
+</return>
 </function>
 
 <function name="atk_editable_text_set_text_contents">
@@ -3581,16 +3642,41 @@ is from the line end at or after the offset to the next line start.
 </parameter_description>
 </parameter>
 <parameter name="start_offset">
-<parameter_description> the start offset of the returned string.
+<parameter_description> the start offset of the returned string
 </parameter_description>
 </parameter>
 <parameter name="end_offset">
-<parameter_description> the end offset of the returned string.
+<parameter_description> the offset of the first character after the 
+returned substring
 </parameter_description>
 </parameter>
 </parameters>
 <return> the text after @offset bounded by the specified @boundary_type.
 </return>
+</function>
+
+<function name="atk_image_get_image_size">
+<description>
+Get the width and height in pixels for the specified image.
+The values of @width and @height are returned as -1 if the
+values cannot be obtained.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GObject instance that implements AtkImageIface
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> filled with the image width
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> filled with the image height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="atk_relation_set_add">
@@ -3695,23 +3781,19 @@ Add the states for the specified types to the current state set.
 <return></return>
 </function>
 
-<function name="atk_object_get_mdi_zorder">
+<function name="atk_state_type_for_name">
 <description>
-Gets the zorder of the accessible. The value G_MININT will be returned 
-if the layer of the accessible is not ATK_LAYER_MDI.
-DEPRECATED: use atk_component_get_mdi_zorder instead!
+Gets the #AtkStateType corresponding to the description string @name.
 
 
 </description>
 <parameters>
-<parameter name="accessible">
-<parameter_description> an #AtkObject
+<parameter name="name">
+<parameter_description> a character string state name
 </parameter_description>
 </parameter>
 </parameters>
-<return> a gint which is the zorder of the accessible, i.e. the depth at 
-which the component is shown in relation to other components in the same 
-container.
+<return> an #AtkStateType corresponding to @name 
 </return>
 </function>
 
@@ -3761,38 +3843,6 @@ Adds a relationship of the specified type with the specified target.
 </return>
 </function>
 
-<function name="atk_text_get_range_extents">
-<description>
-Get the bounding box for text within the specified range.
-
-</description>
-<parameters>
-<parameter name="text">
-<parameter_description> an #AtkText
-</parameter_description>
-</parameter>
-<parameter name="start_offset">
-<parameter_description> The offset of the first text character for which boundary 
-information is required.
-</parameter_description>
-</parameter>
-<parameter name="end_offset">
-<parameter_description> The offset of the text character after the last character 
-for which boundary information is required.
-</parameter_description>
-</parameter>
-<parameter name="coord_type">
-<parameter_description> Specify whether coordinates are relative to the screen or widget window.
-</parameter_description>
-</parameter>
-<parameter name="rect">
-<parameter_description> A pointer to a AtkTextRectangle which is filled in by this function.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="atk_table_set_column_header">
 <description>
 Sets the specified column header to @header.
@@ -3836,19 +3886,24 @@ from @component
 <return></return>
 </function>
 
-<function name="atk_hyperlink_get_end_index">
+<function name="atk_state_set_add_state">
 <description>
-Gets the index with the hypertext document at which this link ends.
+Add a new state for the specified type to the current state set if
+it is not already present.
 
 
 </description>
 <parameters>
-<parameter name="link_">
-<parameter_description> an #AtkHyperlink
+<parameter name="set">
+<parameter_description> an #AtkStateSet
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> an #AtkStateType
 </parameter_description>
 </parameter>
 </parameters>
-<return> the index with the hypertext document at which this link ends
+<return> %TRUE if  the state for @type is not already in @set.
 </return>
 </function>
 
@@ -3870,11 +3925,10 @@ Gets the value of this object.
 <return></return>
 </function>
 
-<function name="atk_state_set_xor_sets">
+<function name="atk_state_set_contains_states">
 <description>
-Constructs the exclusive-or of the two sets, returning %NULL is empty.
-The set returned by this operation contains the states in exactly
-one of the two sets.
+Checks whether the states for all the specified types are in the 
+specified set.
 
 
 </description>
@@ -3883,13 +3937,16 @@ one of the two sets.
 <parameter_description> an #AtkStateSet
 </parameter_description>
 </parameter>
-<parameter name="compare_set">
-<parameter_description> another #AtkStateSet
+<parameter name="types">
+<parameter_description> an array of #AtkStateType
+</parameter_description>
+</parameter>
+<parameter name="n_types">
+<parameter_description> The number of elements in the array
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #AtkStateSet which contains the states which are 
-in exactly one of the two sets.
+<return> %TRUE if all the states for @type are in @set.
 </return>
 </function>
 
