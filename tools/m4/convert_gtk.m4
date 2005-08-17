@@ -104,6 +104,7 @@ _CONV_ENUM(Gtk,FileChooserAction)
 _CONV_ENUM(Gtk,FileFilterFlags)
 _CONV_ENUM(Gtk,IconLookupFlags)
 _CONV_ENUM(Gtk,IconThemeError)
+_CONV_ENUM(Gtk,FileChooserConfirmation)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
