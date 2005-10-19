@@ -25,6 +25,7 @@ int main(int argc, char** argv)
    Gtk::Main kit(argc, argv);
 
    Gtk::Window win;
+   win.set_title("DrawingArea");
 
    MyArea area;
    win.add(area);
