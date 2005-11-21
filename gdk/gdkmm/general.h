@@ -20,6 +20,9 @@
 #ifndef _GDKMM_GENERAL_H
 #define _GDKMM_GENERAL_H
 
+#include <gdkmm/pixbuf.h>
+//#include <cairo.h>
+
 namespace Gdk
 {
 
@@ -30,6 +33,20 @@ int screen_width_mm();
 int screen_height_mm();
 
 void flush();
+
+namespace Cairo
+{
+
+typedef cairo_t* Context; //TODO: Replace this with a real wrapper, from a dependency.
+
+void set_source_color(Context& context, const Gdk::Color& color);
+void set_source_pixbuf(Context& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
+
+//TODO: Rename to add_rectangle_to_path?
+void rectangle(Context& context, const Gdk::Rectangle& rectangle);
+void region(Context& context, const Gdk::Region& region);
+
+} //namespace Cairo
 
 } //namespace Gdk
 

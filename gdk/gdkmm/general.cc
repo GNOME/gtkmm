@@ -50,5 +50,30 @@ void flush()
   gdk_flush();
 }
 
+namespace Cairo
+{
+
+void set_source_color(Context& context, const Gdk::Color& color)
+{
+  gdk_cairo_set_source_color(context, const_cast<GdkColor*>(color.gobj()));
+}
+
+void set_source_pixbuf(Context& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y)
+{
+  gdk_cairo_set_source_pixbuf(context, pixbuf->gobj(), pixbuf_x, pixbuf_y);
+}
+
+void rectangle(Context& context, const Gdk::Rectangle& rectangle)
+{
+  gdk_cairo_rectangle(context, const_cast<GdkRectangle*>(rectangle.gobj()));
+}
+
+void region(Context& context, const Gdk::Region& region)
+{
+  gdk_cairo_region(context, const_cast<GdkRegion*>(region.gobj()));
+}
+
+} //namespace Cairo
+
 } //namespace Gdk
 
