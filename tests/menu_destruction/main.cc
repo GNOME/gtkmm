@@ -1,9 +1,9 @@
 #include <gtkmm.h>
 #include <iostream>
 
-void on_destroyed_optionmenuderived(GtkWidget*, gpointer)
+void on_destroyed_ComboBoxderived(GtkWidget*, gpointer)
 {
-  std::cout << "on_destroyed_optionmenuderived" << std::endl;
+  std::cout << "on_destroyed_ComboBoxderived" << std::endl;
 }
 
 void on_destroyed_menuderived(GtkWidget*, gpointer)
@@ -11,19 +11,22 @@ void on_destroyed_menuderived(GtkWidget*, gpointer)
   std::cout << "on_destroyed_menuderived" << std::endl;
 }
 
-class OptionMenuDerived : public Gtk::OptionMenu
+//Previously, this derived from a Gtk::ComboBox, 
+//and that might have been necessary to trigger the bug at the time,
+//but ComboBox is now deprecated.
+class ComboBoxTextDerived : public Gtk::ComboBoxText
 {
 public:
-  OptionMenuDerived()
+  ComboBoxTextDerived()
   {
-  g_signal_connect (gobj(), "destroy",
-				G_CALLBACK (on_destroyed_optionmenuderived), NULL);
+    g_signal_connect (gobj(), "destroy",
+				G_CALLBACK (on_destroyed_ComboBoxderived), NULL);
   }
   
-  ~OptionMenuDerived()
+  ~ComboBoxTextDerived()
   {
-    remove_menu();
-    std::cout << "~OptionMenuDerived()" << std::endl;
+    //remove_menu();
+    std::cout << "~ComboBoxTextDerived()" << std::endl;
   }
 };
 
@@ -59,15 +62,15 @@ protected:
 
   //Gtk::MenuItem m_MenuItem;
   MenuDerived m_Menu;
-  OptionMenuDerived m_OptionMenu;
+  ComboBoxTextDerived m_ComboBox;
 };
 
 test_window::test_window()
 //: m_MenuItem("One")
 {
   //  m_Menu.append(m_MenuItem);
-  m_OptionMenu.set_menu(m_Menu);
-  add(m_OptionMenu);
+  //m_ComboBox.set_menu(m_Menu);
+  add(m_ComboBox);
   //show_all();
 }
 

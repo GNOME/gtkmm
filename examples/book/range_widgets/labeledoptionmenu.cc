@@ -25,6 +25,8 @@ LabeledOptionMenu::LabeledOptionMenu(const Glib::ustring& menu_title, Gtk::Menu&
 {
   pack_start(m_label, Gtk::PACK_SHRINK);
 
+  #ifndef GTKMM_DISABLE_DEPRECATED
   m_OptionMenu.set_menu(*m_pMenu);
   pack_start(m_OptionMenu);
+  #endif //GTKMM_DISABLE_DEPRECATED
 }
