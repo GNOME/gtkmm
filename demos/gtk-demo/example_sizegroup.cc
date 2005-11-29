@@ -28,7 +28,7 @@ protected:
 
   typedef std::list<Glib::ustring> type_listStrings;
   virtual void add_row(Gtk::Table& table, int row, const Glib::RefPtr<Gtk::SizeGroup>& size_group, const Glib::ustring& label_text, const std::list<Glib::ustring>& options);
-  virtual Gtk::OptionMenu* create_option_menu(const std::list<Glib::ustring>& strings);
+  virtual Gtk::ComboBoxText* create_combobox(const std::list<Glib::ustring>& strings);
 
   virtual void on_response(int response_id);
 
@@ -138,29 +138,25 @@ void Example_SizeGroup::add_row(Gtk::Table& table, int row,
 
   table.attach(*pLabel, 0, 1, row, row + 1, Gtk::EXPAND|Gtk::FILL, Gtk::AttachOptions(0));
 
-  Gtk::OptionMenu* pOptionMenu = create_option_menu(options);
-  pLabel->set_mnemonic_widget(*pOptionMenu);
-  size_group->add_widget(*pOptionMenu);
+  Gtk::ComboBoxText* pComboBoxText = create_combobox(options);
+  pLabel->set_mnemonic_widget(*pComboBoxText);
+  size_group->add_widget(*pComboBoxText);
 
-  table.attach(*pOptionMenu, 1, 2, row, row + 1, Gtk::AttachOptions(0), Gtk::AttachOptions(0));
+  table.attach(*pComboBoxText, 1, 2, row, row + 1, Gtk::AttachOptions(0), Gtk::AttachOptions(0));
 }
 
 /* Convenience function to create an option menu holding a number of strings
  */
-Gtk::OptionMenu* Example_SizeGroup::create_option_menu(const std::list<Glib::ustring>& strings)
+Gtk::ComboBoxText* Example_SizeGroup::create_combobox(const std::list<Glib::ustring>& strings)
 {
-  Gtk::Menu* pMenu = Gtk::manage( new Gtk::Menu() );
+  Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
 
   for(type_listStrings::const_iterator iter = strings.begin(); iter != strings.end(); iter++)
   {
-    pMenu->items().push_back(Gtk::Menu_Helpers::MenuElem(*iter));
-    //pMenu->items().back().show();
+    pCombo->append_text(*iter);
   }
 
-  Gtk::OptionMenu* pOptionMenu = Gtk::manage( new Gtk::OptionMenu() );
-  pOptionMenu->set_menu(*pMenu);
-
-  return pOptionMenu;
+  return pCombo;
 }
 
 void Example_SizeGroup::on_response(int)

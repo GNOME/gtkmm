@@ -47,7 +47,8 @@ void MyContainer::on_size_request(Gtk::Requisition* requisition)
   //Discover the total amount of minimum space needed by this container widget, by examining its child widgets.
   //The layouts in this custom container will be arranged vertically, one above the other.  
   
-   Gtk::Requisition child_requisition_one, child_requisition_two;
+   Gtk::Requisition child_requisition_one = {0, 0};
+   Gtk::Requisition child_requisition_two = {0, 0};
    if(m_child_one && m_child_one->is_visible())
      child_requisition_one = m_child_one->size_request();
 

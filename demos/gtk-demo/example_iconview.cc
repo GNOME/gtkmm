@@ -97,7 +97,7 @@ Example_IconView::Example_IconView()
   //Create the data model:
   m_model = Gtk::ListStore::create(m_columns);
   m_model->set_default_sort_func( sigc::mem_fun(*this, &Example_IconView::on_model_sort) );
-  m_model->set_sort_column_id(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
+  m_model->set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
   
   /* and fill it with the contents of '/' */
   m_parent = "/";

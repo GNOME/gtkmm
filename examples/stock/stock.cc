@@ -3,7 +3,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/box.h>
 #include <gtkmm/window.h>
-#include <gtkmm/optionmenu.h>
+#include <gtkmm/menubar.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/toolbutton.h>
@@ -45,20 +45,20 @@ MainWindowClass::MainWindowClass()
 {
     using namespace Gtk::Menu_Helpers;
 
-    set_size_request(350,100);
+    set_size_request(350, -1);
   
     Gtk::VBox* vbox = Gtk::manage(new Gtk::VBox(false, 0));
     add(*vbox);
 
+    Gtk::MenuBar* menubar = Gtk::manage(new Gtk::MenuBar());
+    vbox->pack_start(*menubar, Gtk::PACK_SHRINK);
+    
     Gtk::Toolbar* toolbar = Gtk::manage(new Gtk::Toolbar());
     vbox->pack_start(*toolbar, Gtk::PACK_SHRINK);
 
-    Gtk::OptionMenu* optionmenu = Gtk::manage(new Gtk::OptionMenu());
-    vbox->pack_start(*optionmenu, Gtk::PACK_SHRINK);
-
     Gtk::Button* button = Gtk::manage(new Gtk::Button("Quit"));
     button->signal_clicked().connect(sigc::mem_fun(*this, &MainWindowClass::quit_pressed_cb));
-    vbox->pack_start(*button);
+    vbox->pack_start(*button, Gtk::PACK_SHRINK);
 
 
     Gtk::ToolButton* toolbutton = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::NEW));
@@ -94,8 +94,12 @@ MainWindowClass::MainWindowClass()
     togglebutton->set_label("Convert Toggle");
     toolbar->append(*togglebutton, sigc::bind( sigc::mem_fun(*this, &MainWindowClass::toolbar_cb), "Convert Toggle"));
 
+
+    menubar->items().push_back(MenuElem("Options"));
+    Gtk::MenuItem* pMenuItem = &(menubar->items().back());
+
     Gtk::Menu* menu = Gtk::manage(new Gtk::Menu());
-    optionmenu->set_menu(*menu);
+    pMenuItem->set_submenu(*menu);
 
     menu->items()
         .push_back(MenuElem("Icons", sigc::bind(sigc::mem_fun(*this, &MainWindowClass::toolbar_item_cb), toolbar, Gtk::TOOLBAR_ICONS)));
@@ -107,7 +111,6 @@ MainWindowClass::MainWindowClass()
         .push_back(MenuElem("Both (horiz)", sigc::bind(sigc::mem_fun(*this, &MainWindowClass::toolbar_item_cb), toolbar,  Gtk::TOOLBAR_BOTH_HORIZ)));
     
     menu->items()[0].activate();
-    optionmenu->set_history(0);
 
     show_all_children();
 }

@@ -44,7 +44,6 @@ protected:
   Gtk::Frame m_Frame_Horizontal, m_Frame_Vertical;
   Gtk::VBox m_VBox1, m_VBox_Sub1, m_VBox_Sub2;
   Gtk::MenuBar m_MenuBar;
-  Gtk::OptionMenu m_OptionMenu;
   Gtk::HSeparator m_Separator;
   Gtk::Button m_Button;
 };
@@ -103,11 +102,6 @@ Example_Menus::Example_Menus()
     items.push_back( CheckMenuElem("Accelerator Frozen") );
     items.back().add_accelerator("activate", get_accel_group(), GDK_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     items.back().add_accelerator("activate", get_accel_group(), GDK_F3, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
-
-    m_OptionMenu.set_menu(*pMenu);
-    m_OptionMenu.set_history(3);
-
-    m_VBox_Sub1.pack_start(m_OptionMenu);
   }
 
   m_VBox1.pack_start(m_Separator, Gtk::PACK_SHRINK);

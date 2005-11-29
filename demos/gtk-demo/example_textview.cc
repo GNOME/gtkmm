@@ -389,17 +389,12 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 1)
     {
-      using namespace Gtk::Menu_Helpers;
+      Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
+      pCombo->append_text("Option 1");
+      pCombo->append_text("Option 2");
+      pCombo->append_text("Option 3");
 
-      Gtk::Menu* pMenu = Gtk::manage( new Gtk::Menu() );
-      MenuList items = pMenu->items();
-      items.push_back(MenuElem("Option 1"));
-      items.push_back(MenuElem("Option 2"));
-      items.push_back(MenuElem("Option 3"));
-
-      Gtk::OptionMenu* pOptionMenu = Gtk::manage( new Gtk::OptionMenu() );
-      pOptionMenu->set_menu(*pMenu);
-      pWidget = pOptionMenu;
+      pWidget = pCombo;
     }
     else if (i == 2)
     {

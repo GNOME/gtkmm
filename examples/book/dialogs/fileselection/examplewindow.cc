@@ -43,6 +43,7 @@ ExampleWindow::~ExampleWindow()
 
 void ExampleWindow::on_button_folder_clicked()
 {
+#ifndef GTKMM_DISABLE_DEPRECATED
   Gtk::FileSelection dialog("Please choose a folder");
   dialog.set_transient_for(*this);
   dialog.get_file_list()->get_parent()->hide(); //Prevent the user from selecting a file.
@@ -69,10 +70,12 @@ void ExampleWindow::on_button_folder_clicked()
       break;
     }
   }
+#endif //GTKMM_DISABLE_DEPRECATED
 }
 
 void ExampleWindow::on_button_file_clicked()
 {
+#ifndef GTKMM_DISABLE_DEPRECATED
   Gtk::FileSelection dialog("Please choose a file");
   dialog.set_transient_for(*this);
   
@@ -100,5 +103,5 @@ void ExampleWindow::on_button_file_clicked()
       break;
     }
   }
-  
+#endif //GTKMM_DISABLE_DEPRECATED
 }
