@@ -1,4 +1,5 @@
 #include <gtkmm/main.h>
+#include "gtkmmconfig.h" //For HAVE_MKFIFO
 #include <fcntl.h>
 #include <iostream>
 
@@ -48,10 +49,14 @@ int main(int argc, char *argv[])
 
   if (access("testfifo", F_OK) == -1) {
     // fifo doesn't exit - create it
+    #ifdef HAVE_MKFIFO
     if (mkfifo("testfifo", 0666) != 0) {
       std::cerr << "error creating fifo" << std::endl;
       return -1;
     }
+    #else
+      std::cerr << "error creating fifo: This platform does not have mkfifo()" << std::endl;
+    #endif //HAVE_MKFIFO
   }
  
   read_fd = open("testfifo", O_RDONLY);
