@@ -26,6 +26,7 @@
 #include <string>
 
 #include <gdkmm/types.h>
+#include <gtkmm/accelkey.h>
 
 namespace Gtk
 {

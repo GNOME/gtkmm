@@ -66,7 +66,7 @@ void unlock_path(const std::string& accel_path)
 
 bool lookup_entry(const Glib::ustring& accel_path, Gtk::AccelKey& key)
 {
-  GtkAccelKey gkey = {GtkAccelKey, Gdk::ModifierType (0)};
+  GtkAccelKey gkey = {GDK_VoidSymbol, GdkModifierType (0)};
   const bool known = gtk_accel_map_lookup_entry(accel_path.c_str(), &gkey);
 	
   if(known)
