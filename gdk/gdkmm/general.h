@@ -37,7 +37,22 @@ void flush();
 namespace Cairo
 {
 
+/** Sets the specified Gdk::Color as the source color of the Cairo context.
+ * @param @context The cairo context.
+ * @param color The color to use as the source color. 
+ *
+ * @newin2p10
+ */
 void set_source_color(::Cairo::Context& context, const Gdk::Color& color);
+
+/** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixbuf_x, pixbuf_y.
+ * @param @context The cairo context.
+ * @param pixbuf A Gdk::Pixbuf
+ * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
+ * @param pixbuf_y Y coordinate of location to place upper left corner of pixbuf.
+ *
+ * @newin2p10
+ */
 void set_source_pixbuf(::Cairo::Context& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
 
 //TODO: Rename to add_rectangle_to_path?
