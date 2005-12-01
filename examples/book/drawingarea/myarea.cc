@@ -42,18 +42,32 @@ void MyArea::on_realize()
 
   // Now we can allocate any additional resources we need
   Glib::RefPtr<Gdk::Window> window = get_window();
-  gc_ = Gdk::GC::create(window);
+  Glib::RefPtr<Gdk::GC> gc_ = Gdk::GC::create(window);
   window->set_background(red_);
   window->clear();
-  gc_->set_foreground(blue_);
+  gc_->set_foreground(blue_); //TODO: Do this with cairo too?
 }
 
 bool MyArea::on_expose_event(GdkEventExpose* /* event */)
 {
   // This is where we draw on the window
   Glib::RefPtr<Gdk::Window> window = get_window();
-  window->clear();
-  window->draw_line(gc_, 1, 1, 100, 100);
+  if(window)
+  {
+    window->clear();
+
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    Cairo::Context context = window->create_cairo_context();
+    context.move_to(0, 0);
+    context.set_source_rgb(0.2, 0.6, 0.8);
+    context.set_line_width(10);
+    context.line_to(width, height);
+    context.stroke();
+  }
+
   return true;
 }
 

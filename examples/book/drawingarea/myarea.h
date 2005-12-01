@@ -34,7 +34,6 @@ protected:
   virtual void on_realize();
   virtual bool on_expose_event(GdkEventExpose* e);
 
-  Glib::RefPtr<Gdk::GC> gc_;
   Gdk::Color blue_, red_;
 };
 
