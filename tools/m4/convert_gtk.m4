@@ -105,6 +105,7 @@ _CONV_ENUM(Gtk,FileFilterFlags)
 _CONV_ENUM(Gtk,IconLookupFlags)
 _CONV_ENUM(Gtk,IconThemeError)
 _CONV_ENUM(Gtk,FileChooserConfirmation)
+_CONV_ENUM(Gtk,SensitivityType)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -127,6 +128,8 @@ _CONVERSION(`guint8',`Gtk::StateType',`static_cast<StateType>($3)')
 _CONVERSION(`const StockID&',`const char*',`($3).get_c_str()')
 _CONVERSION(`const Gtk::StockID&',`const char*',`($3).get_c_str()')
 _CONVERSION(`char*',`StockID',`StockID($3)') # the StockID ctor handles 0
+_CONVERSION(`const char*',`StockID',`StockID($3)') # the StockID ctor handles 0
+
 
 #
 # Ptr (gtk+) -> Ptr (gtkmm)

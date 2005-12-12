@@ -46,6 +46,17 @@ CellRenderer* generate_cellrenderer<bool>(bool editable)
   return pCellRenderer;
 }
 
+template<>
+CellRenderer* generate_cellrenderer<AccelKey>(bool editable)
+{
+  CellRendererAccel* pCellRenderer = new CellRendererAccel();
+
+  //GTK+'s "editable" really means "editable":
+  pCellRenderer->property_editable() = editable;
+
+  return pCellRenderer;
+}
+
 } //CellRenderer_Generation
 
 
