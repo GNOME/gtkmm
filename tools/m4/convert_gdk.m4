@@ -126,10 +126,6 @@ _CONVERSION(`GdkRectangle*',`Gdk::Rectangle*',`&Glib::wrap($3)')
 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle*',`&Glib::wrap($3)')
 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
 
-
-dnl TODO: Should this always be a copy?
-_CONVERSION(const Cursor&,GdkCursor*,($3).gobj_copy())
-
 # Special treatment for the Sun Forte compiler
 #_CONVERSION(const Glib::RefPtr<const Gdk::Pixmap>&,GdkPixmap*,__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(const Glib::RefPtr<const Gdk::Window>&,GdkWindow*,__CONVERT_CONST_REFPTR_TO_P)
