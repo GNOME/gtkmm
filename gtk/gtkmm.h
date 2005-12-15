@@ -45,6 +45,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/checkmenuitem.h>
 #include <gtkmm/cellrenderer.h>
+#include <gtkmm/cellrendereraccel.h>
 #include <gtkmm/cellrenderercombo.h>
 #include <gtkmm/cellrendererpixbuf.h>
 #include <gtkmm/cellrendererprogress.h>
@@ -119,6 +120,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/statusbar.h>
+#include <gtkmm/statusicon.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/stockid.h>
 #include <gtkmm/stockitem.h>
