@@ -60,12 +60,12 @@ bool MyArea::on_expose_event(GdkEventExpose* /* event */)
     const int width = allocation.get_width();
     const int height = allocation.get_height();
 
-    Cairo::Context context = window->create_cairo_context();
-    context.move_to(0, 0);
-    context.set_source_rgb(0.2, 0.6, 0.8);
-    context.set_line_width(10);
-    context.line_to(width, height);
-    context.stroke();
+    Cairo::RefPtr<Cairo::Context> context = window->create_cairo_context();
+    context->move_to(0, 0);
+    context->set_source_rgb(0.2, 0.6, 0.8);
+    context->set_line_width(10);
+    context->line_to(width, height);
+    context->stroke();
   }
 
   return true;

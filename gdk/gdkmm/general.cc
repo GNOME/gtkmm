@@ -53,24 +53,24 @@ void flush()
 namespace Cairo
 {
 
-void set_source_color(::Cairo::Context& context, const Gdk::Color& color)
+void set_source_color(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color)
 {
-  gdk_cairo_set_source_color(context.cobj(), const_cast<GdkColor*>(color.gobj()));
+  gdk_cairo_set_source_color(context->cobj(), const_cast<GdkColor*>(color.gobj()));
 }
 
-void set_source_pixbuf(::Cairo::Context& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y)
+void set_source_pixbuf(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y)
 {
-  gdk_cairo_set_source_pixbuf(context.cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
+  gdk_cairo_set_source_pixbuf(context->cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
 }
 
-void rectangle(::Cairo::Context& context, const Gdk::Rectangle& rectangle)
+void rectangle(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle)
 {
-  gdk_cairo_rectangle(context.cobj(), const_cast<GdkRectangle*>(rectangle.gobj()));
+  gdk_cairo_rectangle(context->cobj(), const_cast<GdkRectangle*>(rectangle.gobj()));
 }
 
-void region(::Cairo::Context& context, const Gdk::Region& region)
+void region(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region)
 {
-  gdk_cairo_region(context.cobj(), const_cast<GdkRegion*>(region.gobj()));
+  gdk_cairo_region(context->cobj(), const_cast<GdkRegion*>(region.gobj()));
 }
 
 } //namespace Cairo
