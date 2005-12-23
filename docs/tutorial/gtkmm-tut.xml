@@ -11,7 +11,7 @@
 
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<bookinfo>d
+<bookinfo>
 
 <title>Programming with gtkmm</title>
 
@@ -24,6 +24,11 @@
 	<firstname>Bernhard</firstname>
 	<surname>Rieder</surname>
 	<contrib>Chapter on &quot;Timeouts&quot;.</contrib>
+      </author>
+      <author>
+	<firstname>Jonathon</firstname>
+	<surname>Jongsma</surname>
+	<contrib>Drawing with Cairo</contrib>
       </author>
       <author>
 	<firstname>Jason</firstname>
@@ -3659,24 +3664,33 @@ This dialog allows the user to choose a font.
 <chapter id="sec-drawingarea">
   <title>The Drawing Area Widget</title>
   <para>
-    The DrawingArea widget is a blank X window that gives you the freedom to create any graphic you desire. Along with that
-    freedom comes the responsibility to handle expose events on the widget. When a widget is first shown, or when it is covered and then
-    uncovered again it needs to redraw itself. Most widgets have code to do this, but the DrawingArea  does not, allowing you to write an expose event signal handler to determine how the contents of the widget will be drawn.
+    The DrawingArea widget is a blank X window that gives you the freedom to
+    create any graphic you desire. Along with that freedom comes the
+    responsibility to handle expose events on the widget. When a widget is
+    first shown, or when it is covered and then uncovered again it needs to
+    redraw itself. Most widgets have code to do this, but the DrawingArea  does
+    not, allowing you to write your own expose event signal handler to
+    determine how the contents of the widget will be drawn.  This is most often
+    done by overriding the virtual <function>on_expose_event()</function> member
+    function.  
   </para>
   <para>
-    There are a number of methods to help you draw various objects into the widget, such as pixels, lines, rectangles, elipses,
-    polygons, images, and text. We'll take each one in turn and give an example of its use.
+      Before gtkmm version 2.10, drawing was mostly done with Graphics Contexts
+      (<classname>Gdk::GC</classname>) and other GDK drawing functions, but this
+      has been largely superceded by the <ulink
+          url="http://cairographics.org">Cairo</ulink> graphics library and its
+      C++ binding <literal>Cairomm</literal>. But first let's take a brief look
+      at the basics of drawing with Gdk.
   </para>
-  <sect1>
-    <title>Graphics Contexts</title>
-    <para>
-      Before getting into the actual drawing routines, some background information about graphics contexts is
-      needed. Graphics contexts are a server-side resource. They contain information that describes how drawing is to be
-      done. This provides for fewer arguments to the drawing methods, and less communication between the client and the
-      server. The following example shows  how to set up a graphics context with a foreground color of red for drawing.
-    </para>
-    <programlisting>
-Gdk::GC some_gc;
+  <para>
+      Gdk graphics contexts (<classname>Gdk::GC</classname>) are a
+      server-side resource. They contain information that describes how
+      drawing is to be done. This provides for fewer arguments to the
+      drawing methods, and less communication between the client and the
+      server. The following example shows  how to set up a graphics context
+      with a foreground color of red for drawing.
+  </para>
+  <programlisting>Gdk::GC some_gc;
 some_gc.create(get_window());
 Gdk::Color some_color;
 Gdk::Colormap some_colormap(Gdk::Colormap::get_system());
@@ -3684,61 +3698,216 @@ some_color.set_red(65535);
 some_color.set_green(0);
 some_color.set_blue(0);
 some_colormap.alloc(some_color);
-some_gc.set_foreground(some_color);
-    </programlisting>
+some_gc.set_foreground(some_color);</programlisting>
+  <para>
+      The first two lines create the graphics context and assign it to the
+      appropriate widget. The <function>get_window() </function> method is
+      a part of the <classname>Gtk::Widget</classname> class, so if you put
+      this code into a derived widget's implementation then you can call it
+      just as it is, otherwise you'd use
+      <function>some_widget.get_window()</function>.
+  </para>
+  <para>
+      The next two lines create the <classname>Gdk::Color</classname> and
+      <classname>Gdk::Colormap</classname>. After setting the color values
+      you then need to allocate the color. The system figures out what to
+      do in this case. The colormap contains information about how colors
+      can be displayed on your screen, and is able to allocate the
+      requested color. For example, on a display of only 256 colors the
+      exact color requested may not be available, so the closest color to
+      the one requested will be used instead. The final line sets the color
+      as the foreground color.
+  </para>
+  <para>
+      There are a number of attributes that can be set for a graphics
+      context. There's the foreground and background color.  When drawing
+      lines, you can set the thickness of the line with
+      <function>set_line_width()</function>. Whether a solid or dashed line
+      is drawn can be set with <function>set_line_style()</function>. The
+      size and proportions of the dashes are set with
+      <function>set_dashes</function>. How two lines join together, whether
+      round or pointed or beveled off, is set with
+      <function>set_join_style()</function>.  Other things that can be set
+      within a graphics context include font style, stippling and tiling
+      for the filling of solid polygons.
+  </para>
+  <para>
+      Graphics contexts are central to drawing with Gdk, because nearly all Gdk
+      drawing functions and many Pango functions take a
+      <classname>Gdk::GC</classname> object as an argument.  So although Cairo
+      has largely superceded many Gdk drawing functions, you're still likely to
+      run into <classname>Gdk::GC</classname> objects quite often, so it's
+      important to know what they are and how they're used.
+  </para>
+  <para>
+      In general, the Cairo drawing API is simpler than the Gdk one, and it is
+      generally recommended to use the Cairo drawing methods wherever possible
+      in preference to the older Gdk drawing methods.  Having introduced the
+      basics of Gdk drawing, we'll leave the details to the API reference, and
+      move on to show you how to draw using Cairo.
+  </para>
+  <para>
+      You can draw very sophisticated shapes using Cairo, but the methods to do
+      so are quite basic.  Cairo provides methods for drawing straight lines,
+      curved lines, and arcs (including circles).  These basic shapes can be
+      combined to create more complex shapes and paths which can be filled with
+      solid colors, gradients, patterns, and other things.  In addition, Cairo
+      can perform complex transformations, do compositing of images, and render
+      antialiased text.
+  </para>
+  <note>
+      <title>Cairo and Pango</title>
+      Although Cairo can render text, it's not meant to be a replacement for
+      Pango.  Pango is a better choice if you need to perform more advanced
+      text rendering such as wrapping or ellipsizing text.  Drawing text with
+      Cairo should only be done if the text is part of a graphic.
+  </note>
+  <para>
+      In this section of the tutorial, we'll cover the basic Cairo drawing
+      model, describe each of the basic drawing elements in some detail (with
+      examples), and then present a simple application that uses Cairo to draw
+      a custom clock widget. 
+  </para>
+  <sect1 id="sec-cairo_drawing_model">
+    <title>The Cairo Drawing Model</title>
     <para>
-      The first two lines create the graphics context and assign it to the appropriate widget. The <function>get_window()
-      </function> method
-      is a part of the <classname>Gtk::Widget</classname> class, so if you put this code into a derived widget's implementation then
-      you can call it just
-      as it is, otherwise you'd use <function>some_widget.get_window()</function>.
+        The basic concept of drawing in Cairo involves defining 'invisible'
+        paths and then stroking or filling them to make them visible.  
     </para>
     <para>
-      The next two lines create the <classname>Gdk::Color</classname> and <classname>Gdk::Colormap</classname>. After setting
-      the color values you then need to allocate the color. The system figures out what to do in this case. The colormap
-      contains information about how colors can be displayed on your screen, and is able to allocate the requested color. For
-      example, on a display of only 256 colors the exact color requested may not be available, so the closest color to the one requested will be used instead. The final line sets the color as the foreground color.
+        To do any drawing in gtkmm with Cairo, you must first create a
+        <classname>Cairo::Context</classname> object.  This class is very
+        similar to the <classname>Gdk::GC</classname> class described briefly
+        above, since it holds all of the graphics state parameters that
+        describe how drawing is to be done.  This includes information such as
+        line width, color, the surface to draw to, and many other things.  This
+        allows the actual drawing functions to take fewer arguments to simplify
+        the interface.  In gtkmm, a <classname>Cairo::Context</classname> is
+        created by calling the
+        <function>Gdk::Window::create_cairo_context()</function> function.
+        Since Cairo context are reference-counted objects, this function
+        returns a <classname>Cairo::RefPtr&lt;Cairo::Context&gt;</classname>
+        object.
     </para>
     <para>
-      There are a number of attributes that can be set for a graphics context. There's the foreground and background color.
-      When drawing lines, you can set the thickness of the line with <function>set_line_width()</function>. Whether a solid
-      or dashed line is drawn can be set with <function>set_line_style()</function>. The size and proportions of the dashes are set with <function>set_dashes</function>. How two lines join together, whether round or pointed or
-      beveled off, is set with <function>set_join_style()</function>.
-      Other things that can be set within a graphics context include font style, stippling and tiling for the filling of
-      solid polygons.
+        The following example shows  how to set up a Cairo context with a
+        foreground color of red and a width of 2.  Any drawing functions that
+        use this context will use these settings.
     </para>
-  </sect1>
-  <sect1 id="sec-drawing_pixels">
-    <title>Drawing Pixels</title>
+    <programlisting>Gtk::DrawingArea myArea;
+Cairo::RefPtr&lt;Cairo::Context&gt; myContext = myArea.get_window()->create_cairo_context();
+myContext->set_source_rgb(1.0, 0.0, 0.0);
+myContext->set_line_width(2.0);</programlisting>
     <para>
-      You can draw individual pixels with the two methods <function>Gdk::Drawable::draw_point()</function> and <function>
-      Gdk::Drawable::draw_points()</function>. All drawing methods take a <classname>Gdk::GC</classname> as their first
-      argument, except where noted. The other two arguments to <function>draw_point()</function> are the x coordinate
-      (horizontal position relative to the left edge of the widget, starting at 0), and the y coordinate (vertical position
-      relative to the top of the widget, starting at 0). <function>draw_points()</function> takes two arguments, the
-      <classname>Gdk::GC</classname> and a collection of <classname>Gdk::Points</classname>. The second argument can be any kind
-      of standard container, such as a <classname>std::vector&lt;Gdk::Point&gt;</classname>. So for example
-      <function>draw_point()</function> could be used like this:
+        Each <classname>Cairo::Context</classname> is associated with a
+        particular <classname>Gdk::Window</classname>, so the first line of the
+        above example creates a <classname>Gtk::DrawingArea</classname> widget
+        and the second line uses its associated
+        <classname>Gdk::Window</classname> to create a
+        <classname>Cairo::Context</classname> object.  The final two lines
+        change the graphics state of the context.
     </para>
-    <programlisting>get_window()-&gt;draw_point(some_gc, 20, 20);</programlisting>
     <para>
-      But <function>draw_points()</function> is a bit more complicated and might be used like this:
+        There are a number of graphics state variables that can be set for a
+        Cairo context.  The most common context attributes are color (using
+        <function>set_source_rgb()</function> or
+        <function>set_source_rgba()</function> for translucent colors), line
+        width (using <function>set_line_width()</function>), line dash pattern
+        (using <function>set_dash()</function>), line cap style (using
+        <function>set_line_cap()</function>), and line join style (using
+        <function>set_line_join()</function>), and font styles (using
+        <function>set_font_size()</function>,
+        <function>set_font_face()</function> and others).
+        There are many other settings as well, such as transformation matrices,
+        fill rules, whether to perform antialiasing, and others.  For further
+        information, see the Cairomm API documentation.
     </para>
-    <programlisting>
-std::vector&lt;Gdk::Point&gt; points_array;
-points_array.push_back(Gdk::Point(10, 10));
-points_array.push_back(Gdk::Point(20, 20));
-draw_points(some_gc, points_array); //One way to draw the two points.
-
-    </programlisting>
+    <para>
+        The current state of a <classname>Cairo::Context</classname> can be
+        saved to an internal stack of saved states and later be restored to the
+        state it was in when you saved it.  To do this, use the
+        <function>save()</function>
+        method and the <function>restore()</function> method.  This can be
+        useful if you need to temporarily change the line width and color (or
+        any other graphics setting) in order to draw something and then return
+        to the previous settings.  In this situation, you could call
+        <function>Cairo::Context::save()</function>, change the graphics
+        settings, draw the lines, and then call
+        <function>Cairo::Context::restore()</function> to restore the original
+        graphics state.  Multiple calls to <function>save()</function> and
+        <function>restore()</function> can be nested; each call to
+        <function>restore()</function> restores the state from the
+        matching paired <function>save()</function>.
+        <tip>
+            It is good practice to put all modifications to the graphics state
+            between <function>save()</function>/<function>restore()</function>
+            function calls. For example, if you have a function that takes a
+            <classname>Cairo::Context</classname> reference as an argument, you
+            might implement it as follows:
+            <programlisting>void doSomething(Cairo::RefPtr&lt;Cairo::Context&gt; context, int x)
+{
+    context->save();
+    // change graphics state
+    // peform drawing operations
+    context->restore();
+}</programlisting>
+        </tip>
+    </para>
   </sect1>
   <sect1 id="sec-drawing_lines">
-    <title>Drawing Lines</title>
-    <sect2><title>Example</title>
+    <title>Drawing Straight Lines</title>
     <para>
-    Drawing lines is more interesting than just points, so here is a complete program:
+        Now that we understand the basics of the Cairo graphics library, we're
+        almost ready to start drawing.  We'll start with the simplest of
+        drawing elements: the straight line.  But first you need to know a
+        little bit about Cairo's coordinate system.  The origin of the Cairo
+        coordinate system is located in the upper-left corner of the window
+        with positive x values to the right and positive y values going down.
+        <tip>
+            Since the Cairo graphics library was written with support for
+            multiple output targets (the X window system, PNG images, OpenGL,
+            etc), there is a distinction between user-space and device-space
+            coordinates.  The mapping between these two coordinate systems
+            defaults to one-to-one so that integer values map roughly to pixels
+            on the screen, but this setting can be adjusted if desired.
+            Sometimes it may be useful to scale the coordinates so that the
+            full width and height of a window both range from 0 to 1 (the 'unit
+            square') or some other mapping that works for your application.
+            this can be done with the
+            <function>Cairo::Context::scale()</function> function.
+        </tip>
     </para>
 
+    <sect2><title>Example</title>
+    <para>
+        In this example, we'll construct a small but fully functional gtkmm
+        program and draw some lines into the window.  The lines are drawn by
+        creating a path and then stroking it.  A path is created using the
+        functions <function>Cairo::Context::move_to()</function> and
+        <function>Cairo::Context::line_to()</function>. The function
+        <function>move_to()</function> is similar to the act of lifting your
+        pen off of the paper and placing it somewhere else -- no line is drawn
+        between the point you were at and the point you moved to.  To draw a
+        line between two points, use the <function>line_to()</function>
+        function. 
+    </para>
+    <para>
+        After you've finished creating your path, you still haven't
+        drawn anything visible yet.  To make the path visible, you must use the
+        function <function>stroke()</function> which will stroke the current
+        path with the line width and style specified in your
+        <classname>Cairo::Context</classname> object.  After stroking, the
+        current path will be cleared so that you can start on your next path.
+    </para>
+        <tip>
+            Many Cairo drawing functions have a <function>_preserve()</function>
+            variant.  Normally drawing functions such as
+            <function>clip()</function>, <function>fill()</function>, or
+            <function>stroke()</function> will clear the current path.  If you
+            use the <function>_preserve()</function> variant, the current path
+            will be retained so that you can use the same path with the next
+            drawing function.
+        </tip>
 
     <figure id="figure-drawingarea-lines">
       <title>Drawing Area - Lines</title>
@@ -3750,105 +3919,392 @@ draw_points(some_gc, points_array); //One way to draw the two points.
     <para><ulink url="&url_examples_base;drawingarea">Source Code</ulink></para>
 
     <para>
-      This program contains two classes. The first is a subclass of <classname>Gtk::DrawingArea</classname> and contains an
-      <function>on_expose_event</function> member function. This method is called whenever the image in the drawing
-      area needs to be redrawn.
-      The four additional arguments to <function>draw_line()</function> (besides the graphics context as the first) are the
-      coordinates for the start and end of the line.
+        This program contains a single class, <classname>MyArea</classname>,
+        which is a subclass of <classname>Gtk::DrawingArea</classname> and
+        contains an <function>on_expose_event()</function> member function.
+        This method is called whenever the image in the drawing area needs to
+        be redrawn.  This function is passed a pointer to a
+        <classname>GdkEventExpose</classname> structure which defines the area
+        that needs to be redrawn.  We use these values to create a rectangle
+        path in Cairo (using the <function>rectangle()</function> function) and
+        then <function>clip()</function> to this path.  The
+        <function>clip()</function> function sets a clip region.  The current
+        clip region affects all drawing operations by effectively masking out
+        any changes to the surface that are outside the current clip region.
+        This allows us to limit our redrawing to only the area that needs to be
+        redrawn. 
+        The actual drawing code sets the color we want to use for drawing by
+        using <function>set_source_rgb()</function> which takes arguments
+        defining the Red, Green, and Blue components of the desired color
+        (valid values are between 0 and 1).  After setting the color, we
+        created a new path using the functions <function>move_to()</function>
+        and <function>line_to()</function>, and then stroked this path with
+        <function>stroke()</function>.
     </para>
-    <para>
-      The <classname>TestWindow</classname> class contains a drawing area. When it is created, it creates a drawing area
-      of 50 pixels across by 50 pixels tall. If the window is resized, the graphic drawn is kept in the top left corner of the
-      larger window. The drawing area is created with a default grey background.
-    </para>
+    <tip>
+        <title>Drawing with relative coordinates</title>In the example above
+        we drew everything using absolute coordinates.  You can also draw using
+        relative coordinates.  For a straight line, this is done with the
+        function <function>Cairo::Context::rel_line_to()</function>.
+    </tip>
     </sect2>
+    <sect2>
+        <title>Line styles</title>
+        <para>
+            In addition to drawing basic straight lines, there are a number of
+            things that you can customize about a line.  You've already seen
+            examples of setting a line's color and width, but there are others
+            as well.  
+        </para>
+        <para>
+            If you've drawn a series of lines that form a path, you may
+            want them to join together in a certain way.  Cairo offers
+            three different ways to join lines together: Miter, Bevel, and
+            Round.  These are show below:
+        </para>
+        <figure id="figure-cairo-joins">
+            <title>Different join types in Cairo</title>
+            <screenshot>
+                <graphic format="PNG" fileref="&url_figures_base;cairo_joins.png"/>
+            </screenshot>
+        </figure>
+        <para>
+            The line join style is set using the function
+            <function>Cairo::Context::set_line_join()</function>.
+        </para>
+        <para>
+            Line ends can have different styles as well.  The default style
+            is for the line to start and stop exactly at the destination
+            points of the line.  This is called a Butt cap.  The other
+            options are Round (uses a round ending, with the center of the
+            circle at the end point) or Square (uses a squared ending, with
+            the center of the square at the end point).  This setting is set
+            using the function
+            <function>Cairo::Context::set_line_cap()</function>.
+        </para>
+        <para>
+            There are other things you can customize as well, including
+            creating dashed lines and other things.  For more information , see
+            the Cairo API documentation.
+        </para>
+    </sect2>
+</sect1>
+    <sect1>
+        <title>Drawing Curved Lines</title>
+        <para>
+            In addition to drawing straight lines Cairo allows you to easily
+            draw curved lines (technically a cubic Bézier spline) using the
+            <function>Cairo::Context::curve_to()</function> and
+            <function>Cairo::Context::rel_curve_to()</function> functions.
+            These functions take coordinates for a destination point as well as
+            coordinates for two 'control' points.  This is best explained using
+            an example, so let's dive in.
+        </para>
+        <sect2>
+            <title>Example</title>
+            <para>
+                This simple application draws a curve with Cairo and displays
+                the control points for each end of the curve.
+            </para>
+        <figure id="figure-drawingarea-curve">
+            <title>Drawing Area - Lines</title>
+            <screenshot>
+                <graphic format="PNG" fileref="&url_figures_base;drawingarea_curve.png"/>
+            </screenshot>
+        </figure>
+
+        <para><ulink url="&url_examples_base;drawingarea/curve">Source Code</ulink></para>
+        <para>
+            The only difference between this example and the straight line
+            example is in the <function>on_expose_event()</function> function,
+            but there are a few new concepts and functions introduced here, so
+            let's examine them briefly.
+        </para>
+        <para>
+            Note that we clip to the area that needs re-exposing just as we did
+            in the last example.  After clipping, however, we make a call to
+            <function>Cairo::Context::scale()</function>, passing in the width
+            and height of the drawing area.  This scales the user-space
+            coordinate system such that the the width and height of the widget
+            are both equal to 1.0 'units'.  There's no particular reason to
+            scale the coordinate system in this case, but sometimes it can make
+            drawing operations easier.
+        </para>
+        <para>
+            The call to <function>Cairo::Context::curve_to()</function> should
+            be fairly self-explanatory.  The first pair of coordinates define
+            the control point for the beginning of the curve.  The second set
+            of coordinates define the control point for the end of the curve,
+            and the last set of coordinates define the destination point.  To
+            make the concept of control points a bit easier to visualize, a
+            line has been draw from each control point to the end-point on the
+            curve that it is associated with.  Note that these control point
+            lines are both translucent.  This is achieved with a variant of
+            <function>set_source_rgb()</function> called
+            <function>set_source_rgba()</function>.  This function takes a
+            fourth argument specifying the alpha value of the color (valid
+            values are between 0 and 1).
+        </para>
+        </sect2>
   </sect1>
-  <sect1 id="sec-drawing_rectangles_and_polygons">
-    <title>Drawing Rectangles and Polygons</title>
-    <para>
-      The <function>draw_rectangle()</function> method draws rectangles and squares. The second argument determines whether
-      the rectangle is filled. Give a non-zero value to have the rectangle filled. The third and fourth arguments
-      specify the x and y coordiates of the upper-left corner of the rectangle, respectively. The last two arguments specify
-      the width and height (in pixels) of the rectangle.
-    </para>
-    <para>
-      Because of the way X handles drawing, an outline rectangle is one pixel taller and wider than a filled rectangle. If
-      you want a rectangle with an outline of one color and a fill of another color, you need to draw the filled rectangle first.
-      Otherwise the filled rectangle will obscure the top and left edges of the outline rectangle. You may need to subtract one pixel from the  width and height of the outline rectangle to get the size you expect.
-    </para>
-    <para>
-      The <function>draw_polygon()</function> method takes a <classname>Glib::ArrayHandle&lt;Gdk::Point&gt;</classname>, which is
-      another way of saying a standard container of <classname>Gdk::Point</classname>, just like we saw in
-      <function>draw_points()</function> above.
-      The first argument is the <classname>Gdk::GC</classname> and the second argument determines if the polygon is a filled one or
-      an outline, just like for the <function>draw_rectangle()</function>. The polygon's shape is taken by drawing a line from the
-      first point to the second, and so on to the last point in the list, and from there a line is drawn back to the first point.
-      This of course implies that you do not need to repeat the first point as the last point.
-    </para>
-  </sect1>
-  <sect1 id="sec-drawing_ellipses_and_arcs">
-    <title>Drawing Ellipses and Arcs</title>
-    <para>
-      The <function>draw_arc()</function> has a lot of parameters. The second one is again for the choice of filled or unfilled arc.
-      The next two arguments are the x and y coordinates of the upper left corner of the circle. Imagine a
-      rectangle surrounding the circle, and just touching it at the top, bottom, and sides. The upper left corner of this box
-      is the point specified by the x and y coordinates. The width and height of this box are the next two arguments. A wide
-      box will make a wide elliptical shape.
-    </para>
-    <para>
-      The final two arguments define the starting and ending angle, in case you do not want to make a complete circle. The
-      angle is measured in 1/64th of a degree, starts at the right, and runs counter-clockwise.
-    </para>
+  <sect1>
+      <title>Drawing Arcs and Circles</title>
+      <para>
+          With Cairo, the same function is used to draw arcs, circles, or
+          ellipses: <function>Cairo::Context::arc()</function>.  This function
+          takes five arguments.  The first two are the coordinates of the
+          center point of the arc, the third argument is the radius of the arc,
+          and the final two arguments define the start and end angle of the
+          arc.  All angles are defined in radians, so drawing a circle is the
+          same as drawing an arc from 0 to 2 * M_PI radians.  
+          An angle of 0 is in the direction of the positive X axis (in user-space). An
+          angle of M_PI/2 radians (90 degrees) is in the direction of the positive Y axis
+          (in user-space). Angles increase in the direction from the positive X axis
+          toward the positive Y axis. So with the default transformation matrix, angles
+          increase in a clockwise direction.
+      </para>
+      <para>
+          To draw an ellipse, you can scale the current transformation matrix
+          by different amounts in the X and Y directions. For example, to draw
+          an ellipse in the box given by <varname>x</varname>,
+          <varname>y</varname>, <varname>width</varname>,
+          <varname>height</varname>:
+
+          <programlisting>context->save();
+context->translate(x, y);
+context->scale(width / 2.0, height / 2.0);
+context->arc(0.0, 0.0, 1.0, 0.0, 2 * M_PI);
+context->restore();</programlisting>
+          Note that this contradicts the <ulink
+              url="http://www.cairographics.org/manual/cairo-Paths.html#cairo-arc">advice
+              given in the official Cairo documentation</ulink>, but it seems
+          to work.
+      </para>
+      <sect2>
+          <title>Example</title>
+          <para>
+              Here's an example of a simple program that draws an arc, a circle
+              and an ellipse into a drawing area.
+          </para>
+          <figure id="figure-drawingarea-arc">
+              <title>Drawing Area - Arcs</title>
+              <screenshot>
+                  <graphic format="PNG"
+                      fileref="&url_figures_base;drawingarea/arcs.png"/>
+              </screenshot>
+          </figure>
+
+          <para><ulink url="&url_examples_base;drawingarea_arcs">Source Code</ulink></para>
+
+          <para>
+              There are a couple of things to note about this example code.
+              Again, the only real difference between this example and the
+              previous ones is the <function>on_expose_event()</function>
+              function, so we'll limit our focus to that function.  In
+              addition, the first part of the function is nearly identical to
+              the previous examples, so we'll skip that portion.
+          </para>
+          <para>
+              Note that in this case, we've expressed nearly everything in
+              terms of the height and width of the window, including the width
+              of the lines.  Because of this, when you resize the window,
+              everything scales with the window.  Also note that there are
+              three drawing sections in the function and each is wrapped with a
+              <function>save()</function>/<function>restore()</function> pair
+              so that we're back at a known state after each drawing.
+          </para>
+          <para>
+              The section for drawing an arc introduces one new function,
+              <function>close_path()</function>.  This function will in effect
+              draw a straight line from the current point back to the first
+              point in the path.  There is a significant difference between
+              calling <function>close_path()</function> and manually drawing a
+              line back to the starting point, however.  If you use
+              <function>close_path()</function>, the lines will be nicely
+              joined together.  If you use <function>line_to()</function>
+              instead, the lines will end at the same point, but Cairo won't do
+              any special joining.
+          </para>
+          <note>
+              <title>Drawing counter-clockwise</title>
+              <para>
+                  The function
+                  <function>Cairo::Context::arc_negative()</function> is
+                  exactly the same as
+                  <function>Cairo::Context::arc()</function> but the angles go
+                  the opposite direction.
+              </para>
+          </note>
+
+      </sect2>
   </sect1>
   <sect1 id="sec-drawing_text">
-    <title>Drawing Text</title>
-    <para>
-      Text is drawn via Pango Layouts. The easiest way to create a <classname>Pango::Layout</classname> is to use
-      <function>create_pango_layout</function>. Once created, the layout can be manipulated in various ways, including changing
-      the text, font, etc. Finally, the layout can be rendered using the <function>draw_layout</function> method of <classname>Gdk::Drawable</classname>, which takes the usual <classname>Gdk::GC</classname>, an x-position, a y-position and the layout itself.
-    </para>
+      <title>Drawing Text</title>
+      <sect2>
+          <title>Drawing Text with Pango</title>
+          <para>
+              Text is drawn via Pango Layouts. The easiest way to create a
+              <classname>Pango::Layout</classname> is to use
+              <function>create_pango_layout</function>. Once created, the layout
+              can be manipulated in various ways, including changing the text,
+              font, etc. Finally, the layout can be rendered using the
+              <function>draw_layout</function> method of
+              <classname>Gdk::Drawable</classname>, which takes a
+              <classname>Gdk::GC</classname> object, an x-position, a
+              y-position and the layout itself.
+          </para>
+      </sect2>
+
+      <!--
+      <sect2>
+          <title>Drawing Text with Cairo</title>
+          <warning>TODO: Add Cairo content.</warning>
+      </sect2>
+      -->
   </sect1>
   <sect1 id="sec-draw_images">
-    <title>Draw Images</title>
-    <para>
-      There are a couple of drawing methods for putting image data into a drawing area. <function>draw_pixmap()</function> can
-      copy the contents of a <classname>Gdk::Drawable</classname> (the window of a drawing area is one) into the drawing area.
-      There is also <function>draw_bitmap()</function> for drawing a two-color image into the drawing area, and
-      <function>draw_image()</function> for drawing an image with more than two colors.
-    </para>
-    <para>
-      For all of these methods, the first argument is the <classname>Gdk::GC</classname>. The second argument is the
-      object of the appropriate type to copy in: <classname>Gdk::Drawable</classname>, <classname>Gdk::Bitmap</classname>,
-      <classname>Gdk::Image</classname>. The next two arguments are the x and y points in the image to begin copying from. Then
-      come the x and y points in the drawing area to copy to. The final two arguments are the width and height of the area to
-      copy.
-    </para>
-    <para>
-      There is also a method for drawing from a <classname>Gdk::Pixbuf</classname>. A <classname>Gdk::Pixbuf</classname>
-      buffer is a useful wrapper around a collection of pixels, which can be read from files, and manipulated in various ways.
-    </para>
-    <para>
-      Probably the most common way of creating <classname>Gdk::Pixbuf</classname>s is to use
-      <function>Gdk::Pixbuf::create_from_file()</function>, which can read an image file, such as a png file into a pixbuf ready
-      for rendering.
-    </para>
-    <para>
-      The <classname>Gdk::Pixbuf</classname> can be rendered with <function>render_to_drawable</function>, which takes quite a few parameters. The <function>render_to_drawable</function> is a member of <classname>Gdk::Pixbuf</classname> rather than <classname>Gdk::Drawable</classname>, which is unlike the <function>draw_*</function> functions described earlier. As such, its first parameter is the drawable to render to. The second parameter is still the <classname>Gdk::GC</classname>. The next two parameters are the point in the pixbuf to start drawing from. This is followed by the point in the drawable to draw it at, and by the width and height to actually draw (which may not be the whole image, especially if you're only responding to an expose event for part of the window). Finally, there are the dithering parameters. If you use Gdk::RGB_DITHER_NONE as the dither type, then the dither offset parameters can both be 0.
-    </para>
-    <para>
-      Here is a small bit of code to tie it all together: (Note that usually you wouldn't load the image every time in the expose event handler! It's just shown here to keep it all together)
-    </para>
-    <programlisting>
-bool myarea::on_expose_event(GdkEventExpose* ev)
+      <title>Drawing Images</title>
+      <sect2>
+          <title>Drawing Images with Gdk</title>
+          <para>
+              There are a couple of drawing methods for putting image data into
+              a drawing area. <function>draw_pixmap()</function> can copy the
+              contents of a <classname>Gdk::Drawable</classname> (the window of
+              a drawing area is one) into the drawing area.  There is also
+              <function>draw_bitmap()</function> for drawing a two-color image
+              into the drawing area, and <function>draw_image()</function> for
+              drawing an image with more than two colors.
+          </para>
+          <para>
+              For all of these methods, the first argument is the
+              <classname>Gdk::GC</classname>. The second argument is the object
+              of the appropriate type to copy in:
+              <classname>Gdk::Drawable</classname>,
+              <classname>Gdk::Bitmap</classname>,
+              <classname>Gdk::Image</classname>. The next two arguments are the
+              x and y points in the image to begin copying from. Then come the
+              x and y points in the drawing area to copy to. The final two
+              arguments are the width and height of the area to copy.
+          </para>
+          <para>
+              There is also a method for drawing from a
+              <classname>Gdk::Pixbuf</classname>. A
+              <classname>Gdk::Pixbuf</classname> buffer is a useful wrapper
+              around a collection of pixels, which can be read from files, and
+              manipulated in various ways.
+          </para>
+          <para>
+              Probably the most common way of creating
+              <classname>Gdk::Pixbuf</classname>s is to use
+              <function>Gdk::Pixbuf::create_from_file()</function>, which can
+              read an image file, such as a png file into a pixbuf ready for
+              rendering.
+          </para>
+          <para>
+              The <classname>Gdk::Pixbuf</classname> can be rendered with
+              <function>render_to_drawable</function>, which takes quite a few
+              parameters. The <function>render_to_drawable</function> is a
+              member of <classname>Gdk::Pixbuf</classname> rather than
+              <classname>Gdk::Drawable</classname>, which is unlike the
+              <function>draw_*</function> functions described earlier. As such,
+              its first parameter is the drawable to render to. The second
+              parameter is still the <classname>Gdk::GC</classname>. The next
+              two parameters are the point in the pixbuf to start drawing from.
+              This is followed by the point in the drawable to draw it at, and
+              by the width and height to actually draw (which may not be the
+              whole image, especially if you're only responding to an expose
+              event for part of the window). Finally, there are the dithering
+              parameters. If you use Gdk::RGB_DITHER_NONE as the dither type,
+              then the dither offset parameters can both be 0.
+          </para>
+          <para>
+              Here is a small bit of code to tie it all together: (Note that
+              usually you wouldn't load the image every time in the expose
+              event handler! It's just shown here to keep it all together)
+          </para>
+          <programlisting>bool myarea::on_expose_event(GdkEventExpose* ev)
 {
-  Glib::RefPtr&lt;Gdk::PixBuf&gt; image = Gdk::PixBuf::create_from_file("myimage.png");
-  image-&gt;render_to_drawable(get_window(), get_style()-&gt;get_black_gc(),
-    0, 0, 100, 80, image-&gt;get_width(), image-&gt;get_height(), // draw the whole image (from 0,0 to the full width,height) at 100,80 in the window
-    Gdk::RGB_DITHER_NONE, 0, 0);
-  return true;
-}
-
-    </programlisting>
+Glib::RefPtr&lt;Gdk::PixBuf&gt; image = Gdk::PixBuf::create_from_file("myimage.png");
+image-&gt;render_to_drawable(get_window(), get_style()-&gt;get_black_gc(),
+0, 0, 100, 80, image-&gt;get_width(), image-&gt;get_height(), // draw the whole image (from 0,0 to the full width,height) at 100,80 in the window
+Gdk::RGB_DITHER_NONE, 0, 0);
+return true;
+}</programlisting>
+      </sect2>
+      <!--
+      <sect2>
+          <title>Drawing images with Cairo</title>
+          <warning>TODO: Add Cairo content.</warning>
+      </sect2>
+      -->
+  </sect1>
+  <!--
+  <sect1 id="sec-drawing-fill">
+      <title>Gradients and other fill techniques</title>
+      <warning>TODO: Add content.</warning>
+  </sect1>
+  <sect1 id="sec-drawing-transformations">
+      <title>Transformations with Cairo</title>
+      <warning>TODO: Add content.</warning>
+  </sect1>
+  -->
+  <sect1 id="sec-drawing-clock-example">
+      <title>Example Application: Creating a Clock with Cairo</title>
+      <para>
+          Now that we've covered the basics of drawing with Cairo, let's try to
+          put it all together and create a simple application that actually
+          does something.  The following example uses Cairo to create a custom
+          <classname>Clock</classname> widget.  The clock has a second hand, a
+          minute hand, and an hour hand, and updates itself every second.
+      </para>
+      <screenshot>
+          <graphic format="PNG"
+              fileref="&url_figures_base;cairo_clock.png"/>
+      </screenshot>
+      <para><ulink url="&url_examples_base;drawingarea/clock">Source Code</ulink></para>
+      <para>
+          As before, almost all of the interesting stuff is done in the expose
+          event handler <function>on_expose_event()</function>.  Before we dig
+          into the expose event handler, notice that the constructor for the
+          <classname>Clock</classname> widget connects a handler function
+          <function>onSecondElapsed()</function> to a timer with a timeout
+          period of 1000 milliseconds (1 second).  This means that
+          <function>onSecondElapsed()</function> will get called once per
+          second.  The sole responsibility of this function is to invalidate
+          the window so that gtkmm will be forced to redraw it.
+      </para>
+      <para>
+          Now let's take a look at the code that performs the actual drawing.
+          The first section of <function>on_expose_event()</function> should be
+          pretty familiar by now as it's mostly 'boilerplate' code for getting
+          the <classname>Gdk::Window</classname>, creating a
+          <classname>Cairo::Context</classname>, and clipping to the area that
+          we want to re-draw.  This example again scales the coordinate system
+          to be a unit square so that it's easier to draw the clock as a
+          percentage of window size so that it will automatically scale when
+          the window size is adjusted.  Furthermore, the coordinate system is
+          scaled over and down so that the (0, 0) coordinate is in the very
+          center of the window.  
+      </para>
+      <para>
+          The function <function>Cairo::Context::paint()</function> is used here
+          to set the background color of the window.  This function takes no
+          arguments and fills the current surface (or the clipped portion of
+          the surface) with the source color currently active.  After setting
+          the background color of the window, we draw a circle for the clock
+          outline, fill it with white, and then stroke the outline in black.
+          Notice that both of these actions use the
+          <function>_preserve</function> variant to preserve the current path,
+          and then this same path is clipped to make sure than our next lines
+          don't go outside the outline of the clock.
+      </para>
+      <para>
+          After drawing the outline, we go around the clock and draw ticks for
+          every hour, with a larger tick at 12, 3, 6, and 9. Now we're finally
+          ready to implement the time-keeping functionality of the clock, which
+          simply involves getting the current values for hours, minutes and
+          seconds, and drawing the hands at the correct angles.
+      </para>
   </sect1>
 </chapter>
 
