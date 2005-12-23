@@ -3664,7 +3664,7 @@ This dialog allows the user to choose a font.
 <chapter id="sec-drawingarea">
   <title>The Drawing Area Widget</title>
   <para>
-    The DrawingArea widget is a blank X window that gives you the freedom to
+    The DrawingArea widget is a blank window that gives you the freedom to
     create any graphic you desire. Along with that freedom comes the
     responsibility to handle expose events on the widget. When a widget is
     first shown, or when it is covered and then uncovered again it needs to
@@ -3674,78 +3674,18 @@ This dialog allows the user to choose a font.
     done by overriding the virtual <function>on_expose_event()</function> member
     function.  
   </para>
+  <note>
   <para>
       Before gtkmm version 2.10, drawing was mostly done with Graphics Contexts
       (<classname>Gdk::GC</classname>) and other GDK drawing functions, but this
       has been largely superceded by the <ulink
           url="http://cairographics.org">Cairo</ulink> graphics library and its
-      C++ binding <literal>Cairomm</literal>. But first let's take a brief look
-      at the basics of drawing with Gdk.
-  </para>
-  <para>
-      Gdk graphics contexts (<classname>Gdk::GC</classname>) are a
-      server-side resource. They contain information that describes how
-      drawing is to be done. This provides for fewer arguments to the
-      drawing methods, and less communication between the client and the
-      server. The following example shows  how to set up a graphics context
-      with a foreground color of red for drawing.
-  </para>
-  <programlisting>Gdk::GC some_gc;
-some_gc.create(get_window());
-Gdk::Color some_color;
-Gdk::Colormap some_colormap(Gdk::Colormap::get_system());
-some_color.set_red(65535);
-some_color.set_green(0);
-some_color.set_blue(0);
-some_colormap.alloc(some_color);
-some_gc.set_foreground(some_color);</programlisting>
-  <para>
-      The first two lines create the graphics context and assign it to the
-      appropriate widget. The <function>get_window() </function> method is
-      a part of the <classname>Gtk::Widget</classname> class, so if you put
-      this code into a derived widget's implementation then you can call it
-      just as it is, otherwise you'd use
-      <function>some_widget.get_window()</function>.
-  </para>
-  <para>
-      The next two lines create the <classname>Gdk::Color</classname> and
-      <classname>Gdk::Colormap</classname>. After setting the color values
-      you then need to allocate the color. The system figures out what to
-      do in this case. The colormap contains information about how colors
-      can be displayed on your screen, and is able to allocate the
-      requested color. For example, on a display of only 256 colors the
-      exact color requested may not be available, so the closest color to
-      the one requested will be used instead. The final line sets the color
-      as the foreground color.
-  </para>
-  <para>
-      There are a number of attributes that can be set for a graphics
-      context. There's the foreground and background color.  When drawing
-      lines, you can set the thickness of the line with
-      <function>set_line_width()</function>. Whether a solid or dashed line
-      is drawn can be set with <function>set_line_style()</function>. The
-      size and proportions of the dashes are set with
-      <function>set_dashes</function>. How two lines join together, whether
-      round or pointed or beveled off, is set with
-      <function>set_join_style()</function>.  Other things that can be set
-      within a graphics context include font style, stippling and tiling
-      for the filling of solid polygons.
-  </para>
-  <para>
-      Graphics contexts are central to drawing with Gdk, because nearly all Gdk
-      drawing functions and many Pango functions take a
-      <classname>Gdk::GC</classname> object as an argument.  So although Cairo
-      has largely superceded many Gdk drawing functions, you're still likely to
-      run into <classname>Gdk::GC</classname> objects quite often, so it's
-      important to know what they are and how they're used.
-  </para>
-  <para>
-      In general, the Cairo drawing API is simpler than the Gdk one, and it is
+      C++ binding <literal>Cairomm</literal>. See the <link linkend="sec-appendix-gdk-drawing">Gdk Appendix</link> for a description of the deprecated GDK techniques. In general, the Cairo drawing API is simpler than the GDK one, and it is
       generally recommended to use the Cairo drawing methods wherever possible
-      in preference to the older Gdk drawing methods.  Having introduced the
-      basics of Gdk drawing, we'll leave the details to the API reference, and
-      move on to show you how to draw using Cairo.
+      in preference to the older GDK drawing methods.
   </para>
+  </note>
+  
   <para>
       You can draw very sophisticated shapes using Cairo, but the methods to do
       so are quite basic.  Cairo provides methods for drawing straight lines,
@@ -3776,9 +3716,7 @@ some_gc.set_foreground(some_color);</programlisting>
     </para>
     <para>
         To do any drawing in gtkmm with Cairo, you must first create a
-        <classname>Cairo::Context</classname> object.  This class is very
-        similar to the <classname>Gdk::GC</classname> class described briefly
-        above, since it holds all of the graphics state parameters that
+        <classname>Cairo::Context</classname> object. This class holds all of the graphics state parameters that
         describe how drawing is to be done.  This includes information such as
         line width, color, the surface to draw to, and many other things.  This
         allows the actual drawing functions to take fewer arguments to simplify
@@ -4152,6 +4090,7 @@ context->restore();</programlisting>
               <classname>Gdk::Drawable</classname>, which takes a
               <classname>Gdk::GC</classname> object, an x-position, a
               y-position and the layout itself.
+              TODO: Update this section for Cairo instead of Gdk::GC.
           </para>
       </sect2>
 
@@ -6394,6 +6333,70 @@ practical - and sensible - to subclass a button for that purpose.
     </para>
     
     </sect1>
+</appendix>
+
+<appendix id="sec-appendix-gdk-drawing">
+<sect1>
+<title>Drawing With GDK</title>
+<para>The GDK drawing API described here is now deprecated, in favour of Cairo. See the <link linkend="sec-drawingarea">DrawingArea</link> chapter for information about the Cairo API.</para> 
+<para>
+      Gdk graphics contexts (<classname>Gdk::GC</classname>) are a
+      server-side resource. They contain information that describes how
+      drawing is to be done. This provides for fewer arguments to the
+      drawing methods, and less communication between the client and the
+      server. The following example shows  how to set up a graphics context
+      with a foreground color of red for drawing.
+  </para>
+  <programlisting>Gdk::GC some_gc;
+some_gc.create(get_window());
+Gdk::Color some_color;
+Gdk::Colormap some_colormap(Gdk::Colormap::get_system());
+some_color.set_red(65535);
+some_color.set_green(0);
+some_color.set_blue(0);
+some_colormap.alloc(some_color);
+some_gc.set_foreground(some_color);</programlisting>
+  <para>
+      The first two lines create the graphics context and assign it to the
+      appropriate widget. The <function>get_window() </function> method is
+      a part of the <classname>Gtk::Widget</classname> class, so if you put
+      this code into a derived widget's implementation then you can call it
+      just as it is, otherwise you'd use
+      <function>some_widget.get_window()</function>.
+  </para>
+  <para>
+      The next two lines create the <classname>Gdk::Color</classname> and
+      <classname>Gdk::Colormap</classname>. After setting the color values
+      you then need to allocate the color. The system figures out what to
+      do in this case. The colormap contains information about how colors
+      can be displayed on your screen, and is able to allocate the
+      requested color. For example, on a display of only 256 colors the
+      exact color requested may not be available, so the closest color to
+      the one requested will be used instead. The final line sets the color
+      as the foreground color.
+  </para>
+  <para>
+      There are a number of attributes that can be set for a graphics
+      context. There's the foreground and background color.  When drawing
+      lines, you can set the thickness of the line with
+      <function>set_line_width()</function>. Whether a solid or dashed line
+      is drawn can be set with <function>set_line_style()</function>. The
+      size and proportions of the dashes are set with
+      <function>set_dashes</function>. How two lines join together, whether
+      round or pointed or beveled off, is set with
+      <function>set_join_style()</function>.  Other things that can be set
+      within a graphics context include font style, stippling and tiling
+      for the filling of solid polygons.
+  </para>
+  <para>
+      Graphics contexts are central to drawing with Gdk, because nearly all Gdk
+      drawing functions and many Pango functions take a
+      <classname>Gdk::GC</classname> object as an argument.  So although Cairo
+      has largely superceded many Gdk drawing functions, you're still likely to
+      run into <classname>Gdk::GC</classname> objects quite often, so it's
+      important to know what they are and how they're used.
+  </para>
+</sect1>
 </appendix>
 
 </book>
