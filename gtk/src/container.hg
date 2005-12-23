@@ -161,7 +161,11 @@ public:
 
 
   _WRAP_SIGNAL(void add(Widget* widget), "add")
-  _WRAP_SIGNAL(void remove(Widget* widget), "remove")
+
+  //We use the optional custom_c_callback parameter with _WRAP_SIGNAL() here,
+  //so that we can write special code to check for deleted child widget parameters:
+  _WRAP_SIGNAL(void remove(Widget* widget), "remove", custom_c_callback)
+
   _WRAP_SIGNAL(void check_resize(), "check_resize")
   _WRAP_SIGNAL(void set_focus_child(Widget* widget), "set_focus_child")
 
@@ -190,26 +194,7 @@ dnl
     reinterpret_cast<GtkObjectClass*>(klass)->destroy = &destroy_callback;
   _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
     static void destroy_callback(GtkObject* self);
-  _POP()
-#m4end
-
-#m4begin
-dnl// Hook in custom remove callback.
-dnl// It will use the generated callback.
-dnl
-  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-    klass->remove = &remove_callback_custom;
-
-    if(G_OBJECT_CLASS_TYPE(klass) == Gtk::Container::get_type())
-    { 
-      //Remove the parent class's (GtkContainer) remove callback - it just prints a warning.
-      //This prevents that warning when people derive directly from Gtk::Container.
-      BaseClassType *const base = static_cast<BaseClassType*>( g_type_class_peek_parent(klass) );
-      base->remove = 0;
-    }
-                
-  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-    static void remove_callback_custom(GtkContainer* self, GtkWidget* p0);
+    static void remove_callback_normal(GtkContainer* self, GtkWidget* p0);
   _POP()
 #m4end
 
