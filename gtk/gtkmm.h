@@ -126,7 +126,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stockitem.h>
 #include <gtkmm/style.h>
 #include <gtkmm/table.h>
-#include <gtkmm/tearoffmenutitem.h>
+#include <gtkmm/tearoffmenuitem.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textiter.h>
