@@ -124,6 +124,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stockitem.h>
 #include <gtkmm/style.h>
 #include <gtkmm/table.h>
+#include <gtkmm/tearoffmenuitem.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textiter.h>
@@ -137,6 +138,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toolitem.h>
 #include <gtkmm/toolbutton.h>
 #include <gtkmm/toggletoolbutton.h>
+#include <gtkmm/menutoolbutton.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>
