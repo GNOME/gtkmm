@@ -5514,8 +5514,10 @@ See gtk_file_chooser_set_current_folder_uri().
 </parameter_description>
 </parameter>
 </parameters>
-<return> the URI for the current folder.
-Free with g_free().
+<return> the URI for the current folder.  Free with g_free().  This
+function will also return %NULL if the file chooser was unable to load the
+last folder that was requested from it; for example, as would be for calling
+gtk_file_chooser_set_current_folder_uri() on a nonexistent folder.
 
 Since: 2.4
 </return>
@@ -10456,7 +10458,7 @@ models when their rows have been reordered.
 </parameter_description>
 </parameter>
 <parameter name="iter">
-<parameter_description> A valid #GtkTreeIter pointing to the node whose children have been reordered
+<parameter_description> A valid #GtkTreeIter pointing to the node whose children have been reordered, or %NULL if the depth of @path is 0.
 </parameter_description>
 </parameter>
 <parameter name="new_order">
@@ -11854,7 +11856,7 @@ GtkWidget *dialog;
 dialog = gtk_message_dialog_new (main_application_window,
 GTK_DIALOG_DESTROY_WITH_PARENT,
 GTK_MESSAGE_ERROR,
-GTK_BUTTON_CLOSE,
+GTK_BUTTONS_CLOSE,
 NULL);
 gtk_message_dialog_set_markup (GTK_MESSAGE_DIALOG (dialog),
 markup);
@@ -14251,24 +14253,14 @@ Since: 2.6
 
 <function name="GtkFileChooser">
 <description>
-This signal is emitted when the user &quot;activates&quot; a file in the file
-chooser.  This can happen by double-clicking on a file in the file list, or
-by pressing &amp;lt;keycap&amp;gt;Enter&amp;lt;/keycap&amp;gt;.
+Whether a file chooser in GTK_FILE_CHOOSER_ACTION_SAVE
+will present an overwrite confirmation dialog if the user
+selects a file name that already exists.
 
-Normally you do not need to connect to this signal.  It is used internally
-by #GtkFileChooserDialog to know when to activate the default button in the
-dialog.
-
-See also: gtk_file_chooser_get_filename(),
-gtk_file_chooser_get_filenames(), gtk_file_chooser_get_uri(),
-gtk_file_chooser_get_uris().
+Since: 2.8
 
 </description>
 <parameters>
-<parameter name="chooser">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -20873,9 +20865,9 @@ Since: 2.4
 
 <function name="gtk_im_context_filter_keypress">
 <description>
-Allow an input method to internally handle a key press event.
-If this function returns %TRUE, then no further processing
-should be done for this keystroke.
+Allow an input method to internally handle key press and release 
+events. If this function returns %TRUE, then no further processing
+should be done for this key event.
 
 
 </description>
@@ -20889,7 +20881,7 @@ should be done for this keystroke.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the input method handled the keystroke.
+<return> %TRUE if the input method handled the key event.
 
 </return>
 </function>
@@ -21114,8 +21106,8 @@ told the socket to remove a key grab.
 
 <function name="gtk_tree_view_create_row_drag_icon">
 <description>
-Creates a #GdkPixmap representation of the row at @path.  This image is used
-for a drag icon.
+Creates a #GdkPixmap representation of the row at @path.  
+This image is used for a drag icon.
 
 
 </description>
@@ -23640,9 +23632,11 @@ See gtk_file_chooser_set_current_folder().
 </parameter_description>
 </parameter>
 </parameters>
-<return> the full path of the current folder, or %NULL
-if the current path cannot be represented as a local filename.
-Free with g_free().
+<return> the full path of the current folder, or %NULL if the current
+path cannot be represented as a local filename.  Free with g_free().  This
+function will also return %NULL if the file chooser was unable to load the
+last folder that was requested from it; for example, as would be for calling
+gtk_file_chooser_set_current_folder() on a nonexistent folder.
 
 Since: 2.4
 </return>
@@ -24642,7 +24636,7 @@ This means that the item will be scrolled to the edge closest to its current
 position.  If the item is currently visible on the screen, nothing is done.
 
 This function only works if the model is set, and @path is a valid row on the
-model.  If the model changes before the @tree_view is realized, the centered
+model.  If the model changes before the @icon_view is realized, the centered
 path will be modified to reflect this change.
 
 Since: 2.8
@@ -24666,7 +24660,7 @@ Since: 2.8
 </parameter_description>
 </parameter>
 <parameter name="col_align">
-<parameter_description> The horizontal alignment of the item specified by @column.
+<parameter_description> The horizontal alignment of the item specified by @path.
 </parameter_description>
 </parameter>
 </parameters>
@@ -25789,8 +25783,8 @@ Since: 2.6
 Gets the #PangoLayout used to display the entry.
 The layout is useful to e.g. convert text positions to
 pixel positions, in combination with gtk_entry_get_layout_offsets().
-The returned layout is owned by the entry so need not be
-freed by the caller.
+The returned layout is owned by the entry and must not be 
+modified or freed by the caller.
 
 Keep in mind that the layout text may contain a preedit string, so
 gtk_entry_layout_index_to_text_index() and
@@ -27377,7 +27371,8 @@ If the resulting reference count is zero, frees the list.
 <function name="gtk_text_tag_table_foreach">
 <description>
 Calls @func on each tag in @table, with user data @data.
-
+Note that the table may not be modified while iterating 
+over it (you can&apos;t add/remove tags).
 
 </description>
 <parameters>
@@ -28843,6 +28838,7 @@ gtk_tree_selection_set_mode().
 <description>
 Increments the reference count on @values.
 
+
 </description>
 <parameters>
 <parameter name="values">
@@ -28850,7 +28846,8 @@ Increments the reference count on @values.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkTextAttributes that were passed in
+</return>
 </function>
 
 <function name="gtk_cell_editable_start_editing">
@@ -31339,7 +31336,7 @@ Since: 2.8
 </parameter_description>
 </parameter>
 <parameter name="pos">
-<parameter_description> Specifies whether to drop, relative to the item
+<parameter_description> Specifies where to drop, relative to the item
 </parameter_description>
 </parameter>
 </parameters>
@@ -33796,7 +33793,7 @@ Since: 2.4
 <description>
 Creates a #GtkFileChooserButton widget which uses @dialog as it&apos;s
 file-picking window. Note that @dialog must be a #GtkFileChooserDialog (or
-subclass).
+subclass) and must not have %GTK_DIALOG_DESTROY_WITH_PARENT set.
 
 
 </description>
@@ -35404,7 +35401,7 @@ cast the object yourself.
 <function name="GtkIconView">
 <description>
 The reorderable property specifies if the items can be reordered
-by DND.
+by drag-and-drop.
 
 Since: 2.8
 
@@ -39288,7 +39285,7 @@ Since: 2.4
 
 <function name="gtk_drag_set_icon_name">
 <description>
-Sets the icon for the window from a named themed icon. See
+Sets the icon for a given drag from a named themed icon. See
 the docs for #GtkIconTheme for more details. Note that the
 size of the icon depends on the icon theme (the icon is
 loaded at the symbolic size #GTK_ICON_SIZE_DND), thus 
@@ -42776,7 +42773,7 @@ Since: 2.8
 </parameter>
 </parameters>
 <return> the accel closure for this action. The returned closure is
-owned by GTK+ must and not be unrefed or modified.
+owned by GTK+ and must not be unreffed or modified.
 </return>
 </function>
 
@@ -44262,17 +44259,29 @@ Returns the #GtkTextBuffer this iterator is associated with.
 
 <function name="GtkTreeView">
 <description>
-Enables of disables the hover expansion mode of @tree_view.
-Hover expansion makes rows expand or collaps if the pointer moves 
-over them.
+The &quot;row-activated&quot; signal is emitted when the method
+gtk_tree_view_row_activated() is called or the user double clicks 
+a treeview row. It is also emitted when a non-editable row is 
+selected and one of the keys: Space, Shift+Space, Return or 
+Enter is pressed.
 
-This mode is primarily indended for treeviews in popups, e.g.
-in #GtkComboBox or #GtkEntryCompletion.
-
-Since: 2.6
+For selection handling refer to the &amp;lt;link linkend=&quot;TreeWidget&quot;&amp;gt;tree 
+widget conceptual overview&amp;lt;/link&amp;gt; as well as #GtkTreeSelection.
 
 </description>
 <parameters>
+<parameter name="tree_view">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> the #GtkTreePath for the activated row
+</parameter_description>
+</parameter>
+<parameter name="column">
+<parameter_description> the #GtkTreeViewColumn in which the activation occurred
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -46183,6 +46192,8 @@ Sets the visibility state of the headers.
 Sets @start_path and @end_path to be the first and last visible path.
 Note that there may be invisible paths in between.
 
+The paths should be freed with gtk_tree_path_free() after use.
+
 
 </description>
 <parameters>
@@ -47331,6 +47342,10 @@ backend-specific GtkPlug implementation.
 
 </description>
 <parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -47506,6 +47521,14 @@ and renders it into a pixbuf. This is a convenience function;
 if more details about the icon are needed, use
 gtk_icon_theme_lookup_icon() followed by gtk_icon_info_load_icon().
 
+Note that you probably want to listen for icon theme changes and
+update the icon. This is usually done by connecting to the 
+GtkWidget::style-set signal. If for some reason you do not want to
+update the icon when the icon theme changes, you should consider
+using gdk_pixbuf_copy() to make a private copy of the pixbuf
+returned by this function. Otherwise GTK+ may need to keep the old 
+icon theme loaded, which would be a waste of memory.
+
 
 </description>
 <parameters>
@@ -47632,7 +47655,7 @@ Determines the destination item for a given position.
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> Return location for the path of the highlighted item, or %NULL.
+<parameter_description> Return location for the path of the item, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="pos">
