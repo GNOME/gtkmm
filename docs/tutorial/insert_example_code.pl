@@ -34,13 +34,13 @@
 
         foreach $source_file (@header_files, @source_files)
         {
-           print "<para>File: ${source_file}\n";
+           print "<para>File: <filename>${source_file}</filename>\n";
+           print "</para>\n";
            print "<programlisting>\n";
 
            &process_source_file("${directory}/${source_file}");
 
            print "</programlisting>\n";
-           print "</para>\n";
         }
 
         print "<!-- end inserted example code -->\n";

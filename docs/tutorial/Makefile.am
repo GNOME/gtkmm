@@ -2,14 +2,13 @@ include $(top_srcdir)/docs/Makefile_web.am_fragment
 
 gtkmm_tut_path = $(web_path_docs)tutorial
 
-SUBDIRS = figures
+SUBDIRS = figures icons
 
 DOCBOOK_PHPWEBNOTES_TRANSFORM = docbook_phpwebnotes.xsl
 
 EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml html $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
 
 DOCBOOK_STYLESHEET ?= http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
-
 
 # Create a DocBook source file that doesn't have the examples' comments blocks:
 gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
@@ -19,7 +18,21 @@ gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
 html/index.html: gtkmm-tut-with-examples.xml
 	rm -rf html
 	$(mkinstalldirs) html
-	xsltproc -o html/ --xinclude --catalogs $(DOCBOOK_STYLESHEET) $<
+	xsltproc \
+		--param toc.section.depth 1	\
+		--stringparam html.stylesheet "../style.css"	\
+		--stringparam admon.graphics 1	\
+		--stringparam admon.graphics.path "../icons/"	\
+		--stringparam admon.graphics.extension ".png"	\
+		--stringparam chunker.output.indent yes	\
+		--stringparam chunker.output.encoding UTF-8	\
+		--stringparam navig.graphics yes	\
+		--stringparam navig.graphics.extension ".png"	\
+		--stringparam navig.graphics.path "../icons/"	\
+		--stringparam toc.list.type "ul"	\
+		-o html/ --xinclude --catalogs $(DOCBOOK_STYLESHEET)	\
+		$<
+
 
 # Create a version of the tutorial that has phpwebnotes code in it.
 html_withcomments/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
