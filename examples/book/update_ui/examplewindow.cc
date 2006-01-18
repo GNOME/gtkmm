@@ -60,7 +60,7 @@ void ExampleWindow::on_button_start()
   for(double i = 0; i < max; ++i)
   {
      std::cout << "gtkmm example: example output: " << i << " of " << max << std::endl;
-     
+
      m_ProgressBar.set_fraction(i / max);
 
      //Allow GTK+ to perform all updates for us
