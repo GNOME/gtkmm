@@ -48,8 +48,9 @@ validate: gtkmm-tut-with-examples.xml
 gtkmm-tut-html.tar.gz: html/index.html
 	tar cf - figures html | gzip -c --best >$@
 
-post-html: html/index.html
+post-html: html/index.html style.css
 	rsync $(rsync_args) figures/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/figures/
+	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
 	rsync $(rsync_args) -r *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/
 
 doc-clean:
@@ -59,7 +60,7 @@ doc-clean:
 
 tutorialdir = $(gtkmm_docdir)/tutorial/html
 
-install-tutorial: html/index.html
+install-tutorial: html/index.html style.css
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(tutorialdir)
 	@dir='$(<D)'; for p in $$dir/*.html ; do \
@@ -67,14 +68,16 @@ install-tutorial: html/index.html
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(tutorialdir)/$$f"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(tutorialdir)/$$f; \
 	done
+	$(INSTALL_DATA) style.css $(DESTDIR)$(tutorialdir)
 
-uninstall-tutorial: html/index.html
+uninstall-tutorial: html/index.html style.css
 	@$(NORMAL_UNINSTALL)
 	@dir='$(<D)'; for p in $$dir/*.html ; do \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " rm -f $(DESTDIR)$(tutorialdir)/$$f"; \
 	  rm -f $(DESTDIR)$(tutorialdir)/$$f; \
 	done
+	rm -f $(DESTDIR)$(tutorialdir)/style.css
 
 all-local: html/index.html
 
