@@ -50,6 +50,7 @@ gtkmm-tut-html.tar.gz: html/index.html
 
 post-html: html/index.html style.css
 	rsync $(rsync_args) figures/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/figures/
+	rsync $(rsync_args) icons/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/icons/
 	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
 	rsync $(rsync_args) -r *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/
 
@@ -69,6 +70,7 @@ install-tutorial: html/index.html style.css
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(tutorialdir)/$$f; \
 	done
 	$(INSTALL_DATA) style.css $(DESTDIR)$(tutorialdir)
+	$(INSTALL_DATA) icons $(DESTDIR)$(tutorialdir)
 
 uninstall-tutorial: html/index.html style.css
 	@$(NORMAL_UNINSTALL)
@@ -78,6 +80,7 @@ uninstall-tutorial: html/index.html style.css
 	  rm -f $(DESTDIR)$(tutorialdir)/$$f; \
 	done
 	rm -f $(DESTDIR)$(tutorialdir)/style.css
+	rm -f $(DESTDIR)$(tutorialdir)/icons
 
 all-local: html/index.html
 
