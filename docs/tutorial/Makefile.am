@@ -40,17 +40,17 @@ html_withcomments/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_T
 	xsltproc -o html_withcomments/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
 
 validate_original: gtkmm-tut.xml
-	xmllint --xinclude --valid --noout --catalogs $<
+	xmllint --xinclude --valid --noout --catalogs $(DOCBOOK_STYLESHEET) $<
 
 validate: gtkmm-tut-with-examples.xml
-	xmllint --xinclude --valid --noout --catalogs $<
+	xmllint --xinclude --valid --noout --catalogs $(DOCBOOK_STYLESHEET) $<
 
 gtkmm-tut-html.tar.gz: html/index.html
 	tar cf - figures html | gzip -c --best >$@
 
 post-html: html/index.html
 	rsync $(rsync_args) figures/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/figures/
-	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
+	rsync $(rsync_args) -r *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/
 
 doc-clean:
 	-rm -rf html
