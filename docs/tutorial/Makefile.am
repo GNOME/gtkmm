@@ -70,7 +70,6 @@ install-tutorial: html/index.html style.css
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(tutorialdir)/$$f; \
 	done
 	$(INSTALL_DATA) style.css $(DESTDIR)$(tutorialdir)
-	$(INSTALL_DATA) icons $(DESTDIR)$(tutorialdir)
 
 uninstall-tutorial: html/index.html style.css
 	@$(NORMAL_UNINSTALL)

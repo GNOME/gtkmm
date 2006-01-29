@@ -22,30 +22,12 @@
 
 ExampleWindow::ExampleWindow()
 {
-  set_title("combo example");
+  set_title("ComboBoxText example");
 
   //Fill the combo:
   m_Combo.append_text("something");
   m_Combo.append_text("something else");
   m_Combo.append_text("something or other");
-
-  /*
-  //Create a mixed entry an add it to the combo's list using the advanced interface ComboDropDown:
-  Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
-
-  Gtk::HBox* hbox = Gtk::manage(new Gtk::HBox(false, 3));
-  hbox->pack_start(*Gtk::manage(new Gtk::Image(Gtk::Stock::CLEAR, Gtk::ICON_SIZE_MENU)), Gtk::PACK_SHRINK);
-  hbox->pack_start(*Gtk::manage(new Gtk::Label("some image - cool!")), Gtk::PACK_SHRINK);
-
-  item->add(*hbox);
-  item->show_all();
-  m_Combo.get_list()->children().push_back(*item);
-  
-  m_Combo.set_item_string(*item, "you selected the image!");
-  */
-  
-  //Restrict it to these choices only:
-  //m_Combo.set_value_in_list();
 
   add(m_Combo);
 

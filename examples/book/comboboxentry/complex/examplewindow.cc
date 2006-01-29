@@ -22,7 +22,7 @@
 
 ExampleWindow::ExampleWindow()
 {
-  set_title("combo example");
+  set_title("ComboBoxEntry example");
 
   //Create the Tree model:
   //m_refTreeModel = Gtk::TreeStore::create(m_Columns);

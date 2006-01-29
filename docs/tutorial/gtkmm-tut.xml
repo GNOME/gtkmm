@@ -1163,67 +1163,6 @@ visible flags.
 
 </sect1>
 
-<sect1 id="sec-ComboBoxes">
-<title>Combo</title>
-
-<para>
-A <classname>Combo</classname> is a combination of a text entry and a popup
-menu. Clicking on one of the menu entries puts it in the entry box.  The entry
-box otherwise works just like a regular <classname>Entry</classname> widget.
-</para>
-
-<para>
-A <classname>Gtk::Combo</classname> contains a
-<classname>Gtk::Entry</classname> widget, which is used to implement the entry
-box.  You can obtain the <classname>Gtk::Entry</classname> using
-<function>get_entry()</function> method.
-</para>
-
-<para>
-To set the values in the popup menu, use
-<programlisting>
-void Gtk::Combo::set_popdown_strings(const Gtk::SArray&amp; strings);
-</programlisting>
-where <literal>strings</literal> is a list of the strings you want to appear in the
-list.  As mentioned in the <link linkend="sec-intermediatetypes">Basics</link>
-section, <classname>Gtk::SArray</classname> is a converter object which can
-take any kind of STL vector container. This means that you can pass vectors or
-lists to this method, and things will work as you expect.  For example, the
-following is legal:
-</para>
-
-<para>
-<programlisting>
-list&lt;string&gt; gl;
-
-gl.push_back("String 1");
-gl.push_back("String 2");
-gl.push_back("String 3");
-gl.push_back("String 4");
-
-combo.set_popdown_strings(gl);
-</programlisting>
-</para>
-
-<para>TODO: STL-style access.</para>
-
-<para><ulink url="&url_refdocs_base_gtk;Combo.html">Reference</ulink></para>
-
-<sect2><title>Example</title>
-
-<figure id="figure-combo">
-  <title>Combo</title>
-  <screenshot>
-    <graphic format="PNG" fileref="&url_figures_base;combo.png"/>
-  </screenshot>
-</figure>
-
-<para><ulink url="&url_examples_base;combo">Source Code</ulink></para>
-
-</sect2>
-
-</sect1>
-
 <sect1 id="sec-Spinbuttons">
 <title>SpinButton</title>
 
@@ -2682,19 +2621,19 @@ have child rows.
 <sect2>
 <title>Model Columns</title>
 <para>
-The <classname>TreeModel::ColumnRecord</classname> class is used to keep track
+The <classname>TreeModelColumnRecord</classname> class is used to keep track
 of the columns and their data types. You add
 <classname>TreeModelColumn</classname> instances to the
 <classname>ColumnRecord</classname> and then use those
 <classname>TreeModelColumns</classname> when getting and setting the data in
 model rows. You will probably find it convenient to derive a new
-<classname>TreeModel::ColumnRecord</classname> which has your
+<classname>TreeModelColumnRecord</classname> which has your
 <classname>TreeModelColumn</classname> instances as member data.
 </para>
 
 <para>
 <programlisting>
-class ModelColumns : public Gtk::TreeModel::ColumnRecord
+class ModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
 
@@ -3265,6 +3204,151 @@ section.
 <para><ulink url="&url_examples_base;treeview/popup/">Source Code</ulink></para>
 
 </sect2>
+
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="sec-chapter-comboboxes">
+<title>Combo Boxes</title>
+
+<para>The <classname>ComboBox</classname> and <classname>ComboBoxEntry</classname> widgets offers a list (or tree) of choices in a dropdown menu. If appropriate, they can show extra information about each item, such as text, a picture, a checkbox, or a progress bar. The <classname>ComboBox</classname> widget restricts the user to the available choices, but the <classname>ComboBoxEntry</classname> contains an <classname>Entry</classname>, allowing the user to enter arbitrary text if the none of the available choices are suitable.
+</para>
+
+<para>For both widgets, the list is provided via a <classname>TreeModel</classname>, and columns from this model are added to the ComboBox's view with the <function>ComboBox::pack_start()</function>. This provides a great deal of flexibility and compile-time type-safety, but the <classname>ComboBoxText</classname> and <classname>ComboBoxEntryText</classname> classes provide a simple text-based specialisation in case that flexibility is not required.
+</para>
+
+<sect1 id="sec-combobox">
+<title>ComboBox</title>
+
+<para><ulink url="&url_refdocs_base_gtk;ComboBox.html">Reference</ulink></para>
+
+<sect2 id="sec-combobox-model">
+<title>The model</title>
+<para>The model for a ComboBox can be defined and filled exactly as for a <classname>TreeView</classname>. For instance, you might derive a ComboBox class with one integer and one text columns, like so:
+<programlisting>
+ModelColumns()
+{ add(m_col_id); add(m_col_name); }
+
+  Gtk::TreeModelColumn&lt;int&gt; m_col_id;
+  Gtk::TreeModelColumn&lt;Glib::ustring&lt; m_col_name;
+};
+
+ModelColumns m_columns;
+</programlisting>
+</para>
+<para>After appending rows to this model, you should provide the model to the <classname>ComboBox</classname> with the <function>set_model()</function> method. Then use the <function>pack_start()</function> or <function>pack_end()</function> methods to specify what methods will be displayed in the ComboBox. As with the TreeView you may either use the default cell renderer by passing the <classname>TreeModelColumn</classname> to the pack methods, or you may instantiate a specific <classname>CellRenderer</classname> and specify a particular mapping with either <function>add_attribute()</function> or <function>set_cell_data_func()</function>. Note that these methods are in the <classname>CellLayout</classname> base class.</para>
+</sect2>
+
+<sect2 id="sec-combobox-get">
+<title>The chosen item</title>
+<para>To discover what item, if any, the user has chosen from the ComboBox, call <function>ComboBox::get_active()</function>. This returns a <classname>TreeModel::iterator</classname> that you can dereference to a <classname>Row</classname> in order to read the values in your columns. For instance, you might read an integer ID value from the model, even though you have chosen only to show the human-readable description in the Combo. For instance:
+<programlisting>
+Gtk::TreeModel::iterator iter = m_Combo.get_active();
+if(iter)
+{ 
+  Gtk::TreeModel::Row row = *iter;
+
+  //Get the data for the selected row, using our knowledge of the tree model:
+  int id = row[m_Columns.m_col_id];
+  set_something_id_chosen(id); //Your own function.
+}
+else
+  set_nothing_chosen(); //Your own function.
+</programlisting>
+</para>
+</sect2>
+
+<sect2 id="sec-combobox-changes">
+<title>Responding to changes</title>
+<para>
+You might need to react to every change of selection in the ComboBox, for instance to update other widgets. To do so, you should handle the &quot;changed&quot; signal. For instance:
+<programlisting>
+m_combo.signal_changed().connect( sigc::mem_fun(*this, &amp;ExampleWindow::on_combo_changed) );
+</programlisting>
+</para>
+</sect2>
+
+<sect2><title>Full Example</title>
+
+<figure id="figure-combobox_complex">
+  <title>ComboBox</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;combobox_complex.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;combobox/complex">Source Code</ulink></para>
+
+</sect2>
+
+<sect2><title>Simple Text Example</title>
+
+<figure id="figure-combobox_text">
+  <title>ComboBox</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;combobox_text.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;combobox/text">Source Code</ulink></para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="sec-comboboxentry">
+<title>ComboBoxEntry</title>
+
+<para><ulink url="&url_refdocs_base_gtk;ComboBoxEntry.html">Reference</ulink></para>
+
+<sect2 id="sec-comboboxentry-text-column">
+<title>The text column</title>
+<para>Unlike a regular <classname>ComboBox</classname>, a <classname>ComboBoxEntry</classname> contains a <classname>Entry</classname> widget for entering of arbitrary text. So that this Entry can interact with the drop-down list of choices, you must specify which of your model columns are the text column, with <function>set_text_column()</function>. For instance:
+<programlisting>
+m_combo.set_text_column(m_columns.m_col_name);
+</programlisting>
+</para>
+<para>
+When you select a choice from the drop-down menu, the value from this column will be placed in the <classname>Entry</classname>.
+</para>
+</sect2>
+
+<sect2 id="sec-comboboxentry-model">
+<title>The entry</title>
+<para>Because the user may enter arbitrary text, an active model row isn't enough to tell us what text the user has inputted. Therefore, you should retrieve the <classname>Entry</classname> widget with the <function>ComboBoxEntry::get_entry()</function> method and call <function>get_text()</function> on that.
+</para>
+</sect2>
+
+<sect2><title>Full Example</title>
+
+<figure id="figure-comboboxentry_complex">
+  <title>ComboBoxEntry</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;comboboxentry_complex.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;comboboxentry/complex">Source Code</ulink></para>
+
+</sect2>
+
+<sect2><title>Simple Text Example</title>
+
+<figure id="figure-comboboxentry_text">
+  <title>ComboBoxEntryText</title>
+  <screenshot>
+    <graphic format="PNG" fileref="&url_figures_base;comboboxentry_text.png"/>
+  </screenshot>
+</figure>
+
+<para><ulink url="&url_examples_base;comboboxentry/text">Source Code</ulink></para>
+
+</sect2>
+
+
 
 
 </sect1>
