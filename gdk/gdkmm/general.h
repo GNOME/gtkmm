@@ -55,8 +55,28 @@ void set_source_color(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::C
  */
 void set_source_pixbuf(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
 
+/** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixmap_x, pixmap_y.
+ * @param @context The cairo context.
+ * @param pixmap A Gdk::Pixmap
+ * @param pixmap_x X coordinate of location to place upper left corner of pixmap.
+ * @param pixmap_y Y coordinate of location to place upper left corner of pixmap.
+ *
+ * @newin2p10
+ */
+void set_source_pixmap(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y);
+
 //TODO: Rename to add_rectangle_to_path?
+
+/** TODO
+ *
+ * @newin2p10
+ */
 void rectangle(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
+
+/** TODO
+ *
+ * @newin2p10
+ */
 void region(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region);
 
 } //namespace Cairo

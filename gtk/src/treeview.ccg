@@ -18,11 +18,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gtk/gtktreeview.h>
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/treeview_private.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>
+#include <gtkmm/entry.h>
+#include <gtk/gtktreeview.h>
 
 namespace
 {
@@ -175,6 +176,52 @@ gboolean SignalProxy_ColumnDrop::gtk_callback(GtkTreeView* tree_view, GtkTreeVie
 void SignalProxy_ColumnDrop::gtk_callback_destroy(void* data)
 {
   delete static_cast<SignalProxy_ColumnDrop*>(data);
+}
+
+
+//SignalProxy_SearchPosition:
+
+//This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
+class SignalProxy_SearchPosition
+{
+public:
+  typedef Gtk::TreeView::SlotSearchPosition SlotType;
+
+  SignalProxy_SearchPosition(const SlotType& slot);
+  ~SignalProxy_SearchPosition();
+
+  static void gtk_callback(GtkTreeView* tree_view, GtkWidget* search_dialog, gpointer user_data);
+  static void gtk_callback_destroy(void* data);
+
+protected:
+  SlotType slot_;
+};
+
+SignalProxy_SearchPosition::SignalProxy_SearchPosition(const SlotType& slot)
+:
+  slot_ (slot)
+{}
+
+SignalProxy_SearchPosition::~SignalProxy_SearchPosition()
+{}
+
+void SignalProxy_SearchPosition::gtk_callback(GtkTreeView* tree_view, GtkWidget* search_dialog, gpointer user_data)
+{
+  SignalProxy_SearchPosition *const self = static_cast<SignalProxy_SearchPosition*>(user_data);
+
+  try
+  {
+    (self->slot_)(Glib::wrap(search_dialog));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+void SignalProxy_SearchPosition::gtk_callback_destroy(void* data)
+{
+  delete static_cast<SignalProxy_SearchPosition*>(data);
 }
 
 } // anonymous namespace

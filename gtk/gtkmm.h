@@ -37,6 +37,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/alignment.h>
 #include <gtkmm/arrow.h>
 #include <gtkmm/aspectframe.h>
+#include <gtkmm/assistant.h>
 #include <gtkmm/base.h>
 #include <gtkmm/bin.h>
 #include <gtkmm/box.h>
@@ -91,6 +92,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/invisible.h>
 #include <gtkmm/label.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/linkbutton.h>
 #include <gtkmm/main.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/menu_elems.h>

@@ -106,6 +106,7 @@ _CONV_ENUM(Gtk,IconLookupFlags)
 _CONV_ENUM(Gtk,IconThemeError)
 _CONV_ENUM(Gtk,FileChooserConfirmation)
 _CONV_ENUM(Gtk,SensitivityType)
+_CONV_ENUM(Gtk,AssistantPageType)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -338,6 +339,9 @@ _CONVERSION(`const GtkIconSource*',`const IconSource&',`Glib::wrap(const_cast<Gt
 _CONVERSION(`GtkIconTheme*',`Glib::RefPtr<IconTheme>',`Glib::wrap($3)')
 _CONVERSION(`GList*',`Glib::ListHandle<Glib::ustring>',__FL2H_SHALLOW)
 
+_CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<WindowGroup>',`Glib::wrap($3)')
+_CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<const WindowGroup>',`Glib::wrap($3)')
+
 # gpointer conversions:
 # There's doesn't seem to be a way to tell g_signal_new that it's a pointer to a gint, for instance:
 #_CONVERSION(`int*',`gpointer',`($1)$3')
@@ -476,6 +480,9 @@ _CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&$3))')
 _CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 _CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
 
+_CONVERSION(`GtkEntry*',`Entry*',__RP2PD)
+_CONVERSION(`GtkEntry*',`const Entry*',__RP2CPD)
+_CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
 
 # Used by Signals:
