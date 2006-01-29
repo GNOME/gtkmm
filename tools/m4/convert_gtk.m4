@@ -480,8 +480,8 @@ _CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&$3))')
 _CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 _CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
 
-_CONVERSION(`GtkEntry*',`Entry*',__RP2PD)
-_CONVERSION(`GtkEntry*',`const Entry*',__RP2CPD)
+_CONVERSION(`GtkEntry*',`Entry*',__RP2P)
+_CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
 _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
 
