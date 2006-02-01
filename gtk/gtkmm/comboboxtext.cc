@@ -51,7 +51,7 @@ void ComboBoxText::append_text(const Glib::ustring& text)
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
   Glib::RefPtr<Gtk::TreeModel> model = get_model();
   Glib::RefPtr<Gtk::ListStore> list_model = Glib::RefPtr<ListStore>::cast_dynamic(model);
-  
+
   if(list_model)
   {
     Gtk::TreeModel::iterator iter = list_model->append();
@@ -110,7 +110,7 @@ void ComboBoxText::clear_items()
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
   Glib::RefPtr<Gtk::TreeModel> model = get_model();
   Glib::RefPtr<Gtk::ListStore> list_model = Glib::RefPtr<ListStore>::cast_dynamic(model);
-  
+
   if(list_model)  
     list_model->clear();
 }
