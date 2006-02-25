@@ -43,6 +43,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/buttonbox.h>
+#include <gtkmm/cellview.h>
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/checkmenuitem.h>
 #include <gtkmm/cellrenderer.h>
@@ -83,6 +84,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/iconset.h>
 #include <gtkmm/iconfactory.h>
 #include <gtkmm/iconsource.h>
+#include <gtkmm/icontheme.h>
 #include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
 #include <gtkmm/imagemenuitem.h>
@@ -91,6 +93,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/calendar.h>
 #include <gtkmm/invisible.h>
 #include <gtkmm/label.h>
+#include <gtkmm/layout.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/linkbutton.h>
 #include <gtkmm/main.h>
