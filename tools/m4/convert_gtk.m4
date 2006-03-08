@@ -107,6 +107,7 @@ _CONV_ENUM(Gtk,IconThemeError)
 _CONV_ENUM(Gtk,FileChooserConfirmation)
 _CONV_ENUM(Gtk,SensitivityType)
 _CONV_ENUM(Gtk,AssistantPageType)
+_CONV_ENUM(Gtk,IconViewDropPosition)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')

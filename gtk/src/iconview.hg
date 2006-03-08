@@ -30,6 +30,8 @@ _PINCLUDE(gtkmm/private/container_p.h)
 namespace Gtk
 {
 
+_WRAP_ENUM(IconViewDropPosition, GtkIconViewDropPosition)
+
 /** TODO
  *
  * @ingroup Widgets
@@ -77,8 +79,42 @@ public:
 
   _WRAP_METHOD(TreeModel::Path get_path_at_pos(int x, int y) const, gtk_icon_view_get_path_at_pos )
 
+
+  /** Finds the path at the point (@a x, @a y), relative to widget coordinates.
+   *
+   * @param x The x position to be identified.
+   * @param y The y position to be identified.
+   * @param path The path.
+   * @param cell The renderer responsible for the cell at (@a x, @a y).
+   * 
+   * @result true if an item exists at the specified position.
+   *
+   * @newin2p6
+   */
   bool get_item_at_pos(int x, int y, TreeModel::Path& path, CellRenderer*& cell) const;
+
+  /** Finds the path at the point (@a x, @a y), relative to widget coordinates.
+   *
+   * @param x The x position to be identified.
+   * @param y The y position to be identified.
+   * @param path The path.
+   * 
+   * @result true if an item exists at the specified position.
+   *
+   * @newin2p6
+   */
   bool get_item_at_pos(int x, int y, TreeModel::Path& path) const;
+
+  /** Finds the path at the point (@a x, @a y), relative to widget coordinates.
+   *
+   * @param x The x position to be identified.
+   * @param y The y position to be identified.
+   * @param path The path.
+   * 
+   * @result true if an item exists at the specified position.
+   *
+   * @newin2p6
+   */
   bool get_item_at_pos(int x, int y, CellRenderer*& cell) const;
   _IGNORE(gtk_icon_view_get_item_at_pos)
 
@@ -105,8 +141,8 @@ public:
   _WRAP_METHOD(void select_path(const TreeModel::Path& path), gtk_icon_view_select_path)
   _WRAP_METHOD(void unselect_path(const TreeModel::Path& path), gtk_icon_view_unselect_path)
   _WRAP_METHOD(bool path_is_selected(const TreeModel::Path& path) const, gtk_icon_view_path_is_selected)
-  
-  
+
+
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   //TODO: I'm not sure about these to_*() functions. murrayc.
   struct TreePathTraits
@@ -126,7 +162,7 @@ public:
 
   _CONVERSION(`GList*',`ArrayHandle_TreePaths',__FL2H_SHALLOW)
   _WRAP_METHOD(ArrayHandle_TreePaths get_selected_items() const, gtk_icon_view_get_selected_items)
-  
+
   _WRAP_METHOD(void select_all(), gtk_icon_view_select_all)
   _WRAP_METHOD(void unselect_all(), gtk_icon_view_unselect_all)
   _WRAP_METHOD(void item_activated(const TreeModel::Path& path),  gtk_icon_view_item_activated)
@@ -134,12 +170,138 @@ public:
   void set_cursor(const TreeModel::Path& path, CellRenderer& cell, bool start_editing);
   _IGNORE(gtk_icon_view_set_cursor)
 
+  /** Fills in @a path and @a cell with the current cursor path and cell. 
+   * If the cursor isn't currently set, then @a path will be empty.
+   * If no cell currently has focus, then @a cell will be NULL.
+   *
+   * @param path The current cursor path.
+   * @param cell The current focus cell.
+   * @result true if the cursor is set.
+   *
+   * @newin2p8
+   */
   bool get_cursor(TreeModel::Path& path, CellRenderer*& cell) const;
+
+  /** Fills in @a path and @a cell with the current cursor path and cell. 
+   * If the cursor isn't currently set, then @a path will be empty.
+   * If no cell currently has focus, then @a cell will be NULL.
+   *
+   * @param path The current cursor path.
+   * @result true if the cursor is set.
+   *
+   * @newin2p8
+   */
   bool get_cursor(TreeModel::Path& path) const;
+
+  /** Fills in @a path and @a cell with the current cursor path and cell. 
+   * If the cursor isn't currently set, then @a path will be empty.
+   * If no cell currently has focus, then @a cell will be NULL.
+   *
+   * @param cell The current focus cell.
+   * @result true if the cursor is set.
+   *
+   * @newin2p8
+   */
   bool get_cursor(CellRenderer*& cell) const;
   _IGNORE(gtk_icon_view_get_cursor)
 
   _WRAP_METHOD(void scroll_to_path(const TreeModel::Path& path, bool use_align, gfloat row_align, gfloat col_align), gtk_icon_view_scroll_to_path)
+
+/* Drag-and-Drop support */
+  /**
+   * Turns the IconView into a drag source for automatic DND.
+   *
+   * @param targets Standard container of targets that the drag will support.
+   * @param start_button_mask Mask of allowed buttons to start drag.
+   * @param actions The bitmask of possible actions for a drag from this widget.
+   */
+  void enable_model_drag_source(const ArrayHandle_TargetEntry& targets,
+                                Gdk::ModifierType start_button_mask = Gdk::MODIFIER_MASK,
+                                Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
+  _IGNORE(gtk_icon_view_enable_model_drag_source)
+
+  /** Turns the IconView into a drop destination for automatic DND.
+   *
+   * @param targets The table of targets that the drag will support.
+   * @param actions The bitmask of possible actions for a drag from this widget.
+   */
+  void enable_model_drag_dest(const ArrayHandle_TargetEntry& targets, Gdk::DragAction actions = Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
+  _IGNORE(gtk_icon_view_enable_model_drag_dest)
+
+  _WRAP_METHOD(void unset_model_drag_source(), gtk_icon_view_unset_model_drag_source)
+  _WRAP_METHOD(void unset_model_drag_dest(), gtk_icon_view_unset_model_drag_dest)
+
+  _WRAP_METHOD(void set_reorderable(bool reorderable = true), gtk_icon_view_set_reorderable)
+  _WRAP_METHOD(bool get_reorderable() const, gtk_icon_view_get_reorderable)
+
+
+/* These are useful to implement your own custom stuff. */
+  //TODO: Discover what arguments are output arguments:
+  _WRAP_METHOD(void set_drag_dest_item(const TreeModel::Path& path, IconViewDropPosition pos), gtk_icon_view_set_drag_dest_item)
+
+  /** Gets information about the item that is highlighted for feedback.
+   *
+   * @param path The highlighted item.
+   * @pos The drop position.
+   *
+   * @newin2p10
+   */
+  void get_drag_dest_item(TreeModel::Path& path, IconViewDropPosition& pos) const;
+
+  /** Gets information about the item that is highlighted for feedback.
+   *
+   * @param path The highlighted item.
+   *
+   * @newin2p10
+   */
+  void get_drag_dest_item(TreeModel::Path& path) const;
+
+  /** Gets information about the item that is highlighted for feedback.
+   *
+   * @pos The drop position.
+   *
+   * @newin2p10
+   */
+  void get_drag_dest_item(IconViewDropPosition& pos) const;
+  _IGNORE(gtk_icon_view_get_drag_dest_item)
+
+  /** Determines the destination item for a given position.
+   *
+   * @param drag_x The position to determine the destination item for.
+   * @param drag_y the position to determine the destination item for.
+   * @param path The path of the item.
+   * @param pos: The drop position.
+   * @result whether there is an item at the given position.
+   *
+   * @newin2p10
+   */
+  bool get_dest_item_at_pos(int drag_x, int drag_y, TreeModel::Path& path, IconViewDropPosition& pos) const;
+
+  /** Determines the destination item for a given position.
+   *
+   * @param drag_x The position to determine the destination item for.
+   * @param drag_y the position to determine the destination item for.
+   * @param path The path of the item.
+   * @result whether there is an item at the given position.
+   *
+   * @newin2p10
+   */
+  bool get_dest_item_at_pos(int drag_x, int drag_y, TreeModel::Path& path) const;
+
+  /** Determines the destination item for a given position.
+   * 
+   * @param drag_x The position to determine the destination item for.
+   * @param drag_y the position to determine the destination item for.
+   * @param pos: The drop position.
+   * @result whether there is an item at the given position.
+   *
+   * @newin2p10
+   */
+  bool get_dest_item_at_pos(int drag_x, int drag_y, IconViewDropPosition& pos) const;
+  _IGNORE(gtk_icon_view_get_dest_item_at_pos)
+
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixmap> create_drag_icon( const TreeModel::Path& path), gtk_icon_view_create_drag_icon)
+
 
   _WRAP_SIGNAL(void set_scroll_adjustments(Adjustment* hadjustment, Adjustment* vadjustment), set_scroll_adjustments) 
   _WRAP_SIGNAL(void item_activated(const TreeModel::Path& path), item_activated)
