@@ -62,17 +62,17 @@ bool MyArea::on_expose_event(GdkEventExpose* event)
     cr->move_to(0.3, 0.3);
     cr->rel_line_to(0.2, -0.2);
     cr->rel_line_to(0.2, 0.2);
-    cr->set_line_join(CAIRO_LINE_JOIN_MITER); /* def ault */
+    cr->set_line_join(Cairo::LINE_JOIN_MITER); /* def ault */
     cr->stroke();
     cr->move_to(0.3, 0.6);
     cr->rel_line_to(0.2, -0.2);
     cr->rel_line_to(0.2, 0.2);
-    cr->set_line_join(CAIRO_LINE_JOIN_BEVEL);
+    cr->set_line_join(Cairo::LINE_JOIN_BEVEL);
     cr->stroke();
     cr->move_to(0.3, 0.9);
     cr->rel_line_to(0.2, -0.2);
     cr->rel_line_to(0.2, 0.2);
-    cr->set_line_join(CAIRO_LINE_JOIN_ROUND);
+    cr->set_line_join(Cairo::LINE_JOIN_ROUND);
     cr->stroke();
 
   }

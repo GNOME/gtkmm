@@ -76,7 +76,7 @@ bool Clock::on_expose_event(GdkEventExpose* event)
         double inset = 0.05;
 
         cr->save();
-        cr->set_line_cap(CAIRO_LINE_CAP_ROUND);
+        cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 
         if (i % 3 != 0)
         {
@@ -105,7 +105,7 @@ bool Clock::on_expose_event(GdkEventExpose* event)
     double seconds= timeinfo->tm_sec * M_PI / 30;
 
     cr->save();
-    cr->set_line_cap(CAIRO_LINE_CAP_ROUND);
+    cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 
     // draw the seconds hand
     cr->save();
