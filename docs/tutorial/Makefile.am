@@ -6,7 +6,7 @@ SUBDIRS = figures icons
 
 DOCBOOK_PHPWEBNOTES_TRANSFORM = docbook_phpwebnotes.xsl
 
-EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml html $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
+EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml style.css html $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
 
 DOCBOOK_STYLESHEET ?= http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
 

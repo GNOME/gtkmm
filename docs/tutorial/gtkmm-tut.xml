@@ -3019,8 +3019,6 @@ For multiple-selection, you need to define a callback, and give it to
 refTreeSelection-&gt;selected_foreach_iter( 
     sigc::mem_fun(*this, &amp;TheClass::selected_row_callback) );
 
-...
-
 void TheClass::selected_row_callback(const Gtk::TreeModel::iterator&amp; iter)
 {
   TreeModel::Row row = *iter;
@@ -3088,6 +3086,61 @@ if(iter)
   refTreeSelection-&gt;select(iter);
 </programlisting>
 </para>
+</sect2>
+
+</sect1>
+
+
+<sect1 id="sec-treeview-sort">
+<title>Sorting</title>
+<para>
+The standard tree models (<classname>TreeStore</classname> and <classname>ListStore</classname> derive from <classname>TreeSortable</classname>, so they offer sorting functionality. For instance, call <function>set_sort_column()</function>, to sort the model by the specified column. Or supply a callback function to <function>set_sort_func()</function> to implement a more complicated sorting algorithm.
+</para>
+
+<para><ulink url="&url_refdocs_base_gtk;TreeSortable.html">TreeSortable Reference</ulink></para>
+
+<sect2>
+<title>Sorting by clicking on columns</title>
+<para>
+So that a user can click on a <classname>TreeView</classname>'s column header to sort the <classname>TreeView</classname>'s contents, call <function>Gtk::TreeViewModel::set_sort_column()</function>, supplying the model column on which model should be sorted when the header is clicked. For instance:
+<programlisting>
+Gtk::TreeView::Column* pColumn = treeview.get_column(0);
+if(pColumn)
+  pColumn->set_sort_column(m_columns.m_col_id);
+</programlisting>
+</para>
+</sect2>
+
+<sect2>
+<title>Independently sorted views of the same model</title>
+<para>
+The <classname>TreeView</classname> already allows you to show the same <classname>TreeModel</classname> in two <classname>TreeView</classname> widgets. If you need one of these TreeViews to sort the model differently than the other then you should use a <classname>TreeModelSort</classname> instead of just, for instance, <function>Gtk::TreeViewModel::set_sort_column()</function>. <classname>TreeModelSort</classname> is a model that contains another model, presenting a sorted version of that model. For instance, you might add a sorted version of a model to a <classname>TreeView</classname> like so:
+<programlisting>
+Glib::RefPtr&lt;Gtk::TreeModelSort&gt; sorted_model = Gtk::TreeModelSort::create(model);
+sorted_model->set_sort_column(columns.m_col_name, Gtk::SORT_ASCENDING);
+treeview.set_model(sorted_model);
+</programlisting>
+</para>
+
+<para>Note, however, that the TreeView will provide iterators to the sorted model. You must convert them to iterators to the underlying child model in order to perform actions on that model. For instance:
+<programlisting>
+void ExampleWindow::on_button_delete()
+{
+  Glib::RefPtr&lt;Gtk::TreeSelection&gt; refTreeSelection= m_treeview.get_selection();
+  if(refTreeSelection)
+  {
+    Gtk::TreeModel::iterator sorted_iter = m_refTreeSelection->get_selected();
+    if(sorted_iter)
+    {
+      Gtk::TreeModel::iterator iter  = m_refModelSort->convert_iter_to_child_iter(sorted_iter);
+      m_refModel->erase(iter);
+    }
+  }
+}
+</programlisting>
+</para>
+
+<para><ulink url="&url_refdocs_base_gtk;TreeModelSort.html">TreeModelSort Reference</ulink></para>
 </sect2>
 
 </sect1>
