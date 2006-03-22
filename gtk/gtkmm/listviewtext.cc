@@ -18,24 +18,27 @@
 #include <gtkmm/listviewtext.h>
 #include <sstream>
 
+namespace Gtk
+{
+
 ListViewText::TextModelColumns::TextModelColumns(guint columns_count)
 : m_columns_count(columns_count)
 {
-  m_data = new Gtk::TreeModelColumn<Glib::ustring>[m_columns_count];
+  m_columns = new Gtk::TreeModelColumn<Glib::ustring>[m_columns_count];
 
-  if(m_data)
+  if(m_columns)
   {
     for(guint i = 0; i < m_columns_count; ++i)
     {
-      add(m_data[i]);
+      add(m_columns[i]);
     }
   }
 }
 
 ListViewText::TextModelColumns::~TextModelColumns()
 {
-  if(m_data)
-    delete[] m_data;
+  if(m_columns)
+    delete[] m_columns;
 }
 
 guint ListViewText::TextModelColumns::get_num_columns() const
@@ -44,13 +47,13 @@ guint ListViewText::TextModelColumns::get_num_columns() const
 }
 
 ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMode mode)
+: m_model_columns(columns_count)
 {
   std::ostringstream columnTitle;
 
   // Create model
-  m_model_columns = new TextModelColumns(columns_count); 
 
-  m_model = Gtk::ListStore::create( *m_model_columns );	
+  m_model = Gtk::ListStore::create(m_model_columns);	
   set_model(m_model);
 
   // Append columns
@@ -60,9 +63,9 @@ ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMod
     columnTitle << "column#" << i;		
 
     if(editable)
-      append_column_editable(columnTitle.str(), m_model_columns->m_data[i]);
+      append_column_editable(columnTitle.str(), m_model_columns.m_columns[i]);
     else
-      append_column( columnTitle.str(), m_model_columns->m_data[i] );
+      append_column( columnTitle.str(), m_model_columns.m_columns[i] );
   }
 
   // Set multiple or simple selection
@@ -71,8 +74,6 @@ ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMod
 
 ListViewText::~ListViewText()
 {
-  if(m_model_columns)
-    delete m_model_columns;
 }
 
 void ListViewText::set_column_title(guint column, const Glib::ustring& title)
@@ -93,7 +94,7 @@ guint ListViewText::append_text(const Glib::ustring& column_one_value)
 {
   Gtk::TreeModel::Row newRow = *(m_model->append());
 
-  newRow[m_model_columns->m_data[0]] = column_one_value;
+  newRow[m_model_columns.m_columns[0]] = column_one_value;
 
   return size() -1;
 }
@@ -102,7 +103,7 @@ void ListViewText::prepend_text(const Glib::ustring& column_one_value)
 {
   Gtk::TreeModel::Row newRow = *( m_model->prepend() );
 
-  newRow[m_model_columns->m_data[0]] = column_one_value;
+  newRow[m_model_columns.m_columns[0]] = column_one_value;
 }
 
 void ListViewText::insert_text(guint row, const Glib::ustring& column_one_value)
@@ -114,7 +115,7 @@ void ListViewText::insert_text(guint row, const Glib::ustring& column_one_value)
 
   if(!column_one_value.empty())
   {
-    newRow[m_model_columns->m_data[0]] = column_one_value;
+    newRow[m_model_columns.m_columns[0]] = column_one_value;
   }
 }
 
@@ -158,7 +159,7 @@ guint ListViewText::size() const
 
 guint ListViewText::get_num_columns() const
 {
-  return m_model_columns->get_num_columns();
+  return m_model_columns.get_num_columns();
 }
 
 ListViewText::SelectionList ListViewText::get_selected()
@@ -179,3 +180,6 @@ ListViewText::SelectionList ListViewText::get_selected()
 
   return selectionList;
 }
+
+} //namespace Gtk
+

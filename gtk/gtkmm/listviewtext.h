@@ -23,6 +23,9 @@
 
 #include <vector>
 
+namespace Gtk
+{
+
 /** A simple listbox which presents some lines of information in columns and lets the user select some of them.
  *
  * This is a convenience class, based on Gtk::TreeView, which allows only text values and does not allow child items.
@@ -111,14 +114,17 @@ protected:
 
     guint get_num_columns() const;
 
-    Gtk::TreeModelColumn<Glib::ustring>* m_data;
+    Gtk::TreeModelColumn<Glib::ustring>* m_columns;
 
   protected:
     guint m_columns_count;
   };
 
   Glib::RefPtr<Gtk::ListStore> m_model;
-  TextModelColumns* m_model_columns;
+  TextModelColumns m_model_columns;
 };
 
-#endif
+} //namespace Gtk
+
+#endif //_GTKMM_LISTVIEW_TEXT_H
+
