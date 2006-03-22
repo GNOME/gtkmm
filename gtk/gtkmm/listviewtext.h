@@ -31,6 +31,12 @@ namespace Gtk
  * This is a convenience class, based on Gtk::TreeView, which allows only text values and does not allow child items.
  * In most cases you will actually need the functionality offered by a real Gtk::TreeView with your own type-safe 
  * Gtk::TreeModel::ColumnRecord.
+ *
+ * @ingroup Widgets
+ * @ingroup Containers
+ * @ingroup TreeView
+ *
+ * @newin2p10
  */
 class ListViewText : public Gtk::TreeView
 {
