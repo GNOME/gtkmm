@@ -14,6 +14,7 @@ sublib_win32_dlls_libs	=
 sublib_files_extra_posix_cc = 
 sublib_files_extra_win32_cc =
 sublib_files_extra_general_cc = accelkey.cc accelmap.cc cellrenderer_generation.cc comboboxtext.cc comboboxentrytext.cc \
+                                listviewtext.cc \
                                 menu_elems.cc radiobuttongroup.cc selectiondata_private.cc stock.cc stockid.cc targetentry.cc \
                                 treemodelcolumn.cc treeview_private.cc
 sublib_files_extra_general_deprecated_cc = 
@@ -21,6 +22,7 @@ sublib_files_extra_general_deprecated_cc =
 sublib_files_extra_posix_h = 
 sublib_files_extra_win32_h =
 sublib_files_extra_general_h = accelkey.h accelmap.h base.h cellrenderer_generation.h comboboxtext.h comboboxentrytext.h\
+                               listviewtext.h \
                                menu_elems.h radiobuttongroup.h selectiondata_private.h stock.h stockid.h targetentry.h \
                                treemodelcolumn.h treeview_private.h
 sublib_files_extra_general_deprecated_h = 
