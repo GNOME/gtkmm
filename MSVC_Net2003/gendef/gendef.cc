@@ -20,6 +20,12 @@
  *  http://www.mico.org/
  */
 
+/* Modified by Cedric Gustin <cedric.gustin@gmail.com> on 2006/01/13 :
+ * Redirect the output of dumpbin to dumpbin.out instead of reading the
+ * output stream of popen, as it fails with Visual Studio 2005 in 
+ * pre-link build events.
+ */
+
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -33,7 +39,8 @@ int main(int argc,char** argv)
 	  return 2;
   }
 
-  string dumpbin = "dumpbin /SYMBOLS";
+  // CG : Explicitly redirect stdout to dumpbin.out.
+  string dumpbin = "dumpbin /SYMBOLS /OUT:dumpbin.out";
   int i = 3;
 
   for(;i<argc;) {
@@ -43,10 +50,14 @@ int main(int argc,char** argv)
 
   FILE * dump; 
   
-  if( (dump = _popen( dumpbin.c_str(),"r")) == NULL ) {
+  if( (dump = _popen(dumpbin.c_str(),"r")) == NULL ) {
 	  cerr << "could not popen dumpbin" << endl;
 	  return 3;
   }
+
+  // CG : Wait for the dumpbin process to finish and open dumpbin.out.
+  _pclose(dump);
+  dump=fopen("dumpbin.out","r");
 
   ofstream def_file(argv[1]);
 
@@ -74,6 +85,10 @@ int main(int argc,char** argv)
 		  }
 	  }
   }
+
+  // CG : Close dumpbin.out and delete it.
+  fclose(dump);
+  remove("dumpbin.out");
 
   cout << dumpbin.c_str() << endl;
 }
