@@ -1,0 +1,92 @@
+/* Copyright (C) 2006 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gdkmm/screen.h>
+#include <gdkmm/pixbuf.h>
+
+#include <gtkmm/recentinfo.h>
+
+#include <glibmm/object.h>
+#include <glibmm/containers.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+/** Exception class for Gtk::RecentManager errors.
+ */
+_WRAP_GERROR(RecentManagerError, GtkRecentManagerError, GTK_RECENT_MANAGER_ERROR)
+
+class RecentManager : public Glib::Object
+{
+  _CLASS_GOBJECT(RecentManager, GtkRecentManager, GTK_RECENT_MANAGER, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(static Glib::RefPtr<RecentManager> get_default(), gtk_recent_manager_get_default, refreturn)
+  _WRAP_METHOD(static Glib::RefPtr<RecentManager> get_for_screen(const Glib::RefPtr<Gdk::Screen>& screen), gtk_recent_manager_get_for_screen, refreturn)
+
+  class Data
+  { 
+  public:
+    Glib::ustring display_name;
+    Glib::ustring description;
+    
+    Glib::ustring mime_type;
+    
+    Glib::ustring app_name;
+    Glib::ustring app_exec;
+    
+    Glib::StringArrayHandle groups;
+  
+    bool is_private;
+  };
+
+#m4 _CONVERSION(`const Data&',`const GtkRecentData*',`(GtkRecentData*)(&($3))')
+
+  _WRAP_METHOD(void set_screen(const Glib::RefPtr<Gdk::Screen>& screen), gtk_recent_manager_set_screen)
+  _WRAP_METHOD(bool add_item(const Glib::ustring& uri), gtk_recent_manager_add_item, errthrow)
+  _WRAP_METHOD(bool add_full(const Glib::ustring& uri, const Data& recent_data), gtk_recent_manager_add_full, errthrow)
+  _WRAP_METHOD(bool remove_item(const Glib::ustring& uri), gtk_recent_manager_remove_item, errthrow)
+  _WRAP_METHOD(RecentInfo lookup_item(const Glib::ustring& uri), gtk_recent_manager_lookup_item, errthrow)
+  _WRAP_METHOD(bool has_item(const Glib::ustring& uri) const, gtk_recent_manager_has_item)
+  _WRAP_METHOD(bool move_item(const Glib::ustring& uri, const Glib::ustring& new_uri), gtk_recent_manager_move_item, errthrow)
+  _WRAP_METHOD(void set_limit(int limit), gtk_recent_manager_set_limit)
+  _WRAP_METHOD(int get_limit() const, gtk_recent_manager_get_limit)
+
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<RecentInfo> > get_items() const, gtk_recent_manager_get_items)
+  _WRAP_METHOD(int purge_items(), gtk_recent_manager_purge_items, errthrow)
+
+  /// For instance, void on_changed();
+  typedef sigc::slot<void> SlotChanged;
+
+  /** The "changed" signals is emitted when an item in the recently used resources list is changed.
+  */
+  _WRAP_SIGNAL(void changed(), "changed")
+
+  _WRAP_PROPERTY("filename", Glib::ustring)
+  _WRAP_PROPERTY("limit", int)
+  _WRAP_PROPERTY("size", int)
+};
+
+} // namespace Gtk

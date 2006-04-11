@@ -115,6 +115,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
+#include <gtkmm/recentfilter.h>
+#include <gtkmm/recentinfo.h>
+#include <gtkmm/recentmanager.h>
 #include <gtkmm/ruler.h>
 #include <gtkmm/scale.h>
 #include <gtkmm/scrollbar.h>

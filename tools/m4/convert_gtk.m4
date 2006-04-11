@@ -40,6 +40,9 @@ _CONVERSION(`char**',`gchar**',`$3')
 _CONVERSION(`gpointer&',`gpointer*',`&($3)')
 _CONVERSION(`void*&',`gpointer*',`&($3)')
 
+_CONVERSION(`unsigned&',`gsize*',`&($3)')
+_CONVERSION(`time_t&',`time_t*',`&($3)')
+
 _CONVERSION(`GError*&',`GError**',`&($3)')
 
 _CONVERSION(`ui_merge_id',`guint',`$3')
@@ -108,6 +111,8 @@ _CONV_ENUM(Gtk,FileChooserConfirmation)
 _CONV_ENUM(Gtk,SensitivityType)
 _CONV_ENUM(Gtk,AssistantPageType)
 _CONV_ENUM(Gtk,IconViewDropPosition)
+_CONV_ENUM(Gtk,RecentFilterFlags)
+_CONV_ENUM(Gtk,RecentManagerError)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -292,6 +297,7 @@ _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Action> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Action> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<ActionGroup> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const ActionGroup> >',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<RecentInfo> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLOW)
@@ -485,6 +491,18 @@ _CONVERSION(`GtkEntry*',`Entry*',__RP2P)
 _CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
 _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
+#RecentFilter
+_CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
+
+#RecentInfo
+_CONVERSION(`GtkRecentInfo*',`RecentInfo',`Glib::wrap($3)')
+_CONVERSION(`const RecentInfo&',`GtkRecentInfo*',__FCR2P)
+
+_CONVERSION(`Glib::StringArrayHandle&',`gchar**',`const_cast<gchar**>(($3).data())')
+_CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
+
+#RecentManager
+_CONVERSION(`GtkRecentManager*',`Glib::RefPtr<RecentManager>',`Glib::wrap($3)')
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
