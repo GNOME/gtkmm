@@ -16,7 +16,6 @@
  */
 
 #include <gtkmm/listviewtext.h>
-#include <sstream>
 
 namespace Gtk
 {
@@ -49,23 +48,22 @@ guint ListViewText::TextModelColumns::get_num_columns() const
 ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMode mode)
 : m_model_columns(columns_count)
 {
-  std::ostringstream columnTitle;
-
+  char column_title[20];
+  
   // Create model
-
   m_model = Gtk::ListStore::create(m_model_columns);	
   set_model(m_model);
 
   // Append columns
   for(guint i = 0; i < columns_count; ++i)
   {
-    columnTitle.str( Glib::ustring() );
-    columnTitle << "column#" << i;		
+    //Get text for the number:
+    sprintf(column_title, "%d", i);		
 
     if(editable)
-      append_column_editable(columnTitle.str(), m_model_columns.m_columns[i]);
+      append_column_editable(column_title, m_model_columns.m_columns[i]);
     else
-      append_column( columnTitle.str(), m_model_columns.m_columns[i] );
+      append_column(column_title, m_model_columns.m_columns[i]);
   }
 
   // Set multiple or simple selection
@@ -96,12 +94,12 @@ guint ListViewText::append_text(const Glib::ustring& column_one_value)
 
   newRow[m_model_columns.m_columns[0]] = column_one_value;
 
-  return size() -1;
+  return size() - 1;
 }
 
 void ListViewText::prepend_text(const Glib::ustring& column_one_value)
 {
-  Gtk::TreeModel::Row newRow = *( m_model->prepend() );
+  Gtk::TreeModel::Row newRow = *(m_model->prepend());
 
   newRow[m_model_columns.m_columns[0]] = column_one_value;
 }
