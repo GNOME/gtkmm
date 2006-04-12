@@ -20,38 +20,14 @@
 
 #include <gtk/gtktreemodelfilter.h>
 
-namespace //anonymous
+
+static gboolean SignalProxy_Visible_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_Visible
-{
-public:
-  typedef Gtk::TreeModelFilter::SlotVisible SlotType;
-
-  SignalProxy_Visible(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_Visible();
-
-  static gboolean gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Visible::~SignalProxy_Visible()
-{}
-
-gboolean SignalProxy_Visible::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
-{
-  SignalProxy_Visible *const self = static_cast<SignalProxy_Visible*>(data);
+  Gtk::TreeModelFilter::SlotVisible* the_slot = static_cast<Gtk::TreeModelFilter::SlotVisible*>(data);
 
   try
   {
-    return (self->slot_)( Gtk::TreeModel::const_iterator(model, iter) );
+    return (*the_slot)( Gtk::TreeModel::const_iterator(model, iter) );
   }
   catch(...)
   {
@@ -61,37 +37,15 @@ gboolean SignalProxy_Visible::gtk_callback(GtkTreeModel* model, GtkTreeIter* ite
   return FALSE; //An arbitary default, just to avoid the compiler warning.
 }
 
-void SignalProxy_Visible::gtk_callback_destroy(void* data)
+static void SignalProxy_Visible_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Visible*>(data);
+  delete static_cast<Gtk::TreeModelFilter::SlotVisible*>(data);
 }
 
 
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_Modify
+static void SignalProxy_Modify_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data)
 {
-public:
-  typedef Gtk::TreeModelFilter::SlotModify SlotType;
-
-  SignalProxy_Modify(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_Modify();
-
-  static void gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Modify::~SignalProxy_Modify()
-{}
-
-void SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data)
-{
-  SignalProxy_Modify *const self = static_cast<SignalProxy_Modify*>(data);
+  Gtk::TreeModelFilter::SlotModify* the_slot = static_cast<Gtk::TreeModelFilter::SlotModify*>(data);
 
   try
   {
@@ -101,7 +55,7 @@ void SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GV
     GType column_type = gtk_tree_model_get_column_type(model, column);
     cppValue.init(column_type);
     
-    (self->slot_)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
+    (*the_slot)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
 
     //GTK+ has already done this for us: g_value_init(value, column_type);
 
@@ -115,13 +69,10 @@ void SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GV
   }
 }
 
-void SignalProxy_Modify::gtk_callback_destroy(void* data)
+static void SignalProxy_Modify_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Modify*>(data);
+  delete static_cast<Gtk::TreeModelFilter::SlotModify*>(data);
 }
-
-
-} // anonymous namespace
 
 
 typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
@@ -143,14 +94,14 @@ TreeModelFilter::TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, con
 
 void TreeModelFilter::set_visible_func(const SlotVisible& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Visible::gtk_callback_destroy() is called.
-  SignalProxy_Visible *const pSignalProxy = new SignalProxy_Visible(slot);
+  // when SignalProxy_Visible_gtk_callback_destroy() is called.
+  SlotVisible* slot_copy = new SlotVisible(slot);
 
   gtk_tree_model_filter_set_visible_func(gobj(),
-      &SignalProxy_Visible::gtk_callback, pSignalProxy,
-      &SignalProxy_Visible::gtk_callback_destroy);
+      &SignalProxy_Visible_gtk_callback, slot_copy,
+      &SignalProxy_Visible_gtk_callback_destroy);
 }
 
 
@@ -180,15 +131,15 @@ TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& 
 
 void TreeModelFilter::set_modify_func(const TreeModelColumnRecord& columns, const SlotModify& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Modify::gtk_callback_destroy() is called.
-  SignalProxy_Modify *const pSignalProxy = new SignalProxy_Modify(slot);
+  // when SignalProxy_Modify_gtk_callback_destroy() is called.
+  SlotModify* slot_copy = new SlotModify(slot);
 
   gtk_tree_model_filter_set_modify_func(gobj(),
     columns.size(), const_cast<GType*>(columns.types()),
-    &SignalProxy_Modify::gtk_callback, pSignalProxy,
-    &SignalProxy_Modify::gtk_callback_destroy);
+    &SignalProxy_Modify_gtk_callback, slot_copy,
+    &SignalProxy_Modify_gtk_callback_destroy);
 }
 
 void TreeModelFilter::set_value_impl(const iterator& /* row */, int /* column */, const Glib::ValueBase& /* value */)

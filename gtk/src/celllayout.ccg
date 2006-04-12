@@ -21,40 +21,15 @@
 #include <gtk/gtkcelllayout.h>
 
 
-namespace //anonymous
+static void SignalProxy_CellData_gtk_callback(GtkCellLayout* /* cell_layout */, GtkCellRenderer* /* cell */, GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_CellData
-{
-public:
-  typedef Gtk::CellLayout::SlotCellData SlotType;
-
-  SignalProxy_CellData(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_CellData();
-
-  static void gtk_callback(GtkCellLayout* cell_layout, GtkCellRenderer* cell, GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_CellData::~SignalProxy_CellData()
-{}
-
-void SignalProxy_CellData::gtk_callback(GtkCellLayout* /* cell_layout */, GtkCellRenderer* /* cell */, GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
-{
-  SignalProxy_CellData *const self = static_cast<SignalProxy_CellData*>(data);
+  Gtk::CellLayout::SlotCellData* the_slot = static_cast<Gtk::CellLayout::SlotCellData*>(data);
 
   try
   {
     //We ignore the cell, because that was given as an argument to the connecting method, so the caller should know which one it is already.
     //And we ignore the tree_model because that can be obtained from the iter or from the CellLayout itself.
-    (self->slot_)(Gtk::TreeModel::const_iterator(tree_model, iter));
+    (*the_slot)(Gtk::TreeModel::const_iterator(tree_model, iter));
   }
   catch(...)
   {
@@ -63,13 +38,10 @@ void SignalProxy_CellData::gtk_callback(GtkCellLayout* /* cell_layout */, GtkCel
 
 }
 
-void SignalProxy_CellData::gtk_callback_destroy(void* data)
+static void SignalProxy_CellData_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_CellData*>(data);
+  delete static_cast<Gtk::CellLayout::SlotCellData*>(data);
 }
-
-} // anonymous namespace
-
 
 namespace Gtk
 {
@@ -82,14 +54,14 @@ void CellLayout::add_attribute(const Glib::PropertyProxy_Base& property, const T
 
 void CellLayout::set_cell_data_func(CellRenderer& cell, const SlotCellData& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot object.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_CellData::gtk_callback_destroy() is called.
-  SignalProxy_CellData *const pSignalProxy = new SignalProxy_CellData(slot);
+  // when SignalProxy_CellData_gtk_callback_destroy() is called.
+  SlotCellData* slot_copy = new SlotCellData(slot);
 
   gtk_cell_layout_set_cell_data_func(gobj(), cell.gobj(),
-      &SignalProxy_CellData::gtk_callback, pSignalProxy,
-      &SignalProxy_CellData::gtk_callback_destroy);
+      &SignalProxy_CellData_gtk_callback, slot_copy,
+      &SignalProxy_CellData_gtk_callback_destroy);
 }
   
 

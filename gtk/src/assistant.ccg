@@ -25,38 +25,13 @@
 
 
 
-namespace //anonymous
+static gint SignalProxy_SlotForwardPage_gtk_callback(gint current_page, gpointer data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_SlotForwardPage
-{
-public:
-  typedef Gtk::Assistant::SlotForwardPage SlotType;
-
-  SignalProxy_SlotForwardPage(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_SlotForwardPage();
-
-  static gint gtk_callback(gint current_page, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_SlotForwardPage::~SignalProxy_SlotForwardPage()
-{}
-
-gint SignalProxy_SlotForwardPage::gtk_callback(gint current_page, gpointer data)
-{
-  SignalProxy_SlotForwardPage *const self = static_cast<SignalProxy_SlotForwardPage*>(data);
+  Gtk::Assistant::SlotForwardPage* the_slot = static_cast<Gtk::Assistant::SlotForwardPage*>(data);
 
   try
   {
-    return (self->slot_)(current_page);
+    return (*the_slot)(current_page);
   }
   catch(...)
   {
@@ -66,12 +41,10 @@ gint SignalProxy_SlotForwardPage::gtk_callback(gint current_page, gpointer data)
 
 }
 
-void SignalProxy_SlotForwardPage::gtk_callback_destroy(void* data)
+static void SignalProxy_SlotForwardPage_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_SlotForwardPage*>(data);
+  delete static_cast<Gtk::Assistant::SlotForwardPage*>(data);
 }
-
-} // anonymous namespace
 
 
 namespace Gtk
@@ -79,14 +52,14 @@ namespace Gtk
 
 void Assistant::set_forward_page_func(const SlotForwardPage& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_SlotForwardPage::gtk_callback_destroy() is called.
-  SignalProxy_SlotForwardPage *const pSignalProxy = new SignalProxy_SlotForwardPage(slot);
+  // when SignalProxy_SlotForwardPage_gtk_callback_destroy() is called.
+  SlotForwardPage* slot_copy = new SlotForwardPage(slot);
 
   gtk_assistant_set_forward_page_func(gobj(), 
-      &SignalProxy_SlotForwardPage::gtk_callback, pSignalProxy,
-      &SignalProxy_SlotForwardPage::gtk_callback_destroy);
+      &SignalProxy_SlotForwardPage_gtk_callback, slot_copy,
+      &SignalProxy_SlotForwardPage_gtk_callback_destroy);
 }
   
 

@@ -27,23 +27,15 @@ namespace Gtk
 namespace TreeView_Private
 {
 
-SignalProxy_CellData::SignalProxy_CellData(const SlotType& slot)
-:
-  slot_ (slot)
-{}
-
-SignalProxy_CellData::~SignalProxy_CellData()
-{}
-
-void SignalProxy_CellData::gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
+void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
                                         GtkTreeModel* model, GtkTreeIter* iter, void* data)
 {
-  SignalProxy_CellData *const self = static_cast<SignalProxy_CellData*>(data);
+  TreeViewColumn::SlotCellData* the_slot = static_cast<TreeViewColumn::SlotCellData*>(data);
 
   try
   {
     // use Slot::operator()
-    (self->slot_)(Glib::wrap(cell, false), TreeIter(model, iter));
+    (*the_slot)(Glib::wrap(cell, false), TreeIter(model, iter));
   }
   catch(...)
   {
@@ -51,28 +43,19 @@ void SignalProxy_CellData::gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cel
   }
 }
 
-void SignalProxy_CellData::gtk_callback_destroy(void* data)
+void SignalProxy_CellData_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_CellData*>(data);
+  delete static_cast<TreeViewColumn::SlotCellData*>(data);
 }
 
 
-
-SignalProxy_RowSeparator::SignalProxy_RowSeparator(const SlotType& slot)
-:
-  slot_ (slot)
-{}
-
-SignalProxy_RowSeparator::~SignalProxy_RowSeparator()
-{}
-
-gboolean SignalProxy_RowSeparator::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data)
+gboolean SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data)
 {
-  SignalProxy_RowSeparator *const self = static_cast<SignalProxy_RowSeparator*>(data);
+  TreeView::SlotRowSeparator* the_slot = static_cast<TreeView::SlotRowSeparator*>(data);
 
   try
   {
-    return (self->slot_)(Glib::wrap(model, true), Gtk::TreeIter(model, iter));
+    return (*the_slot)(Glib::wrap(model, true), Gtk::TreeIter(model, iter));
   }
   catch(...)
   {
@@ -82,9 +65,9 @@ gboolean SignalProxy_RowSeparator::gtk_callback(GtkTreeModel* model, GtkTreeIter
   return 0; // arbitrary value
 }
 
-void SignalProxy_RowSeparator::gtk_callback_destroy(void* data)
+void SignalProxy_RowSeparator_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_RowSeparator*>(data);
+  delete static_cast<TreeView::SlotRowSeparator*>(data);
 }
 
 

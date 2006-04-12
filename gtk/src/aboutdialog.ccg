@@ -24,40 +24,15 @@
 #include <gtk/gtklabel.h>
 
 
-
-namespace //anonymous
+//We use a function instead of a static method, so we can make it static, so it is not exported.
+static void SignalProxy_ActivateLink_gtk_callback(GtkAboutDialog* about, const gchar* link, gpointer data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_ActivateLink
-{
-public:
-  typedef Gtk::AboutDialog::SlotActivateLink SlotType;
-
-  SignalProxy_ActivateLink(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_ActivateLink();
-
-  static void gtk_callback(GtkAboutDialog* about, const gchar* link, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_ActivateLink::~SignalProxy_ActivateLink()
-{}
-
-void SignalProxy_ActivateLink::gtk_callback(GtkAboutDialog* about, const gchar* link, gpointer data)
-{
-  SignalProxy_ActivateLink *const self = static_cast<SignalProxy_ActivateLink*>(data);
+  Gtk::AboutDialog::SlotActivateLink* the_slot = static_cast<Gtk::AboutDialog::SlotActivateLink*>(data);
 
   try
   {
     Gtk::AboutDialog* pCppAbout = Glib::wrap(about);
-    (self->slot_)( *pCppAbout, Glib::convert_const_gchar_ptr_to_ustring(link) );
+    (*the_slot)( *pCppAbout, Glib::convert_const_gchar_ptr_to_ustring(link) );
   }
   catch(...)
   {
@@ -66,12 +41,11 @@ void SignalProxy_ActivateLink::gtk_callback(GtkAboutDialog* about, const gchar* 
 
 }
 
-void SignalProxy_ActivateLink::gtk_callback_destroy(void* data)
+static void SignalProxy_ActivateLink_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_ActivateLink*>(data);
+  Gtk::AboutDialog::SlotActivateLink* the_slot = static_cast<Gtk::AboutDialog::SlotActivateLink*>(data);
+  delete the_slot;
 }
-
-} // anonymous namespace
 
 
 namespace Gtk
@@ -80,27 +54,27 @@ namespace Gtk
 //static:
 void AboutDialog::set_email_hook(const SlotActivateLink& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_ActivateLink::gtk_callback_destroy() is called.
-  SignalProxy_ActivateLink *const pSignalProxy = new SignalProxy_ActivateLink(slot);
+  // when SignalProxy_SlotForwardPage_gtk_callback_destroy() is called.
+  SlotActivateLink* slot_copy = new SlotActivateLink(slot);
 
   gtk_about_dialog_set_email_hook(
-      &SignalProxy_ActivateLink::gtk_callback, pSignalProxy,
-      &SignalProxy_ActivateLink::gtk_callback_destroy);
+      &SignalProxy_ActivateLink_gtk_callback, slot_copy,
+      &SignalProxy_ActivateLink_gtk_callback_destroy);
 }
   
 //static:
 void AboutDialog::set_url_hook(const SlotActivateLink& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_ActivateLink::gtk_callback_destroy() is called.
-  SignalProxy_ActivateLink *const pSignalProxy = new SignalProxy_ActivateLink(slot);
+  // when SignalProxy_SlotForwardPage_gtk_callback_destroy() is called.
+  SlotActivateLink* slot_copy = new SlotActivateLink(slot);
 
   gtk_about_dialog_set_url_hook(
-      &SignalProxy_ActivateLink::gtk_callback, pSignalProxy,
-      &SignalProxy_ActivateLink::gtk_callback_destroy);
+      &SignalProxy_ActivateLink_gtk_callback, &slot_copy,
+      &SignalProxy_ActivateLink_gtk_callback_destroy);
 } 
 
 } // namespace Gtk
