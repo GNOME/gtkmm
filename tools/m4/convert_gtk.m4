@@ -40,7 +40,6 @@ _CONVERSION(`char**',`gchar**',`$3')
 _CONVERSION(`gpointer&',`gpointer*',`&($3)')
 _CONVERSION(`void*&',`gpointer*',`&($3)')
 
-_CONVERSION(`unsigned&',`gsize*',`&($3)')
 _CONVERSION(`time_t&',`time_t*',`&($3)')
 
 _CONVERSION(`GError*&',`GError**',`&($3)')
