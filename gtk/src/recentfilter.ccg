@@ -20,38 +20,11 @@
 
 #include <glibmm/ustring.h>
 
-namespace
-{
-
-// SignalProxy_Custom:
-
 // This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
-class SignalProxy_Custom
+
+static gboolean SignalProxy_Custom_gtk_callback(const GtkRecentFilterInfo* filter_info, gpointer data)
 {
-public:
-  typedef Gtk::RecentFilter::SlotCustom SlotType;
-
-  SignalProxy_Custom(const SlotType& slot);
-  ~SignalProxy_Custom();
-
-  static gboolean gtk_callback(const GtkRecentFilterInfo* filter_info, gpointer data);
-  static void gtk_callback_destroy(void* data);
-  
-protected:
-  SlotType slot_;
-};
-
-SignalProxy_Custom::SignalProxy_Custom(const SlotType& slot)
-:
-  slot_ (slot)
-{}
-
-SignalProxy_Custom::~SignalProxy_Custom()
-{}
-
-gboolean SignalProxy_Custom::gtk_callback(const GtkRecentFilterInfo* filter_info, gpointer data)
-{
-  SignalProxy_Custom *const self = static_cast<SignalProxy_Custom*>(data);
+  const Gtk::RecentFilter::SlotCustom* the_slot = static_cast<Gtk::RecentFilter::SlotCustom*>(data);
 
   try
   {
@@ -64,20 +37,18 @@ gboolean SignalProxy_Custom::gtk_callback(const GtkRecentFilterInfo* filter_info
     
     // Create string lists from char**s.
     
-    for (int i = 0; filter_info->groups[i] != 0; ++i)
+    for(int i = 0; filter_info->groups[i] != 0; ++i)
     {
-      Glib::ustring group(Glib::convert_const_gchar_ptr_to_ustring(filter_info->groups[i]));
-      cppInfo.groups.push_back(group);
+      cppInfo.groups.push_back( Glib::convert_const_gchar_ptr_to_ustring(filter_info->groups[i]) );
     }
-    for (int j = 0; filter_info->applications[j] != 0; ++j)
+    for(int i = 0; filter_info->applications[i] != 0; ++i)
     {
-      Glib::ustring application(Glib::convert_const_gchar_ptr_to_ustring(filter_info->applications[j]));
-      cppInfo.applications.push_back(application);
+      cppInfo.applications.push_back( Glib::convert_const_gchar_ptr_to_ustring(filter_info->applications[i]) );
     }
     
     cppInfo.age = filter_info->age;
   
-    return (self->slot_)(cppInfo);
+    return (*the_slot)(cppInfo);
   }
   catch(...)
   {
@@ -86,32 +57,30 @@ gboolean SignalProxy_Custom::gtk_callback(const GtkRecentFilterInfo* filter_info
   }
 }
 
-void SignalProxy_Custom::gtk_callback_destroy(void* data)
+static void SignalProxy_Custom_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Custom*>(data);
+  delete static_cast<Gtk::RecentFilter::SlotCustom*>(data);
 }
-
-} // anonymous namespace
 
 namespace Gtk
 {
 
 RecentFilter::Info::Info()
-: contains(Gtk::FILTER_MIME_TYPE) //arbitrary default
+: contains(Gtk::RECENT_FILTER_MIME_TYPE), //arbitrary default
   age(0)
 {
 }
 
 void RecentFilter::add_custom(RecentFilterFlags needed, const SlotCustom& slot)
 {
-  // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
-  // It will be deleted when SignalProxy_Custom::gtk_callback_destroy() is called.
-  SignalProxy_Custom *const pSignalProxy = new SignalProxy_Custom(slot);
+  // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
+  // It will be deleted when SignalProxy_Custom_gtk_callback_destroy() is called.
+  SlotCustom* slot_copy = new SlotCustom(slot);
       
   gtk_recent_filter_add_custom(gobj(), (GtkRecentFilterFlags)needed,
-                               &SignalProxy_Custom::gtk_callback,
-                               pSignalProxy,
-                               &SignalProxy_Custom::gtk_callback_destroy);
+                               &SignalProxy_Custom_gtk_callback,
+                               slot_copy,
+                               &SignalProxy_Custom_gtk_callback_destroy);
 }
 
 } // namespace Gtk
