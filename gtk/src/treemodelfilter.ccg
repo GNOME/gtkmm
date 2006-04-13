@@ -101,7 +101,7 @@ void __attribute__ ((visibility("hidden"))) SignalProxy_Modify::gtk_callback(Gtk
     GType column_type = gtk_tree_model_get_column_type(model, column);
     cppValue.init(column_type);
     
-    (self->slot_)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
+    (*the_slot)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
 
     //GTK+ has already done this for us: g_value_init(value, column_type);
 
@@ -143,14 +143,14 @@ TreeModelFilter::TreeModelFilter(const Glib::RefPtr<TreeModel>& child_model, con
 
 void TreeModelFilter::set_visible_func(const SlotVisible& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Visible::gtk_callback_destroy() is called.
-  SignalProxy_Visible *const pSignalProxy = new SignalProxy_Visible(slot);
+  // when SignalProxy_Visible_gtk_callback_destroy() is called.
+  SlotVisible* slot_copy = new SlotVisible(slot);
 
   gtk_tree_model_filter_set_visible_func(gobj(),
-      &SignalProxy_Visible::gtk_callback, pSignalProxy,
-      &SignalProxy_Visible::gtk_callback_destroy);
+      &SignalProxy_Visible_gtk_callback, slot_copy,
+      &SignalProxy_Visible_gtk_callback_destroy);
 }
 
 
@@ -180,15 +180,15 @@ TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& 
 
 void TreeModelFilter::set_modify_func(const TreeModelColumnRecord& columns, const SlotModify& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Modify::gtk_callback_destroy() is called.
-  SignalProxy_Modify *const pSignalProxy = new SignalProxy_Modify(slot);
+  // when SignalProxy_Modify_gtk_callback_destroy() is called.
+  SlotModify* slot_copy = new SlotModify(slot);
 
   gtk_tree_model_filter_set_modify_func(gobj(),
     columns.size(), const_cast<GType*>(columns.types()),
-    &SignalProxy_Modify::gtk_callback, pSignalProxy,
-    &SignalProxy_Modify::gtk_callback_destroy);
+    &SignalProxy_Modify_gtk_callback, slot_copy,
+    &SignalProxy_Modify_gtk_callback_destroy);
 }
 
 void TreeModelFilter::set_value_impl(const iterator& /* row */, int /* column */, const Glib::ValueBase& /* value */)
