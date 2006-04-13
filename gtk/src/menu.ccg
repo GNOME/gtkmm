@@ -23,35 +23,9 @@
 #include <gtkmm/accelgroup.h>
 
 
-namespace
+static void SignalProxy_PopupPosition_gtk_callback(GtkMenu*, int* x, int* y, gboolean* push_in, void* data)
 {
-
-// This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
-class SignalProxy_PopupPosition
-{
-public:
-  typedef Gtk::Menu::SlotPositionCalc SlotType;
-
-  SignalProxy_PopupPosition(const SlotType& slot);
-  ~SignalProxy_PopupPosition();
-
-  static void gtk_callback(GtkMenu* menu, int* x, int* y, gboolean* push_in, void* data);
-
-protected:
-  SlotType slot_;
-};
-
-SignalProxy_PopupPosition::SignalProxy_PopupPosition(const SlotType& slot)
-:
-  slot_ (slot)
-{}
-
-SignalProxy_PopupPosition::~SignalProxy_PopupPosition()
-{}
-
-void SignalProxy_PopupPosition::gtk_callback(GtkMenu*, int* x, int* y, gboolean* push_in, void* data)
-{
-  SignalProxy_PopupPosition *const self = static_cast<SignalProxy_PopupPosition*>(data);
+  const Gtk::Menu::SlotPositionCalc* the_slot = static_cast<Gtk::Menu::SlotPositionCalc*>(data);
 
   int  temp_x = (x) ? *x : 0;
   int  temp_y = (y) ? *y : 0;
@@ -59,7 +33,7 @@ void SignalProxy_PopupPosition::gtk_callback(GtkMenu*, int* x, int* y, gboolean*
 
   try
   {
-    (self->slot_)(temp_x, temp_y, temp_push_in);
+    (*the_slot)(temp_x, temp_y, temp_push_in);
   }
   catch(...)
   {
@@ -71,7 +45,6 @@ void SignalProxy_PopupPosition::gtk_callback(GtkMenu*, int* x, int* y, gboolean*
   if(push_in) *push_in = temp_push_in;
 }
 
-} // anonymous namespace
 
 
 namespace Gtk
@@ -79,20 +52,16 @@ namespace Gtk
 
 void Menu::popup(const SlotPositionCalc& position_calc_slot, guint button, guint32 activate_time)
 {
-  SignalProxy_PopupPosition proxy(position_calc_slot);
-
-  // Tell GTK+ to call the static function with Proxy's address as the extra
+  // Tell GTK+ to call the static function with the slot's address as the extra
   // data, so that the static function can then call the sigc::slot:
-  gtk_menu_popup(gobj(), 0, 0, &SignalProxy_PopupPosition::gtk_callback, &proxy, button, activate_time);
+  gtk_menu_popup(gobj(), 0, 0, &SignalProxy_PopupPosition_gtk_callback, const_cast<SlotPositionCalc*>(&position_calc_slot), button, activate_time);
 }
 
 void Menu::popup(MenuShell& parent_menu_shell, MenuItem& parent_menu_item, const SlotPositionCalc& position_calc_slot, guint button, guint32 activate_time)
 {
-  SignalProxy_PopupPosition proxy(position_calc_slot);
-
-  // Tell GTK+ to call the static function with Proxy's address as the extra
+  // Tell GTK+ to call the static function with the slot's address as the extra
   // data, so that the static function can then call the sigc::slot:
-  gtk_menu_popup(gobj(), parent_menu_shell.Gtk::Widget::gobj(), parent_menu_item.Gtk::Widget::gobj(), &SignalProxy_PopupPosition::gtk_callback, &proxy, button, activate_time);
+  gtk_menu_popup(gobj(), parent_menu_shell.Gtk::Widget::gobj(), parent_menu_item.Gtk::Widget::gobj(), &SignalProxy_PopupPosition_gtk_callback, const_cast<SlotPositionCalc*>(&position_calc_slot), button, activate_time);
 }
 
 void Menu::popup(guint button, guint32 activate_time)

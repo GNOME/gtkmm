@@ -20,78 +20,32 @@
 
 #include <gtk/gtktreemodelfilter.h>
 
-namespace //anonymous
+
+static gboolean SignalProxy_Visible_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class __attribute__ ((visibility("hidden"))) SignalProxy_Visible
-{
-public:
-  typedef Gtk::TreeModelFilter::SlotVisible SlotType;
-
-  SignalProxy_Visible(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_Visible();
-
-  static gboolean gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Visible::~SignalProxy_Visible()
-{}
-
-gboolean __attribute__ ((visibility("hidden"))) SignalProxy_Visible::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
-{
-  SignalProxy_Visible *const self = static_cast<SignalProxy_Visible*>(data);
+  const Gtk::TreeModelFilter::SlotVisible* the_slot = static_cast<Gtk::TreeModelFilter::SlotVisible*>(data);
 
   try
   {
-    return (self->slot_)( Gtk::TreeModel::const_iterator(model, iter) );
+    return (*the_slot)( Gtk::TreeModel::const_iterator(model, iter) );
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
 
-  return FALSE; //An arbitary default, just to avoid the compiler warning.
+  return false; //An arbitary default, just to avoid the compiler warning.
 }
 
-void __attribute__ ((visibility("hidden"))) SignalProxy_Visible::gtk_callback_destroy(void* data)
+static void SignalProxy_Visible_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Visible*>(data);
+  delete static_cast<Gtk::TreeModelFilter::SlotVisible*>(data);
 }
 
 
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class __attribute__ ((visibility("hidden"))) SignalProxy_Modify
+static void SignalProxy_Modify_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data)
 {
-public:
-  typedef Gtk::TreeModelFilter::SlotModify SlotType;
-
-  SignalProxy_Modify(const SlotType& slot)
-  : slot_(slot) {}
-
-  ~SignalProxy_Modify();
-
-  static void gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data);
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Modify::~SignalProxy_Modify()
-{}
-
-void __attribute__ ((visibility("hidden"))) SignalProxy_Modify::gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, GValue* value, gint column, gpointer data)
-{
-  SignalProxy_Modify *const self = static_cast<SignalProxy_Modify*>(data);
+  const Gtk::TreeModelFilter::SlotModify* the_slot = static_cast<Gtk::TreeModelFilter::SlotModify*>(data);
 
   try
   {
@@ -115,13 +69,10 @@ void __attribute__ ((visibility("hidden"))) SignalProxy_Modify::gtk_callback(Gtk
   }
 }
 
-void __attribute__ ((visibility("hidden"))) SignalProxy_Modify::gtk_callback_destroy(void* data)
+static void SignalProxy_Modify_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Modify*>(data);
+  delete static_cast<Gtk::TreeModelFilter::SlotModify*>(data);
 }
-
-
-} // anonymous namespace
 
 
 typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
