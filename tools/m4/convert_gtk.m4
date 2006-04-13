@@ -112,6 +112,7 @@ _CONV_ENUM(Gtk,AssistantPageType)
 _CONV_ENUM(Gtk,IconViewDropPosition)
 _CONV_ENUM(Gtk,RecentFilterFlags)
 _CONV_ENUM(Gtk,RecentManagerError)
+_CONV_ENUM(Gtk,RecentSortType)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -297,6 +298,8 @@ _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Action> >',__FL2H_SHA
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<ActionGroup> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const ActionGroup> >',__FL2H_SHALLOW)
 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<RecentInfo> >',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle<RecentInfo>',__FL2H_SHALLOW)
+_CONVERSION(`GList*',`Glib::ListHandle<const RecentInfo>', __FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Tag> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLOW)
@@ -314,6 +317,8 @@ _CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
+_CONVERSION(`GSList*',`Glib::SListHandle<RecentFilter*>',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle<const RecentFilter*>', __FL2H_SHALLOW)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 
@@ -492,6 +497,11 @@ _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
 #RecentFilter
 _CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
+_CONVERSION(`const RecentFilter&', `GtkRecentFilter*', __FCR2P)
+_CONVERSION(`GtkRecentFilter*',`RecentFilter*', `Glib::wrap($3)')
+_CONVERSION(`GtkRecentFilter*',`const RecentFilter*', `Glib::wrap($3)')
+_CONVERSION(`GtkRecentFilter*', `RecentFilter&', `*Glib::wrap($3)')
+_CONVERSION(`GtkRecentFilter*', `const RecentFilter&', `*Glib::wrap($3)')
 
 #RecentInfo
 _CONVERSION(`GtkRecentInfo*',`RecentInfo',`Glib::wrap($3)')
@@ -502,6 +512,10 @@ _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 
 #RecentManager
 _CONVERSION(`GtkRecentManager*',`Glib::RefPtr<RecentManager>',`Glib::wrap($3)')
+_CONVERSION(`GtkRecentManager*',`Glib::RefPtr<const RecentManager>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<RecentManager>&',`GtkRecentManager*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`Glib::RefPtr<RecentManager>',`GtkRecentManager*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`Glib::RefPtr<const RecentManager>', `GtkRecentManager*', __CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentManager))
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
