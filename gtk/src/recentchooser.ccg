@@ -17,39 +17,15 @@
 
 #include <gtk/gtkrecentchooser.h>
 
-namespace
-{
-
 // This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
-class SignalProxy_Compare
+
+static int SignalProxy_Compare_gtk_callback(GtkRecentInfo* a, GtkRecentInfo* b, gpointer data)
 {
-public:
-  typedef Gtk::RecentChooser::SlotCompare SlotType;
-
-  explicit SignalProxy_Compare(const SlotType& slot);
-  ~SignalProxy_Compare();
-
-  static int gtk_callback(GtkRecentInfo* a, GtkRecentInfo* b, gpointer data);
-  static void gtk_callback_destroy(gpointer data);
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Compare::SignalProxy_Compare(const SlotType& slot)
-:
-  slot_(slot)
-{}
-
-SignalProxy_Compare::~SignalProxy_Compare()
-{}
-
-int SignalProxy_Compare::gtk_callback(GtkRecentInfo* a, GtkRecentInfo* b, gpointer data)
-{
-  SignalProxy_Compare *const self = static_cast<SignalProxy_Compare*>(data);
+  const Gtk::RecentChooser::SlotCompare* the_slot = static_cast<Gtk::RecentChooser::SlotCompare*>(data);
 
   try
   {
-    return (self->slot_)(Glib::wrap(a), Glib::wrap(b));
+    return (*the_slot)(Glib::wrap(a), Glib::wrap(b));
   }
   catch(...)
   {
@@ -59,12 +35,11 @@ int SignalProxy_Compare::gtk_callback(GtkRecentInfo* a, GtkRecentInfo* b, gpoint
   return 0;
 }
 
-void SignalProxy_Compare::gtk_callback_destroy(gpointer data)
+static void SignalProxy_Compare::gtk_callback_destroy(gpointer data)
 {
-  delete static_cast<SignalProxy_Compare*>(data);
+  delete static_cast<Gtk::RecentChooser::SlotCompare*>(data);
 }
 
-}
 
 namespace Gtk
 {
@@ -74,12 +49,12 @@ typedef RecentChooser::ArrayHandle_RecentInfos ArrayHandle_RecentInfos;
 
 void RecentChooser::set_sort_func(const SlotCompare& slot)
 {
-  SignalProxy_Compare *const pSignalProxy = new SignalProxy_Compare(slot);
+  SlotCompare* slot_copy = new SlotCompare(slot);
 
   gtk_recent_chooser_set_sort_func(
       gobj(),
-      &SignalProxy_Compare::gtk_callback, pSignalProxy,
-      &SignalProxy_Compare::gtk_callback_destroy);
+      &SignalProxy_Compare_gtk_callback, pSignalProxy,
+      &SignalProxy_Compare_gtk_callback_destroy);
 }
 
 Glib::StringArrayHandle RecentChooser::get_uris() const
