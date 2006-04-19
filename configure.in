@@ -126,6 +126,8 @@ GLIBMM_CHECK_PERL([5.6.0])
 #  Function checks
 #########################################################################
 
+AC_CHECK_FUNC(mkfifo, AC_DEFINE(HAVE_MKFIFO))
+
 # functions used in demos/gtk-demo. Undefined in config.h.
 AC_LANG_PUSH(C++)
 AC_MSG_CHECKING([for flockfile])
@@ -199,8 +201,8 @@ gtkmm_min_glibmm_version=2.6.0
 gtkmm_min_gtk_version=2.6.0
 
 
-GLIBMM_PREFIX=`pkg-config --variable=prefix glibmm-2.4`
-GMMPROC_DIR=$GLIBMM_PREFIX/lib/glibmm-2.4/proc
+GLIBMM_LIBDIR=`pkg-config --variable=libdir glibmm-2.4`
+GMMPROC_DIR=$GLIBMM_LIBDIR/glibmm-2.4/proc
 AC_SUBST(GMMPROC_DIR)
 GMMPROC=$GMMPROC_DIR/gmmproc
 AC_SUBST(GMMPROC)
@@ -280,13 +282,13 @@ GTKMM_DOXYGEN_INPUT_SUBDIRS([pango atk gdk gtk])
 # Evaluate the --enable-warnings=level option.
 GTKMM_ARG_ENABLE_WARNINGS()
 
-# Add an --enable-deprecatsions configure option:
+# Add an --enable-use-deprecations configure option:
 AC_ARG_ENABLE(deprecations,
-              [AC_HELP_STRING([--enable-deprecations],
+              [AC_HELP_STRING([--enable-use-deprecations],
                               [warn about deprecated usages [default=no]])],,
               [enable_deprecations=no])
               
-if test "x$enable_deprecations" = "xyes"; then
+if test "x$enable_use_deprecations" = "xyes"; then
    DISABLE_DEPRECATED_CFLAGS="\
 -DG_DISABLE_DEPRECATED \
 -DGDK_DISABLE_DEPRECATED \
@@ -295,6 +297,19 @@ if test "x$enable_deprecations" = "xyes"; then
 -DGNOME_DISABLE_DEPRECATED"
    AC_SUBST(DISABLE_DEPRECATED_CFLAGS)
 fi
+
+# Add an --enable-deprecated-api option:
+AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
+                                        [include (build) deprecated API in the libraries [default=yes]])],,
+                        [enable_deprecated_api=yes])
+if test "x$enable_deprecated_api" = "xyes"; then
+AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
+else
+  DISABLE_DEPRECATED_API_CFLAGS="-DPANGOMM_DISABLE_DEPRECATED -DATKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED"
+AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
+AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
+fi
+
 
 AC_ARG_ENABLE(examples, [AC_HELP_STRING([--enable-examples],
                                         [build the included examples [default=yes]])],,
@@ -317,6 +332,17 @@ else
 fi
 
 AC_SUBST(DEMO_SUBDIR)
+
+
+AC_ARG_ENABLE(docs, [AC_HELP_STRING([--enable-docs],
+              [build the included docs [default=yes]])],,
+                        [enable_docs=yes])
+if test "x$enable_docs" = "xyes"; then
+  DOCS_SUBDIR="docs"
+else
+  DOCS_SUBDIR=""
+fi
+AC_SUBST(DOCS_SUBDIR)
 
 # Dummy conditional just to make automake-1.4 happy.
 # We need an always-false condition in docs/Makefile.am.

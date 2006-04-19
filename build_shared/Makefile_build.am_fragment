@@ -12,14 +12,25 @@ include $(srcdir)/../src/Makefile_list_of_hg.am_fragment
 # libraries at link time to resolve symbols (remember a dll is like an
 # executable).
 if PLATFORM_WIN32
+extra_win32_defines = \
+	-D$(shell echo $(sublib_name) | tr [:lower:] [:upper:])_BUILD
 no_undefined = -no-undefined -Wl,--export-all-symbols
 win32_dlls_extra_libs = $(sublib_win32_dlls_libs)
 else
+extra_win32_defines = 
 no_undefined =
 win32_dlls_extra_libs =
 endif
 
-common_ldflags	= -version-info $(sublib_libversion) $(no_undefined)
+# Only export lines that do not contain _GLOBAL_
+# ?! is "negative lookahead" - it stops looking on the line if it finds the regex.
+#libtool_export_options = -export-symbols-regex "_GLOBAL_"
+
+#For instance, this would remove all C++ symbols, because mangled C++ names all start with _Z.
+#Note that ^ means start of line, but [^abc] means not one of these characters.
+#libtool_export_options = -export-symbols-regex "^[^_].*"
+
+common_ldflags	= -version-info $(sublib_libversion) $(no_undefined) $(libtool_export_options)
 
 # All modules can include all other modules,
 # for instance, so that gdkmm can use headers in pangomm.
@@ -34,11 +45,11 @@ dist_sources	= $(files_all_built_cc) $(files_all_extra_cc) $(files_all_built_h) 
 DISTFILES	= $(DIST_COMMON) $(dist_sources) $(TEXINFOS) $(EXTRA_DIST)
 
 
-DEFS = @DEFS@ -DG_LOG_DOMAIN=\"$(sublib_name)\"
+DEFS = @DEFS@ -DG_LOG_DOMAIN=\"$(sublib_name)\" $(extra_win32_defines)
 DEFAULT_INCLUDES	=
 
-# DISABLE_DEPRECATED_CFLAGS is empty unless --enable-deprecated is specified to configure:
-INCLUDES = $(strip $(all_includes)) $(DISABLE_DEPRECATED_CFLAGS)
+# DISABLE_DEPRECATED_CFLAGS and DISABLE_DEPRECATED_API_CFLAGS are empty unless the appropriate --enable-*=no options are specified to configure:
+INCLUDES = $(strip $(all_includes)) $(DISABLE_DEPRECATED_CFLAGS) $(DISABLE_DEPRECATED_API_CFLAGS)
 
 sublib_includedir	= $(includedir)/$(sublib_libname)/$(sublib_name)
 sublib_include_HEADERS	= $(files_all_built_h) $(files_all_extra_h)
