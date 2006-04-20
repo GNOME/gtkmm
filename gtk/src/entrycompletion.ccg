@@ -22,39 +22,15 @@
 #include <gtkmm/entry.h>
 #include <gtk/gtkentrycompletion.h>
 
-namespace //anonymous
+
+static gboolean SignalProxy_Match_gtk_callback(GtkEntryCompletion* completion, const gchar* key, GtkTreeIter* iter, gpointer user_data)
 {
-
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_Match
-{
-public:
-  typedef Gtk::EntryCompletion::SlotMatch SlotType;
-
-  SignalProxy_Match(const SlotType& slot)
-  : slot_(slot) {}
-  
-  ~SignalProxy_Match();
-
-  static gboolean gtk_callback(GtkEntryCompletion* completion, const gchar* key, GtkTreeIter* iter, gpointer user_data);
-  static void gtk_callback_destroy(void* data);                                               
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Match::~SignalProxy_Match()
-{}
-
-gboolean SignalProxy_Match::gtk_callback(GtkEntryCompletion* completion, const gchar* key, GtkTreeIter* iter, gpointer user_data)
-{
-  SignalProxy_Match *const self = static_cast<SignalProxy_Match*>(user_data);
+  const Gtk::EntryCompletion::SlotMatch* the_slot = static_cast<Gtk::EntryCompletion::SlotMatch*>(user_data);
 
   try
   {
     GtkTreeModel* tree_model = gtk_entry_completion_get_model(completion);
-    return (self->slot_)(Glib::convert_const_gchar_ptr_to_ustring(key),
+    return (*the_slot)(Glib::convert_const_gchar_ptr_to_ustring(key),
                          Gtk::TreeModel::const_iterator(tree_model, iter)
                          );
   }
@@ -63,15 +39,13 @@ gboolean SignalProxy_Match::gtk_callback(GtkEntryCompletion* completion, const g
     Glib::exception_handlers_invoke();
   }
 
-  return FALSE; //An arbitary default, just to avoid the compiler warning.
+  return false; //An arbitary default, just to avoid the compiler warning.
 }
 
-void SignalProxy_Match::gtk_callback_destroy(void* data)
+static void SignalProxy_Match_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Match*>(data);
+  delete static_cast<Gtk::EntryCompletion::SlotMatch*>(data);
 }
-
-} // anonymous namespace
 
 
 namespace Gtk
@@ -79,14 +53,14 @@ namespace Gtk
 
 void EntryCompletion::set_match_func(const SlotMatch& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Match::gtk_callback_destroy() is called.
-  SignalProxy_Match *const pSignalProxy = new SignalProxy_Match(slot);
+  // when SignalProxy_Match_gtk_callback_destroy() is called.
+  SlotMatch* slot_copy = new SlotMatch(slot);
 
   gtk_entry_completion_set_match_func(gobj(),
-      &SignalProxy_Match::gtk_callback, pSignalProxy,
-      &SignalProxy_Match::gtk_callback_destroy);
+      &SignalProxy_Match_gtk_callback, slot_copy,
+      &SignalProxy_Match_gtk_callback_destroy);
 }
 
 void EntryCompletion::insert_action_text(const Glib::ustring& text, int index)

@@ -22,10 +22,7 @@
 #include <gtk/gtktreeselection.h>
 
 
-namespace
-{
-
-void proxy_foreach_selection_iter_callback(GtkTreeModel* model, GtkTreePath*, GtkTreeIter* iter, void* data)
+static void proxy_foreach_selection_iter_callback(GtkTreeModel* model, GtkTreePath*, GtkTreeIter* iter, void* data)
 {
   typedef Gtk::TreeSelection::SlotForeachIter SlotType;
   SlotType& slot = *static_cast<SlotType*>(data);
@@ -40,7 +37,7 @@ void proxy_foreach_selection_iter_callback(GtkTreeModel* model, GtkTreePath*, Gt
   }
 }
 
-void proxy_foreach_selection_path_callback(GtkTreeModel*, GtkTreePath* path, GtkTreeIter*, void* data)
+static void proxy_foreach_selection_path_callback(GtkTreeModel*, GtkTreePath* path, GtkTreeIter*, void* data)
 {
   typedef Gtk::TreeSelection::SlotForeachPath SlotType;
   SlotType& slot = *static_cast<SlotType*>(data);
@@ -55,7 +52,7 @@ void proxy_foreach_selection_path_callback(GtkTreeModel*, GtkTreePath* path, Gtk
   }
 }
 
-void proxy_foreach_selection_path_and_iter_callback(GtkTreeModel* model, GtkTreePath* path,
+static void proxy_foreach_selection_path_and_iter_callback(GtkTreeModel* model, GtkTreePath* path,
                                                     GtkTreeIter* iter, void* data)
 {
   typedef Gtk::TreeSelection::SlotForeachPathAndIter SlotType;
@@ -72,36 +69,14 @@ void proxy_foreach_selection_path_and_iter_callback(GtkTreeModel* model, GtkTree
 }
 
 
-// This Signal Proxy allows the C++ coder to specify
-// a sigc::slot instead of a static function.
-class SignalProxy_Select
-{
-public:
-  typedef Gtk::TreeSelection::SlotSelect SlotType;
-
-  SignalProxy_Select(const SlotType& slot) : slot_(slot) {}
-  ~SignalProxy_Select();
-
-  static gboolean gtk_callback(GtkTreeSelection*, GtkTreeModel* model, GtkTreePath* path,
-                               gboolean path_currently_selected, void* data);
-
-  static void gtk_callback_destroy(void* data);
-
-private:
-  SlotType slot_;
-};
-
-SignalProxy_Select::~SignalProxy_Select()
-{}
-
-gboolean SignalProxy_Select::gtk_callback(GtkTreeSelection*, GtkTreeModel* model, GtkTreePath* path,
+static gboolean SignalProxy_Select_gtk_callback(GtkTreeSelection*, GtkTreeModel* model, GtkTreePath* path,
                                           gboolean path_currently_selected, void* data)
 {
-  SignalProxy_Select *const self = static_cast<SignalProxy_Select*>(data);
+  const Gtk::TreeSelection::SlotSelect* the_slot = static_cast<Gtk::TreeSelection::SlotSelect*>(data);
 
   try
   {
-    return (self->slot_)(Glib::wrap(model, true),   // take copy
+    return (*the_slot)(Glib::wrap(model, true),   // take copy
                          Gtk::TreePath(path, true), // take copy
                          path_currently_selected);
   }
@@ -113,27 +88,24 @@ gboolean SignalProxy_Select::gtk_callback(GtkTreeSelection*, GtkTreeModel* model
   return 0;
 }
 
-void SignalProxy_Select::gtk_callback_destroy(void* data)
+static void SignalProxy_Select_gtk_callback_destroy(void* data)
 {
-  delete static_cast<SignalProxy_Select*>(data);
+  delete static_cast<Gtk::TreeSelection::SlotSelect*>(data);
 }
-
-} // anonymous namespace
-
 
 namespace Gtk
 {
 
 void TreeSelection::set_select_function(const SlotSelect& slot)
 {
-  // Create a signal proxy.  A pointer to this will be passed
+  // Create a copy of the slot.  A pointer to this will be passed
   // through the callback's data parameter.  It will be deleted
-  // when SignalProxy_Select::gtk_callback_destroy() is called.
-  SignalProxy_Select *const pSignalProxy = new SignalProxy_Select(slot);
+  // when SignalProxy_Select_gtk_callback_destroy() is called.
+  SlotSelect* slot_copy = new SlotSelect(slot);
 
   gtk_tree_selection_set_select_function(gobj(),
-      &SignalProxy_Select::gtk_callback, pSignalProxy,
-      &SignalProxy_Select::gtk_callback_destroy);
+      &SignalProxy_Select_gtk_callback, slot_copy,
+      &SignalProxy_Select_gtk_callback_destroy);
 }
 
 Glib::RefPtr<TreeModel> TreeSelection::get_model()
