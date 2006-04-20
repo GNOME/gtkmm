@@ -93,26 +93,6 @@ static void SignalProxy_ColumnDrop_gtk_callback_destroy(void* data)
   delete static_cast<Gtk::TreeView::SlotColumnDrop*>(data);
 }
 
-
-static void SignalProxy_SearchPosition_gtk_callback(GtkTreeView* tree_view, GtkWidget* search_dialog, gpointer user_data)
-{
-  Gtk::TreeView::SlotSearchPosition* the_slot = static_cast<Gtk::TreeView::SlotSearchPosition*>(user_data);
-
-  try
-  {
-    (*the_slot)(Glib::wrap(search_dialog));
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-static void SignalProxy_SearchPosition_gtk_callback_destroy(void* data)
-{
-  delete static_cast<Gtk::TreeView::SlotSearchPosition*>(data);
-}
-
 namespace Gtk
 {
 
@@ -224,10 +204,7 @@ bool TreeView::get_dest_row_at_pos(int drag_x, int drag_y, TreeModel::Path& path
 
 void TreeView::map_expanded_rows(const SlotMapping& slot)
 {
-  //Create a signal proxy.
-  SignalProxy_Mapping signalProxy (slot); //It only needs to live as long as this method call.
-
-  gtk_tree_view_map_expanded_rows(gobj(), &SignalProxy_Mapping::gtk_callback, &signalProxy);
+  gtk_tree_view_map_expanded_rows(gobj(), &SignalProxy_Mapping_gtk_callback, const_cast<SlotMapping*>(&slot));
 }
 
 void TreeView::set_search_equal_func(const SlotSearchEqual& slot)
