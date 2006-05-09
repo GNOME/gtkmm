@@ -35,7 +35,8 @@ protected:
   //Child widgets:
   Gtk::VBox m_VBox;
   MyContainer m_MyContainer;
-  Gtk::Button m_Button_One, m_Button_Two;
+  Gtk::Button m_Button_One;
+  Gtk::Label m_Button_Two;
   Gtk::HButtonBox m_ButtonBox;
   Gtk::Button m_Button_Quit;
 };

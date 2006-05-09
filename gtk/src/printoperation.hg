@@ -1,0 +1,113 @@
+/* Copyright (C) 2006 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+#include <gtkmm/pagesetup.h>
+#include <gtkmm/printcontext.h>
+#include <gtkmm/printsettings.h>
+#include <gtkmm/window.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+_WRAP_ENUM(PrintStatus, GtkPrintStatus)
+_WRAP_ENUM(PrintOperationResult, GtkPrintOperationResult)
+_WRAP_GERROR(PrintError, GtkPrintError, GTK_PRINT_ERROR)
+
+class PrintOperation : public Glib::Object
+{
+  _CLASS_GOBJECT(PrintOperation, GtkPrintOperation, GTK_PRINT_OPERATION, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_SIGNAL(void begin_print(const Glib::RefPtr<PrintContext> context), "begin_print")
+  _WRAP_SIGNAL(void request_page_setup(
+    const Glib::RefPtr<PrintContext>& context, int page_no, const Glib::RefPtr<PageSetup> setup), "request_page_setup")
+  _WRAP_SIGNAL(void draw_page(const Glib::RefPtr<PrintContext>& context, int page_nr), "draw_page")
+  _WRAP_SIGNAL(void end_print(const Glib::RefPtr<PrintContext>& context), "end_print")
+  _WRAP_SIGNAL(void status_changed(), "status_changed")
+
+  _WRAP_METHOD(void set_default_page_setup(const Glib::RefPtr<PageSetup>& default_page_setup),
+               gtk_print_operation_set_default_page_setup)
+  _WRAP_METHOD(Glib::RefPtr<PageSetup> get_default_page_setup() const, gtk_print_operation_get_default_page_setup)
+
+  _WRAP_METHOD(void set_print_settings(const Glib::RefPtr<PrintSettings>& print_settings),
+               gtk_print_operation_set_print_settings)
+  _WRAP_METHOD(Glib::RefPtr<PrintSettings> get_print_settings() const, gtk_print_operation_get_print_settings)
+
+  _WRAP_METHOD(void set_job_name(const Glib::ustring& job_name), gtk_print_operation_set_job_name)
+  _WRAP_METHOD(void set_nr_of_pages(int n_pages), gtk_print_operation_set_nr_of_pages)
+  _WRAP_METHOD(void set_current_page(int current_page), gtk_print_operation_set_current_page)
+  _WRAP_METHOD(void set_use_full_page(bool use_full_page = true), gtk_print_operation_set_use_full_page)
+  _WRAP_METHOD(void set_unit(Unit unit), gtk_print_operation_set_unit)
+  _WRAP_METHOD(void set_show_dialog(bool show_dialog = true), gtk_print_operation_set_show_dialog)
+  _WRAP_METHOD(void set_pdf_target(const Glib::ustring& file_name), gtk_print_operation_set_pdf_target)
+
+  _WRAP_METHOD(PrintOperationResult run(Window& parent), gtk_print_operation_run, errthrow)
+  _WRAP_METHOD(PrintStatus get_status() const, gtk_print_operation_get_status)
+  _WRAP_METHOD(Glib::ustring get_status_string() const, gtk_print_operation_get_status_string)
+  _WRAP_METHOD(bool is_finished() const, gtk_print_operation_is_finished)
+
+  _WRAP_METHOD(void run_async(Window& parent), gtk_print_operation_run_async)
+
+  _IGNORE(gtk_print_run_page_setup_dialog, gtk_print_run_page_setup_dialog_async)
+
+  _WRAP_PROPERTY("default_page_setup", PageSetup)
+  _WRAP_PROPERTY("print_settings", PrintSettings)
+  _WRAP_PROPERTY("job_name", Glib::ustring)
+  _WRAP_PROPERTY("number_of_pages", int)
+  _WRAP_PROPERTY("current_page", int)
+  _WRAP_PROPERTY("use_full_page", bool)
+  _WRAP_PROPERTY("unit", Unit)
+  _WRAP_PROPERTY("show_dialog", bool)
+  _WRAP_PROPERTY("pdf_target", Glib::ustring)
+  _WRAP_PROPERTY("status", PrintStatus)
+  _WRAP_PROPERTY("status_string", Glib::ustring)
+};
+
+  /** TODO: explanation
+   *
+   */
+  Glib::RefPtr<PageSetup> run_page_setup_dialog(Window& parent,
+                                                const Glib::RefPtr<PageSetup>& page_setup,
+                                                const Glib::RefPtr<PrintSettings>& print_settings);
+
+  /** For example, 
+   * void on_setup_done(const Glib::RefPtr<PageSetup>& page_setup);
+   */
+  typedef sigc::slot< void, Glib::RefPtr<PageSetup>& > SlotPrintSetupDone;
+
+  /** TODO: explanation
+  * @param parent
+  * @param page_setup
+  * @param print_settings
+  * @param slot
+  */
+  void run_page_setup_dialog_async(Window& parent,
+                                   const Glib::RefPtr<PageSetup>& page_setup,
+                                   const Glib::RefPtr<PrintSettings>& print_settings,
+                                   const SlotPrintSetupDone& slot);
+
+} // namespace Gtk

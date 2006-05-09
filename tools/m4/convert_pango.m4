@@ -145,3 +145,5 @@ _CONVERSION(`const Matrix&',`const PangoMatrix*',`&($3)')
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`GSList*',`SListHandle_LayoutLine',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_ConstLayoutLine',__FL2H_SHALLOW)
+
+_CONVERSION(`PangoFontMap*',`Glib::RefPtr<Pango::FontMap>',`Glib::wrap($3)')

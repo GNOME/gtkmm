@@ -113,6 +113,15 @@ _CONV_ENUM(Gtk,IconViewDropPosition)
 _CONV_ENUM(Gtk,RecentFilterFlags)
 _CONV_ENUM(Gtk,RecentManagerError)
 _CONV_ENUM(Gtk,RecentSortType)
+_CONV_ENUM(Gtk,Unit)
+_CONV_ENUM(Gtk,PageOrientation)
+_CONV_ENUM(Gtk,PrintDuplex)
+_CONV_ENUM(Gtk,PrintQuality)
+_CONV_ENUM(Gtk,PrintPages)
+_CONV_ENUM(Gtk,PageSet)
+_CONV_ENUM(Gtk,PrintStatus)
+_CONV_ENUM(Gtk,PrintOperationResult)
+_CONV_ENUM(Gtk,PrintError)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -516,6 +525,43 @@ _CONVERSION(`GtkRecentManager*',`Glib::RefPtr<const RecentManager>',`Glib::wrap(
 _CONVERSION(`const Glib::RefPtr<RecentManager>&',`GtkRecentManager*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<RecentManager>',`GtkRecentManager*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<const RecentManager>', `GtkRecentManager*', __CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentManager))
+
+#PaperSize
+_CONVERSION(`GtkPaperSize*',`PaperSize',`Glib::wrap($3)')
+_CONVERSION(`GtkPaperSize*',`const PaperSize',`Glib::wrap($3)')
+_CONVERSION(`const PaperSize&',`GtkPaperSize*',__FCR2P)
+
+#PageSetup
+_CONVERSION(`GtkPageOrientation',`PageOrientation',`($2)$3')
+
+_CONVERSION(`PageSetup&',`GtkPageSetup*',__FR2P)
+_CONVERSION(`const PageSetup&',`GtkPageSetup*',__FCR2P)
+_CONVERSION(`GtkPageSetup*',`Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
+_CONVERSION(`GtkPageSetup*',`const Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<PageSetup>',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`const Glib::RefPtr<PageSetup>&',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
+
+#PrintSettings
+_CONVERSION(`GtkPrintDuplex',`PrintDuplex',`($2)$3')
+_CONVERSION(`GtkPrintQuality',`PrintQuality',`($2)$3')
+_CONVERSION(`GtkPrintPages',`PrintPages',`($2)$3')
+_CONVERSION(`GtkPageSet',`PageSet',`($2)$3')
+
+_CONVERSION(`PrintSettings&',`GtkPrintSettings*',__FR2P)
+_CONVERSION(`const PrintSettings&',`GtkPrintSettings*',__FCR2P)
+_CONVERSION(`GtkPrintSettings*',`Glib::RefPtr<PrintSettings>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<PrintSettings>&',`GtkPrintSettings*',__CONVERT_REFPTR_TO_P)
+
+#PrintContext
+_CONVERSION(`GtkPrintContext*',`Glib::RefPtr<PrintContext>',`Glib::wrap($3)')
+_CONVERSION(`GtkPrintContext*',`const Glib::RefPtr<PrintContext>',`Glib::wrap($3)')
+_CONVERSION(`GtkPrintContext*',`const Glib::RefPtr<PrintContext>&',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<PrintContext>',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
+
+_CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`($2)$3')
+_CONVERSION(`GtkPrintStatus',`PrintStatus',`($2)$3')
+
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
