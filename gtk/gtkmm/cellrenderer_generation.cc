@@ -41,7 +41,11 @@ CellRenderer* generate_cellrenderer<bool>(bool editable)
   CellRendererToggle* pCellRenderer = new CellRendererToggle();
 
   //GTK+'s "activatable" really means "editable":
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pCellRenderer->property_activatable() = editable;
+#else
+  pCellRenderer->set_property("activatable", editable);
+#endif
 
   return pCellRenderer;
 }

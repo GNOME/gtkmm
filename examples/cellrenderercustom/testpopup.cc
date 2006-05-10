@@ -61,10 +61,14 @@ AppWindow::AppWindow()
   {
     CellRendererList    *const renderer = new CellRendererList();
     Gtk::TreeViewColumn *const column   = new Gtk::TreeViewColumn("Text 2", *Gtk::manage(renderer));
- 
+
     tree_view_.append_column(*Gtk::manage(column));
 
+#ifdef GLIBMM_PROPERTIES_ENABLED
     column->add_attribute(renderer->property_text(), list_columns_.text2);
+#else
+    column->add_attribute(*renderer, "text", list_columns_.text2);
+#endif
 
     renderer->append_list_item("foo");
     renderer->append_list_item("bar");
@@ -73,7 +77,12 @@ AppWindow::AppWindow()
     renderer->append_list_item("sliff");
     renderer->append_list_item("sloff");
 
+#ifdef GLIBMM_PROPERTIES_ENABLED
     renderer->property_editable() = true;
+#else
+    renderer->set_property("editable", true);
+#endif
+
     renderer->signal_edited().connect(sigc::mem_fun(*this, &AppWindow::on_cell_edited));
   }
 

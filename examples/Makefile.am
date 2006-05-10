@@ -3,7 +3,6 @@ book			\
 arrow			\
 base			\
 calendar		\
-cellrenderercustom	\
 dnd			\
 exception		\
 gdk			\
@@ -13,6 +12,9 @@ stock			\
 tictactoe		\
 treemodelcustom \
 window
+
+# Doesn't build with GLIBMM_ENABLE_PROPERTIES unset:
+#cellrenderercustom
 
 SUBDIRS = $(example_dirs)
 EXTRA_DIST = README Makefile.am_fragment

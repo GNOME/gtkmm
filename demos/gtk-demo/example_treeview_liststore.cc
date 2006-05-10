@@ -187,32 +187,11 @@ void Example_TreeView_ListStore::add_columns()
   }
 
   /* column for bug numbers */
-  {
-    Gtk::CellRendererText* pRenderer = Gtk::manage( new Gtk::CellRendererText() );
-
-    int cols_count =m_TreeView.append_column("Bug number", *pRenderer);
-    Gtk::TreeViewColumn* pColumn =m_TreeView.get_column(cols_count-1);
-
-    pColumn->add_attribute(pRenderer->property_text(), m_columns.number);
-  }
+  m_TreeView.append_column("Bug number", m_columns.number);
 
   /* column for severities */
-  {
-    Gtk::CellRendererText* pRenderer = Gtk::manage( new Gtk::CellRendererText() );
-
-    int cols_count =m_TreeView.append_column("Severity", *pRenderer);
-    Gtk::TreeViewColumn* pColumn =m_TreeView.get_column(cols_count-1);
-
-    pColumn->add_attribute(pRenderer->property_text(), m_columns.severity);
-  }
+  m_TreeView.append_column("Severity", m_columns.severity);
 
   /* column for descriptions */
-  {
-    Gtk::CellRendererText* pRenderer = Gtk::manage( new Gtk::CellRendererText() );
-
-    int cols_count = m_TreeView.append_column("Description", *pRenderer);
-    Gtk::TreeViewColumn* pColumn =m_TreeView.get_column(cols_count-1);
-
-    pColumn->add_attribute(pRenderer->property_text(), m_columns.description);
-  }
+  m_TreeView.append_column("Description", m_columns.description);
 }

@@ -127,8 +127,13 @@ Gtk::CellEditable* CellRendererPopup::start_editing_vfunc(GdkEvent*,
                                                           Gtk::CellRendererState)
 {
   // If the cell isn't editable we return 0.
+#ifdef GLIBMM_PROPERTIES_ENABLED
   if(!property_editable())
     return 0;
+#else
+  if(!(g_object_get_data(G_OBJECT(gobj()), "editable")))
+    return 0;
+#endif
 
   std::auto_ptr<PopupEntry> popup_entry (new PopupEntry(path));
 
@@ -136,7 +141,14 @@ Gtk::CellEditable* CellRendererPopup::start_editing_vfunc(GdkEvent*,
   popup_entry->signal_arrow_clicked().connect(sigc::mem_fun(*this, &Self::on_popup_arrow_clicked));
   popup_entry->signal_hide         ().connect(sigc::mem_fun(*this, &Self::on_popup_hide));
 
+#ifdef GLIBMM_PROPERTIES_ENABLED
   popup_entry->set_text(property_text());
+#else
+  Glib::ustring text;
+  get_property("text", text);
+  popup_entry->set_property("text", text)
+#endif
+
   popup_entry->show();
 
   // Release auto_ptr<> ownership, and let gtkmm manage the widget.

@@ -95,20 +95,37 @@ ExampleWindow::ExampleWindow()
   m_TreeView.append_column(*pColumn);
   
   //Make this View column represent the m_col_itemchosen model column:
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pColumn->add_attribute(pRenderer->property_text(), m_Columns.m_col_itemchosen);
-  
+#else
+  pColumn->add_attribute(*pRenderer, "text", m_Columns.m_col_itemchosen);
+#endif  
+
   //Allow the user to choose from this list to set the value in m_col_itemchosen:
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pColumn->add_attribute(pRenderer->property_model(), m_Columns.m_col_choices);
-  
+#else
+  pColumn->add_attribute(*pRenderer, "model", m_Columns.m_col_itemchosen);
+#endif 
+
   //Alternatively, you could use just one combo model, in all rows, instead of mapping it to a model column:
   //pRenderer->property_model() = m_refTreeModelCombo1;
 
-  pRenderer->property_text_column() = 0; //This must be a text column, in m_refTreeModelCombo1, or m_refTreeModelCombo;
-  
+  //This must be a text column, in m_refTreeModelCombo1, or m_refTreeModelCombo:
+#ifdef GLIBMM_PROPERTIES_ENABLED
+  pRenderer->property_text_column() = 0; 
+#else
+  pRenderer->set_property("text_column", 0);
+#endif
+
   //Allow the user to edit the column:
   //This is done automatically when we use View::append_column(model_column),
   //but that uses a simple Text CellRenderer.
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pRenderer->property_editable() = true;
+#else
+  pRenderer->set_property("editable", true);
+#endif
 
   pRenderer->signal_edited().connect( sigc::mem_fun(*this, &ExampleWindow::on_cellrenderer_choice_edited) );
       
