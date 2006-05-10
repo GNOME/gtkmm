@@ -52,18 +52,23 @@ public:
   _WRAP_METHOD(void pack_start(CellRenderer& cell, bool expand = true), gtk_cell_layout_pack_start)
   _WRAP_METHOD(void pack_end(CellRenderer& cell, bool expand = true), gtk_cell_layout_pack_end)
   _WRAP_METHOD(void clear(), gtk_cell_layout_clear)
-  
+
   _IGNORE(gtk_cell_layout_set_attributes) //I think this is just a convenience method, equivalent to clear() and multiple add_attribute()s. murrayc.
 
   _WRAP_METHOD(void add_attribute(CellRenderer& cell, const Glib::ustring& attribute, int column), gtk_cell_layout_add_attribute)
-  void add_attribute(const Glib::PropertyProxy_Base& property, const TreeModelColumnBase& column);
 
-  //For instance, void on_cell_data(const TreeModel::const_iterator& iter)                                        
+#ifdef GLIBMM_PROPERTIES_ENABLED
+  void add_attribute(const Glib::PropertyProxy_Base& property, const TreeModelColumnBase& column);
+#endif
+
+  void add_attribute(CellRenderer& cell, const Glib::ustring& attribute, const TreeModelColumnBase& column);
+
+  //For instance, void on_cell_data(const TreeModel::const_iterator& iter)
   typedef sigc::slot<void, const TreeModel::const_iterator&> SlotCellData;
 
   void set_cell_data_func(CellRenderer& cell, const SlotCellData& slot);
   _IGNORE(gtk_cell_layout_set_cell_data_func)
-                                                                                  
+
   _WRAP_METHOD(void clear_attributes(CellRenderer& cell), gtk_cell_layout_clear_attributes)
 
   _WRAP_METHOD(void reorder(CellRenderer& cell, int position), gtk_cell_layout_reorder)
@@ -76,7 +81,7 @@ protected:
 //TODO:  _WRAP_VFUNC(void set_cell_data_func(CellRenderer* cell, GtkCellLayoutDataFunc func, gpointer func_data, GDestroyNotify destroy), set_cell_data_func)
   _WRAP_VFUNC(void clear_attributes(CellRenderer* cell), clear_attributes)
   _WRAP_VFUNC(void reorder(CellRenderer* cell, int position), reorder)
-                                 
+
 };
 
 template<class T_ModelColumnType>
@@ -89,7 +94,11 @@ void CellLayout::pack_start(const TreeModelColumn<T_ModelColumnType>& column, bo
   pack_start(*pCellRenderer, expand);
 
   //Make the renderer render the column:
+#ifdef GLIBMM_PROPERTIES_ENABLED
   add_attribute(pCellRenderer->_property_renderable(), column);
+#else
+  add_attribute(*pCellRenderer, pCellRenderer->_property_renderable(), column);
+#endif
 }
 
 } // namespace Gtk

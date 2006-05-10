@@ -25,7 +25,7 @@
 
 TextWidget::TextWidget(bool is_source)
 {
-  set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   set_shadow_type (Gtk::SHADOW_IN);
 
   m_refTextBuffer = Gtk::TextBuffer::create();
@@ -42,22 +42,55 @@ TextWidget::TextWidget(bool is_source)
 #endif /* G_OS_WIN32 */
     m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
 
-    m_refTextBuffer->create_tag("comment")->property_foreground().set_value("red");
-    m_refTextBuffer->create_tag("type")->property_foreground().set_value("ForestGreen");
+    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag  =  m_refTextBuffer->create_tag("comment");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_foreground() = "red";
+#else
+    refTag->set_property("foreground", Glib::ustring("red"));
+#endif
 
-    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("string");
-    refTag->property_foreground().set_value("RosyBrown");
-    refTag->property_weight().set_value(Pango::WEIGHT_BOLD);
+    refTag = m_refTextBuffer->create_tag("type");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_foreground() = "ForestGreen";
+#else
+    refTag->set_property("foreground", Glib::ustring("ForestGreen"));
+#endif
 
-    m_refTextBuffer->create_tag("control")->property_foreground().set_value("purple");
+    refTag = m_refTextBuffer->create_tag("string");
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_foreground() = "RosyBrown";
+    refTag->property_weight() = Pango::WEIGHT_BOLD;
+#else
+    refTag->set_property("foreground", Glib::ustring("RosyBrown"));
+    refTag->set_property("weight", Pango::WEIGHT_BOLD);
+#endif
+
+
+    refTag = m_refTextBuffer->create_tag("control");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_foreground() = "purple";
+#else
+    refTag->set_property("foreground", Glib::ustring("purple"));
+#endif
 
     refTag = m_refTextBuffer->create_tag("preprocessor");
-    refTag->property_style().set_value(Pango::STYLE_OBLIQUE);
-    refTag->property_foreground().set_value("burlywood4");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_style() = Pango::STYLE_OBLIQUE;
+    refTag->property_foreground() = "burlywood4";
+#else
+    refTag->set_property("style", Pango::STYLE_OBLIQUE);
+    refTag->set_property("foreground", Glib::ustring("burlywood4"));
+#endif
 
     refTag = m_refTextBuffer->create_tag("function");
-    refTag->property_weight().set_value(Pango::WEIGHT_BOLD);
-    refTag->property_foreground().set_value("DarkGoldenrod4");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_weight() = Pango::WEIGHT_BOLD;
+    refTag->property_foreground() = "DarkGoldenrod4";
+#else
+    refTag->set_property("weight", Pango::WEIGHT_BOLD);
+    refTag->set_property("foreground", Glib::ustring("DarkGoldenrod4"));
+#endif
   }
   else
   {
@@ -67,7 +100,12 @@ TextWidget::TextWidget(bool is_source)
     m_TextView.set_pixels_below_lines(2);
 
     Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("title");
-    refTag->property_font().set_value("Sans 18");
+#ifdef GLIBMM_PROPERTIES_ENABLED
+    refTag->property_font() = "Sans 18";
+#else
+    refTag->set_property("font", Glib::ustring("Sans 18"));
+#endif
+
   }
 }
 
