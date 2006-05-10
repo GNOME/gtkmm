@@ -122,9 +122,7 @@ Example_UIManager::Example_UIManager()
   add_accel_group(m_refUIManager->get_accel_group());
 
   //Layout the actions in a menubar and toolbar:
-  try
-  {
-    Glib::ustring ui_info = 
+  Glib::ustring ui_info = 
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='FileMenu'>"
@@ -159,13 +157,24 @@ Example_UIManager::Example_UIManager()
         "    <toolitem action='Logo'/>"
         "  </toolbar>"
         "</ui>";
-        
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {  
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
   {
     std::cerr << "building menus failed: " <<  ex.what();
   }
+  #else
+  std::auto_ptr<Glib::Error> error;
+  m_refUIManager->add_ui_from_string(ui_info, error);
+  if(error.get())
+  {
+    std::cerr << "building menus failed: " <<  error->what();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   add(m_Box1);
   Gtk::Widget* pMenuBar = m_refUIManager->get_widget("/MenuBar") ;

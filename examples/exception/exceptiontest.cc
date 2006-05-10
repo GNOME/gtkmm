@@ -8,6 +8,8 @@
 #include <gtkmm/box.h>
 
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+
 namespace
 {
 
@@ -87,15 +89,10 @@ void handler2()
 
 } // anonymous namespace
 
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 int main(int argc, char** argv)
 {
-  // New exception handlers are inserted at the front of the per-thread
-  // handler list.  Thus, in this example handler2() is executed before
-  // handler1().
-  sigc::connection conn_handler1 = Glib::add_exception_handler(&handler1);
-  sigc::connection conn_handler2 = Glib::add_exception_handler(&handler2);
-
   Gtk::Main main_instance (&argc, &argv);
 
   Gtk::Window window;
@@ -104,6 +101,14 @@ int main(int argc, char** argv)
 
   Gtk::Box *const box = new Gtk::VBox(true, 5);
   window.add(*Gtk::manage(box));
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  // New exception handlers are inserted at the front of the per-thread
+  // handler list.  Thus, in this example handler2() is executed before
+  // handler1().
+  sigc::connection conn_handler1 = Glib::add_exception_handler(&handler1);
+  sigc::connection conn_handler2 = Glib::add_exception_handler(&handler2);
+
 
   Gtk::Button *const button1 = new MyButton("From virtual method");
   box->add(*Gtk::manage(button1));
@@ -123,6 +128,8 @@ int main(int argc, char** argv)
   button4->signal_clicked().connect(&global_on_clicked_throw_std_exception);
   button5->signal_clicked().connect(sigc::mem_fun(conn_handler1, &sigc::connection::disconnect));
   button6->signal_clicked().connect(sigc::mem_fun(conn_handler2, &sigc::connection::disconnect));
+
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   window.show_all_children();
   Gtk::Main::run(window);

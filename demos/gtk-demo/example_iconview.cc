@@ -67,6 +67,7 @@ Example_IconView::Example_IconView()
   set_title("Icon View");
   set_default_size(650, 400);
   
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     Glib::ustring filename = demo_find_file("gnome-fs-regular.png");
@@ -74,10 +75,26 @@ Example_IconView::Example_IconView()
     filename = demo_find_file("gnome-fs-directory.png");
     m_refPixbufFolder = Gdk::Pixbuf::create_from_file(filename);
   }
-  catch(const Glib::FileError& ex)
+  catch(const Glib::FileError& error)
   {
-    std::cout << ex.what() << std::endl;
+    std::cout << error.what() << std::endl;
   }
+  #else
+  Glib::ustring filename = demo_find_file("gnome-fs-regular.png");
+  std::auto_ptr<Glib::Error> error;
+  m_refPixbufFile = Gdk::Pixbuf::create_from_file(filename, error);
+
+  if(!error.get())
+  {
+    filename = demo_find_file("gnome-fs-directory.png");
+    m_refPixbufFolder = Gdk::Pixbuf::create_from_file(filename, error);
+  }
+
+  if(error.get())
+  {
+    std::cout << error->what() << std::endl;
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   
   m_VBox.pack_start(m_Toolbar, Gtk::PACK_SHRINK);
   
@@ -181,8 +198,10 @@ void Example_IconView::fill_store()
 
   /* Now go through the directory and extract all the file
    * information */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Glib::Dir dir(m_parent); //throws an exception if it fails.
   
     std::string name = dir.read_name();
@@ -205,11 +224,13 @@ void Example_IconView::fill_store()
     
       name = dir.read_name();
     }
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::FileError& ex)
   {
     std::cout << ex.what() << std::endl;
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 

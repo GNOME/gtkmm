@@ -31,14 +31,18 @@ static void pixbuf_destroy_data_callback(guint8* pixels, void* user_data)
   Gdk::Pixbuf::SlotDestroyData *const slot = static_cast<Gdk::Pixbuf::SlotDestroyData*>(user_data);
   g_return_if_fail(slot != 0);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*slot)(pixels); // invoke callback
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete slot;
 }
@@ -69,29 +73,6 @@ Pixbuf::Pixbuf(const Glib::RefPtr<Drawable>& src,
       0, src->gobj(), cmap->gobj(), src_x, src_y, dest_x, dest_y, width, height))
 {}
 
-Glib::RefPtr<Pixbuf> Pixbuf::create_from_file(const std::string& filename)
-{
-  GError* error = 0;
-  GdkPixbuf *const pixbuf = gdk_pixbuf_new_from_file(filename.c_str(), &error);
-
-  if(error)
-    Glib::Error::throw_exception(error);
-
-  return Glib::wrap(pixbuf);
-}
-
-Glib::RefPtr<Pixbuf> Pixbuf::create_from_file(const std::string& filename, int width, int size, bool preserve_aspect_ratio)
-{
-  GError* error = 0;
-  GdkPixbuf *const pixbuf = gdk_pixbuf_new_from_file_at_scale(filename.c_str(), width, size, preserve_aspect_ratio, &error);
-  //gdk_pixbuf_new_from_file_at_size() just calls gdk_pixbuf_new_from_file_at_scale().
-
-  if(error)
-    Glib::Error::throw_exception(error);
-
-  return Glib::wrap(pixbuf);
-}
-
 Glib::RefPtr<Pixbuf> Pixbuf::create_from_data(const guint8* data, Colorspace colorspace,
                                               bool has_alpha, int bits_per_sample,
                                               int width, int height, int rowstride)
@@ -111,17 +92,6 @@ Glib::RefPtr<Pixbuf> Pixbuf::create_from_data(const guint8* data, Colorspace col
   GdkPixbuf *const pixbuf = gdk_pixbuf_new_from_data(
       data, (GdkColorspace) colorspace, has_alpha, bits_per_sample, width, height, rowstride,
       &pixbuf_destroy_data_callback, new SlotDestroyData(destroy_slot));
-
-  return Glib::wrap(pixbuf);
-}
-
-Glib::RefPtr<Pixbuf> Pixbuf::create_from_inline(int data_length, const guint8* data, bool copy_pixels)
-{
-  GError* error = 0;
-  GdkPixbuf *const pixbuf = gdk_pixbuf_new_from_inline(data_length, data, copy_pixels, &error);
-
-  if(error)
-    Glib::Error::throw_exception(error);
 
   return Glib::wrap(pixbuf);
 }

@@ -57,9 +57,7 @@ ExampleWindow::ExampleWindow()
   add_accel_group(m_refUIManager->get_accel_group());
 
   //Layout the actions in a menubar and toolbar:
-  try
-  {
-    Glib::ustring ui_info =
+  Glib::ustring ui_info =
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='MenuFile'>"
@@ -83,12 +81,23 @@ ExampleWindow::ExampleWindow()
         "  </toolbar>"
         "</ui>";
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {      
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
   {
     std::cerr << "building menus and toolbars failed: " <<  ex.what();
   }
+  #else
+  std::auto_ptr<Glib::Error> ex;
+  m_refUIManager->add_ui_from_string(ui_info, ex);
+  if(ex.get())
+  { 
+    std::cerr << "building menus and toolbars failed: " <<  ex->what();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   Gtk::Widget* pMenuBar = m_refUIManager->get_widget("/MenuBar") ;
 
@@ -129,6 +138,8 @@ void ExampleWindow::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory
                       const Glib::ustring& id, const Glib::ustring& label)
 {
   Gtk::IconSource source;
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     //This throws an exception if the file is not found:
@@ -138,6 +149,14 @@ void ExampleWindow::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory
   {
     std::cout << ex.what() << std::endl;
   }
+  #else
+  std::auto_ptr<Glib::Error> ex;
+  source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath, ex) );
+  if(ex.get())
+  { 
+    std::cerr <<  ex->what();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
   source.set_size_wildcarded(); //Icon may be scaled.

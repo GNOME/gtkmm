@@ -236,9 +236,16 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file("./gtk-logo-rgb.gif");
-  if (!refPixbuf)
+  #else
+  std::auto_ptr<Glib::Error> error;
+  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file("./gtk-logo-rgb.gif", error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(!refPixbuf)
   {
+    //TODO: This is not real error handling.
     g_printerr ("Failed to load image file gtk-logo-rgb.gif\n");
     exit (1);
   }

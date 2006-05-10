@@ -91,7 +91,12 @@ private:
 
 Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   return Gdk::Pixbuf::create_from_file(name);
+  #else
+  std::auto_ptr<Glib::Error> error;
+  return Gdk::Pixbuf::create_from_file(name, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 /*
@@ -101,9 +106,15 @@ Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
  */
 DemoRenderArea::DemoRenderArea()
 :
-  background_ (Gdk::Pixbuf::create_from_file(background_name)),
   frame_num_  (0)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  background_ = Gdk::Pixbuf::create_from_file(background_name);
+  #else
+  std::auto_ptr<Glib::Error> error;
+  background_ = Gdk::Pixbuf::create_from_file(background_name, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   std::transform(
       &image_names[0], &image_names[G_N_ELEMENTS(image_names)],
       std::back_inserter(images_),
@@ -205,8 +216,10 @@ void DemoRenderArea::generate_next_frame()
 
 int main(int argc, char** argv)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Gtk::Main main_instance (&argc, &argv);
 
     Gtk::Window window;
@@ -216,12 +229,14 @@ int main(int argc, char** argv)
     window.show_all();
 
     Gtk::Main::run(window);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& error)
   {
     std::cerr << error.what() << std::endl;
     return EXIT_FAILURE;
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return EXIT_SUCCESS;
 }
