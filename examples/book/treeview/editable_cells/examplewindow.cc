@@ -88,7 +88,11 @@ ExampleWindow::ExampleWindow()
     sigc::mem_fun(*this, &ExampleWindow::treeviewcolumn_validated_on_cell_data) );
 
   //Make the CellRenderer editable, and handle its editing signals:
+#ifdef GLIBMM_PROPERTIES_ENABLED
   m_cellrenderer_validated.property_editable() = true;
+#else
+  m_cellrenderer_validated.set_property("editable", true);
+#endif
 
   m_cellrenderer_validated.signal_editing_started().connect(
     sigc::mem_fun(*this, &ExampleWindow::cellrenderer_validated_on_editing_started) );
@@ -123,7 +127,11 @@ void ExampleWindow::treeviewcolumn_validated_on_cell_data(Gtk::CellRenderer* /* 
     sprintf(buffer, "%d", model_value); 
 
     Glib::ustring view_text = buffer;
+#ifdef GLIBMM_PROPERTIES_ENABLED
     m_cellrenderer_validated.property_text() = view_text;
+#else
+    m_cellrenderer_validated.set_property("text", view_text);
+#endif
   }
 }
 

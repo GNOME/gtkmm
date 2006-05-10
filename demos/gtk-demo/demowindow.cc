@@ -128,11 +128,20 @@ void DemoWindow::fill_tree()
   }
 
   Gtk::CellRendererText* pCell = Gtk::manage(new Gtk::CellRendererText());
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pCell->property_style() = Pango::STYLE_ITALIC;
+#else
+  pCell->set_property("style", Pango::STYLE_ITALIC);
+#endif
 
   Gtk::TreeViewColumn* pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
+#ifdef GLIBMM_PROPERTIES_ENABLED
   pColumn->add_attribute(pCell->property_text(), columns.title);
   pColumn->add_attribute(pCell->property_style_set(), columns.italic);
+#else
+  pColumn->add_attribute(*pCell, "text", columns.title);
+  pColumn->add_attribute(*pCell, "style_set", columns.italic);
+#endif
 
   m_TreeView.append_column(*pColumn);
 

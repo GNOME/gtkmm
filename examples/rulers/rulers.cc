@@ -65,8 +65,19 @@ bool Rulers::on_area_motion_notify_event(GdkEventMotion* event)
 
   if(event)
   {
+#ifdef GLIBMM_PROPERTIES_ENABLED
     m_hrule.property_position().set_value(event->x);
     m_vrule.property_position().set_value(event->y);
+#else
+  Glib::Value<double> property_value;
+  property_value.init(Glib::Value<double>::value_type());
+
+  property_value.set(event->x);
+  m_hrule.set_property_value("position", property_value);
+
+  property_value.set(event->y);
+  m_vrule.set_property_value("position", property_value);
+#endif
   }
 
   return false;  //false = signal not fully handled, pass it on..
