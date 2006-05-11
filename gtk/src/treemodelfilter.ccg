@@ -25,14 +25,18 @@ static gboolean SignalProxy_Visible_gtk_callback(GtkTreeModel* model, GtkTreeIte
 {
   const Gtk::TreeModelFilter::SlotVisible* the_slot = static_cast<Gtk::TreeModelFilter::SlotVisible*>(data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENAB
     return (*the_slot)( Gtk::TreeModel::const_iterator(model, iter) );
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false; //An arbitary default, just to avoid the compiler warning.
 }
@@ -47,8 +51,10 @@ static void SignalProxy_Modify_gtk_callback(GtkTreeModel* model, GtkTreeIter* it
 {
   const Gtk::TreeModelFilter::SlotModify* the_slot = static_cast<Gtk::TreeModelFilter::SlotModify*>(data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     //Initialize the input parameter with the appropriate type for this column.
     //Then the C++ handler can just use operator==() without calling init on the value output arg:
     Glib::ValueBase cppValue;
@@ -61,12 +67,14 @@ static void SignalProxy_Modify_gtk_callback(GtkTreeModel* model, GtkTreeIter* it
 
     //If the C++ handler has inited value with an inappropriate GType, then this will fail,
     //but they should not do that because it makes no sense.
-    g_value_copy(cppValue.gobj() /* source */, value /* destination */);  
+    g_value_copy(cppValue.gobj() /* source */, value /* destination */);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED  
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void SignalProxy_Modify_gtk_callback_destroy(void* data)

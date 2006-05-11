@@ -27,12 +27,15 @@ static gboolean SignalProxy_Match_gtk_callback(GtkEntryCompletion* completion, c
 {
   const Gtk::EntryCompletion::SlotMatch* the_slot = static_cast<Gtk::EntryCompletion::SlotMatch*>(user_data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     GtkTreeModel* tree_model = gtk_entry_completion_get_model(completion);
     return (*the_slot)(Glib::convert_const_gchar_ptr_to_ustring(key),
                          Gtk::TreeModel::const_iterator(tree_model, iter)
                          );
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
@@ -40,6 +43,7 @@ static gboolean SignalProxy_Match_gtk_callback(GtkEntryCompletion* completion, c
   }
 
   return false; //An arbitary default, just to avoid the compiler warning.
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void SignalProxy_Match_gtk_callback_destroy(void* data)
@@ -103,8 +107,10 @@ static gboolean Widget_signal_match_selected_callback(GtkEntryCompletion* self, 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         //This conversion is the custom-written part:
@@ -112,11 +118,13 @@ static gboolean Widget_signal_match_selected_callback(GtkEntryCompletion* self, 
 
         return static_cast<int>( (*static_cast<SlotType*>(slot))(cppIter) );
       }
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke();
     }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 
   typedef gboolean RType;
@@ -131,8 +139,10 @@ static gboolean Widget_signal_match_selected_notify_callback(GtkEntryCompletion*
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         //This conversion is the custom-written part:
@@ -140,11 +150,13 @@ static gboolean Widget_signal_match_selected_notify_callback(GtkEntryCompletion*
 
         (*static_cast<SlotType*>(slot))(cppIter);
       }
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke();
     }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 
   typedef gboolean RType;
@@ -194,18 +206,22 @@ gboolean EntryCompletion_Class::match_selected_callback_custom(GtkEntryCompletio
   // being overridden:
   if(obj && obj->is_derived_())
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try // Trap C++ exceptions which would normally be lost because this is a C callback.
     {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       // Call the virtual member method, which derived classes might override.
 
       //This conversion is the custom-written part:
       Gtk::TreeModel::iterator cppIter(c_model, c_iter);
       return obj->on_match_selected(cppIter);
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke();
     }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
   else
   {

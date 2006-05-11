@@ -32,7 +32,14 @@ bool MyCallback(Glib::IOCondition io_condition)
   else {
    Glib::ustring buf;
 
-   iochannel->read_line (buf);
+   #ifdef GLIBMM_EXCEPTIONS_ENABLED
+   iochannel->read_line(buf);
+   #else
+   std::auto_ptr<Glib::Error> ex;
+   iochannel->read_line(buf, ex);
+   if(ex.get())
+     std::cerr << "Error: " << ex->what() << std::endl;
+   #endif //GLIBMM_EXCEPTIONS_ENABLED
    std::cout << buf;
    if (buf == "Q\n")
 	   Gtk::Main::quit ();
