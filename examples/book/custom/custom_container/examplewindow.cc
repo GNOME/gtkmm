@@ -34,7 +34,13 @@ ExampleWindow::ExampleWindow()
   m_MyContainer.set_child_widgets(m_Button_One, m_Button_Two);
   m_Button_One.show();
   m_Button_Two.show(); 
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
   m_Button_Two.property_xalign() = 1.0f; 
+#else
+  m_Button_Two.set_property("xalign", 1.0f); 
+#endif //GLIBMM_PROPERTIES_ENABLED
+
   m_VBox.pack_start(m_MyContainer, Gtk::PACK_EXPAND_WIDGET);
   m_MyContainer.show();
 

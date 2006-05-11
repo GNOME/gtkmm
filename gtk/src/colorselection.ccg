@@ -31,16 +31,20 @@ static void global_change_palette_hook_callback(GdkScreen* screen, const GdkColo
 {
   g_return_if_fail(global_change_palette_hook != 0);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*global_change_palette_hook)(
         Glib::wrap(screen, true),
         Gdk::ArrayHandle_Color(colors, n_colors, Glib::OWNERSHIP_NONE));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void old_change_palette_hook_callback(const Glib::RefPtr<Gdk::Screen>& screen,
@@ -111,12 +115,15 @@ ColorSelection::set_change_palette_hook(const ColorSelection::SlotChangePaletteH
 
   if(old_func)
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       if(old_func != &global_change_palette_hook_callback)
         old_slot = sigc::bind<-1>(sigc::ptr_fun(&old_change_palette_hook_callback), old_func);
       else if(global_change_palette_hook)
         old_slot = *global_change_palette_hook;
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
@@ -124,6 +131,7 @@ ColorSelection::set_change_palette_hook(const ColorSelection::SlotChangePaletteH
       delete new_slot;
       throw;
     }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 
   delete global_change_palette_hook;
