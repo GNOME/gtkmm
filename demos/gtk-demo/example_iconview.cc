@@ -212,7 +212,13 @@ void Example_IconView::fill_store()
       {
         std::string path = Glib::build_filename(m_parent, name);
         bool is_dir = Glib::file_test(path, Glib::FILE_TEST_IS_DIR);
+        
+        #ifdef GLIBMM_EXCEPTIONS_ENABLED
         Glib::ustring display_name = Glib::filename_to_utf8(name);
+        #else
+        std::auto_ptr<Glib::Error> error;
+        Glib::ustring display_name = Glib::filename_to_utf8(name, error);
+        #endif //GLIBMM_EXCEPTIONS_ENABLED
 
         Gtk::TreeModel::iterator iter = m_model->append();
         Gtk::TreeModel::Row row = *iter;
