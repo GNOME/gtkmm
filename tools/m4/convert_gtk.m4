@@ -565,7 +565,7 @@ _CONVERSION(`GtkPrintStatus',`PrintStatus',`($2)$3')
 #Printer
 _CONVERSION(`GtkPrinter*',`Glib::RefPtr<Printer>',`Glib::wrap($3)')
 _CONVERSION(`GtkPrinter*',`Glib::RefPtr<const Printer>',`Glib::wrap($3)')
-_CONVERSION(`Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
+#_CONVERSION(`Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
 
 
