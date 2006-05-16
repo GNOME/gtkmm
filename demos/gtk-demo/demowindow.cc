@@ -192,7 +192,13 @@ void DemoWindow::on_treeselection_changed()
   if(const Gtk::TreeModel::iterator iter = m_refTreeSelection->get_selected())
   {
     const Glib::ustring filename = (*iter)[demo_columns().filename];
+    
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     load_file(Glib::filename_from_utf8(filename));
+    #else
+    std::auto_ptr<Glib::Error> error;
+    load_file(Glib::filename_from_utf8(filename, error));
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 }
 

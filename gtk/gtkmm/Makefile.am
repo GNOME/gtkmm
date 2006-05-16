@@ -10,7 +10,6 @@ sublib_namespace	= Gtk
 sublib_cflags		= $(GTKMM_CFLAGS)
 sublib_topdir = gtk
 sublib_win32_dlls_libs	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
-	               	  $(top_builddir)/atk/atkmm/libatkmm-1.6.la \
 			  $(top_builddir)/pango/pangomm/libpangomm-1.4.la
 
 
