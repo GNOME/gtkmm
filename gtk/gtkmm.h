@@ -111,10 +111,14 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/optionmenu.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
+#include <gtkmm/pagesetupunixdialog.h>
 #include <gtkmm/papersize.h>
 #include <gtkmm/printcontext.h>
+#include <gtkmm/printer.h>
+#include <gtkmm/printjob.h>
 #include <gtkmm/printoperation.h>
 #include <gtkmm/printsettings.h>
+#include <gtkmm/printunixdialog.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/radioaction.h>
 #include <gtkmm/radiobutton.h>

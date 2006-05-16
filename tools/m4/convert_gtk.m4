@@ -562,6 +562,12 @@ _CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REF
 _CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`($2)$3')
 _CONVERSION(`GtkPrintStatus',`PrintStatus',`($2)$3')
 
+#Printer
+_CONVERSION(`GtkPrinter*',`Glib::RefPtr<Printer>',`Glib::wrap($3)')
+_CONVERSION(`GtkPrinter*',`Glib::RefPtr<const Printer>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
+
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.

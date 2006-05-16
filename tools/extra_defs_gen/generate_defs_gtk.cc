@@ -146,6 +146,10 @@ int main (int argc, char *argv[])
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PREVIEW )
 	    << get_defs( GTK_TYPE_PRINT_OPERATION )
+	    /*<< get_defs( GTK_TYPE_PRINTER )*/
+	    /*<< get_defs( GTK_TYPE_PRINT_JOB )*/
+	    /*<< get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )*/
+	    /*<< get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )*/
             << get_defs( GTK_TYPE_PROGRESS )
             << get_defs( GTK_TYPE_PROGRESS_BAR )
             << get_defs( GTK_TYPE_RADIO_BUTTON )
