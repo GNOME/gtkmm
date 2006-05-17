@@ -20,7 +20,7 @@ html/index.html: gtkmm-tut-with-examples.xml
 	$(mkinstalldirs) html
 	xsltproc \
 		--param toc.section.depth 1	\
-		--stringparam html.stylesheet "../style.css"	\
+		--stringparam html.stylesheet "style.css"	\
 		--stringparam admon.graphics 1	\
 		--stringparam admon.graphics.path "../icons/"	\
 		--stringparam admon.graphics.extension ".png"	\
@@ -52,7 +52,7 @@ post-html: html/index.html style.css
 	rsync $(rsync_args) figures/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/figures/
 	rsync $(rsync_args) icons/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/icons/
 	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
-	rsync $(rsync_args) -r *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/
+	rsync $(rsync_args) *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
 
 doc-clean:
 	-rm -rf html
