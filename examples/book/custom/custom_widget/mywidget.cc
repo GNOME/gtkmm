@@ -35,7 +35,7 @@ MyWidget::MyWidget()
 
 
   gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(G_OBJECT_GET_CLASS(gobj())), 
-     g_param_spec_int("examplescale",
+     g_param_spec_int("Gtkmmmywidget::example_scale",
 		      "Scale of Example Drawing",
                       "The scale to use when drawing the picture. This is just a silly example.",
                       G_MININT,
@@ -46,7 +46,7 @@ MyWidget::MyWidget()
   gtk_rc_parse("custom_gtkrc");
 
   int example_scale = 0;
-  get_style_property("examplescale", example_scale);
+  get_style_property("Gtkmmmywidget::example_scale", example_scale);
   std::cout << "examplescale (from the theme/rc-file) is: " << example_scale << std::endl; 
 }
 
