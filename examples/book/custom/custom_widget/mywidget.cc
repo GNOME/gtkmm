@@ -17,10 +17,37 @@
  */
 
 #include "mywidget.h"
+#include <iostream>
+//#include <gtk/gtkwidget.h> //For GTK_IS_WIDGET()
+
 
 MyWidget::MyWidget()
+: Glib::ObjectBase("mywidget"), //The GType name will actually be gtkmm__CustomObject_mywidget
+  Gtk::Widget()
 {
   set_flags(Gtk::NO_WINDOW);
+
+  //This shows the GType name:
+  std::cout << "GType name: " <<G_OBJECT_TYPE_NAME(gobj()) << std::endl;
+
+  //This show that the GType still derives from GtkWidget:
+  //std::cout << "Gtype is a GtkWidget?:" << GTK_IS_WIDGET(gobj()) << std::endl;
+
+
+  gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(G_OBJECT_GET_CLASS(gobj())), 
+     g_param_spec_int("examplescale",
+		      "Scale of Example Drawing",
+                      "The scale to use when drawing the picture. This is just a silly example.",
+                      G_MININT,
+		      G_MAXINT,
+		      0,
+ 		      G_PARAM_READABLE) );
+
+  gtk_rc_parse("custom_gtkrc");
+
+  int example_scale = 0;
+  get_style_property("examplescale", example_scale);
+  std::cout << "example-scale (from the theme/rc-file) is: " << example_scale << std::endl; 
 }
 
 MyWidget::~MyWidget()
