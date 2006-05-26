@@ -47,7 +47,7 @@ MyWidget::MyWidget()
 
   int example_scale = 0;
   get_style_property("examplescale", example_scale);
-  std::cout << "example-scale (from the theme/rc-file) is: " << example_scale << std::endl; 
+  std::cout << "examplescale (from the theme/rc-file) is: " << example_scale << std::endl; 
 }
 
 MyWidget::~MyWidget()
