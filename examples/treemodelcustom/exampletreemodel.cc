@@ -50,11 +50,6 @@ ExampleTreeModel::ExampleTreeModel(unsigned int columns_count)
   m_stamp(1), //When the model's stamp != the iterator's stamp then that iterator is invalid and should be ignored. Also, 0=invalid
   m_pGlueList(0)
 {
-  GType gtype = G_OBJECT_TYPE(gobj()); //The custom GType created in the Object constructor, from the typeid.
-  Gtk::TreeModel::add_interface( gtype );
-
-   
-  
   //Initialize our underlying data:
   const typeListOfRows::size_type rows_count = 100;
   m_rows.resize(rows_count); //100 rows.
