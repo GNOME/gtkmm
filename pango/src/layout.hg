@@ -60,6 +60,32 @@ protected:
 public:
   _WRAP_CREATE(const Glib::RefPtr<Context>& context)
 
+ /** Creates a layout object set up to match the current transformation
+  * and target surface of the Cairo context.  This layout can then be
+  * used for text measurement with functions like
+  * get_size() or drawing with methods like show_in_cairo_contet(). 
+  * If you change the transformation or target surface for @a context, 
+  * you need to call update_from_cairo_context()
+  *
+  * This is the most convenient way to use Cairo with Pango. 
+  * However it is slightly inefficient since it creates a separate
+  * Pango Context object for each layout. This might matter in an
+  * application that is laying out large amounts of text.
+  * 
+  * @param context A Cairo context.
+  * @result The newly created Pango Layout.
+  */
+  static Glib::RefPtr<Layout> create(const Cairo::RefPtr<Cairo::Context>& context);
+
+  /** Updates the private Pango Context of a Pango Layout created with
+   * create(const Cairo::RefPtr<Cairo::Context>&) to match the current transformation
+   * and target surface of a Cairo Context.
+   *
+   * @param context A Cairo context.
+   */
+  void update_from_cairo_context(const Cairo::RefPtr<Cairo::Context>& context);
+
+
   _WRAP_METHOD(Glib::RefPtr<Layout> copy(), pango_layout_copy)
   _WRAP_METHOD(Glib::RefPtr<Context> get_context() const, pango_layout_get_context, refreturn)
   _WRAP_METHOD(void set_attributes(AttrList& attrs), pango_layout_set_attributes)
@@ -197,6 +223,15 @@ public:
    * @param iter Location to store the iterator.
    */
   void get_iter(LayoutIter& iter);
+
+
+  /** Adds the text in this LayoutLine to the current path in the
+   * specified Cairo @a context. The origin of the glyphs (the left edge
+   * of the line) will be at the current point of the cairo context.
+   *
+   * @param context A Cairo context.
+   */
+  void add_to_cairo_context(const Cairo::RefPtr<Cairo::Context>& context);
 };
 
 } /* namespace Pango */

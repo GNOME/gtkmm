@@ -97,6 +97,8 @@ _CONVERSION(`PangoFontMap*',`Glib::RefPtr<FontMap>',Glib::wrap($3))
 _CONVERSION(`PangoFontMap*',`Glib::RefPtr<const FontMap>',Glib::wrap($3))
 _CONVERSION(`const Glib::RefPtr<FontMap>&',`PangoFontMap*',__CONVERT_REFPTR_TO_P)
 
+_CONVERSION(`PangoCairoFontMap*',`Glib::RefPtr<CairoFontMap>',Glib::wrap($3))
+
 _CONVERSION(`PangoFontSet*',`Glib::RefPtr<FontSet>',Glib::wrap($3))
 _CONVERSION(`const Glib::RefPtr<FontSet>&',`PangoFontSet*',__CONVERT_REFPTR_TO_P)
 
@@ -147,3 +149,6 @@ _CONVERSION(`GSList*',`SListHandle_LayoutLine',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_ConstLayoutLine',__FL2H_SHALLOW)
 
 _CONVERSION(`PangoFontMap*',`Glib::RefPtr<Pango::FontMap>',`Glib::wrap($3)')
+
+_CONVERSION(`const Cairo::FontOptions&',`const cairo_font_options_t*',`($3).cobj()')
+

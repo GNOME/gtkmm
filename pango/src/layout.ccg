@@ -20,6 +20,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <pango/pangocairo.h>
+
 namespace Pango
 {
 
@@ -27,6 +29,16 @@ Layout::Layout(const Glib::RefPtr<Context>& context)
 :
   Glib::Object(G_OBJECT(pango_layout_new(context->gobj())))
 {}
+
+Glib::RefPtr<Layout> Layout::create(const Cairo::RefPtr<Cairo::Context>& context)
+{
+  return Glib::wrap( pango_cairo_create_layout(context->cobj()) );
+}
+
+void Layout::update_from_cairo_context(const Cairo::RefPtr<Cairo::Context>& context)
+{
+  pango_cairo_update_layout(context->cobj(), gobj());
+}
 
 void Layout::set_text(const Glib::ustring& text)
 {
@@ -110,6 +122,11 @@ void Layout::get_iter(LayoutIter& iter)
 void Layout::unset_font_description()
 {
   pango_layout_set_font_description(gobj(), 0);
+}
+
+void Layout::add_to_cairo_context(const Cairo::RefPtr<Cairo::Context>& context)
+{
+  pango_cairo_layout_path(context->cobj(), gobj());
 }
 
 } /* namespace Pango */
