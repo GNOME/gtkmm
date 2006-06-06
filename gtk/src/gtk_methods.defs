@@ -224,6 +224,12 @@
   (gtype-id "GTK_TYPE_PRINT_OPERATION")
 )
 
+(define-object PrintOperationPreview
+  (in-module "Gtk")
+  (c-name "GtkPrintOperationPreview")
+  (gtype-id "GTK_TYPE_PRINT_OPERATION_PREVIEW")
+)
+
 (define-object Printer
   (in-module "Gtk")
   (parent "GObject")
@@ -1157,6 +1163,13 @@
   (gtype-id "GTK_TYPE_WINDOW")
 )
 
+(define-object Win32EmbedWidget
+  (in-module "Gtk")
+  (parent "GtkWindow")
+  (c-name "GtkWin32EmbedWidget")
+  (gtype-id "GTK_TYPE_WIN32_EMBED_WIDGET")
+)
+
 (define-object Plug
   (in-module "Gtk")
   (parent "GtkWindow")
@@ -1525,6 +1538,7 @@
     '("down" "GTK_ARROW_DOWN")
     '("left" "GTK_ARROW_LEFT")
     '("right" "GTK_ARROW_RIGHT")
+    '("none" "GTK_ARROW_NONE")
   )
 )
 
@@ -2401,6 +2415,19 @@
   )
 )
 
+(define-flags PrintCapabilities
+  (in-module "Gtk")
+  (c-name "GtkPrintCapabilities")
+  (gtype-id "GTK_TYPE_PRINT_CAPABILITIES")
+  (values
+    '("page-set" "GTK_PRINT_CAPABILITY_PAGE_SET")
+    '("copies" "GTK_PRINT_CAPABILITY_COPIES")
+    '("collate" "GTK_PRINT_CAPABILITY_COLLATE")
+    '("reverse" "GTK_PRINT_CAPABILITY_REVERSE")
+    '("scale" "GTK_PRINT_CAPABILITY_SCALE")
+  )
+)
+
 (define-enum PrintStatus
   (in-module "Gtk")
   (c-name "GtkPrintStatus")
@@ -2426,6 +2453,7 @@
     '("error" "GTK_PRINT_OPERATION_RESULT_ERROR")
     '("apply" "GTK_PRINT_OPERATION_RESULT_APPLY")
     '("cancel" "GTK_PRINT_OPERATION_RESULT_CANCEL")
+    '("preview" "GTK_PRINT_OPERATION_RESULT_PREVIEW")
   )
 )
 
@@ -2848,28 +2876,6 @@
   (values
     '("tooltip" "GTK_WIDGET_HELP_TOOLTIP")
     '("whats-this" "GTK_WIDGET_HELP_WHATS_THIS")
-  )
-)
-
-(define-enum MessageType
-  (in-module "XEmbed")
-  (c-name "XEmbedMessageType")
-  (gtype-id "X_TYPE_EMBED_MESSAGE_TYPE")
-  (values
-    '("embedded-notify" "XEMBED_EMBEDDED_NOTIFY")
-    '("window-activate" "XEMBED_WINDOW_ACTIVATE")
-    '("window-deactivate" "XEMBED_WINDOW_DEACTIVATE")
-    '("request-focus" "XEMBED_REQUEST_FOCUS")
-    '("focus-in" "XEMBED_FOCUS_IN")
-    '("focus-out" "XEMBED_FOCUS_OUT")
-    '("focus-next" "XEMBED_FOCUS_NEXT")
-    '("focus-prev" "XEMBED_FOCUS_PREV")
-    '("grab-key" "XEMBED_GRAB_KEY")
-    '("ungrab-key" "XEMBED_UNGRAB_KEY")
-    '("modality-on" "XEMBED_MODALITY_ON")
-    '("modality-off" "XEMBED_MODALITY_OFF")
-    '("gtk-grab-key" "XEMBED_GTK_GRAB_KEY")
-    '("gtk-ungrab-key" "XEMBED_GTK_UNGRAB_KEY")
   )
 )
 
@@ -4772,6 +4778,21 @@
   (of-object "GtkButton")
   (c-name "gtk_button_get_image")
   (return-type "GtkWidget*")
+)
+
+(define-method set_image_position
+  (of-object "GtkButton")
+  (c-name "gtk_button_set_image_position")
+  (return-type "none")
+  (parameters
+    '("GtkPositionType" "position")
+  )
+)
+
+(define-method get_image_position
+  (of-object "GtkButton")
+  (c-name "gtk_button_get_image_position")
+  (return-type "GtkPositionType")
 )
 
 
@@ -16601,9 +16622,9 @@
   (return-type "GType")
 )
 
-(define-method get_cairo
+(define-method get_cairo_context
   (of-object "GtkPrintContext")
-  (c-name "gtk_print_context_get_cairo")
+  (c-name "gtk_print_context_get_cairo_context")
   (return-type "cairo_t*")
 )
 
@@ -16637,22 +16658,33 @@
   (return-type "gdouble")
 )
 
-(define-method get_fontmap
+(define-method get_pango_fontmap
   (of-object "GtkPrintContext")
-  (c-name "gtk_print_context_get_fontmap")
+  (c-name "gtk_print_context_get_pango_fontmap")
   (return-type "PangoFontMap*")
 )
 
-(define-method create_context
+(define-method create_pango_context
   (of-object "GtkPrintContext")
-  (c-name "gtk_print_context_create_context")
+  (c-name "gtk_print_context_create_pango_context")
   (return-type "PangoContext*")
 )
 
-(define-method create_layout
+(define-method create_pango_layout
   (of-object "GtkPrintContext")
-  (c-name "gtk_print_context_create_layout")
+  (c-name "gtk_print_context_create_pango_layout")
   (return-type "PangoLayout*")
+)
+
+(define-method set_cairo_context
+  (of-object "GtkPrintContext")
+  (c-name "gtk_print_context_set_cairo_context")
+  (return-type "none")
+  (parameters
+    '("cairo_t*" "cr")
+    '("double" "dpi_x")
+    '("double" "dpi_y")
+  )
 )
 
 
@@ -17151,6 +17183,15 @@
   )
 )
 
+(define-method set_show_preview
+  (of-object "GtkPrintOperation")
+  (c-name "gtk_print_operation_set_show_preview")
+  (return-type "none")
+  (parameters
+    '("gboolean" "show_preview")
+  )
+)
+
 (define-method set_pdf_target
   (of-object "GtkPrintOperation")
   (c-name "gtk_print_operation_set_pdf_target")
@@ -17169,6 +17210,24 @@
   )
 )
 
+(define-method set_show_progress
+  (of-object "GtkPrintOperation")
+  (c-name "gtk_print_operation_set_show_progress")
+  (return-type "none")
+  (parameters
+    '("gboolean" "show_progress")
+  )
+)
+
+(define-method set_custom_tab_label
+  (of-object "GtkPrintOperation")
+  (c-name "gtk_print_operation_set_custom_tab_label")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "label")
+  )
+)
+
 (define-method run
   (of-object "GtkPrintOperation")
   (c-name "gtk_print_operation_run")
@@ -17176,6 +17235,15 @@
   (parameters
     '("GtkWindow*" "parent")
     '("GError**" "error")
+  )
+)
+
+(define-method run_preview
+  (of-object "GtkPrintOperation")
+  (c-name "gtk_print_operation_run_preview")
+  (return-type "none")
+  (parameters
+    '("GtkWindow*" "parent")
   )
 )
 
@@ -17231,6 +17299,39 @@
     '("GtkPrintSettings*" "settings")
     '("GtkPageSetupDoneFunc" "done_cb")
     '("gpointer" "data")
+  )
+)
+
+
+
+;; From gtkprintoperationpreview.h
+
+(define-function gtk_print_operation_preview_get_type
+  (c-name "gtk_print_operation_preview_get_type")
+  (return-type "GType")
+)
+
+(define-method render_page
+  (of-object "GtkPrintOperationPreview")
+  (c-name "gtk_print_operation_preview_render_page")
+  (return-type "none")
+  (parameters
+    '("gint" "page_nr")
+  )
+)
+
+(define-method end_preview
+  (of-object "GtkPrintOperationPreview")
+  (c-name "gtk_print_operation_preview_end_preview")
+  (return-type "none")
+)
+
+(define-method is_selected
+  (of-object "GtkPrintOperationPreview")
+  (c-name "gtk_print_operation_preview_is_selected")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "page_nr")
   )
 )
 
@@ -17829,6 +17930,25 @@
   (of-object "GtkPrintUnixDialog")
   (c-name "gtk_print_unix_dialog_get_selected_printer")
   (return-type "GtkPrinter*")
+)
+
+(define-method add_custom_tab
+  (of-object "GtkPrintUnixDialog")
+  (c-name "gtk_print_unix_dialog_add_custom_tab")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "child")
+    '("GtkWidget*" "tab_label")
+  )
+)
+
+(define-method set_manual_capabilities
+  (of-object "GtkPrintUnixDialog")
+  (c-name "gtk_print_unix_dialog_set_manual_capabilities")
+  (return-type "none")
+  (parameters
+    '("GtkPrintCapabilities" "capabilities")
+  )
 )
 
 
@@ -19420,7 +19540,7 @@
     '("const-gchar*" "app_name")
     '("gchar**" "app_exec")
     '("guint*" "count")
-    '("time_t*" "time")
+    '("time_t*" "time_")
   )
 )
 
@@ -21021,6 +21141,17 @@
     '("gint*" "y")
     '("gboolean*" "push_in")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method get_geometry
+  (of-object "GtkStatusIcon")
+  (c-name "gtk_status_icon_get_geometry")
+  (return-type "gboolean")
+  (parameters
+    '("GdkScreen**" "screen")
+    '("GdkRectangle*" "area")
+    '("GtkOrientation*" "orientation")
   )
 )
 
@@ -28261,6 +28392,21 @@
   (return-type "gboolean")
 )
 
+(define-method set_rubber_banding
+  (of-object "GtkTreeView")
+  (c-name "gtk_tree_view_set_rubber_banding")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enable")
+  )
+)
+
+(define-method get_rubber_banding
+  (of-object "GtkTreeView")
+  (c-name "gtk_tree_view_get_rubber_banding")
+  (return-type "gboolean")
+)
+
 (define-method get_row_separator_func
   (of-object "GtkTreeView")
   (c-name "gtk_tree_view_get_row_separator_func")
@@ -30328,6 +30474,15 @@
 
 
 
+;; From gtkwin32embedwidget.h
+
+(define-function gtk_win32_embed_widget_get_type
+  (c-name "gtk_win32_embed_widget_get_type")
+  (return-type "GType")
+)
+
+
+
 ;; From gtkwindow-decorate.h
 
 (define-function gtk_decorated_window_init
@@ -31177,21 +31332,5 @@
 
 
 ;; From gtkxembed.h
-
-
-
-;; From stamp-gtkmarshalers.h
-
-
-
-;; From stamp-gtkmarshal.h
-
-
-
-;; From stamp-gtktypebuiltins.h
-
-
-
-;; From xembed.h
 
 
