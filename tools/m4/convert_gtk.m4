@@ -121,6 +121,7 @@ _CONV_ENUM(Gtk,PrintPages)
 _CONV_ENUM(Gtk,PageSet)
 _CONV_ENUM(Gtk,PrintStatus)
 _CONV_ENUM(Gtk,PrintOperationResult)
+_CONV_ENUM(Gtk,PrintOperationAction)
 _CONV_ENUM(Gtk,PrintError)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
@@ -567,6 +568,8 @@ _CONVERSION(`GtkPrinter*',`Glib::RefPtr<Printer>',`Glib::wrap($3)')
 _CONVERSION(`GtkPrinter*',`Glib::RefPtr<const Printer>',`Glib::wrap($3)')
 #_CONVERSION(`Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
+
+_CONVERSION(`const Cairo::RefPtr<Cairo::Context>&',`cairo_t*',`($3)->cobj()')
 
 
 # Used by Signals:

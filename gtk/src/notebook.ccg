@@ -21,6 +21,37 @@
 #include <gtk/gtknotebook.h>
 #include <gtkmm/label.h>
 
+//We use a function instead of a static method, so we can make it static, so it is not exported.
+static GtkNotebook* SignalProxy_WindowCreation_gtk_callback(GtkNotebook* source, GtkWidget* page, gint x, gint y, gpointer data)
+{
+  Gtk::Notebook::SlotWindowCreation* the_slot = static_cast<Gtk::Notebook::SlotWindowCreation*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    Gtk::Widget* pCppPage = Glib::wrap(page);
+
+    Gtk::Notebook* pCppNotebookResult = (*the_slot)(pCppPage, x, y);
+    if(pCppNotebookResult)
+      return pCppNotebookResult->gobj();
+    else
+      return 0;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void SignalProxy_WindowCreation_gtk_callback_destroy(void* data)
+{
+  Gtk::Notebook::SlotWindowCreation* the_slot = static_cast<Gtk::Notebook::SlotWindowCreation*>(data);
+  delete the_slot;
+}
+
 
 namespace Gtk
 {
@@ -425,6 +456,19 @@ int Notebook::append_page(Widget& child)
 int Notebook::insert_page(Widget& child, int position)
 {
   return gtk_notebook_insert_page(gobj(), child.gobj(), 0 /* see GTK+ docs */, position);
+}
+
+  /** For instance,
+   * Notebook* on_window_creation(Widget* page, int x, int y);
+   */
+  typedef sigc::slot<Widget*, int, int> SlotWindowCreation;
+
+void Notebook::set_window_creation_hook(const SlotWindowCreation& slot)
+{
+  SlotWindowCreation* slot_copy = new SlotWindowCreation(slot);
+  //TODO: GTK+ needs a destroy callback so we can delete the slot later.
+  //See bug 344209
+  gtk_notebook_set_window_creation_hook(&SignalProxy_WindowCreation_gtk_callback, slot_copy);
 }
 
 } //namespace Gtk
