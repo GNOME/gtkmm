@@ -23,19 +23,20 @@
 
 MyWidget::MyWidget()
 : Glib::ObjectBase("mywidget"), //The GType name will actually be gtkmm__CustomObject_mywidget
-  Gtk::Widget()
+  Gtk::Widget(),
+  m_scale(1000)
 {
   set_flags(Gtk::NO_WINDOW);
 
-  //This shows the GType name:
+  //This shows the GType name, which must be used in the RC file.
   std::cout << "GType name: " <<G_OBJECT_TYPE_NAME(gobj()) << std::endl;
 
   //This show that the GType still derives from GtkWidget:
   //std::cout << "Gtype is a GtkWidget?:" << GTK_IS_WIDGET(gobj()) << std::endl;
 
-
+  //Install a style so that an aspect of this widget may be themed via an RC file: 
   gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(G_OBJECT_GET_CLASS(gobj())), 
-     g_param_spec_int("Gtkmmmywidget::example_scale",
+     g_param_spec_int("example_scale",
 		      "Scale of Example Drawing",
                       "The scale to use when drawing the picture. This is just a silly example.",
                       G_MININT,
@@ -44,10 +45,6 @@ MyWidget::MyWidget()
  		      G_PARAM_READABLE) );
 
   gtk_rc_parse("custom_gtkrc");
-
-  int example_scale = 0;
-  get_style_property("Gtkmmmywidget::example_scale", example_scale);
-  std::cout << "examplescale (from the theme/rc-file) is: " << example_scale << std::endl; 
 }
 
 MyWidget::~MyWidget()
@@ -94,6 +91,12 @@ void MyWidget::on_realize()
 {
   //Call base class:
   Gtk::Widget::on_realize();
+
+  ensure_style();
+
+  //Get the themed style from the RC file:
+  get_style_property("example_scale", m_scale);
+  std::cout << "m_scale (example_scale from the theme/rc-file) is: " << m_scale << std::endl; 
 
   if(!m_refGdkWindow)
   {
@@ -146,8 +149,8 @@ bool MyWidget::on_expose_event(GdkEventExpose* /* event */)
   {
     //Draw on the Gdk::Window:
     m_refGdkWindow->clear();
-    double scale_x = (double)get_allocation().get_width() /1000;
-    double scale_y = (double)get_allocation().get_height() /1000;
+    double scale_x = (double)get_allocation().get_width() / m_scale;
+    double scale_y = (double)get_allocation().get_height() / m_scale;
 
     m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(165*scale_y), (int)(155*scale_x), (int)(838*scale_y));
     m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(838*scale_y), (int)(265*scale_x), (int)(900*scale_y));

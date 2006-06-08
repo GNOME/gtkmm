@@ -38,6 +38,7 @@ _CONVERSION(`Color',`PangoColor',`*($3).gobj()')
 _CONVERSION(`PangoColor',`Color',`Color(&($3))')
 
 _CONVERSION(`PangoFontDescription*',`FontDescription',`FontDescription(($3))')
+_CONVERSION(`const PangoFontDescription*',`FontDescription',`FontDescription(const_cast<PangoFontDescription*>($3))')
 _CONVERSION(`Pango::FontDescription&',`PangoFontDescription*',`($3).gobj()')
 _CONVERSION(`FontDescription&',`PangoFontDescription*',`($3).gobj()')
 _CONVERSION(`const FontDescription&',`const PangoFontDescription*',`($3).gobj()')

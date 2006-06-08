@@ -40,6 +40,8 @@ protected:
 
   Glib::RefPtr<Gdk::Window> m_refGdkWindow;
   Glib::RefPtr<Gdk::GC> m_refGC;
+
+  int m_scale;
 };
 
 #endif //GTKMM_CUSTOM_WIDGET_MYWIDGET_H
