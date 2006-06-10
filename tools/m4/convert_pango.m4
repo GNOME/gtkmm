@@ -143,6 +143,11 @@ _CONVERSION(`Pango::TabAlign&',`PangoTabAlign*',`((PangoTabAlign*) &($3))')
 _CONVERSION(`TabAlign&',`PangoTabAlign*',`((PangoTabAlign*) &($3))')
 
 _CONVERSION(`const Matrix&',`const PangoMatrix*',`&($3)')
+
+#The documentation for pango_context_get_matrix() suggests that it's generally OK 
+#to consider PANGO_MATRIX_INIT and a NULL PangoMatrix* as being equivalent:
+#But this would cause 2 function calls.
+#_CONVERSION(`const PangoMatrix*',`Matrix',`($3) ? *($3) : PANGO_MATRIX_INIT')
 #_CONVERSION(`const Matrix&',`PangoMatrix*',`const_cast<PangoMatrix*>(&($3))')
 
 define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
