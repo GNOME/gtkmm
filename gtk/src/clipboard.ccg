@@ -20,6 +20,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gtkmm/textbuffer.h>
 #include <gtkmm/selectiondata_private.h>
 #include <glibmm/utility.h> //For ScopedPtr<>.
 #include <gtk/gtkclipboard.h>
@@ -127,8 +128,12 @@ static listStrings util_convert_atoms_to_strings(GdkAtom* targets, int n_targets
   for(int i = 0; i < n_targets; i++)
   {
     //Convert the atom to a string:
-    Glib::ustring target = gdk_atom_name(targets[i]);
-    listTargets.push_back(target);
+    char* atom_name = gdk_atom_name(targets[i]);
+    if(atom_name)
+    {
+      listTargets.push_back( Glib::ustring(atom_name) );
+      g_free(atom_name);
+    }
   }
 
   return listTargets;
@@ -166,6 +171,28 @@ static void SignalProxy_TextReceived_gtk_callback(GtkClipboard*, const char* tex
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*the_slot)((text) ? Glib::ustring(text) : Glib::ustring());
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  delete the_slot; // the callback is only used once
+}
+
+static void SignalProxy_RichTextReceived_gtk_callback(GtkClipboard*, GdkAtom format, const guint8* text, gsize             length, void* data)
+{
+  Gtk::Clipboard::SlotRichTextReceived* the_slot = static_cast<Gtk::Clipboard::SlotRichTextReceived*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    gchar* format_atom_name = gdk_atom_name(format);
+    (*the_slot)( (format_atom_name ? Glib::ustring(format_atom_name) : Glib::ustring()), (text ? std::string((char*)text, length) : std::string()) );
+    g_free(format_atom_name);
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
@@ -238,6 +265,15 @@ void Clipboard::request_text(const SlotTextReceived& slot)
       &SignalProxy_TextReceived_gtk_callback, slot_copy);
 }
 
+void Clipboard::request_rich_text(const Glib::RefPtr<TextBuffer>& buffer, const SlotRichTextReceived& slot)
+{
+  // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
+  SlotRichTextReceived* slot_copy = new SlotRichTextReceived(slot);
+
+  gtk_clipboard_request_rich_text(gobj(), buffer->gobj(), 
+      &SignalProxy_RichTextReceived_gtk_callback, slot_copy);
+}
+
 void Clipboard::request_image(const SlotImageReceived& slot)
 {
   // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
@@ -298,6 +334,27 @@ void Clipboard::set_can_store()
 {
   gtk_clipboard_set_can_store( gobj(), 0, 0 /* See C docs */ );
 }
+
+std::string Clipboard::wait_for_rich_text(const Glib::RefPtr<TextBuffer>& buffer, std::string& format)
+{
+  std::string result;
+
+  GdkAtom format_atom = 0;
+  gsize length = 0;
+  guint8* text = gtk_clipboard_wait_for_rich_text(const_cast<GtkClipboard*>(gobj()), buffer->gobj(), &format_atom, &length);
+  if(text && length)
+  {
+    gchar* format_atom_name = gdk_atom_name(format_atom);
+    if(format_atom_name)
+      format = Glib::ScopedPtr<char>(format_atom_name).get(); //This frees the buffer.
+
+    result = std::string((char*)text, length);
+    g_free(text);
+  }
+
+  return result;
+}
+
     
 } //namespace Gtk
 

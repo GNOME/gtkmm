@@ -505,6 +505,10 @@ _CONVERSION(`GtkEntry*',`Entry*',__RP2P)
 _CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
 _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
+
+_CONVERSION(`const Border&',`const GtkBorder*',`&($3)')
+_CONVERSION(`const GtkBorder*',`Border',`*($3)')
+
 #RecentFilter
 _CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
 _CONVERSION(`const RecentFilter&', `GtkRecentFilter*', __FCR2P)

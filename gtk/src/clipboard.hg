@@ -33,6 +33,10 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gtk
 {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+class TextBuffer;
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+
 /** The Clipboard object represents a clipboard of data shared between different processes or between 
  * different widgets in the same process. Each clipboard is identified by a name encoded as a GdkAtom. *
  * (Conversion to and from strings can be done with gdk_atom_intern() and gdk_atom_name().) The default 
@@ -152,6 +156,24 @@ public:
    */
   void request_text(const SlotTextReceived& slot);
   _IGNORE(gtk_clipboard_request_text)
+
+  /// For instance: void on_rich_text_received(const Glib::ustring& format, const std::string& text);
+  typedef sigc::slot<void, const Glib::ustring& , const std::string&> SlotRichTextReceived;
+
+  /** Requests the contents of the clipboard as rich text. When the rich text is later received, 
+   * callback will be called.
+   *
+   * The text parameter to the callback will contain the resulting rich text if the request succeeded, or 
+   * an empty string if it failed. This function can fail for various reasons, in particular if the 
+   * clipboard was empty or if the contents of the clipboard could not be converted into rich text form.
+   *
+   *
+   * @param slot:  a function to call when the text is received,
+   *             or the retrieval fails. (It will always be called
+   *             one way or the other.)
+   */
+  void request_rich_text(const Glib::RefPtr<TextBuffer>& buffer, const SlotRichTextReceived& slot);
+  _IGNORE(gtk_clipboard_request_rich_text)
   
   
   /// For instance: void on_image_received(const Glib::RefPtr<Gdk::Pixbuf>& text);
@@ -208,11 +230,15 @@ public:
   _IGNORE(gtk_clipboard_wait_for_contents)
 
   _WRAP_METHOD(Glib::ustring wait_for_text() const, gtk_clipboard_wait_for_text)
+
+  std::string wait_for_rich_text(const Glib::RefPtr<TextBuffer>& buffer, std::string& format);
+  _IGNORE(gtk_clipboard_wait_for_rich_text)
   
   //Maybe the result should be const, but constness is not so clear-cut here. murrayc
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> wait_for_image() const, gtk_clipboard_wait_for_image)
   
   _WRAP_METHOD(bool wait_is_text_available() const, gtk_clipboard_wait_is_text_available)
+  _WRAP_METHOD(bool wait_is_rich_text_available(const Glib::RefPtr<TextBuffer>& buffer) const, gtk_clipboard_wait_is_rich_text_available)
   _WRAP_METHOD(bool wait_is_image_available() const, gtk_clipboard_wait_is_image_available)  
   _WRAP_METHOD(bool wait_is_target_available(const Glib::ustring& target), gtk_clipboard_wait_is_target_available)
 
