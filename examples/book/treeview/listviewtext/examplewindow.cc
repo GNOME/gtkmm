@@ -19,9 +19,9 @@
 #include <iostream>
 #include "examplewindow.h"
 
-ExampleWindow::ExampleWindow()
-: m_Button_Quit("Quit"),
-  m_ListViewText(3)
+ExampleWindow::ExampleWindow() :
+    m_ListViewText(3),
+    m_Button_Quit("Quit")
 {
   set_title("Gtk::ListViewText example");
   set_border_width(6);
