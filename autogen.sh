@@ -53,8 +53,8 @@ enable_warnings=
 case "$*" in
     *--enable-warnings*|*--disable-warnings*)
         ;;
-    *)  # enable -Werror by default when building with gcc3
-        ${CXX:-"g++"} --version 2>/dev/null | grep '(GCC) 3\.[0-9]\+\.[0-9]' >/dev/null 2>&1 \
+    *)  # enable -Werror by default when building with gcc3 or gcc4
+        ${CXX:-"g++"} --version 2>/dev/null | grep '(GCC) [34]\.[0-9]\+\.[0-9]' >/dev/null 2>&1 \
             && enable_warnings='--enable-warnings=hardcore'
         ;;
 esac
