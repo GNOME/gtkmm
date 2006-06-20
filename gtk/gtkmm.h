@@ -117,6 +117,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/printer.h>
 #include <gtkmm/printjob.h>
 #include <gtkmm/printoperation.h>
+#include <gtkmm/printoperationpreview.h>
 #include <gtkmm/printsettings.h>
 #include <gtkmm/printunixdialog.h>
 #include <gtkmm/progressbar.h>

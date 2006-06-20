@@ -15,10 +15,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gtk/gtkprintoperation.h> // for GtkPrintOperationResult
+
 #include <glibmm/object.h>
 
 #include <gtkmm/pagesetup.h>
 #include <gtkmm/printcontext.h>
+#include <gtkmm/printoperationpreview.h>
 #include <gtkmm/printsettings.h>
 #include <gtkmm/window.h>
 
@@ -43,7 +46,6 @@ protected:
 public:
   _WRAP_CREATE()
 
-
   _WRAP_METHOD(void set_default_page_setup(const Glib::RefPtr<PageSetup>& default_page_setup),
                gtk_print_operation_set_default_page_setup)
   _WRAP_METHOD(Glib::RefPtr<PageSetup> get_default_page_setup() const, gtk_print_operation_get_default_page_setup)
@@ -63,6 +65,14 @@ public:
   _WRAP_METHOD(void set_allow_async(bool allow_async = true), gtk_print_operation_set_allow_async)
   _WRAP_METHOD(void set_custom_tab_label(const Glib::ustring& label), gtk_print_operation_set_custom_tab_label)
 
+  #m4 _CONVERSION(`GtkPrintOperationAction',`PrintOperationAction',`($2)$3')
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  PrintOperationResult run(PrintOperationAction action);
+  #else
+  PrintOperationResult run(PrintOperationAction action, std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD(PrintOperationResult run(PrintOperationAction action, Window& parent), gtk_print_operation_run, errthrow)
   _WRAP_METHOD(PrintStatus get_status() const, gtk_print_operation_get_status)
   _WRAP_METHOD(Glib::ustring get_status_string() const, gtk_print_operation_get_status_string)
@@ -70,6 +80,14 @@ public:
   _WRAP_METHOD(bool is_finished() const, gtk_print_operation_is_finished)
 
   _IGNORE(gtk_print_run_page_setup_dialog, gtk_print_run_page_setup_dialog_async)
+
+  #m4 _CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`($2)$3')
+
+  _IGNORE(gtk_print_operation_get_error)
+
+  //TODO: point out in the docs that the PrintOperationResult enum may also indicate
+  // that an error occurred, and in that case it is up to him to handle it.
+  _WRAP_SIGNAL(void done(PrintOperationResult result), "done")
 
   #m4 _CONVERSION(`GtkPrintContext*',`const Glib::RefPtr<PrintContext>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void begin_print(const Glib::RefPtr<PrintContext>& context), "begin_print")
@@ -81,18 +99,30 @@ public:
   _WRAP_SIGNAL(void end_print(const Glib::RefPtr<PrintContext>& context), "end_print")
   _WRAP_SIGNAL(void status_changed(), "status_changed")
 
+  _WRAP_SIGNAL(Widget* create_custom_widget(), "create_custom_widget")
+
+  _WRAP_SIGNAL(void custom_widget_apply(Widget& widget), "custom_widget_apply")
+
+  #m4 _CONVERSION(`GtkPrintOperationPreview*', `PrintOperationPreview*', `($2)($3)')
+  #m4 _CONVERSION(`PrintOperationPreview*', `GtkPrintOperationPreview*', `($2)($3)')
+
+  #m4 _CONVERSION(`GtkWindow*',`Window&',`*Glib::wrap($3)')
+
+  _WRAP_SIGNAL(bool preview(PrintOperationPreview* preview, const Glib::RefPtr<PrintContext>& context, Window& parent), "preview")
+
   _WRAP_PROPERTY("default_page_setup", Glib::RefPtr<PageSetup>)
   _WRAP_PROPERTY("print_settings", Glib::RefPtr<PrintSettings>)
   _WRAP_PROPERTY("job_name", Glib::ustring)
-  _WRAP_PROPERTY("number_of_pages", int)
+  _WRAP_PROPERTY("n_pages", int)
   _WRAP_PROPERTY("current_page", int)
   _WRAP_PROPERTY("use_full_page", bool)
   _WRAP_PROPERTY("unit", Unit)
   _WRAP_PROPERTY("show_progress", bool)
   _WRAP_PROPERTY("allow_async", bool)
-  _WRAP_PROPERTY("pdf_target", Glib::ustring)
+  _WRAP_PROPERTY("export_filename", std::string)
   _WRAP_PROPERTY("status", PrintStatus)
   _WRAP_PROPERTY("status_string", Glib::ustring)
+  _WRAP_PROPERTY("custom_tab_label", Glib::ustring)
 };
 
   /** TODO: explanation
