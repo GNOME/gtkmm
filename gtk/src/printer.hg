@@ -31,9 +31,9 @@ public:
   //_WRAP_CREATE() - probably not, it's only accessible through PrintUnixDialog + GtkPrintBackend should be ignored
   _IGNORE(gtk_printer_new, gtk_printer_get_backend)
   // I think these are not needed as well, and that Printer should generally be read-only - marko.
-  _IGNORE(gtk_printer_set_is_default, gtk_printer_get_job_count, gtk_printer_is_new, gtk_printer_set_state_message)
-  _IGNORE(gtk_printer_set_is_active, gtk_printer_set_has_details, gtk_printer_set_description, gtk_printer_set_icon_name)
-  _IGNORE(gtk_printer_set_job_count, gtk_printer_set_is_new, gtk_printer_set_location)
+  _IGNORE(gtk_printer_is_new, gtk_printer_set_state_message, gtk_printer_set_is_default)
+  _IGNORE(gtk_printer_set_is_active, gtk_printer_set_has_details, gtk_printer_set_description)
+  _IGNORE(gtk_printer_set_icon_name, gtk_printer_set_job_count, gtk_printer_set_is_new, gtk_printer_set_location)
 
   bool equal(const Glib::RefPtr<Printer>& other) const;
 
@@ -44,12 +44,14 @@ public:
   _WRAP_METHOD(Glib::ustring get_description() const, gtk_printer_get_description)
   _WRAP_METHOD(Glib::ustring get_location() const, gtk_printer_get_location)
   _WRAP_METHOD(Glib::ustring get_icon_name() const, gtk_printer_get_icon_name)
+  _WRAP_METHOD(int get_job_count() const, gtk_printer_get_job_count)
   _WRAP_METHOD(bool is_active() const, gtk_printer_is_active)
   _WRAP_METHOD(bool is_virtual() const, gtk_printer_is_virtual)
   _WRAP_METHOD(bool is_default() const, gtk_printer_is_default)
-  _IGNORE(gtk_printer_compare)
   _WRAP_METHOD(bool accepts_pdf() const, gtk_printer_accepts_pdf)
   _WRAP_METHOD(bool accepts_ps() const, gtk_printer_accepts_ps)
+  _IGNORE(gtk_printer_compare)
+  _IGNORE(gtk_enumerate_printers)
 
   _WRAP_SIGNAL(void details_acquired(bool success), "details_acquired")
   
@@ -72,5 +74,19 @@ inline bool operator==(const Glib::RefPtr<Printer>& lhs, const Glib::RefPtr<Prin
 inline bool operator!=(const Glib::RefPtr<Printer>& lhs, const Glib::RefPtr<Printer>& rhs)
   { return !lhs->equal(rhs); }
 
+/** For example, 
+ * bool on_enumerate_printers(const Glib::RefPtr<Printer>& printer);
+ *
+ * TODO: document return value.
+ *
+ * @relates Gtk::Printer
+ */
+typedef sigc::slot< bool, const Glib::RefPtr<Printer>& > SlotPrinterEnumerator;
+
+/** TODO: document this
+ *
+ * @relates Gtk::Printer
+ */
+void enumerate_printers(const SlotPrinterEnumerator& slot, bool wait = true);
 
 } // namespace Gtk
