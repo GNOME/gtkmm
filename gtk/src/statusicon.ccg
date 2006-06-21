@@ -31,9 +31,18 @@ Glib::RefPtr<StatusIcon> StatusIcon::create_from_file(const std::string& filenam
   return status_icon;
 }
 
-bool StatusIcon::get_geometry(Glib::RefPtr<Gdk::Screen>& screen, Gdk::Rectangle& area, Gdk::Orientation& orientation)
+bool StatusIcon::get_geometry(Glib::RefPtr<Gdk::Screen>& screen, Gdk::Rectangle& area, Orientation& orientation)
 {
-  return gtk_status_icon_get_geometry( (screen ? screen->gobj() : 0) /* NULL is allowed. */, &area, &orientation);
+  GdkScreen* cscreen = 0;
+  GdkRectangle carea;
+  const bool result = gtk_status_icon_get_geometry(const_cast<GtkStatusIcon*>(gobj()), &cscreen, &carea, (GtkOrientation*)(&orientation));
+
+  if(cscreen)
+    screen = Glib::wrap(cscreen);
+
+  *(area.gobj()) = carea;
+
+  return result;
 }
 
 
