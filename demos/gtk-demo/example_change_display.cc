@@ -423,7 +423,9 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
     // The user data field of a GdkWindow is used to store a pointer
     // to the widget that created it.
     GtkWidget* cWidget = 0;
-    refPointerWindow->get_user_data((gpointer*) &cWidget);
+    gpointer* user_data = 0;
+    refPointerWindow->get_user_data(user_data);
+    cWidget = (GtkWidget*)user_data;
 
     Gtk::Widget* pWidget = Glib::wrap(cWidget);
     if(pWidget)
