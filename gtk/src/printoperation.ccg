@@ -39,7 +39,7 @@ SignalProxy_PrintSetupDone_gtk_callback(GtkPageSetup* page_setup, gpointer data)
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  delete static_cast<Gtk::SlotPrintSetupDone*>(data);
+  delete the_slot;
 }
 
 namespace Gtk
@@ -75,26 +75,28 @@ PrintOperation::run(PrintOperationAction action, std::auto_ptr<Glib::Error>& err
 
 Glib::RefPtr<PageSetup>
 run_page_setup_dialog(Window& parent,
-                      const Glib::RefPtr<PageSetup>& page_setup,
-                      const Glib::RefPtr<PrintSettings>& print_settings)
+                      const Glib::RefPtr<const PageSetup>& page_setup,
+                      const Glib::RefPtr<const PrintSettings>& print_settings)
 {
   return Glib::wrap(
     gtk_print_run_page_setup_dialog(
-      parent.gobj(), Glib::unwrap(page_setup), Glib::unwrap(print_settings)));
+      parent.gobj(), 
+      const_cast<GtkPageSetup*>(Glib::unwrap(page_setup)), 
+      const_cast<GtkPrintSettings*>(Glib::unwrap(print_settings))));
 }
 
 void
 run_page_setup_dialog_async(Window& parent,
-                            const Glib::RefPtr<PageSetup>& page_setup,
-                            const Glib::RefPtr<PrintSettings>& print_settings,
+                            const Glib::RefPtr<const PageSetup>& page_setup,
+                            const Glib::RefPtr<const PrintSettings>& print_settings,
                             const SlotPrintSetupDone& slot)
 {
   SlotPrintSetupDone* slot_copy = new SlotPrintSetupDone(slot);
 
   gtk_print_run_page_setup_dialog_async(
     parent.gobj(),
-    Glib::unwrap(page_setup),
-    Glib::unwrap(print_settings),
+    const_cast<GtkPageSetup*>(Glib::unwrap(page_setup)),
+    const_cast<GtkPrintSettings*>(Glib::unwrap(print_settings)),
     &SignalProxy_PrintSetupDone_gtk_callback,
     slot_copy);
 }

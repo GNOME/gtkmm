@@ -39,20 +39,16 @@ protected:
   virtual void print_or_preview(Gtk::PrintOperationAction print_action);
   //virtual void on_preview_dialog_hide();
 
-  //Print(Form)Operation signal handlers.
-  //We bind a PrintFormOperation to these to be able to get necessary
-  //information to update the UI, or print settings.
-  //PrintFormOperation overrides the "pure" printing signals.
-  virtual void on_status_changed(const Glib::RefPtr<PrintFormOperation>&
-                                 operation);
+  //PrintOperation signal handlers.
+  //We handle these so can get necessary information to update the UI or print settings.
+  //Our derived PrintOperation class also overrides some default signal handlers.
+  virtual void on_printoperation_status_changed(const Glib::RefPtr<PrintFormOperation>& operation);
 
-  virtual void on_preview_done(const Glib::RefPtr<Gtk::PrintSettings>&
-                               settings);
+  virtual void on_printoperation_preview_done(const Glib::RefPtr<Gtk::PrintSettings>& settings);
 
-  virtual void on_done(Gtk::PrintOperationResult result,
-                       Glib::RefPtr<PrintFormOperation>& operation);
+  virtual void on_printoperation_done(Gtk::PrintOperationResult result, const Glib::RefPtr<PrintFormOperation>& operation);
 
-/*   virtual bool on_preview(Gtk::PrintOperationPreview* preview, */
+/*   virtual bool on_printoperation_preview(Gtk::PrintOperationPreview* preview, */
 /*                           const Glib::RefPtr<Gtk::PrintContext>& context, */
 /*                           Gtk::Window* parent, */
 /*                           Glib::RefPtr<PrintFormOperation>& operation); */

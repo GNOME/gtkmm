@@ -32,8 +32,7 @@ class PreviewDialog : public Gtk::Dialog
 
  protected:
 
-  virtual void on_drawing_area_realized(const Glib::RefPtr<Gtk::PrintContext>&
-                                        context);
+  virtual void on_drawing_area_realized(const Glib::RefPtr<Gtk::PrintContext>& context);
 
   virtual void on_page_number_changed();
   virtual void on_close_clicked();

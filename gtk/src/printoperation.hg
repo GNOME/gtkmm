@@ -35,6 +35,27 @@ _WRAP_ENUM(PrintOperationResult, GtkPrintOperationResult)
 _WRAP_ENUM(PrintOperationAction, GtkPrintOperationAction)
 _WRAP_GERROR(PrintError, GtkPrintError, GTK_PRINT_ERROR)
 
+/** @defgroup Printing Printing
+ */
+
+/** PrintOperation is the high-level, portable printing API. It looks a bit different than other 
+ * GTK+ dialogs such as the FileChooser, since some platforms don't expose enough infrastructure 
+ * to implement a good print dialog. On such platforms, GtkPrintOperation uses the native print 
+ * dialog. On platforms which do not provide a native print dialog, GTK+ uses its own, see PrintUnixDialog.
+ *
+ * The typical way to use the high-level printing API is to create a PrintOperation object 
+ * when the user chooses to print. Then you set some properties on it,such as the page size, any PrintSettings 
+ * from previous print operations, the number of  pages, the current page, etc.
+ *
+ * Then you start the print operation by calling run(). It will then show a dialog to 
+ * let the user select a printer and options. When the user finishes the dialog various signals will be 
+ * emitted by the PrintOperation for you to handle, the main one being draw_page. You should then 
+ * render the page on the provided PrintContext using Cairo.
+ *
+ * @since 2.10
+ *
+ * @ingroup Printing
+ */
 class PrintOperation : public Glib::Object
 {
   _CLASS_GOBJECT(PrintOperation, GtkPrintOperation, GTK_PRINT_OPERATION, Glib::Object, GObject)
@@ -100,7 +121,7 @@ public:
 
   _WRAP_SIGNAL(Widget* create_custom_widget(), "create_custom_widget")
 
-  _WRAP_SIGNAL(void custom_widget_apply(Widget& widget), "custom_widget_apply")
+  _WRAP_SIGNAL(void custom_widget_apply(Widget* widget), "custom_widget_apply")
 
   #m4 _CONVERSION(`GtkPrintOperationPreview*', `const Glib::RefPtr<PrintOperationPreview>&', `Glib::wrap($3, true)')
   #m4 _CONVERSION(`const Glib::RefPtr<PrintOperationPreview>&', `GtkPrintOperationPreview*', `($3)->gobj()')
@@ -124,27 +145,52 @@ public:
   _WRAP_PROPERTY("custom_tab_label", Glib::ustring)
 };
 
-  /** TODO: explanation
+  //TODO: Make these static members of a class instead of non-class functions?
+
+  //Note: gtk_run_page_setup_dialog() can take a null page_setup object, but the application should always 
+  //store and reuse a page_setup object, so I see no need to provide an overload for that. murrayc.
+  //TODO: The parent parameter may also be null, so maybe we should add an overload for that.
+
+  /** Runs a page setup dialog, letting the user modify the values from page_setup. 
+   * If the user cancels the dialog, the returned PageSetup is identical to that passed in @a page_setup, 
+   * otherwise it contains the modifications done in the dialog.
+   * 
+   * Note that this function may use a recursive mainloop to show the page setup dialog. 
+   * See run_page_setup_dialog_async() if this is a problem.
    *
+   * @param parent Transient parent.
+   * @param page_setup An existing GtkPageSetup.
+   * @param settings Print settings.
+   * @result A new PageSetup object.
+   *
+   * @since 2.10
    */
   Glib::RefPtr<PageSetup> run_page_setup_dialog(Window& parent,
-                                                const Glib::RefPtr<PageSetup>& page_setup,
-                                                const Glib::RefPtr<PrintSettings>& print_settings);
+                                                const Glib::RefPtr<const PageSetup>& page_setup,
+                                                const Glib::RefPtr<const PrintSettings>& print_settings);
 
   /** For example, 
    * void on_setup_done(const Glib::RefPtr<PageSetup>& page_setup);
    */
-  typedef sigc::slot< void, Glib::RefPtr<PageSetup>& > SlotPrintSetupDone;
+  typedef sigc::slot< void, const Glib::RefPtr<PageSetup>& > SlotPrintSetupDone;
 
-  /** TODO: explanation
-  * @param parent
-  * @param page_setup
-  * @param print_settings
-  * @param slot
-  */
+  /** Runs a page setup dialog, letting the user modify the values from page_setup.
+   *
+   * In contrast to run_page_setup_dialog(), this function returns after showing the 
+   * page setup dialog on platforms that support this, and calls the @a slot from a 
+   * signal handler for the ::response signal of the dialog.
+   *
+   * @param parent Transient parent.
+   * @param page_setup An existing GtkPageSetup.
+   * @param settings Print settings.
+   * @result A new PageSetup object.
+   * @param slot
+   *
+   * @since 2.10
+   */
   void run_page_setup_dialog_async(Window& parent,
-                                   const Glib::RefPtr<PageSetup>& page_setup,
-                                   const Glib::RefPtr<PrintSettings>& print_settings,
+                                   const Glib::RefPtr<const PageSetup>& page_setup,
+                                   const Glib::RefPtr<const PrintSettings>& print_settings,
                                    const SlotPrintSetupDone& slot);
 
 } // namespace Gtk

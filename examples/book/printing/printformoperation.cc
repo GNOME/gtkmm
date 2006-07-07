@@ -17,8 +17,6 @@
 #include "previewdialog.h"
 #include "printformoperation.h"
 
-using std::vector;
-
 PrintFormOperation::PrintFormOperation()
 {
   g_debug("pfo ctor");
@@ -34,17 +32,18 @@ Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
   return Glib::RefPtr<PrintFormOperation>(new PrintFormOperation());
 }
 
-void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>&
-                                        print_ctx)
+void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& print_context)
 {
-  //Create and set up Pango layout for PrintData based on passed PrintContext:
-  m_refLayout = print_ctx->create_pango_layout();
+  //Create and set up a Pango layout for PrintData based on the passed PrintContext:
+  //We then use this to calculate the number of pages needed,
+  //and the lines that are on each page.
+  m_refLayout = print_context->create_pango_layout();
 
   Pango::FontDescription font_desc(m_Font);
   m_refLayout->set_font_description(font_desc);
 
-  double width = print_ctx->get_width();
-  double height = print_ctx->get_height();
+  const double width = print_context->get_width();
+  const double height = print_context->get_height();
 
   m_refLayout->set_width(static_cast<int>(width * Pango::SCALE));
 
@@ -57,7 +56,7 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>&
 
   //Set the number of pages to print by determining the line numbers
   //where page breaks occur:
-  int line_count = m_refLayout->get_line_count();
+  const int line_count = m_refLayout->get_line_count();
 
   Glib::RefPtr<Pango::LayoutLine> layout_line;
   double page_height = 0;
@@ -69,7 +68,7 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>&
     layout_line = m_refLayout->get_line(line);
     layout_line->get_extents(ink_rect, logical_rect);
 
-    double line_height = logical_rect.get_height() / 1024.0;
+    const double line_height = logical_rect.get_height() / 1024.0;
 
     if (page_height + line_height > height)
     {
@@ -83,14 +82,13 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>&
   set_n_pages(m_PageBreaks.size() + 1);
 }
 
-void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>&
-                                      print_ctx,
-                                      int page_nr)
+void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
 {
-  //See which lines we need to print:
-  int start_page_line, end_page_line;
+  //Decide which lines we need to print in order to print the specified page:
+  int start_page_line = 0;
+  int end_page_line = 0;
 
-  if (page_nr == 0)
+  if(page_nr == 0)
   {
     start_page_line = 0;
   }
@@ -99,7 +97,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>&
     start_page_line = m_PageBreaks[page_nr - 1];
   }
 
-  if (page_nr < static_cast<int>(m_PageBreaks.size()))
+  if(page_nr < static_cast<int>(m_PageBreaks.size()))
   {
     end_page_line = m_PageBreaks[page_nr];
   }
@@ -109,7 +107,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>&
   }
 
   //Get a Cairo Context, which is used as a drawing board:
-  Cairo::RefPtr<Cairo::Context> cairo_ctx = print_ctx->get_cairo_context();
+  Cairo::RefPtr<Cairo::Context> cairo_ctx = print_context->get_cairo_context();
 
   //We'll use black letters:
   cairo_ctx->set_source_rgb(0, 0, 0);
@@ -137,7 +135,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>&
       cairo_ctx->move_to(logical_rect.get_x() / 1024.0,
                          baseline / 1024.0 - start_pos);
 
-      //TODO: change this when it's wrapped
+      //TODO: Use the C++ method when it's wrapped
       pango_cairo_show_layout_line(cairo_ctx->cobj(), layout_line->gobj());
     }
 
@@ -170,11 +168,11 @@ Gtk::Widget* PrintFormOperation::on_create_custom_widget()
   return vbox;
 }
 
-void PrintFormOperation::on_custom_widget_apply(Gtk::Widget& widget)
+void PrintFormOperation::on_custom_widget_apply(Gtk::Widget* /* widget */)
 {
-  widget.get_name(); // suppress -Werror
-  //Note: the returned widget is the VBox
-  //we created in on_create_custom_widget() - here we don't need to use it.
+  //Note: the returned widget is the VBox we created in on_create_custom_widget().
+  //We don't need to use it, because we can use the child FontButton directly:
+
   Glib::ustring selected_font = m_FontButton.get_font_name();
   m_Font = selected_font;
 }
@@ -186,14 +184,20 @@ bool PrintFormOperation::on_preview(
 {
   g_debug("pfo::on_preview");
 
-  PreviewDialog pd(preview,
+  //Use our custom preview dialog:
+  //TODO: Isn't there a default preview dialog?
+  //Maybe we could just mention custom preview dialogs in the book, or put it in an "advanced" example.
+  PreviewDialog dialog(preview,
                    property_n_pages().get_value(),
                    context,
                    m_refLayout,
                    *parent);
-  pd.run();
+  dialog.run();
 
   g_debug("emitting preview_done");
+
+  //Inform the application that the print preview dialog has closed:
+  //TODO: Why do we need to do this?
   Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
   signal_preview_done.emit(settings);
 

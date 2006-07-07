@@ -80,13 +80,14 @@ void PreviewDialog::on_page_number_changed()
   m_DrawingArea.queue_draw();
 }
 
-bool PreviewDialog::on_expose_event(GdkEventExpose* event)
+bool PreviewDialog::on_expose_event(GdkEventExpose* /* event */)
 {
-  if (event) ; // Werror
+  Glib::RefPtr<Gdk::Window> window = m_DrawingArea.get_window();
+  if(window)
+    window->clear();
 
-  m_DrawingArea.get_window()->clear();
-
-  m_refPreview->render_page(m_Page - 1);
+  if(m_refPreview)
+    m_refPreview->render_page(m_Page - 1);
 
   return true;
 }
