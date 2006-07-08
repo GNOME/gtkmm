@@ -20,7 +20,6 @@
 int main(int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  //g_debug("argc: %i, argv[0]: %s", argc, argv[0]);
 
   ExampleWindow window;
   Gtk::Main::run(window); //Shows the window and returns when it is closed.

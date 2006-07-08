@@ -129,8 +129,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 	start_pos = logical_rect.get_y() / 1024.0;
       }
 
-      cairo_ctx->move_to(logical_rect.get_x() / 1024.0,
-                         baseline / 1024.0 - start_pos);
+      cairo_ctx->move_to(logical_rect.get_x() / 1024.0, baseline / 1024.0 - start_pos);
 
       //TODO: Use the C++ method when it's wrapped
       pango_cairo_show_layout_line(cairo_ctx->cobj(), layout_line->gobj());

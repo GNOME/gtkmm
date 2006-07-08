@@ -180,16 +180,11 @@ void ExampleWindow::on_printoperation_status_changed(const Glib::RefPtr<PrintFor
 
 void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, const Glib::RefPtr<PrintFormOperation>& operation)
 {
-  g_debug("ew::on_printoperation_done");
-
   //Printing is "done" when the print data is spooled.
 
   if (result == Gtk::PRINT_OPERATION_RESULT_ERROR)
   {
-    Gtk::MessageDialog err_dialog(*this,
-                                  "Error printing form",
-                                  false, Gtk::MESSAGE_ERROR,
-                                  Gtk::BUTTONS_OK, true);
+    Gtk::MessageDialog err_dialog(*this, "Error printing form", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
     err_dialog.run();
   }
   else if (result == Gtk::PRINT_OPERATION_RESULT_APPLY)
@@ -203,9 +198,7 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
     //We will connect to the status-changed signal to track status
     //and update a status bar. In addition, you can, for example,
     //keep a list of active print operations, or provide a progress dialog.
-    operation->signal_status_changed().connect(
-      sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed),
-                 operation));
+    operation->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed), operation));
   }
 }
 
@@ -222,9 +215,7 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   print->set_default_page_setup(m_refPageSetup);
   print->set_print_settings(m_refSettings);
 
-  print->signal_done().connect(
-    sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done),
-               print));
+  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done), print));
 
   try
   {
@@ -233,8 +224,7 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   catch (const Gtk::PrintError& ex)
   {
     //See documentation for exact Gtk::PrintError error codes.
-    std::cerr << "An error occurred while trying to run a print operation:" << ex.what()
-              << std::endl;
+    std::cerr << "An error occurred while trying to run a print operation:" << ex.what() << std::endl;
   }
 }
 
