@@ -39,7 +39,6 @@ ExampleWindow::ExampleWindow()
   m_ContextId = m_Statusbar.get_context_id(app_title);
 
   set_title(app_title);
-  set_border_width(6);
   set_default_size(400, 300);
 
   add(m_VBox);
