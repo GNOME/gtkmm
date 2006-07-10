@@ -18,11 +18,8 @@
 #include "printformoperation.h"
 
 #include <iostream>
-#include <vector>
-
-#include <pangomm.h>
-
-using std::vector;
+#include <gtkmm/stock.h>
+#include <gtkmm/messagedialog.h>
 
 const Glib::ustring app_title = "gtkmm Printing Example";
 

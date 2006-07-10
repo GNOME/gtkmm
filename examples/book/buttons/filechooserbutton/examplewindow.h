@@ -19,7 +19,8 @@
 #ifndef GTKMM_EXAMPLE_BUTTONS_H
 #define GTKMM_EXAMPLE_BUTTONS_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/filechooserbutton.h>
 
 class ExampleWindow : public Gtk::Window
 {

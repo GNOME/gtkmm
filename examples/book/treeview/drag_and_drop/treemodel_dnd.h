@@ -19,7 +19,7 @@
 #ifndef GTKMM_EXAMPLE_TREEMODEL_DND_H
 #define GTKMM_EXAMPLE_TREEMODEL_DND_H
 
-#include <gtkmm.h>
+#include <gtkmm/treestore.h>
 
 class TreeModel_Dnd : public Gtk::TreeStore
 {

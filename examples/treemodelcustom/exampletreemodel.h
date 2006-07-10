@@ -19,7 +19,9 @@
 #ifndef GTKMM_EXAMPLETREEMODEL_H
 #define GTKMM_EXAMPLETREEMODEL_H
 
-#include <gtkmm.h>
+#include <glibmm/object.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treepath.h>
 
 class ExampleTreeModel
   : public Glib::Object,

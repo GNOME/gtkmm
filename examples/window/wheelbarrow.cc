@@ -2,7 +2,9 @@
  * gtkmm version of the "wheelbarrow" example from the gtk+ tutorial
  */
 
-#include <gdkmm.h>
+#include <gdkmm/color.h>
+#include <gdkmm/pixbuf.h>
+#include <gdkmm/bitmap.h>
 #include <gtkmm/image.h>
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>

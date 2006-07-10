@@ -17,7 +17,7 @@
  */
 
 #include "examplewindow.h"
-#include <gtkmm/dialog.h>
+#include <gtkmm/messagedialog.h>
 #include <iostream>
 
 

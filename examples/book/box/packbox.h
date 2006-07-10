@@ -19,7 +19,8 @@
 #ifndef GTKMM_EXAMPLE_PACKBOX_H
 #define GTKMM_EXAMPLE_PACKBOX_H
 
-#include <gtkmm.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
 
 class PackBox : public Gtk::HBox
 {

@@ -17,11 +17,16 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <memory>
-#include <vector>
-
-#include <pangomm.h>
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/table.h>
+#include <gtkmm/label.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/statusbar.h>
+#include <gtkmm/uimanager.h>
+#include <gtkmm/printoperation.h>
 
 class PrintFormOperation;
 

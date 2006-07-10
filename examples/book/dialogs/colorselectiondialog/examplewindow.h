@@ -19,7 +19,10 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/colorbutton.h>
+#include <gtkmm/drawingarea.h>
 
 class ExampleWindow : public Gtk::Window
 {

@@ -19,7 +19,10 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/table.h>
+#include <gtkmm/button.h>
 
 class ExampleWindow : public Gtk::Dialog
 {

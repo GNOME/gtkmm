@@ -17,7 +17,10 @@
 #ifndef GTKMM_PREVIEW_WINDOW_H
 #define GTKMM_PREVIEW_WINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/drawingarea.h>
+#include <gtkmm/printoperation.h>
 
 class PreviewDialog : public Gtk::Dialog
 {

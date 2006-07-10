@@ -16,6 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <gtkmm/stock.h>
+#include <gtkmm/separatortoolitem.h>
+#include <gtkmm/radiobuttongroup.h>
+#include <gtkmm/radiotoolbutton.h>
 #include "examplewindow.h"
 #include <iostream>
 

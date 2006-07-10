@@ -19,7 +19,9 @@
 #ifndef GTKMM_EXAMPLE_TIMEREXAMPLE_H
 #define GTKMM_EXAMPLE_TIMEREXAMPLE_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
 #include <iostream>
 #include <map>
 

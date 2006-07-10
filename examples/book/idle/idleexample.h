@@ -19,7 +19,10 @@
 #ifndef GTKMM_EXAMPLE_IDLEEXAMPLE_H
 #define GTKMM_EXAMPLE_IDLEEXAMPLE_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
+#include <gtkmm/progressbar.h>
 #include <iostream>
 
 class IdleExample : public Gtk::Window

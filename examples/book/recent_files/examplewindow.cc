@@ -18,6 +18,7 @@
 
 #include "examplewindow.h"
 #include <gtkmm/stock.h>
+#include <gtkmm/recentchooserdialog.h>
 #include <iostream>
 
 ExampleWindow::ExampleWindow()

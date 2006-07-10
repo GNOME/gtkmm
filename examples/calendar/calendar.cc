@@ -16,7 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/fontselection.h>
+#include <gtkmm/calendar.h>
+#include <gtkmm/label.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/main.h>
 #include <iostream>
 
 

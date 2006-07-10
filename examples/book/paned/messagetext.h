@@ -19,7 +19,8 @@
 #ifndef GTKMM_EXAMPLE_MESSAGETEXT_H
 #define GTKMM_EXAMPLE_MESSAGETEXT_H
 
-#include <gtkmm.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textview.h>
 
 class MessageText : public Gtk::ScrolledWindow
 {

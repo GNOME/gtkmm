@@ -19,7 +19,13 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
+#include <gtkmm/table.h>
+#include <gtkmm/togglebutton.h>
+#include <gtkmm/button.h>
+#include <gtkmm/buttonbox.h>
 
 class ExampleWindow : public Gtk::Window
 {

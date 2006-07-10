@@ -19,7 +19,10 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/eventbox.h>
+#include <gtkmm/label.h>
+#include <gtkmm/tooltips.h>
 
 class ExampleWindow : public Gtk::Window
 {

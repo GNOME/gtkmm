@@ -17,6 +17,7 @@
  */
 
 #include <iostream>
+#include <gtkmm/stock.h>
 #include "examplewindow.h"
 
 ExampleWindow::ExampleWindow()

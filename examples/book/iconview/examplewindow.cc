@@ -151,7 +151,14 @@ void ExampleWindow::add_entry(const std::string& filename, const Glib::ustring& 
   row[m_Columns.m_col_description] = description;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename);
+  try
+  {
+    row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename);
+  }
+  catch (Glib::Exception& e)
+  {
+    std::cerr << "Error creating pixbuf from " << filename << std::endl;
+  }
   #else
   std::auto_ptr<Glib::Error> error;
   row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename, error);

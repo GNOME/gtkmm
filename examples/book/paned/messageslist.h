@@ -19,7 +19,9 @@
 #ifndef GTKMM_EXAMPLE_MESSAGESLIST_H
 #define GTKMM_EXAMPLE_MESSAGESLIST_H
 
-#include <gtkmm.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/treeview.h>
 
 class MessagesList: public Gtk::ScrolledWindow
 {

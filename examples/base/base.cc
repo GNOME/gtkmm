@@ -1,4 +1,4 @@
-#include <gtkmm.h>
+#include <gtkmm/window.h>
 
 int main(int argc, char *argv[])
 {

@@ -16,6 +16,7 @@
 
 #include "previewdialog.h"
 
+#include <gtkmm/stock.h>
 #include <math.h>
 
 PreviewDialog::PreviewDialog(

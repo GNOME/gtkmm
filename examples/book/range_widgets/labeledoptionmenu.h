@@ -19,7 +19,9 @@
 #ifndef GTKMM_EXAMPLE_RANGEWIDGETS_LABELEDOPTIONMENU_H
 #define GTKMM_EXAMPLE_RANGEWIDGETS_LABELEDOPTIONMENU_H
 
-#include <gtkmm.h>
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
+#include <gtkmm/menu.h>
 
 class LabeledOptionMenu : public Gtk::HBox
 {
