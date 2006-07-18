@@ -19,10 +19,72 @@
  */
 
 #include <gtk/gtktextbuffer.h>
+#include <gtk/gtktextbufferrichtext.h>
 #include <glib/gslist.h>
 #include <gtkmm/textmark.h>
 #include <gtkmm/textiter.h>
 
+
+/*
+static guint8* SignalProxy_Serialize(GtkTextBuffer* , GtkTextBuffer* content_buffer,
+                                                   const GtkTextIter* start, const GtkTextIter* end,
+                                                   gsize* length,
+                                                   gpointer user_data)
+{
+  Gtk::TextBuffer::SlotSerialize* the_slot = static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(content_buffer), Glib::wrap(start), Glib::wrap(end), *length);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void SignalProxy_Serialize_gtk_callback_destroy(void* user_data)
+{
+  delete static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
+}
+
+static gboolean SignalProxy_Deserialize(GtkTextBuffer* , GtkTextBuffer* content_buffer,
+                                                   GtkTextIter* iter, const guint8* data,
+                                                   gsize length, gboolean create_tags,
+                                                   gpointer user_data,
+                                                   GError** )
+{
+  Gtk::TextBuffer::SlotDeserialize* the_slot = static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)(Glib::wrap(content_buffer, true), Glib::wrap(iter), data, length, create_tags);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    //TODO: Fill the error parameter.
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void SignalProxy_Deserialize_gtk_callback_destroy(void* user_data)
+{
+  delete static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
+}
+*/
 
 namespace Gtk
 {
@@ -448,10 +510,84 @@ int TextBuffer::size() const
   return get_char_count();
 }
 
+//This is not public API:
+//(and it is copy/pasted from clipboard.ccg)
+typedef std::list<Glib::ustring> listStrings;
+static listStrings util_convert_atoms_to_strings(GdkAtom* targets, int n_targets)
+{
+  listStrings listTargets;
+
+  //Add the targets to the C++ container:
+  for(int i = 0; i < n_targets; i++)
+  {
+    //Convert the atom to a string:
+    char* atom_name = gdk_atom_name(targets[i]);
+    if(atom_name)
+    {
+      listTargets.push_back( Glib::ustring(atom_name) );
+      g_free(atom_name);
+    }
+  }
+
+  return listTargets;
+}
+
 Glib::ustring TextBuffer::get_text(bool include_hidden_chars)
 {
   return get_text(begin(), end(), include_hidden_chars);
 }
+
+Glib::StringArrayHandle TextBuffer::get_serialize_formats() const
+{
+  int n_atoms = 0;
+  GdkAtom* atoms = gtk_text_buffer_get_serialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
+  return util_convert_atoms_to_strings(atoms, n_atoms);
+}
+
+Glib::StringArrayHandle TextBuffer::get_deserialize_formats() const
+{
+  int n_atoms = 0;
+  GdkAtom* atoms = gtk_text_buffer_get_deserialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
+  return util_convert_atoms_to_strings(atoms, n_atoms);
+}
+
+/*
+Glib::ustring TextBuffer::register_serialize_format(const Glib::ustring& mime_type, const SlotSerialize& slot)
+{
+  SlotSerialize* slot_copy = new SlotSerialize(slot);
+  GdkAtom atom = gtk_text_buffer_register_serialize_format(gobj(), mime_type.c_str(), 
+                &SignalProxy_Serialize, slot_copy, &SignalProxy_Serialize_gtk_callback_destroy);
+
+  //Convert the atom to a string:
+  Glib::ustring atom_as_string;
+  char* atom_name = gdk_atom_name(atom);
+  if(atom_name)
+  {
+    atom_as_string = atom_name;
+    g_free(atom_name);
+  }
+
+  return atom_as_string;
+}
+
+Glib::ustring TextBuffer::register_deserialize_format(const Glib::ustring& mime_type, const SlotDeserialize& slot)
+{
+  SlotDeserialize* slot_copy = new SlotDeserialize(slot);
+  GdkAtom atom = gtk_text_buffer_register_deserialize_format(gobj(), mime_type.c_str(), 
+                &SignalProxy_Deserialize, slot_copy, &SignalProxy_Deserialize_gtk_callback_destroy);
+
+  //Convert the atom to a string:
+  Glib::ustring atom_as_string;
+  char* atom_name = gdk_atom_name(atom);
+  if(atom_name)
+  {
+    atom_as_string = atom_name;
+    g_free(atom_name);
+  }
+
+  return atom_as_string;
+}
+*/
 
 } // namespace Gtk
 
