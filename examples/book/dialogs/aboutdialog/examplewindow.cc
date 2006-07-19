@@ -17,7 +17,10 @@
  */
 
 #include "examplewindow.h"
+#include <gtkmm/aboutdialog.h>
 #include <iostream>
+#include <gtk/gtkaboutdialog.h>
+
 
 ExampleWindow::ExampleWindow()
 : m_Button("Show AboutDialog")

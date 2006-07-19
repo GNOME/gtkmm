@@ -20,12 +20,6 @@
 #define GTKMM_EXAMPLEWINDOW_H
 
 #include "exampletreemodel.h"
-#include <gtkmm/window.h>
-#include <gtkmm/box.h>
-#include <gtkmm/buttonbox.h>
-#include <gtkmm/button.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/treeview.h>
 
 class ExampleWindow : public Gtk::Window
 {

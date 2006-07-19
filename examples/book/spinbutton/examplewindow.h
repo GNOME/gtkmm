@@ -19,14 +19,7 @@
 #ifndef GTKMM_EXAMPLEWINDOW_H
 #define GTKMM_EXAMPLEWINDOW_H
 
-#include <gtkmm/window.h>
-#include <gtkmm/frame.h>
-#include <gtkmm/box.h>
-#include <gtkmm/label.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/checkbutton.h>
-#include <gtkmm/button.h>
+#include <gtkmm.h>
 
 class ExampleWindow : public Gtk::Window
 {

@@ -19,6 +19,7 @@
 #ifndef __TICTACTOE_H__
 #define __TICTACTOE_H__
 
+#include <gdkmm.h>
 #include <gtkmm/box.h>
 #include <gtkmm/togglebutton.h>
 

@@ -18,7 +18,6 @@
 
 #include "examplewindow.h"
 #include <algorithm>
-#include <gtkmm/stock.h>
 
 
 namespace

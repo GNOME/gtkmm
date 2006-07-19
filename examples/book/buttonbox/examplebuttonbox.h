@@ -19,9 +19,7 @@
 #ifndef GTKMM_EXAMPLE_BUTTONBOX_H
 #define GTKMM_EXAMPLE_BUTTONBOX_H
 
-#include <glibmm/ustring.h>
-#include <gtkmm/frame.h>
-#include <gtkmm/button.h>
+#include <gtkmm.h>
 
 class ExampleButtonBox : public Gtk::Frame
 {

@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/stock.h>
-#include <gtkmm/toggleaction.h>
 #include "examplewindow.h"
+#include <gtkmm.h>
 #include <iostream>
 
 ExampleWindow::ExampleWindow()

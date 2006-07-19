@@ -18,7 +18,6 @@
 
 #include "examplewindow.h"
 #include <gtkmm/stock.h>
-#include <gtkmm/recentchooserdialog.h>
 #include <iostream>
 
 ExampleWindow::ExampleWindow()
@@ -34,8 +33,10 @@ ExampleWindow::ExampleWindow()
 
   //File menu:
   m_refActionGroup->add( Gtk::Action::create("FileMenu", "File") );
+  m_refActionGroup->add( Gtk::Action::create("FileNew", Gtk::Stock::NEW),
+          sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new));
   m_refActionGroup->add( Gtk::Action::create("FileRecentDialog", "Recent Files Dialog"), 
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_recent_files_dialog) );
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_recent_files_menu) );
   m_refActionGroup->add( Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
 
@@ -51,14 +52,14 @@ ExampleWindow::ExampleWindow()
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='FileMenu'>"
-        "      <menu action='FileNew'>"
-        "        <menuitem action='FileRecentDialog'/>"
-        "      </menu>"
+        "      <menuitem action='FileNew'/>"
+        "      <menuitem action='FileRecentDialog'/>"
         "      <separator/>"
         "      <menuitem action='FileQuit'/>"
         "    </menu>"
         "  </menubar>"
         "  <toolbar  name='ToolBar'>"
+        "    <toolitem action='FileNew'/>"
         "    <toolitem action='FileQuit'/>"
         "  </toolbar>"
         "</ui>";
@@ -96,6 +97,11 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
+void ExampleWindow::on_menu_file_new()
+{
+    std::cout << " New File" << std::endl;
+}
+
 void ExampleWindow::on_menu_file_quit()
 {
   hide(); //Closes the main window to stop the Gtk::Main::run().
@@ -113,5 +119,9 @@ void ExampleWindow::on_menu_file_recent_files_dialog()
   {
      std::cout << "URI selected = " << dialog.get_current_uri() << std::endl;
   }
+}
+
+void ExampleWindow::on_menu_file_recent_files_menu()
+{
 }
 

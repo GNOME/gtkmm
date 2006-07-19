@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/fileselection.h>
 #include "examplewindow.h"
 #include <iostream>
 
@@ -71,8 +70,6 @@ void ExampleWindow::on_button_folder_clicked()
       break;
     }
   }
-#else
-  std::cout << "Gtk::FileSelection is deprecated and gtkmm has not been compiled with support for deprecated widgets" << std::endl;
 #endif //GTKMM_DISABLE_DEPRECATED
 }
 
@@ -106,7 +103,5 @@ void ExampleWindow::on_button_file_clicked()
       break;
     }
   }
-#else
-  std::cout << "Gtk::FileSelection is deprecated and gtkmm has not been compiled with support for deprecated widgets" << std::endl;
 #endif //GTKMM_DISABLE_DEPRECATED
 }

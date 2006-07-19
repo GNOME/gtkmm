@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/main.h>
+#include <gtkmm.h>
 #include "examplewindow.h"
 
 int main(int argc, char *argv[])

@@ -16,10 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/main.h>
-#include <gtkmm/statusicon.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/window.h>
+#include <gtkmm.h>
 
 int main(int argc, char *argv[])
 {

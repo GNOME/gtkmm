@@ -19,15 +19,7 @@
 #ifndef GTKMM_EXAMPLE_RANGEWIDGETS_H
 #define GTKMM_EXAMPLE_RANGEWIDGETS_H
 
-#include <gtkmm/window.h>
-#include <gtkmm/box.h>
-#include <gtkmm/scale.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/checkbutton.h>
-#include <gtkmm/separator.h>
-#include <gtkmm/scrollbar.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/button.h>
+#include <gtkmm.h>
 
 class ExampleWindow : public Gtk::Window
 {

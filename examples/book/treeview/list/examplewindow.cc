@@ -17,7 +17,6 @@
  */
 
 #include <iostream>
-#include <gtkmm/cellrendererprogress.h>
 #include "examplewindow.h"
 
 ExampleWindow::ExampleWindow()
