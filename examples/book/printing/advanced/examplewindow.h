@@ -23,7 +23,6 @@
 #include <pangomm.h>
 #include <gtkmm.h>
 
-//class PreviewWindow;
 class PrintFormOperation;
 
 class ExampleWindow : public Gtk::Window

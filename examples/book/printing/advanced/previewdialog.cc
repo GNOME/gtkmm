@@ -92,10 +92,8 @@ bool PreviewDialog::on_expose_event(GdkEventExpose* /* event */)
   return true;
 }
 
-void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& print_ctx)
+void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */)
 {
-  if (print_ctx) ; //Werror
-
   m_PageSpin.set_range(1.0, m_PageCount);
 
   m_DrawingArea.signal_expose_event().connect(
@@ -127,7 +125,7 @@ void PreviewDialog::on_got_page_size(
     m_DpiY = dpi_y;
   }
 
-  pango_cairo_update_layout(cairo_ctx->cobj(), m_refLayout->gobj());
+  m_refLayout->update_from_cairo_context(cairo_ctx);
 }
 
 void PreviewDialog::on_close_clicked()
