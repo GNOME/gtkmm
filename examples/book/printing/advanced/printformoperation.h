@@ -31,10 +31,9 @@ class PrintFormOperation : public Gtk::PrintOperation
 
   void set_name(const Glib::ustring& name) { m_Name = name; }
   void set_comments(const Glib::ustring& comments) { m_Comments = comments; }
-  void set_font(const Glib::ustring& font) { m_Font = font; }
 
   //TODO: Use an accessor method for this, with a typedef:
-  sigc::signal< void, const Glib::RefPtr<Gtk::PrintSettings>& > signal_preview_done;
+  //sigc::signal< void, const Glib::RefPtr<Gtk::PrintSettings>& > signal_preview_done;
 
  protected:
   PrintFormOperation();
@@ -43,17 +42,18 @@ class PrintFormOperation : public Gtk::PrintOperation
   virtual void on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& context);
   virtual void on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& context, int page_nr);
 
-  virtual Gtk::Widget* on_create_custom_widget();
-  virtual void on_custom_widget_apply(Gtk::Widget* widget);
+  //virtual Gtk::Widget* on_create_custom_widget();
+  //virtual void on_custom_widget_apply(Gtk::Widget* widget);
 
+  /*
   virtual bool on_preview(
                   const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                   const Glib::RefPtr<Gtk::PrintContext>& context,
                   Gtk::Window* parent);
+  */
 
   Glib::ustring m_Name;
   Glib::ustring m_Comments;
-  Glib::ustring m_Font;
   Glib::RefPtr<Pango::Layout> m_refLayout;
   std::vector<int> m_PageBreaks; // line numbers where a page break occurs
   Gtk::FontButton m_FontButton; // displayed in a custom print dialog tab

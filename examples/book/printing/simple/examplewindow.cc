@@ -18,11 +18,8 @@
 #include "printformoperation.h"
 
 #include <iostream>
-#include <vector>
 
 #include <pangomm.h>
-
-using std::vector;
 
 const Glib::ustring app_title = "gtkmm Printing Example";
 
@@ -46,7 +43,6 @@ ExampleWindow::ExampleWindow()
   build_main_menu();
 
   m_VBox.pack_start(m_Table);
-  m_Table.set_border_width(6);
 
   //Arrange the widgets inside the table:
   m_Table.attach(m_NameLabel, 0, 1, 0, 1);

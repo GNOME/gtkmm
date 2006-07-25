@@ -18,12 +18,10 @@
 #include "previewdialog.h"
 #include "printformoperation.h"
 
+
 #include <iostream>
-#include <vector>
 
 #include <pangomm.h>
-
-using std::vector;
 
 const Glib::ustring app_title = "gtkmm Printing Example";
 
@@ -47,7 +45,6 @@ ExampleWindow::ExampleWindow()
   build_main_menu();
 
   m_VBox.pack_start(m_Table);
-  m_Table.set_border_width(6);
 
   //Arrange the widgets inside the table:
   m_Table.attach(m_NameLabel, 0, 1, 0, 1);
@@ -75,7 +72,6 @@ ExampleWindow::ExampleWindow()
 
 ExampleWindow::~ExampleWindow()
 {
-  g_debug("ew dtor");
 }
 
 void ExampleWindow::build_main_menu()
@@ -196,10 +192,7 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
 
   if (result == Gtk::PRINT_OPERATION_RESULT_ERROR)
   {
-    Gtk::MessageDialog err_dialog(*this,
-                                  "Error printing form",
-                                  false, Gtk::MESSAGE_ERROR,
-                                  Gtk::BUTTONS_OK, true);
+    Gtk::MessageDialog err_dialog(*this, "Error printing form", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
     err_dialog.run();
   }
   else if (result == Gtk::PRINT_OPERATION_RESULT_APPLY)
@@ -213,9 +206,7 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
     //We will connect to the status-changed signal to track status
     //and update a status bar. In addition, you can, for example,
     //keep a list of active print operations, or provide a progress dialog.
-    operation->signal_status_changed().connect(
-      sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed),
-                 operation));
+    operation->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed), operation));
   }
 }
 
@@ -227,26 +218,16 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
 
   print->set_name(m_NameEntry.get_text() + " " + m_SurnameEntry.get_text());
   print->set_comments(m_refTextBuffer->get_text(false /* Don't include hidden. */));
-  print->set_font("Sans 12");
+  //print->set_font("Sans 12");
 
   print->set_track_print_status();
   print->set_default_page_setup(m_refPageSetup);
   print->set_print_settings(m_refSettings);
 
-  //Keep a connection so that we can disconnect as soon as we don't need it
-  //and let print be destroyed before the window. TODO: see if/how this affects
-  //PO behaviour.
-  //
-  //This shouldn't be necessary and it complicates the example. murrayc.
+  //print->signal_preview_done.connect( sigc::mem_fun(*this, &ExampleWindow::on_printoperation_preview_done) );
 
-  sigc::connection print_preview_done_connection =
-  print->signal_preview_done.connect(
-    sigc::mem_fun(*this, &ExampleWindow::on_printoperation_preview_done));
+  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done), print));
 
-  sigc::connection print_done_connection =
-  print->signal_done().connect(
-    sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done),
-               print));
 
   try
   {
@@ -255,14 +236,10 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   catch (const Gtk::PrintError& ex)
   {
     //See documentation for exact Gtk::PrintError error codes.
-    std::cerr << "An error occurred while trying to run a print operation:" << ex.what()
-              << std::endl;
+    std::cerr << "An error occurred while trying to run a print operation:" << ex.what() << std::endl;
   }
 
   g_debug("print status: %s", print->get_status_string().c_str());
-  g_debug("disconnecting");
-  print_done_connection.disconnect();
-  print_preview_done_connection.disconnect();
 }
 
 void ExampleWindow::on_menu_file_new()

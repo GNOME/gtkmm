@@ -39,7 +39,7 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& p
   //and the lines that are on each page.
   m_refLayout = print_context->create_pango_layout();
 
-  Pango::FontDescription font_desc(m_Font);
+  Pango::FontDescription font_desc("sans 12");
   m_refLayout->set_font_description(font_desc);
 
   const double width = print_context->get_width();
@@ -132,8 +132,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 	start_pos = logical_rect.get_y() / 1024.0;
       }
 
-      cairo_ctx->move_to(logical_rect.get_x() / 1024.0,
-                         baseline / 1024.0 - start_pos);
+      cairo_ctx->move_to(logical_rect.get_x() / 1024.0, baseline / 1024.0 - start_pos);
 
       layout_line->show_in_cairo_context(cairo_ctx);
     }
@@ -143,6 +142,7 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
   while (line_index < end_page_line && iter.next_line());
 }
 
+/*
 Gtk::Widget* PrintFormOperation::on_create_custom_widget()
 {
   //Create a custom tab in the print dialog titled "Other"
@@ -160,14 +160,16 @@ Gtk::Widget* PrintFormOperation::on_create_custom_widget()
   hbox->pack_start(*label, false, false);
   label->show();
 
-  m_FontButton.set_font_name(m_Font);
-  hbox->pack_start(m_FontButton, false, false);
-  m_FontButton.show();
+  //m_FontButton.set_font_name(m_Font);
+  //hbox->pack_start(m_FontButton, false, false);
+  //m_FontButton.show();
 
   return vbox;
 }
+*/
 
-void PrintFormOperation::on_custom_widget_apply(Gtk::Widget* /* widget */)
+/*
+void PrintFormOperation::on_custom_widget_apply(Gtk::Widget*)
 {
   //Note: the returned widget is the VBox we created in on_create_custom_widget().
   //We don't need to use it, because we can use the child FontButton directly:
@@ -175,7 +177,9 @@ void PrintFormOperation::on_custom_widget_apply(Gtk::Widget* /* widget */)
   Glib::ustring selected_font = m_FontButton.get_font_name();
   m_Font = selected_font;
 }
+*/
 
+/* Uncommenting this causes a crash:
 bool PrintFormOperation::on_preview(
                        const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                        const Glib::RefPtr<Gtk::PrintContext>& context,
@@ -196,3 +200,4 @@ bool PrintFormOperation::on_preview(
 
   return true;
 }
+*/
