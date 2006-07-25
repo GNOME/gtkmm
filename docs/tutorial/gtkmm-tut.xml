@@ -38,8 +38,9 @@ name
       <author>
         <firstname>Jonathon</firstname>
         <surname>Jongsma</surname>
-        <contrib>Drawing with Cairo</contrib>
-        <contrib>Working with CVS</contrib>
+        <contrib>Chapter on &quot;Drawing with Cairo&quot;.</contrib>
+        <contrib>Chapter on &quot;Working with CVS&quot;.</contrib>
+        <contrib>Chapter on &quot;Recent Files&quot;.</contrib>
       </author>
       <author>
         <firstname>Jason</firstname>
@@ -5609,6 +5610,224 @@ and update the print settings.
 
 </sect1>
 
+</chapter>
+
+<chapter id="sec-recent-documents">
+  <title>Recently Used Documents</title>
+    <note>Recent Files support is available in &gtkmm; version 2.10 and
+      later</note>
+  <para>
+    &gtkmm; provides an easy way to manage recently used documents.  The classes
+    involved in implementing this functionality are
+    <classname>RecentManager</classname>,
+    <classname>RecentChooserDialog</classname>,
+    <classname>RecentChooserMenu</classname>,
+    <classname>RecentChooserWidget</classname>, and
+    <classname>RecentFilter</classname>.
+  </para>
+  <para>
+    Each item in the list of recently used files is identified by its URI, and
+    can have associated metadata.  The metadata can be used to specify how the
+    file should be displayed, a description of the file, its mime type, which
+    application registered it, whether it's private to the registering
+    application, and several other things.
+  </para>
+  <sect1>
+    <title>RecentManager</title>
+    <para>
+      <classname>RecentManager</classname> acts as the central database of
+      recently used files.  You use this class to register new files, remove
+      files from the list, or look up recently used files.
+    </para>
+    <para>
+      You can create a new <classname>RecentManager</classname>, but you'll most
+      likely just want to use the default one.  You can get a reference to the
+      default <classname>RecentManager</classname> with
+      <function>get_default()</function>.  
+      </para>
+    <sect2>
+      <title>Adding Items to the List of Recent Files</title>
+      <para>
+        To add a new file to the list of recent documents, in the simplest case,
+        you only need to provide the URI.  For example:
+      </para>
+      <programlisting>Glib::RefPtr&lt;Gtk::RecentManager&gt; recent_manager = Gtk::RecentManager::get_default();
+recent_manager->add_item(uri);</programlisting>
+      <para>
+        If you want to register a file with metadata, you can pass a
+        <classname>RecentManager::Data</classname> parameter to
+        <function>add_item()</function>.  The metadata that can be set on a
+        particular file item is as follows:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para><varname>app_exec</varname>: The command line to be used to launch
+            this resource.  This string may contain the "f" and "u" escape
+            characters which will be expanded to the resource file path and URI
+            respectively</para>
+        </listitem>
+        <listitem>
+          <para><varname>app_name</varname>: The name of the application that
+            registered the resource</para>
+        </listitem>
+        <listitem>
+          <para><varname>description</varname>: A short description of the
+            resource as a UTF-8 encoded string</para>
+        </listitem>
+        <listitem>
+          <para><varname>display_name</varname>: The name of the resource to be
+            used for display as a UTF-8 encoded string</para>
+        </listitem>
+        <listitem>
+          <para><varname>groups</varname>: A list of groups associated with this
+            item.  Groups are essentially arbitrary strings associated with a
+            particular resource.  They can be thought of as 'categories' (such
+            as "email", "graphics", etc) or tags for the resource.</para>
+        </listitem>
+        <listitem>
+          <para><varname>is_private</varname>: Whether this resource should be
+            visible only to applications that have registered it or not</para>
+        </listitem>
+        <listitem>
+          <para><varname>mime_type</varname>: The MIME type of the resource</para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        In addition to adding items to the list, you can also look up items from
+        the list and modify or remove items.
+      </para>
+    </sect2>
+    <sect2>
+      <title>Looking up Items in the List of Recent Files</title>
+      <para>
+        To look up recently used files, <classname>RecentManager</classname>
+        provides several functions.  To look up a specific item by its URI, you
+        can use the <function>lookup_item()</function> function, which will
+        return a <classname>RecentInfo</classname> class.  If the specified URI
+        did not exist in the list of recent files, the
+        <classname>RecentInfo</classname> object will be invalid.
+        <classname>RecentInfo</classname> provides an implementation for
+        <function>operator bool()</function> which can be used to test for
+        validity.  For example:
+      </para>
+<programlisting>Gtk::RecentInfo info = recent_manager-&gt;lookup_item(uri);
+if (info)
+{
+  // item was found
+}</programlisting>
+      <para>
+        A <classname>RecentInfo</classname> object is essentially an object
+        containing all of the metadata about a single recently-used file.  You
+        can use this object to look up any of the properties listed above. FIXME
+        - add cross-reference.
+      </para>
+      <para>
+        If you don't want to look for a specific URI, but instead want to get a
+        list of all recently used items, <classname>RecentManager</classname>
+        provides the <function>get_items()</function> function.  The return
+        value of this function can be assigned to any standard C++ container
+        (e.g. <classname>std::vector</classname>,
+        <classname>std::list</classname>, etc) and contains a list of all
+        recently-used files up to a user-defined limit (FIXME: what's the
+        default limit?).  The following code demonstrates how you might get a
+        list of recently-used files:
+      </para>
+      <programlisting>std::vector&lt;Gtk::RecentInfo&gt; info_list = recent_manager-&gt;get_items();</programlisting>
+      <para>
+        The limit on the number of items returned can be set
+        by <function>set_limit()</function>, and queried with
+        <function>get_limit()</function>.  
+      </para>
+    </sect2>
+    <sect2>
+      <title>Modifying the List of Recent Files</title>
+      <para>
+        There may be times when you need to modify the list of recent files.
+        For instance, if a file is moved or renamed, you may need to update the
+        file's location in the recent files list so that it doesn't point to an
+        incorrect location.  You can update an item's location by using
+        <function>move_item()</function>.
+      </para>
+      <para>
+        In addition to changing a file's URI, you can also remove items from the
+        list, either one at a time or by clearint them all at once.  The former
+        is accomplished with <function>remove_item()</function>, the latter with
+        <function>purge_items()</function>.
+      </para>
+      <note>
+        The functions <function>move_item()</function>,
+        <function>remove_item()</function> and
+        <function>purge_items()</function> have no effect on the actual files
+        that are referred to by the URIs, they only modify the list of recent
+        files.
+      </note>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>RecentChooser</title>
+    <note>Recent Files support is available in &gtkmm; version 2.10 and
+      later</note>
+    <para>
+      <classname>RecentChooser</classname> is an interface that can be
+      implemented by widgets displaying the list of recently used files.
+      &gtkmm; provides three built-in implementations for choosing recent files:
+      <classname>RecentChooserWidget</classname>,
+      <classname>RecentChooserDialog</classname>, and
+      <classname>RecentChooserMenu</classname>.
+    </para>
+    <para>
+      <classname>RecentChooserWidget</classname> is a simple widget for
+      displaying a list of recently used files.
+      <classname>RecentChooserWidget</classname> is the basic building block for
+      <classname>RecentChooserDialog</classname>, but you can embed it into your
+      user interface if you want to.
+    </para>
+    <para>
+      The last class that implements the <classname>RecentChooser</classname>
+      interface is <classname>RecentChooserMenu</classname>.  This class allows
+      you to list recently used files as a menu.
+    </para>
+    <sect3>
+      <title>Simple RecentChooserWidget example</title>
+      <para>Shown below is a simple example of how to use the
+        <classname>RecentChooserDialog</classname> class in a program.</para>
+      <!-- add screenshot eventually
+      <screenshot>
+          <graphic format="PNG"
+              fileref="&url_figures_base;recent_files.png"/>
+      </screenshot>
+      -->
+      <para><ulink url="&url_examples_base;recent_files">Source Code</ulink></para>
+      <para>
+        The constructor for <classname>ExampleWindow</classname> creates the
+        menu using <classname>UIManager</classname> (see <xref
+          linkend="sec-MenusAndToolbars"/> for more information).  It then adds
+        the menu and the toolbar to the window.
+      </para>
+    </sect3>
+    <sect2>
+      <title>Filtering Recent Files</title>
+      <para>
+        For any of the <classname>RecentChooser</classname> classes, if you
+        don't wish to display all of the items in the list of recent files, you
+        can filter the list to show only those that you want.  You can filter
+        the list with the help of the <classname>RecentFilter</classname> class.
+        This class allows you to filter recent files by their name
+        (<function>add_pattern()</function>), their mime type
+        (<function>add_mime_type()</function>), the application that registered
+        them (<function>add_application()</function>), or by a custom filter
+        function (<function>add_custom()</function>).  It also provides the
+        ability to filter based on how long ago the file was modified and which
+        groups it belongs to.
+      </para>
+      <para>
+        After you've created and set up the filter to match only the items you
+        want, you can apply a filter to a chooser widget with the
+        <function>RecentChooser::add_filter()</function> function.
+      </para>
+    </sect2>
+  </sect1>
 </chapter>
 
 <chapter id="sec-timeouts">
