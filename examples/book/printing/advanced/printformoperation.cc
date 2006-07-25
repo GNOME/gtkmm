@@ -16,6 +16,7 @@
 
 #include "previewdialog.h"
 #include "printformoperation.h"
+#include <iostream>
 
 PrintFormOperation::PrintFormOperation()
 {
@@ -34,6 +35,8 @@ Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
 
 void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& print_context)
 {
+  g_debug("PrintFormOperation::on_begin_print");
+
   //Create and set up a Pango layout for PrintData based on the passed PrintContext:
   //We then use this to calculate the number of pages needed,
   //and the lines that are on each page.
@@ -179,25 +182,38 @@ void PrintFormOperation::on_custom_widget_apply(Gtk::Widget*)
 }
 */
 
-/* Uncommenting this causes a crash:
 bool PrintFormOperation::on_preview(
                        const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                        const Glib::RefPtr<Gtk::PrintContext>& context,
                        Gtk::Window* parent)
 {
-  g_debug("pfo::on_preview");
+  if(!parent)
+  {
+    std::cerr << "PrintFormOperation::on_preview(): parent was null." << std::endl;
+    return false;
+  }
+
+  if(!m_refLayout)
+  {
+    std::cerr << "PrintFormOperation::on_preview(): m_refLayout was null." << std::endl;
+    return false;
+  }
+
+  g_debug("pfo::on_preview 1");
 
   //Use our custom preview dialog:
-  PreviewDialog dialog(preview, property_n_pages().get_value(), context, m_refLayout, *parent);
+  PreviewDialog dialog(preview, property_n_pages(), context, m_refLayout, *parent);
+  g_debug("pfo::on_preview 2");
   dialog.run();
 
-  g_debug("emitting preview_done");
+  g_debug("pfo::on_preview 3: emitting preview_done");
 
   //Inform the application that the print preview dialog has closed:
   //TODO: Why do we need to do this?
-  Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
-  signal_preview_done.emit(settings);
+  //Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
+  //signal_preview_done.emit(settings);
+
+   g_debug("pfo::on_preview 4");
 
   return true;
 }
-*/

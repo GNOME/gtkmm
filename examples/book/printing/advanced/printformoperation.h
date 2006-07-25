@@ -45,12 +45,11 @@ class PrintFormOperation : public Gtk::PrintOperation
   //virtual Gtk::Widget* on_create_custom_widget();
   //virtual void on_custom_widget_apply(Gtk::Widget* widget);
 
-  /*
-  virtual bool on_preview(
-                  const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
+
+  virtual bool on_preview(const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                   const Glib::RefPtr<Gtk::PrintContext>& context,
                   Gtk::Window* parent);
-  */
+
 
   Glib::ustring m_Name;
   Glib::ustring m_Comments;
