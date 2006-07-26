@@ -32,11 +32,11 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup = Gtk::ActionGroup::create();
 
   //File menu:
-  m_refActionGroup->add( Gtk::Action::create("FileMenu", "File") );
+  m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") );
   m_refActionGroup->add( Gtk::Action::create("FileNew", Gtk::Stock::NEW),
           sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new));
-  m_refActionGroup->add( Gtk::Action::create("FileRecentDialog", "Recent Files Dialog"), 
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_recent_files_menu) );
+  m_refActionGroup->add( Gtk::Action::create("FileRecentDialog", "_Recent Files Dialog"), 
+    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_recent_files_dialog) );
   m_refActionGroup->add( Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
     sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
 
@@ -119,9 +119,5 @@ void ExampleWindow::on_menu_file_recent_files_dialog()
   {
      std::cout << "URI selected = " << dialog.get_current_uri() << std::endl;
   }
-}
-
-void ExampleWindow::on_menu_file_recent_files_menu()
-{
 }
 
