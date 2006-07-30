@@ -520,8 +520,10 @@ _CONVERSION(`GtkRecentFilter*', `RecentFilter&', `*Glib::wrap($3)')
 _CONVERSION(`GtkRecentFilter*', `const RecentFilter&', `*Glib::wrap($3)')
 
 #RecentInfo
-_CONVERSION(`GtkRecentInfo*',`RecentInfo',`Glib::wrap($3)')
-_CONVERSION(`const RecentInfo&',`GtkRecentInfo*',__FCR2P)
+_CONVERSION(`GtkRecentInfo*',`Glib::RefPtr<RecentInfo>',`Glib::wrap($3)')
+_CONVERSION(`GtkRecentInfo*',`Glib::RefPtr<const RecentInfo>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<RecentInfo>&',`GtkRecentInfo*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const RecentInfo>&',`GtkRecentInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentInfo))
 
 _CONVERSION(`Glib::StringArrayHandle&',`gchar**',`const_cast<gchar**>(($3).data())')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
