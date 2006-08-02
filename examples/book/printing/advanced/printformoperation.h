@@ -21,6 +21,8 @@
 #include <gtkmm.h>
 #include <vector>
 
+class PreviewDialog;
+
 //We derive our own class from PrintOperation,
 //so we can put the actual print implementation here.
 class PrintFormOperation : public Gtk::PrintOperation
@@ -28,6 +30,8 @@ class PrintFormOperation : public Gtk::PrintOperation
  public:
   static Glib::RefPtr<PrintFormOperation> create();
   virtual ~PrintFormOperation();
+
+  Glib::RefPtr<Pango::Layout> get_pango_layout() { return m_refLayout; }
 
   void set_name(const Glib::ustring& name) { m_Name = name; }
   void set_comments(const Glib::ustring& comments) { m_Comments = comments; }
@@ -50,6 +54,9 @@ class PrintFormOperation : public Gtk::PrintOperation
                   const Glib::RefPtr<Gtk::PrintContext>& context,
                   Gtk::Window* parent);
 
+  virtual bool on_preview_window_delete_event(GdkEventAny*);
+
+  PreviewDialog* m_pDialog;
 
   Glib::ustring m_Name;
   Glib::ustring m_Comments;

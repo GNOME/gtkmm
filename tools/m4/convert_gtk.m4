@@ -536,8 +536,8 @@ _CONVERSION(`Glib::RefPtr<RecentManager>',`GtkRecentManager*',__CONVERT_REFPTR_T
 _CONVERSION(`Glib::RefPtr<const RecentManager>', `GtkRecentManager*', __CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentManager))
 
 #PaperSize
-_CONVERSION(`GtkPaperSize*',`PaperSize',`Glib::wrap($3)')
-_CONVERSION(`GtkPaperSize*',`const PaperSize',`Glib::wrap($3)')
+_CONVERSION(`GtkPaperSize*',`PaperSize',`Glib::wrap($3, true)')
+_CONVERSION(`GtkPaperSize*',`const PaperSize',`Glib::wrap($3, true)')
 _CONVERSION(`const PaperSize&',`GtkPaperSize*',__FCR2P)
 
 #PageSetup
@@ -562,8 +562,6 @@ _CONVERSION(`GtkPrintSettings*',`Glib::RefPtr<PrintSettings>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PrintSettings>&',`GtkPrintSettings*',__CONVERT_REFPTR_TO_P)
 
 #PrintContext
-_CONVERSION(`GtkPrintContext*',`Glib::RefPtr<PrintContext>',`Glib::wrap($3)')
-_CONVERSION(`GtkPrintContext*',`const Glib::RefPtr<PrintContext>',`Glib::wrap($3)')
 _CONVERSION(`GtkPrintContext*',`const Glib::RefPtr<PrintContext>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PrintContext>',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))

@@ -193,27 +193,24 @@ bool PrintFormOperation::on_preview(
     return false;
   }
 
-  if(!m_refLayout)
-  {
-    std::cerr << "PrintFormOperation::on_preview(): m_refLayout was null." << std::endl;
-    return false;
-  }
-
-  g_debug("pfo::on_preview 1");
-
   //Use our custom preview dialog:
-  PreviewDialog dialog(preview, property_n_pages(), context, m_refLayout, *parent);
-  g_debug("pfo::on_preview 2");
-  dialog.run();
+  m_pDialog = new PreviewDialog(this, preview, property_n_pages(), context, *parent);
+  m_pDialog->signal_delete_event().connect(
+    sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_delete_event));
 
-  g_debug("pfo::on_preview 3: emitting preview_done");
+  return true;
+}
 
-  //Inform the application that the print preview dialog has closed:
+bool
+PrintFormOperation::on_preview_window_delete_event(GdkEventAny*)
+{
+  //Pass the main window the most recent settings user applied.
   //TODO: Why do we need to do this?
   //Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
   //signal_preview_done.emit(settings);
 
-   g_debug("pfo::on_preview 4");
+  m_pDialog->hide();
+  delete m_pDialog;
 
   return true;
 }

@@ -19,14 +19,16 @@
 
 #include <gtkmm.h>
 
-class PreviewDialog : public Gtk::Dialog
+class PrintFormOperation;
+
+class PreviewDialog : public Gtk::Window
 {
  public:
   explicit PreviewDialog(
+                  PrintFormOperation* pfo,
                   const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                   int page_count,
                   const Glib::RefPtr<Gtk::PrintContext>& context,
-                  const Glib::RefPtr<Pango::Layout>& layout,
                   Gtk::Window& parent);
   ~PreviewDialog();
 
@@ -37,15 +39,18 @@ class PreviewDialog : public Gtk::Dialog
   virtual void on_page_number_changed();
   virtual void on_close_clicked();
 
-  virtual bool on_expose_event(GdkEventExpose* event);
+  virtual bool on_drawing_area_expose_event(GdkEventExpose* event);
 
   //PrintOperationPreview overrides:
   virtual void on_ready(const Glib::RefPtr<Gtk::PrintContext>& print_ctx);
-  virtual void on_got_page_size(const Glib::RefPtr<Gtk::PrintContext>& context,
-                               const Glib::RefPtr<Gtk::PageSetup>& page_setup);
+  virtual void on_got_page_size(const Glib::RefPtr<Gtk::PrintContext>& context, const Glib::RefPtr<Gtk::PageSetup>& page_setup);
+
+  PrintFormOperation* m_pOperation;
 
   Glib::RefPtr<Gtk::PrintOperationPreview> m_refPreview;
   Glib::RefPtr<Pango::Layout> m_refLayout;
+
+  Gtk::VBox m_VBox;
 
   Gtk::HBox m_HBox;
   Gtk::SpinButton m_PageSpin;

@@ -15,37 +15,44 @@
  */
 
 #include "previewdialog.h"
+#include "printformoperation.h"
 
 #include <math.h>
 
 PreviewDialog::PreviewDialog(
+               PrintFormOperation* pfo,
                const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
                int page_count,
                const Glib::RefPtr<Gtk::PrintContext>& print_ctx,
-               const Glib::RefPtr<Pango::Layout>& layout,
                Gtk::Window& parent)
   :
+  m_pOperation(pfo),
   m_refPreview(preview),
-  m_refLayout(layout),
   m_PageSpin(1, 0),
   m_CloseButton(Gtk::Stock::CLOSE),
   m_Page(1),
   m_PageCount(page_count)
 {
-  g_debug("parent title: %s", parent.get_title().c_str());
   set_transient_for(parent);
   set_title("Preview");
   set_border_width(2);
 
-  Gtk::VBox* vbox = get_vbox();
+  add(m_VBox);
 
-  vbox->pack_start(m_HBox);
   m_HBox.pack_start(m_PageSpin);
   m_HBox.pack_start(m_CloseButton);
+  m_VBox.pack_start(m_HBox);
 
   m_DrawingArea.set_size_request(200, 300);
-  vbox->pack_start(m_DrawingArea);
+  m_VBox.pack_start(m_DrawingArea);
   m_DrawingArea.set_double_buffered(false);
+
+
+  m_refPreview->signal_ready().connect(
+    sigc::mem_fun(*this, &PreviewDialog::on_ready));
+
+  m_refPreview->signal_got_page_size().connect(
+    sigc::mem_fun(*this, &PreviewDialog::on_got_page_size));
 
   m_DrawingArea.signal_realize().connect(
     sigc::bind(sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_realized),
@@ -54,7 +61,7 @@ PreviewDialog::PreviewDialog(
   m_CloseButton.signal_clicked().connect(
     sigc::mem_fun(*this, &PreviewDialog::on_close_clicked));
 
-  show_all_children();
+  show_all();
 }
 
 PreviewDialog::~PreviewDialog()
@@ -62,8 +69,7 @@ PreviewDialog::~PreviewDialog()
   g_debug("pw dtor");
 }
 
-void PreviewDialog::on_drawing_area_realized(
-                       const Glib::RefPtr<Gtk::PrintContext>& print_ctx)
+void PreviewDialog::on_drawing_area_realized(const Glib::RefPtr<Gtk::PrintContext>& print_ctx)
 {
   Glib::RefPtr<Gdk::Window> gdk_window = m_DrawingArea.get_window();
   Cairo::RefPtr<Cairo::Context> cairo_ctx = gdk_window->create_cairo_context();
@@ -80,8 +86,10 @@ void PreviewDialog::on_page_number_changed()
   m_DrawingArea.queue_draw();
 }
 
-bool PreviewDialog::on_expose_event(GdkEventExpose* /* event */)
+bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
 {
+  g_debug("on_expose_event");
+
   Glib::RefPtr<Gdk::Window> window = m_DrawingArea.get_window();
   if(window)
     window->clear();
@@ -92,12 +100,12 @@ bool PreviewDialog::on_expose_event(GdkEventExpose* /* event */)
   return true;
 }
 
-void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */)
+void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */ )
 {
   m_PageSpin.set_range(1.0, m_PageCount);
 
   m_DrawingArea.signal_expose_event().connect(
-    sigc::mem_fun(*this, &PreviewDialog::on_expose_event));
+    sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_expose_event));
 
   m_DrawingArea.queue_draw();
 }
@@ -106,6 +114,8 @@ void PreviewDialog::on_got_page_size(
                        const Glib::RefPtr<Gtk::PrintContext>& print_ctx,
                        const Glib::RefPtr<Gtk::PageSetup>& page_setup)
 {
+  g_debug("on_got_page_size");
+
   Gtk::PaperSize paper_size = page_setup->get_paper_size();
 
   double width = paper_size.get_width(Gtk::UNIT_INCH);
@@ -125,7 +135,7 @@ void PreviewDialog::on_got_page_size(
     m_DpiY = dpi_y;
   }
 
-  m_refLayout->update_from_cairo_context(cairo_ctx);
+  m_pOperation->get_pango_layout()->update_from_cairo_context(cairo_ctx);
 }
 
 void PreviewDialog::on_close_clicked()
