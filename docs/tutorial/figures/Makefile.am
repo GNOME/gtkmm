@@ -16,7 +16,7 @@ figures_DATA = alignment.png aspectframe.png \
 	menus_menubar.png menus_menu.png menus_and_toolbars.png \
 	notebook.png \
 	paned.png progressbar.png radiobuttons.png \
-	range_widgets.png scrolledwindow.png spinbutton.png \
+	range_widgets.png recentchooserdialog.png scrolledwindow.png spinbutton.png \
 	table.png toolbar.png textview.png \
 	treeview_list.png treeview_tree.png treeview_editablecells.png treeview_combo_renderer.png \
         treeview_draganddrop.png treeview_popup.png \
