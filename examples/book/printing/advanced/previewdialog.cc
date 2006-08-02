@@ -42,11 +42,11 @@ PreviewDialog::PreviewDialog(
   add(m_VBox);
 
   m_HBox.pack_start(m_PageSpin);
-  m_HBox.pack_start(m_CloseButton);
-  m_VBox.pack_start(m_HBox);
+  m_HBox.pack_start(m_CloseButton, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_HBox, Gtk::PACK_SHRINK);
 
   m_DrawingArea.set_size_request(200, 300);
-  m_VBox.pack_start(m_DrawingArea);
+  m_VBox.pack_start(m_DrawingArea, Gtk::PACK_EXPAND_WIDGET);
   m_DrawingArea.set_double_buffered(false);
 
 
@@ -134,6 +134,9 @@ void PreviewDialog::on_popreview_got_page_size(
     double dpi_x = m_DrawingArea.get_allocation().get_width() / width;
     double dpi_y = m_DrawingArea.get_allocation().get_height() / height;
 
+    // We create a cairo context for the DrawingArea 
+    // and then give that cairo context to the PrintOperation's pango layout 
+    // so that render_page() will render into the drawing area.
     Cairo::RefPtr<Cairo::Context> cairo_ctx = m_DrawingArea.get_window()->create_cairo_context();
 
     if (fabs(dpi_x - m_DpiX) > 0.001 ||
