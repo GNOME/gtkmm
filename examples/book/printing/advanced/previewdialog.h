@@ -41,9 +41,9 @@ class PreviewDialog : public Gtk::Window
 
   virtual bool on_drawing_area_expose_event(GdkEventExpose* event);
 
-  //PrintOperationPreview overrides:
-  virtual void on_ready(const Glib::RefPtr<Gtk::PrintContext>& print_ctx);
-  virtual void on_got_page_size(const Glib::RefPtr<Gtk::PrintContext>& context, const Glib::RefPtr<Gtk::PageSetup>& page_setup);
+  //PrintOperationPreview signal handlers:
+  virtual void on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& print_ctx);
+  virtual void on_popreview_got_page_size(const Glib::RefPtr<Gtk::PrintContext>& context, const Glib::RefPtr<Gtk::PageSetup>& page_setup);
 
   PrintFormOperation* m_pOperation;
 

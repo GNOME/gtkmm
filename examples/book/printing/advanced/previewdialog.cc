@@ -49,10 +49,10 @@ PreviewDialog::PreviewDialog(
 
 
   m_refPreview->signal_ready().connect(
-    sigc::mem_fun(*this, &PreviewDialog::on_ready));
+    sigc::mem_fun(*this, &PreviewDialog::on_popreview_ready));
 
   m_refPreview->signal_got_page_size().connect(
-    sigc::mem_fun(*this, &PreviewDialog::on_got_page_size));
+    sigc::mem_fun(*this, &PreviewDialog::on_popreview_got_page_size));
 
   m_DrawingArea.signal_realize().connect(
     sigc::bind(sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_realized),
@@ -61,7 +61,7 @@ PreviewDialog::PreviewDialog(
   m_CloseButton.signal_clicked().connect(
     sigc::mem_fun(*this, &PreviewDialog::on_close_clicked));
 
-  show_all();
+  show_all_children();
 }
 
 PreviewDialog::~PreviewDialog()
@@ -100,7 +100,7 @@ bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
   return true;
 }
 
-void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */ )
+void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */ )
 {
   m_PageSpin.set_range(1.0, m_PageCount);
 
@@ -110,11 +110,11 @@ void PreviewDialog::on_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx
   m_DrawingArea.queue_draw();
 }
 
-void PreviewDialog::on_got_page_size(
+void PreviewDialog::on_popreview_got_page_size(
                        const Glib::RefPtr<Gtk::PrintContext>& print_ctx,
                        const Glib::RefPtr<Gtk::PageSetup>& page_setup)
 {
-  g_debug("on_got_page_size");
+  g_debug("on_popreview_got_page_size");
 
   Gtk::PaperSize paper_size = page_setup->get_paper_size();
 

@@ -198,6 +198,8 @@ bool PrintFormOperation::on_preview(
   m_pDialog->signal_delete_event().connect(
     sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_delete_event));
 
+  m_pDialog->show();
+
   return true;
 }
 
@@ -209,8 +211,13 @@ PrintFormOperation::on_preview_window_delete_event(GdkEventAny*)
   //Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
   //signal_preview_done.emit(settings);
 
-  m_pDialog->hide();
-  delete m_pDialog;
+  if(m_pDialog)
+  {
+    m_pDialog->hide();
+    delete m_pDialog; //This would hide it anyway.
+  
+    m_pDialog = 0;
+  }
 
   return true;
 }
