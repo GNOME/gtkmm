@@ -87,6 +87,9 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& p
 
 void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
 {
+  if(!print_context || !m_refLayout)
+    return;
+
   //Decide which lines we need to print in order to print the specified page:
   int start_page_line = 0;
   int end_page_line = 0;
@@ -106,7 +109,8 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
   }
   else
   {
-    end_page_line = m_refLayout->get_line_count();
+    if(m_refLayout)
+      end_page_line = m_refLayout->get_line_count();
   }
 
   //Get a Cairo Context, which is used as a drawing board:
@@ -195,16 +199,15 @@ bool PrintFormOperation::on_preview(
 
   //Use our custom preview dialog:
   m_pDialog = new PreviewDialog(this, preview, property_n_pages(), context, *parent);
-  m_pDialog->signal_delete_event().connect(
-    sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_delete_event));
+  m_pDialog->signal_hide().connect(
+    sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_hide));
 
   m_pDialog->show();
 
   return true;
 }
 
-bool
-PrintFormOperation::on_preview_window_delete_event(GdkEventAny*)
+void PrintFormOperation::on_preview_window_hide()
 {
   //Pass the main window the most recent settings user applied.
   //TODO: Why do we need to do this?
@@ -213,11 +216,7 @@ PrintFormOperation::on_preview_window_delete_event(GdkEventAny*)
 
   if(m_pDialog)
   {
-    m_pDialog->hide();
     delete m_pDialog; //This would hide it anyway.
-  
     m_pDialog = 0;
   }
-
-  return true;
 }

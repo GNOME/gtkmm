@@ -54,7 +54,7 @@ class PrintFormOperation : public Gtk::PrintOperation
                   const Glib::RefPtr<Gtk::PrintContext>& context,
                   Gtk::Window* parent);
 
-  virtual bool on_preview_window_delete_event(GdkEventAny*);
+  virtual void on_preview_window_hide();
 
   PreviewDialog* m_pDialog;
 

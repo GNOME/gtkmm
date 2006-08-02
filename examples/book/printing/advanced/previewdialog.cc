@@ -31,7 +31,9 @@ PreviewDialog::PreviewDialog(
   m_PageSpin(1, 0),
   m_CloseButton(Gtk::Stock::CLOSE),
   m_Page(1),
-  m_PageCount(page_count)
+  m_PageCount(page_count),
+  m_DpiX(0),
+  m_DpiY(0)
 {
   set_transient_for(parent);
   set_title("Preview");
@@ -58,8 +60,16 @@ PreviewDialog::PreviewDialog(
     sigc::bind(sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_realized),
 	       print_ctx));
 
+  m_DrawingArea.signal_expose_event().connect(
+    sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_expose_event));
+
   m_CloseButton.signal_clicked().connect(
     sigc::mem_fun(*this, &PreviewDialog::on_close_clicked));
+
+  m_PageSpin.signal_value_changed().connect(
+    sigc::mem_fun(*this, &PreviewDialog::on_page_number_changed));
+
+
 
   show_all_children();
 }
@@ -72,12 +82,12 @@ PreviewDialog::~PreviewDialog()
 void PreviewDialog::on_drawing_area_realized(const Glib::RefPtr<Gtk::PrintContext>& print_ctx)
 {
   Glib::RefPtr<Gdk::Window> gdk_window = m_DrawingArea.get_window();
-  Cairo::RefPtr<Cairo::Context> cairo_ctx = gdk_window->create_cairo_context();
+  if(gdk_window)
+  {
+    Cairo::RefPtr<Cairo::Context> cairo_ctx = gdk_window->create_cairo_context();
 
-  print_ctx->set_cairo_context(cairo_ctx, 72, 72);
-
-  m_PageSpin.signal_value_changed().connect(
-    sigc::mem_fun(*this, &PreviewDialog::on_page_number_changed));
+    print_ctx->set_cairo_context(cairo_ctx, 72, 72);
+  }
 }
 
 void PreviewDialog::on_page_number_changed()
@@ -104,9 +114,6 @@ void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& /*
 {
   m_PageSpin.set_range(1.0, m_PageCount);
 
-  m_DrawingArea.signal_expose_event().connect(
-    sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_expose_event));
-
   m_DrawingArea.queue_draw();
 }
 
@@ -121,21 +128,30 @@ void PreviewDialog::on_popreview_got_page_size(
   double width = paper_size.get_width(Gtk::UNIT_INCH);
   double height = paper_size.get_height(Gtk::UNIT_INCH);
 
-  Cairo::RefPtr<Cairo::Context> cairo_ctx =
-    m_DrawingArea.get_window()->create_cairo_context();
-
-  double dpi_x = m_DrawingArea.get_allocation().get_width() / width;
-  double dpi_y = m_DrawingArea.get_allocation().get_height() / height;
-
-  if (fabs(dpi_x - m_DpiX) > 0.001 ||
-      fabs(dpi_y - m_DpiY) > 0.001)
+ 
+  if(m_DrawingArea.is_realized()) //Avoid getting an odd allocation.
   {
-    print_ctx->set_cairo_context(cairo_ctx, dpi_x, dpi_y);
-    m_DpiX = dpi_x;
-    m_DpiY = dpi_y;
-  }
+    double dpi_x = m_DrawingArea.get_allocation().get_width() / width;
+    double dpi_y = m_DrawingArea.get_allocation().get_height() / height;
 
-  m_pOperation->get_pango_layout()->update_from_cairo_context(cairo_ctx);
+    Cairo::RefPtr<Cairo::Context> cairo_ctx = m_DrawingArea.get_window()->create_cairo_context();
+
+    if (fabs(dpi_x - m_DpiX) > 0.001 ||
+        fabs(dpi_y - m_DpiY) > 0.001)
+    {
+    
+      print_ctx->set_cairo_context(cairo_ctx, dpi_x, dpi_y);
+      m_DpiX = dpi_x;
+      m_DpiY = dpi_y;
+    }
+
+    if(m_pOperation)
+    {
+      Glib::RefPtr<Pango::Layout> layout = m_pOperation->get_pango_layout();
+      if(layout)
+        layout->update_from_cairo_context(cairo_ctx);
+    }
+  }
 }
 
 void PreviewDialog::on_close_clicked()
