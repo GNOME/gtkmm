@@ -27,7 +27,6 @@ class PreviewDialog : public Gtk::Window
   explicit PreviewDialog(
                   PrintFormOperation* pfo,
                   const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
-                  int page_count,
                   const Glib::RefPtr<Gtk::PrintContext>& context,
                   Gtk::Window& parent);
   ~PreviewDialog();
@@ -53,12 +52,12 @@ class PreviewDialog : public Gtk::Window
 
   Gtk::VBox m_VBox;
   Gtk::HBox m_HBox;
+  Gtk::Adjustment m_SpinAdjustment;
   Gtk::SpinButton m_PageSpin;
   Gtk::Button m_CloseButton;
   Gtk::DrawingArea m_DrawingArea;
 
   int m_Page;
-  int m_PageCount;
   double m_DpiX, m_DpiY;
 };
 

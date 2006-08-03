@@ -198,7 +198,7 @@ bool PrintFormOperation::on_preview(
   }
 
   //Use our custom preview dialog:
-  m_pDialog = new PreviewDialog(this, preview, property_n_pages(), context, *parent);
+  m_pDialog = new PreviewDialog(this, preview, context, *parent);
   m_pDialog->signal_hide().connect(
     sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_hide));
 

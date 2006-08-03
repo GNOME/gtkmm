@@ -22,16 +22,15 @@
 PreviewDialog::PreviewDialog(
                PrintFormOperation* pfo,
                const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
-               int page_count,
                const Glib::RefPtr<Gtk::PrintContext>& print_ctx,
                Gtk::Window& parent)
   :
   m_pOperation(pfo),
   m_refPreview(preview),
-  m_PageSpin(1, 0),
+  m_SpinAdjustment(1, 100, 1),
+  m_PageSpin(m_SpinAdjustment, 1, 0),
   m_CloseButton(Gtk::Stock::CLOSE),
   m_Page(1),
-  m_PageCount(page_count),
   m_DpiX(0),
   m_DpiY(0)
 {
@@ -68,8 +67,6 @@ PreviewDialog::PreviewDialog(
 
   m_PageSpin.signal_value_changed().connect(
     sigc::mem_fun(*this, &PreviewDialog::on_page_number_changed));
-
-
 
   show_all_children();
 }
@@ -112,7 +109,7 @@ bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
 
 void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */ )
 {
-  m_PageSpin.set_range(1.0, m_PageCount);
+  m_PageSpin.set_range(1.0, m_pOperation->property_n_pages());
 
   m_DrawingArea.queue_draw();
 }
