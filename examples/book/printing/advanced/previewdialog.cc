@@ -27,7 +27,8 @@ PreviewDialog::PreviewDialog(
   :
   m_pOperation(pfo),
   m_refPreview(preview),
-  m_SpinAdjustment(1, 100, 1),
+  m_refPrintContext(print_ctx),
+  m_SpinAdjustment(1, 100, 1), //TODO: Why/where do we use this?
   m_PageSpin(m_SpinAdjustment, 1, 0),
   m_CloseButton(Gtk::Stock::CLOSE),
   m_Page(1),
@@ -56,8 +57,7 @@ PreviewDialog::PreviewDialog(
     sigc::mem_fun(*this, &PreviewDialog::on_popreview_got_page_size));
 
   m_DrawingArea.signal_realize().connect(
-    sigc::bind(sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_realized),
-	       print_ctx));
+    sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_realized));
 
   m_DrawingArea.signal_expose_event().connect(
     sigc::mem_fun(*this, &PreviewDialog::on_drawing_area_expose_event));
@@ -76,14 +76,15 @@ PreviewDialog::~PreviewDialog()
   g_debug("pw dtor");
 }
 
-void PreviewDialog::on_drawing_area_realized(const Glib::RefPtr<Gtk::PrintContext>& print_ctx)
+void PreviewDialog::on_drawing_area_realized()
 {
   Glib::RefPtr<Gdk::Window> gdk_window = m_DrawingArea.get_window();
   if(gdk_window)
   {
     Cairo::RefPtr<Cairo::Context> cairo_ctx = gdk_window->create_cairo_context();
 
-    print_ctx->set_cairo_context(cairo_ctx, 72, 72);
+    if(m_refPrintContext)
+      m_refPrintContext->set_cairo_context(cairo_ctx, 72, 72);
   }
 }
 
@@ -157,10 +158,13 @@ void PreviewDialog::on_popreview_got_page_size(
 void PreviewDialog::on_hide()
 {
   m_refPreview->end_preview();
+
+  //We will not be using these anymore, so null the RefPtrs:
+  m_refPreview.clear();
+  m_refPrintContext.clear(); 
 }
 
 void PreviewDialog::on_close_clicked()
 {
-  on_hide();
   hide();
 }
