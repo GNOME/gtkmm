@@ -165,4 +165,5 @@ void PreviewDialog::on_hide()
 void PreviewDialog::on_close_clicked()
 {
   on_hide();
+  hide();
 }
