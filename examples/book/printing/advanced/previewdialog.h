@@ -38,6 +38,7 @@ class PreviewDialog : public Gtk::Window
 
   virtual void on_page_number_changed();
   virtual void on_close_clicked();
+  virtual void on_hide();
 
   virtual bool on_drawing_area_expose_event(GdkEventExpose* event);
 
@@ -51,7 +52,6 @@ class PreviewDialog : public Gtk::Window
   Glib::RefPtr<Pango::Layout> m_refLayout;
 
   Gtk::VBox m_VBox;
-
   Gtk::HBox m_HBox;
   Gtk::SpinButton m_PageSpin;
   Gtk::Button m_CloseButton;

@@ -157,8 +157,12 @@ void PreviewDialog::on_popreview_got_page_size(
   }
 }
 
-void PreviewDialog::on_close_clicked()
+void PreviewDialog::on_hide()
 {
   m_refPreview->end_preview();
-  hide();
+}
+
+void PreviewDialog::on_close_clicked()
+{
+  on_hide();
 }
