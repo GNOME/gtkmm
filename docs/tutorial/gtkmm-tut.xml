@@ -5250,6 +5250,8 @@ type.
 <chapter id="sec-printing">
 <title>Printing</title>
 
+<note>Printing support is available in &gtkmm; version 2.10 and later.</note>
+
 <para>
 At the application development level, &gtkmm;'s printing API
 provides dialogs that are consistent across applications and allows us of Cairo's common drawing API, with Pango-driven text rendering. In the implementation of this common API, platform-specific backends and printer-specific drivers are used.
@@ -5324,8 +5326,11 @@ during which various signals are emitted:
 
   <listitem>
     <para>
-      <literal>end_print</literal>: TODO it's much more useful in C
-      as a place to g_free()
+      <literal>end_print</literal>: A handler for it is a safe place to free
+      any resources related to a <classname>PrintOperation</classname>.
+      If you have your custom class that inherits from
+      <classname>PrintOperation</classname>, it is naturally simpler to do it
+      in the destructor.
     </para>
   </listitem>
 
@@ -5365,17 +5370,17 @@ during which various signals are emitted:
 <title>Page setup</title>
 
 <para>
-The <classname>PrintOperation</classname> class has a method called 
+The <classname>PrintOperation</classname> class has a method called
 <function>set_default_page_setup()</function> which selects the default
 paper size, orientation and margins. To show a page setup dialog from your
 application, use the <function>Gtk::run_page_setup_dialog()</function> method,
 which returns a <classname>Gtk::PageSetup</classname> object with the chosen
 settings. Use this object to update a <classname>PrintOperation</classname>
 and to access the selected <classname>Gtk::PaperSize</classname>,
-<literal>Gtk::PageOrientation</literal> and printer-specific margins:
+<literal>Gtk::PageOrientation</literal> and printer-specific margins.
 </para>
-<para>You should save the chosen <classname>Gtk::PageSetup</classname> so you can 
-use it again if the page setup dialog is shown again.</para>
+<para>You should save the chosen <classname>Gtk::PageSetup</classname>
+so you can use it again if the page setup dialog is shown again.</para>
 
 <para>For instance,
 <programlisting>
@@ -5383,6 +5388,10 @@ use it again if the page setup dialog is shown again.</para>
 Glib::RefPtr&lt;Gtk::PageSetup&gt; new_page_setup = Gtk::run_page_setup_dialog(*this, m_refPageSetup, m_refSettings);
 m_refPageSetup = new_page_setup;
 </programlisting>
+</para>
+
+<para>
+<ulink url="&url_refdocs_base_gtk;PageSetup.html">Reference</ulink>
 </para>
 
 <para>
@@ -5458,9 +5467,7 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
     //Update PrintSettings with the ones used in this PrintOperation
 
   if (! op->is_finished())
-  {
     op->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &amp;ExampleWindow::on_printoperation_status_changed), op));
-  }
 }
 </programlisting>
 </para>
@@ -5524,7 +5531,7 @@ You may add a custom tab to the print dialog:
 </para>
 
 <para>
-Although teh <literal>custom_widget_apply</literal> signal provides the widget you
+Although the <literal>custom_widget_apply</literal> signal provides the widget you
 previously created, to simplify things you can keep the widgets you expect
 to contain some user input as class members. For example, let's say you have
 a <classname>Gtk::Entry</classname> called <literal>m_Entry</literal> as
@@ -5557,6 +5564,10 @@ void CustomPrintOperation::on_custom_widget_apply(Gtk::Widget* /* widget */)
 
 </para>
 
+<para>
+The example in examples/book/printing/advanced demonstrates this.
+</para>
+
 </sect1>
 
 <sect1 id="sec-printing_preview">
@@ -5575,9 +5586,10 @@ op->run(Gtk::PRINT_OPERATION_ACTION_PREVIEW, *this);
 </para>
 
 <para>
-On Unix, the default preview handler uses an external viewer program. On Windows,
-the native preview dialog will be shown. If necessary you may override
-this behaviour and provide a custom preview dialog. See the &quot;advanced&quot; printing example.
+On Unix, the default preview handler uses an external viewer program.
+On Windows, the native preview dialog will be shown. If necessary you may
+override this behaviour and provide a custom preview dialog. See the example
+located in /examples/book/printing/advanced.
 </para>
 
 </sect1>
@@ -5596,9 +5608,9 @@ and update the print settings.
 </para>
 
 <figure id="figure-printing-simple">
-  <title>Printing - Simple (TODO: make a screenshot)</title>
+  <title>Printing - Simple</title>
   <screenshot>
-    <graphic format="PNG" fileref="&url_figures_base;printing_simple.png"/>
+    <graphic format="PNG" fileref="&url_figures_base;printing.png"/>
   </screenshot>
 </figure>
 
