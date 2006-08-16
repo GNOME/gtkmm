@@ -159,35 +159,25 @@ void ExampleWindow::build_main_menu()
     m_VBox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
 }
 
-void ExampleWindow::on_printoperation_status_changed(const Glib::RefPtr<PrintFormOperation>& operation)
+void ExampleWindow::on_printoperation_status_changed(Glib::RefPtr<PrintFormOperation>* operation)
 {
   Glib::ustring status_msg;
 
-  if (operation->is_finished())
+  if ((*operation)->is_finished())
   {
     status_msg = "Print job completed.";
   }
   else
   {
     //You could also use get_status().
-    status_msg = operation->get_status_string();
+    status_msg = (*operation)->get_status_string();
   }
 
   m_Statusbar.push(status_msg, m_ContextId);
 }
 
-void ExampleWindow::on_printoperation_preview_done(const Glib::RefPtr<Gtk::PrintSettings>& settings)
+void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, Glib::RefPtr<PrintFormOperation>* operation)
 {
-  g_debug("ew::on_printoperation_preview_done");
-
-  //Store the print settings that the user chose while using the print preview dialog:
-  m_refSettings = settings;
-}
-
-void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, const Glib::RefPtr<PrintFormOperation>& operation)
-{
-  g_debug("ew::on_printoperation_done");
-
   //Printing is "done" when the print data is spooled.
 
   if (result == Gtk::PRINT_OPERATION_RESULT_ERROR)
@@ -198,15 +188,15 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
   else if (result == Gtk::PRINT_OPERATION_RESULT_APPLY)
   {
     //Update PrintSettings with the ones used in this PrintOperation:
-    m_refSettings = operation->get_print_settings();
+    m_refSettings = (*operation)->get_print_settings();
   }
 
-  if (! operation->is_finished())
+  if (! (*operation)->is_finished())
   {
     //We will connect to the status-changed signal to track status
     //and update a status bar. In addition, you can, for example,
     //keep a list of active print operations, or provide a progress dialog.
-    operation->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed), operation));
+    (*operation)->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed), operation));
   }
 }
 
@@ -218,16 +208,16 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
 
   print->set_name(m_NameEntry.get_text() + " " + m_SurnameEntry.get_text());
   print->set_comments(m_refTextBuffer->get_text(false /* Don't include hidden. */));
-  //print->set_font("Sans 12");
+  //The font will be set through a custom tab in the print dialog.
 
   print->set_track_print_status();
   print->set_default_page_setup(m_refPageSetup);
   print->set_print_settings(m_refSettings);
 
-  //print->signal_preview_done.connect( sigc::mem_fun(*this, &ExampleWindow::on_printoperation_preview_done) );
-
-  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done), print));
-
+  //Pass a pointer to Glib::RefPtr<Gtk::PrintFormOperation> to prevent
+  //the unnecessary refcount increase and thus extension of its lifetime
+  //after it has been completed.
+  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done), &print));
 
   try
   {
@@ -262,13 +252,11 @@ void ExampleWindow::on_menu_file_page_setup()
 
 void ExampleWindow::on_menu_file_print_preview()
 {
-  g_debug("starting with PREVIEW");
   print_or_preview(Gtk::PRINT_OPERATION_ACTION_PREVIEW);
 }
 
 void ExampleWindow::on_menu_file_print()
 {
-  g_debug("starting with PRINT_DIALOG");
   print_or_preview(Gtk::PRINT_OPERATION_ACTION_PRINT_DIALOG);
 }
 

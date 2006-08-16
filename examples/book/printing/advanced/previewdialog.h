@@ -24,11 +24,7 @@ class PrintFormOperation;
 class PreviewDialog : public Gtk::Window
 {
  public:
-  explicit PreviewDialog(
-                  PrintFormOperation* pfo,
-                  const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
-                  const Glib::RefPtr<Gtk::PrintContext>& context,
-                  Gtk::Window& parent);
+  explicit PreviewDialog(PrintFormOperation* pfo, const Glib::RefPtr<Gtk::PrintOperationPreview>& preview, const Glib::RefPtr<Gtk::PrintContext>& context, Gtk::Window& parent);
   ~PreviewDialog();
 
  protected:

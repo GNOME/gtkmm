@@ -19,13 +19,13 @@
 #include <iostream>
 
 PrintFormOperation::PrintFormOperation()
+  :
+  m_Font("sans 12")
 {
-  g_debug("pfo ctor");
 }
 
 PrintFormOperation::~PrintFormOperation()
 {
-  g_debug("pfo dtor");
 }
 
 Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
@@ -35,14 +35,12 @@ Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
 
 void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& print_context)
 {
-  g_debug("PrintFormOperation::on_begin_print");
-
   //Create and set up a Pango layout for PrintData based on the passed PrintContext:
   //We then use this to calculate the number of pages needed,
   //and the lines that are on each page.
   m_refLayout = print_context->create_pango_layout();
 
-  Pango::FontDescription font_desc("sans 12");
+  Pango::FontDescription font_desc(m_Font);
   m_refLayout->set_font_description(font_desc);
 
   const double width = print_context->get_width();
@@ -149,13 +147,12 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
   while (line_index < end_page_line && iter.next_line());
 }
 
-/*
 Gtk::Widget* PrintFormOperation::on_create_custom_widget()
 {
   //Create a custom tab in the print dialog titled "Other"
   set_custom_tab_label("Other");
 
-  Gtk::VBox* vbox = new Gtk::VBox();
+  Gtk::VBox* vbox = Gtk::manage(new Gtk::VBox());
   vbox->set_border_width(12);
 
   Gtk::HBox* hbox = Gtk::manage(new Gtk::HBox(false, 8));
@@ -167,15 +164,13 @@ Gtk::Widget* PrintFormOperation::on_create_custom_widget()
   hbox->pack_start(*label, false, false);
   label->show();
 
-  //m_FontButton.set_font_name(m_Font);
-  //hbox->pack_start(m_FontButton, false, false);
-  //m_FontButton.show();
+  m_FontButton.set_font_name(m_Font);
+  hbox->pack_start(m_FontButton, false, false);
+  m_FontButton.show();
 
   return vbox;
 }
-*/
 
-/*
 void PrintFormOperation::on_custom_widget_apply(Gtk::Widget*)
 {
   //Note: the returned widget is the VBox we created in on_create_custom_widget().
@@ -184,12 +179,8 @@ void PrintFormOperation::on_custom_widget_apply(Gtk::Widget*)
   Glib::ustring selected_font = m_FontButton.get_font_name();
   m_Font = selected_font;
 }
-*/
 
-bool PrintFormOperation::on_preview(
-                       const Glib::RefPtr<Gtk::PrintOperationPreview>& preview,
-                       const Glib::RefPtr<Gtk::PrintContext>& context,
-                       Gtk::Window* parent)
+bool PrintFormOperation::on_preview(const Glib::RefPtr<Gtk::PrintOperationPreview>& preview, const Glib::RefPtr<Gtk::PrintContext>& context, Gtk::Window* parent)
 {
   if(!parent)
   {
@@ -199,8 +190,7 @@ bool PrintFormOperation::on_preview(
 
   //Use our custom preview dialog:
   m_pDialog = new PreviewDialog(this, preview, context, *parent);
-  m_pDialog->signal_hide().connect(
-    sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_hide));
+  m_pDialog->signal_hide().connect(sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_hide));
 
   m_pDialog->show();
 
@@ -209,11 +199,6 @@ bool PrintFormOperation::on_preview(
 
 void PrintFormOperation::on_preview_window_hide()
 {
-  //Pass the main window the most recent settings user applied.
-  //TODO: Why do we need to do this?
-  //Glib::RefPtr<Gtk::PrintSettings> settings = get_print_settings();
-  //signal_preview_done.emit(settings);
-
   if(m_pDialog)
   {
     delete m_pDialog; //This would hide it anyway.

@@ -28,7 +28,7 @@ PreviewDialog::PreviewDialog(
   m_pOperation(pfo),
   m_refPreview(preview),
   m_refPrintContext(print_ctx),
-  m_SpinAdjustment(1, 100, 1), //TODO: Why/where do we use this?
+  m_SpinAdjustment(1, 100, 1), //Used to construct m_PageSpin
   m_PageSpin(m_SpinAdjustment, 1, 0),
   m_CloseButton(Gtk::Stock::CLOSE),
   m_Page(1),
@@ -73,7 +73,6 @@ PreviewDialog::PreviewDialog(
 
 PreviewDialog::~PreviewDialog()
 {
-  g_debug("pw dtor");
 }
 
 void PreviewDialog::on_drawing_area_realized()
@@ -96,8 +95,6 @@ void PreviewDialog::on_page_number_changed()
 
 bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
 {
-  g_debug("on_expose_event");
-
   Glib::RefPtr<Gdk::Window> window = m_DrawingArea.get_window();
   if(window)
     window->clear();
@@ -119,8 +116,6 @@ void PreviewDialog::on_popreview_got_page_size(
                        const Glib::RefPtr<Gtk::PrintContext>& print_ctx,
                        const Glib::RefPtr<Gtk::PageSetup>& page_setup)
 {
-  g_debug("on_popreview_got_page_size");
-
   Gtk::PaperSize paper_size = page_setup->get_paper_size();
 
   double width = paper_size.get_width(Gtk::UNIT_INCH);
