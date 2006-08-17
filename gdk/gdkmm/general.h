@@ -65,15 +65,21 @@ void set_source_pixbuf(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib:
  */
 void set_source_pixmap(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y);
 
-//TODO: Rename to add_rectangle_to_path?
+//TODO: Rename to add_rectangle_to_context_path and add_region_to_context_path(), and deprecate rectangle() and region()?
 
-/** TODO
+/** Adds the given rectangle to the current path of the context.
+ *
+ * @param context A cairo context.
+ * @param rectangle A rectangle to add to the path of the context. 
  *
  * @newin2p10
  */
 void rectangle(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
 
-/** TODO
+/** Adds the given region to the current path of the context.
+ *
+ * @param context A cairo context.
+ * @param region A region to add to the path of the context. 
  *
  * @newin2p10
  */
