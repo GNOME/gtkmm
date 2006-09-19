@@ -22,17 +22,25 @@ democodedir=$(datadir)/gtkmm-2.4/demo
 #Build the executable, but don't install it.
 bin_PROGRAMS = demo
 
+if GTKMM_ATKMM_ENABLED
+ATKMMINC = -I$(top_builddir)/atk -I$(top_srcdir)/atk
+endif
+
 #Where to find the header files needed by the source files:
 INCLUDES = -DDEMOCODEDIR="\"$(democodedir)\"" \
            -I$(top_builddir)/gtk   -I$(top_srcdir)/gtk   \
            -I$(top_builddir)/gdk   -I$(top_srcdir)/gdk   \
            -I$(top_builddir)/pango -I$(top_srcdir)/pango \
-           -I$(top_builddir)/atk   -I$(top_srcdir)/atk \
+           $(ATKMMINC) \
            $(GTKMM_CFLAGS)
+
+if GTKMM_ATKMM_ENABLED
+ATKMMLIB = $(local_atkmm_lib)
+endif
 
 #The libraries that the executable needs to link against:
 LIBS = $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
-       $(top_builddir)/atk/atkmm/libatkmm-1.6.la \
+       $(ATKMMLIB) \
        $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
        $(top_builddir)/gtk/gtkmm/libgtkmm-2.4.la \
        $(GTKMM_LIBS)

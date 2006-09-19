@@ -1,5 +1,10 @@
+if GTKMM_ATKMM_ENABLED
+  ATK_SUBDIR=atk
+else
+  ATK_SUBDIR=
+endif
 
-SUBDIRS		= tools pango atk gdk gtk @EXAMPLE_SUBDIR@ @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2003
+SUBDIRS		= tools $(ATK_SUBDIR) pango gdk gtk @EXAMPLE_SUBDIR@ @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2003
 DIST_SUBDIRS	= $(SUBDIRS) scripts
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
