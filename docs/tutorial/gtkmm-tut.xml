@@ -5853,6 +5853,157 @@ if (info)
   </sect1>
 </chapter>
 
+<chapter id="sec-plugs-sockets">
+  <title>Plugs and Sockets</title>
+  <sect1>
+    <title>Overview</title>
+    <para>
+      From time to time, it may be useful to be able to embed a widget from
+      another application within your application.  &gtkmm; allows you to do
+      this with the <classname>Gtk::Socket</classname> and
+      <classname>Gtk::Plug</classname> classes.  It is not anticipated that very
+      many applications will need this functionality, but in the rare case that
+      you need to display a widget that is running in a completely different
+      process, these classes can be very helpful.
+    </para>
+    <para>
+      The communication between a <classname>Socket</classname> and a
+      <classname>Plug</classname> follows the XEmbed protocol. This protocol has
+      also been implemented in other toolkits (e.g. Qt), which allows the same
+      level of integration when embedding a Qt widget in GTK+ or vice versa.
+    </para>
+    <para>
+      The way that <classname>Sockets</classname> and
+      <classname>Plugs</classname> work together is through their window ids.
+      Both a <classname>Socket</classname> and a <classname>Plug</classname>
+      have IDs that can be retrieved with their <function>get_id()</function>
+      member functions.  The use of these IDs will be explained below in <xref
+          linkend="sec-connecting-plugs-sockets"/>.
+    </para>
+    <sect2>
+      <title>Sockets</title>
+      <para>
+        A <classname>Socket</classname> is a special kind of container widget that
+        provides the ability to embed widgets from one process into another
+        process in a way that is transparent to the user.
+      </para>
+    </sect2>
+    <sect2>
+      <title>Plugs</title>
+      <para>
+        A <classname>Plug</classname> is a special kind of Window that can be
+        plugged into a <classname>Socket</classname>.  Besides the normal
+        properties and methods of <classname>Gtk::Window</classname>, a
+        <classname>Plug</classname> provides a constructor that takes the ID of
+        a <classname>Socket</classname>, which will automatically embed the
+        <classname>Plug</classname> into the <classname>Socket</classname> that
+        matches that ID.
+      </para>
+      <para>
+        Since a <classname>Plug</classname> is just a special type of
+        <classname>Gtk::Window</classname> class, you can add containers or
+        widgets to it like you would to any other window.
+      </para>
+    </sect2>
+    <sect2 id="sec-connecting-plugs-sockets">
+      <title>Connecting Plugs and Sockets</title>
+      <para>
+        After a <classname>Socket</classname> or <classname>Plug</classname>
+        object is realized, you can obtain its ID with its
+        <function>get_id()</function> function.  This ID can then be shared with
+        other processes so that other processes know how to connect to
+        eachother.
+      </para>
+      <para>
+        There are two basic strategies that can be used:
+        <itemizedlist>
+          <listitem>
+            <para>
+              Create a <classname>Socket</classname> object in one process and
+              pass the ID of that <classname>Socket</classname> to another
+              process so that it can create a <classname>Plug</classname> object
+              by specifying the given <classname>Socket</classname> ID in its
+              constructor.  There is no way to assign a
+              <classname>Plug</classname> to a particular
+              <classname>Socket</classname> after creation, so you must pass the
+              <classname>Socket</classname> ID to the
+              <classname>Plug</classname>'s constructor.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Create a <classname>Plug</classname> independantly from any
+              particular <classname>Socket</classname> and pass the ID of the
+              <classname>Plug</classname> to other processes that need to use
+              it.  The ID of the <classname>Plug</classname> can be associated
+              with a particular <classname>Socket</classname> object using the
+              <function>Socket::add_id()</function> function.  This is the
+              approach used in the example below.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>Plugs and Sockets Example</title>
+    <para>
+      The following is a simple example of using sockets and plugs.  The method
+      of communication between processes is deliberately kept very simple: The
+      <classname>Plug</classname> writes its ID out to a text file named
+      <filename>plug.id</filename> and the process with the socket reads the ID
+      from this files.  In a real program, you may want to use a more
+      sophisticated method of inter-process communication.
+    </para>
+    <para><ulink url="&url_examples_base;socket/">Source Code</ulink></para>
+    <para>
+      This example creates two executable programs: <filename>socket</filename>
+      and <filename>plug</filename>.  The idea is that
+      <filename>socket</filename> has an application window that will embed a
+      widget from the <filename>plug</filename> program.  The way this example
+      is designed, <filename>plug</filename> must be running first before
+      starting <filename>socket</filename>.  To see the example in action,
+      execute the following commands in order from within the example directory:
+    </para>
+    <para>
+      Start the <filename>plug</filename> program and send it to the background
+      (or just use a different terminal).
+    </para>
+    <screen>$ ./plug &amp;</screen>
+    <para>
+      After which you should see something like the following:
+    </para>
+    <screen>The window ID is: 69206019</screen>
+    <para>Then start the <filename>socket</filename> program:</para>
+    <screen>$ ./socket</screen>
+    <para>
+      After starting <filename>socket</filename>, you should see the following
+      output in the terminal:
+    </para>
+    <screen>I've been embedded.
+A plug was added</screen>
+    <para>
+      The first line of output is from <filename>plug</filename>, after it has
+      been notified that it has been embedded inside of a
+      <classname>Socket</classname>.  The second line was emitted by
+      <filename>socket</filename> in response to its
+      <function>plug_added</function> signal. If everything was done as
+      described above, the <filename>socket</filename> window should look
+      roughly like the following:
+    </para>
+    <screenshot>
+      <graphic format="PNG" fileref="&url_figures_base;socket.png"/>
+    </screenshot>
+    <para>
+      If for some reason the <classname>Socket</classname> couldn't attach the
+      <classname>Plug</classname>, the window would look something like this:
+    </para>
+    <screenshot>
+      <graphic format="PNG" fileref="&url_figures_base;socket-fail.png"/>
+    </screenshot>
+  </sect1>
+</chapter>
+
 <chapter id="sec-timeouts">
 <title>Timeouts, I/O and Idle Functions </title>
 
