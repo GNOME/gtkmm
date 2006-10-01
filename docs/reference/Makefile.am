@@ -42,8 +42,8 @@ gtkmm-reference-html.tar.bz2: $(hierarchy_files) html/index.html
 	tar cf - html | bzip2 -c >$@
 
 post-html: html/index.html $(hierarchy_files)
-	rsync $(rsync_args) -r html/ doxygen-warnings.txt doxygen-output.txt $$USER@shell.sourceforge.net:$(web_path_reference)/html/
-	rsync $(rsync_args) -r $(hierarchy_files) $$USER@shell.sourceforge.net:$(web_path_reference)/
+	rsync $(rsync_args) -r html/ doxygen-warnings.txt doxygen-output.txt $$USER@$(web_host):$(web_path_reference)/html/
+	rsync $(rsync_args) -r $(hierarchy_files) $$USER@$(web_host):$(web_path_reference)/
 
 doc-clean: html-clean
 	-rm -rf xml

@@ -49,10 +49,10 @@ gtkmm-tut-html.tar.gz: html/index.html
 	tar cf - figures html | gzip -c --best >$@
 
 post-html: html/index.html style.css
-	rsync $(rsync_args) figures/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/figures/
-	rsync $(rsync_args) icons/*.png $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/icons/
-	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
-	rsync $(rsync_args) *.css $$USER@shell.sourceforge.net:$(gtkmm_tut_path)/html/
+	rsync $(rsync_args) figures/*.png $$USER@$(web_host):$(gtkmm_tut_path)/figures/
+	rsync $(rsync_args) icons/*.png $$USER@$(web_host):$(gtkmm_tut_path)/icons/
+	rsync $(rsync_args) -r html/ $$USER@$(web_host):$(gtkmm_tut_path)/html/
+	rsync $(rsync_args) *.css $$USER@$(web_host):$(gtkmm_tut_path)/html/
 
 doc-clean:
 	-rm -rf html

@@ -14,7 +14,7 @@ html/index.html: $(docbook_docs)
 	xsltproc -o html/ --catalogs $(DOCBOOK_STYLESHEET) $<
 
 post-html: html/index.html
-	rsync $(rsync_args) -r html $$USER@shell.sourceforge.net:$(gtkmm_faq_path)/
+	rsync $(rsync_args) -r html $$USER@$(web_host):$(gtkmm_faq_path)/
 
 doc-clean:
 	-rm -rf html
