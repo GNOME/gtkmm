@@ -83,7 +83,7 @@ void ListViewText::set_column_title(guint column, const Glib::ustring& title)
 
 Glib::ustring ListViewText::get_column_title(guint column) const
 {
-  g_return_val_if_fail( column < get_columns().size(), Glib::ustring() );
+  g_return_val_if_fail( column < get_columns().size(), "" ); //Using Glib::ustring() fails sometimes: Bug #352226
 
   return get_column(column)->get_title();
 }
