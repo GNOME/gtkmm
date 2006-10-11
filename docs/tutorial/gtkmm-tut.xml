@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY url_refdocs_base_glib_html "../../../../glibmm-2.4/docs/reference/html/">
   <!ENTITY url_refdocs_base_glib "../../../../glibmm-2.4/docs/reference/html/classGlib_1_1">
+  <!ENTITY url_refdocs_base_gtk_html "../../reference/html/">
   <!ENTITY url_refdocs_base_gtk "../../reference/html/classGtk_1_1">
   <!ENTITY url_refdocs_base_gtk_namespace "../../reference/html/namespaceGtk_1_1">
   <!ENTITY url_figures_base "../figures/"> 
@@ -8847,8 +8849,89 @@ For instance,
 
 </sect1>
 
+</appendix>
+
+
+<appendix id="sec-appendix-optional-api">
+<title>Optional API</title>
+<para>The gtkmm API is meant to be easy and convenient. However, some of these conveniences are not worth the overhead on reduced resources devices, such as the Nokia 770 internet tablet. For instance, with regular gtkmm you can implement a signal handler by deriving the class and overriding its virtual on_thesignalname() method. Bbut that additional API increases code size. And in the case of virtual methods, it increases per-object memory size, and demands that the linker loads the method's symbol even if you don't use it. Therefore, gtkmm can be built with a reduced API. In general, the optional API is rarely used, and there slightly less convenient alternatives for all of the optional API.</para>
+<para>When gtkmm has been built with optional API disabled, macros will be undefined, indicating that the API is not available. If you attempt to compile an application that uses this optional API, against a version of gtkmm that has disabled that API, you will see compiler warnings about missing functions.</para>
+<para>The following sections describe the available configure options used to disable optional API. Most developers will rarely need to provide these configure options, because they will rarely build glibmm or gtkmm, preferring to use official packages or installers. However, if you are developing for an embedded device, you might need to be aware of these options.</para>
+
+<sect1>
+<title>Optional API when building glibmm</title>
+
+
+<sect2>
+<title>--enable-deprecated-api=no</title>
+<para>
+When enable-deprecated-api is disabled, no deprecated classes or methods will be available in glibmm. For instance, the Date::set_time(GTime time) method overload will not be provided. The reference documentation contains a <ulink url="&url_refdocs_base_glib_html;deprecated.html">full list of deprecated glibmm API</ulink>.</para>
+<para>If deprecated glibmm API is available, the GLIBMM_DISABLE_DEPRECATED macro will not be defined.</para>
+</sect2>
+
+<sect2>
+<title>--enable-api-exceptions=no</title>
+<para>
+When enable-api-exceptions is disabled, no exceptions will be used in the glibmm or gtkmm API, and no exceptions will be thrown. This allows applications to be built without support for exceptions. For intance, the g++ -fno-exceptions option may be used. Where a method would normally throw an exception, that method will instead take an additional std::auto_ptr&lt;Glib::Error&gt;&amp; output parameter. If you are not using exceptions then you should check whether this parameter was set and handle any error appropriately.</para>
+<para>If exceptions are not available, the GLIBMM_EXCEPTIONS_ENABLED macro will not be defined.</para>
+</sect2>
+
+<sect2>
+<title>--enable-api-properties=no</title>
+<para>
+When enable-api-properties is disabled, no property accessor will be available in the glibmm or gtkmm API. For instance, the Gtk::Button::property_label() method will not be available. &quot;getter&quot; and &quot;setter&quot; methods, such as Gtk::Button::set_label() will still be available.</para>
+<para>When you really need to set or get the property value directly, for instance when using the Gtk::CellRenderer API, you can use the alternative set_property() and get_property() methods. For instance:</para>
+<para>
+<programlisting>
+#ifdef GLIBMM_PROPERTIES_ENABLED
+  m_cellrenderer.property_editable() = true;
+#else
+  m_cellrenderer.set_property("editable", true);
+#endif
+</programlisting>
+</para>
+<para>If property accessors are not available, the GLIBMM_PROPERTIES_ENABLED macro will not be defined.</para>
+</sect2>
+
+<sect2>
+<title>--enable-api-vfuncs=no</title>
+<para>
+When enable-api-exceptions is disabled, no _vfunc virtual methods will be available in the glibmm or gtkmm API. These methods allow the developer to override some low-level behaviour of the underlying GTK+ objects, and they are therefore rarely used. For instance, Gtk::Frame::compute_child_allocation_vfunc() will not be available.</para>
+<para>However, if you really need to override a _vfunc, for instance when implementing a custom Gtk::TreeModel, you may directly access the underlying GObject via the gobj() method.</para>
+<para>If vfuncs are not available, the GLIBMM_VFUNCS_ENABLED macro will not be defined.</para>
+</sect2>
+
+<sect2>
+<title>--enable-api-default-signal-handlers=no</title>
+<para>
+When enable-api-exceptions is disabled, no virtual signal handler methods will be available in the glibmm or gtkmm API. For instance, the Gtk::Button::on_clicked() dialog will not be provided. Instead you must connect a signal handler by using the signal_clicked() accessor. This option offers a considerable code size and per-object memory reduction.</para>
+<para>Note, however, that the compiler will not complain if you attempt to override a default signal handler when they are not supported by gtkmm, because the compiler can not know that you expected to override a virtual method.</para>
+<para>If default signal handlers are not available, the GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED macro will not be defined.</para>
+</sect2>
+
+</sect1>
+
+<sect1>
+<title>Optional API when building gtkmm</title>
+
+<sect2>
+<title>--enable-deprecated-api=no</title>
+<para>
+When enable-deprecated-api is disabled, no deprecated classes or methods will be available in gtkmm. For instance, the Gtk::FileSelection dialog will not be provided, because it is replaced by Gtk::FileChooserDialog. The reference documentation contains a <ulink url="&url_refdocs_base_gtk_html;deprecated.html">full list of deprecated gtkmm API</ulink>.</para>
+<para>If deprecated gtkmm API is available, the GTKMM_DISABLE_DEPRECATED macro will not be defined.</para>
+</sect2>
+
+<sect2>
+<title>--enable-api-atk=no</title>
+<para>
+When enable-api-atk is disabled, no atkmm API will be available in gtkmm. For instance, Gtk::Widget will not inherit from Atk::Implementor.</para>
+<para>If the atkmm API is not available, the GTKMM_ATKMM_ENABLED macro will not be defined.</para>
+</sect2>
+
+</sect1>
 
 </appendix>
+
 
 </book>
 
