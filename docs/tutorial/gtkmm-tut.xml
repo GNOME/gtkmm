@@ -68,6 +68,7 @@ name
         <firstname>Marko</firstname>
         <surname>Anastasov</surname>
         <contrib>Chapter on &quot;Printing&quot;.</contrib>
+        <contrib>Parts of chapter on &quot;Internationalization&quot;.</contrib>
       </author>
     </authorgroup>
 
@@ -6623,117 +6624,288 @@ DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnom
 <chapter id="sec-internationalization">
     <title>Internationalization and Localization</title>
 
-    <para>&gtkmm; applications can easily support multiple languages, including non-ASCII languages such as Chinese and right-to-left languages such as Arabic. An appropriately-written &gtkmm; application will use the appropriate language at runtime based on the user's environment.</para>
+    <para>&gtkmm; applications can easily support multiple languages, including non-European languages such as Chinese and right-to-left languages such as Arabic. An appropriately-written &gtkmm; application will use the appropriate language at runtime based on the user's environment.</para>
 <para>You might not anticipate the need to support additional languages, but you can never rule it out. And it's easier to develop the application properly in the first place rather than retrofitting later.</para>
-<para>The process of writing source code that allows for translation is called <literal>internationalization</literal>, often abbreviated to <literal>i18n</literal>. The <literal>Localization</literal> process provides translated text for other languages, based on that source code.</para>
+<para>The process of writing source code that allows for translation is called <literal>internationalization</literal>, often abbreviated to <literal>i18n</literal>. The <literal>Localization</literal> process, sometimes abbreviated as <literal>l10n</literal>, provides translated text for other languages, based on that source code.</para>
 
-<sect1><title>English in the source code, translations in the .po files.</title>
-<para>
-String literals should be typed in the source code in english as normal, but
-they should be surrounded by a call to the <function>gettext()</function>
-function. These strings will be extracted for translation and the translations
-may be used at runtime instead of the original english strings.
-</para>
+  <para>
+    The main activity in the internationalization process is finding strings seen
+    by users and marking them for translation. You do not need to do
+    it all at once - if you set up the necessary project
+    infrastructure correctly then your application will work normally regardless
+    of how many strings you've covered.
+  </para>
+
+  <para>
+    String literals should be typed in the source code in English, but surrounded by a macro.
+    The <application>gettext</application> (or intltool) utility can then extract the marked strings for tramslation, and 
+    substitute the translated text at runtime. 
+  </para>
+
+<sect1 id="sec-internationalization-intro">
+  <title>Preparing your project</title>
+
+  <note>
+    In the instructions below we will assume that you will not be using
+    <application>gettext</application> directly, but
+    <application>intltool</application>, which was written specifically for
+    <literal>GNOME</literal>. <application>intltool</application> uses
+    <function>gettext()</function>, which extracts strings from source code, 
+    but <application>intltool</application> can also combine strings from other
+    files, for example from desktop menu details, and GUI resource files such as
+    <application>Glade</application> files, into standard
+    <application>gettext</application> <filename>.pot/.po</filename> files.
+    We also assume that you are using
+    <ulink url="http://svn.gnome.org/viewcvs/gnome-common/trunk/autogen.sh?view=markup">
+      <literal>./autogen.sh</literal> from
+      <application>gnome-common</application></ulink>,
+    which, among other things, takes care of some
+    <application>intltool</application> initialization.
+  </note>
+
+  <para>
+    Create a <literal>po</literal> sub-directory in your project's root
+    directory. Within it, create <literal>LINGUAS</literal> and
+    <literal>POTFILES.in</literal> files, as well as a
+    <literal>ChangeLog</literal> file so that translators can keep track
+    of translation changes.
+  </para>
+
+  <para>
+    <literal>LINGUAS</literal>
+    contains an alphabetically sorted list of codes identifying the languages
+    for which your program is translated.
+  </para>
+
+  <para>
+  <literal>POTFILES.in</literal> is a list
+    of paths to all files which contain strings marked up for translation,
+    starting from the project root directory.
+  So for example, the entries
+    would look like:
+
+    <programlisting>
+      src/main.cc
+      src/other.cc
+    </programlisting>
+
+    If you have designed some of the application UI in
+    <application>Glade</application> then also add your 
+    <filename>.glade</filename> files to the list in 
+    <literal>POTFILES.in</literal>.
+  </para>
+
+  <para>
+    Add the following code to your <literal>configure.ac</literal>,
+    substituting 'programname' with the name of your program:
+
+    <programlisting>
+      IT_PROG_INTLTOOL([0.35.0])
+
+      GETTEXT_PACKAGE=programname
+      AC_SUBST(GETTEXT_PACKAGE)
+      AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [The domain to use with gettext])
+      AM_GLIB_GNU_GETTEXT
+
+      PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
+      AC_SUBST(PROGRAMNAME_LOCALEDIR)
+    </programlisting>
+
+    This PROGRAMNAME_LOCALEDIR variable will be used later in the Makefile.am file, to define a macro that will be used in our source code, to initialize gettext.
+  </para>
+
+  <para>
+    In the top-level Makefile.am:
+    <itemizedlist>
+      <listitem>
+        <simpara>Add <literal>po</literal> to the <literal>SUBDIRS</literal>
+        variable.</simpara>
+      </listitem>
+      <listitem>
+        <simpara>
+          Define <literal>INTLTOOL_FILES</literal> as:
+          <programlisting>
+            INTLTOOL_FILES = intltool-extract.in intltool-merge.in intltool-update.in
+          </programlisting>
+        </simpara>
+      </listitem>
+      <listitem>
+        <simpara>
+          Add <literal>INTLTOOL_FILES</literal> to the
+          <literal>EXTRA_DIST</literal> list of files.
+        </simpara>
+      </listitem>
+      <listitem>
+        <simpara>
+          Update your <literal>DISTCLEANFILES</literal>:
+          <programlisting>
+            DISTCLEANFILES = ... intltool-extract intltool-merge intltool-update po/.intltool-merge-cache
+          </programlisting>
+        </simpara>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    In your <literal>src/Makefile.am</literal>, update your
+    <literal>AM_CPPFLAGS</literal>:
+    <programlisting>
+      AM_CPPFLAGS = ... -DPROGRAMNAME_LOCALEDIR=\"${PROGRAMNAME_LOCALEDIR}\"
+    </programlisting>
+  </para>
+</sect1>
+
+<sect1 id="sec-i18n-marking-strings">
+  <title>Marking strings for translation</title>
+
+  <para>
+    String literals should be typed in the source code in English, but
+    they should be surrounded by a call to the <function>gettext()</function>
+    function. These strings will be extracted for translation and the
+    translations may be used at runtime instead of the original English
+    strings.
+  </para>
+
+  <para>
+    The <application>GNU gettext</application> package allows you to mark
+    strings in source code, extract those strings for translation, and use
+    the translated strings in your application.
+  </para>
+
+  <para>
+    However, <application>Glib</application> defines
+    <function>gettext()</function>
+    support macros which are shorter wrappers in an easy-to-use form.
+    To use these macros, include <literal>&lt;glibmm/i18n.h&gt;</literal>,
+    and then, for example, substitute:
+
+    <programlisting>
+      display_message("Getting ready for i18n.");
+    </programlisting>
+
+    with:
+
+    <programlisting>
+      display_message(_("Getting ready for i18n."));
+    </programlisting>
+  </para>
+
+  <para>
+    For reference, it is possible to generate a file which contains all
+    strings which appear in your code, even if they are not marked for translation, 
+    together with file name and line
+    number references. To generate such a file named
+    <literal>my-strings</literal>, execute the following command,
+    within the source code directory:
+
+    <programlisting>
+      xgettext -a -o my-strings --omit-header *.cc *.h
+    </programlisting>
+  </para>
+
+  <para>
+    Finally, to let you program use the translation for the current locale,
+    add this code to the beginning of your <filename>main.cc</filename> file, to initialize gettext.
+
+    <programlisting>
+      bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
+      bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+      textdomain(GETTEXT_PACKAGE);
+    </programlisting>
+  </para>
     
-<sect2 id="sec-i18n-gettext">
-<title>gettext</title>
-
-<para>The <application>GNU gettext</application> package allows you to mark strings in source code, extract those strings for translation, and use the translated strings in your application.</para>
-
-<para>
-Call <function>gettext()</function> with the string literals that should be
-translated. For example:
-
-<programlisting>
-window.set_title(gettext("My application"));	  
-label.set_text(gettext("This is some text"));
-</programlisting>
-</para>
-
-<para>Using <literal>gettext()</literal> throughout your source code can make it harder to read, so many projects, such as <literal>GNOME</literal> define the shorter <literal>_()</literal> macro that does the same thing. For instance,
-<programlisting>
-window.set_title(_("My application"));	  
-label.set_text(_("This is some text"));
-</programlisting>
-
-</para>
-
-<sect3>
+  <sect2 id="sec-i18n-gettext">
     <title>How gettext works</title>
 
-    <para><literal>xgettext</literal> script extracts the strings and put them in a
-        <filename>mypackage.pot</filename> file. The translators of
-        your application create their translations by first copying this .pot file to <filename>languagename.po</filename> files. A locale identifies a language and an encoding for that language, including date and numerical formats. Later, when the
-        text in your source code has changed, the <literal>msmerge</literal> script is used to update the
-        <filename>localename.po</filename> files from the regnerated .pot file.</para>
+    <para>
+      <application>intltool</application> /
+      <application>xgettext</application> script extracts the strings
+      and puts them in a <filename>mypackage.pot</filename> file.
+      The translators of your application create their translations by
+      first copying this <filename>.pot</filename> file to a
+      <filename>localename.po</filename> file. A locale identifies a
+      language and an encoding for that language, including date and numerical
+      formats. Later, when the text in your source code has changed, the
+      <literal>msmerge</literal> script is used to update the
+      <filename>localename.po</filename> files from the regenerated
+      <filename>.pot</filename> file.
+    </para>
 
-    <para> At install time, the <filename>.po</filename> files are
-        converted to a binary format (with the extension
-        <filename>.mo</filename>) and placed in a system-wide directory
-        for locale files.</para>
+    <para>
+      At install time, the <filename>.po</filename> files are converted to
+      a binary format (with the extension <filename>.mo</filename>) and
+      placed in a system-wide directory for locale files, for example
+      <filename>/usr/share/locale/</filename>.
+    </para>
 
-    <para>When the application runs, the
-        <application>gettext</application> library checks the
-        system-wide directory to see if there is a
-        <filename>.mo</filename> file for the user's locale environment
-        (you can set the locale with, for instance, "export LANG=de_DE.UTF-8" from a bash console). Later, when the program reaches a
-        <literal>gettext</literal> call, it looks for a translation.
-        If none is found, the original string is used.</para>
-</sect3>
+    <para>
+      When the application runs, the <application>gettext</application>
+      library checks the system-wide directory to see if there is a
+      <filename>.mo</filename> file for the user's locale environment
+      (you can set the locale with, for instance, "export LANG=de_DE.UTF-8"
+      from a bash console). Later, when the program reaches a
+      <literal>gettext</literal> call, it looks for a translation of a
+      particular string. If none is found, the original string is used.
+    </para>
+  </sect2>
 
-      <sect3>
-       <title>gettext and build files</title>
-       <para>
-           To use <application>gettext</application>, you need to modify your
-           application's build files, to use the
-           <application>gettext</application> library, to generate the
-           <filename>.pot</filename> file, and to install the translations from
-           the <filename>.po</filename> files.
-       </para>
-         <para>
-         <orderedlist>
-         <listitem><simpara>Run <literal>gettextize --force --copy --intl</literal> - you should add this to your autogen.sh script. This creates the <literal>po</literal> and <literal>intl</literal> subdirectories, among other things.</simpara></listitem>
-         <listitem><simpara>Create po/Makevars, by copying po/Makevars.template and editing it.</simpara></listitem>
-         <listitem><simpara>Add AM_GNU_GETTEXT to your configure.in</simpara></listitem>
-         <listitem><simpara>Define ALL_LINGUAS in your configure.in, listing the locales for which .po translations exist in your po directory.</simpara></listitem>
-         <listitem><simpara>Add intl and po to the SUBDIRS in your top-level Makefile.am</simpara></listitem>
-         </orderedlist>
-         </para>
+  <sect2 id="sec-i18n-testing">
+    <title>Testing and adding translations</title>
 
-         <para>
-             To add a translation for a new locale, just copy
-             <filename>po/yourproject.pot</filename> to
-             <filename>somelocale.po</filename>, such as
-             <filename>de.po</filename> or <filename>hu.po</filename>. Also add
-             the locale name to <literal>ALL_LINGUAS</literal> in your
-             <filename>configure.in</filename>.
-         </para>
+    <para>
+      To convince yourself that you've done well, you may wish to add a
+      translation for a new locale. In order to do that, go to the
+      <filename>po</filename> subdirectory of your project and
+      execute the following command:
+      <programlisting>
+        intltool-update --pot
+      </programlisting>
+    </para>
 
-         <para>This is demonstrated in the <ulink url="http://ftp.gnome.org/pub/GNOME/sources/gtkmm_hello/"><literal>gtkmm_hello</literal> example package</ulink> (choose the version that corresponds to your &gtkmm; version).</para>
-		 <para>See also, the <ulink url="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_toc.html#SEC_Contents">gettext manual</ulink>.</para>
-      </sect3>
+    <para>
+      That will create a file named <filename>programname.pot</filename>.
+      Now copy that file to <filename>languagecode.po</filename>, such as
+      <filename>de.po</filename> or <filename>hu.po</filename>. Also add
+      that language code to <literal>LINGUAS</literal>. The
+      <filename>.po</filename> file contains a header and a list of English strings,
+      with space for the translated strings to be entered. Make sure you set the
+      encoding of the <filename>.po</filename> file (specified in the header, but
+      also as content) to <literal>UTF-8</literal>.
+    </para>
 
-      <sect3>
-        <title>GNOME's intltool</title>
-        <para>
-            Applications often use text that isn't in their source code. For
-            instance, desktop menu details, and GUI resource files such as
-            <application>Glade</application> files. But
-            <function>gettext()</function> works only with C/C++ source code.
-            Therefore, the GNOME developers created
-            <application>intltool</application>. It uses
-            <function>gettext()</function> but combines strings from other
-            files into the <application>gettext</application>
-            <filename>.pot/.po</filename> files. The
-            <application>intltool</application> equivalent of
-            <application>gettextize</application> is <application
-                >intltoolize</application >. The <application
-                >intltool</application> <filename>README</filename> file tells
-            you what modifications to make to your build files.
-        </para>
-           <para>This is demonstrated in the <ulink url="http://ftp.gnome.org/pub/GNOME/sources/gnomemm_hello/"><literal>gnomemm_hello</literal> example package</ulink> (choose the version that corresponds to your <literal>gnomemm</literal> version).</para>
-      </sect3>
-    </sect2>
+    <!-- TODO: This need more explanation. What's the point of the fuzzy tag then? murrayc -->
+    <note>
+      It's possible that certain strings will be marked as
+      <literal>fuzzy</literal> in the <filename>.po</filename> file.
+      These translations will not substitute the original string. To make
+      them appear, simply remove the <literal>fuzzy</literal> tag.
+    </note>
+  </sect2>
+
+  <sect2 id="sec-i18n-resources">
+    <title>Resources</title>
+
+    <para>
+      More information about what lies behind the internationalization and localization process
+      is presented and demonstrated in:
+
+      <itemizedlist>
+        <listitem><ulink url="http://www.gnome.org/~malcolm/i18n/index.html">
+        Internationalizing GNOME applications</ulink></listitem>
+        
+        <listitem><ulink url="http://svn.gnome.org/viewcvs/intltool/trunk/README?view=markup">Intltool README</ulink></listitem>
+
+        <listitem><ulink url="http://developer.gnome.org/doc/tutorials/gnome-i18n/translator.html">How to use GNOME CVS as a Translator</ulink></listitem>
+
+        <listitem><ulink url="http://www.gnu.org/software/gettext/manual/gettext.html">gettext manual</ulink></listitem>
+
+        <listitem><ulink url="http://ftp.gnome.org/pub/GNOME/sources/gtkmm_hello/"><literal>gtkmm_hello</literal> example package</ulink></listitem>
+
+        <listitem><ulink url="http://ftp.gnome.org/pub/GNOME/sources/gnomemm_hello/"><literal>gnomemm_hello</literal> example package</ulink></listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
+
 </sect1>
 
 <sect1 id="sec-expecting_utf8">
