@@ -43,6 +43,8 @@ ExampleWindow::ExampleWindow()
   m_Notebook.append_page(m_Label1, "First");
   m_Notebook.append_page(m_Label2, "Second");
 
+  m_Notebook.signal_switch_page().connect( sigc::mem_fun(*this, &ExampleWindow::on_notebook_switch_page) );
+
   show_all_children();
 }
 
@@ -54,6 +56,14 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
+
+void ExampleWindow::on_notebook_switch_page(GtkNotebookPage* /* page */, guint page_num)
+{
+  std::cout << "Switched to tab with index " << page_num << std::endl;
+ 
+  //You can also use m_Notebook.get_current_page() to get this index.
+}
+
 
 
 

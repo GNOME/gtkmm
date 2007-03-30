@@ -30,6 +30,7 @@ public:
 protected:
   //Signal handlers:
   virtual void on_button_quit();
+  virtual void on_notebook_switch_page(GtkNotebookPage* page, guint page_num);
 
   //Child widgets:
   Gtk::VBox m_VBox;
