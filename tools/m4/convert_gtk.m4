@@ -454,7 +454,6 @@ _CONVERSION(`SelectionData&',`GtkSelectionData*', __FR2P)
 _CONVERSION(`GtkAction*',`Glib::RefPtr<Action>',`Glib::wrap($3)')
 _CONVERSION(`GtkAction*',`Glib::RefPtr<const Action>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Action>&',`GtkAction*',__CONVERT_REFPTR_TO_P($3))
-_CONVERSION(`GtkRadioAction*',`const Glib::RefPtr<RadioAction>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<RadioAction>&',`GtkRadioAction*',__CONVERT_REFPTR_TO_P($3))
 
 _CONVERSION(`GtkActionGroup*',`Glib::RefPtr<ActionGroup>',`Glib::wrap($3)')
