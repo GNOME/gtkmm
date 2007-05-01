@@ -265,11 +265,10 @@ CalendarExample::CalendarExample()
 Glib::Date CalendarExample::get_date() const
 {
   using Glib::Date;
-
-  unsigned int year = 0, month = 0, day = 0;
-  calendar_->get_date(year, month, day);
-
-  return Date(Date::Day(day), Date::Month(Date::JANUARY + month), Date::Year(year));
+  Date date;
+  calendar_->get_date(date);
+  
+  return date;  
 }
 
 
