@@ -39,7 +39,6 @@ protected:
   virtual bool on_expose_event(GdkEventExpose* event);
 
   Glib::RefPtr<Gdk::Window> m_refGdkWindow;
-  Glib::RefPtr<Gdk::GC> m_refGC;
 
   int m_scale;
 };

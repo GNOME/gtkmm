@@ -17,32 +17,34 @@
  */
 
 #include "mywidget.h"
+#include <gdkmm/drawable.h>
+#include <gdkmm/general.h>  // for cairo helper functions
 #include <iostream>
 //#include <gtk/gtkwidget.h> //For GTK_IS_WIDGET()
 
 
-MyWidget::MyWidget()
-: Glib::ObjectBase("mywidget"), //The GType name will actually be gtkmm__CustomObject_mywidget
+MyWidget::MyWidget() :
+  Glib::ObjectBase("mywidget"), //The GType name will actually be gtkmm__CustomObject_mywidget
   Gtk::Widget(),
   m_scale(1000)
 {
   set_flags(Gtk::NO_WINDOW);
 
   //This shows the GType name, which must be used in the RC file.
-  std::cout << "GType name: " <<G_OBJECT_TYPE_NAME(gobj()) << std::endl;
+  std::cout << "GType name: " << G_OBJECT_TYPE_NAME(gobj()) << std::endl;
 
   //This show that the GType still derives from GtkWidget:
   //std::cout << "Gtype is a GtkWidget?:" << GTK_IS_WIDGET(gobj()) << std::endl;
 
   //Install a style so that an aspect of this widget may be themed via an RC file: 
   gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(G_OBJECT_GET_CLASS(gobj())), 
-     g_param_spec_int("example_scale",
-		      "Scale of Example Drawing",
-                      "The scale to use when drawing the picture. This is just a silly example.",
-                      G_MININT,
-		      G_MAXINT,
-		      0,
- 		      G_PARAM_READABLE) );
+      g_param_spec_int("example_scale",
+        "Scale of Example Drawing",
+        "The scale to use when drawing the picture. This is just a silly example.",
+        G_MININT,
+        G_MAXINT,
+        0,
+        G_PARAM_READABLE) );
 
   gtk_rc_parse("custom_gtkrc");
 }
@@ -57,7 +59,7 @@ void MyWidget::on_size_request(Gtk::Requisition* requisition)
   *requisition = Gtk::Requisition();
 
   //Discover the total amount of minimum space needed by this widget.
-  
+
   //Let's make this simple example widget always need 50 by 50:
   requisition->height = 50;
   requisition->width = 50;
@@ -117,7 +119,7 @@ void MyWidget::on_realize()
     attributes.window_type = GDK_WINDOW_CHILD;
     attributes.wclass = GDK_INPUT_OUTPUT;
 
-    
+
     m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, &attributes, GDK_WA_X | GDK_WA_Y);
     unset_flags(Gtk::NO_WINDOW);
     set_window(m_refGdkWindow);
@@ -128,42 +130,58 @@ void MyWidget::on_realize()
 
     //make the widget receive expose events
     m_refGdkWindow->set_user_data(gobj());
-    
-    //Allocate a GC for use in on_expose_event():
-    m_refGC = Gdk::GC::create(m_refGdkWindow);
   }
 }
 
 void MyWidget::on_unrealize()
 {
   m_refGdkWindow.clear();
-  m_refGC.clear();
 
   //Call base class:
   Gtk::Widget::on_unrealize();
 }
 
-bool MyWidget::on_expose_event(GdkEventExpose* /* event */)
+bool MyWidget::on_expose_event(GdkEventExpose* event)
 {
   if(m_refGdkWindow)
   {
-    //Draw on the Gdk::Window:
-    m_refGdkWindow->clear();
     double scale_x = (double)get_allocation().get_width() / m_scale;
     double scale_y = (double)get_allocation().get_height() / m_scale;
 
-    m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(165*scale_y), (int)(155*scale_x), (int)(838*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(155*scale_x), (int)(838*scale_y), (int)(265*scale_x), (int)(900*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(900*scale_y), (int)(849*scale_x), (int)(564*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(849*scale_x), (int)(564*scale_y), (int)(849*scale_x), (int)(438*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(849*scale_x), (int)(438*scale_y), (int)(265*scale_x), (int)(100*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(100*scale_y), (int)(155*scale_x), (int)(165*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(100*scale_y), (int)(265*scale_x), (int)(652*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(265*scale_x), (int)(652*scale_y), (int)(526*scale_x), (int)(502*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(411*scale_y), (int)(633*scale_x), (int)(564*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(286*scale_y), (int)(369*scale_x), (int)(592*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(369*scale_x), (int)(286*scale_y), (int)(849*scale_x), (int)(564*scale_y));
-    m_refGdkWindow->draw_line(m_refGC, (int)(633*scale_x), (int)(564*scale_y), (int)(155*scale_x), (int)(838*scale_y));
+    Cairo::RefPtr<Cairo::Context> cr = m_refGdkWindow->create_cairo_context();
+    if (event)
+    {
+      // clip to the area that needs to be re-exposed so we don't draw any
+      // more than we need to.
+      cr->rectangle (event->area.x, event->area.y, event->area.width, event->area.height);
+      cr->clip();
+    }
+
+    // paint the background
+    Gdk::Cairo::set_source_color(cr, get_style ()->get_bg (Gtk::STATE_NORMAL));
+    cr->paint();
+
+    // draw the foreground
+    Gdk::Cairo::set_source_color(cr, get_style ()->get_fg (Gtk::STATE_NORMAL));
+    cr->move_to(155.*scale_x, 165.*scale_y);
+    cr->line_to(155.*scale_x, 838.*scale_y);
+    cr->line_to(265.*scale_x, 900.*scale_y);
+    cr->line_to(849.*scale_x, 564.*scale_y);
+    cr->line_to(849.*scale_x, 438.*scale_y);
+    cr->line_to(265.*scale_x, 100.*scale_y);
+    cr->line_to(155.*scale_x, 165.*scale_y);
+    cr->move_to(265.*scale_x, 100.*scale_y);
+    cr->line_to(265.*scale_x, 652.*scale_y);
+    cr->line_to(526.*scale_x, 502.*scale_y);
+    cr->move_to(369.*scale_x, 411.*scale_y);
+    cr->line_to(633.*scale_x, 564.*scale_y);
+    cr->move_to(369.*scale_x, 286.*scale_y);
+    cr->line_to(369.*scale_x, 592.*scale_y);
+    cr->move_to(369.*scale_x, 286.*scale_y);
+    cr->line_to(849.*scale_x, 564.*scale_y);
+    cr->move_to(633.*scale_x, 564.*scale_y);
+    cr->line_to(155.*scale_x, 838.*scale_y);
+    cr->stroke();
   }
   return true;
 }
