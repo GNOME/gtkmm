@@ -9,6 +9,9 @@ DOCBOOK_PHPWEBNOTES_TRANSFORM = docbook_phpwebnotes.xsl
 EXTRA_DIST = README insert_example_code.pl gtkmm-tut.xml gtkmm-tut-with-examples.xml style.css html $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
 
 DOCBOOK_STYLESHEET ?= http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
+XMLLINT = xmllint
+XSLTPROC = xsltproc
+DB2PDF = docbook2pdf
 
 # Create a DocBook source file that doesn't have the examples' comments blocks:
 gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
@@ -18,7 +21,7 @@ gtkmm-tut-with-examples.xml: gtkmm-tut.xml insert_example_code.pl
 html/index.html: gtkmm-tut-with-examples.xml
 	rm -rf html
 	$(mkinstalldirs) html
-	xsltproc \
+	$(XSLTPROC) \
 		--param toc.section.depth 1	\
 		--stringparam html.stylesheet "style.css"	\
 		--stringparam admon.graphics 1	\
@@ -37,13 +40,13 @@ html/index.html: gtkmm-tut-with-examples.xml
 # Create a version of the tutorial that has phpwebnotes code in it.
 html_withcomments/index.php: gtkmm-tut-with-examples.xml $(DOCBOOK_PHPWEBNOTES_TRANSFORM)
 	rm -rf html_withcomments
-	xsltproc -o html_withcomments/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
+	$(XSLTPROC) -o html_withcomments/ --xinclude --catalogs $(DOCBOOK_PHPWEBNOTES_TRANSFORM) $<
 
 validate_original: gtkmm-tut.xml
-	xmllint --xinclude --valid --noout --catalogs $(DOCBOOK_STYLESHEET) $<
+	$(XMLLINT) --xinclude --postvalid --noout $<
 
 validate: gtkmm-tut-with-examples.xml
-	xmllint --xinclude --valid --noout --catalogs $(DOCBOOK_STYLESHEET) $<
+	$(XMLLINT) --xinclude --postvalid --noout $<
 
 gtkmm-tut-html.tar.gz: html/index.html
 	tar cf - figures html | gzip -c --best >$@
@@ -54,10 +57,26 @@ post-html: html/index.html style.css
 	rsync $(rsync_args) -r html/ $$USER@$(web_host):$(gtkmm_tut_path)/html/
 	rsync $(rsync_args) *.css $$USER@$(web_host):$(gtkmm_tut_path)/html/
 
+# we need to produce a full examples with all of the XIncludes done so that it
+# can processed for PDF
+programming-with-gtkmm.xml: gtkmm-tut-with-examples.xml
+	rm -rf html
+	$(mkinstalldirs) html
+	$(XMLLINT) --xinclude --postvalid $< -o $@
+
+# We have to generate the pdf in a subdirectory (e.g. pdf/) because the tutorial
+# specifies the path to the figures as '../figures' so if we build it in this
+# directory, it won't find the images.
+pdf/programming-with-gtkmm.pdf: programming-with-gtkmm.xml
+	$(DB2PDF) --output pdf $<
+
+pdf : pdf/programming-with-gtkmm.pdf
+
 doc-clean:
 	-rm -rf html
 	-rm -rf html_withcomments
-	-rm -f gtkmm-tut-with-examples.xml gtkmm-tut-html.tar.gz
+	-rm -f gtkmm-tut-with-examples.xml gtkmm-tut-html.tar.gz programming-with-gtkmm.xml
+	-rm -rf pdf
 
 tutorialdir = $(gtkmm_docdir)/tutorial/html
 
