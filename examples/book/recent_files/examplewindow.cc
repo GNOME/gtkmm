@@ -26,7 +26,8 @@ ExampleWindow::ExampleWindow()
   set_title("recent files example");
   set_default_size(200, 200);
 
-  add(m_Box); //We can put a MenuBar at the top of the box and other stuff below it.
+  //We can put a MenuBar at the top of the box and other stuff below it.
+  add(m_Box);
 
   //Create actions for menus and toolbars:
   m_refActionGroup = Gtk::ActionGroup::create();
@@ -35,20 +36,20 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") );
   m_refActionGroup->add( Gtk::Action::create("FileNew", Gtk::Stock::NEW),
           sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new));
-  m_refActionGroup->add( Gtk::Action::create("FileRecentDialog", "_Recent Files Dialog"), 
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_recent_files_dialog) );
+  m_refActionGroup->add( Gtk::Action::create("FileRecentDialog",
+              "_Recent Files Dialog"), sigc::mem_fun(*this,
+                  &ExampleWindow::on_menu_file_recent_files_dialog) );
   m_refActionGroup->add( Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
+          sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
 
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
- 
+
   add_accel_group(m_refUIManager->get_accel_group());
 
   //Layout the actions in a menubar and toolbar:
-
-  Glib::ustring ui_info = 
+  Glib::ustring ui_info =
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='FileMenu'>"
@@ -66,7 +67,7 @@ ExampleWindow::ExampleWindow()
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-  {        
+  {
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
@@ -80,7 +81,6 @@ ExampleWindow::ExampleWindow()
      std::cerr << "building menus failed: " <<  ex->what();
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 
- 
   //Get the menubar and toolbar widgets, and add them to a container widget:
   Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
   if(pMenubar)

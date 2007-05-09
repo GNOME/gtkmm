@@ -80,7 +80,8 @@ void PreviewDialog::on_drawing_area_realized()
   Glib::RefPtr<Gdk::Window> gdk_window = m_DrawingArea.get_window();
   if(gdk_window)
   {
-    Cairo::RefPtr<Cairo::Context> cairo_ctx = gdk_window->create_cairo_context();
+    Cairo::RefPtr<Cairo::Context> cairo_ctx =
+        gdk_window->create_cairo_context();
 
     if(m_refPrintContext)
       m_refPrintContext->set_cairo_context(cairo_ctx, 72, 72);
@@ -105,7 +106,7 @@ bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
   return true;
 }
 
-void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& /* print_ctx */ )
+void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& cxt)
 {
   m_PageSpin.set_range(1.0, m_pOperation->property_n_pages());
 
@@ -121,21 +122,20 @@ void PreviewDialog::on_popreview_got_page_size(
   double width = paper_size.get_width(Gtk::UNIT_INCH);
   double height = paper_size.get_height(Gtk::UNIT_INCH);
 
- 
   if(m_DrawingArea.is_realized()) //Avoid getting an odd allocation.
   {
     double dpi_x = m_DrawingArea.get_allocation().get_width() / width;
     double dpi_y = m_DrawingArea.get_allocation().get_height() / height;
 
-    // We create a cairo context for the DrawingArea 
-    // and then give that cairo context to the PrintOperation's pango layout 
-    // so that render_page() will render into the drawing area.
+    // We create a cairo context for the DrawingArea and then give that cairo
+    // context to the PrintOperation's pango layout so that render_page() will
+    // render into the drawing area.
     Cairo::RefPtr<Cairo::Context> cairo_ctx = m_DrawingArea.get_window()->create_cairo_context();
 
     if (fabs(dpi_x - m_DpiX) > 0.001 ||
         fabs(dpi_y - m_DpiY) > 0.001)
     {
-    
+
       print_ctx->set_cairo_context(cairo_ctx, dpi_x, dpi_y);
       m_DpiX = dpi_x;
       m_DpiY = dpi_y;

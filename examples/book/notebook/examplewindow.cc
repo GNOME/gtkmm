@@ -37,13 +37,15 @@ ExampleWindow::ExampleWindow()
   m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
 
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Add the Notebook pages:
   m_Notebook.append_page(m_Label1, "First");
   m_Notebook.append_page(m_Label2, "Second");
 
-  m_Notebook.signal_switch_page().connect( sigc::mem_fun(*this, &ExampleWindow::on_notebook_switch_page) );
+  m_Notebook.signal_switch_page().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_notebook_switch_page) );
 
   show_all_children();
 }
@@ -60,10 +62,6 @@ void ExampleWindow::on_button_quit()
 void ExampleWindow::on_notebook_switch_page(GtkNotebookPage* /* page */, guint page_num)
 {
   std::cout << "Switched to tab with index " << page_num << std::endl;
- 
+
   //You can also use m_Notebook.get_current_page() to get this index.
 }
-
-
-
-

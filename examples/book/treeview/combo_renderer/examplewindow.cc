@@ -40,29 +40,32 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create and fill the combo models
   //You could also use set_cell_data_func() to choose or fill these later.
   m_refTreeModelCombo1 = Gtk::ListStore::create(m_ColumnsCombo);
-  
+
   Gtk::TreeModel::Row row = *(m_refTreeModelCombo1->append());
   row[m_ColumnsCombo.m_col_choice] = "abc";
   row = *(m_refTreeModelCombo1->append());
   row[m_ColumnsCombo.m_col_choice] = "def";
-  
+
   m_refTreeModelCombo2 = Gtk::ListStore::create(m_ColumnsCombo);
-  
+
   row = *(m_refTreeModelCombo2->append());
-  row[m_ColumnsCombo.m_col_choice] = "foo"; //The value that can be chosen from the combo, to use in the model.
-  row[m_ColumnsCombo.m_col_description] = "The Foo item"; //A description, to help the user to choose the value from the combo.
+  //The value that can be chosen from the combo, to use in the model.
+  row[m_ColumnsCombo.m_col_choice] = "foo";
+  //A description, to help the user to choose the value from the combo.
+  row[m_ColumnsCombo.m_col_description] = "The Foo item";
   row = *(m_refTreeModelCombo2->append());
   row[m_ColumnsCombo.m_col_choice] = "bar";
   row[m_ColumnsCombo.m_col_description] = "The item known as bar";
   row = *(m_refTreeModelCombo2->append());
   row[m_ColumnsCombo.m_col_choice] = "goo";
   row[m_ColumnsCombo.m_col_description] = "goo, goo, goo, goo";
-  
+
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
   m_TreeView.set_model(m_refTreeModel);
@@ -72,8 +75,9 @@ ExampleWindow::ExampleWindow()
   row[m_Columns.m_col_id] = 1;
   row[m_Columns.m_col_name] = "Billy Bob";
   row[m_Columns.m_col_itemchosen] = "click to choose";
-  row[m_Columns.m_col_choices] = m_refTreeModelCombo1; //Choose from this list to set the value in m_col_itemchosen.
-  
+  //Choose from this list to set the value in m_col_itemchosen.
+  row[m_Columns.m_col_choices] = m_refTreeModelCombo1;
+
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
@@ -87,31 +91,37 @@ ExampleWindow::ExampleWindow()
   //Add the TreeView's view columns:
   m_TreeView.append_column("ID", m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_Columns.m_col_name);
-  
+
   //Create a Combo CellRenderer, instead of the default Text CellRenderer:
-  Gtk::TreeView::Column* pColumn = Gtk::manage( new Gtk::TreeView::Column("Item Chosen") ); 
-  Gtk::CellRendererCombo* pRenderer = Gtk::manage(new Gtk::CellRendererCombo);
+  Gtk::TreeView::Column* pColumn = Gtk::manage(
+          new Gtk::TreeView::Column("Item Chosen") ); 
+  Gtk::CellRendererCombo* pRenderer = Gtk::manage(
+          new Gtk::CellRendererCombo);
   pColumn->pack_start(*pRenderer);
   m_TreeView.append_column(*pColumn);
-  
+
   //Make this View column represent the m_col_itemchosen model column:
 #ifdef GLIBMM_PROPERTIES_ENABLED
-  pColumn->add_attribute(pRenderer->property_text(), m_Columns.m_col_itemchosen);
+  pColumn->add_attribute(pRenderer->property_text(),
+          m_Columns.m_col_itemchosen);
 #else
   pColumn->add_attribute(*pRenderer, "text", m_Columns.m_col_itemchosen);
-#endif  
+#endif
 
-  //Allow the user to choose from this list to set the value in m_col_itemchosen:
+  // Allow the user to choose from this list to set the value in
+  // m_col_itemchosen:
 #ifdef GLIBMM_PROPERTIES_ENABLED
   pColumn->add_attribute(pRenderer->property_model(), m_Columns.m_col_choices);
 #else
   pColumn->add_attribute(*pRenderer, "model", m_Columns.m_col_itemchosen);
 #endif 
 
-  //Alternatively, you could use just one combo model, in all rows, instead of mapping it to a model column:
-  //pRenderer->property_model() = m_refTreeModelCombo1;
+  // Alternatively, you could use just one combo model, in all rows, instead of
+  // mapping it to a model column:
+  // pRenderer->property_model() = m_refTreeModelCombo1;
 
-  //This must be a text column, in m_refTreeModelCombo1, or m_refTreeModelCombo:
+  // This must be a text column, in m_refTreeModelCombo1, or
+  // m_refTreeModelCombo:
 #ifdef GLIBMM_PROPERTIES_ENABLED
   pRenderer->property_text_column() = 0; 
 #else
@@ -127,8 +137,9 @@ ExampleWindow::ExampleWindow()
   pRenderer->set_property("editable", true);
 #endif
 
-  pRenderer->signal_edited().connect( sigc::mem_fun(*this, &ExampleWindow::on_cellrenderer_choice_edited) );
-      
+  pRenderer->signal_edited().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_cellrenderer_choice_edited) );
+
   show_all_children();
 }
 
@@ -141,7 +152,8 @@ void ExampleWindow::on_button_quit()
   hide();
 }
 
-void ExampleWindow::on_cellrenderer_choice_edited(const Glib::ustring& path_string, const Glib::ustring& new_text)
+void ExampleWindow::on_cellrenderer_choice_edited(
+        const Glib::ustring& path_string, const Glib::ustring& new_text)
 {
   Gtk::TreePath path(path_string);
 
@@ -154,5 +166,4 @@ void ExampleWindow::on_cellrenderer_choice_edited(const Glib::ustring& path_stri
       row[m_Columns.m_col_itemchosen] = new_text;
   }
 }
-
 

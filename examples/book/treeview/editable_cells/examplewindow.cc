@@ -42,7 +42,8 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
@@ -74,18 +75,21 @@ ExampleWindow::ExampleWindow()
   m_TreeView.append_column_editable("ID", m_Columns.m_col_id);
   m_TreeView.append_column_editable("Name", m_Columns.m_col_name);
   m_TreeView.append_column_editable("foo", m_Columns.m_col_foo);
-  m_TreeView.append_column_numeric_editable("foo", m_Columns.m_col_number, "%010d");
+  m_TreeView.append_column_numeric_editable("foo", m_Columns.m_col_number,
+          "%010d");
 
 
-  //For this column, we create the CellRenderer ourselves, and connect our own signal handlers, 
-  //so that we can validate the data that the user enters, and control how it is displayed.
+  //For this column, we create the CellRenderer ourselves, and connect our own
+  //signal handlers, so that we can validate the data that the user enters, and
+  //control how it is displayed.
   m_treeviewcolumn_validated.set_title("validated (<10)");
   m_treeviewcolumn_validated.pack_start(m_cellrenderer_validated);
   m_TreeView.append_column(m_treeviewcolumn_validated);
-  
+
   //Tell the view column how to render the model values:
-  m_treeviewcolumn_validated.set_cell_data_func(m_cellrenderer_validated, 
-    sigc::mem_fun(*this, &ExampleWindow::treeviewcolumn_validated_on_cell_data) );
+  m_treeviewcolumn_validated.set_cell_data_func(m_cellrenderer_validated,
+          sigc::mem_fun(*this,
+              &ExampleWindow::treeviewcolumn_validated_on_cell_data) );
 
   //Make the CellRenderer editable, and handle its editing signals:
 #ifdef GLIBMM_PROPERTIES_ENABLED
@@ -95,11 +99,11 @@ ExampleWindow::ExampleWindow()
 #endif
 
   m_cellrenderer_validated.signal_editing_started().connect(
-    sigc::mem_fun(*this, &ExampleWindow::cellrenderer_validated_on_editing_started) );
+          sigc::mem_fun(*this,
+        &ExampleWindow::cellrenderer_validated_on_editing_started) );
 
-  m_cellrenderer_validated.signal_edited().connect(
-    sigc::mem_fun(*this, &ExampleWindow::cellrenderer_validated_on_edited) );
-
+  m_cellrenderer_validated.signal_edited().connect( sigc::mem_fun(*this,
+              &ExampleWindow::cellrenderer_validated_on_edited) );
 
   show_all_children();
 }
@@ -113,7 +117,9 @@ void ExampleWindow::on_button_quit()
   hide();
 }
 
-void ExampleWindow::treeviewcolumn_validated_on_cell_data(Gtk::CellRenderer* /* renderer */, const Gtk::TreeModel::iterator& iter)
+void ExampleWindow::treeviewcolumn_validated_on_cell_data(
+        Gtk::CellRenderer* /* renderer */,
+        const Gtk::TreeModel::iterator& iter)
 {
   //Get the value from the model and show it appropriately in the view:
   if(iter)
@@ -122,7 +128,8 @@ void ExampleWindow::treeviewcolumn_validated_on_cell_data(Gtk::CellRenderer* /* 
     int model_value = row[m_Columns.m_col_number_validated];
 
     //This is just an example.
-    //In this case, it would be easier to use append_column_editable() or append_column_numeric_editable()
+    //In this case, it would be easier to use append_column_editable() or
+    //append_column_numeric_editable()
     char buffer[32];
     sprintf(buffer, "%d", model_value); 
 
@@ -135,7 +142,8 @@ void ExampleWindow::treeviewcolumn_validated_on_cell_data(Gtk::CellRenderer* /* 
   }
 }
 
-void ExampleWindow::cellrenderer_validated_on_editing_started(Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+void ExampleWindow::cellrenderer_validated_on_editing_started(
+        Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
 {
   //Start editing with previously-entered (but invalid) text, 
   //if we are allowing the user to correct some invalid data. 
@@ -156,8 +164,10 @@ void ExampleWindow::cellrenderer_validated_on_editing_started(Gtk::CellEditable*
 
 }
 
-void ExampleWindow::cellrenderer_validated_on_edited(const Glib::ustring& path_string, const Glib::ustring& new_text)
-{  
+void ExampleWindow::cellrenderer_validated_on_edited(
+        const Glib::ustring& path_string,
+        const Glib::ustring& new_text)
+{
   Gtk::TreePath path(path_string);
 
   //Convert the inputed text to an integer, as needed by our model column:
@@ -167,20 +177,24 @@ void ExampleWindow::cellrenderer_validated_on_edited(const Glib::ustring& path_s
   if(new_value > 10)
   {
     //Prevent entry of numbers higher than 10.
-  
+
     //Tell the user:
-    Gtk::MessageDialog dialog(*this, "The number must be less than 10. Please try again.", false, Gtk::MESSAGE_ERROR);
+    Gtk::MessageDialog dialog(*this,
+            "The number must be less than 10. Please try again.",
+            false, Gtk::MESSAGE_ERROR);
     dialog.run();
-   
+
     //Start editing again, with the bad text, so that the user can correct it.
-    //A real application should probably allow the user to revert to the previous text.
-    
+    //A real application should probably allow the user to revert to the
+    //previous text.
+
     //Set the text to be used in the start_editing signal handler:
     m_invalid_text_for_retry = new_text;
     m_validate_retry = true;
 
     //Start editing again:
-    m_TreeView.set_cursor(path, m_treeviewcolumn_validated, m_cellrenderer_validated, true /* start_editing */);
+    m_TreeView.set_cursor(path, m_treeviewcolumn_validated,
+            m_cellrenderer_validated, true /* start_editing */);
   }
   else
   {
@@ -190,13 +204,9 @@ void ExampleWindow::cellrenderer_validated_on_edited(const Glib::ustring& path_s
     {
       Gtk::TreeModel::Row row = *iter;
 
-    
       //Put the new value in the model:
       row[m_Columns.m_col_number_validated] = new_value;
     }
   }
 }
-
-
-
 

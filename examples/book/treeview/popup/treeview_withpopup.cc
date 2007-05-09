@@ -42,7 +42,6 @@ TreeView_WithPopup::TreeView_WithPopup()
   append_column("ID", m_Columns.m_col_id);
   append_column("Name", m_Columns.m_col_name);
 
-  
   //Fill popup menu:
   {
     Gtk::Menu::MenuList& menulist = m_Menu_Popup.items();
@@ -54,7 +53,7 @@ TreeView_WithPopup::TreeView_WithPopup()
     menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Remove",
       sigc::mem_fun(*this, &TreeView_WithPopup::on_menu_file_popup_generic) ) );
   }
-  m_Menu_Popup.accelerate(*this);  
+  m_Menu_Popup.accelerate(*this);
 }
 
 TreeView_WithPopup::~TreeView_WithPopup()
@@ -91,4 +90,4 @@ void TreeView_WithPopup::on_menu_file_popup_generic()
     }
   }
 }
- 
+

@@ -31,12 +31,15 @@ ExampleWindow::ExampleWindow()
   listStrings.push_back("something or other");
   m_Combo.set_popdown_strings(listStrings);
 
-  //Create a mixed entry an add it to the combo's list using the advanced interface ComboDropDown:
+  //Create a mixed entry an add it to the combo's list using the advanced
+  //interface ComboDropDown:
   Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
 
   Gtk::HBox* hbox = Gtk::manage(new Gtk::HBox(false, 3));
-  hbox->pack_start(*Gtk::manage(new Gtk::Image(Gtk::Stock::CLEAR, Gtk::ICON_SIZE_MENU)), Gtk::PACK_SHRINK);
-  hbox->pack_start(*Gtk::manage(new Gtk::Label("some image - cool!")), Gtk::PACK_SHRINK);
+  hbox->pack_start(*Gtk::manage(new Gtk::Image(Gtk::Stock::CLEAR,
+                  Gtk::ICON_SIZE_MENU)), Gtk::PACK_SHRINK);
+  hbox->pack_start(*Gtk::manage(new Gtk::Label("some image - cool!")),
+          Gtk::PACK_SHRINK);
 
   item->add(*hbox);
   item->show_all();
@@ -49,7 +52,8 @@ ExampleWindow::ExampleWindow()
   add(m_Combo);
 
   //Connect signal handler:
-  m_Combo.get_entry()->signal_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_combo_changed) );
+  m_Combo.get_entry()->signal_changed().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_combo_changed) );
 
   show_all_children();
 }
@@ -64,7 +68,8 @@ void ExampleWindow::on_combo_changed()
   if(pEntry)
   {
     Glib::ustring text = pEntry->get_text();
-    if(!(text.empty())) //We seem to get 2 signals, one when the text is empty.
+    //We seem to get 2 signals, one when the text is empty.
+    if(!(text.empty()))
       std::cout << "Combo changed: " << text << std::endl;
   }
 }

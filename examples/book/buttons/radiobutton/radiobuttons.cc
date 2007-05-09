@@ -44,7 +44,7 @@ RadioButtons::RadioButtons() :
   m_Box_Top.pack_start(m_Box1);
   m_Box_Top.pack_start(m_Separator);
   m_Box_Top.pack_start(m_Box2);
-  
+
   // Set the inner boxes' borders
   m_Box2.set_border_width(10);
   m_Box1.set_border_width(10);
@@ -64,8 +64,10 @@ RadioButtons::RadioButtons() :
   m_Button_Close.set_flags(Gtk::CAN_DEFAULT);
   m_Button_Close.grab_default();
 
-  // Connect the clicked signal of the button to RadioButtons::on_button_clicked()
-  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &RadioButtons::on_button_clicked) );
+  // Connect the clicked signal of the button to
+  // RadioButtons::on_button_clicked()
+  m_Button_Close.signal_clicked().connect(sigc::mem_fun(*this,
+              &RadioButtons::on_button_clicked) );
 
   // Show all children of the window
   show_all_children();

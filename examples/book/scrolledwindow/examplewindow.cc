@@ -59,7 +59,8 @@ ExampleWindow::ExampleWindow()
   }
 
   /* Add a "close" button to the bottom of the dialog */
-  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_close));
+  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_close));
 
   /* this makes it so the button is the default. */
   m_Button_Close.set_flags(Gtk::CAN_DEFAULT);
@@ -83,5 +84,4 @@ void ExampleWindow::on_button_close()
 {
   hide();
 }
-
 

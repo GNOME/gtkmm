@@ -39,14 +39,17 @@ ExampleWindow::ExampleWindow()
   m_VBox.add(m_HBox);
 
   m_HBox.pack_start(m_CheckButton_Editable);
-  m_CheckButton_Editable.signal_toggled().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbox_editable_toggled) );
+  m_CheckButton_Editable.signal_toggled().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_checkbox_editable_toggled) );
   m_CheckButton_Editable.set_active(true);
 
   m_HBox.pack_start(m_CheckButton_Visible);
-  m_CheckButton_Visible.signal_toggled().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbox_visibility_toggled) );
+  m_CheckButton_Visible.signal_toggled().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_checkbox_visibility_toggled) );
   m_CheckButton_Visible.set_active(true);
 
-  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_close) );
+  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_close) );
   m_VBox.pack_start(m_Button_Close);
   m_Button_Close.set_flags(Gtk::CAN_DEFAULT);
   m_Button_Close.grab_default();

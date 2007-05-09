@@ -32,7 +32,8 @@ ExampleWindow::ExampleWindow()
   add(m_Combo);
 
   //Connect signal handler:
-  m_Combo.signal_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_combo_changed) );
+  m_Combo.signal_changed().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_combo_changed) );
 
   show_all_children();
 }

@@ -44,20 +44,24 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
 
   //Put the TreeModel inside sort models:
-  //Note that you can just call set_sort_column() on the normal model if you only want to display one sorted view.
-  //This example shows how to use SortModel to show two views of the same model, with different sort columns.
+  //Note that you can just call set_sort_column() on the normal model if you
+  //only want to display one sorted view.
+  //This example shows how to use SortModel to show two views of the same model,
+  //with different sort columns.
   m_refTreeModelSort1 = Gtk::TreeModelSort::create(m_refTreeModel);
   m_refTreeModelSort1->set_sort_column(m_Columns.m_col_id, Gtk::SORT_ASCENDING);
   m_TreeView1.set_model(m_refTreeModelSort1);
 
   m_refTreeModelSort2 = Gtk::TreeModelSort::create(m_refTreeModel);
-  m_refTreeModelSort2->set_sort_column(m_Columns.m_col_name, Gtk::SORT_ASCENDING);
+  m_refTreeModelSort2->set_sort_column(m_Columns.m_col_name,
+          Gtk::SORT_ASCENDING);
   m_TreeView2.set_model(m_refTreeModelSort2);
 
 
@@ -75,7 +79,8 @@ ExampleWindow::ExampleWindow()
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Joey Jojo";
-  row[m_Columns.m_col_something] = false; //This should cause this row to be filtered out (now shown).
+  //This should cause this row to be filtered out (now shown).
+  row[m_Columns.m_col_something] = false;
 
   //Add the TreeViews' view columns:
   m_TreeView1.append_column("ID", m_Columns.m_col_id);
@@ -97,5 +102,4 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
 

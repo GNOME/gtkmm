@@ -24,7 +24,8 @@
 
 
 MyWidget::MyWidget() :
-  Glib::ObjectBase("mywidget"), //The GType name will actually be gtkmm__CustomObject_mywidget
+  //The GType name will actually be gtkmm__CustomObject_mywidget
+  Glib::ObjectBase("mywidget"),
   Gtk::Widget(),
   m_scale(1000)
 {
@@ -36,11 +37,13 @@ MyWidget::MyWidget() :
   //This show that the GType still derives from GtkWidget:
   //std::cout << "Gtype is a GtkWidget?:" << GTK_IS_WIDGET(gobj()) << std::endl;
 
-  //Install a style so that an aspect of this widget may be themed via an RC file: 
-  gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(G_OBJECT_GET_CLASS(gobj())), 
+  //Install a style so that an aspect of this widget may be themed via an RC
+  //file: 
+  gtk_widget_class_install_style_property(GTK_WIDGET_CLASS(
+              G_OBJECT_GET_CLASS(gobj())), 
       g_param_spec_int("example_scale",
         "Scale of Example Drawing",
-        "The scale to use when drawing the picture. This is just a silly example.",
+        "The scale to use when drawing. This is just a silly example.",
         G_MININT,
         G_MAXINT,
         0,
@@ -68,13 +71,17 @@ void MyWidget::on_size_request(Gtk::Requisition* requisition)
 void MyWidget::on_size_allocate(Gtk::Allocation& allocation)
 {
   //Do something with the space that we have actually been given:
-  //(We will not be given heights or widths less than we have requested, though we might get more)
+  //(We will not be given heights or widths less than we have requested, though
+  //we might get more)
 
   //Use the offered allocation for this container:
   set_allocation(allocation);
 
   if(m_refGdkWindow)
-    m_refGdkWindow->move_resize( allocation.get_x(), allocation.get_y(), allocation.get_width(), allocation.get_height() );
+  {
+    m_refGdkWindow->move_resize( allocation.get_x(), allocation.get_y(),
+            allocation.get_width(), allocation.get_height() );
+  }
 }
 
 void MyWidget::on_map()
@@ -98,7 +105,8 @@ void MyWidget::on_realize()
 
   //Get the themed style from the RC file:
   get_style_property("example_scale", m_scale);
-  std::cout << "m_scale (example_scale from the theme/rc-file) is: " << m_scale << std::endl; 
+  std::cout << "m_scale (example_scale from the theme/rc-file) is: "
+      << m_scale << std::endl; 
 
   if(!m_refGdkWindow)
   {
@@ -120,7 +128,8 @@ void MyWidget::on_realize()
     attributes.wclass = GDK_INPUT_OUTPUT;
 
 
-    m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, &attributes, GDK_WA_X | GDK_WA_Y);
+    m_refGdkWindow = Gdk::Window::create(get_window() /* parent */, &attributes,
+            GDK_WA_X | GDK_WA_Y);
     unset_flags(Gtk::NO_WINDOW);
     set_window(m_refGdkWindow);
 
@@ -153,16 +162,17 @@ bool MyWidget::on_expose_event(GdkEventExpose* event)
     {
       // clip to the area that needs to be re-exposed so we don't draw any
       // more than we need to.
-      cr->rectangle (event->area.x, event->area.y, event->area.width, event->area.height);
+      cr->rectangle(event->area.x, event->area.y,
+              event->area.width, event->area.height);
       cr->clip();
     }
 
     // paint the background
-    Gdk::Cairo::set_source_color(cr, get_style ()->get_bg (Gtk::STATE_NORMAL));
+    Gdk::Cairo::set_source_color(cr, get_style()->get_bg(Gtk::STATE_NORMAL));
     cr->paint();
 
     // draw the foreground
-    Gdk::Cairo::set_source_color(cr, get_style ()->get_fg (Gtk::STATE_NORMAL));
+    Gdk::Cairo::set_source_color(cr, get_style()->get_fg(Gtk::STATE_NORMAL));
     cr->move_to(155.*scale_x, 165.*scale_y);
     cr->line_to(155.*scale_x, 838.*scale_y);
     cr->line_to(265.*scale_x, 900.*scale_y);

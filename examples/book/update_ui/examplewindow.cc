@@ -37,9 +37,10 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Start, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(6);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
-  m_Button_Start.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_start) );
-
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
+  m_Button_Start.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_start) );
 
   show_all_children();
 }
@@ -56,22 +57,19 @@ void ExampleWindow::on_button_quit()
 void ExampleWindow::on_button_start()
 {
   const double max = 10000;
-  //Do intensive work, while still keeping the user interface updated and responsive.
+  //Do intensive work, while still keeping the user interface updated and
+  //responsive.
   for(double i = 0; i < max; ++i)
   {
-     std::cout << "gtkmm example: example output: " << i << " of " << max << std::endl;
+     std::cout << "gtkmm example: example output: " << i << " of "
+         << max << std::endl;
 
      m_ProgressBar.set_fraction(i / max);
 
-     //Allow GTK+ to perform all updates for us
-     //Without this, the progress bar will appear to do nothing and then suddenly fill completely. 
+     // Allow GTK+ to perform all updates for us. Without this, the progress bar
+     // will appear to do nothing and then suddenly fill completely.
      while(Gtk::Main::instance()->events_pending())
-       Gtk::Main::instance()->iteration();
+         Gtk::Main::instance()->iteration();
   }
 }
-
-
-
-
-
 

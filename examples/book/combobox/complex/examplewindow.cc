@@ -57,11 +57,11 @@ ExampleWindow::ExampleWindow()
   childrow[m_Columns.m_col_id] = 31;
   childrow[m_Columns.m_col_name] = "Xavier McRoberts";
   */
-  
+
   //Add the model columns to the Combo (which is a kind of view),
   //rendering them in the default way:
   m_Combo.pack_start(m_Columns.m_col_id);
-  m_Combo.pack_start(m_Columns.m_col_name); 
+  m_Combo.pack_start(m_Columns.m_col_name);
 
   //Add the ComboBox to the window.
   add(m_Combo);
@@ -80,11 +80,12 @@ void ExampleWindow::on_combo_changed()
 {
   Gtk::TreeModel::iterator iter = m_Combo.get_active();
   if(iter)
-  { 
+  {
     Gtk::TreeModel::Row row = *iter;
     if(row)
-    { 
-      //Get the data for the selected row, using our knowledge of the tree model:
+    {
+      //Get the data for the selected row, using our knowledge of the tree
+      //model:
       int id = row[m_Columns.m_col_id];
       Glib::ustring name = row[m_Columns.m_col_name];
 

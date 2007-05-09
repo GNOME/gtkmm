@@ -29,11 +29,12 @@ Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
   return Glib::RefPtr<PrintFormOperation>(new PrintFormOperation());
 }
 
-void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& print_context)
+void PrintFormOperation::on_begin_print(
+        const Glib::RefPtr<Gtk::PrintContext>& print_context)
 {
-  //Create and set up a Pango layout for PrintData based on the passed PrintContext:
-  //We then use this to calculate the number of pages needed,
-  //and the lines that are on each page.
+  //Create and set up a Pango layout for PrintData based on the passed
+  //PrintContext: We then use this to calculate the number of pages needed, and
+  //the lines that are on each page.
   m_refLayout = print_context->create_pango_layout();
 
   Pango::FontDescription font_desc("sans 12");
@@ -79,7 +80,8 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& p
   set_n_pages(m_PageBreaks.size() + 1);
 }
 
-void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
+void PrintFormOperation::on_draw_page(
+        const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
 {
   //Decide which lines we need to print in order to print the specified page:
   int start_page_line = 0;
@@ -115,8 +117,8 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 
   double start_pos = 0;
   int line_index = 0;
-  
-  do 
+
+  do
   {
     if (line_index >= start_page_line)
     {
@@ -126,10 +128,11 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 
       if (line_index == start_page_line)
       {
-	start_pos = logical_rect.get_y() / 1024.0;
+          start_pos = logical_rect.get_y() / 1024.0;
       }
 
-      cairo_ctx->move_to(logical_rect.get_x() / 1024.0, baseline / 1024.0 - start_pos);
+      cairo_ctx->move_to(logical_rect.get_x() / 1024.0,
+              baseline / 1024.0 - start_pos);
 
       layout_line->show_in_cairo_context(cairo_ctx);
     }

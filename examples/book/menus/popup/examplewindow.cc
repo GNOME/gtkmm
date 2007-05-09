@@ -32,7 +32,8 @@ ExampleWindow::ExampleWindow()
 
   //Add an event box that can catch button_press events:
   m_Box.pack_start(m_EventBox);
-  m_EventBox.signal_button_press_event().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_press_event) );
+  m_EventBox.signal_button_press_event().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_press_event) );
 
   m_EventBox.add(m_Label);
 
@@ -43,18 +44,20 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup = Gtk::ActionGroup::create();
 
   //File|New sub menu:
-  //These menu actions would normally already exist for a main menu, because a context menu
-  //should not normally contain menu items that are only available via a context menu.
-  m_refActionGroup->add( Gtk::Action::create("ContextMenu", "Context Menu") );
+  //These menu actions would normally already exist for a main menu, because a
+  //context menu should not normally contain menu items that are only available
+  //via a context menu.
+  m_refActionGroup->add(Gtk::Action::create("ContextMenu", "Context Menu"));
 
-  m_refActionGroup->add( Gtk::Action::create("ContextEdit", "Edit"),
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+  m_refActionGroup->add(Gtk::Action::create("ContextEdit", "Edit"),
+          sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic));
 
-  m_refActionGroup->add( Gtk::Action::create("ContextProcess", "Process"), Gtk::AccelKey("<control>P"),
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+  m_refActionGroup->add(Gtk::Action::create("ContextProcess", "Process"),
+          Gtk::AccelKey("<control>P"),
+          sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic));
 
-  m_refActionGroup->add( Gtk::Action::create("ContextRemove", "Remove"),
-    sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic) );
+  m_refActionGroup->add(Gtk::Action::create("ContextRemove", "Remove"),
+          sigc::mem_fun(*this, &ExampleWindow::on_menu_file_popup_generic));
 
   //TODO:
   /*
@@ -65,11 +68,11 @@ ExampleWindow::ExampleWindow()
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
- 
+
   add_accel_group(m_refUIManager->get_accel_group());
 
   //Layout the actions in a menubar and toolbar:
-  Glib::ustring ui_info = 
+  Glib::ustring ui_info =
         "<ui>"
         "  <popup name='PopupMenu'>"
         "    <menuitem action='ContextEdit'/>"
@@ -77,11 +80,10 @@ ExampleWindow::ExampleWindow()
         "    <menuitem action='ContextRemove'/>"
         "  </popup>"
         "</ui>";
-        
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-  {      
+  {
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
@@ -92,15 +94,14 @@ ExampleWindow::ExampleWindow()
   std::auto_ptr<Glib::Error> ex;
   m_refUIManager->add_ui_from_string(ui_info, ex);
   if(ex.get())
-  { 
+  {
     std::cerr << "building menus failed: " <<  ex->what();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-
-
   //Get the menu:
-  m_pMenuPopup = dynamic_cast<Gtk::Menu*>( m_refUIManager->get_widget("/PopupMenu") ); 
+  m_pMenuPopup = dynamic_cast<Gtk::Menu*>(
+          m_refUIManager->get_widget("/PopupMenu")); 
   if(!m_pMenuPopup)
     g_warning("menu not found");
 

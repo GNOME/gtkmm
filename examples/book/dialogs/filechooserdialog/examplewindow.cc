@@ -27,12 +27,14 @@ ExampleWindow::ExampleWindow()
   set_title("Gtk::FileSelection example");
 
   add(m_ButtonBox);
-  
+
   m_ButtonBox.pack_start(m_Button_File);
-  m_Button_File.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_file_clicked) );
+  m_Button_File.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_file_clicked) );
 
   m_ButtonBox.pack_start(m_Button_Folder);
-  m_Button_Folder.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_folder_clicked) );
+  m_Button_Folder.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_folder_clicked) );
 
   show_all_children();
 }
@@ -43,13 +45,13 @@ ExampleWindow::~ExampleWindow()
 
 void ExampleWindow::on_button_folder_clicked()
 {
-  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  Gtk::FileChooserDialog dialog("Please choose a folder",
+          Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
   dialog.set_transient_for(*this);
-    
+
   //Add response buttons the the dialog:
   dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   dialog.add_button("Select", Gtk::RESPONSE_OK);
-  
 
   int result = dialog.run();
 
@@ -59,7 +61,8 @@ void ExampleWindow::on_button_folder_clicked()
     case(Gtk::RESPONSE_OK):
     {
       std::cout << "Select clicked." << std::endl;
-      std::cout << "Folder selected: " << dialog.get_filename() << std::endl;
+      std::cout << "Folder selected: " << dialog.get_filename()
+          << std::endl;
       break;
     }
     case(Gtk::RESPONSE_CANCEL):
@@ -77,7 +80,8 @@ void ExampleWindow::on_button_folder_clicked()
 
 void ExampleWindow::on_button_file_clicked()
 {
-  Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  Gtk::FileChooserDialog dialog("Please choose a file",
+          Gtk::FILE_CHOOSER_ACTION_OPEN);
   dialog.set_transient_for(*this);
 
   //Add response buttons the the dialog:
@@ -97,7 +101,7 @@ void ExampleWindow::on_button_file_clicked()
   filter_cpp.add_mime_type("text/x-c++");
   filter_cpp.add_mime_type("text/x-c-header");
   dialog.add_filter(filter_cpp);
-  
+
   Gtk::FileFilter filter_any;
   filter_any.set_name("Any files");
   filter_any.add_pattern("*");
@@ -113,7 +117,8 @@ void ExampleWindow::on_button_file_clicked()
     {
       std::cout << "Open clicked." << std::endl;
 
-      std::string filename = dialog.get_filename(); //Notice that it is a std::string, not a Glib::ustring.
+      //Notice that this is a std::string, not a Glib::ustring.
+      std::string filename = dialog.get_filename();
       std::cout << "File selected: " <<  filename << std::endl;
       break;
     }
@@ -128,5 +133,4 @@ void ExampleWindow::on_button_file_clicked()
       break;
     }
   }
-  
 }

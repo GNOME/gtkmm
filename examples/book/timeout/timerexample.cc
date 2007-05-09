@@ -20,7 +20,8 @@
 
 TimerExample::TimerExample() :
   m_Box(true, 10),
-  m_ButtonAddTimer(Gtk::Stock::ADD), // use Gtk::Stock wherever possible for buttons, etc.
+    // use Gtk::Stock wherever possible for buttons, etc.
+  m_ButtonAddTimer(Gtk::Stock::ADD),
   m_ButtonDeleteTimer(Gtk::Stock::REMOVE),
   m_ButtonQuit(Gtk::Stock::QUIT),
   m_timer_number(0), // start numbering the timers at 0
@@ -35,9 +36,12 @@ TimerExample::TimerExample() :
   m_Box.pack_start(m_ButtonQuit);
 
   // Connect the three buttons:
-  m_ButtonQuit.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_quit));
-  m_ButtonAddTimer.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_add_timer));
-  m_ButtonDeleteTimer.signal_clicked().connect(sigc::mem_fun(*this, &TimerExample::on_button_delete_timer));
+  m_ButtonQuit.signal_clicked().connect(sigc::mem_fun(*this,
+              &TimerExample::on_button_quit));
+  m_ButtonAddTimer.signal_clicked().connect(sigc::mem_fun(*this,
+              &TimerExample::on_button_add_timer));
+  m_ButtonDeleteTimer.signal_clicked().connect(sigc::mem_fun(*this,
+              &TimerExample::on_button_delete_timer));
 
   show_all_children();
 }
@@ -52,10 +56,12 @@ void TimerExample::on_button_add_timer()
   // Creation of a new object prevents long lines and shows us a little
   // how slots work.  We have 0 parameters and bool as a return value
   // after calling sigc::bind.
-  sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*this, &TimerExample::on_timeout), m_timer_number);
+  sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*this,
+              &TimerExample::on_timeout), m_timer_number);
 
   // This is where we connect the slot to the Glib::signal_timeout()
-  sigc::connection conn = Glib::signal_timeout().connect(my_slot, timeout_value);
+  sigc::connection conn = Glib::signal_timeout().connect(my_slot,
+          timeout_value);
 
   // Remember the connection:
   m_timers[m_timer_number] = conn;
@@ -79,9 +85,10 @@ void TimerExample::on_button_delete_timer()
   {
     // get the number of the first timer
     int timer_number = m_timers.begin()->first;
- 
+
     // Give some info to the user:
-    std::cout << "manually disconnecting timer " << timer_number << std::endl;
+    std::cout << "manually disconnecting timer " << timer_number
+        << std::endl;
 
     // Remove the entry in the counter values
     m_counters.erase(timer_number);
@@ -110,14 +117,15 @@ bool TimerExample::on_timeout(int timer_number)
     // delete the connection entry in the STL MAP
     m_timers.erase(timer_number);
 
-    // Note that we do not have to explicitly call disconnect() on the connection
-    // since Gtk::Main does this for us when we return false.
+    // Note that we do not have to explicitly call disconnect() on the
+    // connection since Gtk::Main does this for us when we return false.
     return false;
   }
 
   // Print the timer value
-  std::cout << " - " << m_counters[timer_number] << "/" << count_value << std::endl;
- 
+  std::cout << " - " << m_counters[timer_number] << "/"
+      << count_value << std::endl;
+
  // Keep going (do not disconnect yet):
   return true;
 }

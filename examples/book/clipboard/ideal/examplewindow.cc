@@ -19,7 +19,6 @@
 #include "examplewindow.h"
 #include <algorithm>
 
-
 namespace
 {
 
@@ -37,9 +36,9 @@ ExampleWindow::ExampleWindow()
   m_Table(2, 2, true),
   m_ButtonA1("A1"), m_ButtonA2("A2"), m_ButtonB1("B1"), m_ButtonB2("B2"),
   m_Button_Copy(Gtk::Stock::COPY), m_Button_Paste(Gtk::Stock::PASTE)
-{                                                                                                
+{
   set_title("Gtk::Clipboard example");
-  set_border_width(12);                         
+  set_border_width(12);
 
   add(m_VBox);
 
@@ -55,14 +54,16 @@ ExampleWindow::ExampleWindow()
   //Add ButtonBox to bottom:
   m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
   m_VBox.set_spacing(6);
-  
+
   //Fill ButtonBox:
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
   m_ButtonBox.pack_start(m_Button_Copy, Gtk::PACK_SHRINK);
-  m_Button_Copy.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_copy) );
+  m_Button_Copy.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_copy) );
   m_ButtonBox.pack_start(m_Button_Paste, Gtk::PACK_SHRINK);
-  m_Button_Paste.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_paste) );
-    
+  m_Button_Paste.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_paste) );
+
   show_all_children();
 
   update_paste_status();
@@ -84,7 +85,7 @@ void ExampleWindow::on_button_copy()
 
   //Store the copied data until it is pasted:
   m_ClipboardStore = strData;
-   
+
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
 
   //Targets:
@@ -92,18 +93,21 @@ void ExampleWindow::on_button_copy()
 
   listTargets.push_back( Gtk::TargetEntry(example_target_custom) );
   listTargets.push_back( Gtk::TargetEntry(example_target_text) );
-  
-  refClipboard->set( listTargets, sigc::mem_fun(*this, &ExampleWindow::on_clipboard_get), sigc::mem_fun(*this, &ExampleWindow::on_clipboard_clear) );
+
+  refClipboard->set(listTargets, sigc::mem_fun(*this,
+              &ExampleWindow::on_clipboard_get), sigc::mem_fun(*this,
+                  &ExampleWindow::on_clipboard_clear) );
 
   update_paste_status();
 }
 
 void ExampleWindow::on_button_paste()
-{        
+{
   //Tell the clipboard to call our method when it is ready:
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
 
-  refClipboard->request_contents(example_target_custom,  sigc::mem_fun(*this, &ExampleWindow::on_clipboard_received) );
+  refClipboard->request_contents(example_target_custom,  sigc::mem_fun(*this,
+              &ExampleWindow::on_clipboard_received) );
 
   update_paste_status();
 }
@@ -113,7 +117,7 @@ void ExampleWindow::on_clipboard_get(Gtk::SelectionData& selection_data, guint)
   //info is meant to indicate the target, but it seems to be always 0,
   //so we use the selection_data's target instead.
 
-  const std::string target = selection_data.get_target(); 
+  const std::string target = selection_data.get_target();
 
   if(target == example_target_custom)
   {
@@ -130,27 +134,30 @@ void ExampleWindow::on_clipboard_get(Gtk::SelectionData& selection_data, guint)
     text_representation += m_ButtonA2.get_active() ? "A2, " : "";
     text_representation += m_ButtonB1.get_active() ? "B1, " : "";
     text_representation += m_ButtonB2.get_active() ? "B2, " : "";
-                                          
+
     selection_data.set_text(text_representation);
   }
   else
   {
-    g_warning("ExampleWindow::on_clipboard_get(): Unexpected clipboard target format.");
-  } 
+    g_warning("ExampleWindow::on_clipboard_get(): "
+            "Unexpected clipboard target format.");
+  }
 }
 
 void ExampleWindow::on_clipboard_clear()
 {
   //This isn't really necessary. I guess it might save memory.
-  
   m_ClipboardStore.clear();
 }
 
-void ExampleWindow::on_clipboard_received(const Gtk::SelectionData& selection_data)
+void ExampleWindow::on_clipboard_received(
+        const Gtk::SelectionData& selection_data)
 {
   const std::string target = selection_data.get_target();
 
-  if(target == example_target_custom) //It should always be this, because that' what we asked for when calling request_contents().
+  //It should always be this, because that' what we asked for when calling
+  //request_contents().
+  if(target == example_target_custom)
   {
     Glib::ustring clipboard_data = selection_data.get_data_as_string();
 
@@ -168,20 +175,23 @@ void ExampleWindow::on_clipboard_received(const Gtk::SelectionData& selection_da
 void ExampleWindow::update_paste_status()
 {
   //Disable the paste button if there is nothing to paste.
-  
+
   Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get();
 
   //Discover what targets are available:
-  refClipboard->request_targets( sigc::mem_fun(*this, &ExampleWindow::on_clipboard_received_targets) );
+  refClipboard->request_targets(sigc::mem_fun(*this,
+              &ExampleWindow::on_clipboard_received_targets) );
 }
 
-void ExampleWindow::on_clipboard_received_targets(const Glib::StringArrayHandle& targets_array)
+void ExampleWindow::on_clipboard_received_targets(
+        const Glib::StringArrayHandle& targets_array)
 {
   // Get the list of available clipboard targets:
   std::list<std::string> targets = targets_array;
 
   const bool bPasteIsPossible =
-      std::find(targets.begin(), targets.end(), example_target_custom) != targets.end();
+      std::find(targets.begin(), targets.end(),
+              example_target_custom) != targets.end();
 
   // Enable/Disable the Paste button appropriately:
   m_Button_Paste.set_sensitive(bPasteIsPossible);

@@ -103,12 +103,12 @@ void ExampleWindow::build_main_menu()
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
- 
+
   add_accel_group(m_refUIManager->get_accel_group());
 
   //Layout the actions in a menubar and toolbar:
-  
-  Glib::ustring ui_info = 
+
+  Glib::ustring ui_info =
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='FileMenu'>"
@@ -130,7 +130,7 @@ void ExampleWindow::build_main_menu()
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-  {      
+  {
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
@@ -141,12 +141,11 @@ void ExampleWindow::build_main_menu()
   std::auto_ptr<Glib::Error> ex;
   m_refUIManager->add_ui_from_string(ui_info, ex);
   if(ex.get())
-  { 
+  {
     std::cerr << "building menus failed: " << ex->what();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 
- 
   //Get the menubar and toolbar widgets, and add them to a container widget:
   Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
   if(pMenubar)
@@ -157,7 +156,8 @@ void ExampleWindow::build_main_menu()
     m_VBox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
 }
 
-void ExampleWindow::on_printoperation_status_changed(const Glib::RefPtr<PrintFormOperation>& operation)
+void ExampleWindow::on_printoperation_status_changed(
+        const Glib::RefPtr<PrintFormOperation>& operation)
 {
   Glib::ustring status_msg;
 
@@ -174,13 +174,15 @@ void ExampleWindow::on_printoperation_status_changed(const Glib::RefPtr<PrintFor
   m_Statusbar.push(status_msg, m_ContextId);
 }
 
-void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, const Glib::RefPtr<PrintFormOperation>& operation)
+void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result,
+        const Glib::RefPtr<PrintFormOperation>& operation)
 {
   //Printing is "done" when the print data is spooled.
 
   if (result == Gtk::PRINT_OPERATION_RESULT_ERROR)
   {
-    Gtk::MessageDialog err_dialog(*this, "Error printing form", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+    Gtk::MessageDialog err_dialog(*this, "Error printing form", false,
+            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
     err_dialog.run();
   }
   else if (result == Gtk::PRINT_OPERATION_RESULT_APPLY)
@@ -194,7 +196,9 @@ void ExampleWindow::on_printoperation_done(Gtk::PrintOperationResult result, con
     //We will connect to the status-changed signal to track status
     //and update a status bar. In addition, you can, for example,
     //keep a list of active print operations, or provide a progress dialog.
-    operation->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_status_changed), operation));
+    operation->signal_status_changed().connect(sigc::bind(sigc::mem_fun(*this,
+                    &ExampleWindow::on_printoperation_status_changed),
+                operation));
   }
 }
 
@@ -205,13 +209,14 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   Glib::RefPtr<PrintFormOperation> print = PrintFormOperation::create();
 
   print->set_name(m_NameEntry.get_text() + " " + m_SurnameEntry.get_text());
-  print->set_comments(m_refTextBuffer->get_text(false /* Don't include hidden. */));
+  print->set_comments(m_refTextBuffer->get_text(false /*Don't include hidden*/));
 
   print->set_track_print_status();
   print->set_default_page_setup(m_refPageSetup);
   print->set_print_settings(m_refSettings);
 
-  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this, &ExampleWindow::on_printoperation_done), print));
+  print->signal_done().connect(sigc::bind(sigc::mem_fun(*this,
+                  &ExampleWindow::on_printoperation_done), print));
 
   try
   {
@@ -220,7 +225,8 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   catch (const Gtk::PrintError& ex)
   {
     //See documentation for exact Gtk::PrintError error codes.
-    std::cerr << "An error occurred while trying to run a print operation:" << ex.what() << std::endl;
+    std::cerr << "An error occurred while trying to run a print operation:"
+        << ex.what() << std::endl;
   }
 }
 
@@ -236,9 +242,11 @@ void ExampleWindow::on_menu_file_new()
 void ExampleWindow::on_menu_file_page_setup()
 {
   //Show the page setup dialog, asking it to start with the existing settings:
-  Glib::RefPtr<Gtk::PageSetup> new_page_setup = Gtk::run_page_setup_dialog(*this, m_refPageSetup, m_refSettings);
+  Glib::RefPtr<Gtk::PageSetup> new_page_setup =
+      Gtk::run_page_setup_dialog(*this, m_refPageSetup, m_refSettings);
 
-  //Save the chosen page setup dialog for use when printing, previewing, or showing the page setup dialog again:
+  //Save the chosen page setup dialog for use when printing, previewing, or
+  //showing the page setup dialog again:
   m_refPageSetup = new_page_setup;
 }
 

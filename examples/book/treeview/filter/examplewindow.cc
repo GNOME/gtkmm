@@ -40,14 +40,16 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
 
   //Put the TreeModel inside a filter model:
   m_refTreeModelFilter = Gtk::TreeModelFilter::create(m_refTreeModel);
-  m_refTreeModelFilter->set_visible_func( sigc::mem_fun(*this, &ExampleWindow::on_filter_row_visible) );
+  m_refTreeModelFilter->set_visible_func( sigc::mem_fun(*this,
+              &ExampleWindow::on_filter_row_visible) );
 
   m_TreeView.set_model(m_refTreeModelFilter);
 
@@ -65,7 +67,8 @@ ExampleWindow::ExampleWindow()
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
-  row[m_Columns.m_col_show] = false; //This should cause this row to be filtered out (now shown).
+  //This should cause this row to be filtered out (now shown).
+  row[m_Columns.m_col_show] = false;
 
   //Add the TreeView's view columns:
   m_TreeView.append_column("ID", m_Columns.m_col_id);
@@ -89,16 +92,18 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
-bool ExampleWindow::on_filter_row_visible(const Gtk::TreeModel::const_iterator& iter)
+bool ExampleWindow::on_filter_row_visible(
+        const Gtk::TreeModel::const_iterator& iter)
 {
   if(iter)
   {
     //iter seems to be an iter to the child model:
-    //Gtk::TreeModel::iterator iter_child = m_refTreeModelFilter->convert_iter_to_child_iter(iter);
+    //Gtk::TreeModel::iterator iter_child =
+        //m_refTreeModelFilter->convert_iter_to_child_iter(iter);
     //if(iter_child)
     //{
-      Gtk::TreeModel::Row row = *iter;
-      return row[m_Columns.m_col_show];
+    Gtk::TreeModel::Row row = *iter;
+    return row[m_Columns.m_col_show];
     //}
   }
 
@@ -109,5 +114,4 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
 

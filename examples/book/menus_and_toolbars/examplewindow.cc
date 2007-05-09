@@ -29,27 +29,28 @@ ExampleWindow::ExampleWindow()
 
   //Define the actions:
   m_refActionGroup = Gtk::ActionGroup::create();
-  
+
   m_refActionGroup->add( Gtk::Action::create("MenuFile", "_File") );
   m_refActionGroup->add( Gtk::Action::create("New", Gtk::Stock::NEW),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_file_new) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_file_new) );
   m_refActionGroup->add( Gtk::Action::create("Open", Gtk::Stock::OPEN),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
 
   register_stock_items(); //Makes the "example_stock_rain" stock item available.
-  m_refActionGroup->add( Gtk::ToggleAction::create("Rain", Gtk::StockID("example_stock_rain") ),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+  m_refActionGroup->add( Gtk::ToggleAction::create("Rain",
+              Gtk::StockID("example_stock_rain") ),
+          sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
 
   m_refActionGroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_file_quit) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_file_quit) );
 
   m_refActionGroup->add( Gtk::Action::create("MenuEdit", "_Edit") );
   m_refActionGroup->add( Gtk::Action::create("Cut", Gtk::Stock::CUT),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
   m_refActionGroup->add( Gtk::Action::create("Copy", Gtk::Stock::COPY),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
   m_refActionGroup->add( Gtk::Action::create("Paste", Gtk::Stock::PASTE),
-    sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
+          sigc::mem_fun(*this, &ExampleWindow::on_action_others) );
 
   //Define how the actions are presented in the menus and toolbars:
   Glib::RefPtr<Gtk::UIManager> m_refUIManager = Gtk::UIManager::create();
@@ -83,7 +84,7 @@ ExampleWindow::ExampleWindow()
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-  {      
+  {
     m_refUIManager->add_ui_from_string(ui_info);
   }
   catch(const Glib::Error& ex)
@@ -109,7 +110,7 @@ ExampleWindow::ExampleWindow()
 
   //Add the MenuBar to the window:
   m_Box.pack_start(*pToolbar, Gtk::PACK_SHRINK);
-  
+
   show_all_children();
 }
 
@@ -133,9 +134,10 @@ void ExampleWindow::on_action_others()
 }
 
 
-void ExampleWindow::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory,
-                      const std::string& filepath,
-                      const Glib::ustring& id, const Glib::ustring& label)
+void ExampleWindow::add_stock_item(
+        const Glib::RefPtr<Gtk::IconFactory>& factory,
+        const std::string& filepath,
+        const Glib::ustring& id, const Glib::ustring& label)
 {
   Gtk::IconSource source;
 

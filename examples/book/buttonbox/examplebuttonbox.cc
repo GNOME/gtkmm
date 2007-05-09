@@ -47,4 +47,3 @@ ExampleButtonBox::ExampleButtonBox(bool horizontal,
   bbox->add(m_Button_Help);
 }
 
-

@@ -41,21 +41,23 @@ ExampleWindow::ExampleWindow() :
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
-
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Fill the ListViewText:
   m_ListViewText.set_column_title(0, "City");
-  m_ListViewText.set_column_title(1, "Temperature (celsius)"); //Obviously, you would want to use a real Gtk::TreeView to store a numeric (non-text) value.
+  // Obviously, you would want to use a real Gtk::TreeView to store a numeric
+  // (non-text) value.
+  m_ListViewText.set_column_title(1, "Temperature (celsius)");
   m_ListViewText.set_column_title(2, "Forecast");
 
   guint row_number = m_ListViewText.append_text();
   m_ListViewText.set_text(row_number, 0, "Madrid");
   m_ListViewText.set_text(row_number, 1, "30");   // degrees for Madrid
-  m_ListViewText.set_text(row_number, 2, "cloudy"); // forecast for Madrid  
+  m_ListViewText.set_text(row_number, 2, "cloudy"); // forecast for Madrid
 
   row_number = m_ListViewText.append_text();
-  m_ListViewText.set_text(row_number,  0, "Lisbon"); 
+  m_ListViewText.set_text(row_number,  0, "Lisbon");
   m_ListViewText.set_text(row_number, 1, "25");   // degrees for Lisbon
   m_ListViewText.set_text(row_number, 2, "rainy");  // forecast for Lisbon
 
@@ -70,5 +72,3 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
-

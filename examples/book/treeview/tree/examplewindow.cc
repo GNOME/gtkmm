@@ -26,7 +26,6 @@ ExampleWindow::ExampleWindow()
   set_border_width(5);
   set_default_size(400, 200);
 
-
   add(m_VBox);
 
   //Add the TreeView, inside a ScrolledWindow, with the button underneath:
@@ -41,7 +40,8 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
   m_refTreeModel = Gtk::TreeStore::create(m_Columns);
@@ -81,7 +81,8 @@ ExampleWindow::ExampleWindow()
   m_TreeView.append_column("Name", m_Columns.m_col_name);
 
   //Connect signal:
-  m_TreeView.signal_row_activated().connect( sigc::mem_fun(*this, &ExampleWindow::on_treeview_row_activated) );
+  m_TreeView.signal_row_activated().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_treeview_row_activated) );
 
   show_all_children();
 }
@@ -95,15 +96,15 @@ void ExampleWindow::on_button_quit()
   hide();
 }
 
-void ExampleWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* column */)
+void ExampleWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path,
+        Gtk::TreeViewColumn* /* column */)
 {
   Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
   if(iter)
   {
     Gtk::TreeModel::Row row = *iter;
-    std::cout << "Row activated: ID=" << row[m_Columns.m_col_id] << ", Name=" << row[m_Columns.m_col_name] << std::endl;
+    std::cout << "Row activated: ID=" << row[m_Columns.m_col_id] << ", Name="
+        << row[m_Columns.m_col_name] << std::endl;
   }
 }
-
-
 

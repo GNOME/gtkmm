@@ -30,7 +30,8 @@ ExampleWindow::ExampleWindow()
 
   m_Alignment.add(m_Button);
 
-  m_Button.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_clicked) );
+  m_Button.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_clicked) );
 
   show_all_children();
 }
@@ -43,5 +44,4 @@ void ExampleWindow::on_button_clicked()
 {
   hide();
 }
-
 

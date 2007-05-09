@@ -24,7 +24,8 @@ int main (int argc, char *argv[])
   Gtk::Main kit(argc, argv);
 
   DnDWindow dndWindow;
-  Gtk::Main::run(dndWindow); //Shows the window and returns when it is closed.
+  //Shows the window and returns when it is closed.
+  Gtk::Main::run(dndWindow);
 
   return 0;
 }

@@ -45,15 +45,15 @@ bool Clock::on_expose_event(GdkEventExpose* event)
 
     if (event)
     {
-        // clip to the area indicated by the expose event so that we only redraw
-        // the portion of the window that needs to be redrawn
+        // clip to the area indicated by the expose event so that we only
+        // redraw the portion of the window that needs to be redrawn
         cr->rectangle(event->area.x, event->area.y,
                 event->area.width, event->area.height);
         cr->clip();
     }
 
-    // scale to unit square and translate (0, 0) to be (0.5, 0.5), i.e. the
-    // center of the window
+    // scale to unit square and translate (0, 0) to be (0.5, 0.5), i.e.
+    // the center of the window
     cr->scale(width, height);
     cr->translate(0.5, 0.5);
     cr->set_line_width(m_lineWidth);
@@ -120,14 +120,14 @@ bool Clock::on_expose_event(GdkEventExpose* event)
     // draw the minutes hand
     cr->set_source_rgba(0.117, 0.337, 0.612, 0.9);   // blue
     cr->move_to(0, 0);
-    cr->line_to(sin(minutes + seconds / 60) * (m_radius * 0.8), 
+    cr->line_to(sin(minutes + seconds / 60) * (m_radius * 0.8),
             -cos(minutes + seconds / 60) * (m_radius * 0.8));
     cr->stroke();
 
     // draw the hours hand
     cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
     cr->move_to(0, 0);
-    cr->line_to(sin(hours + minutes / 12.0) * (m_radius * 0.5), 
+    cr->line_to(sin(hours + minutes / 12.0) * (m_radius * 0.5),
             -cos(hours + minutes / 12.0) * (m_radius * 0.5));
     cr->stroke();
     cr->restore();

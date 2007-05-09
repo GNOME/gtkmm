@@ -37,6 +37,3 @@ void Server::do_something()
   m_signal_something.emit(false, 5);
 }
 
-
-
-

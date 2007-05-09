@@ -33,11 +33,12 @@ Glib::RefPtr<PrintFormOperation> PrintFormOperation::create()
   return Glib::RefPtr<PrintFormOperation>(new PrintFormOperation());
 }
 
-void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& print_context)
+void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>&
+        print_context)
 {
-  //Create and set up a Pango layout for PrintData based on the passed PrintContext:
-  //We then use this to calculate the number of pages needed,
-  //and the lines that are on each page.
+  //Create and set up a Pango layout for PrintData based on the passed
+  //PrintContext: We then use this to calculate the number of pages needed, and
+  //the lines that are on each page.
   m_refLayout = print_context->create_pango_layout();
 
   Pango::FontDescription font_desc(m_Font);
@@ -83,7 +84,8 @@ void PrintFormOperation::on_begin_print(const Glib::RefPtr<Gtk::PrintContext>& p
   set_n_pages(m_PageBreaks.size() + 1);
 }
 
-void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
+void PrintFormOperation::on_draw_page(
+        const Glib::RefPtr<Gtk::PrintContext>& print_context, int page_nr)
 {
   if(!print_context || !m_refLayout)
     return;
@@ -123,8 +125,8 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 
   double start_pos = 0;
   int line_index = 0;
-  
-  do 
+
+  do
   {
     if (line_index >= start_page_line)
     {
@@ -134,10 +136,11 @@ void PrintFormOperation::on_draw_page(const Glib::RefPtr<Gtk::PrintContext>& pri
 
       if (line_index == start_page_line)
       {
-	start_pos = logical_rect.get_y() / 1024.0;
+          start_pos = logical_rect.get_y() / 1024.0;
       }
 
-      cairo_ctx->move_to(logical_rect.get_x() / 1024.0, baseline / 1024.0 - start_pos);
+      cairo_ctx->move_to(logical_rect.get_x() / 1024.0,
+              baseline / 1024.0 - start_pos);
 
       layout_line->show_in_cairo_context(cairo_ctx);
     }
@@ -173,24 +176,29 @@ Gtk::Widget* PrintFormOperation::on_create_custom_widget()
 
 void PrintFormOperation::on_custom_widget_apply(Gtk::Widget*)
 {
-  //Note: the returned widget is the VBox we created in on_create_custom_widget().
-  //We don't need to use it, because we can use the child FontButton directly:
+  // Note: the returned widget is the VBox we created in
+  // on_create_custom_widget().  We don't need to use it, because we can use the
+  // child FontButton directly:
 
   Glib::ustring selected_font = m_FontButton.get_font_name();
   m_Font = selected_font;
 }
 
-bool PrintFormOperation::on_preview(const Glib::RefPtr<Gtk::PrintOperationPreview>& preview, const Glib::RefPtr<Gtk::PrintContext>& context, Gtk::Window* parent)
+bool PrintFormOperation::on_preview(const
+        Glib::RefPtr<Gtk::PrintOperationPreview>& preview, const
+        Glib::RefPtr<Gtk::PrintContext>& context, Gtk::Window* parent)
 {
   if(!parent)
   {
-    std::cerr << "PrintFormOperation::on_preview(): parent was null." << std::endl;
+    std::cerr << "PrintFormOperation::on_preview(): parent was null."
+              << std::endl;
     return false;
   }
 
   //Use our custom preview dialog:
   m_pDialog = new PreviewDialog(this, preview, context, *parent);
-  m_pDialog->signal_hide().connect(sigc::mem_fun(*this, &PrintFormOperation::on_preview_window_hide));
+  m_pDialog->signal_hide().connect(sigc::mem_fun(*this,
+              &PrintFormOperation::on_preview_window_hide));
 
   m_pDialog->show();
 

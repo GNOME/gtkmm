@@ -18,7 +18,8 @@
 
 #include "labeledoptionmenu.h"
 
-LabeledOptionMenu::LabeledOptionMenu(const Glib::ustring& menu_title, Gtk::Menu& menu, bool homogeneous, int spacing) :
+LabeledOptionMenu::LabeledOptionMenu(const Glib::ustring& menu_title,
+        Gtk::Menu& menu, bool homogeneous, int spacing) :
     Gtk::HBox(homogeneous, spacing),
     m_label(menu_title),
     m_pMenu(&menu)

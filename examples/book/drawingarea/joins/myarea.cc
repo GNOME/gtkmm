@@ -23,11 +23,9 @@ MyArea::MyArea()
 {
 }
 
-
 MyArea::~MyArea()
 {
 }
-
 
 bool MyArea::on_expose_event(GdkEventExpose* event)
 {
@@ -74,7 +72,6 @@ bool MyArea::on_expose_event(GdkEventExpose* event)
     cr->rel_line_to(0.2, 0.2);
     cr->set_line_join(Cairo::LINE_JOIN_ROUND);
     cr->stroke();
-
   }
 
   return true;

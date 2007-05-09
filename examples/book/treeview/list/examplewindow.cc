@@ -40,7 +40,8 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
   m_refTreeModel = Gtk::ListStore::create(m_Columns);
@@ -52,13 +53,13 @@ ExampleWindow::ExampleWindow()
   row[m_Columns.m_col_name] = "Billy Bob";
   row[m_Columns.m_col_number] = 10;
   row[m_Columns.m_col_percentage] = 15;
-  
+
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 2;
   row[m_Columns.m_col_name] = "Joey Jojo";
   row[m_Columns.m_col_number] = 20;
   row[m_Columns.m_col_percentage] = 40;
-  
+
   row = *(m_refTreeModel->append());
   row[m_Columns.m_col_id] = 3;
   row[m_Columns.m_col_name] = "Rob McRoberts";
@@ -66,11 +67,13 @@ ExampleWindow::ExampleWindow()
   row[m_Columns.m_col_percentage] = 70;
 
   //Add the TreeView's view columns:
-  m_TreeView.append_column("ID", m_Columns.m_col_id); //This number will be shown with the default numeric formatting.
+  //This number will be shown with the default numeric formatting.
+  m_TreeView.append_column("ID", m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_Columns.m_col_name);
- 
-  m_TreeView.append_column_numeric("Formatted number", m_Columns.m_col_number, "%010d" /* 10 digits, using leading zeroes. */);
-   
+
+  m_TreeView.append_column_numeric("Formatted number", m_Columns.m_col_number,
+          "%010d" /* 10 digits, using leading zeroes. */);
+
   //Display a progress bar instead of a decimal number:
   Gtk::CellRendererProgress* cell = new Gtk::CellRendererProgress;
   int cols_count = m_TreeView.append_column("Some percentage", *cell);
@@ -105,5 +108,4 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
 

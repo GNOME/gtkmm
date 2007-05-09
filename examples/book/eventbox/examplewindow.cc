@@ -50,5 +50,3 @@ bool ExampleWindow::on_eventbox_button_press(GdkEventButton*)
   hide();
   return true;
 }
-
-

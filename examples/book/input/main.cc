@@ -25,7 +25,7 @@ Glib::RefPtr<Glib::IOChannel> iochannel;
 // and quit the program if the message was 'Q'.
 bool MyCallback(Glib::IOCondition io_condition)
 {
-  
+
   if ((io_condition & Glib::IO_IN) == 0) {
     std::cerr << "Invalid fifo response" << std::endl;
   }
@@ -42,7 +42,7 @@ bool MyCallback(Glib::IOCondition io_condition)
    #endif //GLIBMM_EXCEPTIONS_ENABLED
    std::cout << buf;
    if (buf == "Q\n")
-	   Gtk::Main::quit ();
+       Gtk::Main::quit ();
 
   }
   return true;
@@ -62,10 +62,11 @@ int main(int argc, char *argv[])
       return -1;
     }
     #else
-      std::cerr << "error creating fifo: This platform does not have mkfifo()" << std::endl;
+      std::cerr << "error creating fifo: This platform does not have mkfifo()"
+          << std::endl;
     #endif //HAVE_MKFIFO
   }
- 
+
   read_fd = open("testfifo", O_RDONLY);
   if (read_fd == -1)
   {

@@ -45,7 +45,7 @@ bool MyArea::on_expose_event(GdkEventExpose* event)
 
     Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
     cr->set_line_width(lesser * 0.02);  // outline thickness changes
-                                            // with window size
+                                        // with window size
 
     // clip to the area indicated by the expose event so that we only redraw
     // the portion of the window that needs to be redrawn
@@ -83,10 +83,10 @@ bool MyArea::on_expose_event(GdkEventExpose* event)
 
     cr->translate(ex, ey);  // make (ex, ey) == (0, 0)
     cr->scale(ew / 2.0, eh / 2.0);  // for width: ew / 2.0 == 1.0
-                                        // for height: eh / 2.0 == 1.0
+                                    // for height: eh / 2.0 == 1.0
 
     cr->arc(0.0, 0.0, 1.0, 0.0, 2 * M_PI);  // 'circle' centered at (0, 0)
-                                                // with 'radius' of 1.0
+                                            // with 'radius' of 1.0
 
     cr->set_source_rgba(0.8, 0.0, 0.0, 0.7);
     cr->fill_preserve();

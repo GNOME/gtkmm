@@ -29,10 +29,12 @@ ExampleWindow::ExampleWindow()
   add(m_ButtonBox);
 
   m_ButtonBox.pack_start(m_Button_File);
-  m_Button_File.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_file_clicked) );
+  m_Button_File.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_file_clicked) );
 
   m_ButtonBox.pack_start(m_Button_Folder);
-  m_Button_Folder.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_folder_clicked) );
+  m_Button_Folder.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_folder_clicked) );
 
   show_all_children();
 }
@@ -46,7 +48,8 @@ void ExampleWindow::on_button_folder_clicked()
 #ifndef GTKMM_DISABLE_DEPRECATED
   Gtk::FileSelection dialog("Please choose a folder");
   dialog.set_transient_for(*this);
-  dialog.get_file_list()->get_parent()->hide(); //Prevent the user from selecting a file.
+  //Prevent the user from selecting a file.
+  dialog.get_file_list()->get_parent()->hide();
 
   int result = dialog.run();
 
@@ -56,7 +59,8 @@ void ExampleWindow::on_button_folder_clicked()
     case(Gtk::RESPONSE_OK):
     {
       std::cout << "OK clicked." << std::endl;
-      std::cout << "Folder selected: " << dialog.get_filename() << std::endl;
+      std::cout << "Folder selected: " << dialog.get_filename()
+          << std::endl;
       break;
     }
     case(Gtk::RESPONSE_CANCEL):
@@ -78,7 +82,7 @@ void ExampleWindow::on_button_file_clicked()
 #ifndef GTKMM_DISABLE_DEPRECATED
   Gtk::FileSelection dialog("Please choose a file");
   dialog.set_transient_for(*this);
-  
+
   int result = dialog.run();
 
   //Handle the response:
@@ -88,7 +92,8 @@ void ExampleWindow::on_button_file_clicked()
     {
       std::cout << "OK clicked." << std::endl;
 
-      std::string filename = dialog.get_filename(); //Notice that it is a std::string, not a Glib::ustring.
+      //Notice that this is a std::string, not a Glib::ustring.
+      std::string filename = dialog.get_filename();
       std::cout << "File selected: " <<  filename << std::endl;
       break;
     }

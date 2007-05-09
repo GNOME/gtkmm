@@ -36,4 +36,3 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
-

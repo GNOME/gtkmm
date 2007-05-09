@@ -45,4 +45,3 @@ ExampleWindow::~ExampleWindow()
 {
 }
 
-

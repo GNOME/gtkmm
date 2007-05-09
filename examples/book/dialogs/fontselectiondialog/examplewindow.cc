@@ -24,10 +24,11 @@ ExampleWindow::ExampleWindow()
 : m_Button("sans")
 {
   set_title("Gtk::FontSelectionDialog example");
-  
-  add(m_Button);  
-  m_Button.signal_font_set().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_font_set) );
-  
+
+  add(m_Button);
+  m_Button.signal_font_set().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_font_set) );
+
   show_all_children();
 }
 

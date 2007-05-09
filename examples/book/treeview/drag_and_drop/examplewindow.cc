@@ -26,7 +26,6 @@ ExampleWindow::ExampleWindow()
   set_border_width(5);
   set_default_size(400, 200);
 
-
   add(m_VBox);
 
   //Add the TreeView, inside a ScrolledWindow, with the button underneath:
@@ -41,11 +40,14 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   //Create the Tree model:
-  //Use our derived model, which overrides some Gtk::TreeDragDest and Gtk::TreeDragSource virtual functions:
-  m_refTreeModel = TreeModel_Dnd::create(); //The columns are declared in the overridden TreeModel.
+  //Use our derived model, which overrides some Gtk::TreeDragDest and
+  //Gtk::TreeDragSource virtual functions:
+  //The columns are declared in the overridden TreeModel.
+  m_refTreeModel = TreeModel_Dnd::create();
   m_TreeView.set_model(m_refTreeModel);
 
   //Enable Drag-and-Drop of TreeView rows:
@@ -59,7 +61,6 @@ ExampleWindow::ExampleWindow()
   row[m_refTreeModel->m_Columns.m_col_name] = "Billy Bob";
   row[m_refTreeModel->m_Columns.m_col_draggable] = true;
   row[m_refTreeModel->m_Columns.m_col_receivesdrags] = true;
-  
 
   Gtk::TreeModel::Row childrow = *(m_refTreeModel->append(row.children()));
   childrow[m_refTreeModel->m_Columns.m_col_id] = 11;
@@ -90,12 +91,14 @@ ExampleWindow::ExampleWindow()
   childrow[m_refTreeModel->m_Columns.m_col_name] = "Xavier McRoberts";
   childrow[m_refTreeModel->m_Columns.m_col_draggable] = true;
   childrow[m_refTreeModel->m_Columns.m_col_receivesdrags] = true;
-  
+
   //Add the TreeView's view columns:
   m_TreeView.append_column("ID", m_refTreeModel->m_Columns.m_col_id);
   m_TreeView.append_column("Name", m_refTreeModel->m_Columns.m_col_name);
-  m_TreeView.append_column_editable("Draggable", m_refTreeModel->m_Columns.m_col_draggable);
-  m_TreeView.append_column_editable("Receives Drags", m_refTreeModel->m_Columns.m_col_receivesdrags);
+  m_TreeView.append_column_editable("Draggable",
+          m_refTreeModel->m_Columns.m_col_draggable);
+  m_TreeView.append_column_editable("Receives Drags",
+          m_refTreeModel->m_Columns.m_col_receivesdrags);
 
   show_all_children();
 }
@@ -108,6 +111,4 @@ void ExampleWindow::on_button_quit()
 {
   hide();
 }
-
-
 

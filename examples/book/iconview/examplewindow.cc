@@ -47,12 +47,10 @@ ExampleWindow::ExampleWindow()
 
   add( m_VBox );
 
-  // Add the TreeView, inside a ScrolledWindow, with the button underneath:
-  //
+  // Add the TreeView inside a ScrolledWindow, with the button underneath:
   m_ScrolledWindow.add(m_IconView);
 
   // Only show the scrollbars when they are necessary:
-  //
   m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
   m_VBox.pack_start(m_ScrolledWindow);
@@ -61,7 +59,8 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.pack_start(m_Button_Quit, Gtk::PACK_SHRINK);
   m_ButtonBox.set_border_width(6);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
 
   // Create the Tree model:
   m_refListModel = Gtk::ListStore::create( m_Columns );
@@ -70,10 +69,12 @@ ExampleWindow::ExampleWindow()
   m_IconView.set_model(m_refListModel);
   m_IconView.set_markup_column(m_Columns.m_col_description);
   m_IconView.set_pixbuf_column(m_Columns.m_col_pixbuf);
-  m_IconView.signal_item_activated().connect( sigc::mem_fun(*this, &ExampleWindow::on_item_activated) );
-  m_IconView.signal_selection_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_selection_changed) );
+  m_IconView.signal_item_activated().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_item_activated) );
+  m_IconView.signal_selection_changed().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_selection_changed) );
 
-  IconEntry entries[] = 
+  IconEntry entries[] =
   {
     IconEntry("mozilla-firefox.png", "<b>Mozilla Firefox</b> Logo"),
     IconEntry("xmms.xpm", "<b>XMMS</b> Logo"),
@@ -144,7 +145,8 @@ void ExampleWindow::on_selection_changed()
   }
 }
 
-void ExampleWindow::add_entry(const std::string& filename, const Glib::ustring& description )
+void ExampleWindow::add_entry(const std::string& filename,
+        const Glib::ustring& description )
 {
   Gtk::TreeModel::Row row = *(m_refListModel->append());
   row[m_Columns.m_col_filename] = filename;

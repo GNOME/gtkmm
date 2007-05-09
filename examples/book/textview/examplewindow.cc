@@ -38,7 +38,7 @@ ExampleWindow::ExampleWindow()
 
   m_VBox.pack_start(m_ScrolledWindow);
 
-  //Add buttons: 
+  //Add buttons:
   m_VBox.pack_start(m_ButtonBox, Gtk::PACK_SHRINK);
 
   m_ButtonBox.pack_start(m_Button_Buffer1, Gtk::PACK_SHRINK);
@@ -48,12 +48,14 @@ ExampleWindow::ExampleWindow()
   m_ButtonBox.set_spacing(5);
   m_ButtonBox.set_layout(Gtk::BUTTONBOX_END);
 
-  
   //Connect signals:
-  m_Button_Quit.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_quit) );
-  m_Button_Buffer1.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_buffer1) );
-  m_Button_Buffer2.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_buffer2) );
-  
+  m_Button_Quit.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_quit) );
+  m_Button_Buffer1.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_buffer1) );
+  m_Button_Buffer2.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_buffer2) );
+
   fill_buffers();
   on_button_buffer1();
 
@@ -66,7 +68,8 @@ void ExampleWindow::fill_buffers()
   m_refTextBuffer1->set_text("This is the text from TextBuffer #1.");
 
   m_refTextBuffer2 = Gtk::TextBuffer::create();
-  m_refTextBuffer2->set_text("This is some alternative text, from TextBuffer #2.");
+  m_refTextBuffer2->set_text(
+          "This is some alternative text, from TextBuffer #2.");
 
 }
 
@@ -88,6 +91,4 @@ void ExampleWindow::on_button_buffer2()
 {
   m_TextView.set_buffer(m_refTextBuffer2);
 }
-
-
 

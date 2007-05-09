@@ -57,11 +57,12 @@ ExampleWindow::ExampleWindow()
   childrow[m_Columns.m_col_id] = 31;
   childrow[m_Columns.m_col_name] = "Xavier McRoberts";
   */
-  
+
   //Add the model columns to the Combo (which is a kind of view),
   //rendering them in the default way:
-  //m_Combo.pack_start(m_Columns.m_col_id); //This is automatically rendered when we use set_text_column().
-  m_Combo.pack_start(m_Columns.m_col_name); 
+  //This is automatically rendered when we use set_text_column().
+  //m_Combo.pack_start(m_Columns.m_col_id);
+  m_Combo.pack_start(m_Columns.m_col_name) 
 
   m_Combo.set_text_column(m_Columns.m_col_id);
 
@@ -69,7 +70,8 @@ ExampleWindow::ExampleWindow()
   add(m_Combo);
 
   //Connect signal handler:
-  m_Combo.signal_changed().connect( sigc::mem_fun(*this, &ExampleWindow::on_combo_changed) );
+  m_Combo.signal_changed().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_combo_changed) );
 
   show_all_children();
 }

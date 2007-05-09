@@ -1,4 +1,4 @@
-//$Id: main.cc,v 1.1.1.1 2003/01/21 13:41:36 murrayc Exp $ -*- c++ -*-
+//$Id$ -*- c++ -*-
 
 /* gtkmm example Copyright (C) 2002 gtkmm development team
  *
@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
   Gtk::Main kit(argc, argv);
 
   ExampleWindow window;
-  Gtk::Main::run(window); //Shows the window and returns when it is closed.
+  //Shows the window and returns when it is closed.
+  Gtk::Main::run(window);
 
   return 0;
 }

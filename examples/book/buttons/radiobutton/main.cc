@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
   Gtk::Main kit(argc, argv);
 
   RadioButtons buttons;
-  Gtk::Main::run(buttons); //Shows the window and returns when it is closed.
+  //Shows the window and returns when it is closed.
+  Gtk::Main::run(buttons);
 
   return 0;
 }

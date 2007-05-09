@@ -39,26 +39,34 @@ ExampleWindow::ExampleWindow()
   m_Alignment.add(m_ProgressBar);
 
   //Add a timer callback to update the value of the progress bar:
-  m_connection_id_timeout = Glib::signal_timeout().connect( sigc::mem_fun(*this, &ExampleWindow::on_timeout), 50 );
+  m_connection_id_timeout = Glib::signal_timeout().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_timeout), 50 );
 
   m_VBox.pack_start(m_Separator, Gtk::PACK_SHRINK);
   m_VBox.pack_start(m_Table);
 
   //Add a check button to select displaying of the trough text:
-  m_Table.attach(m_CheckButton_Text, 0, 1, 0, 1, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);
-  m_CheckButton_Text.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_text) );
+  m_Table.attach(m_CheckButton_Text, 0, 1, 0, 1, Gtk::EXPAND | Gtk::FILL,
+          Gtk::EXPAND | Gtk::FILL, 5, 5);
+  m_CheckButton_Text.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_checkbutton_text) );
 
   //Add a check button to select displaying of the trough text:
-  m_Table.attach(m_CheckButton_Activity, 0, 1, 1, 2, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);
-  m_CheckButton_Activity.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_activity) );
+  m_Table.attach(m_CheckButton_Activity, 0, 1, 1, 2, Gtk::EXPAND | Gtk::FILL,
+          Gtk::EXPAND | Gtk::FILL, 5, 5);
+  m_CheckButton_Activity.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_checkbutton_activity) );
 
   //Add a check button to toggle activity mode:
-  m_Table.attach(m_CheckButton_Orientation, 0, 1, 2, 3, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);
-  m_CheckButton_Orientation.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_checkbutton_orientation) );
+  m_Table.attach(m_CheckButton_Orientation, 0, 1, 2, 3, Gtk::EXPAND | Gtk::FILL,
+          Gtk::EXPAND | Gtk::FILL, 5, 5);
+  m_CheckButton_Orientation.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_checkbutton_orientation) );
 
   //Add a button to exit the program.
   m_VBox.pack_start(m_Button_Close, Gtk::PACK_SHRINK);
-  m_Button_Close.signal_clicked().connect( sigc::mem_fun(*this, &ExampleWindow::on_button_close) );
+  m_Button_Close.signal_clicked().connect(sigc::mem_fun(*this,
+              &ExampleWindow::on_button_close) );
   m_Button_Close.set_flags(Gtk::CAN_DEFAULT);
   m_Button_Close.grab_default();
 
