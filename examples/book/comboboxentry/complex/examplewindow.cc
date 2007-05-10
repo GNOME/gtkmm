@@ -62,7 +62,7 @@ ExampleWindow::ExampleWindow()
   //rendering them in the default way:
   //This is automatically rendered when we use set_text_column().
   //m_Combo.pack_start(m_Columns.m_col_id);
-  m_Combo.pack_start(m_Columns.m_col_name) 
+  m_Combo.pack_start(m_Columns.m_col_name);
 
   m_Combo.set_text_column(m_Columns.m_col_id);
 
