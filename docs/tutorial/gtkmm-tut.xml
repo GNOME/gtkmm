@@ -8730,6 +8730,49 @@ _CLASS_GENERIC(AttrIter, PangoAttrIterator)
 </sect2>
 
 <sect2>
+<title>Constructor macros</title>
+<para>The _CTOR_DEFAULT() and _WRAP_CTOR() macros add constructors, wrapping the specified *_new() C functions. These macros assume that the C object has properties with the same names as the function parameters, as is usually the case, so that it can supply the parameters directly to a g_object_new() call. These constructors never actually call the *_new() C functions, because gtkmm must actually instantiate derived GTypes, and the *_new() C functions are meant only as convenience functions for C programmers.</para> 
+<para>When using _CLASS_GOBJECT(), the constructors should be protected (rather than public) and each constructor should have a corresponding _WRAP_CREATE() in the public section. This prevents the class from being instantiated without using a RefPtr. For instance, 
+<programlisting>
+class ActionGroup : public Glib::Object
+{
+  _CLASS_GOBJECT(ActionGroup, GtkActionGroup, GTK_ACTION_GROUP, Glib::Object, GObject)
+
+protected:
+  _WRAP_CTOR(ActionGroup(const Glib::ustring&amp; name = Glib::ustring()), gtk_action_group_new)
+
+public:
+  _WRAP_CREATE(const Glib::ustring&amp; name = Glib::ustring())
+</programlisting>
+</para>
+
+<sect3>
+<title>_CTOR_DEFAULT</title>
+<para>This macro creates a default constructor with no arguments. 
+</para>
+</sect3>
+
+<sect3>
+<title>_WRAP_CTOR</title>
+<para>This macro creates a constructor with arguments, equivalent to a *_new() C function. It takes a C++ constructor signature, and a C function name.
+</para>
+</sect3>
+
+<sect3>
+<title>Hand-coding constructors</title>
+<para>When a constructor must be partly hand written because, for instance, the *_new() C function's parameters do not correspond directly to object properties, or because the *_new() C function does more than call g_object_new(), the _CONSTRUCT() macro may be used in the .ccg file to save some work. The _CONSTRUCT macro takes a series of property names and values. For instance, from button.ccg:
+<programlisting>
+Button::Button(const Glib::ustring&amp; label, bool mnemonic)
+:
+  _CONSTRUCT("label", label.c_str(), "use_underline", gboolean(mnemonic))
+{}
+</programlisting> 
+</para>
+</sect3>
+
+</sect2>
+
+<sect2>
 <title>Method macros</title>
 <para></para>
 
@@ -8749,6 +8792,15 @@ _WRAP_METHOD(void set_text(const Glib::ustring&amp; text), gtk_entry_set_text)
   <listitem><para>errthrow: Use the last GError* parameter of the C function to throw an exception.</para></listitem>
   <listitem><para>deprecated: Puts the generated code in #ifdef blocks.</para></listitem>
   <listitem><para>constversion: Just call the non-const version of the same function, instead of generating almost duplicate code.</para></listitem>
+</itemizedlist>
+</para>
+<para>Though it's usually obvious what C++ types should be used in the C++ method, here are some hints:
+<itemizedlist>
+  <listitem><para>Objects used via RefPtr: Pass the RefPtr as a const reference. For instance, const Glib::RefPtr&lt;Gtk::Action&gt;&amp; action.</para></listitem>
+  <listitem><para>Const Objects used via RefPtr: If the object should not be changed by the function, then make sure that the object is const, even if the RefPtr is already const. For instance, const Glib::RefPtr&lt;const Gtk::Action&gt;&amp; action.</para></listitem>
+  <listitem><para>Wrapping GList* and GSList* parameters: First, you need to discover what objects are contained in the list's data field for each item, usually by reading the documentation for the C function. The list can then be wrapped by an appropriate intermediate type, such as Glib::ListHandle or Glib::SListHandle. These are templates, so you can specify the item type. For instance, Glib::ListHandle&lt; Glib::RefPtr&lt;Action&gt; &gt;. Existing typedefs exist for some common list types. You may need to define a Traits type to specify how the C and C++ types should be converted.</para></listitem>
+  <listitem><para>Wrapping GList* and GSList* return types: You must discover whether the caller should free the list and whether it should release the items in the list, again by reading the documentation of the C function. With this information you can choose the ownership (none, shallow or deep) for the m4 conversion rule, which you should probably put directly into the .hg file because the ownership depends on the function rather than the type. For instance:
+<programlisting>#m4 _CONVERSION(`GSList*', `Glib::SListHandle&lt;Widget*&gt;', `$2($3, Glib::OWNERSHIP_NONE)')</programlisting></para></listitem>
 </itemizedlist>
 </para>
 </sect3>
