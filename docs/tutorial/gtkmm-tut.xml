@@ -6502,140 +6502,197 @@ DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnom
 </chapter>
 
 <chapter id="sec-internationalization">
-    <title>Internationalization and Localization</title>
-
-    <para>&gtkmm; applications can easily support multiple languages, including non-European languages such as Chinese and right-to-left languages such as Arabic. An appropriately-written &gtkmm; application will use the appropriate language at runtime based on the user's environment.</para>
-<para>You might not anticipate the need to support additional languages, but you can never rule it out. And it's easier to develop the application properly in the first place rather than retrofitting later.</para>
-<para>The process of writing source code that allows for translation is called <literal>internationalization</literal>, often abbreviated to <literal>i18n</literal>. The <literal>Localization</literal> process, sometimes abbreviated as <literal>l10n</literal>, provides translated text for other languages, based on that source code.</para>
+  <title>Internationalization and Localization</title>
 
   <para>
-    The main activity in the internationalization process is finding strings seen
-    by users and marking them for translation. You do not need to do
-    it all at once - if you set up the necessary project
-    infrastructure correctly then your application will work normally regardless
-    of how many strings you've covered.
+    &gtkmm; applications can easily support multiple languages, including
+    non-European languages such as Chinese and right-to-left languages such as
+    Arabic. An appropriately-written and translated &gtkmm; application will use
+    the appropriate language at runtime based on the user's environment.
+  </para>
+  <para>
+    You might not anticipate the need to support additional languages, but
+    you can never rule it out. And it's easier to develop the application
+    properly in the first place rather than retrofitting later.
   </para>
 
   <para>
-    String literals should be typed in the source code in English, but surrounded by a macro.
-    The <application>gettext</application> (or intltool) utility can then extract the marked strings for tramslation, and 
-    substitute the translated text at runtime. 
+    The process of writing source code that allows for translation is called
+    <literal>internationalization</literal>, often abbreviated to
+    <literal>i18n</literal>. The <literal>Localization</literal> process,
+    sometimes abbreviated as <literal>l10n</literal>, provides translated text
+    for other languages, based on that source code.
   </para>
 
-<sect1 id="sec-internationalization-intro">
-  <title>Preparing your project</title>
+  <para>
+    The main activity in the internationalization process is finding strings
+    seen by users and marking them for translation. You do not need to do it all
+    at once - if you set up the necessary project infrastructure correctly then
+    your application will work normally regardless of how many strings you've
+    covered.
+  </para>
 
-  <note>
+  <para>
+    String literals should be typed in the source code in English, but
+    surrounded by a macro.  The <application>gettext</application> (or intltool)
+    utility can then extract the marked strings for tramslation, and substitute
+    the translated text at runtime.
+  </para>
+
+  <sect1 id="sec-internationalization-intro">
+    <title>Preparing your project</title>
+
+    <note>
+      <para>
+        In the instructions below we will assume that you will not be using
+        <application>gettext</application> directly, but
+        <application>intltool</application>, which was written specifically for
+        <literal>GNOME</literal>. <application>intltool</application> uses
+        <function>gettext()</function>, which extracts strings from source code,
+        but <application>intltool</application> can also combine strings from
+        other files, for example from desktop menu details, and GUI resource
+        files such as <application>Glade</application> files, into standard
+        <application>gettext</application> <filename>.pot/.po</filename> files.
+      </para>
+      <para>
+        We also assume that you are using autotools (e.g.
+        <application>automake</application> and
+        <application>autoconf</application>) to build your project, and
+        that you are using <ulink
+          url="http://svn.gnome.org/viewcvs/gnome-common/trunk/autogen.sh?view=markup">
+          <literal>./autogen.sh</literal> from
+          <application>gnome-common</application></ulink>, which, among other
+        things, takes care of some <application>intltool</application>
+        initialization.
+      </para>
+    </note>
+
     <para>
-    In the instructions below we will assume that you will not be using
-    <application>gettext</application> directly, but
-    <application>intltool</application>, which was written specifically for
-    <literal>GNOME</literal>. <application>intltool</application> uses
-    <function>gettext()</function>, which extracts strings from source code, 
-    but <application>intltool</application> can also combine strings from other
-    files, for example from desktop menu details, and GUI resource files such as
-    <application>Glade</application> files, into standard
-    <application>gettext</application> <filename>.pot/.po</filename> files.
-    We also assume that you are using
-    <ulink url="http://svn.gnome.org/viewcvs/gnome-common/trunk/autogen.sh?view=markup">
-      <literal>./autogen.sh</literal> from
-      <application>gnome-common</application></ulink>,
-    which, among other things, takes care of some
-    <application>intltool</application> initialization.
+      Create a sub-directory named <literal>po</literal> in your project's root
+      directory. This directory will eventually contain all of your
+      translations.  Within it, create a file named <literal>LINGUAS</literal>
+      and a file named <literal>POTFILES.in</literal>.  It is common practice to
+      also create a <literal>ChangeLog</literal> file in the
+      <literal>po</literal> directory so that translators can keep track of
+      translation changes.
     </para>
-  </note>
 
-  <para>
-    Create a <literal>po</literal> sub-directory in your project's root
-    directory. Within it, create <literal>LINGUAS</literal> and
-    <literal>POTFILES.in</literal> files, as well as a
-    <literal>ChangeLog</literal> file so that translators can keep track
-    of translation changes.
-  </para>
+    <para>
+      <literal>LINGUAS</literal> contains an alphabetically sorted list of codes
+      identifying the languages for which your program is translated (comment
+      lines starting with a <literal>#</literal> are ignored). Each language
+      code listed in the <literal>LINGUAS</literal> file must have a
+      corresponding <literal>.po</literal> file.  So, if your program has German
+      and Japanese translations, your <literal>LINGUAS</literal> file would
+      look like this:
+    </para>
+    <programlisting># keep this file sorted alphabetically, one language code per line
+de
+ja</programlisting>
+    <para>
+      (In addition, you'd have the files <literal>ja.po</literal> and
+      <literal>de.po</literal> in your
+      <literal>po</literal> directory which contain the German and Japanese
+      translations, respectively.)
+    </para>
 
-  <para>
-    <literal>LINGUAS</literal>
-    contains an alphabetically sorted list of codes identifying the languages
-    for which your program is translated.
-  </para>
+    <para>
+      <literal>POTFILES.in</literal> is a list of paths to all files which
+      contain strings marked up for translation, starting from the project root
+      directory.  So for example, if your project sources were located in a
+      subdirectory named <literal>src</literal>, and you had two files that
+      contained strings that should be translated, your
+      <literal>POTFILES.in</literal> file might look like this:
+    </para>
 
-  <para>
-  <literal>POTFILES.in</literal> is a list
-    of paths to all files which contain strings marked up for translation,
-    starting from the project root directory.
-  So for example, the entries
-    would look like:
+    <programlisting>src/main.cc
+src/other.cc</programlisting>
 
-    <programlisting>
-      src/main.cc
-      src/other.cc
-    </programlisting>
+    <para>
+      If you are using <application>gettext</application> directly, you can only
+      mark strings for translation if they are in source code file.  However, if
+      you use <application>intltool</application>, you can mark strings for
+      translation in a variety of other file formats, including
+      <application>Glade</application> UI files, xml, <ulink
+        url="http://standards.freedesktop.org/desktop-entry-spec/latest/">.desktop
+        files</ulink> and several more.  So, if you have designed some of the
+      application UI in <application>Glade</application> then also add your
+      <filename>.glade</filename> files to the list in
+      <literal>POTFILES.in</literal>.
+    </para>
 
-    If you have designed some of the application UI in
-    <application>Glade</application> then also add your 
-    <filename>.glade</filename> files to the list in 
-    <literal>POTFILES.in</literal>.
-  </para>
+    <para>
+      Now that there is a place to put your translations, you need to initialize
+      <application>intltool</application> and <application>gettext</application>.
+      Add the following code to your <literal>configure.ac</literal>,
+      substituting 'programname' with the name of your program:
+    </para>
 
-  <para>
-    Add the following code to your <literal>configure.ac</literal>,
-    substituting 'programname' with the name of your program:
+    <programlisting>IT_PROG_INTLTOOL([0.35.0])
 
-    <programlisting>
-      IT_PROG_INTLTOOL([0.35.0])
+GETTEXT_PACKAGE=programname
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
+                   [The domain to use with gettext])
+AM_GLIB_GNU_GETTEXT
 
-      GETTEXT_PACKAGE=programname
-      AC_SUBST(GETTEXT_PACKAGE)
-      AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [The domain to use with gettext])
-      AM_GLIB_GNU_GETTEXT
+PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
+AC_SUBST(PROGRAMNAME_LOCALEDIR)</programlisting>
 
-      PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
-      AC_SUBST(PROGRAMNAME_LOCALEDIR)
-    </programlisting>
+    <para>
+      This <varname>PROGRAMNAME_LOCALEDIR</varname> variable will be used later
+      in the <literal>Makefile.am</literal> file, to define a macro that will be
+      used when you initialize <application>gettext</application> in your source
+      code.
+    </para>
 
-    This PROGRAMNAME_LOCALEDIR variable will be used later in the Makefile.am file, to define a macro that will be used in our source code, to initialize gettext.
-  </para>
+    <para>
+      In the top-level Makefile.am:
+      <itemizedlist>
+        <listitem>
+          <para>Add <literal>po</literal> to the <literal>SUBDIRS</literal>
+            variable.  Without this, your translations won't get built and
+            installed when you build the program</para>
+        </listitem>
+        <listitem>
+          <para>
+            Define <literal>INTLTOOL_FILES</literal> as:
+            <programlisting>INTLTOOL_FILES = intltool-extract.in \
+                 intltool-merge.in \
+                 intltool-update.in</programlisting>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Add <literal>INTLTOOL_FILES</literal> to the
+            <literal>EXTRA_DIST</literal> list of files.  This ensures that when
+            you do a <command>make dist</command>, these commands will be
+            included in the source tarball.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Update your <literal>DISTCLEANFILES</literal>:
+            <programlisting>DISTCLEANFILES = ... intltool-extract \
+                 intltool-merge \
+                 intltool-update \
+                 po/.intltool-merge-cache</programlisting>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
 
-  <para>
-    In the top-level Makefile.am:
-    <itemizedlist>
-      <listitem>
-        <simpara>Add <literal>po</literal> to the <literal>SUBDIRS</literal>
-        variable.</simpara>
-      </listitem>
-      <listitem>
-        <para>
-          Define <literal>INTLTOOL_FILES</literal> as:
-          <programlisting>
-            INTLTOOL_FILES = intltool-extract.in intltool-merge.in intltool-update.in
-          </programlisting>
-        </para>
-      </listitem>
-      <listitem>
-        <simpara>
-          Add <literal>INTLTOOL_FILES</literal> to the
-          <literal>EXTRA_DIST</literal> list of files.
-        </simpara>
-      </listitem>
-      <listitem>
-        <para>
-          Update your <literal>DISTCLEANFILES</literal>:
-          <programlisting>
-            DISTCLEANFILES = ... intltool-extract intltool-merge intltool-update po/.intltool-merge-cache
-          </programlisting>
-        </para>
-      </listitem>
-    </itemizedlist>
-  </para>
-
-  <para>
-    In your <literal>src/Makefile.am</literal>, update your
-    <literal>AM_CPPFLAGS</literal>:
-    <programlisting>
-      AM_CPPFLAGS = ... -DPROGRAMNAME_LOCALEDIR=\"${PROGRAMNAME_LOCALEDIR}\"
-    </programlisting>
-  </para>
-</sect1>
+    <para>
+      In your <literal>src/Makefile.am</literal>, update your
+      <literal>AM_CPPFLAGS</literal> to add the following preprocessor macro
+      definition:
+    </para>
+    <programlisting>AM_CPPFLAGS = ... -DPROGRAMNAME_LOCALEDIR=\"${PROGRAMNAME_LOCALEDIR}\"</programlisting>
+    <para>
+      This macro will be used when you initialize <literal>gettext</literal> in
+      your source code.
+    </para>
+  </sect1>
 
 <sect1 id="sec-i18n-marking-strings">
   <title>Marking strings for translation</title>
@@ -6660,16 +6717,9 @@ DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnom
     support macros which are shorter wrappers in an easy-to-use form.
     To use these macros, include <literal>&lt;glibmm/i18n.h&gt;</literal>,
     and then, for example, substitute:
-
-    <programlisting>
-      display_message("Getting ready for i18n.");
-    </programlisting>
-
+    <programlisting>display_message("Getting ready for i18n.");</programlisting>
     with:
-
-    <programlisting>
-      display_message(_("Getting ready for i18n."));
-    </programlisting>
+    <programlisting>display_message(_("Getting ready for i18n."));</programlisting>
   </para>
 
   <para>
@@ -6680,22 +6730,18 @@ DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnom
     <literal>my-strings</literal>, execute the following command,
     within the source code directory:
 
-    <programlisting>
-      xgettext -a -o my-strings --omit-header *.cc *.h
-    </programlisting>
+    <programlisting>xgettext -a -o my-strings --omit-header *.cc *.h</programlisting>
   </para>
 
   <para>
     Finally, to let you program use the translation for the current locale,
     add this code to the beginning of your <filename>main.cc</filename> file, to initialize gettext.
 
-    <programlisting>
-      bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
-      bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-      textdomain(GETTEXT_PACKAGE);
-    </programlisting>
+<programlisting>bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
+bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+textdomain(GETTEXT_PACKAGE);</programlisting>
   </para>
-    
+
   <sect2 id="sec-i18n-gettext">
     <title>How gettext works</title>
 
@@ -6739,9 +6785,7 @@ DerivedDialog::DerivedDialog(BaseObjectType* cobject, const Glib::RefPtr&lt;Gnom
       translation for a new locale. In order to do that, go to the
       <filename>po</filename> subdirectory of your project and
       execute the following command:
-      <programlisting>
-        intltool-update --pot
-      </programlisting>
+      <programlisting>intltool-update --pot</programlisting>
     </para>
 
     <para>
@@ -6850,12 +6894,10 @@ contained non-ASCII characters and the current locale is not UTF-8 encoded, the
 result is a corrupted <classname>Glib::ustring</classname>. You can work around
 this with a manual conversion. For instance, to retrieve the
 <classname>std::string</classname> from a <classname>ostringstream</classname>:
-<programlisting>
-std::ostringstream output;
+<programlisting>std::ostringstream output;
 output.imbue(std::locale("")); // use the user's locale for this stream
 output &lt;&lt; percentage &lt;&lt; " % done";
-label-&gt;set_text(Glib::locale_to_utf8(output.str()));
-</programlisting>
+label-&gt;set_text(Glib::locale_to_utf8(output.str()));</programlisting>
 </para>
 </sect2>
 
@@ -6883,14 +6925,13 @@ Such comments will be shown in the <filename>.po</filename> files. For
 instance:
 </para>
 
-	<programlisting>
-// note to translators: don't translate the "[noun]" part - it is
+<programlisting>// note to translators: don't translate the "[noun]" part - it is
 // just here to distinguish the string from another "jumps" string
 text = strip(gettext("jumps[noun]"), "[noun]");</programlisting>
       </sect2>
 
 <sect2>
-	<title>Composition of strings</title>
+  <title>Composition of strings</title>
 
 <para>
 C programmers use <function>sprintf()</function> to compose and concatenate
@@ -6901,12 +6942,10 @@ the language.</para>
 
 <para>For instance, this code would be problematic:</para>
 
-<programlisting>
-std::cout &lt;&lt; _("Current amount: ") &lt;&lt; amount
-	  &lt;&lt; _(" Future: ") &lt;&lt; future &lt;&lt; std::endl;
+<programlisting>std::cout &lt;&lt; _("Current amount: ") &lt;&lt; amount
+          &lt;&lt; _(" Future: ") &lt;&lt; future &lt;&lt; std::endl;
 
-label.set_text(_("Really delete ") + filename + _(" now?"));
-</programlisting>
+label.set_text(_("Really delete ") + filename + _(" now?"));</programlisting>
 
 <para>
 So you should either avoid this situation or revert to the C-style
@@ -6915,8 +6954,7 @@ So you should either avoid this situation or revert to the C-style
 supports syntax such as:
 </para>
 
-<programlisting>
-label.set_text(compose(_("Really delete %1 now?"), filename));</programlisting>
+<programlisting>label.set_text(compose(_("Really delete %1 now?"), filename));</programlisting>
 </sect2>
 
 <sect2>
