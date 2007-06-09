@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: entrycompletion.hg,v 1.24 2006/07/19 16:58:50 murrayc Exp $ */
 
 /* Copyright (C) 2003 The gtkmm Development Team
  *
@@ -30,6 +30,8 @@ namespace Gtk
 class Entry;
 
 //TODO: This should derive+implement from CellLayout, when we can break ABI.
+/** TODO
+ */
 class EntryCompletion : public Glib::Object
 {
   _CLASS_GOBJECT(EntryCompletion, GtkEntryCompletion, GTK_ENTRY_COMPLETION, Glib::Object, GObject)
@@ -77,6 +79,8 @@ public:
 
   _WRAP_METHOD(void set_inline_completion(bool inline_completion = true), gtk_entry_completion_set_inline_completion)
   _WRAP_METHOD(bool get_inline_completion() const, gtk_entry_completion_get_inline_completion)
+  _WRAP_METHOD(void set_inline_selection(bool inline_selection = true), gtk_entry_completion_set_inline_selection)
+  _WRAP_METHOD(bool get_inline_selection() const, gtk_entry_completion_get_inline_selection)
   _WRAP_METHOD(void set_popup_completion(bool popup_completion = true), gtk_entry_completion_set_popup_completion)
   _WRAP_METHOD(bool get_popup_completion() const, gtk_entry_completion_get_popup_completion)
 
@@ -95,9 +99,10 @@ public:
    */
   _WRAP_SIGNAL(void action_activated(int index), action_activated)
 
-  //We completely hand-code this signal because we want to change how the parameters are wrapped,
+  //We completely hand-code these signals because we want to change how the parameters are wrapped,
   //because we need both the iter and the model to make the C++ iter.
   _IGNORE_SIGNAL(match_selected)
+  _IGNORE_SIGNAL(cursor_on_match)
 
   /** Emitted when a match from the list is selected. 
    * The default behaviour is to replace the contents of the 
@@ -109,9 +114,26 @@ public:
    * @result true if the signal has been handled
    * 
    * @par Prototype:
-   * <tt>bool %match_selected(const TreeModel::iterator& iter)</tt>
+   * <tt>bool %on_match_selected(const TreeModel::iterator& iter)</tt>
    */
   Glib::SignalProxy1< bool, const TreeModel::iterator& > signal_match_selected();
+
+  /** Emitted when a match from the cursor is on a match
+   * of the list. The default behaviour is to replace the contents
+   * of the entry with the contents of the text column in the row 
+   * pointed to by @a iter.
+   *
+   * @param model The TreeModel containing the matches
+   * @param iter A TreeModel::iterator positioned at the selected match
+   * @result true if the signal has been handled
+   * 
+   * @par Prototype:
+   * <tt>bool %on_cursor_on_match(const TreeModel::iterator& iter)</tt>
+   *
+   * @newin2p12
+   */
+  Glib::SignalProxy1< bool, const TreeModel::iterator& > signal_cursor_on_match();
+
 
   #m4begin
 dnl// Hook in custom callback.
@@ -124,8 +146,9 @@ dnl
   _POP()
 #m4end
 
-  //We use no_default_handler for this, because we can not add a new vfunc to 2.5 without breaking ABI.
+  //We use no_default_handler for these signals, because we can not add a new vfunc without breaking ABI.
   //TODO: Remove no_default_handler when we do an ABI-break-with-parallel-install.
+
   /** Emitted when the inline autocompletion is triggered. 
    * The default behaviour is to make the entry display the 
    * whole prefix and select the newly inserted part.
@@ -140,7 +163,7 @@ dnl
    * @param prefix The common prefix of all possible completions.
    * @result true if the signal has been handled
    */ 
-  _WRAP_SIGNAL(bool insert_prefix(const Glib::ustring& prefix), insert_prefix, no_default_handler) 
+  _WRAP_SIGNAL(bool insert_prefix(const Glib::ustring& prefix), insert_prefix, no_default_handler)
 
   _WRAP_PROPERTY("model", Glib::RefPtr<Gtk::TreeModel>)
   _WRAP_PROPERTY("minimum_key_length", int)
@@ -149,12 +172,14 @@ dnl
   _WRAP_PROPERTY("popup_completion", bool)
   _WRAP_PROPERTY("popup_set_width", bool)
   _WRAP_PROPERTY("popup_single_match", bool)
+  _WRAP_PROPERTY("inline-selection", bool)
 
 protected:
 
 #ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //Default Signal Handler:
-  virtual bool on_match_selected(const TreeModel::iterator& iter);        
+  virtual bool on_match_selected(const TreeModel::iterator& iter);  
+  //No default handler for on_cursor_on_match(), to preserver ABI. TODO: Add this when we can break ABI.      
 #endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 };
 

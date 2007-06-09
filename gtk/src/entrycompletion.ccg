@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: entrycompletion.ccg,v 1.13 2006/07/19 16:58:50 murrayc Exp $ */
 
 /* Copyright 2003 The gtkmm Development Team
  *
@@ -170,6 +170,79 @@ const Glib::SignalProxyInfo EntryCompletion_signal_match_selected_info =
   (GCallback) &Widget_signal_match_selected_notify_callback
 };
 
+
+static gboolean Widget_signal_cursor_on_match_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
+{
+  using namespace Gtk;
+  typedef sigc::slot< bool, const TreeModel::iterator& > SlotType;
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    try
+    {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        //This conversion is the custom-written part:
+        Gtk::TreeModel::iterator cppIter(c_model, c_iter);
+
+        return static_cast<int>( (*static_cast<SlotType*>(slot))(cppIter) );
+      }
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+static gboolean Widget_signal_cursor_on_match_notify_callback(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter, void* data)
+{
+  using namespace Gtk;
+  typedef sigc::slot< void, const TreeModel::iterator& > SlotType;
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    try
+    {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        //This conversion is the custom-written part:
+        Gtk::TreeModel::iterator cppIter(c_model, c_iter);
+
+        (*static_cast<SlotType*>(slot))(cppIter);
+      }
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+
+const Glib::SignalProxyInfo EntryCompletion_signal_cursor_on_match_info =
+{
+  "match_selected",
+  (GCallback) &Widget_signal_cursor_on_match_callback,
+  (GCallback) &Widget_signal_cursor_on_match_notify_callback
+};
+
 } //anonymous namespace
 
 
@@ -243,6 +316,12 @@ Glib::SignalProxy1< bool, const TreeModel::iterator& > EntryCompletion::signal_m
 {
   return Glib::SignalProxy1< bool, const TreeModel::iterator& >(this, &EntryCompletion_signal_match_selected_info);
 }
+
+Glib::SignalProxy1< bool, const TreeModel::iterator& > EntryCompletion::signal_cursor_on_match()
+{
+  return Glib::SignalProxy1< bool, const TreeModel::iterator& >(this, &EntryCompletion_signal_cursor_on_match_info);
+}
+
 
 
 } // namespace Gtk
