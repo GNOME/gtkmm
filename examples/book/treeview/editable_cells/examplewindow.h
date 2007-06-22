@@ -63,6 +63,7 @@ protected:
   Gtk::Button m_Button_Quit;
 
   //For the validated column:
+  //You could also use a CellRendererSpin or a CellRendererProgress:
   Gtk::CellRendererText m_cellrenderer_validated;
   Gtk::TreeView::Column m_treeviewcolumn_validated;
   bool m_validate_retry;
