@@ -36,9 +36,19 @@ ExampleWindow::ExampleWindow()
   m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") );
   m_refActionGroup->add( Gtk::Action::create("FileNew", Gtk::Stock::NEW),
           sigc::mem_fun(*this, &ExampleWindow::on_menu_file_new));
+
+  /* A recent-files sub-menu: */
+  //TODO: Shouldn't this have a default constructor?: 
+  //See bug #450032.
+  //m_refActionGroup->add( Gtk::RecentAction::create() );
+  m_refActionGroup->add( Gtk::RecentAction::create("FileRecentFiles",
+              "_Recent Files"));
+
+  /* A menu item to open the recent-files dialog: */
   m_refActionGroup->add( Gtk::Action::create("FileRecentDialog",
-              "_Recent Files Dialog"), sigc::mem_fun(*this,
+              "Recent Files _Dialog"), sigc::mem_fun(*this,
                   &ExampleWindow::on_menu_file_recent_files_dialog) );
+
   m_refActionGroup->add( Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
           sigc::mem_fun(*this, &ExampleWindow::on_menu_file_quit) );
 
@@ -54,6 +64,7 @@ ExampleWindow::ExampleWindow()
         "  <menubar name='MenuBar'>"
         "    <menu action='FileMenu'>"
         "      <menuitem action='FileNew'/>"
+        "      <menuitem action='FileRecentFiles'/>"
         "      <menuitem action='FileRecentDialog'/>"
         "      <separator/>"
         "      <menuitem action='FileQuit'/>"
