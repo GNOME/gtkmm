@@ -1,0 +1,91 @@
+// -*- c++ -*-
+/* $Id: builder.ccg,v 1.11 2006/05/10 20:59:27 murrayc Exp $ */
+
+/* Copyright 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtkbuilder.h>
+
+
+
+// Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular 
+// GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
+static GType
+get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
+{
+  if (!type_name)
+	return G_TYPE_INVALID;
+
+  // See if there is a gtkmm version of the gclass:
+  Glib::ustring classname_prefixed ("gtkmm__"); // gtkmm uses a prefix
+  classname_prefixed += type_name;
+
+  GType gtype = g_type_from_name(classname_prefixed.c_str());
+
+  if(gtype == G_TYPE_INVALID) // if it's not a registered typename
+  {
+    // There's no gtkmm derived type, so just use the normal one.
+    gtype = g_type_from_name(type_name);
+  }
+
+  return gtype;
+}
+
+namespace Gtk
+{
+
+GtkWidget* Builder::get_cwidget(const Glib::ustring& name)
+{
+  GObject *cobject = gtk_builder_get_object (gobj(), name.c_str());
+  if(!cobject)
+  {
+    g_critical("gtkmm: object `%s' not found in GtkBuilder file.", name.c_str());
+    return 0;
+  }
+
+  if (!GTK_IS_WIDGET (cobject))
+  {
+    g_critical("gtkmm: object `%s' (type=`%s') (in GtkBuilder file) is not a widget type.",
+               name.c_str(), G_OBJECT_TYPE_NAME(cobject));
+    /* TODO: Unref/sink it? */
+    return 0;
+  }
+
+  return GTK_WIDGET (cobject);
+}
+
+Gtk::Widget* Builder::get_widget_checked(const Glib::ustring& name, GType type)
+{
+  // Get the widget from the GtkBuilder file.
+  GtkWidget *cobject = get_cwidget(name);
+
+  // Check if it has the correct type.
+  if(!g_type_is_a(G_OBJECT_TYPE(cobject), type))
+  {
+    g_critical("gtkmm: widget `%s' (in GtkBuilder file) is of type `%s' but `%s' was expected",
+               name.c_str(), G_OBJECT_TYPE_NAME(cobject), g_type_name(type));
+    return 0;
+  }
+
+  return Glib::wrap (GTK_WIDGET (cobject));
+}
+
+
+
+
+} // namespace Gtk
+

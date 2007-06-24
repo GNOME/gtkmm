@@ -41,6 +41,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/base.h>
 #include <gtkmm/bin.h>
 #include <gtkmm/box.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/button.h>
 #include <gtkmm/buttonbox.h>
 #include <gtkmm/cellview.h>

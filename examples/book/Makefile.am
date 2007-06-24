@@ -1,4 +1,4 @@
-SUBDIRS = alignment aspectframe box buttonbox \
+SUBDIRS = alignment aspectframe box builder buttonbox \
           buttons clipboard combobox comboboxentry custom \
 		  drag_and_drop dialogs drawingarea \
 		  entry eventbox expander frame helloworld helloworld2 \

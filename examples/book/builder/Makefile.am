@@ -1,0 +1,2 @@
+SUBDIRS = basic derived
+
