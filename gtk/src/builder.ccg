@@ -20,8 +20,6 @@
 
 #include <gtk/gtkbuilder.h>
 
-
-
 // Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular 
 // GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
 static GType
@@ -47,6 +45,46 @@ get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
 
 namespace Gtk
 {
+
+//static
+Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_file(filename))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+//static
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Builder::add_from_string(const Glib::ustring& buffer)
+#else
+bool Builder::add_from_string(const Glib::ustring& buffer, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = gtk_builder_add_from_string(gobj(), buffer.c_str(), -1 /* means null-terminated */, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
 
 GtkWidget* Builder::get_cwidget(const Glib::ustring& name)
 {

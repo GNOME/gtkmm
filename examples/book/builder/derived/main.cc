@@ -27,7 +27,7 @@ int main (int argc, char **argv)
   Glib::RefPtr<Gtk::Builder> refBuilder = Gtk::Builder::create();
   try
   {
-    refBuilder->add_from_file("basic.glade");
+    refBuilder->add_from_file("basic.ui");
   }
   catch(const Gtk::BuilderError& ex)
   {
