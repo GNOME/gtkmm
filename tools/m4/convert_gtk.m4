@@ -579,6 +579,10 @@ _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($
 #PrintJob
 _CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`($2)$3')
 
+#Tooltip
+_CONVERSION(`GtkTooltip*',`const Glib::RefPtr<Tooltip>&',`Glib::wrap($3, true)')
+_CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P($3))
+
 
 # Used by Signals:
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.

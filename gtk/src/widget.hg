@@ -68,6 +68,7 @@ class Adjustment;
 class Window;
 class Container;
 class Settings;
+class Tooltip;
 
 typedef GtkRequisition Requisition;
 
@@ -491,7 +492,15 @@ public:
   //TODO: The drawable should be passed by reference, when we can break API/ABI, but it's not the end of the world. murrayc.
   void draw_insertion_cursor(Glib::RefPtr<Gdk::Drawable> drawable, const Gdk::Rectangle& area, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow = true);
   _IGNORE(gtk_draw_insertion_cursor)
-         
+
+  // Gtk+ 2.12 tooltip API
+  _WRAP_METHOD(void set_tooltip_window(Window& widget), gtk_widget_set_tooltip_window)
+  _WRAP_METHOD(Window* get_tooltip_window(), gtk_widget_get_tooltip_window)
+  _WRAP_METHOD(void trigger_tooltip_query(), gtk_widget_trigger_tooltip_query)
+  _WRAP_METHOD(void set_tooltip_text(const Glib::ustring& text), gtk_widget_set_tooltip_text)
+  _WRAP_METHOD(Glib::ustring get_tooltip_text() const, gtk_widget_get_tooltip_text)
+  _WRAP_METHOD(void set_tooltip_markup(const Glib::ustring& markup), gtk_widget_set_tooltip_markup)
+  _WRAP_METHOD(Glib::ustring get_tooltip_markup() const, gtk_widget_get_tooltip_markup)
   
   /* FLAGS */
 
@@ -819,8 +828,6 @@ dnl
 
   _WRAP_SIGNAL(void composited_changed(), "composited_changed", no_default_handler)
 
-  //TODO: Wrap GtkTooltip?: _WRAP_SIGNAL(void query_tooltip(int x, int y, bool keyboard_tooltip, Tooltip *tooltip), "query_tooltip", no_default_handler)
-
 //TODO: The signal_id is very C-like here:                                                                          
   //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
   
@@ -830,6 +837,9 @@ dnl
   _IGNORE_SIGNAL("keynav_failed")
 
   _IGNORE_SIGNAL("destroy-event")
+
+  // Tooltip signal
+  _WRAP_SIGNAL(bool query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Tooltip>& tooltip), "query_tooltip", no_default_handler)
 
   _WRAP_PROPERTY("name", Glib::ustring)
   _WRAP_PROPERTY("parent", Container*)
@@ -847,6 +857,9 @@ dnl
   _WRAP_PROPERTY("style", Glib::RefPtr<Style>)
   _WRAP_PROPERTY("events", Gdk::EventMask)
   _WRAP_PROPERTY("extension_events", Gdk::ExtensionMode)
+  _WRAP_PROPERTY("has_tooltip", bool)
+  _WRAP_PROPERTY("tooltip_markup", Glib::ustring)
+  _WRAP_PROPERTY("tooltip_text", Glib::ustring)
 
 protected:
   //comment in GTK+ header: "seldomly overidden"

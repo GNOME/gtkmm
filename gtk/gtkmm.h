@@ -167,6 +167,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toolbutton.h>
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/menutoolbutton.h>
+#include <gtkmm/tooltip.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>
