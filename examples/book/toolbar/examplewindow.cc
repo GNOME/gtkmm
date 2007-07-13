@@ -46,10 +46,6 @@ ExampleWindow::ExampleWindow()
     //is also in a menu.  TODO: Use UIManager instead here. See the demo for an
     //example.:
 
-    //We need the Gtk::Tooltips from the Toolbar, I think. I filed a GTK+ bug
-    //about this. murrayc.
-    //Gtk::Tooltips* tooltips = 0;
-
     Gtk::ToolButton* item = Gtk::manage(new Gtk::ToolButton("Click me"));
     //item.set_tooltips(*tooltips, "Toolbar item");
     m_Toolbar.append(*item);

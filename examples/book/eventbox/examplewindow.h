@@ -34,7 +34,6 @@ protected:
   //Child widgets:
   Gtk::EventBox m_EventBox;
   Gtk::Label m_Label;
-  Gtk::Tooltips m_Tooltips;
 };
 
 #endif //GTKMM_EXAMPLEWINDOW_H

@@ -36,7 +36,7 @@ ExampleWindow::ExampleWindow()
   m_EventBox.signal_button_press_event().connect(
     sigc::mem_fun(*this, &ExampleWindow::on_eventbox_button_press) );
 
-  m_Tooltips.set_tip(m_EventBox, "Click me!");
+  m_EventBox.set_tooltip_text("Click me!");
 
   show_all_children();
 }
