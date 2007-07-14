@@ -22,6 +22,14 @@
 #include "glibmm_generate_extra_defs/generate_extra_defs.h"
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+#include <gtk/gtkprinter.h>
+#include <gtk/gtkprintjob.h>
+
+#if !defined(G_OS_WIN32)
+#include <gtk/gtkpagesetupunixdialog.h>
+#include <gtk/gtkprintunixdialog.h>
+#endif /* G_OS_WIN32 */
+
 
 int main (int argc, char *argv[])
 {
@@ -76,6 +84,7 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_ASSISTANT )
             << get_defs( GTK_TYPE_BIN )
             << get_defs( GTK_TYPE_BOX )
+            << get_defs( GTK_TYPE_BUILDER )
             << get_defs( GTK_TYPE_BUTTON )
             << get_defs( GTK_TYPE_BUTTON_BOX )
             << get_defs( GTK_TYPE_CALENDAR )
@@ -145,11 +154,14 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_PLUG )
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PREVIEW )
+	    << get_defs( GTK_TYPE_PRINTER )
+	    << get_defs( GTK_TYPE_PRINT_JOB )
 	    << get_defs( GTK_TYPE_PRINT_OPERATION )
-	    /*<< get_defs( GTK_TYPE_PRINTER )*/
-	    /*<< get_defs( GTK_TYPE_PRINT_JOB )*/
-	    /*<< get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )*/
-	    /*<< get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )*/
+	    << get_defs( GTK_TYPE_PRINT_OPERATION_PREVIEW )
+#if !defined(G_OS_WIN32)
+	    << get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )
+	    << get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )
+#endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PROGRESS )
             << get_defs( GTK_TYPE_PROGRESS_BAR )
             << get_defs( GTK_TYPE_RADIO_BUTTON )

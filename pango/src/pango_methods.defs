@@ -173,6 +173,8 @@
     '("underline-color" "PANGO_ATTR_UNDERLINE_COLOR")
     '("strikethrough-color" "PANGO_ATTR_STRIKETHROUGH_COLOR")
     '("absolute-size" "PANGO_ATTR_ABSOLUTE_SIZE")
+    '("gravity" "PANGO_ATTR_GRAVITY")
+    '("gravity-hint" "PANGO_ATTR_GRAVITY_HINT")
   )
 )
 
@@ -265,6 +267,31 @@
     '("weight" "PANGO_FONT_MASK_WEIGHT")
     '("stretch" "PANGO_FONT_MASK_STRETCH")
     '("size" "PANGO_FONT_MASK_SIZE")
+    '("gravity" "PANGO_FONT_MASK_GRAVITY")
+  )
+)
+
+(define-enum Gravity
+  (in-module "Pango")
+  (c-name "PangoGravity")
+  (gtype-id "PANGO_TYPE_GRAVITY")
+  (values
+    '("south" "PANGO_GRAVITY_SOUTH")
+    '("east" "PANGO_GRAVITY_EAST")
+    '("north" "PANGO_GRAVITY_NORTH")
+    '("west" "PANGO_GRAVITY_WEST")
+    '("auto" "PANGO_GRAVITY_AUTO")
+  )
+)
+
+(define-enum GravityHint
+  (in-module "Pango")
+  (c-name "PangoGravityHint")
+  (gtype-id "PANGO_TYPE_GRAVITY_HINT")
+  (values
+    '("natural" "PANGO_GRAVITY_HINT_NATURAL")
+    '("strong" "PANGO_GRAVITY_HINT_STRONG")
+    '("line" "PANGO_GRAVITY_HINT_LINE")
   )
 )
 
@@ -391,6 +418,12 @@
     '("syloti-nagri" "PANGO_SCRIPT_SYLOTI_NAGRI")
     '("old-persian" "PANGO_SCRIPT_OLD_PERSIAN")
     '("kharoshthi" "PANGO_SCRIPT_KHAROSHTHI")
+    '("unknown" "PANGO_SCRIPT_UNKNOWN")
+    '("balinese" "PANGO_SCRIPT_BALINESE")
+    '("cuneiform" "PANGO_SCRIPT_CUNEIFORM")
+    '("phoenician" "PANGO_SCRIPT_PHOENICIAN")
+    '("phags-pa" "PANGO_SCRIPT_PHAGS_PA")
+    '("nko" "PANGO_SCRIPT_NKO")
   )
 )
 
@@ -419,15 +452,18 @@
 )
 
 
-;; From module-defs.h
-
-
-
-;; From modules.h
-
-
-
 ;; From pangoatsui.h
+
+(define-method get_atsu_font_id
+  (of-object "PangoATSUIFont")
+  (c-name "pango_atsui_font_get_atsu_font_id")
+  (return-type "ATSUFontID")
+)
+
+(define-function pango_atsui_font_get_type
+  (c-name "pango_atsui_font_get_type")
+  (return-type "GType")
+)
 
 
 
@@ -435,11 +471,6 @@
 
 (define-function pango_atsui_font_map_get_type
   (c-name "pango_atsui_font_map_get_type")
-  (return-type "GType")
-)
-
-(define-function pango_atsui_font_get_type
-  (c-name "pango_atsui_font_get_type")
   (return-type "GType")
 )
 
@@ -471,6 +502,12 @@
   (parameters
     '("const-char*" "spec")
   )
+)
+
+(define-method to_string
+  (of-object "PangoColor")
+  (c-name "pango_color_to_string")
+  (return-type "gchar*")
 )
 
 (define-function pango_attr_type_register
@@ -702,6 +739,24 @@
   )
 )
 
+(define-function pango_attr_gravity_new
+  (c-name "pango_attr_gravity_new")
+  (is-constructor-of "PangoAttrGravity")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("PangoGravity" "gravity")
+  )
+)
+
+(define-function pango_attr_gravity_hint_new
+  (c-name "pango_attr_gravity_hint_new")
+  (is-constructor-of "PangoAttrGravityHint")
+  (return-type "PangoAttribute*")
+  (parameters
+    '("PangoGravityHint" "hint")
+  )
+)
+
 (define-function pango_attr_list_get_type
   (c-name "pango_attr_list_get_type")
   (return-type "GType")
@@ -914,12 +969,6 @@
   (return-type "GType")
 )
 
-(define-method get_atsu_font_id
-  (of-object "PangoCairoATSUIFont")
-  (c-name "pango_cairo_atsui_font_get_atsu_font_id")
-  (return-type "ATSUFontID")
-)
-
 
 
 ;; From pangocairo-atsui.h
@@ -953,9 +1002,23 @@
   (return-type "PangoFontMap*")
 )
 
+(define-function pango_cairo_font_map_new_for_font_type
+  (c-name "pango_cairo_font_map_new_for_font_type")
+  (return-type "PangoFontMap*")
+  (parameters
+    '("cairo_font_type_t" "fonttype")
+  )
+)
+
 (define-function pango_cairo_font_map_get_default
   (c-name "pango_cairo_font_map_get_default")
   (return-type "PangoFontMap*")
+)
+
+(define-method get_font_type
+  (of-object "PangoCairoFontMap")
+  (c-name "pango_cairo_font_map_get_font_type")
+  (return-type "cairo_font_type_t")
 )
 
 (define-method set_resolution
@@ -977,6 +1040,14 @@
   (of-object "PangoCairoFontMap")
   (c-name "pango_cairo_font_map_create_context")
   (return-type "PangoContext*")
+)
+
+(define-function pango_cairo_font_get_scaled_font
+  (c-name "pango_cairo_font_get_scaled_font")
+  (return-type "cairo_scaled_font_t*")
+  (parameters
+    '("PangoFont*" "font")
+  )
 )
 
 (define-function pango_cairo_update_context
@@ -1019,6 +1090,26 @@
   (return-type "double")
   (parameters
     '("PangoContext*" "context")
+  )
+)
+
+(define-function pango_cairo_context_set_shape_renderer
+  (c-name "pango_cairo_context_set_shape_renderer")
+  (return-type "none")
+  (parameters
+    '("PangoContext*" "context")
+    '("PangoCairoShapeRendererFunc" "func")
+    '("gpointer" "data")
+    '("GDestroyNotify" "dnotify")
+  )
+)
+
+(define-function pango_cairo_context_get_shape_renderer
+  (c-name "pango_cairo_context_get_shape_renderer")
+  (return-type "PangoCairoShapeRendererFunc")
+  (parameters
+    '("PangoContext*" "context")
+    '("gpointer*" "data")
   )
 )
 
@@ -1067,6 +1158,18 @@
   )
 )
 
+(define-function pango_cairo_show_error_underline
+  (c-name "pango_cairo_show_error_underline")
+  (return-type "none")
+  (parameters
+    '("cairo_t*" "cr")
+    '("double" "x")
+    '("double" "y")
+    '("double" "width")
+    '("double" "height")
+  )
+)
+
 (define-function pango_cairo_glyph_string_path
   (c-name "pango_cairo_glyph_string_path")
   (return-type "none")
@@ -1092,6 +1195,18 @@
   (parameters
     '("cairo_t*" "cr")
     '("PangoLayout*" "layout")
+  )
+)
+
+(define-function pango_cairo_error_underline_path
+  (c-name "pango_cairo_error_underline_path")
+  (return-type "none")
+  (parameters
+    '("cairo_t*" "cr")
+    '("double" "x")
+    '("double" "y")
+    '("double" "width")
+    '("double" "height")
   )
 )
 
@@ -1234,6 +1349,42 @@
   (of-object "PangoContext")
   (c-name "pango_context_get_base_dir")
   (return-type "PangoDirection")
+)
+
+(define-method set_base_gravity
+  (of-object "PangoContext")
+  (c-name "pango_context_set_base_gravity")
+  (return-type "none")
+  (parameters
+    '("PangoGravity" "gravity")
+  )
+)
+
+(define-method get_base_gravity
+  (of-object "PangoContext")
+  (c-name "pango_context_get_base_gravity")
+  (return-type "PangoGravity")
+)
+
+(define-method get_gravity
+  (of-object "PangoContext")
+  (c-name "pango_context_get_gravity")
+  (return-type "PangoGravity")
+)
+
+(define-method set_gravity_hint
+  (of-object "PangoContext")
+  (c-name "pango_context_set_gravity_hint")
+  (return-type "none")
+  (parameters
+    '("PangoGravityHint" "hint")
+  )
+)
+
+(define-method get_gravity_hint
+  (of-object "PangoContext")
+  (c-name "pango_context_get_gravity_hint")
+  (return-type "PangoGravityHint")
 )
 
 (define-method set_matrix
@@ -1450,6 +1601,16 @@
   (return-type "GType")
 )
 
+(define-function pango_gravity_get_type
+  (c-name "pango_gravity_get_type")
+  (return-type "GType")
+)
+
+(define-function pango_gravity_hint_get_type
+  (c-name "pango_gravity_hint_get_type")
+  (return-type "GType")
+)
+
 (define-function pango_alignment_get_type
   (c-name "pango_alignment_get_type")
   (return-type "GType")
@@ -1644,6 +1805,10 @@
 
 
 
+;; From pango-features.h
+
+
+
 ;; From pango-font.h
 
 (define-function pango_font_description_get_type
@@ -1811,6 +1976,21 @@
   (of-object "PangoFontDescription")
   (c-name "pango_font_description_get_size_is_absolute")
   (return-type "gboolean")
+)
+
+(define-method set_gravity
+  (of-object "PangoFontDescription")
+  (c-name "pango_font_description_set_gravity")
+  (return-type "none")
+  (parameters
+    '("PangoGravity" "gravity")
+  )
+)
+
+(define-method get_gravity
+  (of-object "PangoFontDescription")
+  (c-name "pango_font_description_get_gravity")
+  (return-type "PangoGravity")
 )
 
 (define-method get_set_fields
@@ -2001,6 +2181,12 @@
     '("int**" "sizes")
     '("int*" "n_sizes")
   )
+)
+
+(define-method is_synthesized
+  (of-object "PangoFontFace")
+  (c-name "pango_font_face_is_synthesized")
+  (return-type "gboolean")
 )
 
 (define-function pango_font_get_type
@@ -2406,6 +2592,12 @@
   )
 )
 
+(define-method get_width
+  (of-object "PangoGlyphString")
+  (c-name "pango_glyph_string_get_width")
+  (return-type "int")
+)
+
 (define-method extents_range
   (of-object "PangoGlyphString")
   (c-name "pango_glyph_string_extents_range")
@@ -2525,6 +2717,34 @@
 
 
 
+;; From pango-gravity.h
+
+(define-method to_rotation
+  (of-object "PangoGravity")
+  (c-name "pango_gravity_to_rotation")
+  (return-type "double")
+)
+
+(define-function pango_gravity_get_for_matrix
+  (c-name "pango_gravity_get_for_matrix")
+  (return-type "PangoGravity")
+  (parameters
+    '("const-PangoMatrix*" "matrix")
+  )
+)
+
+(define-function pango_gravity_get_for_script
+  (c-name "pango_gravity_get_for_script")
+  (return-type "PangoGravity")
+  (parameters
+    '("PangoScript" "script")
+    '("PangoGravity" "base_gravity")
+    '("PangoGravityHint" "hint")
+  )
+)
+
+
+
 ;; From pango.h
 
 
@@ -2565,6 +2785,43 @@
   (parameters
     '("int" "split_index")
     '("int" "split_offset")
+  )
+)
+
+
+
+;; From pango-language.h
+
+(define-function pango_language_get_type
+  (c-name "pango_language_get_type")
+  (return-type "GType")
+)
+
+(define-function pango_language_from_string
+  (c-name "pango_language_from_string")
+  (return-type "PangoLanguage*")
+  (parameters
+    '("const-char*" "language")
+  )
+)
+
+(define-method get_sample_string
+  (of-object "PangoLanguage")
+  (c-name "pango_language_get_sample_string")
+  (return-type "const-char*")
+)
+
+(define-function pango_language_get_default
+  (c-name "pango_language_get_default")
+  (return-type "PangoLanguage*")
+)
+
+(define-method matches
+  (of-object "PangoLanguage")
+  (c-name "pango_language_matches")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "range_list")
   )
 )
 
@@ -2696,6 +2953,12 @@
   (return-type "PangoWrapMode")
 )
 
+(define-method is_wrapped
+  (of-object "PangoLayout")
+  (c-name "pango_layout_is_wrapped")
+  (return-type "gboolean")
+)
+
 (define-method set_indent
   (of-object "PangoLayout")
   (c-name "pango_layout_set_indent")
@@ -2814,6 +3077,18 @@
   (of-object "PangoLayout")
   (c-name "pango_layout_get_ellipsize")
   (return-type "PangoEllipsizeMode")
+)
+
+(define-method is_ellipsized
+  (of-object "PangoLayout")
+  (c-name "pango_layout_is_ellipsized")
+  (return-type "gboolean")
+)
+
+(define-method get_unknown_glyphs_count
+  (of-object "PangoLayout")
+  (c-name "pango_layout_get_unknown_glyphs_count")
+  (return-type "int")
 )
 
 (define-method context_changed
@@ -2946,9 +3221,24 @@
   )
 )
 
+(define-method get_line_readonly
+  (of-object "PangoLayout")
+  (c-name "pango_layout_get_line_readonly")
+  (return-type "PangoLayoutLine*")
+  (parameters
+    '("int" "line")
+  )
+)
+
 (define-method get_lines
   (of-object "PangoLayout")
   (c-name "pango_layout_get_lines")
+  (return-type "GSList*")
+)
+
+(define-method get_lines_readonly
+  (of-object "PangoLayout")
+  (c-name "pango_layout_get_lines_readonly")
   (return-type "GSList*")
 )
 
@@ -3052,9 +3342,21 @@
   (return-type "PangoLayoutRun*")
 )
 
+(define-method get_run_readonly
+  (of-object "PangoLayoutIter")
+  (c-name "pango_layout_iter_get_run_readonly")
+  (return-type "PangoLayoutRun*")
+)
+
 (define-method get_line
   (of-object "PangoLayoutIter")
   (c-name "pango_layout_iter_get_line")
+  (return-type "PangoLayoutLine*")
+)
+
+(define-method get_line_readonly
+  (of-object "PangoLayoutIter")
+  (c-name "pango_layout_iter_get_line_readonly")
   (return-type "PangoLayoutLine*")
 )
 
@@ -3156,6 +3458,109 @@
 
 
 ;; From pango-layout-private.h
+
+
+
+;; From pango-matrix.h
+
+(define-function pango_matrix_get_type
+  (c-name "pango_matrix_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_copy")
+  (return-type "PangoMatrix*")
+)
+
+(define-method free
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_free")
+  (return-type "none")
+)
+
+(define-method translate
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_translate")
+  (return-type "none")
+  (parameters
+    '("double" "tx")
+    '("double" "ty")
+  )
+)
+
+(define-method scale
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_scale")
+  (return-type "none")
+  (parameters
+    '("double" "scale_x")
+    '("double" "scale_y")
+  )
+)
+
+(define-method rotate
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_rotate")
+  (return-type "none")
+  (parameters
+    '("double" "degrees")
+  )
+)
+
+(define-method concat
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_concat")
+  (return-type "none")
+  (parameters
+    '("const-PangoMatrix*" "new_matrix")
+  )
+)
+
+(define-method transform_point
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_transform_point")
+  (return-type "none")
+  (parameters
+    '("double*" "x")
+    '("double*" "y")
+  )
+)
+
+(define-method transform_distance
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_transform_distance")
+  (return-type "none")
+  (parameters
+    '("double*" "dx")
+    '("double*" "dy")
+  )
+)
+
+(define-method transform_rectangle
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_transform_rectangle")
+  (return-type "none")
+  (parameters
+    '("PangoRectangle*" "rect")
+  )
+)
+
+(define-method transform_pixel_rectangle
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_transform_pixel_rectangle")
+  (return-type "none")
+  (parameters
+    '("PangoRectangle*" "rect")
+  )
+)
+
+(define-method get_font_scale_factor
+  (of-object "PangoMatrix")
+  (c-name "pango_matrix_get_font_scale_factor")
+  (return-type "double")
+)
 
 
 
@@ -3349,12 +3754,40 @@
   )
 )
 
+(define-function pango_ot_ruleset_get_for_description
+  (c-name "pango_ot_ruleset_get_for_description")
+  (return-type "const-PangoOTRuleset*")
+  (parameters
+    '("PangoOTInfo*" "info")
+    '("const-PangoOTRulesetDescription*" "desc")
+  )
+)
+
 (define-function pango_ot_ruleset_new
   (c-name "pango_ot_ruleset_new")
   (is-constructor-of "PangoOtRuleset")
   (return-type "PangoOTRuleset*")
   (parameters
     '("PangoOTInfo*" "info")
+  )
+)
+
+(define-function pango_ot_ruleset_new_for
+  (c-name "pango_ot_ruleset_new_for")
+  (return-type "PangoOTRuleset*")
+  (parameters
+    '("PangoOTInfo*" "info")
+    '("PangoScript" "script")
+    '("PangoLanguage*" "language")
+  )
+)
+
+(define-function pango_ot_ruleset_new_from_description
+  (c-name "pango_ot_ruleset_new_from_description")
+  (return-type "PangoOTRuleset*")
+  (parameters
+    '("PangoOTInfo*" "info")
+    '("const-PangoOTRulesetDescription*" "desc")
   )
 )
 
@@ -3366,6 +3799,38 @@
     '("PangoOTTableType" "table_type")
     '("guint" "feature_index")
     '("gulong" "property_bit")
+  )
+)
+
+(define-method maybe_add_feature
+  (of-object "PangoOTRuleset")
+  (c-name "pango_ot_ruleset_maybe_add_feature")
+  (return-type "gboolean")
+  (parameters
+    '("PangoOTTableType" "table_type")
+    '("PangoOTTag" "feature_tag")
+    '("gulong" "property_bit")
+  )
+)
+
+(define-method maybe_add_features
+  (of-object "PangoOTRuleset")
+  (c-name "pango_ot_ruleset_maybe_add_features")
+  (return-type "guint")
+  (parameters
+    '("PangoOTTableType" "table_type")
+    '("const-PangoOTFeatureMap*" "features")
+    '("guint" "n_features")
+  )
+)
+
+(define-method get_feature_count
+  (of-object "PangoOTRuleset")
+  (c-name "pango_ot_ruleset_get_feature_count")
+  (return-type "guint")
+  (parameters
+    '("guint*" "n_gsub_features")
+    '("guint*" "n_gpos_features")
   )
 )
 
@@ -3385,6 +3850,61 @@
   (parameters
     '("PangoOTBuffer*" "buffer")
   )
+)
+
+(define-method to_script
+  (of-object "PangoOTTag")
+  (c-name "pango_ot_tag_to_script")
+  (return-type "PangoScript")
+)
+
+(define-function pango_ot_tag_from_script
+  (c-name "pango_ot_tag_from_script")
+  (return-type "PangoOTTag")
+  (parameters
+    '("PangoScript" "script")
+  )
+)
+
+(define-method to_language
+  (of-object "PangoOTTag")
+  (c-name "pango_ot_tag_to_language")
+  (return-type "PangoLanguage*")
+)
+
+(define-function pango_ot_tag_from_language
+  (c-name "pango_ot_tag_from_language")
+  (return-type "PangoOTTag")
+  (parameters
+    '("PangoLanguage*" "language")
+  )
+)
+
+(define-method hash
+  (of-object "PangoOTRulesetDescription")
+  (c-name "pango_ot_ruleset_description_hash")
+  (return-type "guint")
+)
+
+(define-method equal
+  (of-object "PangoOTRulesetDescription")
+  (c-name "pango_ot_ruleset_description_equal")
+  (return-type "gboolean")
+  (parameters
+    '("const-PangoOTRulesetDescription*" "desc2")
+  )
+)
+
+(define-method copy
+  (of-object "PangoOTRulesetDescription")
+  (c-name "pango_ot_ruleset_description_copy")
+  (return-type "PangoOTRulesetDescription*")
+)
+
+(define-method free
+  (of-object "PangoOTRulesetDescription")
+  (c-name "pango_ot_ruleset_description_free")
+  (return-type "none")
 )
 
 
@@ -3737,95 +4257,28 @@
 
 ;; From pango-types.h
 
-(define-function pango_matrix_get_type
-  (c-name "pango_matrix_get_type")
-  (return-type "GType")
-)
-
-(define-method copy
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_copy")
-  (return-type "PangoMatrix*")
-)
-
-(define-method free
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_free")
-  (return-type "none")
-)
-
-(define-method translate
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_translate")
-  (return-type "none")
+(define-function pango_units_from_double
+  (c-name "pango_units_from_double")
+  (return-type "int")
   (parameters
-    '("double" "tx")
-    '("double" "ty")
+    '("double" "d")
   )
 )
 
-(define-method scale
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_scale")
-  (return-type "none")
-  (parameters
-    '("double" "scale_x")
-    '("double" "scale_y")
-  )
-)
-
-(define-method rotate
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_rotate")
-  (return-type "none")
-  (parameters
-    '("double" "degrees")
-  )
-)
-
-(define-method concat
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_concat")
-  (return-type "none")
-  (parameters
-    '("const-PangoMatrix*" "new_matrix")
-  )
-)
-
-(define-method get_font_scale_factor
-  (of-object "PangoMatrix")
-  (c-name "pango_matrix_get_font_scale_factor")
+(define-function pango_units_to_double
+  (c-name "pango_units_to_double")
   (return-type "double")
-)
-
-(define-function pango_language_get_type
-  (c-name "pango_language_get_type")
-  (return-type "GType")
-)
-
-(define-function pango_language_from_string
-  (c-name "pango_language_from_string")
-  (return-type "PangoLanguage*")
   (parameters
-    '("const-char*" "language")
+    '("int" "i")
   )
 )
 
-(define-method matches
-  (of-object "PangoLanguage")
-  (c-name "pango_language_matches")
-  (return-type "gboolean")
+(define-function pango_extents_to_pixels
+  (c-name "pango_extents_to_pixels")
+  (return-type "none")
   (parameters
-    '("const-char*" "range_list")
-  )
-)
-
-(define-function pango_get_mirror_char
-  (c-name "pango_get_mirror_char")
-  (return-type "gboolean")
-  (parameters
-    '("gunichar" "ch")
-    '("gunichar*" "mirrored_ch")
+    '("PangoRectangle*" "ink_rect")
+    '("PangoRectangle*" "logical_rect")
   )
 )
 
@@ -3843,6 +4296,15 @@
   (parameters
     '("const-gchar*" "text")
     '("gint" "length")
+  )
+)
+
+(define-function pango_get_mirror_char
+  (c-name "pango_get_mirror_char")
+  (return-type "gboolean")
+  (parameters
+    '("gunichar" "ch")
+    '("gunichar*" "mirrored_ch")
   )
 )
 
@@ -3928,6 +4390,18 @@
   )
 )
 
+(define-function pango_parse_enum
+  (c-name "pango_parse_enum")
+  (return-type "gboolean")
+  (parameters
+    '("GType" "type")
+    '("const-char*" "str")
+    '("int*" "value")
+    '("gboolean" "warn")
+    '("char**" "possible_values")
+  )
+)
+
 (define-function pango_parse_style
   (c-name "pango_parse_style")
   (return-type "gboolean")
@@ -3978,6 +4452,15 @@
   (return-type "const-char*")
 )
 
+(define-function pango_quantize_line_geometry
+  (c-name "pango_quantize_line_geometry")
+  (return-type "none")
+  (parameters
+    '("int*" "thickness")
+    '("int*" "position")
+  )
+)
+
 (define-function pango_log2vis_get_embedding_levels
   (c-name "pango_log2vis_get_embedding_levels")
   (return-type "guint8*")
@@ -3988,12 +4471,6 @@
   )
 )
 
-(define-method get_sample_string
-  (of-object "PangoLanguage")
-  (c-name "pango_language_get_sample_string")
-  (return-type "const-char*")
-)
-
 (define-function pango_is_zero_width
   (c-name "pango_is_zero_width")
   (return-type "gboolean")
@@ -4002,12 +4479,23 @@
   )
 )
 
-(define-function pango_quantize_line_geometry
-  (c-name "pango_quantize_line_geometry")
-  (return-type "none")
+(define-function pango_version
+  (c-name "pango_version")
+  (return-type "int")
+)
+
+(define-function pango_version_string
+  (c-name "pango_version_string")
+  (return-type "const-char*")
+)
+
+(define-function pango_version_check
+  (c-name "pango_version_check")
+  (return-type "const-char*")
   (parameters
-    '("int*" "thickness")
-    '("int*" "position")
+    '("int" "required_major")
+    '("int" "required_minor")
+    '("int" "required_micro")
   )
 )
 
@@ -4137,7 +4625,16 @@
   (c-name "pango_win32_font_cache_load")
   (return-type "HFONT")
   (parameters
-    '("const-LOGFONT*" "logfont")
+    '("const-LOGFONTA*" "logfont")
+  )
+)
+
+(define-method loadw
+  (of-object "PangoWin32FontCache")
+  (c-name "pango_win32_font_cache_loadw")
+  (return-type "HFONT")
+  (parameters
+    '("const-LOGFONTW*" "logfont")
   )
 )
 
@@ -4170,7 +4667,15 @@
 
 (define-function pango_win32_font_logfont
   (c-name "pango_win32_font_logfont")
-  (return-type "LOGFONT*")
+  (return-type "LOGFONTA*")
+  (parameters
+    '("PangoFont*" "font")
+  )
+)
+
+(define-function pango_win32_font_logfontw
+  (c-name "pango_win32_font_logfontw")
+  (return-type "LOGFONTW*")
   (parameters
     '("PangoFont*" "font")
   )
@@ -4180,126 +4685,21 @@
   (c-name "pango_win32_font_description_from_logfont")
   (return-type "PangoFontDescription*")
   (parameters
-    '("const-LOGFONT*" "lfp")
+    '("const-LOGFONTA*" "lfp")
+  )
+)
+
+(define-function pango_win32_font_description_from_logfontw
+  (c-name "pango_win32_font_description_from_logfontw")
+  (return-type "PangoFontDescription*")
+  (parameters
+    '("const-LOGFONTW*" "lfp")
   )
 )
 
 
 
 ;; From pangowin32-private.h
-
-(define-function pango_win32_font_get_type
-  (c-name "pango_win32_font_get_type")
-  (return-type "GType")
-)
-
-(define-function pango_win32_font_new
-  (c-name "pango_win32_font_new")
-  (is-constructor-of "PangoWin32Font")
-  (return-type "PangoWin32Font*")
-  (parameters
-    '("PangoFontMap*" "fontmap")
-    '("const-LOGFONT*" "lfp")
-    '("int" "size")
-  )
-)
-
-(define-function pango_win32_get_shaper_map
-  (c-name "pango_win32_get_shaper_map")
-  (return-type "PangoMap*")
-  (parameters
-    '("PangoLanguage*" "lang")
-  )
-)
-
-(define-function pango_win32_make_matching_logfont
-  (c-name "pango_win32_make_matching_logfont")
-  (return-type "none")
-  (parameters
-    '("PangoFontMap*" "fontmap")
-    '("const-LOGFONT*" "lfp")
-    '("int" "size")
-    '("LOGFONT*" "out")
-  )
-)
-
-(define-function pango_win32_font_entry_get_coverage
-  (c-name "pango_win32_font_entry_get_coverage")
-  (return-type "PangoCoverage*")
-  (parameters
-    '("PangoWin32Face*" "face")
-    '("PangoLanguage*" "lang")
-  )
-)
-
-(define-function pango_win32_font_entry_set_coverage
-  (c-name "pango_win32_font_entry_set_coverage")
-  (return-type "none")
-  (parameters
-    '("PangoWin32Face*" "face")
-    '("PangoCoverage*" "coverage")
-    '("PangoLanguage*" "lang")
-  )
-)
-
-(define-function pango_win32_font_entry_remove
-  (c-name "pango_win32_font_entry_remove")
-  (return-type "none")
-  (parameters
-    '("PangoWin32Face*" "face")
-    '("PangoFont*" "font")
-  )
-)
-
-(define-function pango_win32_font_map_get_type
-  (c-name "pango_win32_font_map_get_type")
-  (return-type "GType")
-)
-
-(define-function pango_win32_fontmap_cache_add
-  (c-name "pango_win32_fontmap_cache_add")
-  (return-type "none")
-  (parameters
-    '("PangoFontMap*" "fontmap")
-    '("PangoWin32Font*" "xfont")
-  )
-)
-
-(define-function pango_win32_fontmap_cache_remove
-  (c-name "pango_win32_fontmap_cache_remove")
-  (return-type "none")
-  (parameters
-    '("PangoFontMap*" "fontmap")
-    '("PangoWin32Font*" "xfont")
-  )
-)
-
-(define-function pango_win32_coverage_language_classify
-  (c-name "pango_win32_coverage_language_classify")
-  (return-type "gint")
-  (parameters
-    '("PangoLanguage*" "lang")
-  )
-)
-
-(define-function pango_win32_get_name_header
-  (c-name "pango_win32_get_name_header")
-  (return-type "gboolean")
-  (parameters
-    '("HDC" "hdc")
-    '("struct-name_header*" "header")
-  )
-)
-
-(define-function pango_win32_get_name_record
-  (c-name "pango_win32_get_name_record")
-  (return-type "gboolean")
-  (parameters
-    '("HDC" "hdc")
-    '("gint" "i")
-    '("struct-name_record*" "record")
-  )
-)
 
 
 

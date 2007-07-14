@@ -15,6 +15,8 @@ _CONV_ENUM(Pango,TabAlign)
 _CONV_ENUM(Pango,Script)
 _CONV_ENUM(Pango,EllipsizeMode)
 _CONV_ENUM(Pango,RenderPart)
+_CONV_ENUM(Pango,Gravity)
+_CONV_ENUM(Pango,GravityHint)
 
 # General conversions:
 _CONVERSION(`gchar*',`const char*',`($3)')
