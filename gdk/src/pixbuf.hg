@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: pixbuf.hg,v 1.16 2006/05/11 11:40:23 murrayc Exp $ */
 
 /* Copyright (C) 1998-2002 The gtkmm Development Team
  *
@@ -65,19 +65,129 @@ class Pixbuf : public Glib::Object
 
 protected:
 
-  //TODO: Document these, based on the docs for the C functions.
-  Pixbuf(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
+  /** Creates a pixbuf object from a drawable.
+   *
+   * Transfers image data from a #GdkDrawable and converts it to an RGB(A)
+   * representation inside a #GdkPixbuf. In other words, copies
+   * image data from a server-side drawable to a client-side RGB(A) buffer.
+   * This allows you to efficiently read individual pixels on the client side.
+   * 
+   * If the drawable @src has no colormap (See Gdk::Drawable::get_colormap()),
+   * then a suitable colormap must be specified. Otherwise, you may use the 
+   * constructor that takes no colormap argument.
+   * Typically a Gdk::Window or a pixmap created by passing a Gdk:Window
+   * to the Gdk::Pixbuf constructor will already have a colormap associated with
+   * it.  If the drawable is a bitmap (1 bit per pixel pixmap),
+   * then a colormap is not required; pixels with a value of 1 are
+   * assumed to be white, and pixels with a value of 0 are assumed to be
+   * black. For taking screenshots, Gdk::Colormap::get_system() returns
+   * the correct colormap to use.
+   *
+   * This will create an RGB pixbuf with 8 bits per channel and no
+   * alpha, with the same size specified by the @a width and @a height
+   * arguments.
+   *
+   * If the specified drawable is a pixmap, then the requested source
+   * rectangle must be completely contained within the pixmap, otherwise
+   * the constructor will fail. For pixmaps only (not for windows)
+   * passing -1 for width or height is allowed to mean the full width
+   * or height of the pixmap.
+   *
+   * If the specified drawable is a window, and the window is off the
+   * screen, then there is no image data in the obscured/offscreen
+   * regions to be placed in the pixbuf. The contents of portions of the
+   * pixbuf corresponding to the offscreen region are undefined.
+   *
+   * If the window you're obtaining data from is partially obscured by
+   * other windows, then the contents of the pixbuf areas corresponding
+   * to the obscured regions are undefined.
+   * 
+   * See alo Gdk::Drawable::get_image().
+   *
+   * @param src Source drawable.
+   * @param cmap: A colormap.
+   * @param src_x Source X coordinate within drawable.
+   * @param src_y Source Y coordinate within drawable.
+   * @param width Width in pixels of region to get.
+   * @param height Height in pixels of region to get.
+   *
+   * @newin2p12
+   */
+   Pixbuf(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
+         int src_x, int src_y, int width, int height);
+
+  /** Creates a pixbuf object from a drawable, using the colormap from the drawable.
+   *
+   * @param src Source drawable.
+   * @param src_x Source X coordinate within drawable.
+   * @param src_y Source Y coordinate within drawable.
+   * @param width Width in pixels of region to get.
+   * @param height Height in pixels of region to get.
+   *
+   * @newin2p12
+   */
+   Pixbuf(const Glib::RefPtr<Drawable>& src,
+         int src_x, int src_y, int width, int height);
+
+  _DEPRECATE_IFDEF_START
+   /// @deprecated Use the constructor without dest_x and dest_y parameters.
+   Pixbuf(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
          int src_x, int src_y, int dest_x, int dest_y, int width, int height);
+  _DEPRECATE_IFDEF_END
+
+  /** Creates a pixbuf object from an image.
+   *
+   * @param src Source Image.
+   * @param cmap A colormap.
+   * @param src_x Source X coordinate within the image.
+   * @param src_y Source Y coordinate within the image.
+   * @param width Width in pixels of region to get.
+   * @param height Height in pixels of region to get.
+   *
+   * @newin2p12
+   */
+  Pixbuf(const Glib::RefPtr<Image>& src, const Glib::RefPtr<Colormap>& cmap,
+         int src_x, int src_y, int width, int height);
+
+  /** Creates a pixbuf object from an image, using the colormap from the image.
+   *
+   * @param src Source Image.
+   * @param src_x Source X coordinate within the image.
+   * @param src_y Source Y coordinate within the image.
+   * @param width Width in pixels of region to get.
+   * @param height Height in pixels of region to get.
+   *
+   * @newinp212
+   */
+  Pixbuf(const Glib::RefPtr<Image>& src,
+         int src_x, int src_y, int width, int height);
+
+  _DEPRECATE_IFDEF_START
+  /// @deprecated Use the constructors without dest_x and dest_y parameters.
   Pixbuf(const Glib::RefPtr<Image>& src, const Glib::RefPtr<Colormap>& cmap,
          int src_x, int src_y, int dest_x, int dest_y, int width, int height);
+  _DEPRECATE_IFDEF_END
 
 public:
   typedef sigc::slot<void, const guint8*> SlotDestroyData;
 
+  _DEPRECATE_IFDEF_START
+  //TODO: Document these as deprecated:
   _WRAP_CREATE(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
                int src_x, int src_y, int dest_x, int dest_y, int width, int height)
   _WRAP_CREATE(const Glib::RefPtr<Image>& src, const Glib::RefPtr<Colormap>& cmap,
                int src_x, int src_y, int dest_x, int dest_y, int width, int height)
+  _DEPRECATE_IFDEF_END
+
+  _WRAP_CREATE(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
+               int src_x, int src_y, int width, int height)
+  _WRAP_CREATE(const Glib::RefPtr<Drawable>& src,
+               int src_x, int src_y, int width, int height)
+
+  _WRAP_CREATE(const Glib::RefPtr<Image>& src, const Glib::RefPtr<Colormap>& cmap,
+               int src_x, int src_y, int width, int height)
+  _WRAP_CREATE(const Glib::RefPtr<Image>& src,
+               int src_x, int src_y, int width, int height)
 
   _WRAP_METHOD(Glib::RefPtr<Pixbuf> copy() const, gdk_pixbuf_copy)
 

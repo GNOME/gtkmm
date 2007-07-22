@@ -477,6 +477,8 @@ _CONVERSION(`GtkTooltips*',`Tooltips*', `Glib::wrap($3)')
 _CONVERSION(`Tooltips*',`GtkTooltips*',`Glib::unwrap($3)')
 _CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
 
+_CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
+
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 #_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 
