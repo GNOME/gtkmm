@@ -1,4 +1,4 @@
-// -*- c++ -*-
+// -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /* $Id: treeview.ccg,v 1.24 2006/06/19 17:28:12 murrayc Exp $ */
 
 /* Copyright 2002 The gtkmm Development Team
@@ -445,6 +445,46 @@ bool TreeView::get_visible_range(TreeModel::Path& start_path, TreeModel::Path& e
 void TreeView::unset_model()
 {
   gtk_tree_view_set_model(gobj(), 0);
+}
+
+bool
+TreeView::get_tooltip_context_path(int& x, int& y,
+                                   bool keyboard_tip,
+                                   TreeModel::Path& path)
+{
+  GtkTreePath* src_path = path.gobj();
+
+  gboolean result =
+    gtk_tree_view_get_tooltip_context(gobj(),
+                                      &x, &y,
+                                      keyboard_tip,
+                                      0,
+                                      &src_path,
+                                      0);
+
+  path = Glib::wrap(src_path, false /* take_copy=false */);
+
+  return result;
+}
+
+bool
+TreeView::get_tooltip_context_iter(int& x, int& y,
+                                   bool keyboard_tip,
+                                   Gtk::TreeModel::iterator& iter)
+{
+  GtkTreeIter* src_iter = iter.gobj();
+
+  gboolean result =
+    gtk_tree_view_get_tooltip_context(gobj(),
+                                      &x, &y,
+                                      keyboard_tip,
+                                      0,
+                                      0,
+                                      src_iter);
+
+  iter = TreeIter(gtk_tree_view_get_model(this->gobj()), src_iter);
+
+  return result;
 }
 
 } // namespace Gtk

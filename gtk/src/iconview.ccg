@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: iconview.ccg,v 1.7 2006/05/11 11:40:24 murrayc Exp $ */
 
 /* Copyright 1998-2004 The gtkmm Development Team
  *
@@ -20,6 +20,7 @@
 
 #include <gtkmm/adjustment.h> 
 #include <gtk/gtkiconview.h>
+#include <gtk/gtktreeview.h>
 
 namespace //anonymous namespace
 {
@@ -186,6 +187,46 @@ void IconView::enable_model_drag_source(const ArrayHandle_TargetEntry& targets, 
 void  IconView::enable_model_drag_dest(const ArrayHandle_TargetEntry& targets, Gdk::DragAction actions)
 {
   gtk_icon_view_enable_model_drag_dest(gobj(), targets.data(), targets.size(), (GdkDragAction)actions);
+}
+
+bool
+IconView::get_tooltip_context_path(int& x, int& y,
+                                   bool keyboard_tip,
+                                   TreeModel::Path& path)
+{
+  GtkTreePath* src_path = path.gobj();
+
+  gboolean result =
+    gtk_icon_view_get_tooltip_context(gobj(),
+                                      &x, &y,
+                                      keyboard_tip,
+                                      0,
+                                      &src_path,
+                                      0);
+
+  path = Glib::wrap(src_path, false /* take_copy=false */);
+
+  return result;
+}
+
+bool
+IconView::get_tooltip_context_iter(int& x, int& y,
+                                   bool keyboard_tip,
+                                   Gtk::TreeModel::iterator& iter)
+{
+  GtkTreeIter* src_iter = iter.gobj();
+
+  gboolean result =
+    gtk_icon_view_get_tooltip_context(gobj(),
+                                      &x, &y,
+                                      keyboard_tip,
+                                      0,
+                                      0,
+                                      src_iter);
+
+  iter = TreeIter(gtk_icon_view_get_model(this->gobj()), src_iter);
+
+  return result;
 }
 
 } // namespace Gtk
