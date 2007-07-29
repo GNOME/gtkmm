@@ -452,17 +452,21 @@ TreeView::get_tooltip_context_path(int& x, int& y,
                                    bool keyboard_tip,
                                    TreeModel::Path& path)
 {
-  GtkTreePath* src_path = path.gobj();
+  //It's cleaner to use a temporary C++ object and get a C pointer to it,
+  //because GtkTreePath is a simple struct, not a GtkObject, so
+  //gtk_tree_path_new() would be necessary. markoa.
+  TreeModel::Path tmp_path;
+  GtkTreePath* cpath = tmp_path.gobj();
 
   gboolean result =
     gtk_tree_view_get_tooltip_context(gobj(),
                                       &x, &y,
                                       keyboard_tip,
                                       0,
-                                      &src_path,
+                                      &cpath,
                                       0);
 
-  path = Glib::wrap(src_path, false /* take_copy=false */);
+  path = Glib::wrap(cpath, false /* take_copy=false */);
 
   return result;
 }
@@ -472,7 +476,7 @@ TreeView::get_tooltip_context_iter(int& x, int& y,
                                    bool keyboard_tip,
                                    Gtk::TreeModel::iterator& iter)
 {
-  GtkTreeIter* src_iter = iter.gobj();
+  GtkTreeIter src_iter;
 
   gboolean result =
     gtk_tree_view_get_tooltip_context(gobj(),
@@ -480,12 +484,11 @@ TreeView::get_tooltip_context_iter(int& x, int& y,
                                       keyboard_tip,
                                       0,
                                       0,
-                                      src_iter);
+                                      &src_iter);
 
-  iter = TreeIter(gtk_tree_view_get_model(this->gobj()), src_iter);
+  iter = TreeIter(gtk_tree_view_get_model(this->gobj()), &src_iter);
 
   return result;
 }
 
 } // namespace Gtk
-
