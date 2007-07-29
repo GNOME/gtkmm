@@ -43,7 +43,6 @@ class Printer : public Glib::Object
 
 public:
   //TODO: _WRAP_CREATE() - probably not, it's only accessible through PrintUnixDialog + GtkPrintBackend should be ignored
-  _IGNORE(gtk_printer_new, gtk_printer_get_backend)
   //TODO: I think these are not needed as well, and that Printer should generally be read-only - marko.
   _IGNORE(gtk_printer_is_new, gtk_printer_set_state_message, gtk_printer_set_is_default)
   _IGNORE(gtk_printer_set_is_active, gtk_printer_set_has_details, gtk_printer_set_description)
@@ -51,8 +50,11 @@ public:
 
   bool equal(const Glib::RefPtr<Printer>& other) const;
 
-  //TODO: _WRAP_METHOD(Glib::RefPtr<PrintBackend> get_backend(), gtk_printer_get_backend. refreturn)
+  //GtkPrintBackend is in a "semi-private" header.
+  //_WRAP_METHOD(Glib::RefPtr<PrintBackend> get_backend(), gtk_printer_get_backend, refreturn)
   //_WRAP_METHOD(Glib::RefPtr<const PrintBackend> get_backend() const, gtk_printer_get_backend, refreturn, constversion)
+  _IGNORE(gtk_printer_new, gtk_printer_get_backend)
+
   _WRAP_METHOD(Glib::ustring get_name() const, gtk_printer_get_name)
   _WRAP_METHOD(Glib::ustring get_state_message() const, gtk_printer_get_state_message)
   _WRAP_METHOD(Glib::ustring get_description() const, gtk_printer_get_description)
@@ -82,7 +84,10 @@ public:
   _WRAP_SIGNAL(void details_acquired(bool success), "details_acquired")
   
   _WRAP_PROPERTY("name", Glib::ustring)
-  //TODO: _WRAP_PROPERTY("backend", Glib::RefPtr<PrintBackend>)
+
+  //GtkPrintBackend is in a "semi-private" header:
+  //_WRAP_PROPERTY("backend", Glib::RefPtr<PrintBackend>)
+
   _WRAP_PROPERTY("is_virtual", bool)
   _WRAP_PROPERTY("state_message", Glib::ustring)
   _WRAP_PROPERTY("location", Glib::ustring)
@@ -102,14 +107,16 @@ inline bool operator!=(const Glib::RefPtr<Printer>& lhs, const Glib::RefPtr<Prin
 
 /** For example, 
  * bool on_enumerate_printers(const Glib::RefPtr<Printer>& printer);
- *
- * TODO: document return value.
+ * @param printer A printer.
+ * @param result true to stop the enumeration, false to continue. 
  *
  * @relates Gtk::Printer
  */
 typedef sigc::slot< bool, const Glib::RefPtr<Printer>& > SlotPrinterEnumerator;
 
-/** TODO: document this
+/** Calls a function for all Printers. If the callback returns true, the enumeration is stopped.
+ * @slot A function to call for each printer
+ * @parm wait If true, wait in a recursive mainloop until all printers are enumerated; otherwise return early.
  *
  * @relates Gtk::Printer
  */
