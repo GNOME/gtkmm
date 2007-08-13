@@ -106,7 +106,7 @@ bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
   return true;
 }
 
-void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>& cxt)
+void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>&)
 {
   m_PageSpin.set_range(1.0, m_pOperation->property_n_pages());
 

@@ -168,7 +168,7 @@ bool ExampleWindow::on_textview_query_tooltip(int x, int y, bool keyboard_toolti
   return true;
 }
 
-bool ExampleWindow::on_button_query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+bool ExampleWindow::on_button_query_tooltip(int, int, bool, const Glib::RefPtr<Gtk::Tooltip>&)
 {
   //We already have a custom window ready, just return true to show it:
   return true;
