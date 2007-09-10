@@ -47,14 +47,26 @@ class RecentAction : public Gtk::Action
   _CLASS_GOBJECT(RecentAction, GtkRecentAction, GTK_RECENT_ACTION, Gtk::Action, GtkAction)
 
 protected:
-  //TODO: See bug #450032: _CTOR_DEFAULT()
-  _WRAP_CTOR(RecentAction(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip = Glib::ustring(), const Gtk::StockID& stock_id = Gtk::StockID()), gtk_recent_action_new)
-  _WRAP_CTOR(RecentAction(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip, const Gtk::StockID& stock_id, const Glib::RefPtr<RecentManager>& manager), gtk_recent_action_new_for_manager )
+  _CTOR_DEFAULT
+
+//Make sure that we use NULL instead of empty strings for the constructors:
+#m4 _CONVERSION(`const Glib::ustring&',`const char*',`$3.empty() ? 0 : $3.c_str()')
+
+  //Note that the order of the parameters is not the same as gtk_recent_action_new(), because 
+  //a) we want to be consistent with Action, ToggleAction, etc.
+  //b) this allows us to use the StockID parameter to distinguish the create() overloads.
+  _WRAP_CTOR(RecentAction(const Glib::ustring& name, const StockID& stock_id = StockID(), const Glib::ustring& label = Glib::ustring(), const Glib::ustring& tooltip = Glib::ustring()), gtk_recent_action_new)
+  _WRAP_CTOR(RecentAction(const Glib::ustring& name, const StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip, const Glib::RefPtr<RecentManager>& manager), gtk_recent_action_new_for_manager )
 
 public:
-  //TODO: See bug #450032: _WRAP_CREATE()
-  _WRAP_CREATE(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip = Glib::ustring(), const Gtk::StockID& stock_id = Gtk::StockID())
-  _WRAP_CREATE(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip, const Gtk::StockID& stock_id, const Glib::RefPtr<RecentManager>& manager)
+  //Note that gtk_recent_action_new() does not allow name to be NULL, which suggests that we should not have a default constructor,
+  //but it's OK to set the name later:
+  _WRAP_CREATE()
+
+  static Glib::RefPtr<RecentAction> create(const Glib::ustring& name, const Glib::ustring& label = Glib::ustring(), const Glib::ustring& tooltip = Glib::ustring());
+  _WRAP_CREATE(const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label = Glib::ustring(), const Glib::ustring& tooltip = Glib::ustring())
+  _WRAP_CREATE(const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip, const Glib::RefPtr<RecentManager>& manager)
+
 
   _WRAP_METHOD(bool get_show_numbers(), gtk_recent_action_get_show_numbers)
   _WRAP_METHOD(void set_show_numbers(bool show_numbers = true), gtk_recent_action_set_show_numbers)
