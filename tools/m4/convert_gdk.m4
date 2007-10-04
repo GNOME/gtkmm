@@ -154,8 +154,6 @@ _CONVERSION(`GdkWindow*',`Glib::RefPtr<Window>', `Glib::wrap((GdkWindowObject*)(
 _CONVERSION(`GdkWindow*',`Glib::RefPtr<const Window>', `Glib::wrap((GdkWindowObject*)($3))')
 _CONVERSION(`GdkWindow*',`Glib::RefPtr<Gdk::Window>', `Glib::wrap((GdkWindowObject*)($3))')
 _CONVERSION(`GdkWindow*',`Glib::RefPtr<const Gdk::Window>', `Glib::wrap((GdkWindowObject*)($3))')
-_CONVERSION(`GdkWindow*',`const Glib::RefPtr<Gdk::Window>&', `Glib::wrap((GdkWindowObject*)($3), true)')
-#_CONVERSION(`GdkDrawable*',`const Glib::RefPtr<Gdk::Drawable>&', `Glib::wrap($3)')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
@@ -244,11 +242,5 @@ _CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`($2)($3)')
 _CONVERSION(`NativeWindow',`GdkNativeWindow',`($2)($3)')
 _CONVERSION(`GdkEvent*',`const GdkEvent*',`($2)($3)')
 
-# Used by signals:
-# TODO: Have some kind of _CONVERSION_ONLY_FOR_SIGNALS().
-_CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
-_CONVERSION(`GdkPixbuf*',`const Glib::RefPtr<Gdk::Pixbuf>&', Glib::wrap($3, true))
-_CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
-_CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Display>&', Glib::wrap($3, true))
-_CONVERSION(`GdkDevice*',`const Glib::RefPtr<Gdk::Device>&', `Glib::wrap($3, true)')
 
+_CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
