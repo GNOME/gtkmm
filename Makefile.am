@@ -4,7 +4,7 @@ else
   ATK_SUBDIR=
 endif
 
-SUBDIRS		= tools $(ATK_SUBDIR) pango gdk gtk @EXAMPLE_SUBDIR@ @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2003
+SUBDIRS		= tools $(ATK_SUBDIR) pango gdk gtk @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2003
 DIST_SUBDIRS	= $(SUBDIRS) scripts
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
@@ -42,13 +42,12 @@ doc_tarball_files = \
 # but this target is for maintainer use only anyway.
 
 gtkmm-2-4-docs.tar.gz:
-	find examples -name '*.cc' -o -name '*.h' -o -name '*.xpm' -o -name '*.xml' | \
 	tar cf - --files-from - $(doc_tarball_files) | gzip -c --best >$@
 
-# Upload documentation and examples:
+# Upload documentation:
 
 post-html-recursive:
-	list='docs examples'; for subdir in $$list; do \
+	list='docs'; for subdir in $$list; do \
 	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
 	done
 
