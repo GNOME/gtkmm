@@ -182,7 +182,6 @@ _CONVERSION(`GtkRcStyle*',`Glib::RefPtr<RcStyle>',`Glib::wrap($3)')
 _CONVERSION(`GtkRcStyle*',`Glib::RefPtr<const RcStyle>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<RcStyle>&',`GtkRcStyle*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<RcStyle>',`GtkRcStyle*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`GtkRcStyle*',`const Glib::RefPtr<RcStyle>&',`Glib::wrap($3)')
 
 # AccelGroup:
 _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<AccelGroup>',`Glib::wrap($3)')
@@ -605,7 +604,7 @@ _CONVERSION(`GObject*',`const Glib::RefPtr<Glib::Object>&',`Glib::wrap($3, true)
 _CONVERSION(`GtkTreePath*',`const TreeModel::Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`GtkTreePath*',`const Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
-_CONVERSION(`GtkStyle*',`const Glib::RefPtr<Style>&',`Glib::wrap($3, true)')
+
 _CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkTreeModel*',`const Glib::RefPtr<const TreeModel>&',`Glib::wrap($3, true)')
