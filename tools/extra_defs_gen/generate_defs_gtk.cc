@@ -22,10 +22,10 @@
 #include "glibmm_generate_extra_defs/generate_extra_defs.h"
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
-#include <gtk/gtkprinter.h>
-#include <gtk/gtkprintjob.h>
 
 #if !defined(G_OS_WIN32)
+#include <gtk/gtkprinter.h>
+#include <gtk/gtkprintjob.h>
 #include <gtk/gtkpagesetupunixdialog.h>
 #include <gtk/gtkprintunixdialog.h>
 #endif /* G_OS_WIN32 */
@@ -154,8 +154,10 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_PLUG )
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PREVIEW )
+#if !defined(G_OS_WIN32)
 	    << get_defs( GTK_TYPE_PRINTER )
 	    << get_defs( GTK_TYPE_PRINT_JOB )
+#endif /* G_OS_WIN32 */
 	    << get_defs( GTK_TYPE_PRINT_OPERATION )
 	    << get_defs( GTK_TYPE_PRINT_OPERATION_PREVIEW )
 #if !defined(G_OS_WIN32)
