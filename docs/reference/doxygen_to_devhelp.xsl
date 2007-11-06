@@ -45,29 +45,47 @@
   <!--
   <function name="atk_set_value" link="atk-atkvalue.html#ATK-SET-VALUE"/>
   -->
-  <xsl:param name="base_name"><xsl:value-of select="name"/></xsl:param>
-  <xsl:param name="parent_name"><xsl:value-of select="../name"/></xsl:param>
-  <xsl:param name="name"><xsl:value-of select="concat($parent_name, '::', $base_name)"/></xsl:param>
-  <!-- Link is refid attribute of parent element + "#" + diff between refid of parent and own refid -->
-  <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
-  <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
-  <xsl:param name="offset"><xsl:value-of select="string-length($refid_parent) + 3"/></xsl:param>
-  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset)"/></xsl:param>
-  <xsl:param name="link"><xsl:value-of select="$refid_parent"/>.html#<xsl:value-of select="$ref_diff"/></xsl:param>
-  <function name="{$name}" link="{$reference_prefix}{$link}"/>
+  <xsl:variable name="fqn">
+    <xsl:call-template name="get-fully-qualified-name" />
+  </xsl:variable>
+  <xsl:variable name="link">
+    <xsl:call-template name="get-member-link" />
+  </xsl:variable>
+  <function name="{$fqn}" link="{$reference_prefix}{$link}"/>
 </xsl:template>
 
 <xsl:template match="member" mode="as-sub">
-  <xsl:param name="base_name"><xsl:value-of select="name"/></xsl:param>
-  <xsl:param name="parent_name"><xsl:value-of select="../name"/></xsl:param>
-  <xsl:param name="name"><xsl:value-of select="concat($parent_name, '::', $base_name)"/></xsl:param>
-  <!-- Link is refid attribute of parent element + "#" + diff between refid of parent and own refid -->
-  <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
-  <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
-  <xsl:param name="offset"><xsl:value-of select="string-length($refid_parent) + 3"/></xsl:param>
-  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset)"/></xsl:param>
-  <xsl:param name="link"><xsl:value-of select="$refid_parent"/>.html#<xsl:value-of select="$ref_diff"/></xsl:param>
-  <sub name="{$name}" link="{$reference_prefix}{$link}"/>
+  <xsl:variable name="fqn">
+    <xsl:call-template name="get-fully-qualified-name" />
+  </xsl:variable>
+  <xsl:variable name="link">
+    <xsl:call-template name="get-member-link" />
+  </xsl:variable>
+  <sub name="{$fqn}" link="{$reference_prefix}{$link}"/>
+</xsl:template>
+
+
+<!-- get a url link for the current member node.
+  The source xml looks like this:
+  <compound refid="classGtk_1_1AboutDialog" kind="class"><name>Gtk::AboutDialog</name>
+    <member refid="classGtk_1_1AboutDialog_1ad14950354fa1d9e7d02e951bd0f232e" kind="typedef"><name>SlotActivateLink</name></member>
+
+  The URL for the member function is obtained by adding '.html' to the refid of
+  the parent node.  The in-page anchor id is the portion of the child's refid
+  that is different than the parent's refid, but without the leading '_1'
+  So, in the example above, the url would be:
+    classGtk_1_1AboutDialog.html#ad14950354fa1d9e7d02e951bd0f232e
+-->
+<xsl:template name="get-member-link">
+  <xsl:variable name="offset">
+    <xsl:value-of select="string-length(../@refid) + 3"/>
+  </xsl:variable>
+  <xsl:value-of select="concat(../@refid, '.html#', substring(@refid, $offset))"/>
+</xsl:template>
+
+<!-- Get the fully qualified name for the current class member node -->
+<xsl:template name="get-fully-qualified-name">
+  <xsl:value-of select="concat(../name, '::', name)"/>
 </xsl:template>
 
 </xsl:stylesheet>
