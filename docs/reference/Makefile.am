@@ -2,6 +2,7 @@ doxygen_configfile = Doxyfile
 doxygen_configfile_source = $(srcdir)/Doxyfile.in
 beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
 devhelp_file = gtkmm-2.4.devhelp
+devhelp_stylesheet = doxygen_to_devhelp.xsl
 
 include $(top_srcdir)/docs/Makefile_web.am_fragment
 web_path_reference = $(web_path_docs)reference
@@ -31,9 +32,12 @@ html/index.html: $(doxygen_configfile_source)
 	$(beautify_docs) html 2>> doxygen-warnings.txt | tee -a doxygen-output.txt
 
 
+# the xml output is made along with the html output
+xml/index.xml: html/index.html
+
 # DevHelp reference
-gtkmm-2.4.devhelp: xml/index.xml
-	xsltproc -o $(devhelp_file) doxygen_to_devhelp.xsl xml/index.xml
+$(devhelp_file): xml/index.xml $(devhelp_stylesheet)
+	xsltproc -o $@ $(devhelp_stylesheet) xml/index.xml
 
 gtkmm-reference-html.tar.gz: $(hierarchy_files) html/index.html
 	tar cf - html | gzip -c --best >$@

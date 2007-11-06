@@ -50,7 +50,7 @@
   <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
   <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
   <xsl:param name="offset"><xsl:value-of select="string-length($refid_parent) + 3"/></xsl:param>
-  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset, 5)"/></xsl:param>
+  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset)"/></xsl:param>
   <xsl:param name="link"><xsl:value-of select="$refid_parent"/>.html#<xsl:value-of select="$ref_diff"/></xsl:param>
   <function name="{$name}" link="{$reference_prefix}{$link}"/>
 </xsl:template>
@@ -61,7 +61,7 @@
   <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
   <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
   <xsl:param name="offset"><xsl:value-of select="string-length($refid_parent) + 3"/></xsl:param>
-  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset, 5)"/></xsl:param>
+  <xsl:param name="ref_diff"><xsl:value-of select="substring($own_refid, $offset)"/></xsl:param>
   <xsl:param name="link"><xsl:value-of select="$refid_parent"/>.html#<xsl:value-of select="$ref_diff"/></xsl:param>
   <sub name="{$name}" link="{$reference_prefix}{$link}"/>
 </xsl:template>
