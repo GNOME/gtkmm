@@ -45,7 +45,9 @@
   <!--
   <function name="atk_set_value" link="atk-atkvalue.html#ATK-SET-VALUE"/>
   -->
-  <xsl:param name="name"><xsl:value-of select="name"/></xsl:param>
+  <xsl:param name="base_name"><xsl:value-of select="name"/></xsl:param>
+  <xsl:param name="parent_name"><xsl:value-of select="../name"/></xsl:param>
+  <xsl:param name="name"><xsl:value-of select="concat($parent_name, '::', $base_name)"/></xsl:param>
   <!-- Link is refid attribute of parent element + "#" + diff between refid of parent and own refid -->
   <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
   <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
@@ -56,7 +58,9 @@
 </xsl:template>
 
 <xsl:template match="member" mode="as-sub">
-  <xsl:param name="name"><xsl:value-of select="name"/></xsl:param>
+  <xsl:param name="base_name"><xsl:value-of select="name"/></xsl:param>
+  <xsl:param name="parent_name"><xsl:value-of select="../name"/></xsl:param>
+  <xsl:param name="name"><xsl:value-of select="concat($parent_name, '::', $base_name)"/></xsl:param>
   <!-- Link is refid attribute of parent element + "#" + diff between refid of parent and own refid -->
   <xsl:param name="refid_parent"><xsl:value-of select="parent::node()/@refid"/></xsl:param>
   <xsl:param name="own_refid"><xsl:value-of select="@refid"/></xsl:param>
