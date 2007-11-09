@@ -44,6 +44,9 @@ public:
   StockID(const StockID& other);
   StockID& operator=(const StockID& other);
 
+  /// Tests whether the StockID is not empty.
+  operator bool() const;
+
   bool equal(const StockID& rhs) const;
 
   Glib::ustring get_string() const;
