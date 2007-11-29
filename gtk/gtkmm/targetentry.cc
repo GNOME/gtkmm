@@ -21,7 +21,7 @@
  */
 
 #include <gtkmm/targetentry.h>
-
+#include <cstring> //For memset().
 
 namespace Gtk
 {
