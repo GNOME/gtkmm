@@ -22,21 +22,56 @@
 
 #include <gtk/gtkcalendar.h>
 
+
+//TODO: This should have been changed to a non-const gchar* return in GTK+ by the time you read this. murrayc.
+static const gchar* SignalProxy_Details_gtk_callback(GtkCalendar* model, guint year, guint month, guint day, gpointer user_data)
+{
+  Gtk::Calendar::SlotDetails* the_slot = static_cast<Gtk::Calendar::SlotDetails*>(user_data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    const Glib::ustring temp = (*the_slot)(year, month, day);
+    return temp.c_str();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void SignalProxy_Details_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::Calendar::SlotDetails*>(data);
+}
+
 namespace Gtk
 {
 
 void Calendar::get_date(Glib::Date& date) const
 {
-	guint year = 0;
-	guint month = 0;
-	guint day = 0;
-	
-	get_date(year, month, day);
-	
-	date.set_year(year);
-	date.set_month(static_cast<Glib::Date::Month>(Glib::Date::JANUARY + month)); // Month from 1 to 12 instead from 0 to 11
-	date.set_day(day);	
+  guint year = 0;
+  guint month = 0;
+  guint day = 0;
+  
+  get_date(year, month, day);
+  
+  date.set_year(year);
+  date.set_month(static_cast<Glib::Date::Month>(Glib::Date::JANUARY + month)); // Month from 1 to 12 instead from 0 to 11
+  date.set_day(day);  
 }
+
+void Calendar::set_detail_func(const SlotDetails& slot)
+{
+  SlotDetails* slot_copy = new SlotDetails(slot);
+  gtk_calendar_set_detail_func(gobj(), &SignalProxy_Details_gtk_callback, slot_copy, &SignalProxy_Details_gtk_callback_destroy);
+}
+
 
 } //namespace Gtk
 
