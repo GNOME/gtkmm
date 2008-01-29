@@ -27,6 +27,7 @@ extern const int gtkmm_minor_version;
 extern const int gtkmm_micro_version;
 
 #include <glibmm.h>
+#include <giomm.h>
 #include <gdkmm.h>
 
 #include <gtkmm/object.h>
