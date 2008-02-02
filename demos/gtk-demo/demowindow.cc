@@ -31,6 +31,7 @@
 #include <cctype>
 #include <cerrno>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef NEED_FLOCKFILE_PROTO
 extern "C" void flockfile (FILE *);
