@@ -10,6 +10,7 @@
 #include "gtkmm.h"
 #include "gtk/gtkstock.h"
 #include "gtk/gtk.h"
+#include "demo-common.h"
 
 class Window_EasterEgg : public Gtk::Window
 {
@@ -237,10 +238,10 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file("./gtk-logo-rgb.gif");
+  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file(demo_find_file("gtk-logo-rgb.gif"));
   #else
   std::auto_ptr<Glib::Error> error;
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file("./gtk-logo-rgb.gif", error);
+  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file(demo_find_file("gtk-logo-rgb.gif"), error);
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(!refPixbuf)
@@ -474,7 +475,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 3)
       {
-        pWidget = Gtk::manage( new Gtk::Image("./floppybuddy.gif") );
+        pWidget = Gtk::manage( new Gtk::Image(demo_find_file("floppybuddy.gif")) );
       }
     else if (i == 4)
     {

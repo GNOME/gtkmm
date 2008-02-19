@@ -13,6 +13,7 @@
  */
 
 #include <gtkmm.h>
+#include "demo-common.h"
 
 class Example_Images : public Gtk::Window
 {
@@ -71,7 +72,7 @@ Example_Images::Example_Images()
   m_Alignment_Image.add(m_Frame_Image);
   m_VBox.pack_start(m_Alignment_Image, Gtk::PACK_SHRINK);
 
-  Gtk::Image* pImage = Gtk::manage(new Gtk::Image("gtk-logo-rgb.gif"));
+  Gtk::Image* pImage = Gtk::manage(new Gtk::Image(demo_find_file("gtk-logo-rgb.gif")));
   m_Frame_Image.add(*pImage);
 
   /* Animation */
@@ -87,7 +88,7 @@ Example_Images::Example_Images()
   m_Alignment_Animation.add(m_Frame_Animation);
   m_VBox.pack_start(m_Alignment_Animation, Gtk::PACK_SHRINK);
 
-  pImage = Gtk::manage(new Gtk::Image("floppybuddy.gif"));
+  pImage = Gtk::manage(new Gtk::Image(demo_find_file("floppybuddy.gif")));
   m_Frame_Animation.add(*pImage);
 
   /* Progressive */
@@ -254,13 +255,13 @@ bool Example_Images::on_timeout()
     #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
-      m_image_stream = Glib::IOChannel::create_from_file("alphatest.png", "r");
+      m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png"), "r");
     }
     catch(const Glib::Error& error)
     {
     #else
     std::auto_ptr<Glib::Error> error;
-    m_image_stream = Glib::IOChannel::create_from_file("alphatest.png", "r", error);
+    m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png)", "r", error);
     if(error.get())
     {
     #endif //GLIBMM_EXCEPTIONS_ENABLED
