@@ -20,6 +20,7 @@
  */
 
 #include "textwidget.h"
+#include <string.h>
 #include "pangomm/fontdescription.h"
 
 

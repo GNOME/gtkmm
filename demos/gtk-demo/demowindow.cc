@@ -31,6 +31,8 @@
 #include <cctype>
 #include <cerrno>
 #include <stdio.h>
+#include <string.h>
+#include "demo-common.h"
 
 #ifdef NEED_FLOCKFILE_PROTO
 extern "C" void flockfile (FILE *);
@@ -276,7 +278,7 @@ void DemoWindow::load_file(const std::string& filename)
     FILE* file = fopen (filename.c_str(), "r");
     if (!file)
     {
-      std::string installed = /* DEMOCODEDIR + G_DIR_SEPARATOR_S + */ filename;
+      std::string installed = demo_find_file(filename);
       file = fopen (installed.c_str(), "r");
     }
 

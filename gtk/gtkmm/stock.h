@@ -53,109 +53,125 @@ struct BuiltinStockID
 namespace Stock
 {
 
-extern GTKMM_API const Gtk::BuiltinStockID DIALOG_AUTHENTICATION;   /*!< @image html stock_dialog_authentication_48.png     */
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_AUTHENTICATION;   /*!< @image html gtk-dialog-authentication.png     */
 
-extern GTKMM_API const Gtk::BuiltinStockID DIALOG_INFO;      /*!< @image html stock_dialog_info_48.png         */
-extern GTKMM_API const Gtk::BuiltinStockID DIALOG_WARNING;   /*!< @image html stock_dialog_warning_48.png      */
-extern GTKMM_API const Gtk::BuiltinStockID DIALOG_ERROR;     /*!< @image html stock_dialog_error_48.png        */
-extern GTKMM_API const Gtk::BuiltinStockID DIALOG_QUESTION;  /*!< @image html stock_dialog_question_48.png     */
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_INFO;      /*!< @image html gtk-dialog-info.png         */
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_WARNING;   /*!< @image html gtk-dialog-warning.png      */
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_ERROR;     /*!< @image html gtk-dialog-error.png        */
+extern GTKMM_API const Gtk::BuiltinStockID DIALOG_QUESTION;  /*!< @image html gtk-dialog-question.png     */
 
 // These aren't real stock items, because they provide only an icon.
-extern GTKMM_API const Gtk::BuiltinStockID DND;              /*!< @image html stock_dnd_32.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID DND_MULTIPLE;     /*!< @image html stock_dnd_multiple_32.png        */
+extern GTKMM_API const Gtk::BuiltinStockID DND;              /*!< @image html gtk-dnd.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID DND_MULTIPLE;     /*!< @image html gtk-dnd-multiple.png        */
 
-extern GTKMM_API const Gtk::BuiltinStockID ABOUT;            /*!< @image html stock_about_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID ADD;              /*!< @image html stock_add_24.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID APPLY;            /*!< @image html stock_apply_20.png               */
-extern GTKMM_API const Gtk::BuiltinStockID BOLD;             /*!< @image html stock_text_bold_24.png           */
-extern GTKMM_API const Gtk::BuiltinStockID CANCEL;           /*!< @image html stock_cancel_20.png              */
-extern GTKMM_API const Gtk::BuiltinStockID CDROM;            /*!< @image html stock_cdrom_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID CLEAR;            /*!< @image html stock_clear_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID CLOSE;            /*!< @image html stock_close_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID COLOR_PICKER;     /*!< @image html stock_color_picker_24.png        */
-extern GTKMM_API const Gtk::BuiltinStockID CONVERT;          /*!< @image html stock_convert_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID CONNECT;          /*!< @image html stock_connect_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID COPY;             /*!< @image html stock_copy_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID CUT;              /*!< @image html stock_cut_24.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID DELETE;           /*!< @image html stock_trash_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID DIRECTORY;        /*!< @image html stock_directory_24.png           */
-extern GTKMM_API const Gtk::BuiltinStockID DISCARD;          /*!< @image html stock_discard_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID DISCONNECT;       /*!< @image html stock_disconnect_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID EDIT;             /*!< @image html stock_edit_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID EXECUTE;          /*!< @image html stock_exec_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID FILE;             /*!< @image html stock_file_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID FIND;             /*!< @image html stock_search_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID FIND_AND_REPLACE; /*!< @image html stock_search_replace_24.png      */
-extern GTKMM_API const Gtk::BuiltinStockID FLOPPY;           /*!< @image html stock_save_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID FULLSCREEN;       /*!< @image html stock_fullscreen_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID LEAVE_FULLSCREEN; /*!< @image html stock_leave_fullscreen_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID GOTO_BOTTOM;      /*!< @image html stock_bottom_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID GOTO_FIRST;       /*!< @image html stock_first_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID GOTO_LAST;        /*!< @image html stock_last_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID GOTO_TOP;         /*!< @image html stock_top_24.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID GO_BACK;          /*!< @image html stock_left_arrow_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID GO_DOWN;          /*!< @image html stock_down_arrow_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID GO_FORWARD;       /*!< @image html stock_right_arrow_24.png         */
-extern GTKMM_API const Gtk::BuiltinStockID GO_UP;            /*!< @image html stock_up_arrow_24.png            */
-extern GTKMM_API const Gtk::BuiltinStockID HARDDISK;         /*!< @image html stock_harddisk_24.png            */
-extern GTKMM_API const Gtk::BuiltinStockID HELP;             /*!< @image html stock_help_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID HOME;             /*!< @image html stock_home_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID INDEX;            /*!< @image html stock_index_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID INFO;            /*!< @image html stock_info_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID INDENT;           /*!< @image html stock_indent_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID UNINDENT;         /*!< @image html stock_unindent_24.png            */
-extern GTKMM_API const Gtk::BuiltinStockID ITALIC;           /*!< @image html stock_text_italic_24.png         */
-extern GTKMM_API const Gtk::BuiltinStockID JUMP_TO;          /*!< @image html stock_jump_to_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_CENTER;   /*!< @image html stock_align_center_24.png        */
-extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_FILL;     /*!< @image html stock_align_justify_24.png       */
-extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_LEFT;     /*!< @image html stock_align_left_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_RIGHT;    /*!< @image html stock_align_right_24.png         */
-extern GTKMM_API const Gtk::BuiltinStockID MISSING_IMAGE;    /*!< @image html stock_broken_image_24.png        */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_FORWARD;    /*!< @image html stock_media_forward_24.png       */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_NEXT;       /*!< @image html stock_media_next_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PAUSE;      /*!< @image html stock_media_pause_24.png         */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PLAY;       /*!< @image html stock_media_play_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PREVIOUS;   /*!< @image html stock_media_previous_24.png      */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_RECORD;     /*!< @image html stock_media_record_24.png        */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_REWIND;     /*!< @image html stock_media_rewind_24.png        */
-extern GTKMM_API const Gtk::BuiltinStockID MEDIA_STOP;       /*!< @image html stock_media_stop_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID NETWORK;          /*!< @image html stock_network_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID NEW;              /*!< @image html stock_new_24.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID NO;               /*!< @image html stock_no_20.png                  */
-extern GTKMM_API const Gtk::BuiltinStockID OK;               /*!< @image html stock_ok_20.png                  */
-extern GTKMM_API const Gtk::BuiltinStockID OPEN;             /*!< @image html stock_open_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_PORTRAIT; /*!< @image html stock_orientation_portrait_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_LANDSCAPE; /*!< @image html stock_orientation_landscape_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_LANDSCAPE; /*!< @image html stock_orientation_reverse_landscape_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_PORTRAIT; /*!< @image html stock_orientation_reverse_portrait_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID PASTE;            /*!< @image html stock_paste_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID PREFERENCES;      /*!< @image html stock_preferences_24.png         */
-extern GTKMM_API const Gtk::BuiltinStockID PRINT;            /*!< @image html stock_print_24.png               */
-extern GTKMM_API const Gtk::BuiltinStockID PRINT_PREVIEW;    /*!< @image html stock_print_preview_24.png       */
-extern GTKMM_API const Gtk::BuiltinStockID PROPERTIES;       /*!< @image html stock_properties_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID QUIT;             /*!< @image html stock_exit_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID REDO;             /*!< @image html stock_redo_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID REFRESH;          /*!< @image html stock_refresh_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID REMOVE;           /*!< @image html stock_remove_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID REVERT_TO_SAVED;  /*!< @image html stock_revert_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID SAVE;             /*!< @image html stock_save_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID SAVE_AS;          /*!< @image html stock_save_as_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID SELECT_ALL;       /*!< @image html stock_selectall_24.png           */
-extern GTKMM_API const Gtk::BuiltinStockID SELECT_COLOR;     /*!< @image html stock_colorselector_24.png       */
-extern GTKMM_API const Gtk::BuiltinStockID SELECT_FONT;      /*!< @image html stock_font_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID SORT_ASCENDING;   /*!< @image html stock_sort_ascending_24.png      */
-extern GTKMM_API const Gtk::BuiltinStockID SORT_DESCENDING;  /*!< @image html stock_sort_descending_24.png     */
-extern GTKMM_API const Gtk::BuiltinStockID SPELL_CHECK;      /*!< @image html stock_spellcheck_24.png          */
-extern GTKMM_API const Gtk::BuiltinStockID STOP;             /*!< @image html stock_stop_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID STRIKETHROUGH;    /*!< @image html stock_text_strikethrough_24.png  */
-extern GTKMM_API const Gtk::BuiltinStockID UNDELETE;         /*!< @image html stock_undelete_24.png            */
-extern GTKMM_API const Gtk::BuiltinStockID UNDERLINE;        /*!< @image html stock_text_underline_24.png      */
-extern GTKMM_API const Gtk::BuiltinStockID UNDO;             /*!< @image html stock_undo_24.png                */
-extern GTKMM_API const Gtk::BuiltinStockID YES;              /*!< @image html stock_yes_20.png                 */
-extern GTKMM_API const Gtk::BuiltinStockID ZOOM_100;         /*!< @image html stock_zoom_1_24.png              */
-extern GTKMM_API const Gtk::BuiltinStockID ZOOM_FIT;         /*!< @image html stock_zoom_fit_24.png            */
-extern GTKMM_API const Gtk::BuiltinStockID ZOOM_IN;          /*!< @image html stock_zoom_in_24.png             */
-extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html stock_zoom_out_24.png            */
+extern GTKMM_API const Gtk::BuiltinStockID ABOUT;            /*!< @image html gtk-about.png               */
+extern GTKMM_API const Gtk::BuiltinStockID ADD;              /*!< @image html gtk-add.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID APPLY;            /*!< @image html gtk-apply.png               */
+extern GTKMM_API const Gtk::BuiltinStockID BOLD;             /*!< @image html gtk-bold.png           */
+extern GTKMM_API const Gtk::BuiltinStockID CANCEL;           /*!< @image html gtk-cancel.png              */
+extern GTKMM_API const Gtk::BuiltinStockID CDROM;            /*!< @image html gtk-cdrom.png               */
+extern GTKMM_API const Gtk::BuiltinStockID CLEAR;            /*!< @image html gtk-clear.png               */
+extern GTKMM_API const Gtk::BuiltinStockID CLOSE;            /*!< @image html gtk-close.png               */
+extern GTKMM_API const Gtk::BuiltinStockID COLOR_PICKER;     /*!< @image html gtk-color-picker.png        */
+extern GTKMM_API const Gtk::BuiltinStockID CONVERT;          /*!< @image html gtk-convert.png             */
+extern GTKMM_API const Gtk::BuiltinStockID CONNECT;          /*!< @image html gtk-connect.png             */
+extern GTKMM_API const Gtk::BuiltinStockID COPY;             /*!< @image html gtk-copy.png                */
+extern GTKMM_API const Gtk::BuiltinStockID CUT;              /*!< @image html gtk-cut.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID DELETE;           /*!< @image html gtk-delete.png               */
+extern GTKMM_API const Gtk::BuiltinStockID DIRECTORY;        /*!< @image html gtk-directory.png           */
+extern GTKMM_API const Gtk::BuiltinStockID DISCARD;          /*!< @image html gtk-discard.png             */
+extern GTKMM_API const Gtk::BuiltinStockID DISCONNECT;       /*!< @image html gtk-disconnect.png          */
+extern GTKMM_API const Gtk::BuiltinStockID EDIT;             /*!< @image html gtk-edit.png                */
+extern GTKMM_API const Gtk::BuiltinStockID EXECUTE;          /*!< @image html gtk-execute.png                */
+extern GTKMM_API const Gtk::BuiltinStockID FILE;             /*!< @image html gtk-file.png                */
+extern GTKMM_API const Gtk::BuiltinStockID FIND;             /*!< @image html gtk-find.png              */
+extern GTKMM_API const Gtk::BuiltinStockID FIND_AND_REPLACE; /*!< @image html gtk-find-and-replace.png      */
+extern GTKMM_API const Gtk::BuiltinStockID FLOPPY;           /*!< @image html gtk-floppy.png                */
+extern GTKMM_API const Gtk::BuiltinStockID FULLSCREEN;       /*!< @image html gtk-fullscreen.png                */
+extern GTKMM_API const Gtk::BuiltinStockID LEAVE_FULLSCREEN; /*!< @image html gtk-leave-fullscreen.png                */
+extern GTKMM_API const Gtk::BuiltinStockID GOTO_BOTTOM;      /*!< @image html gtk-goto-bottom.png              */
+extern GTKMM_API const Gtk::BuiltinStockID GOTO_FIRST;       /*!< left-to-right languages: @image html gtk-goto-first-ltr.png
+                                                                  right-to-left languages: @image html gtk-goto-first-rtl.png               */
+extern GTKMM_API const Gtk::BuiltinStockID GOTO_LAST;        /*!< left-to-right languages: @image html gtk-goto-last-ltr.png
+                                                                  right-to-left languages: @image html gtk-goto-last-rtl.png                */
+extern GTKMM_API const Gtk::BuiltinStockID GOTO_TOP;         /*!< @image html gtk-goto-top.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID GO_BACK;          /*!< left-to-right languages: @image html gtk-go-back-ltr.png
+                                                                  right-to-left languages: @image html gtk-go-back-rtl.png          */
+extern GTKMM_API const Gtk::BuiltinStockID GO_DOWN;          /*!< @image html gtk-go-down.png          */
+extern GTKMM_API const Gtk::BuiltinStockID GO_FORWARD;       /*!< left-to-right languages: @image html gtk-go-forward-ltr.png
+                                                                  right-to-left languages: @image html gtk-go-forward-rtl.png         */
+extern GTKMM_API const Gtk::BuiltinStockID GO_UP;            /*!< @image html gtk-go-up.png            */
+extern GTKMM_API const Gtk::BuiltinStockID HARDDISK;         /*!< @image html gtk-harddisk.png            */
+extern GTKMM_API const Gtk::BuiltinStockID HELP;             /*!< @image html gtk-help.png                */
+extern GTKMM_API const Gtk::BuiltinStockID HOME;             /*!< @image html gtk-home.png                */
+extern GTKMM_API const Gtk::BuiltinStockID INDEX;            /*!< @image html gtk-index.png               */
+extern GTKMM_API const Gtk::BuiltinStockID INFO;             /*!< @image html gtk-info.png               */
+extern GTKMM_API const Gtk::BuiltinStockID INDENT;           /*!< left-to-right languages: @image html gtk-indent-ltr.png
+                                                                  right-to-left languages: @image html gtk-indent-rtl.png          */
+extern GTKMM_API const Gtk::BuiltinStockID UNINDENT;         /*!< left-to-right languages: @image html gtk-unindent-ltr.png
+                                                                  right-to-left languages: @image html gtk-unindent-rtl.png            */
+extern GTKMM_API const Gtk::BuiltinStockID ITALIC;           /*!< @image html gtk-italic.png         */
+extern GTKMM_API const Gtk::BuiltinStockID JUMP_TO;          /*!< left-to-right languages: @image html gtk-jump-to-ltr.png
+                                                                  right-to-left languages: @image html gtk-jump-to-rtl.png             */
+extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_CENTER;   /*!< @image html gtk-justify-center.png        */
+extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_FILL;     /*!< @image html gtk-justify-fill.png       */
+extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_LEFT;     /*!< @image html gtk-justify-left.png          */
+extern GTKMM_API const Gtk::BuiltinStockID JUSTIFY_RIGHT;    /*!< @image html gtk-justify-right.png         */
+extern GTKMM_API const Gtk::BuiltinStockID MISSING_IMAGE;    /*!< @image html gtk-missing-image.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_FORWARD;    /*!< left-to-right languages: @image html gtk-media-forward-ltr.png
+                                                                  right-to-left languages: @image html gtk-media-forward-rtl.png       */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_NEXT;       /*!< left-to-right languages: @image html gtk-media-next-ltr.png
+                                                                  right-to-left languages: @image html gtk-media-next-rtl.png          */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PAUSE;      /*!< @image html gtk-media-pause.png         */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PLAY;       /*!< left-to-right languages: @image html gtk-media-play-ltr.png
+                                                                  right-to-left languages: @image html gtk-media-play-rtl.png          */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_PREVIOUS;   /*!< left-to-right languages: @image html gtk-media-previous-ltr.png
+                                                                  right-to-left languages: @image html gtk-media-previous-rtl.png      */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_RECORD;     /*!< @image html gtk-media-record.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_REWIND;     /*!< left-to-right languages: @image html gtk-media-rewind-ltr.png
+                                                                  right-to-left languages: @image html gtk-media-rewind-rtl.png        */
+extern GTKMM_API const Gtk::BuiltinStockID MEDIA_STOP;       /*!< @image html gtk-media-stop.png          */
+extern GTKMM_API const Gtk::BuiltinStockID NETWORK;          /*!< @image html gtk-network.png             */
+extern GTKMM_API const Gtk::BuiltinStockID NEW;              /*!< @image html gtk-new.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID NO;               /*!< @image html gtk-no.png                  */
+extern GTKMM_API const Gtk::BuiltinStockID OK;               /*!< @image html gtk-ok.png                  */
+extern GTKMM_API const Gtk::BuiltinStockID OPEN;             /*!< @image html gtk-open.png                */
+extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_PORTRAIT; /*!< @image html gtk-orientation-portrait.png                */
+extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_LANDSCAPE; /*!< @image html gtk-orientation-landscape.png                */
+extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_LANDSCAPE; /*!< @image html gtk-orientation-reverse-landscape.png                */
+extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_PORTRAIT; /*!< @image html gtk-orientation-reverse-portrait.png                */
+extern GTKMM_API const Gtk::BuiltinStockID PASTE;            /*!< @image html gtk-paste.png               */
+extern GTKMM_API const Gtk::BuiltinStockID PREFERENCES;      /*!< @image html gtk-preferences.png         */
+extern GTKMM_API const Gtk::BuiltinStockID PRINT;            /*!< @image html gtk-print.png               */
+extern GTKMM_API const Gtk::BuiltinStockID PRINT_PREVIEW;    /*!< @image html gtk-print-preview.png       */
+extern GTKMM_API const Gtk::BuiltinStockID PROPERTIES;       /*!< @image html gtk-properties.png          */
+extern GTKMM_API const Gtk::BuiltinStockID QUIT;             /*!< @image html gtk-quit.png                */
+extern GTKMM_API const Gtk::BuiltinStockID REDO;             /*!< left-to-right languages: @image html gtk-redo-ltr.png
+                                                                  right-to-left languages: @image html gtk-redo-rtl.png                */
+extern GTKMM_API const Gtk::BuiltinStockID REFRESH;          /*!< @image html gtk-refresh.png             */
+extern GTKMM_API const Gtk::BuiltinStockID REMOVE;           /*!< @image html gtk-remove.png              */
+extern GTKMM_API const Gtk::BuiltinStockID REVERT_TO_SAVED;  /*!< left-to-right languages: @image html gtk-revert-to-saved-ltr.png
+                                                                  right-to-left languages: @image html gtk-revert-to-saved-rtl.png              */
+extern GTKMM_API const Gtk::BuiltinStockID SAVE;             /*!< @image html gtk-save.png                */
+extern GTKMM_API const Gtk::BuiltinStockID SAVE_AS;          /*!< @image html gtk-save-as.png             */
+extern GTKMM_API const Gtk::BuiltinStockID SELECT_ALL;       /*!< @image html gtk-select-all.png           */
+extern GTKMM_API const Gtk::BuiltinStockID SELECT_COLOR;     /*!< @image html gtk-select-color.png       */
+extern GTKMM_API const Gtk::BuiltinStockID SELECT_FONT;      /*!< @image html gtk-select-font.png                */
+extern GTKMM_API const Gtk::BuiltinStockID SORT_ASCENDING;   /*!< @image html gtk-sort-ascending.png      */
+extern GTKMM_API const Gtk::BuiltinStockID SORT_DESCENDING;  /*!< @image html gtk-sort-descending.png     */
+extern GTKMM_API const Gtk::BuiltinStockID SPELL_CHECK;      /*!< @image html gtk-spell-check.png          */
+extern GTKMM_API const Gtk::BuiltinStockID STOP;             /*!< @image html gtk-stop.png                */
+extern GTKMM_API const Gtk::BuiltinStockID STRIKETHROUGH;    /*!< @image html gtk-strikethrough.png  */
+extern GTKMM_API const Gtk::BuiltinStockID UNDELETE;         /*!< left-to-right languages: @image html gtk-undelete-ltr.png
+                                                                  right-to-left languages: @image html gtk-undelete-rtl.png            */
+extern GTKMM_API const Gtk::BuiltinStockID UNDERLINE;        /*!< @image html gtk-underline.png      */
+extern GTKMM_API const Gtk::BuiltinStockID UNDO;             /*!< left-to-right languages: @image html gtk-undo-ltr.png
+                                                                  right-to-left languages: @image html gtk-undo-rtl.png                */
+extern GTKMM_API const Gtk::BuiltinStockID YES;              /*!< @image html gtk-yes.png                 */
+extern GTKMM_API const Gtk::BuiltinStockID ZOOM_100;         /*!< @image html gtk-zoom-100.png              */
+extern GTKMM_API const Gtk::BuiltinStockID ZOOM_FIT;         /*!< @image html gtk-zoom-fit.png            */
+extern GTKMM_API const Gtk::BuiltinStockID ZOOM_IN;          /*!< @image html gtk-zoom-in.png             */
+extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html gtk-zoom-out.png            */
 
 
 void add(const Gtk::StockItem& item);
