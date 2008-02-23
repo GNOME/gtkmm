@@ -17,8 +17,11 @@
  */
 
 #include <iostream>
+#include <cstdlib>
 #include <gtkmm/main.h>
 #include "examplewindow.h"
+
+using std::atoi;
 
 int main(int argc, char *argv[])
 {

@@ -19,9 +19,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <cstring>
 #include "textwidget.h"
-#include <string.h>
 #include "pangomm/fontdescription.h"
+  
+using std::strstr;
+using std::strncmp;
+using std::strlen;
 
 
 TextWidget::TextWidget(bool is_source)

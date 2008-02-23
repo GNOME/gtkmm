@@ -17,7 +17,12 @@
  */
 
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 #include "examplewindow.h"
+
+using std::sprintf;
+using std::strtol;
 
 ExampleWindow::ExampleWindow()
 : m_Button_Quit("Quit"),

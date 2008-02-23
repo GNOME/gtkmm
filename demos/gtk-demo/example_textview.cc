@@ -7,10 +7,14 @@
  *
  */
 
-#include "gtkmm.h"
-#include "gtk/gtkstock.h"
-#include "gtk/gtk.h"
+#include <cstdlib>
+#include <gtkmm.h>
+#include <gtk/gtkstock.h>
+#include <gtk/gtk.h>
+
 #include "demo-common.h"
+
+using std::exit;
 
 class Window_EasterEgg : public Gtk::Window
 {

@@ -18,6 +18,7 @@
 
 #include "myarea.h"
 #include <cairomm/context.h>
+#include <math.h>
 
 MyArea::MyArea()
 {

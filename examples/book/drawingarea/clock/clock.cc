@@ -17,6 +17,7 @@
  */
 
 #include <ctime>
+#include <math.h>
 #include <cairomm/context.h>
 #include "clock.h"
 

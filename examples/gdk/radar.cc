@@ -31,7 +31,6 @@
 #include <gtkmm/window.h>
 #include <gtkmm/main.h>
 
-#include <cmath>
 #include <math.h> //Needed by the IRIX MipsPro compiler, for sin().
 #include <sstream>
 

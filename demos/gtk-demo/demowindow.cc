@@ -31,7 +31,12 @@
 #include <cctype>
 #include <cerrno>
 #include <stdio.h>
-#include <string.h>
+
+#include <cstring>
+
+using std::isspace;
+using std::strlen;
+
 #include "demo-common.h"
 
 #ifdef NEED_FLOCKFILE_PROTO
