@@ -23,6 +23,8 @@
 #include <gtkmm/targetentry.h>
 #include <cstring> //For memset().
 
+using std::memset;
+
 namespace Gtk
 {
 

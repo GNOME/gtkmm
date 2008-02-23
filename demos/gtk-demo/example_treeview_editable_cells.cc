@@ -6,7 +6,10 @@
  *
  */
 
+#include <cstdlib>
 #include <gtkmm.h>
+
+using std::strtod;
 
 class CellItem_Product
 {
