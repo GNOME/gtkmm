@@ -65,5 +65,18 @@ doc-clean: doc-clean-recursive
 doc-rebuild:
 	(cd docs && $(MAKE) $(AM_MAKEFLAGS) doc-rebuild)
 
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild
+SVN_REV=`svnversion -n`
+URL_KEY=URL:
+SVN_PATH=`svn info |grep "$(URL_KEY)" |sed -e "s/$(URL_KEY)\s*//"`
+ROOT_KEY=Repository Root:
+SVN_ROOT=`svn info |grep "$(ROOT_KEY)" |sed -e "s/$(ROOT_KEY)\s*//"`
+
+tag-release: distcheck
+	svn cp -m "tag $(PACKAGE) $(VERSION)" $(SVN_PATH)@$(SVN_REV) $(SVN_ROOT)/tags/$(PACKAGE)-$(VERSION)
+
+release: tag-release
+	scp $(DIST_ARCHIVES) master.gnome.org:
+	@echo "Tarball uploaded.  Now run install-module on master.gnome.org"
+
+.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release
 
