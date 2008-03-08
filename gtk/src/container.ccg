@@ -162,11 +162,20 @@ void Container_Class::remove_callback(GtkContainer* self, GtkWidget* p0)
   }
   else
   {
+    //Call the original underlying C function:
+
+    //But don't do this if the GType is just the base GtkContainer 
+    //(the case when deriving from Gtk::Container)
+    //because GtkContainer::remove() then shows a warning that it was not implemented,
+    //and that warning is not useful to us in that case.
+    if(G_OBJECT_TYPE(self) == Gtk::Container::get_type())
+      return;
+
+    //Call the original underlying C function:
     BaseClassType *const base = static_cast<BaseClassType*>(
         g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
     );
 
-    //Call the original underlying C function:
     if(base && base->remove)
       (*base->remove)(self, p0);
   }
