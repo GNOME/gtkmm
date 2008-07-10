@@ -142,8 +142,12 @@ extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_LANDSCAPE; /*!< @
 extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_PORTRAIT; /*!< @image html gtk-orientation-reverse-portrait.png                */
 extern GTKMM_API const Gtk::BuiltinStockID PASTE;            /*!< @image html gtk-paste.png               */
 extern GTKMM_API const Gtk::BuiltinStockID PREFERENCES;      /*!< @image html gtk-preferences.png         */
+extern GTKMM_API const Gtk::BuiltinStockID PAGE_SETUP;       /*!< @image html gtk-page-setup.png          */
 extern GTKMM_API const Gtk::BuiltinStockID PRINT;            /*!< @image html gtk-print.png               */
+extern GTKMM_API const Gtk::BuiltinStockID PRINT_ERROR;      /*!< @image html gtk-print-error.png         */
 extern GTKMM_API const Gtk::BuiltinStockID PRINT_PREVIEW;    /*!< @image html gtk-print-preview.png       */
+extern GTKMM_API const Gtk::BuiltinStockID PRINT_REPORT;     /*!< @image html gtk-print-report.png        */
+extern GTKMM_API const Gtk::BuiltinStockID PRINT_WARNING;    /*!< @image html gtk-print-warning.png       */
 extern GTKMM_API const Gtk::BuiltinStockID PROPERTIES;       /*!< @image html gtk-properties.png          */
 extern GTKMM_API const Gtk::BuiltinStockID QUIT;             /*!< @image html gtk-quit.png                */
 extern GTKMM_API const Gtk::BuiltinStockID REDO;             /*!< left-to-right languages: @image html gtk-redo-ltr.png
