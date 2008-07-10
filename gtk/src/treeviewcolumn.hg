@@ -213,7 +213,15 @@ public:
 
 
   _WRAP_METHOD(void cell_set_cell_data(const Glib::RefPtr<TreeModel>& tree_model, const TreeModel::iterator& iter, bool is_expander, bool is_expanded), gtk_tree_view_column_cell_set_cell_data)
-  _WRAP_METHOD(void cell_get_size(Gdk::Rectangle& cell_area, int& x_offset, int& y_offset, int& width, int& height) const, gtk_tree_view_column_cell_get_size)
+
+  //This is obviously a bad cast, but we need it to preserve this (wrong) deprecated version of this function:
+  #m4 _CONVERSION(`Gdk::Rectangle&',`const GdkRectangle*',const_cast<const GdkRectangle*>(($3).gobj()))
+  _WRAP_METHOD(void cell_get_size(Gdk::Rectangle& cell_area, int& x_offset, int& y_offset, int& width, int& height) const, gtk_tree_view_column_cell_get_size, deprecated "Use the cell_get_size() method override that takes a const cell_area.")
+
+  //TODO: cell_area can be NULL. Add a method override.
+  //But see http://bugzilla.gnome.org/show_bug.cgi?id=542329 about the lack of C documentation.
+  _WRAP_METHOD(void cell_get_size(const Gdk::Rectangle& cell_area, int& x_offset, int& y_offset, int& width, int& height) const, gtk_tree_view_column_cell_get_size)
+
   _WRAP_METHOD(bool cell_is_visible() const, gtk_tree_view_column_cell_is_visible)
   _WRAP_METHOD(void focus_cell(CellRenderer& cell), gtk_tree_view_column_focus_cell)
 

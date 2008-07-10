@@ -49,13 +49,28 @@ class PrintSettings : public Glib::Object
 protected:
   _CTOR_DEFAULT
 
-#if 0 //TODO: Reimplement, or add _construct_from_* functions in GTK+.
-GtkPrintSettings *gtk_print_settings_new_from_file           (const gchar          *file_name,
-							      GError              **error);
-GtkPrintSettings *gtk_print_settings_new_from_key_file       (GKeyFile             *key_file,
-							      const gchar          *group_name,
-							      GError              **error);
-#endif
+  //TODO: Documentation:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<PrintSettings> create_from_key_file(const Glib::KeyFile& key_file);
+#else
+  static Glib::RefPtr<PrintSettings> create_from_key_file(const Glib::KeyFile& key_file, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  //TODO: Documentation:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<PrintSettings> create_from_key_file(const Glib::KeyFile& key_file, const Glib::ustring& group_name);
+#else
+  static Glib::RefPtr<PrintSettings> create_from_key_file(const Glib::KeyFile& key_file, const Glib::ustring& group_name, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(gtk_print_settings_new_from_key_file)
+
+  //TODO: Documentation:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<PrintSettings> create_from_file(const std::string& file_name);
+#else
+  static Glib::RefPtr<PrintSettings> create_from_file(const std::string& file_name, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(gtk_print_settings_new_from_file)
 
 public:
   _WRAP_CREATE()
@@ -97,6 +112,21 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<PrintSettings> copy() const, gtk_print_settings_copy)
 
+  //The from_ infix was added to these functions to make them clearer. GTK+ didn't want to change them.
+  _WRAP_METHOD(bool load_from_file(const std::string& file_name), gtk_print_settings_load_file, errthrow)
+
+  #m4 _CONVERSION(`const Glib::KeyFile&', `GKeyFile*', __FCR2P)
+  _WRAP_METHOD(bool load_from_key_file(const Glib::KeyFile& key_file, const Glib::ustring& group_name), gtk_print_settings_load_key_file, errthrow)
+
+  //TODO: Documentation:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool load_from_key_file(const Glib::KeyFile& key_file);
+#else
+  bool load_from_key_file(const Glib::KeyFile& key_file, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+
+  //The save_ prefix was added to these functions to make them clearer. GTK+ didn't want to change them.
   _WRAP_METHOD(bool save_to_file(const std::string& file_name) const, gtk_print_settings_to_file, errthrow)
 
   #m4 _CONVERSION(`Glib::KeyFile&', `GKeyFile*', __FR2P)

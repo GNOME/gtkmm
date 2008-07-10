@@ -85,25 +85,6 @@
   (gtype-id "GTK_TYPE_FILE_CHOOSER_SETTINGS")
 )
 
-(define-object FileFolder
-  (in-module "Gtk")
-  (c-name "GtkFileFolder")
-  (gtype-id "GTK_TYPE_FILE_FOLDER")
-)
-
-(define-object FileSystem
-  (in-module "Gtk")
-  (c-name "GtkFileSystem")
-  (gtype-id "GTK_TYPE_FILE_SYSTEM")
-)
-
-(define-object FileSystemHandle
-  (in-module "Gtk")
-  (parent "GObject")
-  (c-name "GtkFileSystemHandle")
-  (gtype-id "GTK_TYPE_FILE_SYSTEM_HANDLE")
-)
-
 (define-object IMContextSimple
   (in-module "Gtk")
   (parent "GtkIMContext")
@@ -1388,6 +1369,7 @@
     '("invalid-tag" "GTK_BUILDER_ERROR_INVALID_TAG")
     '("missing-property-value" "GTK_BUILDER_ERROR_MISSING_PROPERTY_VALUE")
     '("invalid-value" "GTK_BUILDER_ERROR_INVALID_VALUE")
+    '("version-mismatch" "GTK_BUILDER_ERROR_VERSION_MISMATCH")
   )
 )
 
@@ -2373,36 +2355,6 @@
   )
 )
 
-(define-flags FileInfoType
-  (in-module "Gtk")
-  (c-name "GtkFileInfoType")
-  (gtype-id "GTK_TYPE_FILE_INFO_TYPE")
-  (values
-    '("display-name" "GTK_FILE_INFO_DISPLAY_NAME")
-    '("is-folder" "GTK_FILE_INFO_IS_FOLDER")
-    '("is-hidden" "GTK_FILE_INFO_IS_HIDDEN")
-    '("mime-type" "GTK_FILE_INFO_MIME_TYPE")
-    '("modification-time" "GTK_FILE_INFO_MODIFICATION_TIME")
-    '("size" "GTK_FILE_INFO_SIZE")
-    '("icon" "GTK_FILE_INFO_ICON")
-    '("all" "GTK_FILE_INFO_ALL")
-  )
-)
-
-(define-enum FileSystemError
-  (in-module "Gtk")
-  (c-name "GtkFileSystemError")
-  (gtype-id "GTK_TYPE_FILE_SYSTEM_ERROR")
-  (values
-    '("nonexistent" "GTK_FILE_SYSTEM_ERROR_NONEXISTENT")
-    '("not-folder" "GTK_FILE_SYSTEM_ERROR_NOT_FOLDER")
-    '("invalid-uri" "GTK_FILE_SYSTEM_ERROR_INVALID_URI")
-    '("bad-filename" "GTK_FILE_SYSTEM_ERROR_BAD_FILENAME")
-    '("failed" "GTK_FILE_SYSTEM_ERROR_FAILED")
-    '("already-exists" "GTK_FILE_SYSTEM_ERROR_ALREADY_EXISTS")
-  )
-)
-
 (define-enum FileSystemModelColumns
   (in-module "Gtk")
   (c-name "GtkFileSystemModelColumns")
@@ -2423,6 +2375,7 @@
     '("force-svg" "GTK_ICON_LOOKUP_FORCE_SVG")
     '("use-builtin" "GTK_ICON_LOOKUP_USE_BUILTIN")
     '("generic-fallback" "GTK_ICON_LOOKUP_GENERIC_FALLBACK")
+    '("force-size" "GTK_ICON_LOOKUP_FORCE_SIZE")
   )
 )
 
@@ -2463,6 +2416,7 @@
     '("icon-set" "GTK_IMAGE_ICON_SET")
     '("animation" "GTK_IMAGE_ANIMATION")
     '("icon-name" "GTK_IMAGE_ICON_NAME")
+    '("gicon" "GTK_IMAGE_GICON")
   )
 )
 
@@ -3303,6 +3257,18 @@
   (return-type "GtkAccelGroup*")
 )
 
+(define-method get_is_locked
+  (of-object "GtkAccelGroup")
+  (c-name "gtk_accel_group_get_is_locked")
+  (return-type "gboolean")
+)
+
+(define-method get_modifier_mask
+  (of-object "GtkAccelGroup")
+  (c-name "gtk_accel_group_get_modifier_mask")
+  (return-type "GdkModifierType")
+)
+
 (define-method lock
   (of-object "GtkAccelGroup")
   (c-name "gtk_accel_group_lock")
@@ -3837,7 +3803,7 @@
   (parameters
     '("GtkTranslateFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "notify")
+    '("GDestroyNotify" "notify")
   )
 )
 
@@ -5537,7 +5503,7 @@
   (return-type "none")
   (parameters
     '("GtkWidget*" "widget")
-    '("GdkRectangle*" "cell_area")
+    '("const-GdkRectangle*" "cell_area")
     '("gint*" "x_offset")
     '("gint*" "y_offset")
     '("gint*" "width")
@@ -5552,9 +5518,9 @@
   (parameters
     '("GdkWindow*" "window")
     '("GtkWidget*" "widget")
-    '("GdkRectangle*" "background_area")
-    '("GdkRectangle*" "cell_area")
-    '("GdkRectangle*" "expose_area")
+    '("const-GdkRectangle*" "background_area")
+    '("const-GdkRectangle*" "cell_area")
+    '("const-GdkRectangle*" "expose_area")
     '("GtkCellRendererState" "flags")
   )
 )
@@ -5567,8 +5533,8 @@
     '("GdkEvent*" "event")
     '("GtkWidget*" "widget")
     '("const-gchar*" "path")
-    '("GdkRectangle*" "background_area")
-    '("GdkRectangle*" "cell_area")
+    '("const-GdkRectangle*" "background_area")
+    '("const-GdkRectangle*" "cell_area")
     '("GtkCellRendererState" "flags")
   )
 )
@@ -5581,8 +5547,8 @@
     '("GdkEvent*" "event")
     '("GtkWidget*" "widget")
     '("const-gchar*" "path")
-    '("GdkRectangle*" "background_area")
-    '("GdkRectangle*" "cell_area")
+    '("const-GdkRectangle*" "background_area")
+    '("const-GdkRectangle*" "cell_area")
     '("GtkCellRendererState" "flags")
   )
 )
@@ -6077,6 +6043,16 @@
   )
 )
 
+(define-method request_uris
+  (of-object "GtkClipboard")
+  (c-name "gtk_clipboard_request_uris")
+  (return-type "none")
+  (parameters
+    '("GtkClipboardURIReceivedFunc" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method request_targets
   (of-object "GtkClipboard")
   (c-name "gtk_clipboard_request_targets")
@@ -6119,6 +6095,12 @@
   (return-type "GdkPixbuf*")
 )
 
+(define-method wait_for_uris
+  (of-object "GtkClipboard")
+  (c-name "gtk_clipboard_wait_for_uris")
+  (return-type "gchar**")
+)
+
 (define-method wait_for_targets
   (of-object "GtkClipboard")
   (c-name "gtk_clipboard_wait_for_targets")
@@ -6147,6 +6129,12 @@
 (define-method wait_is_image_available
   (of-object "GtkClipboard")
   (c-name "gtk_clipboard_wait_is_image_available")
+  (return-type "gboolean")
+)
+
+(define-method wait_is_uris_available
+  (of-object "GtkClipboard")
+  (c-name "gtk_clipboard_wait_is_uris_available")
   (return-type "gboolean")
 )
 
@@ -6958,6 +6946,12 @@
   )
 )
 
+(define-method get_color_selection
+  (of-object "GtkColorSelectionDialog")
+  (c-name "gtk_color_selection_dialog_get_color_selection")
+  (return-type "GtkWidget*")
+)
+
 
 
 ;; From gtkcolorsel.h
@@ -7355,7 +7349,7 @@
   (parameters
     '("GtkTreeViewRowSeparatorFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -7583,7 +7577,7 @@
     '("GtkCallback" "callback")
     '("GtkCallbackMarshal" "marshal")
     '("gpointer" "callback_data")
-    '("GtkDestroyNotify" "notify")
+    '("GDestroyNotify" "notify")
   )
 )
 
@@ -7643,6 +7637,12 @@
   (parameters
     '("GtkWidget*" "child")
   )
+)
+
+(define-method get_focus_child
+  (of-object "GtkContainer")
+  (c-name "gtk_container_get_focus_child")
+  (return-type "GtkWidget*")
 )
 
 (define-method set_focus_vadjustment
@@ -8724,6 +8724,18 @@
   (return-type "gint")
 )
 
+(define-method get_action_area
+  (of-object "GtkDialog")
+  (c-name "gtk_dialog_get_action_area")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_content_area
+  (of-object "GtkDialog")
+  (c-name "gtk_dialog_get_content_area")
+  (return-type "GtkWidget*")
+)
+
 
 
 ;; From gtkdndcursors.h
@@ -9490,6 +9502,21 @@
   (return-type "const-GtkBorder*")
 )
 
+(define-method set_overwrite_mode
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_set_overwrite_mode")
+  (return-type "none")
+  (parameters
+    '("gboolean" "overwrite")
+  )
+)
+
+(define-method get_overwrite_mode
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_get_overwrite_mode")
+  (return-type "gboolean")
+)
+
 (define-method set_max_length
   (of-object "GtkEntry")
   (c-name "gtk_entry_set_max_length")
@@ -9503,6 +9530,12 @@
   (of-object "GtkEntry")
   (c-name "gtk_entry_get_max_length")
   (return-type "gint")
+)
+
+(define-method get_text_length
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_get_text_length")
+  (return-type "guint16")
 )
 
 (define-method set_activates_default
@@ -10561,520 +10594,9 @@
 
 ;; From gtkfilesystem.h
 
-(define-function gtk_file_system_error_quark
-  (c-name "gtk_file_system_error_quark")
-  (return-type "GQuark")
-)
-
-(define-function gtk_file_info_get_type
-  (c-name "gtk_file_info_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_file_info_new
-  (c-name "gtk_file_info_new")
-  (is-constructor-of "GtkFileInfo")
-  (return-type "GtkFileInfo*")
-)
-
-(define-method copy
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_copy")
-  (return-type "GtkFileInfo*")
-)
-
-(define-method free
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_free")
-  (return-type "none")
-)
-
-(define-method get_display_name
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_display_name")
-  (return-type "const-gchar*")
-)
-
-(define-method get_display_key
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_display_key")
-  (return-type "const-gchar*")
-)
-
-(define-method set_display_name
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_display_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "display_name")
-  )
-)
-
-(define-method get_is_folder
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_is_folder")
-  (return-type "gboolean")
-)
-
-(define-method set_is_folder
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_is_folder")
-  (return-type "none")
-  (parameters
-    '("gboolean" "is_folder")
-  )
-)
-
-(define-method get_is_hidden
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_is_hidden")
-  (return-type "gboolean")
-)
-
-(define-method set_is_hidden
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_is_hidden")
-  (return-type "none")
-  (parameters
-    '("gboolean" "is_hidden")
-  )
-)
-
-(define-method get_mime_type
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_mime_type")
-  (return-type "const-gchar*")
-)
-
-(define-method set_mime_type
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_mime_type")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "mime_type")
-  )
-)
-
-(define-method get_modification_time
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_modification_time")
-  (return-type "GtkFileTime")
-)
-
-(define-method set_modification_time
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_modification_time")
-  (return-type "none")
-  (parameters
-    '("GtkFileTime" "modification_time")
-  )
-)
-
-(define-method get_size
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_size")
-  (return-type "gint64")
-)
-
-(define-method set_size
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_size")
-  (return-type "none")
-  (parameters
-    '("gint64" "size")
-  )
-)
-
-(define-method set_icon_name
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_set_icon_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "con_name")
-  )
-)
-
-(define-method get_icon_name
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_get_icon_name")
-  (return-type "const-gchar*")
-)
-
-(define-method render_icon
-  (of-object "GtkFileInfo")
-  (c-name "gtk_file_info_render_icon")
-  (return-type "GdkPixbuf*")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("gint" "pixel_size")
-    '("GError**" "error")
-  )
-)
-
-(define-function gtk_file_system_handle_get_type
-  (c-name "gtk_file_system_handle_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_file_system_get_type
-  (c-name "gtk_file_system_get_type")
-  (return-type "GType")
-)
-
-(define-method list_volumes
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_list_volumes")
-  (return-type "GSList*")
-)
-
-(define-method get_volume_for_path
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_get_volume_for_path")
-  (return-type "GtkFileSystemVolume*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-  )
-)
-
-(define-method volume_free
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_free")
-  (return-type "none")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-  )
-)
-
-(define-method volume_get_base_path
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_get_base_path")
-  (return-type "GtkFilePath*")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-  )
-)
-
-(define-method volume_get_is_mounted
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_get_is_mounted")
-  (return-type "gboolean")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-  )
-)
-
-(define-method volume_mount
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_mount")
-  (return-type "GtkFileSystemHandle*")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-    '("GtkFileSystemVolumeMountCallback" "callback")
-    '("gpointer" "data")
-  )
-)
-
-(define-method volume_get_display_name
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_get_display_name")
-  (return-type "char*")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-  )
-)
-
-(define-method volume_render_icon
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_render_icon")
-  (return-type "GdkPixbuf*")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-    '("GtkWidget*" "widget")
-    '("gint" "pixel_size")
-    '("GError**" "error")
-  )
-)
-
-(define-method volume_get_icon_name
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_volume_get_icon_name")
-  (return-type "gchar*")
-  (parameters
-    '("GtkFileSystemVolume*" "volume")
-    '("GError**" "error")
-  )
-)
-
-(define-method get_parent
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_get_parent")
-  (return-type "gboolean")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GtkFilePath**" "parent")
-    '("GError**" "error")
-  )
-)
-
-(define-method get_folder
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_get_folder")
-  (return-type "GtkFileSystemHandle*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GtkFileInfoType" "types")
-    '("GtkFileSystemGetFolderCallback" "callback")
-    '("gpointer" "data")
-  )
-)
-
-(define-method get_info
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_get_info")
-  (return-type "GtkFileSystemHandle*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GtkFileInfoType" "types")
-    '("GtkFileSystemGetInfoCallback" "callback")
-    '("gpointer" "data")
-  )
-)
-
-(define-method create_folder
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_create_folder")
-  (return-type "GtkFileSystemHandle*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GtkFileSystemCreateFolderCallback" "callback")
-    '("gpointer" "data")
-  )
-)
-
-(define-function gtk_file_system_cancel_operation
-  (c-name "gtk_file_system_cancel_operation")
-  (return-type "none")
-  (parameters
-    '("GtkFileSystemHandle*" "handle")
-  )
-)
-
-(define-method make_path
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_make_path")
-  (return-type "GtkFilePath*")
-  (parameters
-    '("const-GtkFilePath*" "base_path")
-    '("const-gchar*" "display_name")
-    '("GError**" "error")
-  )
-)
-
-(define-method parse
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_parse")
-  (return-type "gboolean")
-  (parameters
-    '("const-GtkFilePath*" "base_path")
-    '("const-gchar*" "str")
-    '("GtkFilePath**" "folder")
-    '("gchar**" "file_part")
-    '("GError**" "error")
-  )
-)
-
-(define-method path_to_uri
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_path_to_uri")
-  (return-type "gchar*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-  )
-)
-
-(define-method path_to_filename
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_path_to_filename")
-  (return-type "gchar*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-  )
-)
-
-(define-method uri_to_path
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_uri_to_path")
-  (return-type "GtkFilePath*")
-  (parameters
-    '("const-gchar*" "uri")
-  )
-)
-
-(define-method filename_to_path
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_filename_to_path")
-  (return-type "GtkFilePath*")
-  (parameters
-    '("const-gchar*" "filename")
-  )
-)
-
-(define-method path_is_local
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_path_is_local")
-  (return-type "gboolean")
-  (parameters
-    '("const-GtkFilePath*" "path")
-  )
-)
-
-(define-method insert_bookmark
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_insert_bookmark")
-  (return-type "gboolean")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("gint" "position")
-    '("GError**" "error")
-  )
-)
-
-(define-method remove_bookmark
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_remove_bookmark")
-  (return-type "gboolean")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GError**" "error")
-  )
-)
-
-(define-method list_bookmarks
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_list_bookmarks")
-  (return-type "GSList*")
-)
-
-(define-method get_bookmark_label
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_get_bookmark_label")
-  (return-type "gchar*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-  )
-)
-
-(define-method set_bookmark_label
-  (of-object "GtkFileSystem")
-  (c-name "gtk_file_system_set_bookmark_label")
-  (return-type "none")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("const-gchar*" "label")
-  )
-)
-
-(define-function gtk_file_folder_get_type
-  (c-name "gtk_file_folder_get_type")
-  (return-type "GType")
-)
-
-(define-method list_children
-  (of-object "GtkFileFolder")
-  (c-name "gtk_file_folder_list_children")
-  (return-type "gboolean")
-  (parameters
-    '("GSList**" "children")
-    '("GError**" "error")
-  )
-)
-
-(define-method get_info
-  (of-object "GtkFileFolder")
-  (c-name "gtk_file_folder_get_info")
-  (return-type "GtkFileInfo*")
-  (parameters
-    '("const-GtkFilePath*" "path")
-    '("GError**" "error")
-  )
-)
-
-(define-method is_finished_loading
-  (of-object "GtkFileFolder")
-  (c-name "gtk_file_folder_is_finished_loading")
-  (return-type "gboolean")
-)
-
-(define-function gtk_file_path_get_type
-  (c-name "gtk_file_path_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_file_paths_sort
-  (c-name "gtk_file_paths_sort")
-  (return-type "GSList*")
-  (parameters
-    '("GSList*" "paths")
-  )
-)
-
-(define-function gtk_file_paths_copy
-  (c-name "gtk_file_paths_copy")
-  (return-type "GSList*")
-  (parameters
-    '("GSList*" "paths")
-  )
-)
-
-(define-function gtk_file_paths_free
-  (c-name "gtk_file_paths_free")
-  (return-type "none")
-  (parameters
-    '("GSList*" "paths")
-  )
-)
-
-(define-function gtk_file_system_create
-  (c-name "gtk_file_system_create")
-  (return-type "GtkFileSystem*")
-  (parameters
-    '("const-char*" "file_system_name")
-  )
-)
-
 
 
 ;; From gtkfilesystemmodel.h
-
-
-
-;; From gtkfilesystemunix.h
-
-(define-function gtk_file_system_unix_new
-  (c-name "gtk_file_system_unix_new")
-  (is-constructor-of "GtkFileSystemUnix")
-  (return-type "GtkFileSystem*")
-)
-
-(define-function gtk_file_system_unix_get_type
-  (c-name "gtk_file_system_unix_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From gtkfilesystemwin32.h
-
-(define-function gtk_file_system_win32_new
-  (c-name "gtk_file_system_win32_new")
-  (is-constructor-of "GtkFileSystemWin32")
-  (return-type "GtkFileSystem*")
-)
-
-(define-function gtk_file_system_win32_get_type
-  (c-name "gtk_file_system_win32_get_type")
-  (return-type "GType")
-)
 
 
 
@@ -11256,6 +10778,66 @@
   (return-type "GtkWidget*")
 )
 
+(define-method get_family_entry
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_family_entry")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_family_list
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_family_list")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_face_entry
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_face_entry")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_face_list
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_face_list")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_size_entry
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_size_entry")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_size_list
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_size_list")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_preview_entry
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_preview_entry")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_family
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_family")
+  (return-type "PangoFontFamily*")
+)
+
+(define-method get_face
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_face")
+  (return-type "PangoFontFace*")
+)
+
+(define-method get_size
+  (of-object "GtkFontSelection")
+  (c-name "gtk_font_selection_get_size")
+  (return-type "gint")
+)
+
 (define-method get_font_name
   (of-object "GtkFontSelection")
   (c-name "gtk_font_selection_get_font_name")
@@ -11304,6 +10886,24 @@
   (parameters
     '("const-gchar*" "title")
   )
+)
+
+(define-method get_ok_button
+  (of-object "GtkFontSelectionDialog")
+  (c-name "gtk_font_selection_dialog_get_ok_button")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_apply_button
+  (of-object "GtkFontSelectionDialog")
+  (c-name "gtk_font_selection_dialog_get_apply_button")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_cancel_button
+  (of-object "GtkFontSelectionDialog")
+  (c-name "gtk_font_selection_dialog_get_cancel_button")
+  (return-type "GtkWidget*")
 )
 
 (define-method get_font_name
@@ -11471,6 +11071,14 @@
 
 ;; From gtkhandlebox.h
 
+(define-function int
+  (c-name "int")
+  (return-type "signed")
+  (parameters
+    '("snap_edge-:" "3")
+  )
+)
+
 (define-function gtk_handle_box_get_type
   (c-name "gtk_handle_box_get_type")
   (return-type "GType")
@@ -11525,6 +11133,12 @@
   (of-object "GtkHandleBox")
   (c-name "gtk_handle_box_get_snap_edge")
   (return-type "GtkPositionType")
+)
+
+(define-method get_child_detached
+  (of-object "GtkHandleBox")
+  (c-name "gtk_handle_box_get_child_detached")
+  (return-type "gboolean")
 )
 
 
@@ -12252,6 +11866,17 @@
   )
 )
 
+(define-method lookup_by_gicon
+  (of-object "GtkIconTheme")
+  (c-name "gtk_icon_theme_lookup_by_gicon")
+  (return-type "GtkIconInfo*")
+  (parameters
+    '("GIcon*" "icon")
+    '("gint" "size")
+    '("GtkIconLookupFlags" "flags")
+  )
+)
+
 (define-method list_icons
   (of-object "GtkIconTheme")
   (c-name "gtk_icon_theme_list_icons")
@@ -12304,6 +11929,15 @@
   (of-object "GtkIconInfo")
   (c-name "gtk_icon_info_free")
   (return-type "none")
+)
+
+(define-function gtk_icon_info_new_for_pixbuf
+  (c-name "gtk_icon_info_new_for_pixbuf")
+  (return-type "GtkIconInfo*")
+  (parameters
+    '("GtkIconTheme*" "icon_theme")
+    '("GdkPixbuf*" "pixbuf")
+  )
 )
 
 (define-method get_base_size
@@ -12936,6 +12570,15 @@
   )
 )
 
+(define-function gtk_image_new_from_gicon
+  (c-name "gtk_image_new_from_gicon")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GIcon*" "icon")
+    '("GtkIconSize" "size")
+  )
+)
+
 (define-method clear
   (of-object "GtkImage")
   (c-name "gtk_image_clear")
@@ -13019,6 +12662,16 @@
   )
 )
 
+(define-method set_from_gicon
+  (of-object "GtkImage")
+  (c-name "gtk_image_set_from_gicon")
+  (return-type "none")
+  (parameters
+    '("GIcon*" "icon")
+    '("GtkIconSize" "size")
+  )
+)
+
 (define-method set_pixel_size
   (of-object "GtkImage")
   (c-name "gtk_image_set_pixel_size")
@@ -13092,6 +12745,16 @@
   (return-type "none")
   (parameters
     '("const-gchar**" "icon_name")
+    '("GtkIconSize*" "size")
+  )
+)
+
+(define-method get_gicon
+  (of-object "GtkImage")
+  (c-name "gtk_image_get_gicon")
+  (return-type "none")
+  (parameters
+    '("GIcon**" "gicon")
     '("GtkIconSize*" "size")
   )
 )
@@ -13238,7 +12901,7 @@
   (c-name "gtk_im_context_set_cursor_location")
   (return-type "none")
   (parameters
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
   )
 )
 
@@ -13307,6 +12970,10 @@
     '("gint" "n_seqs")
   )
 )
+
+
+
+;; From gtkimcontextsimpleseqs.h
 
 
 
@@ -14022,6 +13689,12 @@
     '("GtkAdjustment*" "hadjustment")
     '("GtkAdjustment*" "vadjustment")
   )
+)
+
+(define-method get_bin_window
+  (of-object "GtkLayout")
+  (c-name "gtk_layout_get_bin_window")
+  (return-type "GdkWindow*")
 )
 
 (define-method put
@@ -14841,7 +14514,7 @@
     '("GtkFunction" "function")
     '("GtkCallbackMarshal" "marshal")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -14879,7 +14552,7 @@
     '("GtkFunction" "function")
     '("GtkCallbackMarshal" "marshal")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -14918,7 +14591,7 @@
     '("GtkFunction" "function")
     '("GtkCallbackMarshal" "marshal")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -14947,7 +14620,7 @@
     '("GdkInputFunction" "function")
     '("GtkCallbackMarshal" "marshal")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -15144,6 +14817,12 @@
   )
 )
 
+(define-method get_accel_path
+  (of-object "GtkMenu")
+  (c-name "gtk_menu_get_accel_path")
+  (return-type "const-gchar*")
+)
+
 (define-method attach_to_widget
   (of-object "GtkMenu")
   (c-name "gtk_menu_attach_to_widget")
@@ -15235,6 +14914,12 @@
   (parameters
     '("gint" "monitor_num")
   )
+)
+
+(define-method get_monitor
+  (of-object "GtkMenu")
+  (c-name "gtk_menu_get_monitor")
+  (return-type "gint")
 )
 
 (define-function gtk_menu_get_for_attach_widget
@@ -15349,6 +15034,12 @@
   (parameters
     '("const-gchar*" "accel_path")
   )
+)
+
+(define-method get_accel_path
+  (of-object "GtkMenuItem")
+  (c-name "gtk_menu_item_get_accel_path")
+  (return-type "const-gchar*")
 )
 
 (define-method remove_submenu
@@ -15571,6 +15262,12 @@
   )
 )
 
+(define-method get_image
+  (of-object "GtkMessageDialog")
+  (c-name "gtk_message_dialog_get_image")
+  (return-type "GtkWidget*")
+)
+
 (define-method set_markup
   (of-object "GtkMessageDialog")
   (c-name "gtk_message_dialog_set_markup")
@@ -15656,6 +15353,60 @@
 
 
 ;; From gtkmodules.h
+
+
+
+;; From gtkmountoperation.h
+
+(define-function gtk_mount_operation_get_type
+  (c-name "gtk_mount_operation_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_mount_operation_new
+  (c-name "gtk_mount_operation_new")
+  (is-constructor-of "GtkMountOperation")
+  (return-type "GMountOperation*")
+  (parameters
+    '("GtkWindow*" "parent")
+  )
+)
+
+(define-method is_showing
+  (of-object "GtkMountOperation")
+  (c-name "gtk_mount_operation_is_showing")
+  (return-type "gboolean")
+)
+
+(define-method set_parent
+  (of-object "GtkMountOperation")
+  (c-name "gtk_mount_operation_set_parent")
+  (return-type "none")
+  (parameters
+    '("GtkWindow*" "parent")
+  )
+)
+
+(define-method get_parent
+  (of-object "GtkMountOperation")
+  (c-name "gtk_mount_operation_get_parent")
+  (return-type "GtkWindow*")
+)
+
+(define-method set_screen
+  (of-object "GtkMountOperation")
+  (c-name "gtk_mount_operation_set_screen")
+  (return-type "none")
+  (parameters
+    '("GdkScreen*" "screen")
+  )
+)
+
+(define-method get_screen
+  (of-object "GtkMountOperation")
+  (c-name "gtk_mount_operation_get_screen")
+  (return-type "GdkScreen*")
+)
 
 
 
@@ -16099,7 +15850,7 @@
 
 (define-function gtk_object_get_type
   (c-name "gtk_object_get_type")
-  (return-type "GtkType")
+  (return-type "GType")
 )
 
 (define-method sink
@@ -17036,6 +16787,18 @@
   (return-type "GdkNativeWindow")
 )
 
+(define-method get_embedded
+  (of-object "GtkPlug")
+  (c-name "gtk_plug_get_embedded")
+  (return-type "gboolean")
+)
+
+(define-method get_socket_window
+  (of-object "GtkPlug")
+  (c-name "gtk_plug_get_socket_window")
+  (return-type "GdkWindow*")
+)
+
 
 
 ;; From gtkplugprivate.h
@@ -17539,6 +17302,12 @@
   (of-object "GtkPrinter")
   (c-name "gtk_printer_list_papers")
   (return-type "GList*")
+)
+
+(define-method get_default_page_size
+  (of-object "GtkPrinter")
+  (c-name "gtk_printer_get_default_page_size")
+  (return-type "GtkPageSetup*")
 )
 
 (define-method compare
@@ -20692,6 +20461,39 @@
   )
 )
 
+(define-method get_orientation
+  (of-object "GtkScaleButton")
+  (c-name "gtk_scale_button_get_orientation")
+  (return-type "GtkOrientation")
+)
+
+(define-method set_orientation
+  (of-object "GtkScaleButton")
+  (c-name "gtk_scale_button_set_orientation")
+  (return-type "none")
+  (parameters
+    '("GtkOrientation" "orientation")
+  )
+)
+
+(define-method get_plus_button
+  (of-object "GtkScaleButton")
+  (c-name "gtk_scale_button_get_plus_button")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_minus_button
+  (of-object "GtkScaleButton")
+  (c-name "gtk_scale_button_get_minus_button")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_popup
+  (of-object "GtkScaleButton")
+  (c-name "gtk_scale_button_get_popup")
+  (return-type "GtkWidget*")
+)
+
 
 
 ;; From gtkscale.h
@@ -21103,6 +20905,39 @@
   )
 )
 
+(define-method get_target
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_target")
+  (return-type "GdkAtom")
+)
+
+(define-method get_data_type
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_data_type")
+  (return-type "GdkAtom")
+)
+
+(define-method get_format
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_format")
+  (return-type "gint")
+)
+
+(define-method get_data
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_data")
+  (return-type "const-guchar*")
+  (parameters
+    '("guint*" "length")
+  )
+)
+
+(define-method get_display
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_display")
+  (return-type "GdkDisplay*")
+)
+
 (define-method set
   (of-object "GtkSelectionData")
   (c-name "gtk_selection_data_set")
@@ -21466,6 +21301,21 @@
 
 
 
+;; From gtkshow.h
+
+(define-function gtk_show_uri
+  (c-name "gtk_show_uri")
+  (return-type "gboolean")
+  (parameters
+    '("GdkScreen*" "screen")
+    '("const-gchar*" "uri")
+    '("guint32" "timestamp")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From gtksignal.h
 
 (define-function gtk_signal_newv
@@ -21697,6 +21547,12 @@
   (of-object "GtkSocket")
   (c-name "gtk_socket_get_id")
   (return-type "GdkNativeWindow")
+)
+
+(define-method get_plug_window
+  (of-object "GtkSocket")
+  (c-name "gtk_socket_get_plug_window")
+  (return-type "GdkWindow*")
 )
 
 (define-method steal
@@ -22184,6 +22040,12 @@
   )
 )
 
+(define-method get_x11_window_id
+  (of-object "GtkStatusIcon")
+  (c-name "gtk_status_icon_get_x11_window_id")
+  (return-type "guint32")
+)
+
 
 
 ;; From gtkstock.h
@@ -22239,7 +22101,7 @@
     '("const-gchar*" "domain")
     '("GtkTranslateFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "notify")
+    '("GDestroyNotify" "notify")
   )
 )
 
@@ -22324,7 +22186,7 @@
     '("GdkWindow*" "window")
     '("gboolean" "set_bg")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("gint" "x")
     '("gint" "y")
     '("gint" "width")
@@ -22673,7 +22535,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x1")
@@ -22689,7 +22551,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "y1_")
@@ -22706,7 +22568,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22724,11 +22586,11 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
-    '("GdkPoint*" "points")
-    '("gint" "npoints")
+    '("const-GdkPoint*" "points")
+    '("gint" "n_points")
     '("gboolean" "fill")
   )
 )
@@ -22741,7 +22603,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("GtkArrowType" "arrow_type")
@@ -22761,7 +22623,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22779,7 +22641,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22797,7 +22659,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22815,7 +22677,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22833,7 +22695,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22851,7 +22713,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22869,9 +22731,9 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
-    '("gchar*" "detail")
+    '("const-gchar*" "detail")
     '("gint" "x")
     '("gint" "y")
     '("gint" "width")
@@ -22890,9 +22752,9 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
-    '("gchar*" "detail")
+    '("const-gchar*" "detail")
     '("gint" "x")
     '("gint" "y")
     '("gint" "width")
@@ -22911,9 +22773,9 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
-    '("gchar*" "detail")
+    '("const-gchar*" "detail")
     '("gint" "x")
     '("gint" "y")
     '("gint" "width")
@@ -22929,7 +22791,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22947,7 +22809,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22966,7 +22828,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("GtkShadowType" "shadow_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -22984,7 +22846,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -23001,7 +22863,7 @@
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
     '("gboolean" "use_text")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -23017,7 +22879,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("GdkWindowEdge" "edge")
@@ -23071,7 +22933,7 @@
     '("GtkStyle*" "style")
     '("GdkWindow*" "window")
     '("GtkStateType" "state_type")
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GtkWidget*" "widget")
     '("const-gchar*" "detail")
     '("gint" "x")
@@ -23086,8 +22948,8 @@
   (parameters
     '("GtkWidget*" "widget")
     '("GdkDrawable*" "drawable")
-    '("GdkRectangle*" "area")
-    '("GdkRectangle*" "location")
+    '("const-GdkRectangle*" "area")
+    '("const-GdkRectangle*" "location")
     '("gboolean" "is_primary")
     '("GtkTextDirection" "direction")
     '("gboolean" "draw_arrow")
@@ -23339,7 +23201,7 @@
   (c-name "gtk_test_spin_button_click")
   (return-type "gboolean")
   (parameters
-    '("GtkSpinButton*" "widget")
+    '("GtkSpinButton*" "spinner")
     '("guint" "button")
     '("gboolean" "upwards")
   )
@@ -27182,7 +27044,7 @@
   (c-name "gtk_tooltip_set_tip_area")
   (return-type "none")
   (parameters
-    '("GdkRectangle*" "rect")
+    '("const-GdkRectangle*" "rect")
   )
 )
 
@@ -27590,7 +27452,7 @@
   (parameters
     '("GtkTreeModelFilterVisibleFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -27603,7 +27465,7 @@
     '("GType*" "types")
     '("GtkTreeModelFilterModifyFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -28182,7 +28044,7 @@
 (define-method convert_child_iter_to_iter
   (of-object "GtkTreeModelSort")
   (c-name "gtk_tree_model_sort_convert_child_iter_to_iter")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("GtkTreeIter*" "sort_iter")
     '("GtkTreeIter*" "child_iter")
@@ -28264,7 +28126,7 @@
   (parameters
     '("GtkTreeSelectionFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -28278,6 +28140,12 @@
   (of-object "GtkTreeSelection")
   (c-name "gtk_tree_selection_get_tree_view")
   (return-type "GtkTreeView*")
+)
+
+(define-method get_select_function
+  (of-object "GtkTreeSelection")
+  (c-name "gtk_tree_selection_get_select_function")
+  (return-type "GtkTreeSelectionFunc")
 )
 
 (define-method get_selected
@@ -28444,7 +28312,7 @@
     '("gint" "sort_column_id")
     '("GtkTreeIterCompareFunc" "sort_func")
     '("gpointer" "user_data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -28455,7 +28323,7 @@
   (parameters
     '("GtkTreeIterCompareFunc" "sort_func")
     '("gpointer" "user_data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -28794,7 +28662,7 @@
     '("GtkCellRenderer*" "cell_renderer")
     '("GtkTreeCellDataFunc" "func")
     '("gpointer" "func_data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -29076,7 +28944,7 @@
   (c-name "gtk_tree_view_column_cell_get_size")
   (return-type "none")
   (parameters
-    '("GdkRectangle*" "cell_area")
+    '("const-GdkRectangle*" "cell_area")
     '("gint*" "x_offset")
     '("gint*" "y_offset")
     '("gint*" "width")
@@ -29348,7 +29216,7 @@
   (parameters
     '("GtkTreeViewColumnDropFunc" "func")
     '("gpointer" "user_data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -29696,7 +29564,7 @@
   (parameters
     '("GtkTreeViewSearchEqualFunc" "search_equal_func")
     '("gpointer" "search_user_data")
-    '("GtkDestroyNotify" "search_destroy")
+    '("GDestroyNotify" "search_destroy")
   )
 )
 
@@ -29811,7 +29679,7 @@
   (parameters
     '("GtkTreeDestroyCountFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -29894,7 +29762,7 @@
   (parameters
     '("GtkTreeViewRowSeparatorFunc" "func")
     '("gpointer" "data")
-    '("GtkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -30045,41 +29913,6 @@
 
 (define-function gtk_cell_renderer_accel_mode_get_type
   (c-name "gtk_cell_renderer_accel_mode_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_cell_type_get_type
-  (c-name "gtk_cell_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_clist_drag_pos_get_type
-  (c-name "gtk_clist_drag_pos_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_button_action_get_type
-  (c-name "gtk_button_action_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_ctree_pos_get_type
-  (c-name "gtk_ctree_pos_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_ctree_line_style_get_type
-  (c-name "gtk_ctree_line_style_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_ctree_expander_style_get_type
-  (c-name "gtk_ctree_expander_style_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_ctree_expansion_type_get_type
-  (c-name "gtk_ctree_expansion_type_get_type")
   (return-type "GType")
 )
 
@@ -30543,11 +30376,6 @@
   (return-type "GType")
 )
 
-(define-function gtk_tree_view_mode_get_type
-  (c-name "gtk_tree_view_mode_get_type")
-  (return-type "GType")
-)
-
 (define-function gtk_tree_model_flags_get_type
   (c-name "gtk_tree_model_flags_get_type")
   (return-type "GType")
@@ -30578,14 +30406,61 @@
   (return-type "GType")
 )
 
+(define-function gtk_tree_view_mode_get_type
+  (c-name "gtk_tree_view_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_cell_type_get_type
+  (c-name "gtk_cell_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_clist_drag_pos_get_type
+  (c-name "gtk_clist_drag_pos_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_button_action_get_type
+  (c-name "gtk_button_action_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_ctree_pos_get_type
+  (c-name "gtk_ctree_pos_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_ctree_line_style_get_type
+  (c-name "gtk_ctree_line_style_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_ctree_expander_style_get_type
+  (c-name "gtk_ctree_expander_style_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_ctree_expansion_type_get_type
+  (c-name "gtk_ctree_expansion_type_get_type")
+  (return-type "GType")
+)
+
 
 
 ;; From gtktypeutils.h
 
-(define-method class
-  (of-object "GtkType")
-  (c-name "gtk_type_class")
-  (return-type "gpointer")
+(define-function gtk_identifier_get_type
+  (c-name "gtk_identifier_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_type_init
+  (c-name "gtk_type_init")
+  (return-type "none")
+  (parameters
+    '("GTypeDebugFlags" "debug_flags")
+  )
 )
 
 (define-method unique
@@ -30595,6 +30470,12 @@
   (parameters
     '("const-GtkTypeInfo*" "gtkinfo")
   )
+)
+
+(define-method class
+  (of-object "GtkType")
+  (c-name "gtk_type_class")
+  (return-type "gpointer")
 )
 
 (define-method new
@@ -30630,14 +30511,6 @@
   (return-type "GtkFlagValue*")
   (parameters
     '("const-gchar*" "value_name")
-  )
-)
-
-(define-function gtk_type_init
-  (c-name "gtk_type_init")
-  (return-type "none")
-  (parameters
-    '("GTypeDebugFlags" "debug_flags")
   )
 )
 
@@ -30790,6 +30663,10 @@
   (c-name "gtk_ui_manager_new_merge_id")
   (return-type "guint")
 )
+
+
+
+;; From gtkunixprint.h
 
 
 
@@ -31210,7 +31087,7 @@
   (c-name "gtk_widget_draw")
   (return-type "none")
   (parameters
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
   )
 )
 
@@ -31347,7 +31224,7 @@
   (c-name "gtk_widget_intersect")
   (return-type "gboolean")
   (parameters
-    '("GdkRectangle*" "area")
+    '("const-GdkRectangle*" "area")
     '("GdkRectangle*" "intersection")
   )
 )
@@ -31357,7 +31234,7 @@
   (c-name "gtk_widget_region_intersect")
   (return-type "GdkRegion*")
   (parameters
-    '("GdkRegion*" "region")
+    '("const-GdkRegion*" "region")
   )
 )
 
@@ -31491,6 +31368,18 @@
   (of-object "GtkWidget")
   (c-name "gtk_widget_get_child_visible")
   (return-type "gboolean")
+)
+
+(define-method get_allocation
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_allocation")
+  (return-type "GtkAllocation")
+)
+
+(define-method get_window
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_window")
+  (return-type "GdkWindow*")
 )
 
 (define-method get_parent
@@ -31665,6 +31554,15 @@
   (return-type "GtkClipboard*")
   (parameters
     '("GdkAtom" "selection")
+  )
+)
+
+(define-method get_snapshot
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_snapshot")
+  (return-type "GdkPixmap*")
+  (parameters
+    '("GdkRectangle*" "clip_rect")
   )
 )
 
@@ -32357,6 +32255,12 @@
   )
 )
 
+(define-method get_default
+  (of-object "GtkWindow")
+  (c-name "gtk_window_get_default")
+  (return-type "GtkWidget*")
+)
+
 (define-method activate_default
   (of-object "GtkWindow")
   (c-name "gtk_window_activate_default")
@@ -33044,6 +32948,12 @@
   (parameters
     '("GtkWindow*" "window")
   )
+)
+
+(define-method list_windows
+  (of-object "GtkWindowGroup")
+  (c-name "gtk_window_group_list_windows")
+  (return-type "GList*")
 )
 
 (define-method remove_embedded_xid
