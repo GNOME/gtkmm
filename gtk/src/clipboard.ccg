@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: clipboard.ccg,v 1.11 2006/06/13 17:16:26 murrayc Exp $ */
 
 /* 
  *
@@ -204,6 +204,27 @@ static void SignalProxy_RichTextReceived_gtk_callback(GtkClipboard*, GdkAtom for
   delete the_slot; // the callback is only used once
 }
 
+static void SignalProxy_UrisReceived_gtk_callback(GtkClipboard*, gchar** uris, void* data)
+{
+  Gtk::Clipboard::SlotUrisReceived* the_slot = static_cast<Gtk::Clipboard::SlotUrisReceived*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    //Handle: Does this take ownership? It should probalby copy. murrayc.
+    (*the_slot)( Glib::StringArrayHandle(uris) );
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  delete the_slot; // the callback is only used once
+}
+
 static void SignalProxy_ImageReceived_gtk_callback(GtkClipboard*, GdkPixbuf* image, void* data)
 {
   Gtk::Clipboard::SlotImageReceived* the_slot = static_cast<Gtk::Clipboard::SlotImageReceived*>(data);
@@ -272,6 +293,14 @@ void Clipboard::request_rich_text(const Glib::RefPtr<TextBuffer>& buffer, const 
 
   gtk_clipboard_request_rich_text(gobj(), buffer->gobj(), 
       &SignalProxy_RichTextReceived_gtk_callback, slot_copy);
+}
+
+void Clipboard::request_uris(const SlotUrisReceived& slot)
+{
+  // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
+  SlotUrisReceived* slot_copy = new SlotUrisReceived(slot);
+
+  gtk_clipboard_request_uris(gobj(), &SignalProxy_UrisReceived_gtk_callback, slot_copy);
 }
 
 void Clipboard::request_image(const SlotImageReceived& slot)

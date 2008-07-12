@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: image.ccg,v 1.3 2005/07/10 19:24:22 murrayc Exp $ */
 
 /* 
  *
@@ -94,14 +94,22 @@ Glib::ustring Image::get_icon_name() const
   return Glib::convert_const_gchar_ptr_to_ustring(pchIconName);
 }
 
-Glib::ustring Image::get_icon_name(IconSize& size)
+Glib::RefPtr<Gio::Icon> Image::get_gicon(Gtk::IconSize& icon_size)
 {
-  const gchar* pchIconName = 0;
-  GtkIconSize cIconSize = GTK_ICON_SIZE_INVALID;
-  gtk_image_get_icon_name(const_cast<GtkImage*>(gobj()), &pchIconName, &cIconSize);
-  size = (IconSize)cIconSize;
-  return Glib::convert_const_gchar_ptr_to_ustring(pchIconName);
+  GIcon* cicon = 0;
+  GtkIconSize cicon_size = GTK_ICON_SIZE_INVALID;
+  gtk_image_get_gicon(gobj(), &cicon, &cicon_size);
+
+  icon_size = Gtk::IconSize(cicon_size);
+  return Glib::wrap(cicon);
 }
+
+Glib::RefPtr<const Gio::Icon> Image::get_gicon(Gtk::IconSize& icon_size) const
+{
+  Image* nonconstthis = const_cast<Image*>(this);
+  return nonconstthis->get_gicon(icon_size);
+}
+
 
 } // namespace Gtk
 

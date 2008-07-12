@@ -620,3 +620,7 @@ _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 # Used by AboutDialog:
 #_CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`($3).data())')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
+
+_CONVERSION(`const Glib::RefPtr<const Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))
+
+
