@@ -30,7 +30,8 @@ ExampleWindow::ExampleWindow()
   add(m_Frame);
 
   /* Set the frames label */
-  m_Frame.set_label("Gtk::Frame Widget");
+  Gtk::Button* label_widget = Gtk::manage(new Gtk::Button("button title"));
+  m_Frame.set_label_widget(*label_widget);
 
   /* Align the label at the right of the frame */
   //m_Frame.set_label_align(Gtk::ALIGN_RIGHT, Gtk::ALIGN_TOP);
