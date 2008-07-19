@@ -201,6 +201,7 @@ gtkmm_min_glibmm_version=2.14.1
 gtkmm_min_giomm_version=2.16.0
 gtkmm_min_gtk_version=2.13.4
 gtkmm_min_cairomm_version=1.2.2
+gtkmm_min_pangomm_version=2.13.1
 
 
 GLIBMM_LIBDIR=`pkg-config --variable=libdir glibmm-2.4`
@@ -214,21 +215,20 @@ PKG_CHECK_MODULES(ATKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} atk >= 1.9.0)
 AC_SUBST(ATKMM_CFLAGS)
 AC_SUBST(ATKMM_LIBS)
 
-PKG_CHECK_MODULES(PANGOMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} pangocairo >= 1.5.2)
-AC_SUBST(PANGOMM_CFLAGS)
-AC_SUBST(PANGOMM_LIBS)
-
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-PKG_CHECK_MODULES(GDKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+PKG_CHECK_MODULES(GDKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version}
+                         cairomm-1.0 >= ${gtkmm_min_cairomm_version}
+                         pangomm-1.4 >= ${gtkmm_min_pangomm_version}
+                         gtk+-2.0 >= ${gtkmm_min_gtk_version})
 AC_SUBST(GDKMM_CFLAGS)
 AC_SUBST(GDKMM_LIBS)
 
 # Only check for gtk+-unix-print-2.0 on non-win32 platform, as 
 # gtk+-unix-print-2.0.pc is not always included in win32 installers. 
 if test x"$os_win32" = xyes; then
-  PKG_CHECK_MODULES(GTKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} giomm-2.4 >= ${gtkmm_min_giomm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
+  PKG_CHECK_MODULES(GTKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} giomm-2.4 >= ${gtkmm_min_giomm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} pangomm-1.4 >= ${gtkmm_min_pangomm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version})
 else
-  PKG_CHECK_MODULES(GTKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} giomm-2.4 >= ${gtkmm_min_giomm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version} gtk+-unix-print-2.0 >= ${gtkmm_min_gtk_version})
+  PKG_CHECK_MODULES(GTKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version} giomm-2.4 >= ${gtkmm_min_giomm_version} cairomm-1.0 >= ${gtkmm_min_cairomm_version} pangomm-1.4 >= ${gtkmm_min_pangomm_version} gtk+-2.0 >= ${gtkmm_min_gtk_version} gtk+-unix-print-2.0 >= ${gtkmm_min_gtk_version})
 fi
 AC_SUBST(GTKMM_CFLAGS)
 AC_SUBST(GTKMM_LIBS)
@@ -285,7 +285,7 @@ AC_LANG_CPLUSPLUS
 
 
 # Create a list of input directories for Doxygen.
-GTKMM_DOXYGEN_INPUT_SUBDIRS([pango atk gdk gtk])
+GTKMM_DOXYGEN_INPUT_SUBDIRS([atk gdk gtk])
 
 # Evaluate the --enable-warnings=level option.
 GTKMM_ARG_ENABLE_WARNINGS()
@@ -313,11 +313,10 @@ AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
 if test "x$enable_deprecated_api" = "xyes"; then
 AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
 else
-  AC_DEFINE(PANGOMM_DISABLE_DEPRECATED, 1, [Whether not to build deprecated API in pangomm])
   AC_DEFINE(ATKMM_DISABLE_DEPRECATED, 1, [Whether not to build deprecated API in atkmm])
   AC_DEFINE(GDKMM_DISABLE_DEPRECATED, 1, [Whether not to build deprecated API in gdkmm])
   AC_DEFINE(GTKMM_DISABLE_DEPRECATED, 1, [Whether not to build deprecated API in gtkmm])
-  DISABLE_DEPRECATED_API_CFLAGS="-DPANGOMM_DISABLE_DEPRECATED -DATKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED"
+  DISABLE_DEPRECATED_API_CFLAGS="-DATKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED"
 AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
 AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
 fi
@@ -408,12 +407,6 @@ AC_CONFIG_FILES([
     gtk/gtkmm/Makefile
       gtk/gtkmm/private/Makefile
 
-  pango/Makefile
-  pango/pangomm-1.4.pc
-    pango/src/Makefile
-    pango/pangomm/Makefile
-      pango/pangomm/private/Makefile
-
   tools/Makefile
     tools/m4/Makefile
     tools/extra_defs_gen/Makefile
@@ -444,8 +437,6 @@ AC_CONFIG_FILES([
     MSVC_Net2003/gendef/Makefile
     MSVC_Net2003/atkmm/Makefile
     MSVC_Net2003/atkmm/atkmm.rc
-    MSVC_Net2003/pangomm/Makefile
-    MSVC_Net2003/pangomm/pangomm.rc
     MSVC_Net2003/gdkmm/Makefile
     MSVC_Net2003/gdkmm/gdkmm.rc
     MSVC_Net2003/gtkmm/Makefile

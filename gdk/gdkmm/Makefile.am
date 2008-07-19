@@ -26,6 +26,5 @@ include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 lib_LTLIBRARIES		= libgdkmm-2.4.la
 libgdkmm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
 libgdkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgdkmm_2_4_la_LIBADD	= $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
-			  $(GDKMM_LIBS)
+libgdkmm_2_4_la_LIBADD	= $(GDKMM_LIBS)
 

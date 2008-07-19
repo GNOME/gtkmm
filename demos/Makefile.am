@@ -18,7 +18,6 @@ endif
 #Where to find the header files needed by the source files:
 INCLUDES = -I$(top_builddir)/gtk   -I$(top_srcdir)/gtk   \
            -I$(top_builddir)/gdk   -I$(top_srcdir)/gdk   \
-           -I$(top_builddir)/pango -I$(top_srcdir)/pango \
            $(ATKMMINC) \
            $(GTKMM_CFLAGS)
 
@@ -27,8 +26,7 @@ ATKMMLIB = $(local_atkmm_lib)
 endif
 
 #The libraries that the executable needs to link against:
-LIBS = $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
-       $(ATKMMLIB) \
+LIBS = $(ATKMMLIB) \
        $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
        $(top_builddir)/gtk/gtkmm/libgtkmm-2.4.la \
        $(GTKMM_LIBS)

@@ -33,7 +33,6 @@ lib_LTLIBRARIES		= libgtkmm-2.4.la
 libgtkmm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
 libgtkmm_2_4_la_LDFLAGS	= $(common_ldflags)
 libgtkmm_2_4_la_LIBADD	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
-			  $(top_builddir)/pango/pangomm/libpangomm-1.4.la \
 			  $(LIBADD_ATK) \
 			  $(GTKMM_LIBS)
 
