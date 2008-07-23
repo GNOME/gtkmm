@@ -57,6 +57,26 @@ Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
 }
 
 //static
+Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename, const Glib::ustring& object_id)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_file(filename, object_id))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+//static
+Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename, const Glib::StringArrayHandle& object_ids)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_file(filename, object_ids))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+//static
 Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
@@ -64,6 +84,42 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer)
     return builder;
   else
     return Glib::RefPtr<Builder>();
+}
+
+//static
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, const Glib::ustring& object_id)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, object_id))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+//static
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, const Glib::StringArrayHandle& object_ids)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, object_ids))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Builder::add_from_file(const std::string& filename, const Glib::ustring& object_id)
+#else
+bool Builder::add_from_file(const std::string& filename, const Glib::ustring& object_id, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  std::list<Glib::ustring> object_ids;
+  object_ids.push_back(object_id);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  return add_from_file(filename, object_ids);
+  #else
+  return add_from_file(filename, object_ids, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 
@@ -75,6 +131,41 @@ bool Builder::add_from_string(const Glib::ustring& buffer, std::auto_ptr<Glib::E
 {
   GError* gerror = 0;
   bool retvalue = gtk_builder_add_from_string(gobj(), buffer.c_str(), -1 /* means null-terminated */, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Builder::add_from_string(const Glib::ustring& buffer, const Glib::ustring& object_id)
+#else
+bool Builder::add_from_string(const Glib::ustring& buffer, const Glib::ustring& object_id, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  std::list<Glib::ustring> object_ids;
+  object_ids.push_back(object_id);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  return add_from_string(buffer, object_ids);
+  #else
+  return add_from_string(buffer, object_ids, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Builder::add_from_string(const Glib::ustring& buffer, const Glib::StringArrayHandle& object_ids)
+#else
+bool Builder::add_from_string(const Glib::ustring& buffer, const Glib::StringArrayHandle& object_ids, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = gtk_builder_add_objects_from_string(gobj(), buffer.c_str(), -1 /* means null-terminated */, const_cast<char**>(object_ids.data()), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
