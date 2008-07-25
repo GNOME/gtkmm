@@ -60,6 +60,7 @@ _CC_INCLUDE(gtk/gtktypebuiltins.h)
 _WRAP_ENUM(DestDefaults, GtkDestDefaults)
 _WRAP_ENUM(WidgetFlags, GtkWidgetFlags)
 _WRAP_ENUM(WidgetHelpType, GtkWidgetHelpType)
+_WRAP_ENUM(DragResult, GtkDragResult)
 
 class Action;
 class Style;
@@ -277,11 +278,28 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Clipboard> get_clipboard(const Glib::ustring& selection), gtk_widget_get_clipboard, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Clipboard> get_clipboard(const Glib::ustring& selection) const, gtk_widget_get_clipboard, refreturn, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixmap> get_snapshot(const Gdk::Rectangle& clip_rect) const, gtk_widget_get_snapshot)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixmap> get_snapshot(Gdk::Rectangle& clip_rect) const, gtk_widget_get_snapshot)
 
-  //TODO: Documentation:
+ /** Create a Gdk::Pixmap of the contents of the widget and its children.
+  *
+  * Works even if the widget is obscured. The depth and visual of the
+  * resulting pixmap is dependent on the widget being snapshot and likely
+  * differs from those of a target widget displaying the pixmap.
+  * The function Gdk::Pixbuf::get_from_drawable() can be used to convert
+  * the pixmap to a visual independant representation.
+  *
+  * The snapshot area used by this function is the widget's allocation plus
+  * any extra space occupied by additional windows belonging to this widget
+  * (such as the arrows of a spin button).
+  * Thus, the resulting snapshot pixmap is possibly larger than the allocation.
+  *
+  * The returned pixmap can be empty.
+  *
+  * @result A Gdk::Pixmap snapshot of the widget
+  * 
+  * @newin2p14
+  */
   Glib::RefPtr<Gdk::Pixmap> get_snapshot() const;
-
 
   //TODO: This probably needs a special conversion to do an extra ref (take_copy=true) for the returned instance:
   _WRAP_METHOD(Glib::RefPtr<Atk::Object> get_accessible(), gtk_widget_get_accessible, refreturn, ifdef GTKMM_ATKMM_ENABLED)
@@ -788,7 +806,7 @@ dnl
    */
   _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
 
-  //TODO: Check the parameters: _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context), "drag_failed")
+  _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context, DragResult result), "drag_failed", no_default_handler)
   
   /**  The drag_leave signal is emitted on the drop site when the cursor leaves the widget.
    * A typical reason to connect to this signal is to undo things done in the drag_motion signal handler, 
