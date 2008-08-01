@@ -5,7 +5,7 @@ SUBDIRS = FAQ images reference
 
 EXTRA_DIST = Makefile_web.am_fragment index.html
 
-gtkmm_doc_DATA = index.html
+#gtkmm_doc_DATA = 
 
 include $(top_srcdir)/docs/Makefile_web.am_fragment
 
