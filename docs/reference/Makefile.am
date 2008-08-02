@@ -30,7 +30,7 @@ html/index.html: $(doxygen_configfile_source) $(STOCK_DIR)
 	done; \
 	DOXYGEN_IMAGE_PATH="$${DOXYGEN_IMAGE_PATH:=$$image_path}" doxygen $(doxygen_configfile) \
 	2> doxygen-warnings.txt | tee doxygen-output.txt && cat doxygen-warnings.txt
-	cd html && ./installdox -l glibmm_doxygen_tags@../../../../glibmm-2.4/docs/reference/html -l pangomm_doxygen_tags@../../../../pangomm-2.4/docs/reference/html \
+	cd html && ./installdox -l glibmm_doxygen_tags@../../../../glibmm-2.4/docs/reference/html -l pangomm_doxygen_tags@../../../../pangomm-1.4/docs/reference/html \
 	2>> doxygen-warnings.txt | tee -a doxygen-output.txt && cd ..
 	$(beautify_docs) html 2>> doxygen-warnings.txt | tee -a doxygen-output.txt
 

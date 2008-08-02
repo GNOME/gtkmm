@@ -16,10 +16,10 @@ post-html-recursive:
 	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
 	done
 
-post-html-local: index.html
-	scp $$SSH_OPT $^ $$USER@$(web_host):$(web_path_docs)
+#post-html-local: index.html
+#	scp $$SSH_OPT $^ $$USER@$(web_host):$(web_path_docs)
 
-post-html: post-html-recursive post-html-local
+post-html: post-html-recursive
 
 doc-clean-recursive:
 	list='$(SUBDIRS)'; for subdir in $$list; do \
