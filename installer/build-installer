@@ -1,0 +1,68 @@
+#!/bin/sh
+
+echo "This builds the development and runtime installers for gtkmm. Make "
+echo "sure to have everything (libsigc++, glibmm, cairomm, pangomm, gtkmm, "
+echo "libglademm, libxml++) installed to /usr/local, and to have "
+echo "successfully built everything with MSVC (both Debug and Release builds)"
+echo "Make also sure that makensis is in your PATH"
+
+# Copy all of /usr/local into here. It's probably more than we need, but we
+# can be sure we have the required stuff this way.
+# TODO: Maybe it would be enough to create Windows Shortcuts here.
+echo "Copying mingw files..."
+cp -R /usr/local/bin . || exit -1
+cp -R /usr/local/lib . || exit -1
+cp -R /usr/local/share . || exit -1
+cp -R /usr/local/include . || exit -1
+
+# Change prefix in .pc files to be /target instead of /usr/local. pkg-config
+# then looks relative to the .pc file for the actual package.
+
+# TODO: If someone knows how to do this more elegant, please tell me
+# (armin@arbur.net). Note that perl -i does _not_ work on Windows (at least
+# not with the msys one).
+mkdir -p temp || exit -1
+for file in lib/pkgconfig/*.pc; do
+	perl -pe 's/prefix=\/usr\/local/prefix=\/target/' $file > temp/`basename $file` || exit -1
+done
+
+for file in temp/*.pc; do
+	mv $file lib/pkgconfig/`basename $file` || exit -1
+done
+rmdir temp
+
+# Strip DLLs for the runtime version
+echo "Stripping binaries..."
+mkdir -p bin_stripped || exit -1
+cp -R bin/* bin_stripped || exit -1
+strip bin_stripped/*.dll || exit -1
+strip bin_stripped/*.exe || exit -1
+
+# Get the MSVC files into here
+echo "Copying MSVC files..."
+./install-msvc-module libsigc++ || exit -1
+./install-msvc-module glibmm || exit -1
+./install-msvc-module giomm || exit -1
+./install-msvc-module cairomm || exit -1
+./install-msvc-module pangomm || exit -1
+./install-msvc-module atkmm || exit -1
+./install-msvc-module gdkmm || exit -1
+./install-msvc-module gtkmm || exit -1
+./install-msvc-module libglademm || exit -1
+./install-msvc-module libxml++ || exit -1
+
+cp gtkmm-2.4.vsprops MSVC || exit -1
+cp gtkmm-2.4d.vsprops MSVC || exit -1
+
+echo "Copying gtk-demo..."
+mkdir -p demo || exit -1
+cp -R ../demos/gtk-demo/* demo/ || exit -1
+cp ../demos/gtk-demo/.libs/gtkmm-demo.exe demo/demo.exe || exit -1
+strip demo/demo.exe || exit -1
+
+echo "Creating installer..."
+makensis gtkmm-installer.nsi || exit -1
+
+echo "Creating runtime installer..."
+perl -pe 's/; !define RUNTIME_ONLY 1/!define RUNTIME_ONLY 1/' gtkmm-installer.nsi > gtkmm-runtime-installer.nsi || exit -1
+makensis gtkmm-runtime-installer.nsi || exit -1

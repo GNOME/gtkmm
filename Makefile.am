@@ -4,7 +4,7 @@ else
   ATK_SUBDIR=
 endif
 
-SUBDIRS		= tools $(ATK_SUBDIR) gdk gtk @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2005
+SUBDIRS		= tools $(ATK_SUBDIR) gdk gtk @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2005 installer
 DIST_SUBDIRS	= $(SUBDIRS) scripts
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \

@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# This installs MSVC-built libraries of a module such as libsigc++, glibmm or
+# gtkmm into the MSVC subdirectory
+
+module=$1
+
+# Assume all the other libraries are at same point as gtkmm:
+basepath=../..
+
+# TODO: Automatically find latest version of package: First try SVN checkout, then look for latest installed tarball version.
+if test $module = 'libsigc++'; then
+	# Path to extracted tarball or SVN checkout
+	sourcepath="${basepath}/libsigc++"
+	# Basename of DLL
+	basename='sigc-2.0'
+	# Abiname of package
+	abiname='sigc++-2.0'
+	# Subdirectory in MSVC_Net2005
+	subdir='.'
+elif test $module = 'glibmm'; then
+	sourcepath="${basepath}/glibmm-2.16.4"
+	basename='glibmm-2.4'
+	abiname='glibmm-2.4'
+	subdir='glibmm'
+elif test $module = 'giomm'; then
+	sourcepath="${basepath}/glibmm-2.16.4"
+	basename='giomm-2.4'
+	abiname='giomm-2.4'
+	subdir='giomm'
+elif test $module = 'cairomm'; then
+	sourcepath="${basepath}/cairomm_msvc"
+	basename='cairomm-1.0'
+	abiname='cairomm-1.0'
+	subdir='cairomm'
+elif test $module = 'pangomm'; then
+	sourcepath="${basepath}/pangomm-2.13.4"
+	basename='pangomm-1.4'
+	abiname='pangomm-1.4'
+	subdir='pangomm'
+elif test $module = 'atkmm'; then
+	sourcepath="${basepath}/gtkmm-2.12.7"
+	basename='atkmm-1.6'
+	abiname='atkmm-1.6'
+	subdir='atkmm'
+elif test $module = 'gdkmm'; then
+	sourcepath="${basepath}/gtkmm-2.12.7"
+	basename='gdkmm-2.4'
+	abiname='gdkmm-2.4'
+	subdir='gdkmm'
+elif test $module = 'gtkmm'; then
+	sourcepath="${basepath}/gtkmm-2.12.7"
+	basename='gtkmm-2.4'
+	abiname='gtkmm-2.4'
+	subdir='gtkmm'
+elif test $module = 'libglademm'; then
+	sourcepath="${basepath}/libglademm-2.6.3"
+	basename='glademm-2.4'
+	abiname='glademm-2.4'
+	subdir='libglademm'
+elif test $module = 'libxml++'; then
+	sourcepath="${basepath}/libxml++"
+	basename='xml++-2.6'
+	abiname='libxml++-2.6'
+	subdir='libxml++'
+else
+	echo "Module $module not known"
+	exit -1
+fi
+
+#echo "Source Path: $sourcepath"
+#echo "Basename: $basename"
+#echo "Abiname: $abiname"
+#echo "Subdir: $subdir"
+
+targetpath=MSVC
+
+mkdir -p ${targetpath} || exit -1
+cp $sourcepath/MSVC_Net2005/$subdir/Release/${basename}.dll $targetpath || exit -1
+cp $sourcepath/MSVC_Net2005/$subdir/Debug/${basename}d.dll $targetpath || exit -1
+cp $sourcepath/MSVC_Net2005/$subdir/Debug/${basename}d.pdb $targetpath || exit -1
+
+mkdir -p ${targetpath}/lib || exit -1
+cp $sourcepath/MSVC_Net2005/$subdir/Release/${basename}.lib $targetpath || exit -1
+cp $sourcepath/MSVC_Net2005/$subdir/Debug/${basename}d.lib $targetpath || exit -1
+
+# Configfile is used from mingw, thus commented out:
+#configfile=$sourcepath/MSVC_Net2005/$subdir/*config.h
+#if test -f configfile; then
+#	mkdir -p $targetpath/lib/${abiname}/include/ || exit -1
+#	cp $configfile $targetpath/lib/${abiname}/include/ || exit -1
+#fi

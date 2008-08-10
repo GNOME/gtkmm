@@ -1,0 +1,159 @@
+
+
+		Gtkmm on the Win32 platform
+		***************************
+
+
+Content
+-------
+
+	1. Building gtkmm on Win32
+		1.1 Mingw
+		1.2 MS Visual Studio 2005
+	2. Using the binaries and building your gtkmm application
+		2.1 Mingw
+		2.2 MS Visual Studio 2005
+	3. Gtkmm methods and signals not available on win32
+	4. Gtkmm examples and demos on win32
+
+
+1. Building gtkmm on Win32
+   ========================
+
+Currently, both the mingw (native win32) gcc compiler and MS Visual
+Studio 2005 are supported. gtkmm can be built with mingw32-gcc using
+the gnu autotools (automake, autoconf, libtool). As explicitly
+stated in the gtk+ for win32 distribution (http://www.gimp.org/win32/),
+the gcc compiler provided by the cygwin distribution should not be
+used to build gtk+/gtkmm libraries and/or applications (see the
+README.win32 that comes with the gtk+ DLLs). This MIGHT cause
+conflicts between the cygwin and msvcrt runtime environments.
+
+1.1. Mingw
+     -----
+
+The mingw distribution which has been tested with this release is the
+following :
+
+* MinGW-4.1 as the base distribution.
+
+The bare mingw distribution does not provide the necessary tools (sh, perl, m4
+, autoconf, automake, ..) to run the provided configure script "as is". One 
+(currently non supported) solution is to use mingw in conjunction with msys,
+which is readily available on the mingw website (http://www.mingw.org/).
+
+The preferred method is to combine the cygwin distribution (for the unix tools
+that were mentioned above) with mingw by making sure that the mingw
+tools (gcc, ld, dlltool, ..) are called first.
+
+First, make sure that you have working distribution of the native port
+of both libsigc++-2.0.x and gtk+-2.0 on win32 (see
+http://www.gimp.org/win32). If you can't compile a simple gtk+ example
+using gcc and `pkg-config --cflags --libs`, you should not even think
+about trying to compile gtkmm, let alone using precompiled libgtkmm
+DLLs to port your gtkmm application !
+
+The configure script can then be called using (as an example) the
+following options
+
+./configure --prefix=/target --build=i386-pc-mingw32 --disable-static
+
+then
+
+make
+make check
+make install
+
+1.2. MS Visual Studio 2005
+     ---------------------
+
+Open the gtkmm.sln solution file in the MSVC_Net2003 directory. In
+the Tools/Options panel, add the appropriate GTK+, glibmm include and lib
+directories to the Projects and Solutions/VC++ directories. Build the
+solution. 
+
+Important NOTE : to circumvent the C++ compiler bug described in this
+bugzilla entry (http://bugzilla.gnome.org/show_bug.cgi?id=158040), it
+is necessary to add '/vd2' to the list of compiler options when
+building and/or using gtkmm with Visual Studio 2005. 
+
+gtkmm-2.10 will probably not work correctly with Visual Studio 7.1 or
+below because of the aforementioned bug.
+
+2. Using the binaries and building your gtkmm application
+=============================================================
+
+
+2.1. Mingw
+     -----
+
+To build your gtkmm application, it is recommended to either use mingw
+combined with cygwin (http://www.cygwin.com) or msys
+(http://www.mingw.org). If you use mingw/cygwin, make sure that the
+directory that contains the mingw executables is first in your PATH
+(by checking with g++ -v). Then
+
+1. Add the directories with the gtkmm, gtk+ DLLs and the gtk+
+executables (especially the one containing pkg-config.exe) to your
+path. If you have selected the corresponding option in the Gtkmm
+installer, both the gtkmm and gtk+ runtime will already be in your
+PATH. Make sure pkg-config is available by typing 'pkg-config --version'
+
+2. Set the PKG_CONFIG_PATH environment variable to point to the various
+lib/pkgconfig directories. Look for files with the .pc extension in
+the gtk+ and gtkmm developer packages. It's basically the same syntax
+as on linux but the directory are separated by semicolons.
+
+3. Check the gtkmm distribution by typing 'pkg-config --modversion
+--cflags --libs gtkmm-2.4'. You should get something like
+
+2.10.1
+-IC:/target/include/gtkmm-2.4
+-IC:/target/lib/gtkmm-2.4/include 
+-IC:/target/include/glibmm-2.4 
+-IC:/target/lib/glibmm-2.4/include 
+-IC:/target/include/gdkmm-2.4
+-IC:/target/lib/gdkmm-2.4/include 
+-IC:/target/include/pangomm-1.4 
+-IC:/target/include/atkmm-1.6 
+-IC:/target/include/sigc++-2.0 
+-IC:/target/lib/sigc++-2.0/include 
+-IC:/GTK/include/gtk-2.0 
+-IC:/GTK/include/glib-2.0 
+-IC:/GTK/lib/glib-2.0/include 
+-IC:/GTK/lib/gtk-2.0/include 
+-IC:/GTK/include/pango-1.0 
+-IC:/GTK/include/atk-1.0
+-LC:/target/lib 
+-LC:/GTK/lib 
+-lgtkmm-2.4 -lgdkmm-2.4 -latkmm-1.6 -lgtk-win32-2.0 
+-lpangomm-1.4 -lglibmm-2.4 -lsigc-2.0 -lgdk-win32-2.0 
+-latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 
+-lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv
+
+Of course, the target directories will reflect your local installation
+tree.
+
+4. Compile your program with
+
+g++ `pkg-config --cflags gtkmm-2.4` my_programs.cc -o my_program 
+`pkg-config --libs gtkmm-2.4`
+
+Alternatively, you can adapt the above compiler and linker flags to
+your directory structure...
+
+2.2. MS Visual Studio 2005
+     --------------------- 
+
+To build a gtkmm project with MS Visual Studio 2005 or Visual C++ 2005, simply create a new project and add the MSVC/gtkmm-2.4d.vsprops or MSVC/gtkmm-2.4.vsprops project sheets to the project for a Debug and Release target, respectively. See the MSDN documentation for more information on how to use project sheets. Add source and header files to the project, set the name of the executable to be created in the project properties, and build  the solution/project.  
+
+3. Gtkmm methods and signals not available on win32
+===================================================
+
+All gtkmm methods and signals are available on win32.
+
+4. Gtkmm examples and demos on win32
+====================================
+
+All demos and examples compile/run on win32
+
