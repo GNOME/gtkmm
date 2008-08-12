@@ -500,7 +500,6 @@ _CONVERSION(`GtkRequisition', `Requisition', `($2)($3)')
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
-_CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&$3))')
 _CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 _CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
 
@@ -623,6 +622,7 @@ _CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
 
 _CONVERSION(`const Glib::RefPtr<const Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))
+_CONVERSION(`GIcon*',`Glib::RefPtr<Gio::Icon>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gio::File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<Gio::File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
