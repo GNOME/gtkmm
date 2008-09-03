@@ -126,6 +126,7 @@ _CONV_ENUM(Gtk,PrintOperationAction)
 _CONV_ENUM(Gtk,PrintError)
 _CONV_ENUM(Gtk,PrintCapabilities)
 _CONV_ENUM(Gtk,DragResult)
+_CONV_ENUM(Gtk,NumberUpLayout)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
