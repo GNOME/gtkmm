@@ -12,7 +12,8 @@ EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_gensrc.am_fragment \
 		  build_shared/Makefile_conditional.am_fragment \
 		  CHANGES README.win32 README.SUN PORTING \
-      autogen.sh
+                  autogen.sh \
+                  COPYING COPYING.tools
 
 
 all-local:
