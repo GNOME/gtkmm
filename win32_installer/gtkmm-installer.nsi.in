@@ -3,6 +3,7 @@
 ; Author         Cedric Gustin <cedric.gustin@swing.be>
 
 ;    Copyright (C) 2004-2006  Cedric Gustin
+;                  2008       Armin Burgmeier
 ;
 ;    This program is free software; you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -36,11 +37,6 @@
 !define PRODUCT_VERSION_INSTALLER "1"
 !endif
 
-; TODO: Autodetect the required GTK+ version here, instead of relying on
-; gtkmm and GTK+ version numbers to be in sync
-!ifndef GTK_VERSION
-!define GTK_VERSION "@GTKMM_MAJOR_VERSION@.@GTKMM_MINOR_VERSION@"
-!endif
 !ifdef PRODUCT_API_VERSION
 !undef PRODUCT_API_VERSION
 !endif
@@ -102,7 +98,7 @@ ${StrTok} # Supportable for Install Sections and Functions
 
 !addincludedir "NSISLibrary"
 !include "PathManipulation.nsh"
-!include "DetectGTK.nsh"
+;!include "DetectGTK.nsh"
 !include "VersionCheck.nsh"
 !include "CmdParameters.nsh"
 !include "StringUtilities.nsh"
@@ -193,12 +189,243 @@ InstallDirRegKey HKLM Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION} "Path"
   InstType "Runtime only"
 !endif
 
-Section -installgtk SecGTKInstaller
- 
-  Push ${GTK_VERSION}
-  Call CheckGTKRuntime
- 
+;Section -installgtk SecGTKInstaller
+; 
+;  Push ${GTK_VERSION}
+;  Call CheckGTKRuntime
+; 
+;SectionEnd
+
+SubSection "GTK+"
+
+Section "Runtime" SecGTKRuntime
+!ifndef RUNTIME_ONLY
+  SectionIn 1 2 RO
+!else
+  SectionIn RO
+!endif
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\bin
+
+  ; These break when stripped, therefore we always load them from bin/
+  File bin\zlib1.dll
+  File bin\intl.dll
+
+  File ${BINDIR}\jpeg62.dll
+  File ${BINDIR}\libpng12-0.dll
+  File ${BINDIR}\libtiff3.dll
+  File ${BINDIR}\libglib-2.0-0.dll
+  File ${BINDIR}\libgobject-2.0-0.dll
+  File ${BINDIR}\libgmodule-2.0-0.dll
+  File ${BINDIR}\libgthread-2.0-0.dll
+  File ${BINDIR}\libgio-2.0-0.dll
+  File ${BINDIR}\libcairo-2.dll
+  File ${BINDIR}\libatk-1.0-0.dll
+  File ${BINDIR}\libpango-1.0-0.dll
+  File ${BINDIR}\libpangocairo-1.0-0.dll
+  File ${BINDIR}\libpangoft2-1.0-0.dll
+  File ${BINDIR}\libpangowin32-1.0-0.dll
+  File ${BINDIR}\libgdk-win32-2.0-0.dll
+  File ${BINDIR}\libgdk_pixbuf-2.0-0.dll
+  File ${BINDIR}\libgtk-win32-2.0-0.dll
+  File ${BINDIR}\libglade-2.0-0.dll
+  File ${BINDIR}\gspawn-win32-helper.exe
+  File ${BINDIR}\gspawn-win32-helper-console.exe
+  File ${BINDIR}\gtk-update-icon-cache.exe
+  File ${BINDIR}\gtk-demo.exe
+
+  SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
+  File /r lib\gtk-2.0\2.10.0\engines
+  File /r lib\gtk-2.0\2.10.0\immodules
+  File /r lib\gtk-2.0\2.10.0\loaders
+
+  SetOutPath $INSTDIR\etc
+  File /r etc\gtk-2.0
+  File /r etc\pango
+
+  SetOutPath $INSTDIR\share\doc
+  File /r share\doc\glib-2.16.5
+  File /r share\doc\cairo-1.6.4-2
+  File /r share\doc\pango-1.20.5
+  File /r share\doc\gtk+-2.12.11
+
+  SetOutPath $INSTDIR\share
+  File /r share\locale
+  File /r share\themes
+; Only required for gtk-demo:
+  File /r share\gtk-2.0
+
+  SetOutPath $INSTDIR\contrib
+  File /r contrib\tiff
+
 SectionEnd
+
+!ifndef RUNTIME_ONLY
+Section "Development" SecGTKDevelopment
+  SectionIn 1
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\bin
+
+  ; These are only useful to developers
+  File ${BINDIR}\pkg-config.exe
+  File ${BINDIR}\glib-genmarshal.exe
+  File ${BINDIR}\glib-gettextize
+  File ${BINDIR}\glib-mkenums
+  File ${BINDIR}\gobject-query.exe
+  File ${BINDIR}\pango-querymodules.exe
+  File ${BINDIR}\gdk-pixbuf-csource.exe
+  File ${BINDIR}\gdk-pixbuf-query-loaders.exe
+  File ${BINDIR}\gtk-builder-convert
+  File ${BINDIR}\gtk-query-immodules-2.0.exe
+  File ${BINDIR}\libglade-convert
+
+  SetOutPath $INSTDIR\include
+  File /r include\glib-2.0
+  File /r include\cairo
+  File /r include\atk-1.0
+  File /r include\pango-1.0
+  File /r include\gtk-2.0
+  File /r include\libglade-2.0
+
+  File include\libintl.h
+  File include\png.h
+  File include\pngconf.h
+  File include\tiff.h
+  File include\tiffconf.h
+  File include\tiffio.h
+  file include\tiffvers.h
+  file include\zconf.h
+  file include\zlib.h
+
+  SetOutPath $INSTDIR\lib\gtk-2.0
+  File /r lib\gtk-2.0\include
+
+  SetOutPath $INSTDIR\lib\glib-2.0
+  File /r lib\glib-2.0\include
+
+  SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
+  File /r lib\gtk-2.0\2.10.0\engines
+  File /r lib\gtk-2.0\2.10.0\immodules
+  File /r lib\gtk-2.0\2.10.0\loaders
+
+  File lib\intl.def
+  File lib\intl.lib
+  File lib\libintl.dll.a
+  File lib\libtiff.def
+  File lib\libtiff.lib
+  File lib\libtiff.dll.a
+  File lib\libpng.def
+  File lib\libpng.lib
+  File lib\libpng12.dll.a
+  File lib\zlib.def
+  File lib\zdll.lib
+  File lib\libz.a
+  File lib\glib-2.0.def
+  File lib\glib-2.0.lib
+  File lib\libglib-2.0.dll.a
+  File lib\gobject-2.0.def
+  File lib\gobject-2.0.lib
+  File lib\libgobject-2.0.dll.a
+  File lib\gmodule-2.0.def
+  File lib\gmodule-2.0.lib
+  File lib\libgmodule-2.0.dll.a
+  File lib\gthread-2.0.def
+  File lib\gthread-2.0.lib
+  File lib\libgthread-2.0.dll.a
+  File lib\gio-2.0.def
+  File lib\gio-2.0.lib
+  File lib\libgio-2.0.dll.a
+  File lib\cairo.def
+  File lib\cairo.lib
+  File lib\libcairo.dll.a
+  File lib\atk-1.0.def
+  File lib\atk-1.0.lib
+  File lib\libatk-1.0.dll.a
+  File lib\pango-1.0.def
+  File lib\pango-1.0.lib
+  File lib\libpango-1.0.dll.a
+  File lib\pangocairo-1.0.def
+  File lib\pangocairo-1.0.lib
+  File lib\libpangocairo-1.0.dll.a
+  File lib\pangoft2-1.0.def
+  File lib\pangoft2-1.0.lib
+  File lib\libpangoft2-1.0.dll.a
+  File lib\pangowin32-1.0.def
+  File lib\pangowin32-1.0.lib
+  File lib\libpangowin32-1.0.dll.a
+; TODO: What about .defs here?
+  File lib\gdk-win32-2.0.lib
+  File lib\libgdk-win32-2.0.dll.a
+  File lib\gdk_pixbuf-2.0.lib
+  File lib\libgdk_pixbuf-2.0.dll.a
+  File lib\gtk-win32-2.0.lib
+  File lib\libgtk-win32-2.0.dll.a
+  File lib\glade-2.0.lib
+  File lib\libglade-2.0.dll.a
+
+  SetOutPath $INSTDIR\lib\pkgconfig
+  File lib\pkgconfig\libpng.pc
+  File lib\pkgconfig\libpng12.pc
+  File lib\pkgconfig\glib-2.0.pc
+  File lib\pkgconfig\gmodule-2.0.pc
+  File lib\pkgconfig\gmodule-no-export-2.0.pc
+  File lib\pkgconfig\gobject-2.0.pc
+  File lib\pkgconfig\gthread-2.0.pc
+  File lib\pkgconfig\gio-2.0.pc
+  File lib\pkgconfig\cairo.pc
+  File lib\pkgconfig\cairo-png.pc
+  File lib\pkgconfig\cairo-pdf.pc
+  File lib\pkgconfig\cairo-ps.pc
+  File lib\pkgconfig\cairo-svg.pc
+  File lib\pkgconfig\cairo-win32.pc
+  File lib\pkgconfig\cairo-win32-font.pc
+  File lib\pkgconfig\atk.pc
+  File lib\pkgconfig\pango.pc
+  File lib\pkgconfig\pangocairo.pc
+  File lib\pkgconfig\pangoft2.pc
+  File lib\pkgconfig\pangowin32.pc
+  File lib\pkgconfig\gdk-2.0.pc
+  File lib\pkgconfig\gdk-pixbuf-2.0.pc
+  File lib\pkgconfig\gdk-win32-2.0.pc
+  File lib\pkgconfig\gtk+-2.0.pc
+  File lib\pkgconfig\gtk+-win32-2.0.pc
+  File lib\pkgconfig\libglade-2.0.pc
+
+  SetOutPath $INSTDIR\share\doc
+  File /r share\doc\glib-dev-2.16.5
+  File /r share\doc\pango-dev-1.20.5
+  File /r share\doc\gtk+-dev-2.12.11
+
+  SetOutPath $INSTDIR\share\xml
+  File /r share\xml\libglade
+
+  SetOutPath $INSTDIR\share\aclocal
+  File share\aclocal\glib-2.0.m4
+  File share\aclocal\glib-gettext.m4
+  File share\aclocal\gtk-2.0.m4
+  File share\aclocal\pkg.m4
+SectionEnd
+
+Section "Documentation" SecGTKDocumentation
+  SectionIn 1
+  SetOverwrite ifnewer
+  
+  SetOutPath $INSTDIR\share\gtk-doc\html
+  File /r share\gtk-doc\html\glib
+  File /r share\gtk-doc\html\gobject
+  File /r share\gtk-doc\html\cairo
+  File /r share\gtk-doc\html\pango
+  File /r share\gtk-doc\html\gdk
+  File /r share\gtk-doc\html\gdk-pixbuf
+  File /r share\gtk-doc\html\gtk
+  File /r share\gtk-doc\html\libglade
+
+SectionEnd
+!endif
+
+SubSectionEnd 
 
 SubSection "libsigc++"
 
@@ -652,6 +879,32 @@ Section -Post SecPost
 !ifndef RUNTIME_ONLY
   IfFileExists "$INSTDIR\share\doc\*.*" "" +2
     CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Documentation"
+  IfFileExists "$INSTDIR\share\gtk-doc\html\*.*" "" +2
+    CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Documentation"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\glib\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\glib Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\glib\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\gobject\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\gobject Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\gobject\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\cairo\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\cairo Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\cairo\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\pango\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\pango Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\pango\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\gdk\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\GDK Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\gdk\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\gdk-pixbuf\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\gdk-pixbuf Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\gdk-pixbuf\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\gtk\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\GTK+ Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\gtk\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\libglade\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglade Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\libglade\index.html"
 
   IfFileExists "$INSTDIR\share\doc\libsigc-2.0\docs\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk" "$INSTDIR\share\doc\libsigc-2.0\docs\reference\html\index.html"
@@ -757,6 +1010,15 @@ continue:
   Delete "$SMPROGRAMS\$ICONS_GROUP\Read Me.lnk"
 
 !ifndef RUNTIME_ONLY
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glib Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gobject Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\cairo Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\pango Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\GDK Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gdk-pixbuf Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\GTK+ Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglade Reference Manual.lnk"
+
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glibmm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gtkmm Reference Manual.lnk"
@@ -806,7 +1068,38 @@ continue:
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
 
 !ifndef RUNTIME_ONLY
+  ; bin
+
+  ; These are only useful to developers
+  Delete $INSTDIR\bin\pkg-config.exe
+  Delete $INSTDIR\bin\glib-genmarshal.exe
+  Delete $INSTDIR\bin\glib-gettextize
+  Delete $INSTDIR\bin\glib-mkenums
+  Delete $INSTDIR\bin\gobject-query.exe
+  Delete $INSTDIR\bin\pango-querymodules.exe
+  Delete $INSTDIR\bin\gdk-pixbuf-csource.exe
+  Delete $INSTDIR\bin\gdk-pixbuf-query-loaders.exe
+  Delete $INSTDIR\bin\gtk-builder-convert
+  Delete $INSTDIR\bin\gtk-query-immodules-2.0.exe
+  Delete $INSTDIR\bin\libglade-convert
+
   ; include
+  RMDIR /r $INSTDIR\include\glib-2.0
+  RMDIR /r $INSTDIR\include\cairo
+  RMDIR /r $INSTDIR\include\atk-1.0
+  RMDIR /r $INSTDIR\include\pango-1.0
+  RMDIR /r $INSTDIR\include\gtk-2.0
+  RMDIR /r $INSTDIR\include\libglade-2.0
+  Delete $INSTDIR\include\libintl.h
+  Delete $INSTDIR\include\png.h
+  Delete $INSTDIR\include\pngconf.h
+  Delete $INSTDIR\include\tiff.h
+  Delete $INSTDIR\include\tiffconf.h
+  Delete $INSTDIR\include\tiffio.h
+  Delete $INSTDIR\include\tiffvers.h
+  Delete $INSTDIR\include\zconf.h
+  Delete $INSTDIR\include\zlib.h
+
   RMDir /r $INSTDIR\include\sigc++-2.0
   RMDir /r $INSTDIR\include\cairomm-1.0
   RMDir /r $INSTDIR\include\glibmm-2.4
@@ -818,12 +1111,37 @@ continue:
   RMDir /r $INSTDIR\include\libxml++-2.6
 
   ; lib
+
+  RMDIR /r $INSTDIR\lib\glib-2.0\include
+  RMDIR /r $INSTDIR\lib\gtk-2.0\include
+  RMDir $INSTDIR\lib\glib-2.0
+
   RMDir /r $INSTDIR\lib\sigc++-2.0
   RMDir /r $INSTDIR\lib\glibmm-2.4
   RMDir /r $INSTDIR\lib\gdkmm-2.4
   RMDir /r $INSTDIR\lib\gtkmm-2.4
   RMDir /r $INSTDIR\lib\libglademm-2.4
   RMDir /r $INSTDIR\lib\libxml++-2.6
+
+  Delete $INSTDIR\lib\libintl.dll.a
+  Delete $INSTDIR\lib\libtiff.dll.a
+  Delete $INSTDIR\lib\libpng12.dll.a
+  Delete $INSTDIR\lib\libz.a
+  Delete $INSTDIR\lib\libglib-2.0.dll.a
+  Delete $INSTDIR\lib\libgobject-2.0.dll.a
+  Delete $INSTDIR\lib\libgmodule-2.0.dll.a
+  Delete $INSTDIR\lib\libgthread-2.0.dll.a
+  Delete $INSTDIR\lib\libgio-2.0.dll.a
+  Delete $INSTDIR\lib\libcairo.dll.a
+  Delete $INSTDIR\lib\libatk-1.0.dll.a
+  Delete $INSTDIR\lib\libpango-1.0.dll.a
+  Delete $INSTDIR\lib\libpangocairo-1.0.dll.a
+  Delete $INSTDIR\lib\libpangoft2-1.0.dll.a
+  Delete $INSTDIR\lib\libpangowin32-1.0.dll.a
+  Delete $INSTDIR\lib\libgdk-win32-2.0.dll.a
+  Delete $INSTDIR\lib\libgdk_pixbuf-2.0.dll.a
+  Delete $INSTDIR\lib\libgtk-win32-2.0.dll.a
+  Delete $INSTDIR\lib\libglade-2.0.dll.a
 
   Delete $INSTDIR\lib\libsigc-*.dll.a
   Delete $INSTDIR\lib\libcairomm-*.dll.a
@@ -836,6 +1154,41 @@ continue:
   Delete $INSTDIR\lib\libglademm-*.dll.a
   Delete $INSTDIR\lib\libxml++-*.dll.a
  
+  Delete $INSTDIR\lib\intl.def
+  Delete $INSTDIR\lib\intl.lib
+  Delete $INSTDIR\lib\libtiff.def
+  Delete $INSTDIR\lib\libtiff.lib
+  Delete $INSTDIR\lib\libpng.def
+  Delete $INSTDIR\lib\libpng.lib
+  Delete $INSTDIR\lib\zlib.def
+  Delete $INSTDIR\lib\zdll.lib
+  Delete $INSTDIR\lib\glib-2.0.def
+  Delete $INSTDIR\lib\glib-2.0.lib
+  Delete $INSTDIR\lib\gobject-2.0.def
+  Delete $INSTDIR\lib\gobject-2.0.lib
+  Delete $INSTDIR\lib\gmodule-2.0.def
+  Delete $INSTDIR\lib\gmodule-2.0.lib
+  Delete $INSTDIR\lib\gthread-2.0.def
+  Delete $INSTDIR\lib\gthread-2.0.lib
+  Delete $INSTDIR\lib\gio-2.0.def
+  Delete $INSTDIR\lib\gio-2.0.lib
+  Delete $INSTDIR\lib\cairo.def
+  Delete $INSTDIR\lib\cairo.lib
+  Delete $INSTDIR\lib\atk-1.0.def
+  Delete $INSTDIR\lib\atk-1.0.lib
+  Delete $INSTDIR\lib\pango-1.0.def
+  Delete $INSTDIR\lib\pango-1.0.lib
+  Delete $INSTDIR\lib\pangocairo-1.0.def
+  Delete $INSTDIR\lib\pangocairo-1.0.lib
+  Delete $INSTDIR\lib\pangoft2-1.0.def
+  Delete $INSTDIR\lib\pangoft2-1.0.lib
+  Delete $INSTDIR\lib\pangowin32-1.0.def
+  Delete $INSTDIR\lib\pangowin32-1.0.lib
+  Delete $INSTDIR\lib\gdk-win32-2.0.lib
+  Delete $INSTDIR\lib\gdk_pixbuf-2.0.lib
+  Delete $INSTDIR\lib\gtk-win32-2.0.lib
+  Delete $INSTDIR\lib\glade-2.0.lib
+
   Delete $INSTDIR\lib\sigc-*.lib
   Delete $INSTDIR\lib\cairomm-*.lib
   Delete $INSTDIR\lib\glibmm-*.lib
@@ -847,6 +1200,33 @@ continue:
   Delete $INSTDIR\lib\libglademm-*.lib.lnk
   Delete $INSTDIR\lib\xml++-*.lib
   Delete $INSTDIR\lib\libxml++-*.lib.lnk
+
+  Delete $INSTDIR\lib\pkgconfig\libpng.pc
+  Delete $INSTDIR\lib\pkgconfig\libpng12.pc
+  Delete $INSTDIR\lib\pkgconfig\glib-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gmodule-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gmodule-no-export-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gobject-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gthread-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gio-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-png.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-pdf.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-ps.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-svg.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-win32.pc
+  Delete $INSTDIR\lib\pkgconfig\cairo-win32-font.pc
+  Delete $INSTDIR\lib\pkgconfig\atk.pc
+  Delete $INSTDIR\lib\pkgconfig\pango.pc
+  Delete $INSTDIR\lib\pkgconfig\pangocairo.pc
+  Delete $INSTDIR\lib\pkgconfig\pangoft2.pc
+  Delete $INSTDIR\lib\pkgconfig\pangowin32.pc
+  Delete $INSTDIR\lib\pkgconfig\gdk-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gdk-pixbuf-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gdk-win32-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gtk+-2.0.pc
+  Delete $INSTDIR\lib\pkgconfig\gtk+-win32-2.0.pc  
+  Delete $INSTDIR\lib\pkgconfig\libglade-2.0.pc  
 
   Delete $INSTDIR\lib\pkgconfig\sigc++-*.pc
   Delete $INSTDIR\lib\pkgconfig\cairomm-*.pc
@@ -860,6 +1240,30 @@ continue:
   RMDir $INSTDIR\lib\pkgconfig
 
   ; share
+
+  RMDir /r $INSTDIR\share\doc\glib-dev-2.16.5
+  RMDir /r $INSTDIR\share\doc\pango-dev-1.20.5
+  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.12.11
+
+  RMDir /r $INSTDIR\share\xml\libglade
+  RMDir $INSTDIR\share\xml
+
+  Delete $INSTDIR\share\aclocal\glib-2.0.m4
+  Delete $INSTDIR\share\aclocal\glib-gettext.m4
+  Delete $INSTDIR\share\aclocal\gtk-2.0.m4
+  Delete $INSTDIR\share\aclocal\pkg.m4
+
+  RMDir /r $INSTDIR\share\gtk-doc\html\glib
+  RMDir /r $INSTDIR\share\gtk-doc\html\gobject
+  RMDir /r $INSTDIR\share\gtk-doc\html\cairo
+  RMDir /r $INSTDIR\share\gtk-doc\html\pango
+  RMDir /r $INSTDIR\share\gtk-doc\html\gdk
+  RMDir /r $INSTDIR\share\gtk-doc\html\gdk-pixbuf
+  RMDir /r $INSTDIR\share\gtk-doc\html\gtk
+  RMDir /r $INSTDIR\share\gtk-doc\html\libglade
+  RMDir $INSTDIR\share\gtk-doc\html
+  RMDir $INSTDIR\share\gtk-doc
+
   RMDir /r $INSTDIR\share\doc\libsigc-2.0
   RMDir /r $INSTDIR\share\doc\libcairomm-1.0
   RMDir /r $INSTDIR\share\doc\glibmm-2.4
@@ -877,8 +1281,6 @@ continue:
 
   Delete $INSTDIR\share\aclocal\glibmm_check_perl.m4
   RMDir $INSTDIR\share\aclocal
-  
-  RMDir $INSTDIR\share
   
   Delete $INSTDIR\MSVC\gtkmm-2.4.vsprops
   Delete $INSTDIR\MSVC\gtkmm-2.4d.vsprops
@@ -909,13 +1311,48 @@ continue:
   Delete $INSTDIR\lib\libguiloader.dll.a
   Delete $INSTDIR\lib\libguiloader-c++.dll.a
   
-  RMDir $INSTDIR\lib
-  
   RMDir $INSTDIR\include
 
 !endif
 
   ; bin
+
+  ; These break when stripped, therefore we always load them from bin/
+  Delete $INSTDIR\bin\zlib1.dll
+  Delete $INSTDIR\bin\intl.dll
+
+  Delete $INSTDIR\bin\jpeg62.dll
+  Delete $INSTDIR\bin\libpng12-0.dll
+  Delete $INSTDIR\bin\libtiff3.dll
+  Delete $INSTDIR\bin\libglib-2.0-0.dll
+  Delete $INSTDIR\bin\libgobject-2.0-0.dll
+  Delete $INSTDIR\bin\libgmodule-2.0-0.dll
+  Delete $INSTDIR\bin\libgthread-2.0-0.dll
+  Delete $INSTDIR\bin\libgio-2.0-0.dll
+  Delete $INSTDIR\bin\libcairo-2.dll
+  Delete $INSTDIR\bin\libatk-1.0-0.dll
+  Delete $INSTDIR\bin\libpango-1.0-0.dll
+  Delete $INSTDIR\bin\libpangocairo-1.0-0.dll
+  Delete $INSTDIR\bin\libpangoft2-1.0-0.dll
+  Delete $INSTDIR\bin\libpangowin32-1.0-0.dll
+  Delete $INSTDIR\bin\libgdk-win32-2.0-0.dll
+  Delete $INSTDIR\bin\libgdk_pixbuf-2.0-0.dll
+  Delete $INSTDIR\bin\libgtk-win32-2.0-0.dll
+  Delete $INSTDIR\bin\libglade-2.0-0.dll
+  Delete $INSTDIR\bin\gspawn-win32-helper.exe
+  Delete $INSTDIR\bin\gspawn-win32-helper-console.exe
+  Delete $INSTDIR\bin\gtk-update-icon-cache.exe
+  Delete $INSTDIR\bin\gtk-demo.exe
+
+  RMDir /r $INSTDIR\lib\gtk-2.0\2.10.0
+  RMDir $INSTDIR\lib\gtk-2.0
+  RMDir $INSTDIR\lib
+  
+  ; etc
+  RMDir /r $INSTDIR\etc\gtk-2.0
+  RMDir /r $INSTDIR\etc\pango
+  RMDir $INSTDIR\etc
+
   Delete $INSTDIR\bin\libsigc-*.dll
   Delete $INSTDIR\bin\libcairomm-*.dll
   Delete $INSTDIR\bin\libglibmm-*.dll
@@ -954,6 +1391,23 @@ continue:
   
   RMDir $INSTDIR\bin
   
+  ; share (non-development files)
+  RMDir /r $INSTDIR\share\doc\glib-2.16.5
+  RMDir /r $INSTDIR\share\doc\cairo-1.6.4-2
+  RMDir /r $INSTDIR\share\doc\pango-1.20.5
+  RMDir /r $INSTDIR\share\doc\gtk+-2.12.11
+  RMDir $INSTDIR\share\doc
+
+  RMdir /r $INSTDIR\share\locale
+  RMDir /r $INSTDIR\share\themes
+  RMDir /r $INSTDIR\share\gtk-2.0
+
+  RMDir $INSTDIR\share
+
+  ; contrib
+  RMDir /r $INSTDIR\contrib\tiff
+  RMDir $INSTDIR\contrib
+
 #  
   ; GTKMM_BASEPATH environment variable
   Push "GTKMM_BASEPATH"
@@ -973,6 +1427,7 @@ SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKRuntime} "GTK+ Runtime Environment"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcRuntime} "libsigc++ Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecCairommRuntime} "cairomm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGlibmmRuntime} "glibmm Runtime Libraries"
@@ -981,6 +1436,8 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibxmlRuntime} "libxml++ Runtime Libraries"
  
 !ifndef RUNTIME_ONLY
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKDevelopment} "GTK+ development headers and import libraries"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKDocumentation} "GTK+ Documentation"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcDevelopment} "libsigc++ development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcDocumentation} "libsigc++ Documentation"
 
@@ -1010,8 +1467,9 @@ SectionEnd
 
 Function EnableGTKInstaller
 
-  !insertmacro SelectSection ${SecGTKInstaller}
+;  !insertmacro SelectSection ${SecGTKInstaller}
 
+  !insertmacro UnselectSection ${SecGTKRuntime}
   !insertmacro UnselectSection ${SecSigcRuntime}
   !insertmacro UnselectSection ${SecCairommRuntime}
   !insertmacro UnselectSection ${SecGlibmmRuntime}
@@ -1020,6 +1478,9 @@ Function EnableGTKInstaller
   !insertmacro UnselectSection ${SecLibxmlRuntime}
   
 !ifndef RUNTIME_ONLY
+  !insertmacro UnselectSection ${SecGTKDevelopment}
+  !insertmacro UnselectSection ${SecGTKDocumentation}
+
   !insertmacro UnselectSection ${SecSigcDevelopment}
   !insertmacro UnselectSection ${SecSigcDocumentation}
 
@@ -1049,8 +1510,9 @@ FunctionEnd
 
 Function DisableGTKInstaller
 
-  !insertmacro UnselectSection ${SecGTKInstaller}
+;  !insertmacro UnselectSection ${SecGTKInstaller}
 
+  !insertmacro SelectSection ${SecGTKRuntime}
   !insertmacro SelectSection ${SecSigcRuntime}
   !insertmacro SelectSection ${SecCairommRuntime}
   !insertmacro SelectSection ${SecGlibmmRuntime}
@@ -1059,6 +1521,9 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecLibxmlRuntime}
 
 !ifndef RUNTIME_ONLY
+  !insertmacro SelectSection ${SecGTKDevelopment}
+  !insertmacro SelectSection ${SecGTKDocumentation}
+
   !insertmacro SelectSection ${SecSigcDevelopment}
   !insertmacro SelectSection ${SecSigcDocumentation}
 
@@ -1234,11 +1699,11 @@ FunctionEnd
 ;--------------------------------
 ; Callbacks
 
-Function .onSelChange
-
-  !insertmacro UnselectSection ${SecGTKInstaller}
-
-FunctionEnd
+;Function .onSelChange
+;
+;  !insertmacro UnselectSection ${SecGTKInstaller}
+;
+;FunctionEnd
 
 Function .onInit
 
