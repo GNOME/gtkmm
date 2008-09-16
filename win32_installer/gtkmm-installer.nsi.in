@@ -211,6 +211,9 @@ Section "Runtime" SecGTKRuntime
   ; These break when stripped, therefore we always load them from bin/
   File bin\zlib1.dll
   File bin\intl.dll
+  File bin\charset.dll
+  File bin\iconv.dll
+  File bin\libxml2.dll
 
   File ${BINDIR}\jpeg62.dll
   File ${BINDIR}\libpng12-0.dll
@@ -268,6 +271,9 @@ Section "Development" SecGTKDevelopment
 
   SetOutPath $INSTDIR\bin
 
+  ; Again, we always use the non-stripped version here since stripping breaks it
+  File bin\iconv.exe
+
   ; These are only useful to developers
   File ${BINDIR}\pkg-config.exe
   File ${BINDIR}\glib-genmarshal.exe
@@ -282,6 +288,7 @@ Section "Development" SecGTKDevelopment
   File ${BINDIR}\libglade-convert
 
   SetOutPath $INSTDIR\include
+  File /r include\libxml
   File /r include\glib-2.0
   File /r include\cairo
   File /r include\atk-1.0
@@ -289,6 +296,9 @@ Section "Development" SecGTKDevelopment
   File /r include\gtk-2.0
   File /r include\libglade-2.0
 
+  File include\iconv.h
+  File include\libcharset.h
+  File include\localcharset.h
   File include\libintl.h
   File include\png.h
   File include\pngconf.h
@@ -310,6 +320,12 @@ Section "Development" SecGTKDevelopment
   File /r lib\gtk-2.0\2.10.0\immodules
   File /r lib\gtk-2.0\2.10.0\loaders
 
+  SetOutPath $INSTDIR\lib
+  File lib\libxml2.lib
+  File lib\libxml2.dll.a
+  File lib\charset.lib
+  File lib\iconv.lib
+  File lib\libiconv.a
   File lib\intl.def
   File lib\intl.lib
   File lib\libintl.dll.a
@@ -366,6 +382,7 @@ Section "Development" SecGTKDevelopment
   File lib\libglade-2.0.dll.a
 
   SetOutPath $INSTDIR\lib\pkgconfig
+  File lib\pkgconfig\libxml-2.0.pc
   File lib\pkgconfig\libpng.pc
   File lib\pkgconfig\libpng12.pc
   File lib\pkgconfig\glib-2.0.pc
@@ -412,6 +429,9 @@ Section "Documentation" SecGTKDocumentation
   SectionIn 1
   SetOverwrite ifnewer
   
+  SetOutPath $INSTDIR\share\doc
+  File /r share\doc\libiconv
+
   SetOutPath $INSTDIR\share\gtk-doc\html
   File /r share\gtk-doc\html\glib
   File /r share\gtk-doc\html\gobject
@@ -1070,7 +1090,7 @@ continue:
 !ifndef RUNTIME_ONLY
   ; bin
 
-  ; These are only useful to developers
+  Delete $INSTDIR\bin\iconv.exe
   Delete $INSTDIR\bin\pkg-config.exe
   Delete $INSTDIR\bin\glib-genmarshal.exe
   Delete $INSTDIR\bin\glib-gettextize
@@ -1084,12 +1104,16 @@ continue:
   Delete $INSTDIR\bin\libglade-convert
 
   ; include
+  RMDir /r $INSTDIR\include\libxml
   RMDIR /r $INSTDIR\include\glib-2.0
   RMDIR /r $INSTDIR\include\cairo
   RMDIR /r $INSTDIR\include\atk-1.0
   RMDIR /r $INSTDIR\include\pango-1.0
   RMDIR /r $INSTDIR\include\gtk-2.0
   RMDIR /r $INSTDIR\include\libglade-2.0
+  Delete $INSTDIR\include\iconv.h
+  Delete $INSTDIR\include\libcharset.h
+  Delete $INSTDIR\include\localcharset.h
   Delete $INSTDIR\include\libintl.h
   Delete $INSTDIR\include\png.h
   Delete $INSTDIR\include\pngconf.h
@@ -1112,8 +1136,8 @@ continue:
 
   ; lib
 
-  RMDIR /r $INSTDIR\lib\glib-2.0\include
-  RMDIR /r $INSTDIR\lib\gtk-2.0\include
+  RMDir /r $INSTDIR\lib\glib-2.0\include
+  RMDir /r $INSTDIR\lib\gtk-2.0\include
   RMDir $INSTDIR\lib\glib-2.0
 
   RMDir /r $INSTDIR\lib\sigc++-2.0
@@ -1123,6 +1147,11 @@ continue:
   RMDir /r $INSTDIR\lib\libglademm-2.4
   RMDir /r $INSTDIR\lib\libxml++-2.6
 
+  Delete $INSTDIR\lib\libxml2.lib
+  Delete $INSTDIR\lib\libxml2.dll.a
+  Delete $INSTDIR\lib\charset.lib
+  Delete $INSTDIR\lib\iconv.lib
+  Delete $INSTDIR\lib\libiconv.a
   Delete $INSTDIR\lib\libintl.dll.a
   Delete $INSTDIR\lib\libtiff.dll.a
   Delete $INSTDIR\lib\libpng12.dll.a
@@ -1201,6 +1230,7 @@ continue:
   Delete $INSTDIR\lib\xml++-*.lib
   Delete $INSTDIR\lib\libxml++-*.lib.lnk
 
+  Delete $INSTDIR\lib\pkgconfig\libxml-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\libpng.pc
   Delete $INSTDIR\lib\pkgconfig\libpng12.pc
   Delete $INSTDIR\lib\pkgconfig\glib-2.0.pc
@@ -1240,6 +1270,8 @@ continue:
   RMDir $INSTDIR\lib\pkgconfig
 
   ; share
+
+  RMDir /r $INSTDIR\share\doc\libiconv
 
   RMDir /r $INSTDIR\share\doc\glib-dev-2.16.5
   RMDir /r $INSTDIR\share\doc\pango-dev-1.20.5
@@ -1317,9 +1349,11 @@ continue:
 
   ; bin
 
-  ; These break when stripped, therefore we always load them from bin/
   Delete $INSTDIR\bin\zlib1.dll
   Delete $INSTDIR\bin\intl.dll
+  Delete $INSTDIR\bin\iconv.dll
+  Delete $INSTDIR\bin\charset.dll
+  Delete $INSTDIR\bin\libxml2.dll
 
   Delete $INSTDIR\bin\jpeg62.dll
   Delete $INSTDIR\bin\libpng12-0.dll
