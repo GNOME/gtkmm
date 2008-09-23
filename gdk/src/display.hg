@@ -140,14 +140,61 @@ public:
   
   _WRAP_METHOD(static Glib::RefPtr<Display> open_default_libgtk_only(), gdk_display_open_default_libgtk_only, refreturn)
 
-  _WRAP_METHOD(guint32 get_drag_protocol(guint32 xid, GdkDragProtocol& protocol), gdk_drag_get_protocol_for_display)
+#ifdef G_OS_WIN32
+  /** Finds out the DND protocol supported by a window.
+   * 
+   * @newin2p2
+   * @deprecated
+   * @param xid The X id of the destination window.
+   * @param protocol Location where the supported DND protocol is returned.
+   * @return The X id of the window where the drop should happen. This 
+   * may be @a xid or the X id of a proxy window, or None if @a xid doesn't
+   * support Drag and Drop.
+   *
+   * On Windows, GdkNativeWindow is not the same as guint32, so we keep the
+   * guint32 variant for ABI compatibility. On Linux, it is the same, and they
+   * can't be overloaded therefore. But the ABI stays the same anyway.
+   */
+  guint32 get_drag_protocol(guint32 xid, GdkDragProtocol& protocol);
+#endif
+
+  _WRAP_METHOD(GdkNativeWindow get_drag_protocol(GdkNativeWindow xid, GdkDragProtocol& protocol), gdk_drag_get_protocol_for_display)
 
   _WRAP_METHOD(GdkKeymap* get_keymap(), gdk_keymap_get_for_display)
   _WRAP_METHOD(const GdkKeymap* get_keymap() const, gdk_keymap_get_for_display, constversion)
 
   bool set_selection_owner(const Glib::RefPtr<Window>& owner, Glib::ustring& selection, guint32 time_, bool send_event);
   Glib::RefPtr<Window> get_selection_owner(const Glib::ustring& selection);
+
+#ifdef G_OS_WIN32
+  /** Send a response to SelectionRequest event.
+   * 
+   * @newin2p2
+   * @param requestor Window to which to deliver response.
+   * @param selection Selection that was requested.
+   * @param target Target that was selected.
+   * @param property Property in which the selection owner stored the data,
+   * or "None" to indicate that the request was rejected.
+   * @param time_ Timestamp.
+   *
+   * On Windows, GdkNativeWindow is not the same as guint32, so we keep the
+   * guint32 variant for ABI compatibility. On Linux, it is the same, and they
+   * can't be overloaded therefore. But the ABI stays the same anyway.
+   */
   void selection_send_notify(guint32 requestor, Glib::ustring& selection, Glib::ustring& target, Glib::ustring& property, guint32 time_);
+#endif
+
+  /** Send a response to SelectionRequest event.
+   * 
+   * @newin2p2
+   * @param requestor Window to which to deliver response.
+   * @param selection Selection that was requested.
+   * @param target Target that was selected.
+   * @param property Property in which the selection owner stored the data,
+   * or "None" to indicate that the request was rejected.
+   * @param time_ Timestamp.
+   */
+  void selection_send_notify(GdkNativeWindow requestor, Glib::ustring& selection, Glib::ustring& target, Glib::ustring& property, guint32 time_);
 
   _WRAP_METHOD(Glib::RefPtr<Pixmap> lookup_pixmap(NativeWindow anid), gdk_pixmap_lookup_for_display)
   _WRAP_METHOD(Glib::RefPtr<const Pixmap> lookup_pixmap(NativeWindow anid) const, gdk_pixmap_lookup_for_display, constversion)

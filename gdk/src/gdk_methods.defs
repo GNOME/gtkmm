@@ -49,12 +49,6 @@
   (gtype-id "GDK_TYPE_KEYMAP")
 )
 
-(define-object Paintable
-  (in-module "Gdk")
-  (c-name "GdkPaintable")
-  (gtype-id "GDK_TYPE_PAINTABLE")
-)
-
 (define-object PangoRenderer
   (in-module "Gdk")
   (parent "PangoRenderer")
@@ -167,6 +161,7 @@
     '("setting" "GDK_SETTING")
     '("owner-change" "GDK_OWNER_CHANGE")
     '("grab-broken" "GDK_GRAB_BROKEN")
+    '("damage" "GDK_DAMAGE")
   )
 )
 
@@ -245,6 +240,9 @@
     '("normal" "GDK_CROSSING_NORMAL")
     '("grab" "GDK_CROSSING_GRAB")
     '("ungrab" "GDK_CROSSING_UNGRAB")
+    '("gtk-grab" "GDK_CROSSING_GTK_GRAB")
+    '("gtk-ungrab" "GDK_CROSSING_GTK_UNGRAB")
+    '("state-changed" "GDK_CROSSING_STATE_CHANGED")
   )
 )
 
@@ -469,60 +467,6 @@
     '("ytilt" "GDK_AXIS_YTILT")
     '("wheel" "GDK_AXIS_WHEEL")
     '("last" "GDK_AXIS_LAST")
-  )
-)
-
-(define-flags ColorInfoFlags
-  (in-module "Gdk")
-  (c-name "GdkColorInfoFlags")
-  (gtype-id "GDK_TYPE_COLOR_INFO_FLAGS")
-  (values
-    '("e" "GDK_COLOR_WRITEABLE")
-  )
-)
-
-(define-flags DebugFlag
-  (in-module "Gdk")
-  (c-name "GdkDebugFlag")
-  (gtype-id "GDK_TYPE_DEBUG_FLAG")
-  (values
-    '("misc" "GDK_DEBUG_MISC")
-    '("events" "GDK_DEBUG_EVENTS")
-    '("dnd" "GDK_DEBUG_DND")
-    '("xim" "GDK_DEBUG_XIM")
-    '("nograbs" "GDK_DEBUG_NOGRABS")
-    '("colormap" "GDK_DEBUG_COLORMAP")
-    '("gdkrgb" "GDK_DEBUG_GDKRGB")
-    '("gc" "GDK_DEBUG_GC")
-    '("pixmap" "GDK_DEBUG_PIXMAP")
-    '("image" "GDK_DEBUG_IMAGE")
-    '("input" "GDK_DEBUG_INPUT")
-    '("cursor" "GDK_DEBUG_CURSOR")
-    '("multihead" "GDK_DEBUG_MULTIHEAD")
-    '("xinerama" "GDK_DEBUG_XINERAMA")
-    '("draw" "GDK_DEBUG_DRAW")
-  )
-)
-
-(define-enum ArgType
-  (in-module "Gdk")
-  (c-name "GdkArgType")
-  (gtype-id "GDK_TYPE_ARG_TYPE")
-  (values
-    '("string" "GDK_ARG_STRING")
-    '("int" "GDK_ARG_INT")
-    '("bool" "GDK_ARG_BOOL")
-    '("nobool" "GDK_ARG_NOBOOL")
-    '("callback" "GDK_ARG_CALLBACK")
-  )
-)
-
-(define-flags EventFlags
-  (in-module "Gdk")
-  (c-name "GdkEventFlags")
-  (gtype-id "GDK_TYPE_EVENT_FLAGS")
-  (values
-    '("g" "GDK_EVENT_PENDING")
   )
 )
 
@@ -800,7 +744,72 @@
 )
 
 
-;; From gdkalias.h
+;; From gdkapplaunchcontext.h
+
+(define-function gdk_app_launch_context_get_type
+  (c-name "gdk_app_launch_context_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_app_launch_context_new
+  (c-name "gdk_app_launch_context_new")
+  (is-constructor-of "GdkAppLaunchContext")
+  (return-type "GdkAppLaunchContext*")
+)
+
+(define-method set_display
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_display")
+  (return-type "none")
+  (parameters
+    '("GdkDisplay*" "display")
+  )
+)
+
+(define-method set_screen
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_screen")
+  (return-type "none")
+  (parameters
+    '("GdkScreen*" "screen")
+  )
+)
+
+(define-method set_desktop
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_desktop")
+  (return-type "none")
+  (parameters
+    '("gint" "desktop")
+  )
+)
+
+(define-method set_timestamp
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_timestamp")
+  (return-type "none")
+  (parameters
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method set_icon
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_icon")
+  (return-type "none")
+  (parameters
+    '("GIcon*" "icon")
+  )
+)
+
+(define-method set_icon_name
+  (of-object "GdkAppLaunchContext")
+  (c-name "gdk_app_launch_context_set_icon_name")
+  (return-type "none")
+  (parameters
+    '("const-char*" "icon_name")
+  )
+)
 
 
 
@@ -819,7 +828,7 @@
   (return-type "none")
   (parameters
     '("cairo_t*" "cr")
-    '("GdkColor*" "color")
+    '("const-GdkColor*" "color")
   )
 )
 
@@ -925,7 +934,7 @@
   (return-type "gint")
   (parameters
     '("GdkColor*" "colors")
-    '("gint" "ncolors")
+    '("gint" "n_colors")
     '("gboolean" "writeable")
     '("gboolean" "best_match")
     '("gboolean*" "success")
@@ -948,8 +957,8 @@
   (c-name "gdk_colormap_free_colors")
   (return-type "none")
   (parameters
-    '("GdkColor*" "colors")
-    '("gint" "ncolors")
+    '("const-GdkColor*" "colors")
+    '("gint" "n_colors")
   )
 )
 
@@ -1085,10 +1094,6 @@
     '("gulong" "planes")
   )
 )
-
-
-
-;; From gdkconfig.h
 
 
 
@@ -1289,7 +1294,7 @@
   (c-name "gdk_display_put_event")
   (return-type "none")
   (parameters
-    '("GdkEvent*" "event")
+    '("const-GdkEvent*" "event")
   )
 )
 
@@ -1442,7 +1447,7 @@
   (parameters
     '("GdkWindow*" "clipboard_window")
     '("guint32" "time_")
-    '("GdkAtom*" "targets")
+    '("const-GdkAtom*" "targets")
     '("gint" "n_targets")
   )
 )
@@ -1576,10 +1581,10 @@
 
 (define-function gdk_drag_get_protocol_for_display
   (c-name "gdk_drag_get_protocol_for_display")
-  (return-type "guint32")
+  (return-type "GdkNativeWindow")
   (parameters
     '("GdkDisplay*" "display")
-    '("guint32" "xid")
+    '("GdkNativeWindow" "xid")
     '("GdkDragProtocol*" "protocol")
   )
 )
@@ -1600,9 +1605,9 @@
 
 (define-function gdk_drag_get_protocol
   (c-name "gdk_drag_get_protocol")
-  (return-type "guint32")
+  (return-type "GdkNativeWindow")
   (parameters
-    '("guint32" "xid")
+    '("GdkNativeWindow" "xid")
     '("GdkDragProtocol*" "protocol")
   )
 )
@@ -1812,8 +1817,8 @@
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
     '("gboolean" "filled")
-    '("GdkPoint*" "points")
-    '("gint" "npoints")
+    '("const-GdkPoint*" "points")
+    '("gint" "n_points")
   )
 )
 
@@ -1896,8 +1901,8 @@
   (parameters
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
-    '("GdkPoint*" "points")
-    '("gint" "npoints")
+    '("const-GdkPoint*" "points")
+    '("gint" "n_points")
   )
 )
 
@@ -1908,7 +1913,7 @@
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
     '("GdkSegment*" "segs")
-    '("gint" "nsegs")
+    '("gint" "n_segs")
   )
 )
 
@@ -1918,8 +1923,8 @@
   (parameters
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
-    '("GdkPoint*" "points")
-    '("gint" "npoints")
+    '("const-GdkPoint*" "points")
+    '("gint" "n_points")
   )
 )
 
@@ -2013,7 +2018,7 @@
   (parameters
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
-    '("PangoMatrix*" "matrix")
+    '("const-PangoMatrix*" "matrix")
     '("PangoFont*" "font")
     '("gint" "x")
     '("gint" "y")
@@ -2027,7 +2032,7 @@
   (parameters
     '("GdkDrawable*" "drawable")
     '("GdkGC*" "gc")
-    '("GdkTrapezoid*" "trapezoids")
+    '("const-GdkTrapezoid*" "trapezoids")
     '("gint" "n_trapezoids")
   )
 )
@@ -2413,7 +2418,7 @@
   (c-name "gdk_event_request_motions")
   (return-type "none")
   (parameters
-    '("GdkEventMotion*" "event")
+    '("const-GdkEventMotion*" "event")
   )
 )
 
@@ -3093,7 +3098,7 @@
     '("GdkInputCondition" "condition")
     '("GdkInputFunction" "function")
     '("gpointer" "data")
-    '("GdkDestroyNotify" "destroy")
+    '("GDestroyNotify" "destroy")
   )
 )
 
@@ -3365,6 +3370,28 @@
   )
 )
 
+(define-function gdk_threads_add_timeout_seconds_full
+  (c-name "gdk_threads_add_timeout_seconds_full")
+  (return-type "guint")
+  (parameters
+    '("gint" "priority")
+    '("guint" "interval")
+    '("GSourceFunc" "function")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function gdk_threads_add_timeout_seconds
+  (c-name "gdk_threads_add_timeout_seconds")
+  (return-type "guint")
+  (parameters
+    '("guint" "interval")
+    '("GSourceFunc" "function")
+    '("gpointer" "data")
+  )
+)
+
 
 
 ;; From gdki18n.h
@@ -3575,24 +3602,6 @@
 
 
 
-;; From gdkinternals.h
-
-(define-function gdk_synthesize_window_state
-  (c-name "gdk_synthesize_window_state")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "window")
-    '("GdkWindowState" "unset_flags")
-    '("GdkWindowState" "set_flags")
-  )
-)
-
-
-
-;; From gdkintl.h
-
-
-
 ;; From gdkkeys.h
 
 (define-function gdk_keymap_get_type
@@ -3752,14 +3761,6 @@
 
 
 
-;; From gdkmarshalers.h
-
-
-
-;; From gdkmedialib.h
-
-
-
 ;; From gdkpango.h
 
 (define-function gdk_pango_renderer_get_type
@@ -3851,7 +3852,7 @@
     '("PangoLayoutLine*" "line")
     '("gint" "x_origin")
     '("gint" "y_origin")
-    '("gint*" "index_ranges")
+    '("const-gint*" "index_ranges")
     '("gint" "n_ranges")
   )
 )
@@ -3863,7 +3864,7 @@
     '("PangoLayout*" "layout")
     '("gint" "x_origin")
     '("gint" "y_origin")
-    '("gint*" "index_ranges")
+    '("const-gint*" "index_ranges")
     '("gint" "n_ranges")
   )
 )
@@ -4150,10 +4151,6 @@
 
 
 
-;; From gdkpoly-generic.h
-
-
-
 ;; From gdkprivate.h
 
 (define-method destroy_notify
@@ -4365,10 +4362,6 @@
 
 
 
-;; From gdkregion-generic.h
-
-
-
 ;; From gdkregion.h
 
 (define-function gdk_region_new
@@ -4381,8 +4374,8 @@
   (c-name "gdk_region_polygon")
   (return-type "GdkRegion*")
   (parameters
-    '("GdkPoint*" "points")
-    '("gint" "npoints")
+    '("const-GdkPoint*" "points")
+    '("gint" "n_points")
     '("GdkFillRule" "fill_rule")
   )
 )
@@ -4593,7 +4586,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "rgb_buf")
+    '("const-guchar*" "rgb_buf")
     '("gint" "rowstride")
   )
 )
@@ -4609,7 +4602,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "rgb_buf")
+    '("const-guchar*" "rgb_buf")
     '("gint" "rowstride")
     '("gint" "xdith")
     '("gint" "ydith")
@@ -4627,7 +4620,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "buf")
+    '("const-guchar*" "buf")
     '("gint" "rowstride")
   )
 )
@@ -4643,7 +4636,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "buf")
+    '("const-guchar*" "buf")
     '("gint" "rowstride")
     '("gint" "xdith")
     '("gint" "ydith")
@@ -4661,7 +4654,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "buf")
+    '("const-guchar*" "buf")
     '("gint" "rowstride")
   )
 )
@@ -4677,7 +4670,7 @@
     '("gint" "width")
     '("gint" "height")
     '("GdkRgbDither" "dith")
-    '("guchar*" "buf")
+    '("const-guchar*" "buf")
     '("gint" "rowstride")
     '("GdkRgbCmap*" "cmap")
   )
@@ -4907,6 +4900,33 @@
   )
 )
 
+(define-method get_monitor_width_mm
+  (of-object "GdkScreen")
+  (c-name "gdk_screen_get_monitor_width_mm")
+  (return-type "gint")
+  (parameters
+    '("gint" "monitor_num")
+  )
+)
+
+(define-method get_monitor_height_mm
+  (of-object "GdkScreen")
+  (c-name "gdk_screen_get_monitor_height_mm")
+  (return-type "gint")
+  (parameters
+    '("gint" "monitor_num")
+  )
+)
+
+(define-method get_monitor_plug_name
+  (of-object "GdkScreen")
+  (c-name "gdk_screen_get_monitor_plug_name")
+  (return-type "gchar*")
+  (parameters
+    '("gint" "monitor_num")
+  )
+)
+
 (define-method broadcast_client_message
   (of-object "GdkScreen")
   (c-name "gdk_screen_broadcast_client_message")
@@ -5043,7 +5063,7 @@
   (c-name "gdk_selection_send_notify")
   (return-type "none")
   (parameters
-    '("guint32" "requestor")
+    '("GdkNativeWindow" "requestor")
     '("GdkAtom" "selection")
     '("GdkAtom" "target")
     '("GdkAtom" "property")
@@ -5056,7 +5076,7 @@
   (return-type "none")
   (parameters
     '("GdkDisplay*" "display")
-    '("guint32" "requestor")
+    '("GdkNativeWindow" "requestor")
     '("GdkAtom" "selection")
     '("GdkAtom" "target")
     '("GdkAtom" "property")
@@ -5110,6 +5130,44 @@
     '("GdkScreen*" "screen")
     '("const-gchar*" "command_line")
     '("GError**" "error")
+  )
+)
+
+
+
+;; From gdktestutils.h
+
+(define-function gdk_test_render_sync
+  (c-name "gdk_test_render_sync")
+  (return-type "none")
+  (parameters
+    '("GdkWindow*" "window")
+  )
+)
+
+(define-function gdk_test_simulate_key
+  (c-name "gdk_test_simulate_key")
+  (return-type "gboolean")
+  (parameters
+    '("GdkWindow*" "window")
+    '("gint" "x")
+    '("gint" "y")
+    '("guint" "keyval")
+    '("GdkModifierType" "modifiers")
+    '("GdkEventType" "key_pressrelease")
+  )
+)
+
+(define-function gdk_test_simulate_button
+  (c-name "gdk_test_simulate_button")
+  (return-type "gboolean")
+  (parameters
+    '("GdkWindow*" "window")
+    '("gint" "x")
+    '("gint" "y")
+    '("guint" "button")
+    '("GdkModifierType" "modifiers")
+    '("GdkEventType" "button_pressrelease")
   )
 )
 
@@ -6093,6 +6151,18 @@
   (return-type "none")
 )
 
+(define-method freeze_toplevel_updates_libgtk_only
+  (of-object "GdkWindow")
+  (c-name "gdk_window_freeze_toplevel_updates_libgtk_only")
+  (return-type "none")
+)
+
+(define-method thaw_toplevel_updates_libgtk_only
+  (of-object "GdkWindow")
+  (c-name "gdk_window_thaw_toplevel_updates_libgtk_only")
+  (return-type "none")
+)
+
 (define-function gdk_window_process_all_updates
   (c-name "gdk_window_process_all_updates")
   (return-type "none")
@@ -6164,4 +6234,24 @@
   (return-type "GdkWindow*")
 )
 
+(define-method redirect_to_drawable
+  (of-object "GdkWindow")
+  (c-name "gdk_window_redirect_to_drawable")
+  (return-type "none")
+  (parameters
+    '("GdkDrawable*" "drawable")
+    '("gint" "src_x")
+    '("gint" "src_y")
+    '("gint" "dest_x")
+    '("gint" "dest_y")
+    '("gint" "width")
+    '("gint" "height")
+  )
+)
+
+(define-method remove_redirection
+  (of-object "GdkWindow")
+  (c-name "gdk_window_remove_redirection")
+  (return-type "none")
+)
 
