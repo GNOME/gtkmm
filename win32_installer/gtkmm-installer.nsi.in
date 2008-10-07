@@ -229,6 +229,7 @@ Section "Runtime" SecGTKRuntime
   File ${BINDIR}\libpangocairo-1.0-0.dll
   File ${BINDIR}\libpangoft2-1.0-0.dll
   File ${BINDIR}\libpangowin32-1.0-0.dll
+  File ${BINDIR}\libgailutil-18.dll
   File ${BINDIR}\libgdk-win32-2.0-0.dll
   File ${BINDIR}\libgdk_pixbuf-2.0-0.dll
   File ${BINDIR}\libgtk-win32-2.0-0.dll
@@ -240,18 +241,19 @@ Section "Runtime" SecGTKRuntime
 
   SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
   File /r lib\gtk-2.0\2.10.0\engines
-  File /r lib\gtk-2.0\2.10.0\immodules
-  File /r lib\gtk-2.0\2.10.0\loaders
+
+  SetOutPath $INSTDIR\lib\gtk-2.0
+  File /r lib\gtk-2.0\modules
 
   SetOutPath $INSTDIR\etc
   File /r etc\gtk-2.0
   File /r etc\pango
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-2.16.5
-  File /r share\doc\cairo-1.6.4-2
-  File /r share\doc\pango-1.20.5
-  File /r share\doc\gtk+-2.12.11
+  File /r share\doc\glib-2.18.1
+  File /r share\doc\cairo_1.7.6-1_win32
+  File /r share\doc\pango-1.22.0
+  File /r share\doc\gtk+-2.14.3
 
   SetOutPath $INSTDIR\share
   File /r share\locale
@@ -285,7 +287,6 @@ Section "Development" SecGTKDevelopment
   File ${BINDIR}\gdk-pixbuf-query-loaders.exe
   File ${BINDIR}\gtk-builder-convert
   File ${BINDIR}\gtk-query-immodules-2.0.exe
-  File ${BINDIR}\libglade-convert
 
   SetOutPath $INSTDIR\include
   File /r include\libxml
@@ -315,10 +316,8 @@ Section "Development" SecGTKDevelopment
   SetOutPath $INSTDIR\lib\glib-2.0
   File /r lib\glib-2.0\include
 
-  SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
-  File /r lib\gtk-2.0\2.10.0\engines
-  File /r lib\gtk-2.0\2.10.0\immodules
-  File /r lib\gtk-2.0\2.10.0\loaders
+  SetOutPath $INSTDIR\lib\gtk-2.0
+  File /r lib\gtk-2.0\include
 
   SetOutPath $INSTDIR\lib
   File lib\libxml2.lib
@@ -371,6 +370,8 @@ Section "Development" SecGTKDevelopment
   File lib\pangowin32-1.0.def
   File lib\pangowin32-1.0.lib
   File lib\libpangowin32-1.0.dll.a
+  File lib\gailutil.lib
+  File lib\libgailutil.dll.a
 ; TODO: What about .defs here?
   File lib\gdk-win32-2.0.lib
   File lib\libgdk-win32-2.0.dll.a
@@ -411,9 +412,9 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\libglade-2.0.pc
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-dev-2.16.5
-  File /r share\doc\pango-dev-1.20.5
-  File /r share\doc\gtk+-dev-2.12.11
+  File /r share\doc\glib-dev-2.18.1
+  File /r share\doc\pango-dev-1.22.0
+  File /r share\doc\gtk+-dev-2.14.3
 
   SetOutPath $INSTDIR\share\xml
   File /r share\xml\libglade
@@ -561,11 +562,15 @@ Section "Runtime" SecGlibmmRuntime
 
   SetOutPath $INSTDIR\bin
   File ${BINDIR}\libglibmm-2.4-1.dll
+  File ${BINDIR}\libgiomm-2.4-1.dll
   File ${BINDIR}\libglibmm_generate_extra_defs-2.4-1.dll
   File MSVC\glibmm-2.4.dll
+  File MSVC\giomm-2.4.dll
   !ifndef RUNTIME_ONLY
     File MSVC\glibmm-2.4d.dll
     File MSVC\glibmm-2.4d.pdb
+    File MSVC\giomm-2.4d.dll
+    File MSVC\giomm-2.4d.pdb
   !endif
   
 SectionEnd
@@ -577,16 +582,22 @@ Section "Development" SecGlibmmDevelopment
 
   SetOutPath $INSTDIR\include
   File /r include\glibmm-2.4
+  File /r include\giomm-2.4
 
   SetOutPath $INSTDIR\lib
   File lib\libglibmm-2.4.dll.a
+  File lib\libgiomm-2.4.dll.a
   File lib\libglibmm_generate_extra_defs-2.4.dll.a
   File /r lib\glibmm-2.4
+  File /r lib\giomm-2.4
   File MSVC\glibmm-2.4.lib
   File MSVC\glibmm-2.4d.lib
+  File MSVC\giomm-2.4.lib
+  File MSVC\giomm-2.4d.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\glibmm-2.4.pc
+  File lib\pkgconfig\giomm-2.4.pc
   
   SetOutPath $INSTDIR\share\aclocal
   File share\aclocal\glibmm_check_perl.m4
@@ -599,6 +610,63 @@ Section "Documentation" SecGlibmmDocumentation
 
   SetOutPath $INSTDIR\share\doc
   File /r share\doc\glibmm-2.4
+
+;  SetOutPath $INSTDIR\share\devhelp\books
+;  File /r share\devhelp\books\glibmm-2.4
+SectionEnd
+!endif
+
+SubSectionEnd
+
+SubSection "pangomm"
+
+Section "Runtime" SecPangommRuntime
+!ifndef RUNTIME_ONLY
+  SectionIn 1 2 RO
+!else
+  SectionIn RO
+!endif
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\bin
+  File ${BINDIR}\libpangomm-1.4-1.dll
+  File MSVC\pangomm-1.4.dll
+
+  !ifndef RUNTIME_ONLY
+    File MSVC\pangomm-1.4d.dll
+    File MSVC\pangomm-1.4d.pdb
+  !endif
+
+SectionEnd
+
+!ifndef RUNTIME_ONLY
+Section "Development" SecPangommDevelopment
+  SectionIn 1
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\include
+  File /r include\pangomm-1.4
+
+  SetOutPath $INSTDIR\lib
+  File lib\libpangomm-1.4.dll.a
+  
+  File MSVC\pangomm-1.4.lib
+  File MSVC\pangomm-1.4d.lib
+
+  SetOutPath $INSTDIR\lib\pkgconfig
+  File lib\pkgconfig\pangomm-1.4.pc
+  
+SectionEnd
+
+Section "Documentation" SecPangommDocumentation
+  SectionIn 1
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\share\doc
+  File /r share\doc\pangomm-1.4
+
+  SetOutPath $INSTDIR\share\devhelp\books
+  File /r share\devhelp\books\pangomm-1.4
 
 SectionEnd
 !endif
@@ -619,12 +687,10 @@ Section "Runtime" SecGtkmmRuntime
   File ${BINDIR}\libatkmm-1.6-1.dll
   File ${BINDIR}\libgdkmm-2.4-1.dll
   File ${BINDIR}\libgtkmm-2.4-1.dll
-  File ${BINDIR}\libpangomm-1.4-1.dll
 
   File MSVC\atkmm-1.6.dll
   File MSVC\gdkmm-2.4.dll
   File MSVC\gtkmm-2.4.dll
-  File MSVC\pangomm-1.4.dll
 
   !ifndef RUNTIME_ONLY
     File MSVC\atkmm-1.6d.dll
@@ -633,8 +699,6 @@ Section "Runtime" SecGtkmmRuntime
     File MSVC\gdkmm-2.4d.pdb
     File MSVC\gtkmm-2.4d.dll
     File MSVC\gtkmm-2.4d.pdb
-    File MSVC\pangomm-1.4d.dll
-    File MSVC\pangomm-1.4d.pdb
   !endif
   
 SectionEnd
@@ -648,13 +712,11 @@ Section "Development" SecGtkmmDevelopment
   File /r include\atkmm-1.6
   File /r include\gtkmm-2.4
   File /r include\gdkmm-2.4
-  File /r include\pangomm-1.4
 
   SetOutPath $INSTDIR\lib
   File lib\libatkmm-1.6.dll.a
   File lib\libgdkmm-2.4.dll.a
   File lib\libgtkmm-2.4.dll.a
-  File lib\libpangomm-1.4.dll.a
   File /r lib\gtkmm-2.4
   File /r lib\gdkmm-2.4
   
@@ -664,14 +726,11 @@ Section "Development" SecGtkmmDevelopment
   File MSVC\gdkmm-2.4d.lib
   File MSVC\gtkmm-2.4.lib
   File MSVC\gtkmm-2.4d.lib
-  File MSVC\pangomm-1.4.lib
-  File MSVC\pangomm-1.4d.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\atkmm-1.6.pc
   File lib\pkgconfig\gtkmm-2.4.pc
   File lib\pkgconfig\gdkmm-2.4.pc
-  File lib\pkgconfig\pangomm-1.4.pc
   
   SetOutPath $INSTDIR\MSVC
   File MSVC\gtkmm-2.4.vsprops
@@ -703,8 +762,6 @@ Section "Documentation" SecGtkmmDocumentation
   SetOutPath $INSTDIR\share\devhelp\books
   File /r share\devhelp\books\gtkmm-2.4
 
-; TODO: Add docs from pangomm-2.4 when we switch to gtkmm-2.14
-  
 SectionEnd
 !endif
 
@@ -935,7 +992,8 @@ Section -Post SecPost
   IfFileExists "$INSTDIR\share\doc\glibmm-2.4\docs\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\glibmm Reference Manual.lnk" "$INSTDIR\share\doc\glibmm-2.4\docs\reference\html\index.html"
 
-  ; TODO: Add link to pangomm-2.4 documentation when we switch to gtkmm-2.14
+  IfFileExists "$INSTDIR\share\doc\pangomm-1.4\docs\reference\html\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\pangomm Reference Manual.lnk" "$INSTDIR\share\doc\pangomm-1.4\docs\reference\html\index.html"
 
   IfFileExists "$INSTDIR\share\doc\gtkmm-2.4\docs\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\gtkmm Reference Manual.lnk" "$INSTDIR\share\doc\gtkmm-2.4\docs\index.html"
@@ -1041,6 +1099,7 @@ continue:
 
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glibmm Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\pangomm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gtkmm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglademm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\cairomm Reference Manual.lnk"
@@ -1101,7 +1160,6 @@ continue:
   Delete $INSTDIR\bin\gdk-pixbuf-query-loaders.exe
   Delete $INSTDIR\bin\gtk-builder-convert
   Delete $INSTDIR\bin\gtk-query-immodules-2.0.exe
-  Delete $INSTDIR\bin\libglade-convert
 
   ; include
   RMDir /r $INSTDIR\include\libxml
@@ -1127,6 +1185,7 @@ continue:
   RMDir /r $INSTDIR\include\sigc++-2.0
   RMDir /r $INSTDIR\include\cairomm-1.0
   RMDir /r $INSTDIR\include\glibmm-2.4
+  RMDir /r $INSTDIR\include\giomm-2.4
   RMDir /r $INSTDIR\include\atkmm-1.6
   RMDir /r $INSTDIR\include\gdkmm-2.4
   RMDir /r $INSTDIR\include\gtkmm-2.4
@@ -1142,6 +1201,7 @@ continue:
 
   RMDir /r $INSTDIR\lib\sigc++-2.0
   RMDir /r $INSTDIR\lib\glibmm-2.4
+  RMDir /r $INSTDIR\lib\giomm-2.4
   RMDir /r $INSTDIR\lib\gdkmm-2.4
   RMDir /r $INSTDIR\lib\gtkmm-2.4
   RMDir /r $INSTDIR\lib\libglademm-2.4
@@ -1167,6 +1227,7 @@ continue:
   Delete $INSTDIR\lib\libpangocairo-1.0.dll.a
   Delete $INSTDIR\lib\libpangoft2-1.0.dll.a
   Delete $INSTDIR\lib\libpangowin32-1.0.dll.a
+  Delete $INSTDIR\lib\libgailutil.dll.a
   Delete $INSTDIR\lib\libgdk-win32-2.0.dll.a
   Delete $INSTDIR\lib\libgdk_pixbuf-2.0.dll.a
   Delete $INSTDIR\lib\libgtk-win32-2.0.dll.a
@@ -1175,6 +1236,7 @@ continue:
   Delete $INSTDIR\lib\libsigc-*.dll.a
   Delete $INSTDIR\lib\libcairomm-*.dll.a
   Delete $INSTDIR\lib\libglibmm-*.dll.a
+  Delete $INSTDIR\lib\libgiomm-*.dll.a
   Delete $INSTDIR\lib\libglibmm_generate_extra_defs-*.dll.a
   Delete $INSTDIR\lib\libatkmm-*.dll.a
   Delete $INSTDIR\lib\libgdkmm-*.dll.a
@@ -1213,6 +1275,7 @@ continue:
   Delete $INSTDIR\lib\pangoft2-1.0.lib
   Delete $INSTDIR\lib\pangowin32-1.0.def
   Delete $INSTDIR\lib\pangowin32-1.0.lib
+  Delete $INSTDIR\lib\gailutil.lib
   Delete $INSTDIR\lib\gdk-win32-2.0.lib
   Delete $INSTDIR\lib\gdk_pixbuf-2.0.lib
   Delete $INSTDIR\lib\gtk-win32-2.0.lib
@@ -1221,6 +1284,7 @@ continue:
   Delete $INSTDIR\lib\sigc-*.lib
   Delete $INSTDIR\lib\cairomm-*.lib
   Delete $INSTDIR\lib\glibmm-*.lib
+  Delete $INSTDIR\lib\giomm-*.lib
   Delete $INSTDIR\lib\atkmm-*.lib
   Delete $INSTDIR\lib\gdkmm-*.lib
   Delete $INSTDIR\lib\gtkmm-*.lib
@@ -1261,6 +1325,7 @@ continue:
   Delete $INSTDIR\lib\pkgconfig\sigc++-*.pc
   Delete $INSTDIR\lib\pkgconfig\cairomm-*.pc
   Delete $INSTDIR\lib\pkgconfig\glibmm-*.pc
+  Delete $INSTDIR\lib\pkgconfig\giomm-*.pc
   Delete $INSTDIR\lib\pkgconfig\atkmm-*.pc
   Delete $INSTDIR\lib\pkgconfig\gdkmm-*.pc
   Delete $INSTDIR\lib\pkgconfig\gtkmm-*.pc
@@ -1273,9 +1338,9 @@ continue:
 
   RMDir /r $INSTDIR\share\doc\libiconv
 
-  RMDir /r $INSTDIR\share\doc\glib-dev-2.16.5
-  RMDir /r $INSTDIR\share\doc\pango-dev-1.20.5
-  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.12.11
+  RMDir /r $INSTDIR\share\doc\glib-dev-2.18.1
+  RMDir /r $INSTDIR\share\doc\pango-dev-1.22.0
+  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.14.3
 
   RMDir /r $INSTDIR\share\xml\libglade
   RMDir $INSTDIR\share\xml
@@ -1299,14 +1364,16 @@ continue:
   RMDir /r $INSTDIR\share\doc\libsigc-2.0
   RMDir /r $INSTDIR\share\doc\libcairomm-1.0
   RMDir /r $INSTDIR\share\doc\glibmm-2.4
-  ; TODO: Remove pangomm-2.4 docs when we switch to gtkmm-2.14
+  RMDir /r $INSTDIR\share\doc\pangomm-1.4
   RMDir /r $INSTDIR\share\doc\gtkmm-2.4
   RMDir /r $INSTDIR\share\doc\gnomemm-2.6\libglademm-2.4
   RMDir $INSTDIR\share\doc\gnomemm-2.6
   RMDir /r $INSTDIR\share\doc\libxml++-2.6
   RMDir $INSTDIR\share\doc
   
+  RMDir /r $INSTDIR\share\devhelp\books\glibmm-2.4
   RMDir /r $INSTDIR\share\devhelp\books\gtkmm-2.4
+  RMDir /r $INSTDIR\share\devhelp\books\pangomm-1.4
   RMDir /r $INSTDIR\share\devhelp\books\libglademm-2.4
   RMDir $INSTDIR\share\devhelp\books
   RMDir $INSTDIR\share\devhelp
@@ -1369,6 +1436,7 @@ continue:
   Delete $INSTDIR\bin\libpangocairo-1.0-0.dll
   Delete $INSTDIR\bin\libpangoft2-1.0-0.dll
   Delete $INSTDIR\bin\libpangowin32-1.0-0.dll
+  Delete $INSTDIR\bin\libgailutil-18.dll
   Delete $INSTDIR\bin\libgdk-win32-2.0-0.dll
   Delete $INSTDIR\bin\libgdk_pixbuf-2.0-0.dll
   Delete $INSTDIR\bin\libgtk-win32-2.0-0.dll
@@ -1379,6 +1447,7 @@ continue:
   Delete $INSTDIR\bin\gtk-demo.exe
 
   RMDir /r $INSTDIR\lib\gtk-2.0\2.10.0
+  RMDir /r $INSTDIR\lib\gtk-2.0\modules
   RMDir $INSTDIR\lib\gtk-2.0
   RMDir $INSTDIR\lib
   
@@ -1390,6 +1459,7 @@ continue:
   Delete $INSTDIR\bin\libsigc-*.dll
   Delete $INSTDIR\bin\libcairomm-*.dll
   Delete $INSTDIR\bin\libglibmm-*.dll
+  Delete $INSTDIR\bin\libgiomm-*.dll
   Delete $INSTDIR\bin\libglibmm_generate_extra_defs-*.dll
   Delete $INSTDIR\bin\libatkmm-*.dll
   Delete $INSTDIR\bin\libgdkmm-*.dll
@@ -1402,6 +1472,7 @@ continue:
   Delete $INSTDIR\bin\sigc-*.dll
   Delete $INSTDIR\bin\cairomm-*.dll
   Delete $INSTDIR\bin\glibmm-*.dll
+  Delete $INSTDIR\bin\giomm-*.dll
   Delete $INSTDIR\bin\atkmm-*.dll
   Delete $INSTDIR\bin\gdkmm-*.dll
   Delete $INSTDIR\bin\gtkmm-*.dll
@@ -1414,6 +1485,7 @@ continue:
   Delete $INSTDIR\bin\sigc-*.pdb
   Delete $INSTDIR\bin\cairomm-*.pdb
   Delete $INSTDIR\bin\glibmm-*.pdb
+  Delete $INSTDIR\bin\giomm-*.pdb
   Delete $INSTDIR\bin\atkmm-*.pdb
   Delete $INSTDIR\bin\gdkmm-*.pdb
   Delete $INSTDIR\bin\gtkmm-*.pdb
@@ -1426,10 +1498,10 @@ continue:
   RMDir $INSTDIR\bin
   
   ; share (non-development files)
-  RMDir /r $INSTDIR\share\doc\glib-2.16.5
-  RMDir /r $INSTDIR\share\doc\cairo-1.6.4-2
-  RMDir /r $INSTDIR\share\doc\pango-1.20.5
-  RMDir /r $INSTDIR\share\doc\gtk+-2.12.11
+  RMDir /r $INSTDIR\share\doc\glib-2.18.1
+  RMDir /r $INSTDIR\share\doc\cairo_1.7.6-1_win32
+  RMDir /r $INSTDIR\share\doc\pango-1.22.0
+  RMDir /r $INSTDIR\share\doc\gtk+-2.14.3
   RMDir $INSTDIR\share\doc
 
   RMdir /r $INSTDIR\share\locale
@@ -1465,6 +1537,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcRuntime} "libsigc++ Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecCairommRuntime} "cairomm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGlibmmRuntime} "glibmm Runtime Libraries"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommRuntime} "pangomm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmRuntime} "gtkmm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibglademmRuntime} "libglademm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibxmlRuntime} "libxml++ Runtime Libraries"
@@ -1480,6 +1553,9 @@ SectionEnd
 
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGlibmmDevelopment} "glibmm development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGlibmmDocumentation} "glibmm Documentation"
+
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommDevelopment} "pangomm development headers and import libraries"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommDocumentation} "pangomm Documentation"
 
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmDevelopment} "gtkmm development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmDocumentation} "gtkmm Documentation"
@@ -1507,6 +1583,7 @@ Function EnableGTKInstaller
   !insertmacro UnselectSection ${SecSigcRuntime}
   !insertmacro UnselectSection ${SecCairommRuntime}
   !insertmacro UnselectSection ${SecGlibmmRuntime}
+  !insertmacro UnselectSection ${SecPangommRuntime}
   !insertmacro UnselectSection ${SecGtkmmRuntime}
   !insertmacro UnselectSection ${SecLibglademmRuntime}
   !insertmacro UnselectSection ${SecLibxmlRuntime}
@@ -1523,6 +1600,9 @@ Function EnableGTKInstaller
 
   !insertmacro UnselectSection ${SecGlibmmDevelopment}
   !insertmacro UnselectSection ${SecGlibmmDocumentation}
+
+  !insertmacro UnselectSection ${SecPangommDevelopment}
+  !insertmacro UnselectSection ${SecPangommDocumentation}
 
   !insertmacro UnselectSection ${SecGtkmmDevelopment}
   !insertmacro UnselectSection ${SecGtkmmDemo}
@@ -1550,6 +1630,7 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecSigcRuntime}
   !insertmacro SelectSection ${SecCairommRuntime}
   !insertmacro SelectSection ${SecGlibmmRuntime}
+  !insertmacro SelectSection ${SecPangommRuntime}
   !insertmacro SelectSection ${SecGtkmmRuntime}
   !insertmacro SelectSection ${SecLibglademmRuntime}
   !insertmacro SelectSection ${SecLibxmlRuntime}
@@ -1567,6 +1648,9 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecGlibmmDevelopment}
   !insertmacro SelectSection ${SecGlibmmDocumentation}
   
+  !insertmacro SelectSection ${SecPangommDevelopment}
+  !insertmacro SelectSection ${SecPangommDocumentation}
+
   !insertmacro SelectSection ${SecGtkmmDevelopment}
   !insertmacro SelectSection ${SecGtkmmDemo}
   !insertmacro SelectSection ${SecGtkmmDocumentation}
