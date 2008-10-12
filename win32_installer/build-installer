@@ -3,10 +3,11 @@
 echo "This builds the development and runtime installers for gtkmm. Make "
 echo "sure to have everything (libsigc++, glibmm, cairomm, pangomm, gtkmm, "
 echo "libglademm, libxml++) installed to /usr/local, and to have "
-echo "successfully built everything with MSVC (both Debug and Release builds)."
-echo "Make also sure that the official GTK+ bundle has been unzipped to"
-echo "/bundle, as well as libxml2 and iconv runtime and development files."
-echo "Finally, make sure that makensis is in your PATH"
+echo "successfully built everything with both MSVC 2005 and MSVC 2008 (both "
+echo "Debug and Release builds). Make also sure that the official GTK+ "
+echo "bundle has been unzipped to echo /bundle, as well as libxml2 and iconv "
+echo "runtime and development files. Finally, make sure that makensis is in "
+echo "your PATH"
 
 # Copy all of /usr/local into here. It's probably more than we need, but we
 # can be sure we have the required stuff this way.
@@ -17,8 +18,7 @@ cp -R /usr/local/lib . || exit -1
 cp -R /usr/local/share . || exit -1
 cp -R /usr/local/include . || exit -1
 
-# Same with /usr, for GTK+
-# TODO: Get this from a separate directory where only the bundle is to be installed...?
+# Same with /bundle, for GTK+
 cp -R /bundle/bin . || exit -1
 cp -R /bundle/lib . || exit -1
 cp -R /bundle/share . || exit -1
@@ -66,19 +66,19 @@ strip bin_stripped/*.exe || exit -1;
 
 # Get the MSVC files into here
 echo "Copying MSVC files..."
-./install-msvc-module libsigc++ || exit -1
-./install-msvc-module glibmm || exit -1
-./install-msvc-module giomm || exit -1
-./install-msvc-module cairomm || exit -1
-./install-msvc-module pangomm || exit -1
-./install-msvc-module atkmm || exit -1
-./install-msvc-module gdkmm || exit -1
-./install-msvc-module gtkmm || exit -1
-./install-msvc-module libglademm || exit -1
-./install-msvc-module libxml++ || exit -1
+for module in libsigc++ glibmm giomm cairomm pangomm atkmm gdkmm gtkmm libglademm libxml++; do
+	for toolset in vc80 vc90; do
+		./install-msvc-module $module $toolset || exit -1
+	done
+done
 
-cp gtkmm-2.4.vsprops MSVC || exit -1
-cp gtkmm-2.4d.vsprops MSVC || exit -1
+cp gtkmm-vc80-2_4.vsprops MSVC || exit -1
+cp gtkmm-vc90-2_4.vsprops MSVC || exit -1
+cp gtkmm-vc80-d-2_4.vsprops MSVC || exit -1
+cp gtkmm-vc90-d-2_4.vsprops MSVC || exit -1
+# Compatibility with old naming scheme
+cp gtkmm-vc80-2_4.vsprops MSVC/gtkmm-2.4.vsprops || exit -1
+cp gtkmm-vc80-d-2_4.vsprops MSVC/gtkmm-2.4d.vsprops || exit -1
 
 echo "Copying gtk-demo..."
 mkdir -p demo || exit -1
