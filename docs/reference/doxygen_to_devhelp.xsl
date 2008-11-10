@@ -10,7 +10,7 @@
 <xsl:template match="/">
   <book title="gtkmm 2.4 library Reference Manual"
         name="gtkmm 2.4"
-        link="{$reference_prefix}../../index.html">
+        link="{$reference_prefix}index.html">
   <chapters>
     <sub name="Classes" link="{$reference_prefix}classes.html">
       <xsl:apply-templates select="doxygenindex/compound[@kind='class']">
