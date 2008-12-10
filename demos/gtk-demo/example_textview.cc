@@ -9,7 +9,6 @@
 
 #include <cstdlib>
 #include <gtkmm.h>
-#include <gtk/gtkstock.h>
 #include <gtk/gtk.h>
 
 #include "demo-common.h"

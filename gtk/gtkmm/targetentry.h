@@ -27,7 +27,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/arrayhandle.h>
 #include <gtkmm/enums.h>
-#include <gtk/gtkselection.h> //For GtkTargetEntry.
+#include <gtk/gtk.h> //For GtkTargetEntry.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C"

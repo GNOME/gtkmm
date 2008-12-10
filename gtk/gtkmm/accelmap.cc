@@ -19,7 +19,7 @@
  */
 
 #include <gtkmm/accelmap.h>
-#include <gtk/gtkaccelmap.h>
+#include <gtk/gtk.h>
 
 namespace Gtk
 {

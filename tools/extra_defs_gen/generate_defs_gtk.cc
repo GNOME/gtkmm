@@ -24,10 +24,7 @@
 #include <gtk/gtk.h>
 
 #if !defined(G_OS_WIN32)
-#include <gtk/gtkprinter.h>
-#include <gtk/gtkprintjob.h>
-#include <gtk/gtkpagesetupunixdialog.h>
-#include <gtk/gtkprintunixdialog.h>
+#include <gtk/gtkunixprint.h>
 #endif /* G_OS_WIN32 */
 
 

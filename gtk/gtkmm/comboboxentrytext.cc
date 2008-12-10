@@ -24,8 +24,7 @@
 
 #include <gtkmm/liststore.h>
 #include <gtkmm/cellrenderertext.h>
-#include <gtk/gtkcombobox.h>
-#include <gtk/gtkcelllayout.h>
+#include <gtk/gtk.h>
 
 namespace Gtk
 {

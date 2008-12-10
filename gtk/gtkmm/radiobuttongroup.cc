@@ -23,10 +23,7 @@
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radioaction.h>
 #include <gtkmm/radiotoolbutton.h>
-#include <gtk/gtkradiobutton.h>
-#include <gtk/gtkradioaction.h>
-#include <gtk/gtkradiomenuitem.h>
-#include <gtk/gtkradiotoolbutton.h>
+#include <gtk/gtk.h>
 
 namespace Gtk
 {

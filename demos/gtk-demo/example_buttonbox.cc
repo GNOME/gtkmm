@@ -4,7 +4,7 @@
  */
 
 #include "gtkmm.h"
-#include "gtk/gtkstock.h"
+#include "gtk/gtk.h"
 
 class Example_ButtonBox : public Gtk::Window
 {
