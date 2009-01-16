@@ -30,6 +30,9 @@ namespace TreeView_Private
 void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
                                         GtkTreeModel* model, GtkTreeIter* iter, void* data)
 {
+  if(!model)
+    g_warning("SignalProxy_CellData_gtk_callback(): model is NULL, which is unusual.\n");
+
   TreeViewColumn::SlotCellData* the_slot = static_cast<TreeViewColumn::SlotCellData*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -37,7 +40,14 @@ void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLE
     // use Slot::operator()
-    (*the_slot)(Glib::wrap(cell, false), TreeIter(model, iter));
+    Gtk::TreeModel::iterator cppiter = TreeIter(model, iter);
+    if(!cppiter->get_model_gobject())
+    {
+      g_warning("SignalProxy_CellData_gtk_callback() The cppiter has no model\n");
+      return; 
+    }
+
+    (*the_slot)(Glib::wrap(cell, false), cppiter);
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)

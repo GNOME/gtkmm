@@ -127,6 +127,7 @@ _CONV_ENUM(Gtk,PrintError)
 _CONV_ENUM(Gtk,PrintCapabilities)
 _CONV_ENUM(Gtk,DragResult)
 _CONV_ENUM(Gtk,NumberUpLayout)
+_CONV_ENUM(Gtk,EntryIconPosition)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -624,6 +625,7 @@ _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const g
 
 _CONVERSION(`const Glib::RefPtr<const Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))
 _CONVERSION(`GIcon*',`Glib::RefPtr<Gio::Icon>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))
 _CONVERSION(`const Glib::RefPtr<const Gio::File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<Gio::File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
