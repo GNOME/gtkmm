@@ -1,1 +1,1 @@
-EXTRA_DIST = english.nsh french.nsh
+EXTRA_DIST = english.nsh french.nsh simpchinese.nsh

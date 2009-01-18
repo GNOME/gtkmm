@@ -7,20 +7,6 @@
 ;;  Author: Herman Bloggs <hermanator12002@yahoo.com>
 ;;
 
-LangString GTK_RUNTIME_REQUIRED	        ${LANG_ENGLISH} \
-  "You must have the GTK+ $R1 Runtime Environment to use gtkmm. Do you want to install it now ?$\n$\nClick 'Yes' to download and run the GTK+ $R1 installer, 'No' to skip this step or 'Cancel' to cancel the gtkmm installation."
-LangString GTK_DEVEL_REQUIRED           ${LANG_ENGLISH} \
-  "You must have the GTK+ $R1 Development Environment to use gtkmm. Do you want to install it now ?$\n$\nClick 'Yes' to download and run the GTK+ $R1 installer, 'No' to skip this step or 'Cancel' to cancel the gtkmm installation."
-LangString GTK_GET_VERSION		${LANG_ENGLISH} "Getting the GTK+ installer version"
-LangString GTK_DOWNLOADING		${LANG_ENGLISH} "Downloading the GTK+ installer"
-LangString GTK_STARTING	        	${LANG_ENGLISH} "Starting the GTK+ installer"
-LangString GTK_FINISHED        	        ${LANG_ENGLISH} "GTK+ Setup finished"
-LangString GTK_INTERRUPTED 	        ${LANG_ENGLISH} "The GTK installer has been abnormally interrupted"
-LangString GTK_INTERRUPT_REASON         ${LANG_ENGLISH} \
-  "The GTK+ installer is about to be interrupted for the following reason : $2.$\n$\nDo you want to continue the gtkmm installation ?"
-
-LangString MISC_DOWNLOAD_CANCELLED     	${LANG_ENGLISH} "Download cancelled"
-LangString MISC_DOWNLOAD_ERROR          ${LANG_ENGLISH} "Unkown error during download"
 LangString MISC_ADMIN_REQUIRED          ${LANG_ENGLISH} \
   "Administrator rights are required to uninstall ${PRODUCT_NAME}. Exiting the installer now..."
 LangString MISC_INSTALL_OPTION          ${LANG_ENGLISH} "Install Option"

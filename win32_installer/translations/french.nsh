@@ -7,20 +7,6 @@
 ;;  Author: Eric Boumaour <zongo@nekeme.net>, 2003.
 ;;
 
-LangString GTK_RUNTIME_REQUIRED	        ${LANG_FRENCH} \
-  "Le GTK+ $R1 Runtime Environment est nécessaire pour pouvoir utiliser gtkmm. Désirez-vous l'installer maintenant ?$\n$\nCliquez 'Oui' pour décharger puis installer GTK+ $R1, 'Non' pour passer cette étape ou 'Annuler' pour annuler l'installation de gtkmm."
-LangString GTK_DEVEL_REQUIRED           ${LANG_FRENCH} \
-  "Le GTK+ $R1 Development Environment est nécessaire pour pouvoir utiliser gtkmm. Désirez-vous l'installer maintenant ?$\n$\nCliquez 'Oui' pour décharger puis installer GTK+ $R1, 'Non' pour passer cette étape ou 'Annuler' pour annuler l'installation de gtkmm."
-LangString GTK_GET_VERSION		${LANG_FRENCH} "Acquisition de la version de l'installeur GTK+"
-LangString GTK_DOWNLOADING		${LANG_FRENCH} "Dechargement de l'installeur GTK+"
-LangString GTK_STARTING	        	${LANG_FRENCH} "Lancement de l'installeur GTK+"
-LangString GTK_FINISHED        	        ${LANG_FRENCH} "Installation de GTK+ terminée"
-LangString GTK_INTERRUPTED 	        ${LANG_FRENCH} "L'installeur GTK+ s'est arrêté de manière anormale"
-LangString GTK_INTERRUPT_REASON         ${LANG_FRENCH} \
-  "L'installeur GTK+ va s'arrêter pour la raison suivante : $2.$\n$\nDésirez-vous poursuivre l'installation de gtkmm ?"
-
-LangString MISC_DOWNLOAD_CANCELLED     	${LANG_FRENCH} "Déchargement annulé"
-LangString MISC_DOWNLOAD_ERROR          ${LANG_FRENCH} "Erreur inconnue durant le déchargement"
 LangString MISC_ADMIN_REQUIRED          ${LANG_FRENCH} \
   "Des droits administrateur sont nécessaires pour désinstaller${PRODUCT_NAME}. L'installation va s'arrêter maintenant..."
 LangString MISC_INSTALL_OPTION          ${LANG_FRENCH} "Option d'installation"
