@@ -40,7 +40,7 @@ xml/index.xml: html/index.html
 
 # DevHelp reference
 $(devhelp_file): xml/index.xml $(devhelp_stylesheet)
-	xsltproc -o $@ $(devhelp_stylesheet) xml/index.xml
+	xsltproc -o $@ $(srcdir)/$(devhelp_stylesheet) xml/index.xml
 
 gtkmm-reference-html.tar.gz: $(hierarchy_files) html/index.html
 	tar cf - html | gzip -c --best >$@
@@ -76,7 +76,7 @@ install-reference: html/index.html $(devhelp_file)
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f; \
 	done
 	$(mkinstalldirs) $(DESTDIR)$(devhelpdir)
-	$(INSTALL_DATA) $(srcdir)/$(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
+	$(INSTALL_DATA) $(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
 	$(INSTALL_DATA) $(srcdir)/widget_hierarchy.png $(DESTDIR)$(referencetopdir)/$$f;
 	$(INSTALL_DATA) $(srcdir)/widget_hierarchy.html $(DESTDIR)$(referencetopdir)/$$f;
 
