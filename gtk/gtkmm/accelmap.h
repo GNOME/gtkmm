@@ -41,15 +41,15 @@ namespace AccelMap
  * with the canonical accel_key and accel_mods for this path.
  * To change the accelerator during runtime programatically, use
  * change_entry().
- * The accelerator path must consist of "&lt;WINDOWTYPE&gt;/Category1/Category2/.../Action",
- * where &lt;WINDOWTYPE&gt; should be a unique application-specific identifier, that
+ * The accelerator path must consist of "<WINDOWTYPE>/Category1/Category2/.../Action",
+ * where <WINDOWTYPE> should be a unique application-specific identifier, that
  * corresponds to the kind of window the accelerator is being used in, e.g. "Gimp-Image",
  * "Abiword-Document" or "Gnumeric-Settings".
  * The Category1/.../Action portion is most appropriately chosen by the action the
  * accelerator triggers, i.e. for accelerators on menu items, choose the item's menu path,
  * e.g. "File/Save As", "Image/View/Zoom" or "Edit/Select All".
  * So a full valid accelerator path may look like:
- * "&lt;Gimp-Toolbox&gt;/File/Dialogs/Tool Options...".
+ * "<Gimp-Toolbox>/File/Dialogs/Tool Options...".
  *
  * @param accel_path valid accelerator path
  * @param accel_key the accelerator key
