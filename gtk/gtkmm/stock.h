@@ -69,6 +69,7 @@ extern GTKMM_API const Gtk::BuiltinStockID ADD;              /*!< @image html gt
 extern GTKMM_API const Gtk::BuiltinStockID APPLY;            /*!< @image html gtk-apply.png               */
 extern GTKMM_API const Gtk::BuiltinStockID BOLD;             /*!< @image html gtk-bold.png           */
 extern GTKMM_API const Gtk::BuiltinStockID CANCEL;           /*!< @image html gtk-cancel.png              */
+extern GTKMM_API const Gtk::BuiltinStockID CAPS_LOCK_WARNING; /*!< @image html gtk-caps-lock-warning.png  */
 extern GTKMM_API const Gtk::BuiltinStockID CDROM;            /*!< @image html gtk-cdrom.png               */
 extern GTKMM_API const Gtk::BuiltinStockID CLEAR;            /*!< @image html gtk-clear.png               */
 extern GTKMM_API const Gtk::BuiltinStockID CLOSE;            /*!< @image html gtk-close.png               */

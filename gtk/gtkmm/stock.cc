@@ -46,6 +46,7 @@ const Gtk::BuiltinStockID ADD = { GTK_STOCK_ADD };
 const Gtk::BuiltinStockID APPLY= { GTK_STOCK_APPLY };
 const Gtk::BuiltinStockID BOLD= { GTK_STOCK_BOLD };
 const Gtk::BuiltinStockID CANCEL = { GTK_STOCK_CANCEL };
+const Gtk::BuiltinStockID CAPS_LOCK_WARNING = { GTK_STOCK_CAPS_LOCK_WARNING };
 const Gtk::BuiltinStockID CDROM = { GTK_STOCK_CDROM };
 const Gtk::BuiltinStockID CLEAR = { GTK_STOCK_CLEAR };
 const Gtk::BuiltinStockID CLOSE = { GTK_STOCK_CLOSE };
