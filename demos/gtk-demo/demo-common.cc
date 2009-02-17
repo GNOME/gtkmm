@@ -7,6 +7,7 @@
 
 #undef DEMOCODEDIR
 
+// TODO: Apply scorched earth tactics on code below.
 static char *
 get_democodedir(void)
 {
@@ -14,7 +15,7 @@ get_democodedir(void)
 
   if (result == NULL)
     {
-      result = g_win32_get_package_installation_directory (NULL, NULL);
+      result = g_win32_get_package_installation_directory_of_module(0);
       if (result == NULL)
 	result = "unknown-location";
 
