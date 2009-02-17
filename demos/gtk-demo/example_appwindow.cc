@@ -107,36 +107,6 @@ Example_AppWindow::Example_AppWindow()
                    0, 1,                   1, 2,
                    Gtk::FILL|Gtk::EXPAND, Gtk::AttachOptions(0)
                    );
-
-    /* Create the toolbar
-     */
-
-//    gtk_toolbar_insert_stock (Gtk::TOOLBAR (toolbar),
-//                              Gtk::Stock::OPEN,
-//                              "This is a demo button with an 'open' icon",
-//                              NULL,
-//                              G_CALLBACK (toolbar_cb),
-//                              window, /* user data for callback */
-//                              -1);  /* -1 means "append" */
-//
-//    gtk_toolbar_insert_stock (Gtk::TOOLBAR (toolbar),
-//                              Gtk::Stock::QUIT,
-//                              "This is a demo button with a 'quit' icon",
-//                              NULL,
-//                              G_CALLBACK (toolbar_cb),
-//                              window, /* user data for callback */
-//                              -1);  /* -1 means "append" */
-//
-//    gtk_toolbar_append_space (Gtk::TOOLBAR (toolbar));
-//
-//    gtk_toolbar_insert_stock (Gtk::TOOLBAR (toolbar),
-//                              "demo-gtk-logo",
-//                              "This is a demo button with a 'gtk' icon",
-//                              NULL,
-//                              G_CALLBACK (toolbar_cb),
-//                              window, /* user data for callback */
-//                              -1);  /* -1 means "append" */
-
   }
 
 
