@@ -413,6 +413,22 @@ public:
                                        Gtk::TextDirection direction, Gtk::StateType state, Gtk::IconSize size,
                                        Gtk::Widget& widget, const Glib::ustring& detail), gtk_style_render_icon)
 
+  _IGNORE(gtk_style_get)
+  _WRAP_METHOD(void get_style_property_value(GType widget_type, const Glib::ustring& property_name, Glib::ValueBase& value), tk_style_get_style_property)
+  
+  /** Queries the value of a style property corresponding to a
+   * widget class in the given style.
+   *
+   * @param widget_type the GType of a descendant of GtkWidget.
+   * @param property_name The name of the style property to get.
+   * @param value: An output parameter in which  the value of the property being queried will be stored.
+   *
+   * @newin2p16
+   */
+  template <class PropertyType>
+  void get_style_property(GType widget_type, const Glib::ustring& property_name, PropertyType& value) const;
+
+  
 protected:
   _WRAP_VFUNC(void realize(), realize)
   _WRAP_VFUNC(void unrealize(), unrealize)
@@ -588,6 +604,18 @@ protected:
   _WRAP_SIGNAL(void realize(), realize)
   _WRAP_SIGNAL(void unrealize(), unrealize)
 };
+
+
+template <class PropertyType> inline
+void Style::get_style_property(GType widget_type, const Glib::ustring& property_name, PropertyType& value) const
+{
+  Glib::Value<PropertyType> property_value;
+  property_value.init(Glib::Value<PropertyType>::value_type());
+
+  this->get_style_property_value(widget_type, property_name, property_value);
+
+  value = property_value.get();
+}
 
 } // namespace Gtk
 
