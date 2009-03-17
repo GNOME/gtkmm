@@ -2,21 +2,18 @@
 
 echo "This builds the development and runtime installers for gtkmm. Make "
 echo "sure to have everything (libsigc++, glibmm, cairomm, pangomm, gtkmm, "
-echo "libglademm, libxml++) installed to /usr/local, and to have "
-echo "successfully built everything with both MSVC 2005 and MSVC 2008 (both "
-echo "Debug and Release builds). Make also sure that the official GTK+ "
-echo "bundle has been unzipped to echo /bundle, as well as libxml2 and iconv "
-echo "runtime and development files. Finally, make sure that makensis is in "
-echo "your PATH"
+echo "libglademm, libxml++) installed to /gtkmm_debug and /gtkmm_release, "
+echo "respectively and to have successfully built everything with both "
+echo "MSVC 2005 and MSVC 2008 (both Debug and Release builds). Make also "
+echo "sure that the official GTK+ bundle has been unzipped to /bundle, as "
+echo "well as libxml2 and iconv runtime and development files. Install "
+echo "libglade into /libglade. Finally, make sure that makensis is in your PATH"
 
-# Copy all of /usr/local into here. It's probably more than we need, but we
-# can be sure we have the required stuff this way.
-# TODO: Maybe it would be enough to create Windows Shortcuts here.
 echo "Copying mingw files..."
-cp -R /usr/local/bin . || exit -1
-cp -R /usr/local/lib . || exit -1
-cp -R /usr/local/share . || exit -1
-cp -R /usr/local/include . || exit -1
+cp -R /gtkmm_debug/bin . || exit -1
+cp -R /gtkmm_debug/lib . || exit -1
+cp -R /gtkmm_debug/share . || exit -1
+cp -R /gtkmm_debug/include . || exit -1
 
 # Same with /bundle, for GTK+
 cp -R /bundle/bin . || exit -1
@@ -25,6 +22,12 @@ cp -R /bundle/share . || exit -1
 cp -R /bundle/include . || exit -1
 cp -R /bundle/etc . || exit -1
 cp -R /bundle/contrib . || exit -1
+
+# libglade
+cp -R /libglade/bin . || exit -1
+cp -R /libglade/include . || exit -1
+cp -R /libglade/lib . || exit -1
+cp -R /libglade/share . || exit -1
 
 # The license text in the installer
 cp ../COPYING lgpl.txt
@@ -59,10 +62,13 @@ echo "gtk-theme-name = \"MS-Windows\"" > etc/gtk-2.0/gtkrc || exit -1
 echo "Stripping binaries..."
 mkdir -p bin_stripped || exit -1
 cp -R bin/* bin_stripped || exit -1
+# Use the gtkmm release binaries (they have been compiled with -O2 instead of -O0)
+cp -R /gtkmm_release/bin* bin_stripped || exit -1
 strip bin_stripped/*.dll || exit -1
-strip bin_stripped/*.exe || exit -1;
+strip bin_stripped/*.exe || exit -1
 
 # TODO: Strip modules in lib/gtk-2.0?
+# TODO: Strip .dll.a files with --strip-unneeded
 
 # Get the MSVC files into here
 echo "Copying MSVC files..."
