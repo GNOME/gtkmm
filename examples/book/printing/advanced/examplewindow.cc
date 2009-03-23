@@ -222,7 +222,7 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
   //after it has been completed.
   print->signal_done().connect(sigc::bind(sigc::mem_fun(*this,
                   &ExampleWindow::on_printoperation_done), &print));
-
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     print->run(print_action /* print or preview */, *this);
@@ -233,6 +233,16 @@ void ExampleWindow::print_or_preview(Gtk::PrintOperationAction print_action)
     std::cerr << "An error occurred while trying to run a print operation:"
         << ex.what() << std::endl;
   }
+#else
+  std::auto_ptr<Glib::Error> error;
+  print->run(print_action /* print or preview */, *this, error);
+
+  if (error.get())
+  {
+    std::cerr << "An error occurred while trying to run a print operation:"
+              << error->what() << std::endl;
+  }
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   g_debug("print status: %s", print->get_status_string().c_str());
 }

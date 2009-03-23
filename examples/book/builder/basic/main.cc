@@ -3,6 +3,7 @@
 
 Gtk::Dialog* pDialog = 0;
 
+static
 void on_button_clicked()
 {
   if(pDialog)
@@ -15,6 +16,7 @@ int main (int argc, char **argv)
 
   //Load the GtkBuilder file and instantiate its widgets:
   Glib::RefPtr<Gtk::Builder> refBuilder = Gtk::Builder::create();
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     refBuilder->add_from_file("basic.ui");
@@ -24,6 +26,15 @@ int main (int argc, char **argv)
     std::cerr << ex.what() << std::endl;
     return 1;
   }
+#else
+  std::auto_ptr<Glib::Error> error;
+
+  if (!refBuilder->add_from_file("basic.ui", error))
+  {
+    std::cerr << error->what() << std::endl;
+    return 1;
+  }
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   //Get the GtkBuilder-instantiated Dialog:
   
@@ -43,4 +54,3 @@ int main (int argc, char **argv)
 
   return 0;
 }
-

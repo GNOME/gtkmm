@@ -142,7 +142,12 @@ bool ExampleWindow::on_textview_query_tooltip(int x, int y, bool keyboard_toolti
 
   if (keyboard_tooltip)
   {
+#ifdef GLIBMM_PROPERTIES_ENABLED
     int offset = m_ref_text_buffer->property_cursor_position().get_value();
+#else
+    int offset = 0;
+    m_ref_text_buffer->get_property("cursor-position", offset);
+#endif
     iter = m_ref_text_buffer->get_iter_at_offset(offset);
   }
   else

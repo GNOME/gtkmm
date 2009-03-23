@@ -108,8 +108,13 @@ bool PreviewDialog::on_drawing_area_expose_event(GdkEventExpose* /* event */)
 
 void PreviewDialog::on_popreview_ready(const Glib::RefPtr<Gtk::PrintContext>&)
 {
+#ifdef GLIBMM_PROPERTIES_ENABLED
   m_PageSpin.set_range(1.0, m_pOperation->property_n_pages());
-
+#else
+  int n_pages = 0;
+  m_pOperation->get_property("n-pages", n_pages);
+  m_PageSpin.set_range(1.0, n_pages);
+#endif
   m_DrawingArea.queue_draw();
 }
 

@@ -100,6 +100,11 @@ PPI::PPI()
   alpha = 0.0;
 
   add_events(Gdk::EXPOSURE_MASK);
+
+#ifndef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
+  signal_realize().connect(sigc::mem_fun(*this, &PPI::on_realize));
+  signal_expose_event().connect(sigc::mem_fun(*this, &PPI::on_expose_event));
+#endif
 }
 
 
@@ -110,9 +115,10 @@ PPI::~PPI()
 
 void PPI::on_realize()
 {
+#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   // We need to call the base on_realize()
   Gtk::DrawingArea::on_realize();
-
+#endif
   // Now we can allocate any additional resources we need
   Glib::RefPtr<Gdk::Window> window = get_window();
 

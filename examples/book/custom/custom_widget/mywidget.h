@@ -29,6 +29,7 @@ public:
 
 protected:
 
+#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //Overrides:
   virtual void on_size_request(Gtk::Requisition* requisition);
   virtual void on_size_allocate(Gtk::Allocation& allocation);
@@ -37,6 +38,7 @@ protected:
   virtual void on_realize();
   virtual void on_unrealize();
   virtual bool on_expose_event(GdkEventExpose* event);
+#endif /* GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED */
 
   Glib::RefPtr<Gdk::Window> m_refGdkWindow;
 

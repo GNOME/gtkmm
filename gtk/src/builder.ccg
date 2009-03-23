@@ -46,7 +46,8 @@ get_type_from_name_vfunc_callback(GtkBuilder*, const char* type_name)
 namespace Gtk
 {
 
-//static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+// static
 Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
@@ -55,8 +56,20 @@ Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
   else
     return Glib::RefPtr<Builder>();
 }
+#else
+Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename,
+                                                std::auto_ptr<Glib::Error>& error)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_file(filename, error))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
-//static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+// static
 Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
@@ -65,7 +78,17 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer)
   else
     return Glib::RefPtr<Builder>();
 }
-
+#else
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  std::auto_ptr<Glib::Error>& error)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, error))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool Builder::add_from_string(const Glib::ustring& buffer)

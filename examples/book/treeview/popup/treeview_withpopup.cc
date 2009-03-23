@@ -54,6 +54,11 @@ TreeView_WithPopup::TreeView_WithPopup()
       sigc::mem_fun(*this, &TreeView_WithPopup::on_menu_file_popup_generic) ) );
   }
   m_Menu_Popup.accelerate(*this);
+
+#ifndef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
+  signal_button_press_event()
+    .connect(sigc::mem_fun(*this, &TreeView_WithPopup::on_button_press_event), false);
+#endif
 }
 
 TreeView_WithPopup::~TreeView_WithPopup()
@@ -62,9 +67,13 @@ TreeView_WithPopup::~TreeView_WithPopup()
 
 bool TreeView_WithPopup::on_button_press_event(GdkEventButton* event)
 {
+  bool return_value = false;
+
+#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //Call base class, to allow normal handling,
   //such as allowing the row to be selected by the right-click:
-  bool return_value = TreeView::on_button_press_event(event);
+  return_value = TreeView::on_button_press_event(event);
+#endif
 
   //Then do our custom stuff:
   if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
