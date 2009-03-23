@@ -173,6 +173,9 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   add_columns();
   m_ScrolledWindow.add(m_TreeView);
 
+#ifndef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
+  signal_realize().connect(sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_realize), false);
+#endif
   show_all();
 }
 
@@ -475,8 +478,9 @@ void Example_TreeView_TreeStore::add_columns()
 void Example_TreeView_TreeStore::on_realize()
 {
   m_TreeView.expand_all();
-
+#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //call base class:
   Window::on_realize();
+#endif
 }
 

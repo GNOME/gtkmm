@@ -261,7 +261,7 @@ bool Example_Images::on_timeout()
     {
     #else
     std::auto_ptr<Glib::Error> error;
-    m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png)", "r", error);
+    m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png"), "r", error);
     if(error.get())
     {
     #endif //GLIBMM_EXCEPTIONS_ENABLED
