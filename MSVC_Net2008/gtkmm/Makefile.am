@@ -9,5 +9,5 @@ EXTRA_DIST = gtkmmconfig.h gtkmm.vcproj gtkmm.rc
 # wht respect to the .h.in file, to prevent an error with 'make distcheck'.
 # See http://sources.redhat.com/automake/automake.html#distcleancheck
 
-gtkmmconfig.h: $(top_srcdir)/gtk/gtkmmconfig.h.in $(top_srcdir)/configure.in
+gtkmmconfig.h: $(top_srcdir)/gtk/gtkmmconfig.h.in $(top_srcdir)/configure.ac
 	cp -f $(top_builddir)/gtk/gtkmmconfig.h $@
