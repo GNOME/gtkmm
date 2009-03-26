@@ -22,32 +22,38 @@
 
 #include <gtk/gtk.h>
 
-
-static gchar* SignalProxy_Details_gtk_callback(GtkCalendar* model, guint year, guint month, guint day, gpointer user_data)
+namespace
+{
+extern "C"
+{
+static gchar* SignalProxy_Details_gtk_callback(GtkCalendar*, guint year, guint month, guint day,
+                                               gpointer user_data)
 {
   Gtk::Calendar::SlotDetails* the_slot = static_cast<Gtk::Calendar::SlotDetails*>(user_data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
+#endif
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     const Glib::ustring temp = (*the_slot)(year, month, day);
     return g_strdup(temp.c_str()); //Freed by GtkCalendar.
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-
   return 0; // arbitrary value
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif
 }
 
 static void SignalProxy_Details_gtk_callback_destroy(void* data)
 {
   delete static_cast<Gtk::Calendar::SlotDetails*>(data);
 }
+
+} // extern "C"
+} // anonymous namespace
 
 namespace Gtk
 {
