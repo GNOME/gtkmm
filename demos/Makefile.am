@@ -16,10 +16,12 @@ ATKMMINC = -I$(top_builddir)/atk -I$(top_srcdir)/atk
 endif
 
 #Where to find the header files needed by the source files:
-INCLUDES = -I$(top_builddir)/gtk   -I$(top_srcdir)/gtk   \
-           -I$(top_builddir)/gdk   -I$(top_srcdir)/gdk   \
-           $(ATKMMINC) \
-           $(GTKMM_CFLAGS)
+all_includes = -I$(top_builddir)/gtk -I$(top_srcdir)/gtk \
+               -I$(top_builddir)/gdk -I$(top_srcdir)/gdk \
+               $(ATKMMINC) \
+               $(GTKMM_WXXFLAGS) $(GTKMM_CFLAGS)
+
+INCLUDES = $(strip $(all_includes))
 
 if GTKMM_ATKMM_ENABLED
 ATKMMLIB = $(local_atkmm_lib)
