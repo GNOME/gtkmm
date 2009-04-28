@@ -47,6 +47,9 @@ namespace Gtk
  */
 struct BuiltinStockID
 {
+  /**
+   * The text representation of the stock id, usually something like "gtk-about".
+   */
   const char* id;
 };
 
@@ -178,13 +181,42 @@ extern GTKMM_API const Gtk::BuiltinStockID ZOOM_FIT;         /*!< @image html gt
 extern GTKMM_API const Gtk::BuiltinStockID ZOOM_IN;          /*!< @image html gtk-zoom-in.png             */
 extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html gtk-zoom-out.png            */
 
-
+/** Add a stock item to the list of registered stock items.
+ * @param item StockItem to register.
+ * 
+ * If an item already exists with the same stock ID the old item gets replaced. 
+ */
 void add(const Gtk::StockItem& item);
 
+/** Fills item with the registered values for stock_id.
+  * @param stock_id StockID to search for.
+  * @param item item to fill in case stockid was found.
+  *
+  * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
+  */
 bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
+
+/** See IconSet::lookup_default()
+  * @param stock_id StockID to search for.
+  * @param iconset to fill.
+  *
+  * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
+  */
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSet& iconset);
+
+/** Receive an Image of the registered stock id with the correct size.
+  * @param stock_id StockID to search for.
+  * @param size: IconSize of the desired Image.
+  * @param image: Image to fill.
+  *
+  * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise
+  */  
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image);
 
+/** Retrieves a list of all known stock IDs added to an IconFactory or registered with Stock::add().
+  *
+  * @return list of all known stock IDs.
+  */
 Glib::SListHandle<Gtk::StockID,Gtk::StockID_Traits> get_ids();
 
 } // namespace Stock
