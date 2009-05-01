@@ -118,7 +118,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cellrenderertoggle.h>
 #include <gtkmm/colorbutton.h>
 #include <gtkmm/colorselection.h>
-#include <gtkmm/combo.h> //TODO: Deprecated.
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxentry.h>
 #include <gtkmm/comboboxentrytext.h>
@@ -137,7 +136,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/filechooserwidget.h>
 #include <gtkmm/filefilter.h>
-#include <gtkmm/fileselection.h> //TODO: Deprecated.
 #include <gtkmm/fixed.h>
 #include <gtkmm/fontbutton.h>
 #include <gtkmm/fontselection.h>
@@ -172,7 +170,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/notebook.h>
 #include <gtkmm/object.h>
 #include <gtkmm/offscreenwindow.h>
-#include <gtkmm/optionmenu.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
 #ifndef G_OS_WIN32
@@ -239,7 +236,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/menutoolbutton.h>
 #include <gtkmm/tooltip.h>
-#include <gtkmm/tooltips.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>
 #include <gtkmm/treemodelsort.h>
