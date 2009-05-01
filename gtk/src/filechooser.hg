@@ -61,17 +61,6 @@ _WRAP_GERROR(FileChooserError,GtkFileChooserError,GTK_FILE_CHOOSER_ERROR)
  * UTF-8, which all gtkmm widgets expect. You should use
  * Glib::filename_to_utf8() to convert filenames into strings that can be
  * passed to gtkmm widgets.
- *
- * @note
- * The gtkmm FileChooser API is broken in that methods return Glib::ustring
- * even though the returned string is not necessarily UTF-8 encoded.  Any
- * FileChooser method that takes or returns a filename (not a URI) should
- * have std::string as parameter or return type.  Fortunately this mistake
- * doesn't prevent you from handling filenames correctly in your application.
- * Just pretend that the API uses std::string and call Glib::filename_to_utf8()
- * or Glib::filename_from_utf8() as appropriate.
- *
- * See http://bugzilla.gnome.org/show_bug.cgi?id=142138 for more information.
  */
 class FileChooser : public Glib::Interface
 {
@@ -95,15 +84,18 @@ public:
   _WRAP_METHOD(bool get_create_folders() const, gtk_file_chooser_get_create_folders)
 
   _WRAP_METHOD(void set_current_name(const Glib::ustring& name), gtk_file_chooser_set_current_name)
-  _WRAP_METHOD(Glib::ustring get_filename() const, gtk_file_chooser_get_filename)
-  _WRAP_METHOD(bool set_filename(const Glib::ustring& filename), gtk_file_chooser_set_filename)
-  _WRAP_METHOD(bool select_filename(const Glib::ustring& filename), gtk_file_chooser_select_filename)
-  _WRAP_METHOD(void unselect_filename(const Glib::ustring& filename), gtk_file_chooser_unselect_filename)
+  _WRAP_METHOD(std::string get_filename() const, gtk_file_chooser_get_filename)
+  _WRAP_METHOD(bool set_filename(const std::string& filename), gtk_file_chooser_set_filename)
+  _WRAP_METHOD(bool select_filename(const std::string& filename), gtk_file_chooser_select_filename)
+  _WRAP_METHOD(void unselect_filename(const std::string& filename), gtk_file_chooser_unselect_filename)
   _WRAP_METHOD(void select_all(), gtk_file_chooser_select_all)
   _WRAP_METHOD(void unselect_all(), gtk_file_chooser_unselect_all)
-  _WRAP_METHOD(Glib::SListHandle<Glib::ustring> get_filenames() const, gtk_file_chooser_get_filenames)
-  _WRAP_METHOD(bool set_current_folder(const Glib::ustring& filename), gtk_file_chooser_set_current_folder)
-  _WRAP_METHOD(Glib::ustring get_current_folder() const, gtk_file_chooser_get_current_folder)
+  
+#m4 _CONVERSION(`GSList*',`Glib::SListHandle<std::string>',__FL2H_DEEP)
+  _WRAP_METHOD(Glib::SListHandle<std::string> get_filenames() const, gtk_file_chooser_get_filenames)
+
+  _WRAP_METHOD(bool set_current_folder(const std::string& filename), gtk_file_chooser_set_current_folder)
+  _WRAP_METHOD(std::string get_current_folder() const, gtk_file_chooser_get_current_folder)
 
 
 /* URI manipulation
@@ -147,7 +139,8 @@ public:
   _WRAP_METHOD(void set_use_preview_label(bool use_label = true), gtk_file_chooser_set_use_preview_label)
   _WRAP_METHOD(bool get_use_preview_label() const, gtk_file_chooser_get_use_preview_label)
 
-  _WRAP_METHOD(Glib::ustring get_preview_filename() const, gtk_file_chooser_get_preview_filename)
+#m4 _CONVERSION(`return-char*',`std::string',`Glib::convert_return_gchar_ptr_to_stdstring($3)')
+  _WRAP_METHOD(std::string get_preview_filename() const, gtk_file_chooser_get_preview_filename)
   _WRAP_METHOD(Glib::ustring get_preview_uri() const, gtk_file_chooser_get_preview_uri)
 
   //No refreturn is needed here, because the C function provides a reference:
@@ -176,9 +169,10 @@ public:
   
 /* Per-application shortcut folders */
 
-  _WRAP_METHOD(bool add_shortcut_folder(const Glib::ustring& folder), gtk_file_chooser_add_shortcut_folder, errthrow)
-  _WRAP_METHOD(bool remove_shortcut_folder(const Glib::ustring& folder), gtk_file_chooser_remove_shortcut_folder, errthrow)
-  _WRAP_METHOD(Glib::SListHandle<Glib::ustring> list_shortcut_folders() const, gtk_file_chooser_list_shortcut_folders)
+  _WRAP_METHOD(bool add_shortcut_folder(const std::string& folder), gtk_file_chooser_add_shortcut_folder, errthrow)
+  _WRAP_METHOD(bool remove_shortcut_folder(const std::string& folder), gtk_file_chooser_remove_shortcut_folder, errthrow)
+ 
+  _WRAP_METHOD(Glib::SListHandle<std::string> list_shortcut_folders() const, gtk_file_chooser_list_shortcut_folders)
 
   _WRAP_METHOD(bool add_shortcut_folder_uri(const Glib::ustring& uri), gtk_file_chooser_add_shortcut_folder_uri, errthrow)
   _WRAP_METHOD(bool remove_shortcut_folder_uri(const Glib::ustring& uri), gtk_file_chooser_remove_shortcut_folder_uri, errthrow)
