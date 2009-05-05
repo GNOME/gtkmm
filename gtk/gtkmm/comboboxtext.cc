@@ -98,12 +98,6 @@ Glib::ustring ComboBoxText::get_active_text() const
   return result;
 }
 
-//deprecated.
-void ComboBoxText::clear()
-{
-  clear_items();
-}
-
 void ComboBoxText::clear_items()
 {
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
