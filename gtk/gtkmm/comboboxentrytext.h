@@ -66,17 +66,6 @@ public:
    */
   void prepend_text(const Glib::ustring& text);
 
-  //@deprecated Use get_entry()->get_text() to get the actual entered text.
-  Glib::ustring get_active_text() const;
-
-  //@deprecated Use get_entry()->set_text() to set the actual entered text.
-  void set_active_text(const Glib::ustring& text);
-
-  //There is a clear() method in the CellLayout base class, so this would cause confusion.
-  //TODO: Remove this when we can break API.
-  /// @deprecated See clear_items(). Since 2.8.
-  void clear();
-
   /** Remove all items from the drop-down menu.
    */
   void clear_items();

@@ -80,12 +80,6 @@ void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
   }
 }
 
-//deprecated.
-void ComboBoxEntryText::clear()
-{
-  clear_items();
-}
-
 void ComboBoxEntryText::clear_items()
 {
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
@@ -116,43 +110,6 @@ void ComboBoxEntryText::remove_text(const Glib::ustring& text)
       }
     }
   }
-}
-
-Glib::ustring ComboBoxEntryText::get_active_text() const
-{
-  Glib::ustring result;
-
-  //Get the active row:
-  TreeModel::iterator active_row = get_active();
-  if(active_row)
-  {
-    Gtk::TreeModel::Row row = *active_row;
-    result = row[m_text_columns.m_column];
-  }
-
-  return result;
-}
-
-void ComboBoxEntryText::set_active_text(const Glib::ustring& text)
-{
-  //Look for the row with this text, and activate it:
-  Glib::RefPtr<Gtk::TreeModel> model = get_model();
-  if(model)
-  {
-    for(Gtk::TreeModel::iterator iter = model->children().begin(); iter != model->children().end(); ++iter)
-    {
-      const Glib::ustring& this_text = (*iter)[m_text_columns.m_column];
-
-      if(this_text == text)
-      {
-        set_active(iter);
-        return; //success
-      }
-    }
-  }
-
-  //Not found, so mark it as blank:
-  unset_active();
 }
 
 
