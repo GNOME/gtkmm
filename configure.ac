@@ -429,6 +429,7 @@ AC_CONFIG_FILES([
     tests/property_notification/Makefile
     tests/scrolledwindow/Makefile
     tests/wrap_existing/Makefile
+    tests/boxhelper/Makefile
 ])
 
 AC_CONFIG_FILES([
