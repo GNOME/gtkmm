@@ -107,9 +107,14 @@ esac
 AC_MSG_RESULT([$os_win32])
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
+# Disable static libraries by default
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+
+if test x$enable_static = "xyes"; then
+	AC_DEFINE([GTKMM_STATIC_LIB],[1], [Defined when gtkmm is built as a static library])
+fi
 
 AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
 SUN m4 does not work for building gtkmm. 
