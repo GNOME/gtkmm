@@ -528,6 +528,7 @@ _CONVERSION(`const Glib::RefPtr<RecentInfo>&',`GtkRecentInfo*',__CONVERT_REFPTR_
 _CONVERSION(`const Glib::RefPtr<const RecentInfo>&',`GtkRecentInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentInfo))
 
 _CONVERSION(`Glib::StringArrayHandle&',`gchar**',`const_cast<gchar**>(($3).data())')
+_CONVERSION(`Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 
 #RecentManager
