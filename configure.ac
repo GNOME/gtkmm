@@ -223,6 +223,7 @@ AC_SUBST(ATKMM_LIBS)
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 PKG_CHECK_MODULES(GDKMM, glibmm-2.4 >= ${gtkmm_min_glibmm_version}
+                         giomm-2.4 >= ${gtkmm_min_glibmm_version}
                          cairomm-1.0 >= ${gtkmm_min_cairomm_version}
                          pangomm-1.4 >= ${gtkmm_min_pangomm_version}
                          gtk+-2.0 >= ${gtkmm_min_gtk_version})
