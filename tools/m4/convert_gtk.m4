@@ -631,6 +631,10 @@ _CONVERSION(`const Glib::RefPtr<const Gio::File>&',`GFile*',__CONVERT_CONST_REFP
 _CONVERSION(`GFile*',`Glib::RefPtr<Gio::File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
 
+_CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
+
+
 
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
 
