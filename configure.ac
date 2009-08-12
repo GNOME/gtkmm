@@ -44,9 +44,6 @@ AC_MSG_CHECKING([for native Windows host])
 AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
 AC_MSG_RESULT([$gtkmm_host_windows])
 AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
-# TODO: kill dummies
-AM_CONDITIONAL([OS_WIN32], [false])
-AM_CONDITIONAL([PLATFORM_WIN32], [false])
 
 # TODO: What exactly does this do?  If both static and shared libraries
 # are built, both builds will have this macro defined!
@@ -68,10 +65,8 @@ PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
 PKG_CHECK_MODULES([GTKMM], [$GTKMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
-MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs-only-other --libs-only-l gthread-2.0])
+MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
-# TODO: Temporary hack
-AC_SUBST([GMMPROC], ['${GMMPROC_DIR}/gmmproc'])
 
 # Create a list of input directories for Doxygen.
 # TODO: kill
@@ -93,6 +88,7 @@ Do not use this option for distribution packages.]])
   DISABLE_DEPRECATED_API_CFLAGS='-DATKMM_DISABLE_DEPRECATED=1 -DGDKMM_DISABLE_DEPRECATED=1 -DGTKMM_DISABLE_DEPRECATED=1'dnl
 ])
 AC_SUBST([DISABLE_DEPRECATED_API_CFLAGS])
+AM_CONDITIONAL([DISABLE_DEPRECATED_API], [test "x$gtkmm_deprecated_api" = xyes])
 
 # Offer the ability to omit some API from the library, to reduce the code size.
 # Note that there are other options in glibmm, which affect gtkmm.
@@ -102,7 +98,6 @@ AS_IF([test "x$gtkmm_enable_api_atkmm" = xno],
       [GTKMM_PC_ATKMM_DEP=],
       [GTKMM_PC_ATKMM_DEP=atkmm-1.6])
 AC_SUBST([GTKMM_PC_ATKMM_DEP])
-
 AM_CONDITIONAL([GTKMM_ATKMM_ENABLED], [test "x$gtkmm_enable_api_atkmm" != xno])
 
 GTKMM_ARG_ENABLE_API_MAEMO_EXTENSIONS
@@ -111,7 +106,7 @@ AC_LANG([C++])
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 
 # Evaluate the --enable-warnings=level option.
-DK_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
+MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra]
                        [G PANGO ATK GDK GDK_PIXBUF GTK])
@@ -120,7 +115,6 @@ AC_CONFIG_FILES([
       atk/atkmm-1.6.pc
       atk/src/Makefile
       atk/atkmm/Makefile
-      atk/atkmm/private/Makefile
 ])
 
 AC_CONFIG_FILES([
@@ -138,16 +132,12 @@ AC_CONFIG_FILES([
   gdk/gdkmm-2.4.pc
     gdk/src/Makefile
     gdk/gdkmm/Makefile
-      gdk/gdkmm/private/Makefile
 
   gtk/gtkmm-2.4.pc
     gtk/src/Makefile
     gtk/gtkmm/Makefile
-      gtk/gtkmm/private/Makefile
 
   tools/Makefile
-    tools/m4/Makefile
-    tools/extra_defs_gen/Makefile
 ])
 
 AC_CONFIG_FILES([
