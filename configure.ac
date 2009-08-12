@@ -22,7 +22,7 @@ AC_PREREQ([2.59])
 AC_CONFIG_SRCDIR([gtk/gtkmm.h])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([scripts])
-AC_CONFIG_HEADERS([config.h gtk/gtkmmconfig.h])
+AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
 
 MM_INIT_MODULE([atkmm-1.6], m4_expand([AC_PACKAGE_VERSION]))
 MM_INIT_MODULE([gdkmm-2.4], m4_expand([AC_PACKAGE_VERSION]))
@@ -117,7 +117,6 @@ DK_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [G PANGO ATK GDK GDK_PIXBUF GTK])
 
 AC_CONFIG_FILES([
-      atk/Makefile
       atk/atkmm-1.6.pc
       atk/src/Makefile
       atk/atkmm/Makefile
@@ -136,13 +135,11 @@ AC_CONFIG_FILES([
 AC_CONFIG_FILES([
   Makefile
 
-  gdk/Makefile
   gdk/gdkmm-2.4.pc
     gdk/src/Makefile
     gdk/gdkmm/Makefile
       gdk/gdkmm/private/Makefile
 
-  gtk/Makefile
   gtk/gtkmm-2.4.pc
     gtk/src/Makefile
     gtk/gtkmm/Makefile
