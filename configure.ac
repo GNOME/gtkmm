@@ -141,6 +141,7 @@ AC_CONFIG_FILES([
 ])
 
 AC_CONFIG_FILES([
+  demos/Makefile
   tests/Makefile
     tests/child_widget/Makefile
     tests/child_widget2/Makefile

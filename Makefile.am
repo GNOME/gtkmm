@@ -37,7 +37,7 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests $(doc_subdirs)
+SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
 DIST_SUBDIRS = tools atk/src gdk/src gtk/src atk/atkmm gdk/gdkmm gtk/gtkmm tests demos docs scripts
 
 if GTKMM_ATKMM_ENABLED
