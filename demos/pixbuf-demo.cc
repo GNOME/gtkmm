@@ -3,7 +3,7 @@
  * Copyright (C) 2002 The gtkmm Development Team
  *
  * Authors: Federico Mena-Quintero <federico@gimp.org>
- * gtkmm port: Daniel Elstner <daniel.elstner@gmx.net>
+ * gtkmm port: Daniel Elstner <daniel.kitta@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,11 +37,8 @@
 #include <gtkmm/style.h>
 #include <gtkmm/window.h>
 
-
 namespace
 {
-
-const double pi = 3.14159265358979323844;
 
 /*
  * These values control the smoothness and speed of the animation.
@@ -55,20 +52,19 @@ enum
 };
 
 const char * const background_name =
-  "background.jpg";
+  "gtk-demo/background.jpg";
 
 const char * const image_names[] =
 {
-  "apple-red.png",
-  "gnome-applets.png",
-  "gnome-calendar.png",
-  "gnome-foot.png",
-  "gnome-gmush.png",
-  "gnome-gimp.png",
-  "gnome-gsame.png",
-  "gnu-keys.png"
+  "gtk-demo/apple-red.png",
+  "gtk-demo/gnome-applets.png",
+  "gtk-demo/gnome-calendar.png",
+  "gtk-demo/gnome-foot.png",
+  "gtk-demo/gnome-gmush.png",
+  "gtk-demo/gnome-gimp.png",
+  "gtk-demo/gnome-gsame.png",
+  "gtk-demo/gnu-keys.png"
 };
-
 
 class DemoRenderArea : public Gtk::DrawingArea
 {
@@ -88,15 +84,15 @@ private:
   void generate_next_frame();
 };
 
-
 Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   return Gdk::Pixbuf::create_from_file(name);
-  #else
+#else
+  // Ignore this; it's broken by design.
   std::auto_ptr<Glib::Error> error;
   return Gdk::Pixbuf::create_from_file(name, error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif
 }
 
 /*
@@ -106,15 +102,15 @@ Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
  */
 DemoRenderArea::DemoRenderArea()
 :
-  frame_num_  (0)
+  frame_num_ (0)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   background_ = Gdk::Pixbuf::create_from_file(background_name);
-  #else
+#else
+  // Ignore this; it's broken by design.
   std::auto_ptr<Glib::Error> error;
   background_ = Gdk::Pixbuf::create_from_file(background_name, error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-
+#endif
   std::transform(
       &image_names[0], &image_names[G_N_ELEMENTS(image_names)],
       std::back_inserter(images_),
@@ -170,14 +166,14 @@ void DemoRenderArea::generate_next_frame()
   const double xmid = back_width  / 2.0;
   const double ymid = back_height / 2.0;
 
-  const double f = 2.0 * pi * double(frame_num_) / CYCLE_LEN;
+  const double f = 2.0 * G_PI * double(frame_num_) / CYCLE_LEN;
 
   double r = std::min(xmid, ymid) / 2.0;
   r += (r / 3.0) * std::sin(f);
 
   for(unsigned i = 0; i < images_.size(); ++i)
   {
-    const double ang = 2.0 * pi * double(i) / images_.size() - f;
+    const double ang = 2.0 * G_PI * double(i) / images_.size() - f;
 
     const double iw = images_[i]->get_width();
     const double ih = images_[i]->get_height();
@@ -203,7 +199,6 @@ void DemoRenderArea::generate_next_frame()
           overall_alpha);
     }
   }
-
   frame_num_ = (frame_num_ + 1) % CYCLE_LEN;
 
   // Tell GTK+ the widget should be redrawn soon.  This will trigger the
@@ -213,13 +208,12 @@ void DemoRenderArea::generate_next_frame()
 
 } // anonymous namespace
 
-
 int main(int argc, char** argv)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
+#endif
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Gtk::Main main_instance (&argc, &argv);
 
     Gtk::Window window;
@@ -229,15 +223,14 @@ int main(int argc, char** argv)
     window.show_all();
 
     Gtk::Main::run(window);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   catch(const Glib::Error& error)
   {
     std::cerr << error.what() << std::endl;
     return EXIT_FAILURE;
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-
+#endif
   return EXIT_SUCCESS;
 }
 

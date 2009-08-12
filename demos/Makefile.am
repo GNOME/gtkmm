@@ -49,7 +49,9 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
 
-image_files =				\
+democodedir = $(datadir)/$(GTKMM_MODULE_NAME)/demo
+democode_DATA = $(gtk_demo_gtkmm_demo_SOURCES)
+dist_democode_DATA =			\
 	gtk-demo/alphatest.png		\
 	gtk-demo/apple-red.png		\
 	gtk-demo/background.jpg		\
@@ -64,9 +66,6 @@ image_files =				\
 	gtk-demo/gnome-gsame.png	\
 	gtk-demo/gnu-keys.png		\
 	gtk-demo/gtk-logo-rgb.gif
-
-democodedir = $(datadir)/$(GTKMM_MODULE_NAME)/demo
-dist_democode_DATA = $(gtk_demo_gtkmm_demo_SOURCES) $(image_files)
 
 if GTKMM_ATKMM_ENABLED
 atkmm_includes = -I$(top_builddir)/atk $(if $(srcdir:.=),-I$(top_srcdir)/atk)
