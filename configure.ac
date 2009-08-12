@@ -81,17 +81,18 @@ AC_ARG_ENABLE([deprecated-api],
                               [omit deprecated API from the library])],
               [gtkmm_deprecated_api=$enableval],
               [gtkmm_deprecated_api=yes])
-AS_IF([test "x$gtkmm_deprecated_api" = xyes],
+AS_IF([test "x$gtkmm_deprecated_api" != xno],
 [
   AC_MSG_NOTICE([[Deprecated API will be built, for backwards-compatibility.]])
   DISABLE_DEPRECATED_API_CFLAGS=dnl
 ], [
   AC_MSG_WARN([[Deprecated API will not be built, breaking compatibility.
 Do not use this option for distribution packages.]])
-  DISABLE_DEPRECATED_API_CFLAGS='-DATKMM_DISABLE_DEPRECATED=1 -DGDKMM_DISABLE_DEPRECATED=1 -DGTKMM_DISABLE_DEPRECATED=1'dnl
+  DISABLE_DEPRECATED_API_CFLAGS='dnl
+-DATKMM_DISABLE_DEPRECATED=1 -DGDKMM_DISABLE_DEPRECATED=1 -DGTKMM_DISABLE_DEPRECATED=1'dnl
 ])
 AC_SUBST([DISABLE_DEPRECATED_API_CFLAGS])
-AM_CONDITIONAL([DISABLE_DEPRECATED_API], [test "x$gtkmm_deprecated_api" = xyes])
+AM_CONDITIONAL([DISABLE_DEPRECATED_API], [test "x$gtkmm_deprecated_api" = xno])
 
 # Offer the ability to omit some API from the library, to reduce the code size.
 # Note that there are other options in glibmm, which affect gtkmm.
