@@ -32,8 +32,13 @@ src_subdirs = tools $(atk_maint_subdir) gdk/src gtk/src
 else
 src_subdirs =
 endif
-SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests
-DIST_SUBDIRS = $(SUBDIRS) demos docs scripts
+if ENABLE_DOCUMENTATION
+doc_subdirs = docs
+else
+doc_subdirs =
+endif
+SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests $(doc_subdirs)
+DIST_SUBDIRS = tools atk/src gdk/src gtk/src atk/atkmm gdk/gdkmm gtk/gtkmm tests demos docs scripts
 
 if GTKMM_ATKMM_ENABLED
 atkmm_includedir = $(includedir)/$(ATKMM_MODULE_NAME)

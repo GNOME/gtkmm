@@ -68,9 +68,12 @@ MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
 
-# Create a list of input directories for Doxygen.
-# TODO: kill
-GTKMM_DOXYGEN_INPUT_SUBDIRS([atk gdk gtk])
+MM_ARG_ENABLE_DOCUMENTATION
+MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
+MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
+MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
+MM_ARG_WITH_TAGFILE_DOC([pangomm-2.4.tag], [pangomm-2.4])
+MM_ARG_WITH_TAGFILE_DOC([cairomm_doxygen_tags], [cairomm-1.0])
 
 # TODO: Refactor into shared Autoconf macro
 AC_ARG_ENABLE([deprecated-api],
@@ -119,11 +122,7 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   docs/Makefile
-    docs/images/Makefile
-    docs/reference/Makefile
-    docs/reference/Doxyfile
-      docs/reference/images/Makefile
-        docs/reference/images/widgets/Makefile
+  docs/reference/Doxyfile
 ])
 
 AC_CONFIG_FILES([
