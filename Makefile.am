@@ -32,8 +32,7 @@ src_subdirs = tools $(atk_maint_subdir) gdk/src gtk/src
 else
 src_subdirs =
 endif
-SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm \
-	  tests MSVC_Net2005 MSVC_Net2008 win32_installer
+SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests
 DIST_SUBDIRS = $(SUBDIRS) demos docs scripts
 
 if GTKMM_ATKMM_ENABLED
@@ -54,5 +53,16 @@ nodist_gtkmm_libinclude_HEADERS = gtk/gtkmmconfig.h
 pkgconfigdir = $(libdir)/pkgconfig
 nodist_pkgconfig_DATA = $(atk_atkmm_pcfile) gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
 
+include $(srcdir)/MSVC_Net2005/filelist.am
+include $(srcdir)/MSVC_Net2008/filelist.am
+include $(srcdir)/win32_installer/filelist.am
+
+text_files = CHANGES COPYING.tools PORTING README.SUN README.win32
+msvc_files = $(addprefix MSVC_Net2005/,$(msvc_net2005_data)) \
+             $(addprefix MSVC_Net2008/,$(msvc_net2008_data))
+winstall_files = $(addprefix win32_installer/,$(windows_installer_files))
+
+dist_noinst_DATA = $(text_files) $(msvc_files) $(winstall_files)
 dist_noinst_SCRIPTS = autogen.sh
-dist_noinst_DATA = CHANGES COPYING.tools PORTING README.SUN README.win32
+
+DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files)) win32_installer/lgpl.txt

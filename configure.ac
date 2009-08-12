@@ -172,32 +172,26 @@ AC_CONFIG_FILES([
 ])
 
 AC_CONFIG_FILES([
-  MSVC_Net2005/Makefile
-    MSVC_Net2005/gendef/Makefile
-    MSVC_Net2005/atkmm/Makefile
-    MSVC_Net2005/atkmm/atkmm.rc
-    MSVC_Net2005/gdkmm/Makefile
-    MSVC_Net2005/gdkmm/gdkmm.rc
-    MSVC_Net2005/gtkmm/Makefile
-    MSVC_Net2005/gtkmm/gtkmm.rc
-    MSVC_Net2005/demos/Makefile
-      MSVC_Net2005/demos/gtk-demo/Makefile
+  MSVC_Net2005/atkmm/atkmm.rc
+  MSVC_Net2005/gdkmm/gdkmm.rc
+  MSVC_Net2005/gtkmm/gtkmm.rc
 
-  MSVC_Net2008/Makefile
-    MSVC_Net2008/gendef/Makefile
-    MSVC_Net2008/atkmm/Makefile
-    MSVC_Net2008/atkmm/atkmm.rc
-    MSVC_Net2008/gdkmm/Makefile
-    MSVC_Net2008/gdkmm/gdkmm.rc
-    MSVC_Net2008/gtkmm/Makefile
-    MSVC_Net2008/gtkmm/gtkmm.rc
-    MSVC_Net2008/demos/Makefile
-      MSVC_Net2008/demos/gtk-demo/Makefile
+  MSVC_Net2008/atkmm/atkmm.rc
+  MSVC_Net2008/gdkmm/gdkmm.rc
+  MSVC_Net2008/gtkmm/gtkmm.rc
 
-  win32_installer/Makefile
-    win32_installer/NSISLibrary/Makefile
-    win32_installer/translations/Makefile
   win32_installer/gtkmm-installer.nsi
 ])
 
+# Copy the generated configuration headers into the MSVC project directories.
+AC_CONFIG_COMMANDS([MSVC_Net2005/gdkmm/gdkmmconfig.h],
+                   [cp -f gdk/gdkmmconfig.h MSVC_Net2005/gdkmm/gdkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2005/gtkmm/gtkmmconfig.h],
+                   [cp -f gtk/gtkmmconfig.h MSVC_Net2005/gtkmm/gtkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2008/gdkmm/gdkmmconfig.h],
+                   [cp -f gdk/gdkmmconfig.h MSVC_Net2008/gdkmm/gdkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2008/gtkmm/gtkmmconfig.h],
+                   [cp -f gtk/gtkmmconfig.h MSVC_Net2008/gtkmm/gtkmmconfig.h])
+AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],
+                   [cp -f COPYING win32_installer/lgpl.txt])
 AC_OUTPUT
