@@ -1,11 +1,30 @@
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of gtkmm.
+##
+## gtkmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## gtkmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
+
+ACLOCAL_AMFLAGS = -I scripts ${ACLOCAL_FLAGS}
+
 if GTKMM_ATKMM_ENABLED
   ATK_SUBDIR=atk
 else
   ATK_SUBDIR=
 endif
 
-SUBDIRS		= tools $(ATK_SUBDIR) gdk gtk @DEMO_SUBDIR@ @DOCS_SUBDIR@ tests MSVC_Net2005 MSVC_Net2008 win32_installer
-DIST_SUBDIRS	= $(SUBDIRS) scripts
+SUBDIRS		= tools $(ATK_SUBDIR) gdk gtk tests MSVC_Net2005 MSVC_Net2008 win32_installer
+DIST_SUBDIRS	= $(SUBDIRS) demos docs scripts
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_build_gensrc.am_fragment \
