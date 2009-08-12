@@ -42,7 +42,7 @@ include $(top_srcdir)/scripts/compile-binding.am
 local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags)
 
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
-AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
+AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
 libgtkmm_2_4_la_SOURCES = $(binding_sources)
 libgtkmm_2_4_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
