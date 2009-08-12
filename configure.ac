@@ -143,19 +143,6 @@ AC_CONFIG_FILES([
 AC_CONFIG_FILES([
   demos/Makefile
   tests/Makefile
-    tests/child_widget/Makefile
-    tests/child_widget2/Makefile
-    tests/child_widget_managed/Makefile
-    tests/refcount_dialog/Makefile
-    tests/dialog/Makefile
-    tests/dialog_deletethis/Makefile
-    tests/delete_cpp_child/Makefile
-    tests/main_with_options/Makefile
-    tests/menu_destruction/Makefile
-    tests/property_notification/Makefile
-    tests/scrolledwindow/Makefile
-    tests/wrap_existing/Makefile
-    tests/boxhelper/Makefile
 ])
 
 AC_CONFIG_FILES([
