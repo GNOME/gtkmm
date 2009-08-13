@@ -73,7 +73,7 @@ MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
-MM_ARG_WITH_TAGFILE_DOC([cairomm_doxygen_tags], [cairomm-1.0])
+MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 
 # TODO: Refactor into shared Autoconf macro
 AC_ARG_ENABLE([deprecated-api],
