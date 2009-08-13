@@ -38,13 +38,11 @@ else
 doc_subdirs =
 endif
 SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
-DIST_SUBDIRS = tools atk/src gdk/src gtk/src atk/atkmm gdk/gdkmm gtk/gtkmm tests demos docs scripts
 
 if GTKMM_ATKMM_ENABLED
 atkmm_includedir = $(includedir)/$(ATKMM_MODULE_NAME)
 atkmm_include_HEADERS = atk/atkmm.h
 endif
-
 gdkmm_includedir = $(includedir)/$(GDKMM_MODULE_NAME)
 gdkmm_include_HEADERS = gdk/gdkmm.h
 gdkmm_libincludedir = $(libdir)/$(GDKMM_MODULE_NAME)/include

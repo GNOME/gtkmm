@@ -100,7 +100,7 @@ GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" = xno],
       [GTKMM_PC_ATKMM_DEP=],
-      [GTKMM_PC_ATKMM_DEP=atkmm-1.6])
+      [GTKMM_PC_ATKMM_DEP=$ATKMM_MODULE_NAME])
 AC_SUBST([GTKMM_PC_ATKMM_DEP])
 AM_CONDITIONAL([GTKMM_ATKMM_ENABLED], [test "x$gtkmm_enable_api_atkmm" != xno])
 
@@ -115,51 +115,28 @@ MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-pedantic -Wall -Wextra]
                        [G PANGO ATK GDK GDK_PIXBUF GTK])
 
-AC_CONFIG_FILES([
-      atk/atkmm-1.6.pc
-      atk/src/Makefile
-      atk/atkmm/Makefile
-])
-
-AC_CONFIG_FILES([
-  docs/Makefile
-  docs/reference/Doxyfile
-])
-
-AC_CONFIG_FILES([
-  Makefile
-
-  gdk/gdkmm-2.4.pc
-    gdk/src/Makefile
-    gdk/gdkmm/Makefile
-
-  gtk/gtkmm-2.4.pc
-    gtk/src/Makefile
-    gtk/gtkmm/Makefile
-
-  tools/Makefile
-])
-
-AC_CONFIG_FILES([
-  demos/Makefile
-  tests/Makefile
-])
-
-AC_CONFIG_FILES([
-  scripts/Makefile
-])
-
-AC_CONFIG_FILES([
-  MSVC_Net2005/atkmm/atkmm.rc
-  MSVC_Net2005/gdkmm/gdkmm.rc
-  MSVC_Net2005/gtkmm/gtkmm.rc
-
-  MSVC_Net2008/atkmm/atkmm.rc
-  MSVC_Net2008/gdkmm/gdkmm.rc
-  MSVC_Net2008/gtkmm/gtkmm.rc
-
-  win32_installer/gtkmm-installer.nsi
-])
+AC_CONFIG_FILES([Makefile
+                 tools/Makefile
+                 atk/atkmm-1.6.pc
+                 atk/src/Makefile
+                 atk/atkmm/Makefile
+                 gdk/gdkmm-2.4.pc
+                 gdk/src/Makefile
+                 gdk/gdkmm/Makefile
+                 gtk/gtkmm-2.4.pc
+                 gtk/src/Makefile
+                 gtk/gtkmm/Makefile
+                 tests/Makefile
+                 demos/Makefile
+                 docs/Makefile
+                 docs/reference/Doxyfile
+                 MSVC_Net2005/atkmm/atkmm.rc
+                 MSVC_Net2005/gdkmm/gdkmm.rc
+                 MSVC_Net2005/gtkmm/gtkmm.rc
+                 MSVC_Net2008/atkmm/atkmm.rc
+                 MSVC_Net2008/gdkmm/gdkmm.rc
+                 MSVC_Net2008/gtkmm/gtkmm.rc
+                 win32_installer/gtkmm-installer.nsi])
 
 # Copy the generated configuration headers into the MSVC project directories.
 AC_CONFIG_COMMANDS([MSVC_Net2005/gdkmm/gdkmmconfig.h],
