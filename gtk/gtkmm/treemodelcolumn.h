@@ -1,6 +1,5 @@
 #ifndef _GTKMM_TREEMODELCOLUMN_H
 #define _GTKMM_TREEMODELCOLUMN_H
-/* $Id$ */
 
 /* Copyright (c) 2002 The gtkmm Development Team
  *
@@ -19,14 +18,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib-object.h>
-#include <glibmm/value.h>
-
-#include <vector>
 #include <gtkmmconfig.h>
-
-GLIBMM_USING_STD(vector)
-
+#include <glibmm/value.h>
+#include <glib-object.h>
+#include <vector>
 
 namespace Gtk
 {
