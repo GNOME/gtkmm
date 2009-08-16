@@ -38,7 +38,7 @@ htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html
 docimagesdir = $(libdocdir)/images
 dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 
-include $(top_srcdir)/scripts/doc-reference.am
+include $(top_srcdir)/build/doc-reference.am
 
 dist_noinst_DATA +=				\
 	reference/gtkmm_header.html_fragment	\

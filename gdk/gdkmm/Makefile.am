@@ -27,7 +27,7 @@ files_extra_cc = $(gdkmm_files_extra_cc)
 files_extra_h  = $(gdkmm_files_extra_h)
 files_extra_ph = $(gdkmm_files_extra_ph)
 
-include $(top_srcdir)/scripts/compile-binding.am
+include $(top_srcdir)/build/compile-binding.am
 
 AM_CPPFLAGS = $(binding_includes) $(binding_cppflags) $(GTHREAD_CFLAGS) $(GDKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)

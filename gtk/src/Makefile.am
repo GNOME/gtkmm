@@ -26,4 +26,4 @@ files_defs = $(gtkmm_files_defs)
 files_ccg  = $(gtkmm_files_ccg)
 files_hg   = $(gtkmm_files_hg)
 
-include $(top_srcdir)/scripts/generate-binding.am
+include $(top_srcdir)/build/generate-binding.am

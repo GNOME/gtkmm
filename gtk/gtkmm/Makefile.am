@@ -37,7 +37,7 @@ endif
 local_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk) $(atkmm_includes)
 local_libadd   = $(atkmm_libadd) $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
 
-include $(top_srcdir)/scripts/compile-binding.am
+include $(top_srcdir)/build/compile-binding.am
 
 local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags)
 

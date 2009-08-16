@@ -20,8 +20,8 @@ AC_INIT([gtkmm], [2.17.2], [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkm
 AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([gtk/gtkmm.h])
-AC_CONFIG_AUX_DIR([scripts])
-AC_CONFIG_MACRO_DIR([scripts])
+AC_CONFIG_AUX_DIR([build])
+AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
 
 MM_INIT_MODULE([atkmm-1.6], m4_expand([AC_PACKAGE_VERSION]))
