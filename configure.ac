@@ -100,9 +100,10 @@ AM_CONDITIONAL([DISABLE_DEPRECATED_API], [test "x$gtkmm_deprecated_api" = xno])
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" = xno],
-      [GTKMM_PC_ATKMM_DEP=],
-      [GTKMM_PC_ATKMM_DEP=$ATKMM_MODULE_NAME])
-AC_SUBST([GTKMM_PC_ATKMM_DEP])
+      [GTKMM_REQ_ATKMM= GTKMM_REQ_ATKMM_UNINST=],
+      [GTKMM_REQ_ATKMM=$ATKMM_MODULE_NAME GTKMM_REQ_ATKMM_UNINST=$ATKMM_MODULE_NAME-uninstalled])
+AC_SUBST([GTKMM_REQ_ATKMM])
+AC_SUBST([GTKMM_REQ_ATKMM_UNINST])
 AM_CONDITIONAL([GTKMM_ATKMM_ENABLED], [test "x$gtkmm_enable_api_atkmm" != xno])
 
 GTKMM_ARG_ENABLE_API_MAEMO_EXTENSIONS
@@ -119,12 +120,15 @@ MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  atk/atkmm-1.6.pc
+                 atk/atkmm-1.6-uninstalled.pc
                  atk/src/Makefile
                  atk/atkmm/Makefile
                  gdk/gdkmm-2.4.pc
+                 gdk/gdkmm-2.4-uninstalled.pc
                  gdk/src/Makefile
                  gdk/gdkmm/Makefile
                  gtk/gtkmm-2.4.pc
+                 gtk/gtkmm-2.4-uninstalled.pc
                  gtk/src/Makefile
                  gtk/gtkmm/Makefile
                  tests/Makefile
