@@ -69,31 +69,6 @@ MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
 
-MM_ARG_ENABLE_DOCUMENTATION
-MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
-MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
-MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
-MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
-MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
-
-# TODO: Refactor into shared Autoconf macro
-AC_ARG_ENABLE([deprecated-api],
-              [AS_HELP_STRING([--disable-deprecated-api],
-                              [omit deprecated API from the library])],
-              [gtkmm_deprecated_api=$enableval],
-              [gtkmm_deprecated_api=yes])
-AS_IF([test "x$gtkmm_deprecated_api" != xno],
-[
-  AC_MSG_NOTICE([[Deprecated API will be built, for backwards-compatibility.]])
-], [
-  AC_MSG_WARN([[Deprecated API will not be built, breaking compatibility.
-Do not use this option for distribution packages.]])
-  AC_DEFINE([ATKMM_DISABLE_DEPRECATED], [1], [Define to omit deprecated API from atkmm.])
-  AC_DEFINE([GDKMM_DISABLE_DEPRECATED], [1], [Define to omit deprecated API from gdkmm.])
-  AC_DEFINE([GTKMM_DISABLE_DEPRECATED], [1], [Define to omit deprecated API from gtkmm.])
-])
-AM_CONDITIONAL([DISABLE_DEPRECATED_API], [test "x$gtkmm_deprecated_api" = xno])
-
 # Offer the ability to omit some API from the library, to reduce the code size.
 # Note that there are other options in glibmm, which affect gtkmm.
 GTKMM_ARG_ENABLE_API_ATKMM
@@ -106,6 +81,14 @@ AC_SUBST([GTKMM_REQ_ATKMM_UNINST])
 AM_CONDITIONAL([GTKMM_ATKMM_ENABLED], [test "x$gtkmm_enable_api_atkmm" != xno])
 
 GTKMM_ARG_ENABLE_API_MAEMO_EXTENSIONS
+MM_ARG_DISABLE_DEPRECATED_API([ATKMM GDKMM GTKMM])
+
+MM_ARG_ENABLE_DOCUMENTATION
+MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
+MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
+MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
+MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
+MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 
 AC_LANG([C++])
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
