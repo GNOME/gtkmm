@@ -29,7 +29,9 @@ files_extra_ph = $(gdkmm_files_extra_ph)
 
 include $(top_srcdir)/build/compile-binding.am
 
-AM_CPPFLAGS = $(binding_includes) $(binding_cppflags) $(GTHREAD_CFLAGS) $(GDKMM_CFLAGS)
+local_cppflags = $(binding_includes) $(binding_cppflags) -DGDKMM_BUILD=1
+
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GDKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
 libgdkmm_2_4_la_SOURCES = $(binding_sources)

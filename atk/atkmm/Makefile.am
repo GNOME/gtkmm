@@ -29,7 +29,9 @@ files_extra_ph = $(atkmm_files_extra_ph)
 
 include $(top_srcdir)/build/compile-binding.am
 
-AM_CPPFLAGS = $(binding_includes) $(binding_cppflags) $(GTHREAD_CFLAGS) $(ATKMM_CFLAGS)
+local_cppflags = $(binding_includes) $(binding_cppflags) -DATKMM_BUILD=1
+
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(ATKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
 libatkmm_1_6_la_SOURCES = $(binding_sources)

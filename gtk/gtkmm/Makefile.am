@@ -39,7 +39,7 @@ local_libadd   = $(atkmm_libadd) $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_
 
 include $(top_srcdir)/build/compile-binding.am
 
-local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags)
+local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGTKMM_BUILD=1
 
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
