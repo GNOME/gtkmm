@@ -36,7 +36,7 @@ namespace Gtk
  * @ingroup Containers
  * @ingroup TreeView
  *
- * @newin2p10
+ * @since{2,10}
  */
 class ListViewText : public Gtk::TreeView
 {
