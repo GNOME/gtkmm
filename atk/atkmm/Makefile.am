@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-lib_LTLIBRARIES = libatkmm-1.6.la
+lib_LTLIBRARIES = libatkmm-@ATKMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
@@ -34,6 +34,6 @@ local_cppflags = $(binding_includes) $(binding_cppflags) -DATKMM_BUILD=1
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(ATKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
-libatkmm_1_6_la_SOURCES = $(binding_sources)
-libatkmm_1_6_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
-libatkmm_1_6_la_LIBADD  = $(ATKMM_LIBS)
+libatkmm_@ATKMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libatkmm_@ATKMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
+libatkmm_@ATKMM_API_VERSION@_la_LIBADD  = $(ATKMM_LIBS)

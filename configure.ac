@@ -101,16 +101,16 @@ MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
-                 atk/atkmm-1.6.pc
-                 atk/atkmm-1.6-uninstalled.pc
+                 atk/${ATKMM_MODULE_NAME}.pc:atk/atkmm.pc.in
+                 atk/${ATKMM_MODULE_NAME}-uninstalled.pc:atk/atkmm-uninstalled.pc.in
                  atk/src/Makefile
                  atk/atkmm/Makefile
-                 gdk/gdkmm-2.4.pc
-                 gdk/gdkmm-2.4-uninstalled.pc
+                 gdk/${GDKMM_MODULE_NAME}.pc:gdk/gdkmm.pc.in
+                 gdk/${GDKMM_MODULE_NAME}-uninstalled.pc:gdk/gdkmm-uninstalled.pc.in
                  gdk/src/Makefile
                  gdk/gdkmm/Makefile
-                 gtk/gtkmm-2.4.pc
-                 gtk/gtkmm-2.4-uninstalled.pc
+                 gtk/${GTKMM_MODULE_NAME}.pc:gtk/gtkmm.pc.in
+                 gtk/${GTKMM_MODULE_NAME}-uninstalled.pc:gtk/gtkmm-uninstalled.pc.in
                  gtk/src/Makefile
                  gtk/gtkmm/Makefile
                  tests/Makefile

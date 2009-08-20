@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-lib_LTLIBRARIES = libgdkmm-2.4.la
+lib_LTLIBRARIES = libgdkmm-@GDKMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
@@ -34,6 +34,6 @@ local_cppflags = $(binding_includes) $(binding_cppflags) -DGDKMM_BUILD=1
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GDKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
-libgdkmm_2_4_la_SOURCES = $(binding_sources)
-libgdkmm_2_4_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
-libgdkmm_2_4_la_LIBADD  = $(GDKMM_LIBS)
+libgdkmm_@GDKMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libgdkmm_@GDKMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
+libgdkmm_@GDKMM_API_VERSION@_la_LIBADD  = $(GDKMM_LIBS)
