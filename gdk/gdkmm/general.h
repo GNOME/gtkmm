@@ -45,7 +45,7 @@ namespace Cairo
  * @deprecated Use the overloaded function that takes a const RefPtr
  * reference.
  *
- * @since{2,10}
+ * @newin{2,10}
  */
 void set_source_color(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
 #endif
@@ -54,7 +54,7 @@ void set_source_color(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::C
  * @param @context The cairo context.
  * @param color The color to use as the source color. 
  *
- * @since{2,12}
+ * @newin{2,12}
  */
 void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
 
@@ -68,7 +68,7 @@ void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const 
  * @deprecated Use the overloaded function that takes a const RefPtr
  * reference.
  *
- * @since{2,10}
+ * @newin{2,10}
  */
 void set_source_pixbuf(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
 #endif
@@ -79,7 +79,7 @@ void set_source_pixbuf(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib:
  * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
  * @param pixbuf_y Y coordinate of location to place upper left corner of pixbuf.
  *
- * @since{2,12}
+ * @newin{2,12}
  */
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
 
@@ -93,7 +93,7 @@ void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const
  * @deprecated Use the overloaded function that takes a const RefPtr
  * reference.
  *
- * @since{2,10}
+ * @newin{2,10}
  */
 void set_source_pixmap(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y);
 #endif
@@ -104,7 +104,7 @@ void set_source_pixmap(::Cairo::RefPtr< ::Cairo::Context >& context, const Glib:
  * @param pixmap_x X coordinate of location to place upper left corner of pixmap.
  * @param pixmap_y Y coordinate of location to place upper left corner of pixmap.
  *
- * @since{2,12}
+ * @newin{2,12}
  */
 void set_source_pixmap(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y);
 
@@ -117,7 +117,7 @@ void set_source_pixmap(const ::Cairo::RefPtr< ::Cairo::Context >& context, const
  * @deprecated Use add_rectangle_to_path() instead
  * reference.
  *
- * @since{2,10}
+ * @newin{2,10}
  */
 void rectangle(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
 #endif
@@ -127,7 +127,7 @@ void rectangle(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangl
  * @param context A cairo context.
  * @param rectangle A rectangle to add to the path of the context. 
  *
- * @since{2,12}
+ * @newin{2,12}
  */
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
 
@@ -139,7 +139,7 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
  *
  * @deprecated Use add_region_to_path() instead
  *
- * @since{2,10}
+ * @newin{2,10}
  */
 void region(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region);
 #endif
@@ -149,7 +149,7 @@ void region(::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& reg
  * @param context A cairo context.
  * @param region A region to add to the path of the context. 
  *
- * @since{2,12}
+ * @newin{2,12}
  */
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region);
 
