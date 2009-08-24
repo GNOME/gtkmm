@@ -172,7 +172,8 @@ public:
   
   _WRAP_METHOD(bool mnemonic_activate(bool group_cycling), gtk_widget_mnemonic_activate)
 
-  //Probably not usefule. Too C-specific: _WRAP_METHOD(bool can_activate_accel(guint signal_id) const, gtk_widget_can_activate_accel)
+  _IGNORE(gtk_widget_can_activate_accel)
+  //Probably not useful. Too C-specific: _WRAP_METHOD(bool can_activate_accel(guint signal_id) const, gtk_widget_can_activate_accel)
 
   //TODO: Use C++ type
   _WRAP_METHOD(bool event(GdkEvent* event), gtk_widget_event)
@@ -187,12 +188,20 @@ public:
   _WRAP_METHOD(Gdk::Region region_intersect(const Gdk::Region& region) const, gtk_widget_region_intersect)
 
   _WRAP_METHOD(void freeze_child_notify(), gtk_widget_freeze_child_notify)
-  _WRAP_METHOD(void	child_notify(const Glib::ustring& child_property), gtk_widget_child_notify)
-  _WRAP_METHOD(void	thaw_child_notify(), gtk_widget_thaw_child_notify)
+  _WRAP_METHOD(void child_notify(const Glib::ustring& child_property), gtk_widget_child_notify)
+  _WRAP_METHOD(void thaw_child_notify(), gtk_widget_thaw_child_notify)
+
+  _WRAP_METHOD(void set_can_focus(bool can_focus = true), gtk_widget_set_can_focus)
+  _WRAP_METHOD(bool get_can_focus() const, gtk_widget_get_can_focus)
+  _WRAP_METHOD(bool has_focus() const, gtk_widget_has_focus)
 
   _WRAP_METHOD(bool is_focus() const, gtk_widget_is_focus)
-  _WRAP_METHOD(void	grab_focus(), gtk_widget_grab_focus)
-  _WRAP_METHOD(void	grab_default(), gtk_widget_grab_default)
+  _WRAP_METHOD(void grab_focus(), gtk_widget_grab_focus)
+  _WRAP_METHOD(void set_can_default(bool can_default = true), gtk_widget_set_can_default)
+  _WRAP_METHOD(bool get_can_default() const, gtk_widget_get_can_default)
+  _WRAP_METHOD(bool has_default() const, gtk_widget_has_default)
+  _WRAP_METHOD(void grab_default(), gtk_widget_grab_default)
+  _WRAP_METHOD(bool has_grab() const, gtk_widget_has_grab)
 
   /** Block events to everything else than this widget and its children. This
    * way you can get modal behaviour (usually not recommended). One practical
@@ -215,10 +224,19 @@ public:
   void unset_name();
   _WRAP_METHOD(Glib::ustring get_name() const, gtk_widget_get_name)
 
-  _WRAP_METHOD(void set_state(Gtk::StateType state), gtk_widget_set_state)
+  _WRAP_METHOD(void set_state(StateType state), gtk_widget_set_state)
+  _WRAP_METHOD(StateType get_state() const, gtk_widget_get_state)
   _WRAP_METHOD(void set_sensitive(bool sensitive = true), gtk_widget_set_sensitive)
+  _WRAP_METHOD(bool get_sensitive() const, gtk_widget_get_sensitive)
+  _WRAP_METHOD(bool is_sensitive() const, gtk_widget_is_sensitive)
+  _WRAP_METHOD(void set_visible(bool visible = true), gtk_widget_set_visible)
+  _WRAP_METHOD(bool get_visible() const, gtk_widget_get_visible)
+  _WRAP_METHOD(void set_has_window(bool has_window = true), gtk_widget_set_has_window)
+  _WRAP_METHOD(bool get_has_window() const, gtk_widget_get_has_window)
   _WRAP_METHOD(void set_app_paintable(bool app_paintable = true), gtk_widget_set_app_paintable)
+  _WRAP_METHOD(bool get_app_paintable() const, gtk_widget_get_app_paintable)
   _WRAP_METHOD(void set_double_buffered(bool double_buffered = true), gtk_widget_set_double_buffered)
+  _WRAP_METHOD(bool get_double_buffered() const, gtk_widget_get_double_buffered)
 
   _WRAP_METHOD(void set_redraw_on_allocate(bool redraw_on_allocate = true),
                gtk_widget_set_redraw_on_allocate)
@@ -228,6 +246,13 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_window(), gtk_widget_get_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_window() const, gtk_widget_get_window, refreturn, constversion)
+
+  //TODO: Documentation.
+  Allocation get_allocation() const;
+  _IGNORE(gtk_widget_get_allocation)
+
+  #m4  _CONVERSION(`const Allocation&',`const GtkAllocation*',`($3).gobj()')
+  _WRAP_METHOD(void set_allocation(const Allocation& allocation), gtk_widget_set_allocation)
 
   _WRAP_METHOD(Container* get_parent(), gtk_widget_get_parent)
   _WRAP_METHOD(const Container* get_parent() const, gtk_widget_get_parent, constversion)
@@ -570,29 +595,32 @@ public:
   //: Returns property {flags.mapped}.
   bool is_mapped() const;
 
-  //: Returns property {flags.visible}.
-  bool is_visible() const; 
-
   //: Returns if the widget is ready to be drawn to.
   // Checks to see if the widget is both visible and mapped which
   // makes it possible to perform drawing commands on.
   bool is_drawable() const;
   
-  //: Returns property {flags.sensitive}. You might want to check
-  // is_sensitive instead.
+  /** @deprecated: Use get_sensitive() instead.
+   */
   bool sensitive() const;
 
   bool parent_sensitive() const;
-  bool is_sensitive() const;
-  bool can_focus() const;
-  bool has_focus() const;
+
+  /** @deprecated: Use get_can_default() instead.
+   */
   bool can_default() const;
-  bool has_default() const;
-  bool has_grab() const;
+
   bool rc_style() const;
   bool is_composite_child() const;
+
+  /** @deprecated: Use get_app_paintable() instead.
+   */
   bool app_paintable() const;
+
   bool receives_default() const;
+
+  /** @deprecated: Use get_double_buffered() instead.
+   */
   bool double_buffered() const;
 
   WidgetFlags get_flags() const;
@@ -608,12 +636,8 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Action> get_action(), gtk_widget_get_action, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Action> get_action() const, gtk_widget_get_action, refreturn, constversion)
 
-  _MEMBER_GET(state, state, Gtk::StateType, guint8)
   _MEMBER_GET(saved_state, saved_state, Gtk::StateType, guint8)
   _MEMBER_GET(requisition, requisition, Requisition, GtkRequisition)
-
-#m4  _CONVERSION(`GtkAllocation',`Allocation',`($2)(Glib::wrap(&($3)))')
-  _MEMBER_GET(allocation, allocation, Allocation, GtkAllocation)
 
 
   _WRAP_SIGNAL(void show(),"show")
@@ -953,7 +977,6 @@ protected:
 
   void realize_if_needed();
 
-  _MEMBER_SET(allocation, allocation, Allocation, GtkAllocation)
   _MEMBER_SET_GOBJECT(window, window, Gdk::Window, GdkWindow*)
 
 #m4begin
