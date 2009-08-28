@@ -24,7 +24,7 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
 
-MM_PREREQ([0.4])
+MM_PREREQ([0.7])
 MM_INIT_MODULE([atkmm-1.6])
 MM_INIT_MODULE([gdkmm-2.4])
 MM_INIT_MODULE([gtkmm-2.4])
