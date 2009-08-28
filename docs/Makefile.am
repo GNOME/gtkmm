@@ -31,10 +31,6 @@ doc_input = $(addprefix $(top_srcdir)/atk/atkmm/,$(atkmm_files_h)) \
             $(addprefix $(top_srcdir)/gdk/gdkmm/,$(gdkmm_files_h)) \
             $(addprefix $(top_srcdir)/gtk/gtkmm/,$(gtkmm_files_h))
 
-# Override the web location to use the old-style path with redundant
-# directory components.
-htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html/
-
 docimagesdir = $(libdocdir)/images
 dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 
