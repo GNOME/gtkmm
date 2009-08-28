@@ -41,8 +41,6 @@ dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 include $(top_srcdir)/build/doc-reference.am
 
 dist_noinst_DATA +=				\
-	reference/gtkmm_header.html_fragment	\
-	reference/gtkmm_footer.html_fragment	\
 	reference/widget_hierarchy.dia		\
 	reference/widget_hierarchy.html		\
 	reference/widget_hierarchy.png
