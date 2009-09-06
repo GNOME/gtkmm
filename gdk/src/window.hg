@@ -64,7 +64,7 @@ class Window : public Gdk::Drawable
   _CLASS_GOBJECT(Window, GdkWindow, GDK_WINDOW_OBJECT, Gdk::Drawable, GdkDrawable, GdkWindowObject)
   _STRUCT_NOT_HIDDEN
   _IGNORE(gdk_window_set_hints, gdk_window_destroy, gdk_window_new, gdk_window_get_deskrelative_origin, gdk_window_get_internal_paint_info)
-  _IGNORE(gdk_window_destroy_notify)
+  _IGNORE(gdk_window_destroy_notify, gdk_window_is_destroyed)
 
 
 protected:
@@ -87,6 +87,22 @@ public:
   _WRAP_METHOD(void clear_area_e(int x, int y, int width, int height), gdk_window_clear_area_e)
   _WRAP_METHOD(void raise(), gdk_window_raise)
   _WRAP_METHOD(void lower(), gdk_window_lower)
+
+  _WRAP_METHOD(void restack(const Glib::RefPtr<Window>& sibling, bool above), gdk_window_restack)
+
+  /** Changes the position of this window in the Z-order (stacking order). This 
+   * either raises (if @a above is true) or lowers the window.
+   *
+   * If this is a toplevel, the window manager may choose to deny the
+   * request to move the window in the Z-order. restack() only
+   * requests the restack but does not guarantee it.
+   *
+   * @param above Whether to raise or lower the window.
+   *
+   * @newin{2,18}
+   */
+  void restack(bool above);
+
   _WRAP_METHOD(void focus(guint32 timestamp), gdk_window_focus)
   _WRAP_METHOD(void set_user_data(gpointer user_data), gdk_window_set_user_data)
   _WRAP_METHOD(void set_override_redirect(bool override_redirect = true), gdk_window_set_override_redirect)
@@ -97,6 +113,7 @@ public:
   
   _WRAP_METHOD(void scroll(int dx, int dy), gdk_window_scroll)
   _WRAP_METHOD(void move_region(const Region& region, int dx, int dy), gdk_window_move_region)
+  _WRAP_METHOD(bool ensure_native(), gdk_window_ensure_native)
 
   _WRAP_METHOD(void shape_combine_mask(const Glib::RefPtr<Bitmap>& mask, int x, int y), gdk_window_shape_combine_mask)
   void unset_shape_combine_mask();
@@ -153,11 +170,14 @@ public:
    * For top-level windows this means that it will use the default cursor for the ROOT window.
    */
   void set_cursor();
+
+  //TODO:_WRAP_METHOD(Cursor get_cursor(), gdk_window_get_cursor)
   
   _WRAP_METHOD(void get_user_data(gpointer* data), gdk_window_get_user_data)
   _WRAP_METHOD(void get_geometry(int& x, int& y, int& width, int& height, int& depth) const, gdk_window_get_geometry)
   _WRAP_METHOD(void get_position(int& x, int& y) const, gdk_window_get_position)
   _WRAP_METHOD(int get_origin(int& x, int& y) const, gdk_window_get_origin)
+  _WRAP_METHOD(void get_root_coords(int x, int y, int& root_x, int& root_y), gdk_window_get_root_coords)
   _IGNORE(gdk_window_get_deskrelative_origin)
   _WRAP_METHOD(void get_root_origin(int& x, int& y) const, gdk_window_get_root_origin)
   _WRAP_METHOD(void get_frame_extents(Rectangle& rect), gdk_window_get_frame_extents)
@@ -269,6 +289,21 @@ public:
   _WRAP_METHOD(void set_accept_focus(bool accept_focus = true), gdk_window_set_accept_focus)
   
   _WRAP_METHOD(void set_focus_on_map(bool focus_on_map), gdk_window_set_focus_on_map)
+
+  _WRAP_METHOD(static Glib::RefPtr<Window> get_default_root_window(), gdk_get_default_root_window)
+
+//TODO: Wrap these?
+/*
+GdkPixmap *gdk_offscreen_window_get_pixmap     (GdkWindow     *window);
+void       gdk_offscreen_window_set_embedder   (GdkWindow     *window,
+						GdkWindow     *embedder);
+GdkWindow *gdk_offscreen_window_get_embedder   (GdkWindow     *window);
+*/
+
+  _WRAP_METHOD(void redirect_to_drawable(const Glib::RefPtr<Drawable>& drawable, int src_x, int src_y, int dest_x, int dest_y, int width, int height), gdk_window_redirect_to_drawable)
+  _WRAP_METHOD(void remove_redirection(), gdk_window_remove_redirection)
+
+  _WRAP_METHOD(void geometry_changed(), gdk_window_geometry_changed)
 };
 
 } /* namespace Gdk */
