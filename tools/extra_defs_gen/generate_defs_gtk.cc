@@ -1,7 +1,4 @@
-/* $Id$ */
-
-/* generate_defs_gtk.cc
- *
+/*
  * Copyright (C) 2001 The Free Software Foundation
  *
  * This library is free software; you can redistribute it and/or
@@ -19,16 +16,24 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "glibmm_generate_extra_defs/generate_extra_defs.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+// We always need to generate the .defs for all types because the code
+// using deprecated API is generated unconditionally and only disabled
+// at compile time.
+#undef ATK_DISABLE_DEPRECATED
+#undef GDK_DISABLE_DEPRECATED
+#undef GTK_DISABLE_DEPRECATED
+
+#include <glibmm_generate_extra_defs/generate_extra_defs.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+#ifndef G_OS_WIN32
+# include <gtk/gtkunixprint.h>
+#endif
 
-#if !defined(G_OS_WIN32)
-#include <gtk/gtkunixprint.h>
-#endif /* G_OS_WIN32 */
-
-
-int main (int argc, char *argv[])
+int main(int argc, char** argv)
 {
   gtk_init(&argc, &argv);
 
@@ -68,7 +73,7 @@ int main (int argc, char *argv[])
             << get_defs( GDK_TYPE_SCREEN )
             << get_defs( GDK_TYPE_VISUAL )
             << get_defs( GDK_TYPE_WINDOW )
-    
+
             << get_defs( GTK_TYPE_ABOUT_DIALOG )
             << get_defs( GTK_TYPE_ACCEL_GROUP )
             << get_defs( GTK_TYPE_ACCEL_LABEL )
@@ -93,17 +98,17 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_CELL_RENDERER )
             << get_defs( GTK_TYPE_CELL_RENDERER_ACCEL )
             << get_defs( GTK_TYPE_CELL_RENDERER_COMBO )
-	    << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )	    
+            << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )
             << get_defs( GTK_TYPE_CELL_RENDERER_TEXT )
             << get_defs( GTK_TYPE_CELL_RENDERER_TOGGLE )
             << get_defs( GTK_TYPE_CELL_RENDERER_PIXBUF )
             << get_defs( GTK_TYPE_CELL_RENDERER_PROGRESS )
-            << get_defs( GTK_TYPE_CELL_RENDERER_SPIN )	
-            << get_defs( GTK_TYPE_CLIPBOARD )       
-            << get_defs( GTK_TYPE_COLOR_BUTTON )   
+            << get_defs( GTK_TYPE_CELL_RENDERER_SPIN )
+            << get_defs( GTK_TYPE_CLIPBOARD )
+            << get_defs( GTK_TYPE_COLOR_BUTTON )
             << get_defs( GTK_TYPE_COLOR_SELECTION )
             << get_defs( GTK_TYPE_COMBO ) /* Deprecated */
-            << get_defs( GTK_TYPE_COMBO_BOX ) 
+            << get_defs( GTK_TYPE_COMBO_BOX )
             << get_defs( GTK_TYPE_CONTAINER )
             << get_defs( GTK_TYPE_CTREE ) /* Deprecated */
             << get_defs( GTK_TYPE_CELL_VIEW )
@@ -116,12 +121,12 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_EVENT_BOX )
             << get_defs( GTK_TYPE_EXPANDER )
             << get_defs( GTK_TYPE_FILE_FILTER )
-            << get_defs( GTK_TYPE_FILE_CHOOSER_BUTTON ) 
+            << get_defs( GTK_TYPE_FILE_CHOOSER_BUTTON )
             << get_defs( GTK_TYPE_FILE_CHOOSER_DIALOG )
-            << get_defs( GTK_TYPE_FILE_CHOOSER_WIDGET )                        
+            << get_defs( GTK_TYPE_FILE_CHOOSER_WIDGET )
             << get_defs( GTK_TYPE_FILE_SELECTION ) /* Deprecated */
             << get_defs( GTK_TYPE_FIXED )
-            << get_defs( GTK_TYPE_FONT_BUTTON )            
+            << get_defs( GTK_TYPE_FONT_BUTTON )
             << get_defs( GTK_TYPE_FONT_SELECTION )
             << get_defs( GTK_TYPE_FONT_SELECTION_DIALOG )
             << get_defs( GTK_TYPE_FRAME )
@@ -143,13 +148,13 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_MENU_BAR )
             << get_defs( GTK_TYPE_MENU_ITEM )
             << get_defs( GTK_TYPE_MENU_SHELL )
-            << get_defs( GTK_TYPE_MENU_TOOL_BUTTON )            
-	    << get_defs( GTK_TYPE_MESSAGE_DIALOG )
+            << get_defs( GTK_TYPE_MENU_TOOL_BUTTON )
+            << get_defs( GTK_TYPE_MESSAGE_DIALOG )
             << get_defs( GTK_TYPE_MISC )
             << get_defs( GTK_TYPE_NOTEBOOK )
             << get_defs( GTK_TYPE_OBJECT )
             << get_defs( GTK_TYPE_OPTION_MENU )
-            << get_defs( GTK_TYPE_ORIENTABLE ) 
+            << get_defs( GTK_TYPE_ORIENTABLE )
             << get_defs( GTK_TYPE_PANED )
             << get_defs( GTK_TYPE_PIXMAP )
 #if !defined(G_OS_WIN32)
@@ -157,20 +162,20 @@ int main (int argc, char *argv[])
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PREVIEW )
 #if !defined(G_OS_WIN32)
-	    << get_defs( GTK_TYPE_PRINTER )
-	    << get_defs( GTK_TYPE_PRINT_JOB )
+            << get_defs( GTK_TYPE_PRINTER )
+            << get_defs( GTK_TYPE_PRINT_JOB )
 #endif /* G_OS_WIN32 */
-	    << get_defs( GTK_TYPE_PRINT_OPERATION )
-	    << get_defs( GTK_TYPE_PRINT_OPERATION_PREVIEW )
+            << get_defs( GTK_TYPE_PRINT_OPERATION )
+            << get_defs( GTK_TYPE_PRINT_OPERATION_PREVIEW )
 #if !defined(G_OS_WIN32)
-	    << get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )
-	    << get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )
+            << get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )
+            << get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_PROGRESS )
             << get_defs( GTK_TYPE_PROGRESS_BAR )
             << get_defs( GTK_TYPE_RADIO_BUTTON )
             << get_defs( GTK_TYPE_RADIO_TOOL_BUTTON )
-            << get_defs( GTK_TYPE_RADIO_ACTION )            
+            << get_defs( GTK_TYPE_RADIO_ACTION )
             << get_defs( GTK_TYPE_RADIO_MENU_ITEM )
             << get_defs( GTK_TYPE_RANGE )
             << get_defs( GTK_TYPE_RECENT_ACTION )
@@ -201,19 +206,19 @@ int main (int argc, char *argv[])
             << get_defs( GTK_TYPE_TOGGLE_BUTTON )
             << get_defs( GTK_TYPE_TOOLBAR )
             << get_defs( GTK_TYPE_TOOL_ITEM )
-            << get_defs( GTK_TYPE_TOOL_BUTTON )                          
+            << get_defs( GTK_TYPE_TOOL_BUTTON )
             << get_defs( GTK_TYPE_TEXT_BUFFER )
             << get_defs( GTK_TYPE_TEXT_MARK )
             << get_defs( GTK_TYPE_TEXT_TAG )
             << get_defs( GTK_TYPE_TEXT_TAG_TABLE )
             << get_defs( GTK_TYPE_TEXT_VIEW )
-            << get_defs( GTK_TYPE_TOGGLE_ACTION )            
-            << get_defs( GTK_TYPE_TOGGLE_TOOL_BUTTON )  
+            << get_defs( GTK_TYPE_TOGGLE_ACTION )
+            << get_defs( GTK_TYPE_TOGGLE_TOOL_BUTTON )
             << get_defs( GTK_TYPE_TOOLTIP )
             << get_defs( GTK_TYPE_TOOLTIPS )
             << get_defs( GTK_TYPE_TREE_SELECTION )
-            << get_defs( GTK_TYPE_TREE_MODEL ) 
-            << get_defs( GTK_TYPE_TREE_MODEL_FILTER )            
+            << get_defs( GTK_TYPE_TREE_MODEL )
+            << get_defs( GTK_TYPE_TREE_MODEL_FILTER )
             << get_defs( GTK_TYPE_TREE_STORE )
             << get_defs( GTK_TYPE_TREE_VIEW )
             << get_defs( GTK_TYPE_TREE_VIEW_COLUMN )
