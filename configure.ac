@@ -87,8 +87,8 @@ MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
-MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
+MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
 AC_LANG([C++])
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
@@ -96,7 +96,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra]
+                       [-pedantic -Wall -Wextra],
                        [G PANGO ATK GDK GDK_PIXBUF GTK])
 
 AC_CONFIG_FILES([Makefile
