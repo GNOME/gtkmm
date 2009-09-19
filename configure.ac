@@ -15,7 +15,8 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [2.17.11], [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
+AC_INIT([gtkmm], [2.17.11],
+        [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
 
@@ -24,6 +25,11 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
 
+AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news dist-bzip2 no-define nostdinc tar-pax])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+AM_MAINTAINER_MODE
+AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
+
 MM_PREREQ([0.7.1])
 MM_INIT_MODULE([atkmm-1.6])
 MM_INIT_MODULE([gdkmm-2.4])
@@ -31,10 +37,6 @@ MM_INIT_MODULE([gtkmm-2.4])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([LIBGTKMM_SO_VERSION], [1:30:0])
-
-AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news dist-bzip2 no-define nostdinc tar-pax])
-AM_MAINTAINER_MODE
-AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 AC_PROG_CXX
 AC_DISABLE_STATIC
