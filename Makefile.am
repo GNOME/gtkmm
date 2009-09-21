@@ -60,7 +60,7 @@ include $(srcdir)/MSVC_Net2005/filelist.am
 include $(srcdir)/MSVC_Net2008/filelist.am
 include $(srcdir)/win32_installer/filelist.am
 
-text_files = CHANGES COPYING.tools PORTING README.SUN README.win32
+text_files = COPYING.tools PORTING README.SUN README.win32
 msvc_files = $(addprefix MSVC_Net2005/,$(msvc_net2005_data)) \
              $(addprefix MSVC_Net2008/,$(msvc_net2008_data))
 winstall_files = $(addprefix win32_installer/,$(windows_installer_files))
