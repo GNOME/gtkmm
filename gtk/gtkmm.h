@@ -91,6 +91,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
 #include <gtkmm/imagemenuitem.h>
+#include <gtkmm/infobar.h>
 #include <gtkmm/inputdialog.h>
 #include <gtkmm/item.h>
 #include <gtkmm/calendar.h>
