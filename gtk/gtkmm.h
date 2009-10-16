@@ -54,6 +54,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cellrendererpixbuf.h>
 #include <gtkmm/cellrendererprogress.h>
 #include <gtkmm/cellrendererspin.h>
+#include <gtkmm/cellrendererspinner.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrenderertoggle.h>
 #include <gtkmm/colorbutton.h>
@@ -147,6 +148,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/settings.h>
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/spinbutton.h>
+#include <gtkmm/spinner.h>
 #include <gtkmm/statusbar.h>
 #include <gtkmm/statusicon.h>
 #include <gtkmm/stock.h>
