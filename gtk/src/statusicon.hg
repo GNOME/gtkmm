@@ -1,5 +1,3 @@
-/* $Id: statusicon.hg,v 1.6 2006/07/05 16:59:28 murrayc Exp $ */
-
 /* Copyright (C) 2005 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -17,37 +15,41 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef GTK_DISABLE_DEPRECATED
+#m4 _POP()
+_CONFIGINCLUDE(gtkmmconfig.h)
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
 
-#include <gtkmm/image.h> //For ImageType.
+#include <gtkmm/image.h>
 #include <gtkmm/stockid.h>
 #include <gtkmm/menu.h>
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/types.h>
 #include <gtkmm/object.h>
-
+#include <gtkmm/tooltip.h>
 
 namespace Gtk
 {
 
-/** The "system tray" or notification area is normally used for transient icons that indicate some 
- * special state. For example, a system tray icon might appear to tell the user that they have new 
- * mail, or have an incoming instant message, or something along those lines. The basic idea is 
+/** The "system tray" or notification area is normally used for transient icons that indicate some
+ * special state. For example, a system tray icon might appear to tell the user that they have new
+ * mail, or have an incoming instant message, or something along those lines. The basic idea is
  * that creating an icon in the notification area is less annoying than popping up a dialog.
  *
- * A StatusIcon object can be used to display an icon in a "system tray". The icon can have a 
- * tooltip, and the user can interact with it by activating it or popping up a context menu. 
- * Critical information should not solely be displayed in a StatusIcon, since it may not be 
- * visible (e.g. when the user doesn't have a notification area on his panel). This can be checked 
+ * A StatusIcon object can be used to display an icon in a "system tray". The icon can have a
+ * tooltip, and the user can interact with it by activating it or popping up a context menu.
+ * Critical information should not solely be displayed in a StatusIcon, since it may not be
+ * visible (e.g. when the user doesn't have a notification area on his panel). This can be checked
  * with is_embedded().
  *
- * On X11, the implementation follows the freedesktop.org "System Tray" specification.  
- * Implementations of the "tray" side of this specification can be found e.g. in the GNOME and KDE 
- * panel applications. 
+ * On X11, the implementation follows the freedesktop.org "System Tray" specification.
+ * Implementations of the "tray" side of this specification can be found e.g. in the GNOME and KDE
+ * panel applications.
  *
- * @newin2p10
+ * @newin{2,10}
  */
 class StatusIcon : public Glib::Object
 {
@@ -68,14 +70,14 @@ public:
   _WRAP_CREATE(const StockID& stock_id)
   _WRAP_CREATE(const Glib::ustring& icon_name)
 
- /** Creates a status icon displaying the file @a filename. 
-  * The image will be scaled down to fit in the available 
+ /** Creates a status icon displaying the file @a filename.
+  * The image will be scaled down to fit in the available
   * space in the notification area, if necessary.
-  * 
+  *
   * @param filename A filename.
   * @result A new StatusIcon
   *
-  * @newin2p10
+  * @newin{2,10}
   */
   static Glib::RefPtr<StatusIcon> create_from_file(const std::string& filename);
   _IGNORE(gtk_status_icon_new_from_file)
@@ -103,7 +105,8 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::Screen> get_screen(), gtk_status_icon_get_screen, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Screen> get_screen() const, gtk_status_icon_get_screen, refreturn, constversion)
 
-  _WRAP_METHOD(void set_tooltip(const Glib::ustring& tooltip_text), gtk_status_icon_set_tooltip)
+  _WRAP_METHOD(void set_tooltip(const Glib::ustring& tooltip_text),
+               gtk_status_icon_set_tooltip, deprecated)
 
   _WRAP_METHOD(void set_visible(bool visible = true), gtk_status_icon_set_visible)
   _WRAP_METHOD(bool get_visible() const, gtk_status_icon_get_visible)
@@ -112,10 +115,10 @@ public:
 
   _WRAP_METHOD(bool is_embedded() const, gtk_status_icon_is_embedded)
 
-  /** Displays a menu aligned to the status icon, and makes it available for selection. 
+  /** Displays a menu aligned to the status icon, and makes it available for selection.
    * Applications can use this function to display context-sensitive menus.
    *
-   * This is equivalent to the gtk_status_icon_position_menu() helper callback in GTK+, 
+   * This is equivalent to the gtk_status_icon_position_menu() helper callback in GTK+,
    * which can be provided to gtk_menu_popup().
    *
    * See Gtk::Menu::popup() for more details.
@@ -124,34 +127,33 @@ public:
    * @param button The mouse button which was pressed to initiate the event.
    * @param activate_time The time at which the activation event occurred.
    *
-   * @newin2p12
+   * @newin{2,12}
    */
   void popup_menu_at_position(Menu& menu, guint button, guint32 activate_time);
   _IGNORE(gtk_status_icon_position_menu)
    //Note that gtk_status_icon_position_menu() is meant to be used as a helpful callback when calling gtk_menu_popup().
-   //We make it easier by just providing a popup method that uses it. 
-
+   //We make it easier by just providing a popup method that uses it.
 
   //In gtk_status_icon_get_geometry(), any of the parameters may be NULL,
   //but we don't need 6 different overloads, with different parameters.
   //But we can add some if there are common cases.
 
   /** Obtains information about the location of the status icon
-   * on screen. This information can be used to e.g. position 
-   * popups like notification bubbles. 
-   * See popup_menu_at_position() for a more convenient 
+   * on screen. This information can be used to e.g. position
+   * popups like notification bubbles.
+   * See popup_menu_at_position() for a more convenient
    * alternative for positioning menus.
    *
-   * Note that some platforms do not allow GTK+ to provide 
+   * Note that some platforms do not allow GTK+ to provide
    * this information.
    *
    * @param screen: The screen.
    * @param area The area occupied by the status icon.
-   * @param orientation The orientation of the panel  in which the status icon is embedded. A panel 
+   * @param orientation The orientation of the panel  in which the status icon is embedded. A panel
    * at the top or bottom of the screen is horizontal, a panel at the left or right is vertical.
    * @result true if the location information has been filled in.
    *
-   * @newin2p10
+   * @newin{2,10}
    */
   bool get_geometry(Glib::RefPtr<Gdk::Screen>& screen, Gdk::Rectangle& area, Orientation& orientation);
   _IGNORE(gtk_status_icon_get_geometry)
@@ -162,6 +164,8 @@ public:
   _WRAP_METHOD(void set_tooltip_text(const Glib::ustring& text), gtk_status_icon_set_tooltip_text)
   _WRAP_METHOD(Glib::ustring get_tooltip_markup() const, gtk_status_icon_get_tooltip_markup)
   _WRAP_METHOD(void set_tooltip_markup(const Glib::ustring& markup), gtk_status_icon_set_tooltip_markup)
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), gtk_status_icon_set_title)
+  _WRAP_METHOD(Glib::ustring get_title() const, gtk_status_icon_get_title)
 
   _WRAP_METHOD(guint32 get_x11_window_id() const, gtk_status_icon_get_x11_window_id)
 
@@ -175,6 +179,7 @@ public:
   _WRAP_PROPERTY("screen", Glib::RefPtr<Gdk::Screen>)
   _WRAP_PROPERTY("blinking", bool)
   _WRAP_PROPERTY("visible", bool)
+  _WRAP_PROPERTY("title", Glib::ustring)
 
   _WRAP_SIGNAL(bool size_changed(int size), size_changed)
 
@@ -183,7 +188,7 @@ public:
   _WRAP_SIGNAL(bool button_press_event(GdkEventButton* event), button_press_event)
   _WRAP_SIGNAL(bool button_release_event(GdkEventButton* event), button_release_event)
   _WRAP_SIGNAL(bool scroll_event(GdkEventScroll* event), scroll_event)
+  _WRAP_SIGNAL(bool query_tooltip(int x, int y, bool keyboard_mode, const Glib::RefPtr<Tooltip>& tooltip), query_tooltip)
 };
 
 } // namespace Gtk
-

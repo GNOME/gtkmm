@@ -1,31 +1,39 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of gtkmm.
+##
+## gtkmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## gtkmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = private
+lib_LTLIBRARIES = libatkmm-@ATKMM_API_VERSION@.la
 
-sublib_name = atkmm
-sublib_libname = atkmm-1.6
-sublib_libversion = $(LIBGTKMM_SO_VERSION)
-sublib_namespace	= Atk
-sublib_cflags = $(ATKMM_CFLAGS)
-sublib_topdir = atk
-sublib_win32_dlls_libs	=
+include $(srcdir)/../src/filelist.am
+include $(srcdir)/filelist.am
 
-sublib_files_extra_posix_cc =
-sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = init.cc
-sublib_files_extra_general_deprecated_cc =
+files_built_cc = $(atkmm_files_built_cc)
+files_built_h  = $(atkmm_files_built_h)
+files_built_ph = $(atkmm_files_built_ph)
+files_extra_cc = $(atkmm_files_extra_cc)
+files_extra_h  = $(atkmm_files_extra_h)
+files_extra_ph = $(atkmm_files_extra_ph)
 
-sublib_files_extra_posix_h =
-sublib_files_extra_win32_h =
-sublib_files_extra_general_h = init.h
-sublib_files_extra_general_deprecated_h = 
+include $(top_srcdir)/build/compile-binding.am
 
-include $(top_srcdir)/build_shared/Makefile_build.am_fragment
+local_cppflags = $(binding_includes) $(binding_cppflags) -DATKMM_BUILD=1
 
-lib_LTLIBRARIES = libatkmm-1.6.la
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(ATKMM_CFLAGS)
+AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 
-libatkmm_1_6_la_SOURCES = $(files_built_cc) $(files_extra_cc)
-libatkmm_1_6_la_LDFLAGS = $(common_ldflags)
-libatkmm_1_6_la_LIBADD = $(win32_dlls_extra_libs) $(ATKMM_LIBS)
-
+libatkmm_@ATKMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libatkmm_@ATKMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
+libatkmm_@ATKMM_API_VERSION@_la_LIBADD  = $(ATKMM_LIBS)

@@ -162,12 +162,14 @@ void Container_Class::remove_callback(GtkContainer* self, GtkWidget* p0)
   }
   else
   {
-    BaseClassType *const base = static_cast<BaseClassType*>(
-        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-    );
+    BaseClassType *const base =
+      static_cast<BaseClassType*>(g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
 
-    //Call the original underlying C function:
-    if(base && base->remove)
+    // Do not try to call the default implementation of the virtual function
+    // GtkContainerClass::remove(), because it unhelpfully informs us that
+    // it isn't implemented.  This leaves us with no generic means to check
+    // whether it is implemented.
+    if(base && G_TYPE_FROM_CLASS(base) != GTK_TYPE_CONTAINER && base->remove)
       (*base->remove)(self, p0);
   }
 }

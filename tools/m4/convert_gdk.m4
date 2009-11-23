@@ -1,4 +1,5 @@
 include(convert_glib.m4)
+include(convert_gio.m4)
 
 _EQUAL(gint8[],gint8*)
 _EQUAL(guchar,guint8)

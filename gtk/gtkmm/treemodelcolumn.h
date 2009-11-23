@@ -1,6 +1,5 @@
 #ifndef _GTKMM_TREEMODELCOLUMN_H
 #define _GTKMM_TREEMODELCOLUMN_H
-/* $Id$ */
 
 /* Copyright (c) 2002 The gtkmm Development Team
  *
@@ -19,14 +18,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib-object.h>
-#include <glibmm/value.h>
-
-#include <vector>
 #include <gtkmmconfig.h>
-
-GLIBMM_USING_STD(vector)
-
+#include <glibmm/value.h>
+#include <glib-object.h>
+#include <vector>
 
 namespace Gtk
 {
@@ -68,10 +63,9 @@ class TreeModelColumnBase;
  * they merely describe what C++ type is stored in which column
  * of a TreeModel, and save you from having to repeat that type information in several places.
  *
- * Thus you may use a statically allocated
- * TreeModel::ColumnRecord (as long as you make sure it's instantiated after
- * Gtk::Main), even when creating multiple models from it. However, it is very difficult to 
- * specify the sequence of allocation of static objects, so this should probably be avoided.
+ * Thus TreeModel::ColumnRecord can be made a singleton (as long as you make
+ * sure it's instantiated after Gtk::Main), even when creating multiple models
+ * from it.
  */
 class TreeModelColumnRecord
 {

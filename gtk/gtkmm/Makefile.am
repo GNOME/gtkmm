@@ -1,41 +1,49 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of gtkmm.
+##
+## gtkmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## gtkmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS			= private
+lib_LTLIBRARIES = libgtkmm-@GTKMM_API_VERSION@.la
 
-sublib_name		= gtkmm
-sublib_libname		= gtkmm-2.4
-sublib_libversion = $(LIBGTKMM_SO_VERSION)
-sublib_namespace	= Gtk
-sublib_cflags		= $(GTKMM_CFLAGS)
-sublib_topdir = gtk
-sublib_win32_dlls_libs	=
+include $(srcdir)/../src/filelist.am
+include $(srcdir)/filelist.am
 
-sublib_files_extra_posix_cc = 
-sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = accelkey.cc accelmap.cc cellrenderer_generation.cc comboboxtext.cc comboboxentrytext.cc \
-                                listviewtext.cc \
-                                menu_elems.cc radiobuttongroup.cc selectiondata_private.cc stock.cc stockid.cc targetentry.cc \
-                                treemodelcolumn.cc treeview_private.cc
-sublib_files_extra_general_deprecated_cc = 
-
-sublib_files_extra_posix_h = 
-sublib_files_extra_win32_h =
-sublib_files_extra_general_h = accelkey.h accelmap.h base.h cellrenderer_generation.h comboboxtext.h comboboxentrytext.h\
-                               listviewtext.h \
-                               menu_elems.h radiobuttongroup.h selectiondata_private.h stock.h stockid.h targetentry.h \
-                               treemodelcolumn.h treeview_private.h
-sublib_files_extra_general_deprecated_h = 
-
-include $(top_srcdir)/build_shared/Makefile_build.am_fragment
-
-lib_LTLIBRARIES		= libgtkmm-2.4.la
-libgtkmm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
-libgtkmm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgtkmm_2_4_la_LIBADD	= $(top_builddir)/gdk/gdkmm/libgdkmm-2.4.la \
-			  $(LIBADD_ATK) \
-			  $(GTKMM_LIBS)
+files_built_cc = $(gtkmm_files_built_cc)
+files_built_h  = $(gtkmm_files_built_h)
+files_built_ph = $(gtkmm_files_built_ph)
+files_extra_cc = $(gtkmm_files_extra_cc)
+files_extra_h  = $(gtkmm_files_extra_h)
+files_extra_ph = $(gtkmm_files_extra_ph)
 
 if GTKMM_ATKMM_ENABLED
-libgtkmm_2_4_la_LIBADD += $(top_builddir)/atk/atkmm/libatkmm-1.6.la
+atkmm_includes = -I$(top_builddir)/atk $(if $(srcdir:.=),-I$(top_srcdir)/atk)
+atkmm_libadd   = $(top_builddir)/atk/atkmm/libatkmm-$(ATKMM_API_VERSION).la
+else
+atkmm_includes =
+atkmm_libadd   =
 endif
+local_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk) $(atkmm_includes)
+local_libadd   = $(atkmm_libadd) $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
+
+include $(top_srcdir)/build/compile-binding.am
+
+local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGTKMM_BUILD=1
+
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
+AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
+
+libgtkmm_@GTKMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libgtkmm_@GTKMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGTKMM_SO_VERSION)
+libgtkmm_@GTKMM_API_VERSION@_la_LIBADD  = $(local_libadd) $(GTKMM_LIBS)

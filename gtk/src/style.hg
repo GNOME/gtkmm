@@ -409,7 +409,7 @@ public:
    * @param property_name The name of the style property to get.
    * @param value: An output parameter in which  the value of the property being queried will be stored.
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class PropertyType>
   void get_style_property(GType widget_type, const Glib::ustring& property_name, PropertyType& value) const;
@@ -598,7 +598,13 @@ void Style::get_style_property(GType widget_type, const Glib::ustring& property_
   Glib::Value<PropertyType> property_value;
   property_value.init(Glib::Value<PropertyType>::value_type());
 
-  this->get_style_property_value(widget_type, property_name, property_value);
+  //We cast away the const.
+  //TODO: Either this get_style_property() should be non-const, 
+  //or get_style_property_value() should be const.
+  //We can't really have both const and unconst versions of them because output parameters can't be const.
+  //Bug https://bugzilla.gnome.org/show_bug.cgi?id=594171
+  Style* unconst_this = const_cast<Style*>(this);
+  unconst_this->get_style_property_value(widget_type, property_name, property_value);
 
   value = property_value.get();
 }

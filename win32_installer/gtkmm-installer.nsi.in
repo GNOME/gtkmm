@@ -34,15 +34,14 @@
 !define PRODUCT_VERSION_MICRO "@GTKMM_MICRO_VERSION@"
 !endif
 !ifndef PRODUCT_VERSION_INSTALLER
-!define PRODUCT_VERSION_INSTALLER "2"
+!define PRODUCT_VERSION_INSTALLER "1"
 !endif
 
 !ifdef PRODUCT_API_VERSION
 !undef PRODUCT_API_VERSION
 !endif
 
-; TODO: Autodetect this
-!define PRODUCT_API_VERSION "2.4"
+!define PRODUCT_API_VERSION "@GTKMM_API_VERSION@"
 
 ;--------------------------------
 ; Defines
@@ -60,7 +59,7 @@
 !ifdef PRODUCT_VERSION
 !undef PRODUCT_VERSION
 !endif
-!define PRODUCT_VERSION "${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}.${PRODUCT_VERSION_MICRO}"
+!define PRODUCT_VERSION "@PACKAGE_VERSION@"
 
 !ifdef RUNTIME_ONLY
   !define INSTALLER_NAME "${PRODUCT_NAME}-win32-runtime-${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER}.exe"
@@ -215,11 +214,14 @@ Section "Runtime" SecGTKRuntime
   File bin\intl.dll
   File bin\charset.dll
   File bin\iconv.dll
-  File bin\libxml2.dll
 
-  File ${BINDIR}\jpeg62.dll
+  File ${BINDIR}\libxml2-2.dll
+  File ${BINDIR}\libjpeg-7.dll
   File ${BINDIR}\libpng12-0.dll
-  File ${BINDIR}\libtiff3.dll
+  File ${BINDIR}\libtiff-3.dll
+  File ${BINDIR}\freetype6.dll
+  File ${BINDIR}\libexpat-1.dll
+  File ${BINDIR}\libfontconfig-1.dll
   File ${BINDIR}\libglib-2.0-0.dll
   File ${BINDIR}\libgobject-2.0-0.dll
   File ${BINDIR}\libgmodule-2.0-0.dll
@@ -252,20 +254,19 @@ Section "Runtime" SecGTKRuntime
   File /r etc\gtk-2.0
   File /r etc\pango
 
+  ; TODO: Add others... libiconv, fontconfig, libxml2, tiff... however note
+  ; that some contain devel-only things.
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-2.20.0
-  File /r share\doc\cairo_1.8.6-1_win32
-  File /r share\doc\pango-1.24.0
-  File /r share\doc\gtk+-2.16.0
+  File /r share\doc\glib-2.22.2
+  File /r share\doc\cairo_1.8.8-3_win32
+  File /r share\doc\pango-1.26.0
+  File /r share\doc\gtk+-2.18.3
 
   SetOutPath $INSTDIR\share
   File /r share\locale
   File /r share\themes
 ; Only required for gtk-demo:
   File /r share\gtk-2.0
-
-  SetOutPath $INSTDIR\contrib
-  File /r contrib\tiff
 
 !ifndef RUNTIME_ONLY
   SetOutPath $INSTDIR\redist
@@ -275,11 +276,14 @@ Section "Runtime" SecGTKRuntime
   File bin\intl.dll
   File bin\charset.dll
   File bin\iconv.dll
-  File bin\libxml2.dll
 
-  File bin_stripped\jpeg62.dll
+  File bin_stripped\libxml2-2.dll
+  File bin_stripped\libjpeg-7.dll
   File bin_stripped\libpng12-0.dll
-  File bin_stripped\libtiff3.dll
+  File bin_stripped\libtiff-3.dll
+  File bin_stripped\freetype6.dll
+  File bin_stripped\libexpat-1.dll
+  File bin_stripped\libfontconfig-1.dll
   File bin_stripped\libglib-2.0-0.dll
   File bin_stripped\libgobject-2.0-0.dll
   File bin_stripped\libgmodule-2.0-0.dll
@@ -325,15 +329,26 @@ Section "Development" SecGTKDevelopment
   File ${BINDIR}\gtk-query-immodules-2.0.exe
 
   SetOutPath $INSTDIR\include
-  File /r include\libxml
+  File /r include\libxml2
+  File /r include\freetype2
+  File /r include\fontconfig
+  File /r include\libpng12
   File /r include\glib-2.0
   File /r include\cairo
   File /r include\atk-1.0
   File /r include\pango-1.0
   File /r include\gtk-2.0
   File /r include\libglade-2.0
+  File /r include\gail-1.0
 
+  File include\expat.h
+  File include\expat_external.h
+  File include\ft2build.h
   File include\iconv.h
+  File include\jconfig.h
+  File include\jerror.h
+  File include\jmorecfg.h
+  File include\jpeglib.h
   File include\libcharset.h
   File include\localcharset.h
   File include\libintl.h
@@ -342,9 +357,9 @@ Section "Development" SecGTKDevelopment
   File include\tiff.h
   File include\tiffconf.h
   File include\tiffio.h
-  file include\tiffvers.h
-  file include\zconf.h
-  file include\zlib.h
+  File include\tiffvers.h
+  File include\zconf.h
+  File include\zlib.h
 
   SetOutPath $INSTDIR\lib\gtk-2.0
   File /r lib\gtk-2.0\include
@@ -364,8 +379,8 @@ Section "Development" SecGTKDevelopment
   File lib\intl.def
   File lib\intl.lib
   File lib\libintl.dll.a
-  File lib\libtiff.def
-  File lib\libtiff.lib
+;  File lib\libtiff.def Is no longer provided by the bundle since 2.16.6
+;  File lib\libtiff.lib Is no longer provided by the bundle since 2.16.6
   File lib\libtiff.dll.a
   File lib\libpng.def
   File lib\libpng.lib
@@ -373,6 +388,13 @@ Section "Development" SecGTKDevelopment
   File lib\zlib.def
   File lib\zdll.lib
   File lib\libz.a
+  File lib\libfreetype.dll.a
+  File lib\libexpat.def
+  File lib\expat.lib
+  File lib\libexpat.dll.a
+  File lib\fontconfig.def
+  File lib\fontconfig.lib
+  File lib\libfontconfig.dll.a
   File lib\glib-2.0.def
   File lib\glib-2.0.lib
   File lib\libglib-2.0.dll.a
@@ -422,6 +444,7 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\libxml-2.0.pc
   File lib\pkgconfig\libpng.pc
   File lib\pkgconfig\libpng12.pc
+  File lib\pkgconfig\freetype2.pc
   File lib\pkgconfig\glib-2.0.pc
   File lib\pkgconfig\gmodule-2.0.pc
   File lib\pkgconfig\gmodule-no-export-2.0.pc
@@ -446,11 +469,12 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\gtk+-2.0.pc
   File lib\pkgconfig\gtk+-win32-2.0.pc
   File lib\pkgconfig\libglade-2.0.pc
+  File lib\pkgconfig\gail.pc
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-dev-2.20.0
-  File /r share\doc\pango-dev-1.24.0
-  File /r share\doc\gtk+-dev-2.16.0
+  File /r share\doc\glib-dev-2.22.2
+  File /r share\doc\pango-dev-1.26.0
+  File /r share\doc\gtk+-dev-2.18.3
 
   SetOutPath $INSTDIR\share\xml
   File /r share\xml\libglade
@@ -459,6 +483,8 @@ Section "Development" SecGTKDevelopment
   File /r share\glib-2.0
 
   SetOutPath $INSTDIR\share\aclocal
+  File share\aclocal\libxml.m4
+  File share\aclocal\freetype2.m4
   File share\aclocal\glib-2.0.m4
   File share\aclocal\glib-gettext.m4
   File share\aclocal\gtk-2.0.m4
@@ -473,6 +499,7 @@ Section "Documentation" SecGTKDocumentation
   File /r share\doc\libiconv
 
   SetOutPath $INSTDIR\share\gtk-doc\html
+  File /r share\gtk-doc\html\libxml2
   File /r share\gtk-doc\html\glib
   File /r share\gtk-doc\html\gobject
   File /r share\gtk-doc\html\cairo
@@ -481,6 +508,7 @@ Section "Documentation" SecGTKDocumentation
   File /r share\gtk-doc\html\gdk-pixbuf
   File /r share\gtk-doc\html\gtk
   File /r share\gtk-doc\html\libglade
+  File /r share\gtk-doc\html\gail-libgail-util
 
 SectionEnd
 !endif
@@ -1037,7 +1065,6 @@ Section -Post SecPost
   SetOutPath $INSTDIR\redist
   File /oname=README.txt "redist_README.txt"
 
-  File bin_stripped\zlib1.dll
   SetOutPath $INSTDIR
   File "gtkmm.ico"
   File "lgpl.txt"
@@ -1076,6 +1103,9 @@ Section -Post SecPost
   IfFileExists "$INSTDIR\share\gtk-doc\html\*.*" "" +2
     CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Documentation"
 
+  IfFileExists "$INSTDIR\share\gtk-doc\html\libxml2\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libxml2 Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\libxml2\index.html"
+
   IfFileExists "$INSTDIR\share\gtk-doc\html\glib\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\glib Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\glib\index.html"
 
@@ -1099,6 +1129,9 @@ Section -Post SecPost
 
   IfFileExists "$INSTDIR\share\gtk-doc\html\libglade\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglade Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\libglade\index.html"
+
+  IfFileExists "$INSTDIR\share\gtk-doc\html\gail-libgail-util\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libgail-util Reference Manual.lnk" "$INSTDIR\share\gtk-doc\html\gail-libgail-util\index.html"
 
   IfFileExists "$INSTDIR\share\doc\libsigc-2.0\docs\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk" "$INSTDIR\share\doc\libsigc-2.0\docs\reference\html\index.html"
@@ -1265,6 +1298,51 @@ continue:
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
 
 !ifndef RUNTIME_ONLY
+  ; redist
+  Delete $INSTDIR\redist\zlib1.dll
+  Delete $INSTDIR\redist\intl.dll
+  Delete $INSTDIR\redist\iconv.dll
+  Delete $INSTDIR\redist\charset.dll
+
+  Delete $INSTDIR\redist\libxml2-2.dll
+  Delete $INSTDIR\redist\libjpeg-7.dll
+  Delete $INSTDIR\redist\libpng12-0.dll
+  Delete $INSTDIR\redist\libtiff-3.dll
+  Delete $INSTDIR\redist\freetype6.dll
+  Delete $INSTDIR\redist\libexpat-1.dll
+  Delete $INSTDIR\redist\libfontconfig-1.dll
+  Delete $INSTDIR\redist\libglib-2.0-0.dll
+  Delete $INSTDIR\redist\libgobject-2.0-0.dll
+  Delete $INSTDIR\redist\libgmodule-2.0-0.dll
+  Delete $INSTDIR\redist\libgthread-2.0-0.dll
+  Delete $INSTDIR\redist\libgio-2.0-0.dll
+  Delete $INSTDIR\redist\libcairo-2.dll
+  Delete $INSTDIR\redist\libatk-1.0-0.dll
+  Delete $INSTDIR\redist\libpango-1.0-0.dll
+  Delete $INSTDIR\redist\libpangocairo-1.0-0.dll
+  Delete $INSTDIR\redist\libpangoft2-1.0-0.dll
+  Delete $INSTDIR\redist\libpangowin32-1.0-0.dll
+  Delete $INSTDIR\redist\libgailutil-18.dll
+  Delete $INSTDIR\redist\libgdk-win32-2.0-0.dll
+  Delete $INSTDIR\redist\libgdk_pixbuf-2.0-0.dll
+  Delete $INSTDIR\redist\libgtk-win32-2.0-0.dll
+  Delete $INSTDIR\redist\libglade-2.0-0.dll
+  Delete $INSTDIR\redist\gspawn-win32-helper.exe
+  Delete $INSTDIR\redist\gspawn-win32-helper-console.exe
+
+  Delete $INSTDIR\redist\libsigc-2.0-0.dll
+  Delete $INSTDIR\redist\libcairomm-1.0-1.dll
+  Delete $INSTDIR\redist\libglibmm-2.4-1.dll
+  Delete $INSTDIR\redist\libgiomm-2.4-1.dll
+  Delete $INSTDIR\redist\libatkmm-1.6-1.dll
+  Delete $INSTDIR\redist\libpangomm-1.4-1.dll
+  Delete $INSTDIR\redist\libgdkmm-2.4-1.dll
+  Delete $INSTDIR\redist\libgtkmm-2.4-1.dll
+  Delete $INSTDIR\redist\libglademm-2.4-1.dll
+  Delete $INSTDIR\redist\libxml++-2.6-2.dll
+  Delete $INSTDIR\redist\README.txt
+  RMDir $INSTDIR\redist
+
   ; bin
 
   Delete $INSTDIR\bin\iconv.exe
@@ -1280,14 +1358,25 @@ continue:
   Delete $INSTDIR\bin\gtk-query-immodules-2.0.exe
 
   ; include
-  RMDir /r $INSTDIR\include\libxml
+  RMDir /r $INSTDIR\include\libxml2
+  RMDir /r $INSTDIR\include\freetype2
+  RMDir /r $INSTDIR\include\fontconfig
+  RMDir /r $INSTDIR\include\libpng12
   RMDIR /r $INSTDIR\include\glib-2.0
   RMDIR /r $INSTDIR\include\cairo
   RMDIR /r $INSTDIR\include\atk-1.0
   RMDIR /r $INSTDIR\include\pango-1.0
   RMDIR /r $INSTDIR\include\gtk-2.0
   RMDIR /r $INSTDIR\include\libglade-2.0
+  RMDir /r $INSTDIR\include\gail-1.0
+  Delete $INSTDIR\include\expat.h
+  Delete $INSTDIR\include\expat_external.h
+  Delete $INSTDIR\include\ft2build.h
   Delete $INSTDIR\include\iconv.h
+  Delete $INSTDIR\include\jconfig.h
+  Delete $INSTDIR\include\jerror.h
+  Delete $INSTDIR\include\jmorecfg.h
+  Delete $INSTDIR\include\jpeglib.h
   Delete $INSTDIR\include\libcharset.h
   Delete $INSTDIR\include\localcharset.h
   Delete $INSTDIR\include\libintl.h
@@ -1334,6 +1423,9 @@ continue:
   Delete $INSTDIR\lib\libtiff.dll.a
   Delete $INSTDIR\lib\libpng12.dll.a
   Delete $INSTDIR\lib\libz.a
+  Delete $INSTDIR\lib\libfreetype.dll.a
+  Delete $INSTDIR\lib\libexpat.dll.a
+  Delete $INSTDIR\lib\libfontconfig.dll.a
   Delete $INSTDIR\lib\libglib-2.0.dll.a
   Delete $INSTDIR\lib\libgobject-2.0.dll.a
   Delete $INSTDIR\lib\libgmodule-2.0.dll.a
@@ -1365,12 +1457,16 @@ continue:
  
   Delete $INSTDIR\lib\intl.def
   Delete $INSTDIR\lib\intl.lib
-  Delete $INSTDIR\lib\libtiff.def
-  Delete $INSTDIR\lib\libtiff.lib
+;  Delete $INSTDIR\lib\libtiff.def
+;  Delete $INSTDIR\lib\libtiff.lib
   Delete $INSTDIR\lib\libpng.def
   Delete $INSTDIR\lib\libpng.lib
   Delete $INSTDIR\lib\zlib.def
   Delete $INSTDIR\lib\zdll.lib
+  Delete $INSTDIR\lib\libexpat.def
+  Delete $INSTDIR\lib\expat.lib
+  Delete $INSTDIR\lib\fontconfig.def
+  Delete $INSTDIR\lib\fontconfig.lib
   Delete $INSTDIR\lib\glib-2.0.def
   Delete $INSTDIR\lib\glib-2.0.lib
   Delete $INSTDIR\lib\gobject-2.0.def
@@ -1408,13 +1504,12 @@ continue:
   Delete $INSTDIR\lib\gtkmm-*.lib
   Delete $INSTDIR\lib\pangomm-*.lib
   Delete $INSTDIR\lib\glademm-*.lib
-;  Delete $INSTDIR\lib\libglademm-*.lib.lnk
   Delete $INSTDIR\lib\xml++-*.lib
-;  Delete $INSTDIR\lib\libxml++-*.lib.lnk
 
   Delete $INSTDIR\lib\pkgconfig\libxml-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\libpng.pc
   Delete $INSTDIR\lib\pkgconfig\libpng12.pc
+  Delete $INSTDIR\lib\pkgconfig\freetype2.pc
   Delete $INSTDIR\lib\pkgconfig\glib-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gmodule-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gmodule-no-export-2.0.pc
@@ -1439,6 +1534,7 @@ continue:
   Delete $INSTDIR\lib\pkgconfig\gtk+-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gtk+-win32-2.0.pc  
   Delete $INSTDIR\lib\pkgconfig\libglade-2.0.pc  
+  Delete $INSTDIR\lib\pkgconfig\gail.pc
 
   Delete $INSTDIR\lib\pkgconfig\sigc++-*.pc
   Delete $INSTDIR\lib\pkgconfig\cairomm-*.pc
@@ -1456,18 +1552,23 @@ continue:
 
   RMDir /r $INSTDIR\share\doc\libiconv
 
-  RMDir /r $INSTDIR\share\doc\glib-dev-2.18.1
-  RMDir /r $INSTDIR\share\doc\pango-dev-1.22.0
-  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.14.3
+  RMDir /r $INSTDIR\share\doc\glib-dev-2.22.2
+  RMDir /r $INSTDIR\share\doc\pango-dev-1.26.0
+  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.18.3
 
   RMDir /r $INSTDIR\share\xml\libglade
   RMDir $INSTDIR\share\xml
 
+  RMDir /r $INSTDIR\share\glib-2.0
+
+  Delete $INSTDIR\share\aclocal\libxml.m4
+  Delete $INSTDIR\share\aclocal\freetype2.m4
   Delete $INSTDIR\share\aclocal\glib-2.0.m4
   Delete $INSTDIR\share\aclocal\glib-gettext.m4
   Delete $INSTDIR\share\aclocal\gtk-2.0.m4
   Delete $INSTDIR\share\aclocal\pkg.m4
 
+  RMDir /r $INSTDIR\share\gtk-doc\html\libxml2
   RMDir /r $INSTDIR\share\gtk-doc\html\glib
   RMDir /r $INSTDIR\share\gtk-doc\html\gobject
   RMDir /r $INSTDIR\share\gtk-doc\html\cairo
@@ -1476,6 +1577,7 @@ continue:
   RMDir /r $INSTDIR\share\gtk-doc\html\gdk-pixbuf
   RMDir /r $INSTDIR\share\gtk-doc\html\gtk
   RMDir /r $INSTDIR\share\gtk-doc\html\libglade
+  RMDir /r $INSTDIR\share\gtk-doc\html\gail-libgail-util
   RMDir $INSTDIR\share\gtk-doc\html
   RMDir $INSTDIR\share\gtk-doc
 
@@ -1542,11 +1644,14 @@ continue:
   Delete $INSTDIR\bin\intl.dll
   Delete $INSTDIR\bin\iconv.dll
   Delete $INSTDIR\bin\charset.dll
-  Delete $INSTDIR\bin\libxml2.dll
 
-  Delete $INSTDIR\bin\jpeg62.dll
+  Delete $INSTDIR\bin\libxml2-2.dll
+  Delete $INSTDIR\bin\libjpeg-7.dll
   Delete $INSTDIR\bin\libpng12-0.dll
-  Delete $INSTDIR\bin\libtiff3.dll
+  Delete $INSTDIR\bin\libtiff-3.dll
+  Delete $INSTDIR\bin\freetype6.dll
+  Delete $INSTDIR\bin\libexpat-1.dll
+  Delete $INSTDIR\bin\libfontconfig-1.dll
   Delete $INSTDIR\bin\libglib-2.0-0.dll
   Delete $INSTDIR\bin\libgobject-2.0-0.dll
   Delete $INSTDIR\bin\libgmodule-2.0-0.dll
@@ -1585,9 +1690,9 @@ continue:
   Delete $INSTDIR\bin\libgiomm-*.dll
   Delete $INSTDIR\bin\libglibmm_generate_extra_defs-*.dll
   Delete $INSTDIR\bin\libatkmm-*.dll
+  Delete $INSTDIR\bin\libpangomm-*.dll
   Delete $INSTDIR\bin\libgdkmm-*.dll
   Delete $INSTDIR\bin\libgtkmm-*.dll
-  Delete $INSTDIR\bin\libpangomm-*.dll
   Delete $INSTDIR\bin\libglademm-*.dll
   Delete $INSTDIR\bin\libxml++-*.dll
  
@@ -1597,13 +1702,11 @@ continue:
   Delete $INSTDIR\bin\glibmm-*.dll
   Delete $INSTDIR\bin\giomm-*.dll
   Delete $INSTDIR\bin\atkmm-*.dll
+  Delete $INSTDIR\bin\pangomm-*.dll
   Delete $INSTDIR\bin\gdkmm-*.dll
   Delete $INSTDIR\bin\gtkmm-*.dll
-  Delete $INSTDIR\bin\pangomm-*.dll
   Delete $INSTDIR\bin\glademm-*.dll
-;  Delete $INSTDIR\bin\libglademm-*.dll.lnk
   Delete $INSTDIR\bin\xml++-*.dll
-;  Delete $INSTDIR\bin\libxml++-*.dll.lnk
   
   Delete $INSTDIR\bin\sigc-*.pdb
   Delete $INSTDIR\bin\cairomm-*.pdb
@@ -1614,17 +1717,15 @@ continue:
   Delete $INSTDIR\bin\gtkmm-*.pdb
   Delete $INSTDIR\bin\pangomm-*.pdb
   Delete $INSTDIR\bin\glademm-*.pdb
-;  Delete $INSTDIR\bin\libglademm-*.pdb.lnk
   Delete $INSTDIR\bin\xml++-*.pdb
-;  Delete $INSTDIR\bin\libxml++-*.pdb.lnk
   
   RMDir $INSTDIR\bin
   
   ; share (non-development files)
-  RMDir /r $INSTDIR\share\doc\glib-2.18.1
-  RMDir /r $INSTDIR\share\doc\cairo_1.7.6-1_win32
-  RMDir /r $INSTDIR\share\doc\pango-1.22.0
-  RMDir /r $INSTDIR\share\doc\gtk+-2.14.3
+  RMDir /r $INSTDIR\share\doc\glib-2.22.2
+  RMDir /r $INSTDIR\share\doc\cairo_1.8.8-3_win32
+  RMDir /r $INSTDIR\share\doc\pango-1.26.0
+  RMDir /r $INSTDIR\share\doc\gtk+-2.18.3
   RMDir $INSTDIR\share\doc
 
   RMdir /r $INSTDIR\share\locale
@@ -1633,11 +1734,6 @@ continue:
 
   RMDir $INSTDIR\share
 
-  ; contrib
-  RMDir /r $INSTDIR\contrib\tiff
-  RMDir $INSTDIR\contrib
-
-#  
   ; GTKMM_BASEPATH environment variable
   Push "GTKMM_BASEPATH"
   Push $CONTEXT

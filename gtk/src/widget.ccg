@@ -278,9 +278,6 @@ void Widget::unset_cursor()
   gtk_widget_modify_cursor(gobj(), 0, 0);
 }
 
-bool Widget::is_toplevel() const
-  { return GTK_WIDGET_TOPLEVEL(gobj()); }
-
 bool Widget::has_no_window() const
   { return GTK_WIDGET_NO_WINDOW(gobj()); }
 
@@ -290,50 +287,57 @@ bool Widget::is_realized() const
 bool Widget::is_mapped() const
   { return GTK_WIDGET_MAPPED(gobj()); }
 
-bool Widget::is_visible() const
-  { return GTK_WIDGET_VISIBLE(gobj()); }
-
+_DEPRECATE_IFDEF_START
+//deprecated:
 bool Widget::is_drawable() const
-  { return GTK_WIDGET_DRAWABLE(gobj()); }
+{
+  return get_is_drawable();
+}
 
+//deprecated:
+bool Widget::receives_default() const
+{
+  return get_receives_default();
+}
+
+//deprecated:
+bool Widget::is_toplevel() const
+{
+  return get_is_toplevel();
+}
+
+//deprecated:
+bool Widget::is_visible() const
+  { return get_visible(); }
+
+//deprecated:
 bool Widget::sensitive() const
-  { return GTK_WIDGET_SENSITIVE(gobj()); }
+  { return get_sensitive(); }
+
+//deprecated:
+bool Widget::app_paintable() const
+  { return get_app_paintable(); }
+
+//deprecated:
+bool Widget::double_buffered() const
+  { return get_double_buffered(); }
+_DEPRECATE_IFDEF_END
+
+Allocation Widget::get_allocation() const
+{
+  Allocation allocation;
+  gtk_widget_get_allocation(const_cast<GtkWidget*>(gobj()), allocation.gobj());
+  return allocation;
+}
 
 bool Widget::parent_sensitive() const
   { return GTK_WIDGET_PARENT_SENSITIVE(gobj()); }
-
-bool Widget::is_sensitive() const
-  { return GTK_WIDGET_IS_SENSITIVE(gobj()); }
-
-bool Widget::can_focus() const
-  { return GTK_WIDGET_CAN_FOCUS(gobj()); }
-
-bool Widget::has_focus() const
-  { return GTK_WIDGET_HAS_FOCUS(gobj()); }
-
-bool Widget::can_default() const
-  { return GTK_WIDGET_CAN_DEFAULT(gobj()); }
-
-bool Widget::has_default() const
-  { return GTK_WIDGET_HAS_DEFAULT(gobj()); }
-
-bool Widget::has_grab() const
-  { return GTK_WIDGET_HAS_GRAB(gobj()); }
 
 bool Widget::rc_style() const
   { return GTK_WIDGET_RC_STYLE(gobj()); }
 
 bool Widget::is_composite_child() const
   { return GTK_WIDGET_COMPOSITE_CHILD(gobj()); }
-
-bool Widget::app_paintable() const
-  { return GTK_WIDGET_APP_PAINTABLE(gobj()); }
-
-bool Widget::receives_default() const
-  { return GTK_WIDGET_RECEIVES_DEFAULT(gobj()); }
-
-bool Widget::double_buffered() const
-  { return GTK_WIDGET_DOUBLE_BUFFERED(gobj()); }
 
 WidgetFlags Widget::get_flags() const
   { return static_cast<WidgetFlags>(GTK_WIDGET_FLAGS(gobj())); }
@@ -443,7 +447,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
   //if(self)
    //g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(self));
   #endif
-  
+
   Widget *const obj = dynamic_cast<Widget*>(
       Glib::ObjectBase::_get_current_wrapper(self));
 
@@ -452,7 +456,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
   // have to test for cpp_destruction_in_progress_ at this point.
 
   if(obj && !obj->_cpp_destruction_is_in_progress()) //When it should really be destroyed, we zero gobj_.
-  { 
+  {
     GtkWidget *const pWidget = obj->gobj();
     g_return_if_fail(pWidget == GTK_WIDGET(self));
 
@@ -460,9 +464,9 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
     // the nasty self-destroying behaviour of GTK+.  This applies to
     // any widget inside a GtkContainer on gtk_container_destroy()
     // See also Window_Class::dispose_vfunc_callback().
-  
+
     if(obj->referenced_) //Not managed
-    { 
+    {
       // GTKMM_LIFECYCLE
       // Remove the widget from its parent container so that it
       // won't be destroyed later by gtk_container_destroy().
@@ -476,7 +480,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
         #ifdef GLIBMM_DEBUG_REFCOUNTING
         g_warning("Widget_Class::dispose_vfunc_callback(): removing gobject_: %p from parent: %p", (void*)self, (void*)pWidget->parent);
         #endif
-  
+
         gtk_container_remove(GTK_CONTAINER(pWidget->parent), pWidget);
 
         #ifdef GLIBMM_DEBUG_REFCOUNTING
@@ -486,7 +490,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
       // Special case for GtkMenu because gtk_menu_attach_to_widget does
       // not set widget->parent but gtk_menu_item_destroy() destroys the menu
       // like gtk_container_destroy()
-      // Gtk::Menu does not use a parent widget because it must 
+      // Gtk::Menu does not use a parent widget because it must
       // be contained in its Gtk::Window so that it can be displayed as a popup.
       else if (GTK_IS_MENU(pWidget) && GTK_IS_MENU_ITEM(gtk_menu_get_attach_widget(GTK_MENU(pWidget))))
       {
@@ -496,7 +500,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
       #ifdef GLIBMM_DEBUG_REFCOUNTING
       g_warning("Widget_Class::dispose_vfunc_callback(): before gtk_widget_hide().");
       #endif
-        
+
       // Now hide the widget.  The C++ object must _not_ be accessed anymore
       // after this call, because a signal_hide() handler might delete it.
       gtk_widget_hide(pWidget);
@@ -504,7 +508,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
       #ifdef GLIBMM_DEBUG_REFCOUNTING
       g_warning("Widget_Class::dispose_vfunc_callback(): after gtk_widget_hide().");
       #endif
-      
+
       // GTKMM_LIFECYCLE
       return; // Prevent calling of normal C dispose vfunc (see below)
     }
@@ -512,7 +516,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
     #ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("Widget_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");
     #endif
-    
+
     // Always hide widgets on gtk_object_destroy(), regardless of whether
     // the widget is managed or not.  This is done for consistency so that
     // connecting to signal_hide() is guaranteed to work.
@@ -529,7 +533,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Widget_Class::dispose_vfunc_callback(): before calling base->dispose.");
   #endif
-        
+
   if(base->dispose)
     (*base->dispose)(self);
 
@@ -550,12 +554,12 @@ Glib::ustring Widget::drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>
 }
 
 void Widget::unset_shape_combine_mask()
-{            
+{
   gtk_widget_shape_combine_mask(gobj(), 0, 0, 0); /* See GTK+ docs */
 }
 
 void Widget::unset_input_shape_combine_mask()
-{            
+{
   gtk_widget_input_shape_combine_mask(gobj(), 0, 0, 0); /* See GTK+ docs */
 }
 
@@ -573,9 +577,8 @@ Requisition Widget::size_request() const
 
 Glib::RefPtr<Gdk::Pixmap> Widget::get_snapshot() const
 {
-  return Glib::wrap((GdkPixmapObject*)(gtk_widget_get_snapshot(const_cast<GtkWidget*>(gobj()), NULL)));
+  return Glib::wrap(reinterpret_cast<GdkPixmapObject*>(
+      gtk_widget_get_snapshot(const_cast<GtkWidget*>(gobj()), 0)), false);
 }
 
-
 } // namespace Gtk
-

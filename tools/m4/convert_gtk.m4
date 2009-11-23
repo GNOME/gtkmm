@@ -225,6 +225,7 @@ _CONVERSION(`GtkWidget*',`Gtk::Tree*',__RP2PD)
 _CONVERSION(`GtkWidget*',`ScrolledWindow*',`Glib::wrap((GtkScrolledWindow*)($3))')
 _CONVERSION(`GtkWidget*',`Window*',`Glib::wrap((GtkWindow*)($3))')
 _CONVERSION(`GtkWidget*',`TreeView*',`Glib::wrap((GtkTreeView*)($3))')
+_CONVERSION(`GtkWidget*',`ButtonBox*',`Glib::wrap((GtkButtonBox*)($3))')
 _CONVERSION(`GtkWidget*',`HButtonBox*',`Glib::wrap((GtkHButtonBox*)($3))')
 _CONVERSION(`GtkWidget*',`ComboDropDown*',`Glib::wrap((GtkList*)($3))')
 _CONVERSION(`GtkWidget*',`Image*',`Glib::wrap((GtkImage*)($3))')
@@ -528,6 +529,7 @@ _CONVERSION(`const Glib::RefPtr<RecentInfo>&',`GtkRecentInfo*',__CONVERT_REFPTR_
 _CONVERSION(`const Glib::RefPtr<const RecentInfo>&',`GtkRecentInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentInfo))
 
 _CONVERSION(`Glib::StringArrayHandle&',`gchar**',`const_cast<gchar**>(($3).data())')
+_CONVERSION(`Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 
 #RecentManager
@@ -629,6 +631,10 @@ _CONVERSION(`const Glib::RefPtr<Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_
 _CONVERSION(`const Glib::RefPtr<const Gio::File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<Gio::File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
+
+_CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
+
 
 
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')

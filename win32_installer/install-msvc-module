@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 # This installs MSVC-built libraries of a module such as libsigc++, glibmm or
 # gtkmm into the MSVC subdirectory
@@ -10,9 +10,10 @@ toolset=$2
 basepath=../..
 
 # TODO: Automatically find latest version of package: First try SVN checkout, then look for latest installed tarball version.
-if test $module = 'libsigc++'; then
+case $module in
+    libsigc++)
 	# Path to extracted tarball or SVN checkout
-	sourcepath="${basepath}/libsigc++-2.2.3"
+	sourcepath="${basepath}/libsigc++-2.2.4.2"
 	# Basename of DLL
 	basename='sigc'
 	# Version tag of DLL name
@@ -21,73 +22,88 @@ if test $module = 'libsigc++'; then
 	abiname='sigc++-2.0'
 	# Subdirectory in MSVC_Net2005
 	subdir='.'
-elif test $module = 'glibmm'; then
-	sourcepath="${basepath}/glibmm-2.20.0"
+	;;
+    glibmm)
+	sourcepath="${basepath}/glibmm-2.22.1"
 	basename='glibmm'
 	vername='2_4'
 	abiname='glibmm-2.4'
 	subdir='glibmm'
-elif test $module = 'giomm'; then
-	sourcepath="${basepath}/glibmm-2.20.0"
+	;;
+    giomm)
+	sourcepath="${basepath}/glibmm-2.22.1"
 	basename='giomm'
 	vername='2_4'
 	abiname='giomm-2.4'
 	subdir='giomm'
-elif test $module = 'cairomm'; then
-	sourcepath="${basepath}/cairomm-1.8.0"
+	;;
+    cairomm)
+	sourcepath="${basepath}/cairomm"
 	basename='cairomm'
 	vername='1_0'
 	abiname='cairomm-1.0'
 	subdir='cairomm'
-elif test $module = 'pangomm'; then
-	sourcepath="${basepath}/pangomm-2.24.0"
+	;;
+    pangomm)
+	sourcepath="${basepath}/pangomm-2.26.0"
 	basename='pangomm'
 	vername='1_4'
 	abiname='pangomm-1.4'
 	subdir='pangomm'
-elif test $module = 'atkmm'; then
-	sourcepath="${basepath}/gtkmm-2.16.0"
+	;;
+    atkmm)
+	sourcepath="${basepath}/gtkmm-2.18.2"
 	basename='atkmm'
 	vername='1_6'
 	abiname='atkmm-1.6'
 	subdir='atkmm'
-elif test $module = 'gdkmm'; then
-	sourcepath="${basepath}/gtkmm-2.16.0"
+	;;
+    gdkmm)
+	sourcepath="${basepath}/gtkmm-2.18.2"
 	basename='gdkmm'
 	vername='2_4'
 	abiname='gdkmm-2.4'
 	subdir='gdkmm'
-elif test $module = 'gtkmm'; then
-	sourcepath="${basepath}/gtkmm-2.16.0"
+	;;
+    gtkmm)
+	sourcepath="${basepath}/gtkmm-2.18.2"
 	basename='gtkmm'
 	vername='2_4'
 	abiname='gtkmm-2.4'
 	subdir='gtkmm'
-elif test $module = 'libglademm'; then
+	;;
+    libglademm)
 	sourcepath="${basepath}/libglademm-2.6.7"
 	basename='glademm'
 	vername='2_4'
 	abiname='glademm-2.4'
 	subdir='libglademm'
-elif test $module = 'libxml++'; then
-	sourcepath="${basepath}/libxml++-2.26.0"
+	;;
+    libxml++)
+	sourcepath="${basepath}/libxml++-2.26.1"
 	basename='xml++'
 	vername='2_6'
 	abiname='libxml++-2.6'
 	subdir='libxml++'
-else
+	;;
+    *)
 	echo "Module $module not known"
-	exit -1
-fi
+	exit 1
+	;;
+esac
 
-if test $toolset = 'vc80'; then
+case $toolset in
+    vc80)
 	vcdir='MSVC_Net2005'
-elif test $toolset = 'vc90'; then
+	;;
+    vc90)
 	vcdir='MSVC_Net2008'
-else
+	;;
+    *)
 	echo "Toolset $toolset not known"
-	exit -1
-fi
+	exit 1
+	;;
+esac
 
 #echo "Source Path: $sourcepath"
 #echo "Basename: $basename"
@@ -96,18 +112,18 @@ fi
 
 targetpath=MSVC
 
-mkdir -p ${targetpath} || exit -1
-cp $sourcepath/$vcdir/$subdir/Release/${basename}-${toolset}-${vername}.dll $targetpath || exit -1
-cp $sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.dll $targetpath || exit -1
-cp $sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.pdb $targetpath || exit -1
+mkdir -p "${targetpath}" || exit 1
+cp "$sourcepath/$vcdir/$subdir/Release/${basename}-${toolset}-${vername}.dll" "$targetpath" || exit 1
+cp "$sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.dll" "$targetpath" || exit 1
+cp "$sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.pdb" "$targetpath" || exit 1
 
-mkdir -p ${targetpath}/lib || exit -1
-cp $sourcepath/$vcdir/$subdir/Release/${basename}-${toolset}-${vername}.lib $targetpath || exit -1
-cp $sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.lib $targetpath || exit -1
+mkdir -p "${targetpath}/lib" || exit 1
+cp "$sourcepath/$vcdir/$subdir/Release/${basename}-${toolset}-${vername}.lib" "$targetpath" || exit 1
+cp "$sourcepath/$vcdir/$subdir/Debug/${basename}-${toolset}-d-${vername}.lib" "$targetpath" || exit 1
 
 # Configfile is used from mingw, thus commented out:
 #configfile=$sourcepath/MSVC_Net2005/$subdir/*config.h
 #if test -f configfile; then
-#	mkdir -p $targetpath/lib/${abiname}/include/ || exit -1
-#	cp $configfile $targetpath/lib/${abiname}/include/ || exit -1
+#	mkdir -p $targetpath/lib/${abiname}/include/ || exit 1
+#	cp $configfile $targetpath/lib/${abiname}/include/ || exit 1
 #fi
