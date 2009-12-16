@@ -34,7 +34,7 @@
 !define PRODUCT_VERSION_MICRO "@GTKMM_MICRO_VERSION@"
 !endif
 !ifndef PRODUCT_VERSION_INSTALLER
-!define PRODUCT_VERSION_INSTALLER "1"
+!define PRODUCT_VERSION_INSTALLER "2"
 !endif
 
 !ifdef PRODUCT_API_VERSION
@@ -141,6 +141,7 @@ Var USE_GTKDIR
 !insertmacro MUI_PAGE_LICENSE "lgpl.txt"
 Page custom CustomPageSetContext
 !define MUI_PAGE_CUSTOMFUNCTION_PRE CustomSetTargetDirectory
+!define MUI_DIRECTORYPAGE_TEXT_TOP  "$(GTKMM_DIRECTORYPAGE_HINT)"
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom CustomPagePathQuestion
 !ifndef RUNTIME_ONLY
@@ -178,7 +179,10 @@ Page custom CustomPagePathQuestion
 
 Name "${PRODUCT_FULLNAME} ${PRODUCT_VERSION}"
 OutFile "${INSTALLER_NAME}"
-InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+;InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+; Use a default path which has no spaces in it, pkg-config fails otherwise.
+; see http://lists.freedesktop.org/archives/pkg-config/2007-September/000224.html
+InstallDir "C:\${PRODUCT_NAME}"
 ; Get installation folder from registry if available
 InstallDirRegKey HKLM Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION} "Path"
 
@@ -257,10 +261,10 @@ Section "Runtime" SecGTKRuntime
   ; TODO: Add others... libiconv, fontconfig, libxml2, tiff... however note
   ; that some contain devel-only things.
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-2.22.2
+  File /r share\doc\glib-2.22.3
   File /r share\doc\cairo_1.8.8-3_win32
-  File /r share\doc\pango-1.26.0
-  File /r share\doc\gtk+-2.18.3
+  File /r share\doc\pango-1.26.1
+  File /r share\doc\gtk+-2.18.5
 
   SetOutPath $INSTDIR\share
   File /r share\locale
@@ -445,6 +449,7 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\libpng.pc
   File lib\pkgconfig\libpng12.pc
   File lib\pkgconfig\freetype2.pc
+  File lib\pkgconfig\fontconfig.pc
   File lib\pkgconfig\glib-2.0.pc
   File lib\pkgconfig\gmodule-2.0.pc
   File lib\pkgconfig\gmodule-no-export-2.0.pc
@@ -472,9 +477,9 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\gail.pc
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-dev-2.22.2
-  File /r share\doc\pango-dev-1.26.0
-  File /r share\doc\gtk+-dev-2.18.3
+  File /r share\doc\glib-dev-2.22.3
+  File /r share\doc\pango-dev-1.26.1
+  File /r share\doc\gtk+-dev-2.18.5
 
   SetOutPath $INSTDIR\share\xml
   File /r share\xml\libglade
@@ -752,6 +757,7 @@ Section "Development" SecPangommDevelopment
 
   SetOutPath $INSTDIR\lib
   File lib\libpangomm-1.4.dll.a
+  File /r lib\pangomm-1.4
   
   File MSVC\pangomm-vc80-1_4.lib
   File MSVC\pangomm-vc90-1_4.lib
@@ -1240,6 +1246,7 @@ continue:
   Delete "$SMPROGRAMS\$ICONS_GROUP\Read Me.lnk"
 
 !ifndef RUNTIME_ONLY
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libxml2 Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glib Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gobject Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\cairo Reference Manual.lnk"
@@ -1248,6 +1255,7 @@ continue:
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gdk-pixbuf Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\GTK+ Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglade Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libgail-util Reference Manual.lnk"
 
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glibmm Reference Manual.lnk"
@@ -1409,6 +1417,7 @@ continue:
   RMDir /r $INSTDIR\lib\sigc++-2.0
   RMDir /r $INSTDIR\lib\glibmm-2.4
   RMDir /r $INSTDIR\lib\giomm-2.4
+  RMDir /r $INSTDIR\lib\pangomm-1.4
   RMDir /r $INSTDIR\lib\gdkmm-2.4
   RMDir /r $INSTDIR\lib\gtkmm-2.4
   RMDir /r $INSTDIR\lib\libglademm-2.4
@@ -1510,6 +1519,7 @@ continue:
   Delete $INSTDIR\lib\pkgconfig\libpng.pc
   Delete $INSTDIR\lib\pkgconfig\libpng12.pc
   Delete $INSTDIR\lib\pkgconfig\freetype2.pc
+  Delete $INSTDIR\lib\pkgconfig\fontconfig.pc
   Delete $INSTDIR\lib\pkgconfig\glib-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gmodule-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gmodule-no-export-2.0.pc
@@ -1552,9 +1562,9 @@ continue:
 
   RMDir /r $INSTDIR\share\doc\libiconv
 
-  RMDir /r $INSTDIR\share\doc\glib-dev-2.22.2
-  RMDir /r $INSTDIR\share\doc\pango-dev-1.26.0
-  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.18.3
+  RMDir /r $INSTDIR\share\doc\glib-dev-2.22.3
+  RMDir /r $INSTDIR\share\doc\pango-dev-1.26.1
+  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.18.5
 
   RMDir /r $INSTDIR\share\xml\libglade
   RMDir $INSTDIR\share\xml
@@ -1722,10 +1732,10 @@ continue:
   RMDir $INSTDIR\bin
   
   ; share (non-development files)
-  RMDir /r $INSTDIR\share\doc\glib-2.22.2
+  RMDir /r $INSTDIR\share\doc\glib-2.22.3
   RMDir /r $INSTDIR\share\doc\cairo_1.8.8-3_win32
-  RMDir /r $INSTDIR\share\doc\pango-1.26.0
-  RMDir /r $INSTDIR\share\doc\gtk+-2.18.3
+  RMDir /r $INSTDIR\share\doc\pango-1.26.1
+  RMDir /r $INSTDIR\share\doc\gtk+-2.18.5
   RMDir $INSTDIR\share\doc
 
   RMdir /r $INSTDIR\share\locale

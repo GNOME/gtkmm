@@ -25,6 +25,10 @@ LangString GTKMM_ADD_PATH               ${LANG_SIMPCHINESE} \
 LangString GTKMM_NEWER                  ${LANG_SIMPCHINESE} \
 "${PRODUCT_NAME} ($R1) 已经在您的系统上安装了，并且新于本发布版本(${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER})."
 
+;; TODO: This needs to be translated!
+LangString GTKMM_DIRECTORYPAGE_HINT     ${LANG_SIMPCHINESE} \
+"Setup will install ${PRODUCT_FULLNAME} ${PRODUCT_VERSION} in the following folder. To install in a different folder, click Browse and select another folder. Click Next to continue.$\r$\n$\r$\nIf you intend to use MinGW, then it is not recommended to use a path that has space characters in it because this will break pkg-config."
+
 LangString GTKMM_RIGHTS_INSTALL               ${LANG_SIMPCHINESE} \
 "安装于"
 LangString GTKMM_RIGHTS_ANYONE               ${LANG_SIMPCHINESE} \
