@@ -451,6 +451,7 @@ _CONVERSION(`const Glib::RefPtr<Clipboard>&',`GtkClipboard*',__CONVERT_REFPTR_TO
 #_CONVERSION(`GtkClipboard*',`Gtk::Clipboard&',`Glib::wrap($3, true)')
 
 _CONVERSION(`SelectionData',`GtkSelectionData*', `($3).gobj()')
+_CONVERSION(`const SelectionData&',`const GtkSelectionData*', __FR2P)
 _CONVERSION(`const SelectionData&',`GtkSelectionData*', __FCR2P)
 _CONVERSION(`SelectionData&',`GtkSelectionData*', __FR2P)
 #_CONVERSION(`GtkSelectionData*',`SelectionData', `Gtk::SelectionData(($3), true)')
