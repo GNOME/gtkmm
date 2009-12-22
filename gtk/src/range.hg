@@ -127,9 +127,23 @@ public:
   _WRAP_PROPERTY("fill-level", double)
   
 protected:
-#m4 _CONVERSION(`Gtk::Border*',`GtkBorder*',($3))
-#m4 _CONVERSION(`GtkBorder*',`Gtk::Border*',($3))
-  _WRAP_VFUNC(void get_range_border(Gtk::Border* border) const, get_range_border)
+  virtual void get_range_border_vfunc(Gtk::Border& border) const;
+#m4begin
+dnl /* get_range_border_vfunc is wrapped partially by hand (C callback is
+dnl  * custom), because this vfunc is a getter with a "return value" as
+dnl  * parameter. This complicates things a bit - we cannot use Glib::wrap in
+dnl  * obj->get_range_border_vfunc(Glib::wrap(c_border));
+dnl  * because compiler complains about passing `Gtk::Border', when expecting
+dnl  * `Gtk::Border&'. Using `Gtk::Border(c_border)' also does not work, because
+dnl  * it is making a copy of passed C border and, when went out of scope,
+dnl  * destroys it without copying contents to a C border. See:
+dnl  * https://bugzilla.gnome.org/show_bug.cgi?id=603926#c3
+dnl  */
+dnl // _VFUNC_H is not used - prototype is written above.
+  _VFUNC_PH(get_range_border, void, `GtkRange* self, GtkBorder* border')
+  _VFUNC_CC(get_range_border_vfunc, get_range_border, void, void, `Gtk::Border& border', `border.gobj()', 1)
+dnl // _VFUNC_PCC is not used - custom C callback is implemented in range.ccg.
+#m4end
 };
 
 } // namespace Gtk
