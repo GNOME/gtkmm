@@ -19,6 +19,7 @@
 #include <gtkmm/toolitem.h>
 #include <gtkmm/orientable.h>
 #include <gtkmm/adjustment.h>
+#include <gtkmm/toolitemgroup.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/container_p.h)
@@ -28,7 +29,18 @@ namespace Gtk
 
 _WRAP_ENUM(ToolPaletteDragTargets, GtkToolPaletteDragTargets)
 
-/** TODO
+/** A ToolPalette allows you to add ToolItems to a palette-like container with 
+ * various categories and drag and drop support.
+ *
+ * ToolItems cannot be added directly to a ToolPalette - instead they are added 
+ * to a ToolItemGroup which can than be added to a ToolPalette. To add a 
+ * ToolItemGroup to a ToolPalette, use Gtk::Container::add(). 
+ *
+ * The easiest way to use drag and drop with ToolPalette is to call 
+ * add_drag_dest() with the desired drag source palette and the desired drag 
+ * target widget. Then get_drag_item() can be used to get the dragged item in 
+ * the "drag-data-received" signal handler of the drag target.
+ *
  * @ingroup Widgets
  * @ingroup Containers
  */
@@ -41,13 +53,15 @@ class ToolPalette
 public:
   _CTOR_DEFAULT()
 
-  _WRAP_METHOD(void set_group_position(Widget& group, int position), gtk_tool_palette_set_group_position)
-  _WRAP_METHOD(void set_exclusive(Widget& group, bool exclusive), gtk_tool_palette_set_exclusive)
-  _WRAP_METHOD(void set_expand(Widget& group, bool expand = true), gtk_tool_palette_set_expand)
+//This conversion is needed because of https://bugzilla.gnome.org/show_bug.cgi?id=567729#c37
+#m4 _CONVERSION(`ToolItemGroup&',`GtkWidget*',`GTK_WIDGET(($3).gobj())')
+  _WRAP_METHOD(void set_group_position(ToolItemGroup& group, int position), gtk_tool_palette_set_group_position)
+  _WRAP_METHOD(void set_exclusive(ToolItemGroup& group, bool exclusive), gtk_tool_palette_set_exclusive)
+  _WRAP_METHOD(void set_expand(ToolItemGroup& group, bool expand = true), gtk_tool_palette_set_expand)
 
-  _WRAP_METHOD(int get_group_position(Widget& group) const, gtk_tool_palette_get_group_position)
-  _WRAP_METHOD(bool get_exclusive(Widget& group) const, gtk_tool_palette_get_exclusive)
-  _WRAP_METHOD(bool get_expand(Widget& group), gtk_tool_palette_get_expand)
+  _WRAP_METHOD(int get_group_position(ToolItemGroup& group) const, gtk_tool_palette_get_group_position)
+  _WRAP_METHOD(bool get_exclusive(ToolItemGroup& group) const, gtk_tool_palette_get_exclusive)
+  _WRAP_METHOD(bool get_expand(ToolItemGroup& group), gtk_tool_palette_get_expand)
 
   _WRAP_METHOD(void set_icon_size(IconSize icon_size), gtk_tool_palette_set_icon_size)
   _WRAP_METHOD(void unset_icon_size(), gtk_tool_palette_unset_icon_size)
@@ -58,8 +72,15 @@ public:
   _WRAP_METHOD(ToolbarStyle get_style() const, gtk_tool_palette_get_style)
 
   _WRAP_METHOD(ToolItem* get_drop_item(int x, int y), gtk_tool_palette_get_drop_item)
-  _WRAP_METHOD(Widget* get_drop_group(int x, int y), gtk_tool_palette_get_drop_group)
-  _WRAP_METHOD(Widget* get_drag_item(const SelectionData& selection), gtk_tool_palette_get_drag_item )
+
+//This conversion is needed because of https://bugzilla.gnome.org/show_bug.cgi?id=567729#c37
+#m4 _CONVERSION(`GtkWidget*',`ToolItemGroup*',`Glib::wrap(GTK_TOOL_ITEM_GROUP($3))')
+#m4 _CONVERSION(`GtkWidget*',`const ToolItemGroup*',`Glib::wrap(GTK_TOOL_ITEM_GROUP($3))')
+  _WRAP_METHOD(ToolItemGroup* get_drop_group(int x, int y), gtk_tool_palette_get_drop_group)
+  _WRAP_METHOD(const ToolItemGroup* get_drop_group(int x, int y) const, gtk_tool_palette_get_drop_group, constversion)
+
+  _WRAP_METHOD(ToolItem* get_drag_item(const SelectionData& selection), gtk_tool_palette_get_drag_item)
+  _WRAP_METHOD(const ToolItem* get_drag_item(const SelectionData& selection) const, gtk_tool_palette_get_drag_item, constversion)
 
   _WRAP_METHOD(void set_drag_source(ToolPaletteDragTargets targets), gtk_tool_palette_set_drag_source)
   _WRAP_METHOD(void add_drag_dest(Gtk::Widget& widget, DestDefaults flags, ToolPaletteDragTargets targets, Gdk::DragAction actions), gtk_tool_palette_add_drag_dest)
