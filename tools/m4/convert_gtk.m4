@@ -511,8 +511,10 @@ _CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
 _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 
 
-_CONVERSION(`const Border&',`const GtkBorder*',`&($3)')
-_CONVERSION(`const GtkBorder*',`Border',`*($3)')
+_CONVERSION(`Gtk::Border&',`GtkBorder*',__FR2P)
+_CONVERSION(`GtkBorder*',`Gtk::Border&',`Glib::wrap($3)')
+_CONVERSION(`const Border&',`const GtkBorder*',__FR2P)
+_CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))')
 
 #RecentFilter
 _CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
