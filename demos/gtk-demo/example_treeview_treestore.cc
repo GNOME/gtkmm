@@ -333,7 +333,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRenderer* pRenderer = pColumn->get_first_cell_renderer();
+      Gtk::CellRenderer* pRenderer = pColumn->get_first_cell();
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
@@ -350,7 +350,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
+      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
@@ -377,7 +377,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
+      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
@@ -402,7 +402,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
+      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
@@ -429,7 +429,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
+      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
@@ -454,7 +454,7 @@ void Example_TreeView_TreeStore::add_columns()
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
+      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
       #else
