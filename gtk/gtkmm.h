@@ -65,7 +65,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/comboboxentrytext.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/container.h>
-#include <gtkmm/curve.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/editable.h>
@@ -92,7 +91,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/image.h>
 #include <gtkmm/imagemenuitem.h>
 #include <gtkmm/infobar.h>
-#include <gtkmm/inputdialog.h>
 #include <gtkmm/item.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/invisible.h>
