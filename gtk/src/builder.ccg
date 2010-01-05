@@ -20,13 +20,14 @@
 
 #include <gtk/gtk.h>
 
+#ifdef GLIBMM_VFUNCS_ENABLED
 // Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular 
 // GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
 static GType
 get_type_from_name_vfunc_callback(GtkBuilder*, const char* type_name)
 {
   if (!type_name)
-	return G_TYPE_INVALID;
+    return G_TYPE_INVALID;
 
   // See if there is a gtkmm version of the gclass:
   Glib::ustring classname_prefixed ("gtkmm__"); // gtkmm uses a prefix
@@ -42,6 +43,7 @@ get_type_from_name_vfunc_callback(GtkBuilder*, const char* type_name)
 
   return gtype;
 }
+#endif /* !GLIBMM_VFUNCS_ENABLED */
 
 namespace Gtk
 {
@@ -79,7 +81,7 @@ Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename, con
     return Glib::RefPtr<Builder>();
 }
 #else
-Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename, const char* object_id, std::auto_ptr<Glib::Error> error)
+Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename, const char* object_id, std::auto_ptr<Glib::Error>& error)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
   if(builder->add_from_file(filename, object_id, error))
@@ -153,8 +155,10 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
 }
 #endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 //static
-Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, const char* object_id)
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const char* object_id)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
   if(builder->add_from_string(buffer, object_id))
@@ -162,9 +166,23 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, c
   else
     return Glib::RefPtr<Builder>();
 }
+#else
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const char* object_id,
+                                                  std::auto_ptr<Glib::Error>& error)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, object_id, error))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 //static
-Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, const Glib::ustring& object_id)
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const Glib::ustring& object_id)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
   if(builder->add_from_string(buffer, object_id))
@@ -172,9 +190,23 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, c
   else
     return Glib::RefPtr<Builder>();
 }
+#else
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const Glib::ustring& object_id,
+                                                  std::auto_ptr<Glib::Error>& error)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, object_id, error))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 //static
-Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, const Glib::StringArrayHandle& object_ids)
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const Glib::StringArrayHandle& object_ids)
 {
   Glib::RefPtr<Builder> builder = Builder::create();
   if(builder->add_from_string(buffer, object_ids))
@@ -182,6 +214,18 @@ Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer, c
   else
     return Glib::RefPtr<Builder>();
 }
+#else
+Glib::RefPtr<Builder> Builder::create_from_string(const Glib::ustring& buffer,
+                                                  const Glib::StringArrayHandle& object_ids,
+                                                  std::auto_ptr<Glib::Error>& error)
+{
+  Glib::RefPtr<Builder> builder = Builder::create();
+  if(builder->add_from_string(buffer, object_ids, error))
+    return builder;
+  else
+    return Glib::RefPtr<Builder>();
+}
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool Builder::add_from_file(const std::string& filename, const char* object_id)

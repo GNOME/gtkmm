@@ -27,6 +27,9 @@ LangString GTKMM_ADD_PATH               ${LANG_ENGLISH} \
 LangString GTKMM_NEWER                  ${LANG_ENGLISH} \
 "${PRODUCT_NAME} ($R1) is already installed on your system, and is newer than this distribution (${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER})."
 
+LangString GTKMM_DIRECTORYPAGE_HINT     ${LANG_ENGLISH} \
+"Setup will install ${PRODUCT_FULLNAME} ${PRODUCT_VERSION} in the following folder. To install in a different folder, click Browse and select another folder. Click Next to continue.$\r$\n$\r$\nIf you intend to use MinGW, then it is not recommended to use a path that has space characters in it because this will break pkg-config."
+
 LangString GTKMM_RIGHTS_INSTALL               ${LANG_ENGLISH} \
 "Install for"
 LangString GTKMM_RIGHTS_ANYONE               ${LANG_ENGLISH} \
