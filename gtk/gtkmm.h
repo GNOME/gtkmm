@@ -109,6 +109,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/misc.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/object.h>
+#include <gtkmm/offscreenwindow.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
 #include <gtkmm/pagesetupunixdialog.h>
