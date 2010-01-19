@@ -96,6 +96,11 @@ _CONVERSION(`const Glib::RefPtr<const Font>&',`PangoFont*',__CONVERT_CONST_REFPT
 #_CONVERSION(`const Glib::RefPtr<const Font>&',`PangoFont*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Pango::Font>&',`PangoFont*',__CONVERT_CONST_REFPTR_TO_P_SUN(Pango::Font))
 
+_CONVERSION(`PangoFontFace*',`Glib::RefPtr<Pango::FontFace>',Glib::wrap($3))
+_CONVERSION(`PangoFontFace*',`Glib::RefPtr<const Pango::FontFace>',Glib::wrap($3))
+_CONVERSION(`PangoFontFamily*',`Glib::RefPtr<Pango::FontFamily>',Glib::wrap($3))
+_CONVERSION(`PangoFontFamily*',`Glib::RefPtr<const Pango::FontFamily>',Glib::wrap($3))
+
 _CONVERSION(`PangoFontMap*',`Glib::RefPtr<FontMap>',Glib::wrap($3))
 _CONVERSION(`PangoFontMap*',`Glib::RefPtr<const FontMap>',Glib::wrap($3))
 _CONVERSION(`const Glib::RefPtr<FontMap>&',`PangoFontMap*',__CONVERT_REFPTR_TO_P)
