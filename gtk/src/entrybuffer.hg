@@ -1,0 +1,128 @@
+/* $Id: entrybuffer.hg,v 1.20 2006/11/20 09:19:49 murrayc Exp $ */
+
+/* Copyright(C) 1998-2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or(at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+// This is for including the config header before any code (such as
+// the #ifndef GTKMM_DISABLE_DEPRECATED in deprecated classes) is generated:
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <gtkmm/object.h>
+#include <gtkmm/texttagtable.h>
+#include <gtkmm/textchildanchor.h>
+#include <gtkmm/textmark.h>
+#include <gtkmm/textiter.h>
+#include <gtkmm/clipboard.h>
+#include <gdkmm/pixbuf.h>
+#include <gtkmmconfig.h>
+#include <utility>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+class TextMark;
+class TextIter;
+
+/** A Text buffer for the Entry widget.
+ *
+ * The EntryBuffer class contains the actual text displayed in an Entry widget.
+ *
+ * A single EntryBuffer object can be shared by multiple Entry
+ * widgets which will then share the same text content, but not the cursor
+ * position, visibility attributes, icon etc.
+ *
+ * EntryBuffer may be derived from. Such a derived class might allow
+ * text to be stored in an alternate location, such as non-pageable memory,
+ * useful in the case of important passwords. Or a derived class could 
+ * integrate with an application's concept of undo/redo.
+ *
+ * @newin2p20
+ */
+class EntryBuffer : public Glib::Object
+{
+   _CLASS_GOBJECT(EntryBuffer, GtkEntryBuffer, GTK_TEXT_BUFFER, Glib::Object, GObject)
+protected:
+
+  /** Create a new EntryBuffer object with no text.
+   */
+  _CTOR_DEFAULT()
+
+  /** Create a new EntryBuffer object.
+   *
+   * @param text Initial buffer text.
+   */
+  explicit EntryBuffer(const Glib::ustring& text);
+
+public:
+  /** Create a new EntryBuffer object with no text.
+   */
+  _WRAP_CREATE()
+
+  /** Create a new EntryBuffer object.
+   *
+   * @param text Initial buffer text.
+   */
+  _WRAP_CREATE(const Glib::ustring& text)
+
+  _WRAP_METHOD(gsize get_bytes() const, gtk_entry_buffer_get_bytes)
+  _WRAP_METHOD(guint get_length() const, gtk_entry_buffer_get_length)
+  _WRAP_METHOD(Glib::ustring get_text() const, gtk_entry_buffer_get_text)
+
+  /** Sets the text in the buffer.
+   * This is roughly equivalent to calling delete_text() and insert_text().
+   *
+   * @param text The text to set in the buffer.
+   */
+  void set_text(const Glib::ustring& text);
+  _IGNORE(gtk_entry_buffer_set_text)
+
+  _WRAP_METHOD(void set_max_length(int max_length), gtk_entry_buffer_set_max_length)
+  _WRAP_METHOD(int get_max_length() const, gtk_entry_buffer_get_max_length)
+
+  /** Inserts @a text into the contents of the buffer, at position @a position.
+   *
+   * @param position The position at which to insert text.
+   * @param text The text to insert into the buffer.
+   * @result The number of characters actually inserted.
+   */
+  guint insert_text(guint position, const Glib::ustring& text);
+  _IGNORE(gtk_entry_buffer_insert_text)
+
+  _WRAP_METHOD(guint delete_text(guint position, int n_chars), gtk_entry_buffer_delete_text)
+
+  /** Used when deriving from EntryBuffer.
+   * @param position Position at which text was inserted.
+   * @param text Text that was inserted.
+   */
+  void emit_inserted_text(guint position, const Glib::ustring& text);
+  _IGNORE(gtk_entry_buffer_emit_inserted_text)
+
+  _WRAP_METHOD(void emit_deleted_text(guint position, guint n_chars),  gtk_entry_buffer_emit_deleted_text)
+
+  _WRAP_SIGNAL(void inserted_text(guint position, const gchar* chars, guint n_chars), "inserted-text")
+  _WRAP_SIGNAL(void deleted_text(guint position, guint n_chars), "deleted-text")
+
+  _WRAP_PROPERTY("text", Glib::ustring)
+  _WRAP_PROPERTY("length", guint)
+  _WRAP_PROPERTY("max-length", int)
+};
+
+} // namespace Gtk
+
