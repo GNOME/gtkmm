@@ -412,6 +412,10 @@ _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<ChildAnchor>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<TextChildAnchor>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<const TextChildAnchor>',`Glib::wrap($3)')
 
+_CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<EntryBuffer>',`Glib::wrap($3)')
+_CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<const EntryBuffer>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<EntryBuffer>&',`GtkEntryBuffer*',__CONVERT_REFPTR_TO_P)
+
 # Tree:
 #_CONVERSION(`const TreeIter&',`const GtkTreeIter*',__FR2P)
 _CONVERSION(`const iterator&',`const GtkTreeIter*',__FR2P)
