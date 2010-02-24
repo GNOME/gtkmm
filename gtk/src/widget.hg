@@ -233,6 +233,8 @@ public:
   _WRAP_METHOD(bool get_has_window() const, gtk_widget_get_has_window)
   _WRAP_METHOD(bool get_is_toplevel() const, gtk_widget_is_toplevel)
   _WRAP_METHOD(bool get_is_drawable() const, gtk_widget_is_drawable)
+  _WRAP_METHOD(bool get_realized() const, gtk_widget_get_realized)
+  _WRAP_METHOD(bool get_mapped() const, gtk_widget_get_mapped)
   _WRAP_METHOD(void set_app_paintable(bool app_paintable = true), gtk_widget_set_app_paintable)
   _WRAP_METHOD(bool get_app_paintable() const, gtk_widget_get_app_paintable)
   _WRAP_METHOD(void set_double_buffered(bool double_buffered = true), gtk_widget_set_double_buffered)
@@ -599,13 +601,28 @@ public:
 
   _WRAP_METHOD(bool is_composited() const, gtk_widget_is_composited)
 
-
   _IGNORE(gtk_widget_get_action) //deprecated
   _WRAP_METHOD(Glib::RefPtr<Action> get_related_action(), gtk_widget_get_related_action, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Action> get_related_action() const, gtk_widget_get_related_action, refreturn, constversion)
 
   _MEMBER_GET(saved_state, saved_state, Gtk::StateType, guint8)
-  _MEMBER_GET(requisition, requisition, Requisition, GtkRequisition)
+
+  //TODO: Move this to protected when we can break API:
+  /**  Retrieves the widget's requisition.
+   *
+   * This method should only be used by widget implementations in
+   * order to discover whether the widget's requisition has actually
+   * changed after some internal state change (so that they can call
+   * queue_resize() instead of queue_draw()).
+   *
+   * Normally, size_request() should be used.
+   *
+   * @result The widget's requisition.
+   *
+   * @newin2p20
+   */
+  Requisition get_requisition() const;
+  _IGNORE(gtk_widget_get_requisition)
 
 
   _WRAP_SIGNAL(void show(),"show")
@@ -871,7 +888,7 @@ dnl
   _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint info, guint time), "drag_data_received")
 
   //_WRAP_SIGNAL(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", ifdef GTKMM_ATKMM_ENABLED, refreturn, deprecated)
-  
+
   _WRAP_SIGNAL(void screen_changed(const Glib::RefPtr<Gdk::Screen>& previous_screen), "screen_changed")
 
   _WRAP_SIGNAL(void composited_changed(), "composited_changed", no_default_handler)
@@ -931,6 +948,10 @@ protected:
 
   _WRAP_METHOD(void realize(), gtk_widget_realize)
   _WRAP_METHOD(void unrealize(), gtk_widget_unrealize)
+
+  _WRAP_METHOD(void set_mapped(bool mapped = true), gtk_widget_set_mapped)
+  _WRAP_METHOD(void set_realized(bool realized = true), gtk_widget_set_realized)
+  _WRAP_METHOD(void style_attach(), gtk_widget_style_attach)
 
   _WRAP_METHOD(void get_child_requisition(Requisition& requisition) const, gtk_widget_get_child_requisition)
 
