@@ -411,6 +411,8 @@ _CONVERSION(`const Glib::RefPtr<TextBuffer::ChildAnchor>&',`GtkTextChildAnchor*'
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<ChildAnchor>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<TextChildAnchor>',`Glib::wrap($3)')
 _CONVERSION(`GtkTextChildAnchor*',`Glib::RefPtr<const TextChildAnchor>',`Glib::wrap($3)')
+_CONVERSION(`GtkSizeGroup*',`Glib::RefPtr<SizeGroup>',`Glib::wrap($3)')
+_CONVERSION(`GtkSizeGroup*',`Glib::RefPtr<const SizeGroup>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<EntryBuffer>',`Glib::wrap($3)')
 _CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<const EntryBuffer>',`Glib::wrap($3)')
