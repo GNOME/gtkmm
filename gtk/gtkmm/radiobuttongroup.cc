@@ -61,7 +61,7 @@ void RadioButtonGroup::add(RadioMenuItem& item)
   item.set_group(*this);
 
   //probably not necessary:
-  group_ = item.gobj()->group;
+  group_ = gtk_radio_menu_item_get_group(item.gobj());
 }
 
 void RadioButtonGroup::add(const Glib::RefPtr<RadioAction>& item)
