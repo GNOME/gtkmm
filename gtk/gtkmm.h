@@ -21,6 +21,45 @@
 #ifndef _GTKMM_H
 #define _GTKMM_H
 
+/** @mainpage gtkmm Reference Manual
+ *
+ * @section description Description
+ *
+ * gtkmm is the official C++ interface for the popular GUI library GTK+.
+ * Highlights include typesafe callbacks, and a comprehensive set of widgets
+ * that are easily extensible via inheritance.
+ *
+ * @section features Features
+ *
+ * - Use inheritance to derive custom widgets.
+ * - Type-safe signal handlers, in standard C++.
+ * - Polymorphism.
+ * - Use of Standard C++ Library, including strings, containers, and iterators.
+ * - Full internationalisation with UTF8.
+ * - Complete C++ memory management.
+ *   - Object composition.
+ *   - Automatic deallocation of dynamically allocated widgets.
+ * - Full use of C++ namespaces.
+ * - No macros.
+ * - Cross-platform: Linux (gcc), FreeBSD (gcc), NetBSD (gcc), Solaris (gcc,
+ *   Forte), Win32 (gcc, MSVC++ .Net 2003), MacOS X (gcc), others.
+ * - Free software and free of cost for both Open Source and proprietary
+ *   development.
+ * - Discussed, designed and implemented in public.
+ *
+ * @section license License
+ *
+ * gtkmm is free software distributed under the GNU Lesser General Public
+ * License (LGPL).
+ *
+ * @section releases Release Schedule
+ *
+ * gtkmm follows the official GNOME Platform Bindings release schedule. This
+ * guarantees API/ABI-stability and new releases on a predictable schedule,
+ * delivering C++ API for the underlying GTK+ and GNOME APIs as soon as
+ * possible.
+ */
+
 /* Gtkmm version.  */
 extern const int gtkmm_major_version;
 extern const int gtkmm_minor_version;
