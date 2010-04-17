@@ -1,4 +1,3 @@
-/* $Id$ */
 /* gtkmm - a C++ wrapper for the Gtk toolkit
  *
  * Copyright 1999-2002 The gtkmm Development Team
@@ -29,35 +28,52 @@
  * Highlights include typesafe callbacks, and a comprehensive set of widgets
  * that are easily extensible via inheritance.
  *
+ * For instance, see @ref Widgets, @ref Dialogs, @ref TreeView "TreeView" and
+ * @ref TextView "TextView".
+ *
+ * See also the <em>Programming with gtkmm</em> book:
+ * http://library.gnome.org/devel/gtkmm-tutorial/stable/
+ *
  * @section features Features
  *
+ * - GTK+’s mature, capable set of @ref widgets Widgets. See the GTK+ website
+ *   for more information: http://www.gtk.org/
  * - Use inheritance to derive custom widgets.
- * - Type-safe signal handlers, in standard C++.
+ * - Type-safe signal handlers (slots), in standard C++, using libsigc++:
+ *   http://libsigc.sourceforge.net/
  * - Polymorphism.
- * - Use of Standard C++ Library, including strings, containers, and iterators.
+ * - Use of the Standard C++ Library, including strings, containers and
+ *   iterators.
  * - Full internationalisation with UTF8.
  * - Complete C++ memory management.
- *   - Object composition.
- *   - Automatic deallocation of dynamically allocated widgets.
+ *   - Member instances or dynamic new and delete.
+ *   - Optional automatic deletion of child widgets.
+ *   - No manual reference-counting.
  * - Full use of C++ namespaces.
  * - No macros.
- * - Cross-platform: Linux (gcc), FreeBSD (gcc), NetBSD (gcc), Solaris (gcc,
- *   Forte), Win32 (gcc, MSVC++ .Net 2003), MacOS X (gcc), others.
- * - Free software and free of cost for both Open Source and proprietary
- *   development.
- * - Discussed, designed and implemented in public.
  *
- * @section license License
+ * @section basics Basic usage
  *
- * gtkmm is free software distributed under the GNU Lesser General Public
- * License (LGPL).
- *
- * @section releases Release Schedule
- *
- * gtkmm follows the official GNOME Platform Bindings release schedule. This
- * guarantees API/ABI-stability and new releases on a predictable schedule,
- * delivering C++ API for the underlying GTK+ and GNOME APIs as soon as
- * possible.
+ * Include the gtkmm header:
+ * @code
+ * #include <gtkmm.h>
+ * @endcode
+ * This includes every header installed by gtkmm, so can slow down
+ * compilation, but suffices for this simple example. Assuming that your
+ * program source file is @c program.cc, compile it with:
+ * @code
+ * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-2.4`
+ * @endcode
+ * Alternatively, if using autoconf, use the following in @c configure.ac:
+ * @code
+ * PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4])
+ * @endcode
+ * Then use the generated @c GTKMM_CFLAGS and @c GTKMM_LIBS variables in the
+ * project @c Makefile.am files. For example:
+ * @code
+ * program_CPPFLAGS = $(GTKMM_CFLAGS)
+ * program_LDADD = $(GTKMM_LIBS)
+ * @endcode
  */
 
 /* Gtkmm version.  */
@@ -236,4 +252,3 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/window.h>
 
 #endif /* #ifndef GTKMM_H */
-
