@@ -58,7 +58,7 @@
  * @code
  * #include <gtkmm.h>
  * @endcode
- * (You may include invididual headers, such ass gtkmm/button.h instead.)
+ * (You may include invididual headers, such as gtkmm/button.h instead.)
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
