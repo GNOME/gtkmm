@@ -52,18 +52,19 @@
  * - Full use of C++ namespaces.
  * - No macros.
  *
- * @section basics Basic usage
+ * @section basics Basic Usage
  *
  * Include the gtkmm header:
  * @code
  * #include <gtkmm.h>
  * @endcode
- * This includes every header installed by gtkmm, so can slow down
- * compilation, but suffices for this simple example. Assuming that your
- * program source file is @c program.cc, compile it with:
+ * (You may include invididual headers, such ass gtkmm/button.h instead.)
+ *
+ * If your source file is @c program.cc, you can compile it with:
  * @code
  * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-2.4`
  * @endcode
+ *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
  * PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4])
