@@ -31,16 +31,18 @@
  * For instance, see @ref Widgets, @ref Dialogs, @ref TreeView "TreeView" and
  * @ref TextView "TextView".
  *
- * See also the <em>Programming with gtkmm</em> book:
- * http://library.gnome.org/devel/gtkmm-tutorial/stable/
+ * See also the
+ * <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
+ * with gtkmm</a> book.
+ *
  *
  * @section features Features
  *
- * - GTK+’s mature, capable set of @ref widgets Widgets. See the GTK+ website
- *   for more information: http://www.gtk.org/
+ * - GTK+’s mature, capable set of @ref widgets Widgets. See
+ *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
  * - Use inheritance to derive custom widgets.
- * - Type-safe signal handlers (slots), in standard C++, using libsigc++:
- *   http://libsigc.sourceforge.net/
+ * - Type-safe signal handlers (slots), in standard C++, using
+ *   <a href="http://libsigc.sourceforge.net/">libsigc++</a>.
  * - Polymorphism.
  * - Use of the Standard C++ Library, including strings, containers and
  *   iterators.
@@ -58,7 +60,7 @@
  * @code
  * #include <gtkmm.h>
  * @endcode
- * (You may include individual headers, such as gtkmm/button.h instead.)
+ * (You may include individual headers, such as @c gtkmm/button.h instead.)
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
