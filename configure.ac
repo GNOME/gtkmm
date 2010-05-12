@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [2.19.6],
+AC_INIT([gtkmm], [2.90.0],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -32,8 +32,8 @@ AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 MM_PREREQ([0.8])
 MM_INIT_MODULE([atkmm-1.6])
-MM_INIT_MODULE([gdkmm-2.4])
-MM_INIT_MODULE([gtkmm-2.4])
+MM_INIT_MODULE([gdkmm-3.0])
+MM_INIT_MODULE([gtkmm-3.0])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([LIBGTKMM_SO_VERSION], [2:0:1])
@@ -56,11 +56,11 @@ AS_IF([test "x$enable_static" = xyes],
 AC_SUBST([ATKMM_MODULES], ['glibmm-2.4 >= 2.22 atk >= 1.12'])
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.22 pangomm-1.4 >= 2.26 gtk+-2.0 >= 2.19.6'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.22 pangomm-1.4 >= 2.26 gtk+-3.0 >= 2.90.0'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
-      [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-2.0"])
+      [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-3.0"])
 AC_SUBST([GTKMM_MODULES])
 
 PKG_CHECK_MODULES([ATKMM], [$ATKMM_MODULES])
