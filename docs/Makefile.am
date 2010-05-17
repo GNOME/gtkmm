@@ -29,7 +29,8 @@ gtkmm_files_h = $(gtkmm_files_built_h) $(filter-out wrap_init.h,$(gtkmm_files_ex
 book_name = $(GTKMM_MODULE_NAME)
 doc_input = $(addprefix $(top_srcdir)/atk/atkmm/,$(atkmm_files_h)) \
             $(addprefix $(top_srcdir)/gdk/gdkmm/,$(gdkmm_files_h)) \
-            $(addprefix $(top_srcdir)/gtk/gtkmm/,$(gtkmm_files_h))
+            $(addprefix $(top_srcdir)/gtk/gtkmm/,$(gtkmm_files_h)) \
+	    $(top_srcdir)/gtk/gtkmm.h
 
 docimagesdir = $(libdocdir)/images
 dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif

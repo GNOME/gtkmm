@@ -53,7 +53,7 @@ AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
 AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
-AC_SUBST([ATKMM_MODULES], ['glibmm-2.4 >= 2.22 atk >= 1.12'])
+AC_SUBST([ATKMM_MODULES], ['glibmm-2.4 >= 2.24 atk >= 1.12'])
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.22 pangomm-1.4 >= 2.26 gtk+-3.0 >= 2.90.0'])
@@ -99,7 +99,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -DGSEAL_ENABLE],
-                       [G PANGO ATK GDK GDK_PIXBUF GTK])
+                       [G PANGO ATK GDK GDK_PIXBUF GTK PANGOMM])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile

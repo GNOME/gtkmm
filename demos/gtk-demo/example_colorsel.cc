@@ -1,4 +1,4 @@
-/* Color Selector
+ /* Color Selector
  *
  * GtkColorSelection lets the user choose a color. GtkColorSelectionDialog is
  * a prebuilt dialog containing a GtkColorSelection.
@@ -81,7 +81,7 @@ void Example_ColorSel::on_button_clicked()
   Gtk::ColorSelectionDialog dialog ("Changing color");
   dialog.set_transient_for(*this);
 
-  Gtk::ColorSelection *const pColorSel = dialog.get_colorsel();
+  Gtk::ColorSelection *const pColorSel = dialog.get_color_selection();
 
   pColorSel->set_previous_color(m_Color);
   pColorSel->set_current_color(m_Color);

@@ -192,7 +192,7 @@ Example_UIManager::Example_UIManager()
   m_Button.signal_clicked().connect( sigc::mem_fun( *this, &Example_UIManager::on_button_clicked ) );
   
   m_Box2.pack_start(m_Button, Gtk::PACK_EXPAND_WIDGET);
-  m_Button.set_flags(Gtk::CAN_DEFAULT);
+  m_Button.set_can_default();
   m_Button.grab_default();
 
   show_all();

@@ -1,4 +1,3 @@
-/* $Id$ */
 /* gtkmm - a C++ wrapper for the Gtk toolkit
  *
  * Copyright 1999-2002 The gtkmm Development Team
@@ -20,6 +19,65 @@
 
 #ifndef _GTKMM_H
 #define _GTKMM_H
+
+/** @mainpage gtkmm Reference Manual
+ *
+ * @section description Description
+ *
+ * gtkmm is the official C++ interface for the popular GUI library GTK+.
+ * Highlights include typesafe callbacks, and a comprehensive set of widgets
+ * that are easily extensible via inheritance.
+ *
+ * For instance, see @ref Widgets, @ref Dialogs, @ref TreeView "TreeView" and
+ * @ref TextView "TextView".
+ *
+ * See also the
+ * <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
+ * with gtkmm</a> book.
+ *
+ *
+ * @section features Features
+ *
+ * - GTK+’s mature, capable set of @ref widgets Widgets. See
+ *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
+ * - Use inheritance to derive custom widgets.
+ * - Type-safe signal handlers (slots), in standard C++, using
+ *   <a href="http://libsigc.sourceforge.net/">libsigc++</a>.
+ * - Polymorphism.
+ * - Use of the Standard C++ Library, including strings, containers and
+ *   iterators.
+ * - Full internationalisation with UTF8.
+ * - Complete C++ memory management.
+ *   - Member instances or dynamic new and delete.
+ *   - Optional automatic deletion of child widgets.
+ *   - No manual reference-counting.
+ * - Full use of C++ namespaces.
+ * - No macros.
+ *
+ * @section basics Basic Usage
+ *
+ * Include the gtkmm header:
+ * @code
+ * #include <gtkmm.h>
+ * @endcode
+ * (You may include individual headers, such as @c gtkmm/button.h instead.)
+ *
+ * If your source file is @c program.cc, you can compile it with:
+ * @code
+ * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-2.4`
+ * @endcode
+ *
+ * Alternatively, if using autoconf, use the following in @c configure.ac:
+ * @code
+ * PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4])
+ * @endcode
+ * Then use the generated @c GTKMM_CFLAGS and @c GTKMM_LIBS variables in the
+ * project @c Makefile.am files. For example:
+ * @code
+ * program_CPPFLAGS = $(GTKMM_CFLAGS)
+ * program_LDADD = $(GTKMM_LIBS)
+ * @endcode
+ */
 
 /* Gtkmm version.  */
 extern const int gtkmm_major_version;
@@ -112,15 +170,21 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/offscreenwindow.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
-#include <gtkmm/pagesetupunixdialog.h>
+#ifndef G_OS_WIN32
+# include <gtkmm/pagesetupunixdialog.h>
+#endif
 #include <gtkmm/papersize.h>
 #include <gtkmm/printcontext.h>
-#include <gtkmm/printer.h>
-#include <gtkmm/printjob.h>
+#ifndef G_OS_WIN32
+# include <gtkmm/printer.h>
+# include <gtkmm/printjob.h>
+#endif
 #include <gtkmm/printoperation.h>
 #include <gtkmm/printoperationpreview.h>
 #include <gtkmm/printsettings.h>
-#include <gtkmm/printunixdialog.h>
+#ifndef G_OS_WIN32
+# include <gtkmm/printunixdialog.h>
+#endif
 #include <gtkmm/progressbar.h>
 #include <gtkmm/radioaction.h>
 #include <gtkmm/radiobutton.h>
@@ -185,4 +249,3 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/window.h>
 
 #endif /* #ifndef GTKMM_H */
-
