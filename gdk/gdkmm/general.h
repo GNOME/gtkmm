@@ -37,51 +37,75 @@ void flush();
 namespace Cairo
 {
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Sets the specified Gdk::Color as the source color of the Cairo context.
  * @param @context The cairo context.
  * @param color The color to use as the source color. 
  *
- * @newin{2,12}
+ * @deprecated Use the overloaded function that takes a const RefPtr
+ * reference.
+ *
+ * @newin{2,10}
  */
 void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
+#endif
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixbuf_x, pixbuf_y.
  * @param @context The cairo context.
  * @param pixbuf A Gdk::Pixbuf
  * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
  * @param pixbuf_y Y coordinate of location to place upper left corner of pixbuf.
  *
- * @newin{2,12}
+ * @deprecated Use the overloaded function that takes a const RefPtr
+ * reference.
+ *
+ * @newin{2,10}
  */
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y);
+#endif
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixmap_x, pixmap_y.
  * @param @context The cairo context.
  * @param pixmap A Gdk::Pixmap
  * @param pixmap_x X coordinate of location to place upper left corner of pixmap.
  * @param pixmap_y Y coordinate of location to place upper left corner of pixmap.
  *
- * @newin{2,12}
+ * @deprecated Use the overloaded function that takes a const RefPtr
+ * reference.
+ *
+ * @newin{2,10}
  */
 void set_source_pixmap(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y);
+#endif
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Adds the given rectangle to the current path of the context.
  *
  * @param context A cairo context.
  * @param rectangle A rectangle to add to the path of the context. 
  *
- * @newin{2,12}
+ * @deprecated Use add_rectangle_to_path() instead
+ * reference.
+ *
+ * @newin{2,10}
  */
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
+#endif
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Adds the given region to the current path of the context.
  *
  * @param context A cairo context.
  * @param region A region to add to the path of the context. 
  *
- * @newin{2,12}
+ * @deprecated Use add_region_to_path() instead
+ *
+ * @newin{2,10}
  */
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region);
+#endif
 
 } //namespace Cairo
 

@@ -35,10 +35,12 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gdkmm/screen.h>
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
+//#include <gtkmm/style.h>
 #include <gtkmm/targetlist.h>
 #include <gtkmm/rc.h>
 #include <gtkmm/object.h>
 #include <gtkmm/clipboard.h>
+//#include <gtkmm/action.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/object_p.h)
@@ -188,16 +190,12 @@ public:
 
   _WRAP_METHOD(void set_can_focus(bool can_focus = true), gtk_widget_set_can_focus)
   _WRAP_METHOD(bool get_can_focus() const, gtk_widget_get_can_focus)
-  _WRAP_METHOD(bool can_focus() const, gtk_widget_get_can_focus,
-               deprecated "Replaced by get_can_focus().")
   _WRAP_METHOD(bool has_focus() const, gtk_widget_has_focus)
 
   _WRAP_METHOD(bool is_focus() const, gtk_widget_is_focus)
   _WRAP_METHOD(void grab_focus(), gtk_widget_grab_focus)
   _WRAP_METHOD(void set_can_default(bool can_default = true), gtk_widget_set_can_default)
   _WRAP_METHOD(bool get_can_default() const, gtk_widget_get_can_default)
-  _WRAP_METHOD(bool can_default() const, gtk_widget_get_can_default,
-               deprecated "Replaced by get_can_default().")
   _WRAP_METHOD(bool has_default() const, gtk_widget_has_default)
   _WRAP_METHOD(void grab_default(), gtk_widget_grab_default)
   _WRAP_METHOD(void set_receives_default(bool receives_default = true), gtk_widget_set_receives_default)
@@ -509,7 +507,7 @@ public:
  _WRAP_METHOD(void remove_mnemonic_label(Widget& label), gtk_widget_remove_mnemonic_label)
 
   //TODO: Should drag_get_data() be const?
-  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::ustring& target, guint32 time), gtk_drag_get_data)		
+  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::ustring& target, guint32 time), gtk_drag_get_data)
 
   _WRAP_METHOD(void drag_highlight(), gtk_drag_highlight)
   _WRAP_METHOD(void drag_unhighlight(), gtk_drag_unhighlight)
@@ -581,82 +579,6 @@ public:
   _WRAP_METHOD(Glib::ustring get_tooltip_markup() const, gtk_widget_get_tooltip_markup)
   _WRAP_METHOD(void set_has_tooltip(bool has_tooltip = TRUE), gtk_widget_set_has_tooltip)
   _WRAP_METHOD(bool get_has_tooltip() const, gtk_widget_get_has_tooltip)
-
-_DEPRECATE_IFDEF_START
-  /** @deprecated Use !get_has_window() instead.
-   */
-  bool has_no_window() const;
-
-  /** @deprecated Use get_realized() instead.
-   */
-  bool is_realized() const;
-
-  /** @deprecated Use get_mapped() instead.
-   */
-  bool is_mapped() const;
-
-  /** @deprecated: Use get_is_toplevel() instead.
-   */
-  bool is_toplevel() const;
-
-  /** @deprecated: Use get_is_drawable() instead.
-   */
-  bool is_drawable() const;
-
-  /** @deprecated: Use get_visible() instead.
-   */
-  bool is_visible() const;
-
-  /** @deprecated: Use get_sensitive() instead.
-   */
-  bool sensitive() const;
-
-  /** @deprecated: Use get_app_paintable() instead.
-   */
-  bool app_paintable() const;
-
-  /** @deprecated: Use get_receives_default() instead.
-   */
-  bool receives_default() const;
-
-  /** @deprecated: Use get_double_buffered() instead.
-   */
-  bool double_buffered() const;
-
-  /** @deprecated Call get_sensitive() on the result of get_parent() instead.
-   */
-  bool parent_sensitive() const;
-
-  _DEPRECATE_IFDEF_END
-
-  /** @deprecated: Use has_rc_style() instead.
-   */
-  bool rc_style() const;
-
-  /**  @deprecated: Use the proper method to test individual states, such as 
-   * get_app_paintable(), get_can_default(),
-   * get_can_focus(), get_double_buffered(),
-   * has_default(), is_drawable(),
-   * has_focus(), has_grab(), get_mapped(),
-   * get_has_window(), has_rc_style(),
-   * get_realized(), get_receives_default(),
-   * get_sensitive(), is_sensitive(),
-   * is_toplevel() or get_visible().
-   */
-  WidgetFlags get_flags() const;
-
-  //TODO: Document the deprecation when GTK+ does.
-  void set_flags(WidgetFlags flags);
-
-  //TODO: Document the deprecation when GTK+ does.
-  void unset_flags(WidgetFlags flags);
-
-  //TODO: Remove this when we can break ABI:
-  /** @deprecated You should not need to call this method.
-   */
-  _MEMBER_GET(saved_state, saved_state, Gtk::StateType, guint8)
-
-  _DEPRECATE_IFDEF_END
 
   int get_width() const;
   int get_height() const;
@@ -877,7 +799,7 @@ dnl
   _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
 
   _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context, DragResult result), "drag_failed", no_default_handler)
-  
+
   /**  The drag_leave signal is emitted on the drop site when the cursor leaves the widget.
    * A typical reason to connect to this signal is to undo things done in the drag_motion signal handler,
    *  e.g. undo highlighting with drag_unhighlight().
@@ -947,13 +869,15 @@ dnl
    */
   _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint info, guint time), "drag_data_received")
 
+  //_WRAP_SIGNAL(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", ifdef GTKMM_ATKMM_ENABLED, refreturn, deprecated)
+
   _WRAP_SIGNAL(void screen_changed(const Glib::RefPtr<Gdk::Screen>& previous_screen), "screen_changed")
 
   _WRAP_SIGNAL(void composited_changed(), "composited_changed", no_default_handler)
 
 //TODO: The signal_id is very C-like here:
   //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
-  
+
   _WRAP_SIGNAL(bool popup_menu(), "popup_menu", no_default_handler) //Note that popup-menu is a keybinding signal, but is really meant to be wrapped.
 
   //Keybinding signals:
