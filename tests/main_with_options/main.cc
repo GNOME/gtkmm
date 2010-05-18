@@ -101,10 +101,8 @@ int main(int argc, char *argv[])
   ExampleOptionGroup group;
   context.set_main_group(group);
   
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Gtk::Main main_instance(argc, argv, context);
   
     //Here we can see the parsed values of our custom command-line arguments:
@@ -128,13 +126,11 @@ int main(int argc, char *argv[])
     //Try --name="bobble" to change the window's title to "bobble", for instance.
     Gtk::Window testWindow;
     main_instance.run(testWindow); //Shows the window and returns when it is closed.
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& ex)
   {
     std::cout << "Exception: " << ex.what() << std::endl;
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   return 0;

@@ -39,11 +39,7 @@ CellRenderer* generate_cellrenderer(bool editable = false)
   CellRendererText* pCellRenderer = new CellRendererText(); //the default - template specializations will use other renderers.
   //CellRendererText can render both strings and numerical values.
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
   pCellRenderer->property_editable() = editable;
-#else
-  pCellRenderer->set_property("editable", editable);
-#endif
 
   return pCellRenderer;
 }

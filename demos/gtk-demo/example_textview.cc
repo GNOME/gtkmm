@@ -124,15 +124,9 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   Glib::RefPtr<Gtk::TextBuffer::Tag> refTag;
 
   refTag = refBuffer->create_tag("heading");
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refTag->property_weight() = Pango::WEIGHT_BOLD;
   refTag->property_size() = 15 * Pango::SCALE;
-#else
-  refTag->set_property("weight", Pango::WEIGHT_BOLD);
-  refTag->set_property("size", 15 * Pango::SCALE);
-#endif
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refBuffer->create_tag("italic")->property_style() = Pango::STYLE_ITALIC;
   refBuffer->create_tag("bold")->property_weight() = Pango::WEIGHT_BOLD;
   refBuffer->create_tag("big")->property_size() = 20 * Pango::SCALE;
@@ -141,23 +135,12 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refBuffer->create_tag("monospace")->property_family() = "monospace";
   refBuffer->create_tag("blue_foreground")->property_foreground() = "blue";
   refBuffer->create_tag("red_background")->property_background() = "red";
-#else
-  refBuffer->create_tag("italic")->set_property("style", Pango::STYLE_ITALIC);
-  refBuffer->create_tag("bold")->set_property("weight", Pango::WEIGHT_BOLD);
-  refBuffer->create_tag("big")->set_property("size", 20 * Pango::SCALE);
-  refBuffer->create_tag("xx-small")->set_property("scale", Pango::SCALE_XX_SMALL);
-  refBuffer->create_tag("x-large")->set_property("scale", Pango::SCALE_X_LARGE);
-  refBuffer->create_tag("monospace")->set_property("family", Glib::ustring("monospace"));
-  refBuffer->create_tag("blue_foreground")->set_property("foreground", Glib::ustring("blue"));
-  refBuffer->create_tag("red_background")->set_property("background", Glib::ustring("red"));
-#endif
 
   enum { gray50_width = 2, gray50_height = 2 };
   static const char gray50_bits[] = { 0x02, 0x01 };
 
   Glib::RefPtr<Gdk::Bitmap> refStipple = Gdk::Bitmap::create(gray50_bits, gray50_width, gray50_height);
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refBuffer->create_tag("background_stipple")->property_background_stipple() = refStipple;
   refBuffer->create_tag("foreground_stipple")->property_foreground_stipple() = refStipple;
 
@@ -170,82 +153,34 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refBuffer->create_tag("no_wrap")->property_wrap_mode() = Gtk::WRAP_NONE;
   refBuffer->create_tag("center")->property_justification() = Gtk::JUSTIFY_CENTER;
   refBuffer->create_tag("right_justify")->property_justification() = Gtk::JUSTIFY_RIGHT;
-#else
-  refBuffer->create_tag("background_stipple")->set_property("background_stipple", refStipple);
-  refBuffer->create_tag("foreground_stipple")->set_property("foreground_stipple", refStipple);
-
-  refBuffer->create_tag("big_gap_before_line")->set_property("pixels_above_lines", 30);
-  refBuffer->create_tag("big_gap_after_line")->set_property("pixels_below_lines", 30);
-  refBuffer->create_tag("double_spaced_line")->set_property("pixels_inside_wrap", 10);
-  refBuffer->create_tag("not_editable")->set_property("editable", FALSE);
-  refBuffer->create_tag("word_wrap")->set_property("wrap_mode", Gtk::WRAP_WORD);
-  refBuffer->create_tag("char_wrap")->set_property("wrap_mode", Gtk::WRAP_CHAR);
-  refBuffer->create_tag("no_wrap")->set_property("wrap_mode", Gtk::WRAP_NONE);
-  refBuffer->create_tag("center")->set_property("justification", Gtk::JUSTIFY_CENTER);
-  refBuffer->create_tag("right_justify")->set_property("justification", Gtk::JUSTIFY_RIGHT);
-#endif
 
   refTag = refBuffer->create_tag("wide_margins");
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refTag->property_left_margin() = 50;
   refTag->property_right_margin() = 50;
-#else
-  refTag->set_property("left_margin", 50);
-  refTag->set_property("right_margin", 50);
-#endif
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refBuffer->create_tag("strikethrough")->property_strikethrough() = true;
   refBuffer->create_tag("underline")->property_underline() = Pango::UNDERLINE_SINGLE;
   refBuffer->create_tag("double_underline")->property_underline() = Pango::UNDERLINE_DOUBLE;
-#else
-  refBuffer->create_tag("strikethrough")->set_property("strikethrough", true);
-  refBuffer->create_tag("underline")->set_property("underline", Pango::UNDERLINE_SINGLE);
-  refBuffer->create_tag("double_underline")->set_property("underline", Pango::UNDERLINE_DOUBLE);
-#endif
 
   refTag = refBuffer->create_tag("superscript");
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refTag->property_rise() = 10 * Pango::SCALE;	  /* 10 pixels */
   refTag->property_size() = 8 * Pango::SCALE;	  /* 8 points */
-#else
-  refTag->set_property("rise", 10 * Pango::SCALE);	  /* 10 pixels */
-  refTag->set_property("size", 8 * Pango::SCALE);	  /* 8 points */
-#endif
 
   refTag = refBuffer->create_tag("subscript");
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refTag->property_rise() = -10 * Pango::SCALE;   /* 10 pixels */
   refTag->property_size() = 8 * Pango::SCALE;	   /* 8 points */
-#else
-  refTag->set_property("rise", 10 * Pango::SCALE);   /* 10 pixels */
-  refTag->set_property("size", 8 * Pango::SCALE);	   /* 8 points */
-#endif
 
   refTag = refBuffer->create_tag("rtl_quote");
-#ifdef GLIBMM_PROPERTIES_ENABLED
   refTag->property_wrap_mode() = Gtk::WRAP_WORD;
   refTag->property_direction() = Gtk::TEXT_DIR_RTL;
   refTag->property_indent() = 30;
   refTag->property_left_margin() = 20;
   refTag->property_right_margin() = 20;
-#else
-  refTag->set_property("wrap_mode", Gtk::WRAP_WORD);
-  refTag->set_property("direction", Gtk::TEXT_DIR_RTL);
-  refTag->set_property("indent", 30);
-  refTag->set_property("left_margin", 20);
-  refTag->set_property("right_margin", 20);
-#endif
 }
 
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file(demo_find_file("gtk-logo-rgb.gif"));
-  #else
-  std::auto_ptr<Glib::Error> error;
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file(demo_find_file("gtk-logo-rgb.gif"), error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(!refPixbuf)
   {

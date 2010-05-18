@@ -135,20 +135,11 @@ void DemoWindow::fill_tree()
   }
 
   Gtk::CellRendererText* pCell = Gtk::manage(new Gtk::CellRendererText());
-#ifdef GLIBMM_PROPERTIES_ENABLED
   pCell->property_style() = Pango::STYLE_ITALIC;
-#else
-  pCell->set_property("style", Pango::STYLE_ITALIC);
-#endif
 
   Gtk::TreeViewColumn* pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
-#ifdef GLIBMM_PROPERTIES_ENABLED
   pColumn->add_attribute(pCell->property_text(), columns.title);
   pColumn->add_attribute(pCell->property_style_set(), columns.italic);
-#else
-  pColumn->add_attribute(*pCell, "text", columns.title);
-  pColumn->add_attribute(*pCell, "style_set", columns.italic);
-#endif
 
   m_TreeView.append_column(*pColumn);
 
@@ -200,12 +191,7 @@ void DemoWindow::on_treeselection_changed()
   {
     const Glib::ustring filename = (*iter)[demo_columns().filename];
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     load_file(Glib::filename_from_utf8(filename));
-    #else
-    std::auto_ptr<Glib::Error> error;
-    load_file(Glib::filename_from_utf8(filename, error));
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 }
 
@@ -225,9 +211,7 @@ bool DemoWindow::read_line (FILE *stream, GString *str)
 
 #ifdef HAVE_GETC_UNLOCKED
       c = getc_unlocked (stream);
-#else
-      c = getc(stream);
-#endif
+#endif //GLIBMM_PROPERTIES_ENABLED
       if (c == EOF)
 	goto done;
       else
@@ -240,9 +224,7 @@ bool DemoWindow::read_line (FILE *stream, GString *str)
 	  {
 #ifdef HAVE_GETC_UNLOCKED
 	    int next_c = getc_unlocked (stream);
-#else
-	    int next_c = getc(stream);
-#endif	
+#endif //GLIBMM_PROPERTIES_ENABLED
 	    if (!(next_c == EOF ||
 		  (c == '\r' && next_c == '\n') ||
 		  (c == '\n' && next_c == '\r')))

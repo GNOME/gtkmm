@@ -54,11 +54,7 @@ std::string demo_find_file(const std::string& base)
     {
       Glib::ustring msg = "Cannot find demo data file " + base;  
 
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       throw Glib::FileError(Glib::FileError::NO_SUCH_ENTITY, msg);
-      #else
-      std::cerr << "File Error: " << msg << std::endl;
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
       return Glib::ustring();
     }
     

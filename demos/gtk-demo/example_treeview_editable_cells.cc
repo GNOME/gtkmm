@@ -252,11 +252,7 @@ void Example_TreeView_EditableCells::add_columns()
     if(pCellRenderText)
     {
       //Set the appropriate property,
-#ifdef GLIBMM_PROPERTIES_ENABLED
       pCellRenderText->property_editable() = true;
-#else
-      pCellRenderText->set_property("editable", true);
-#endif
     
       //Connect to the appropriate signal, sending the model_column too,
       pCellRenderText->signal_edited().connect( sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_column_number_edited) );
@@ -274,11 +270,7 @@ void Example_TreeView_EditableCells::add_columns()
     if(pCellRenderText)
     {
       //Set the appropriate property,
-      #ifdef GLIBMM_PROPERTIES_ENABLED
       pCellRenderText->property_editable() = true;
-      #else
-      pCellRenderText->set_property("editable", true);
-      #endif
     
       //Connect to the appropriate signal, sending the model_column too,
       pCellRenderText->signal_edited().connect( sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_column_product_edited) );
