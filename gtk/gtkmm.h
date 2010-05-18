@@ -64,12 +64,12 @@
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-2.4`
+ * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-3.0`
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4])
+ * PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
  * @endcode
  * Then use the generated @c GTKMM_CFLAGS and @c GTKMM_LIBS variables in the
  * project @c Makefile.am files. For example:

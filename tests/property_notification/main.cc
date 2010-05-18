@@ -29,7 +29,6 @@ int main (int argc, char **argv)
   button.connect_property_changed("color", sigc::ptr_fun(&on_property_color_changed));
 
   button.property_color().signal_changed().connect(sigc::ptr_fun(&on_property_color_changed_nicer_api));
-#endif
 
   button.connect_property_changed("name", sigc::ptr_fun(&on_property_name_changed));
 
@@ -38,5 +37,3 @@ int main (int argc, char **argv)
 
   Gtk::Main::run(window);
 }
-
-  
