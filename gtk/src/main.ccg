@@ -228,20 +228,16 @@ gboolean RunSig::gtk_callback(gpointer data)
 
   if(GtkMainConnectionNode::list_remove(conn_node))
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
       // Recreate the specific SlotType from the generic slot_base.
       SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
       (*pSlot)();
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke();
     }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     // We don't need it anymore, since RunSig is a one-shot signal.
     GtkMainConnectionNode::destroy_notify_handler(conn_node);
@@ -269,21 +265,17 @@ sigc::connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_leve
 // static
 gboolean QuitSig::gtk_callback(gpointer data)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // Call the slot:
     GtkMainConnectionNode* node = static_cast<GtkMainConnectionNode*>(data);
     SlotType* pSlot = static_cast<SlotType*>(node->get_slot());
     (*pSlot)();
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0;
 }
@@ -305,21 +297,17 @@ sigc::connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
 // static
 gint KeySnooperSig::gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer data)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // Recreate the specific SlotType from the generic slot node.
     GtkMainConnectionNode* conn_node = static_cast<GtkMainConnectionNode*>(data);
     SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
     return (*pSlot)(Glib::wrap(widget), event);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0;
 }
@@ -416,15 +404,7 @@ Main::Main(int& argc, char**& argv, Glib::OptionContext& option_context)
 
     add_gtk_option_group(option_context);
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     option_context.parse(argc, argv);
-    #else
-    std::auto_ptr<Glib::Error> ex;
-    option_context.parse(argc, argv, ex);
-    //if(ex.get())
-    //  std::cerr << ex->what() << std::endl;
-    //TODO: Pass the ex up to the caller?
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 }
 

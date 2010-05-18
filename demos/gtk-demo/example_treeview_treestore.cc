@@ -334,11 +334,7 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRenderer* pRenderer = pColumn->get_first_cell_renderer();
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
 
       pColumn->set_clickable();
     }
@@ -351,19 +347,10 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
 
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
       pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
-      #else
-      pColumn->add_attribute(*pRenderer, "visible", m_columns.visible);
-      pColumn->add_attribute(*pRenderer, "activatable", m_columns.world);
-      #endif
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
@@ -378,17 +365,9 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
       
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-      #else
-      pColumn->add_attribute(*pRenderer, "visible", m_columns.visible);
-      #endif
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
@@ -403,19 +382,10 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
       
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
       pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
-      #else
-      pColumn->add_attribute(*pRenderer, "visible", m_columns.visible);
-      pColumn->add_attribute(*pRenderer, "activatable", m_columns.world);
-      #endif
       
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
@@ -430,17 +400,9 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
       
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-      #else
-      pColumn->add_attribute(*pRenderer, "visible", m_columns.visible);
-      #endif
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
@@ -455,17 +417,9 @@ void Example_TreeView_TreeStore::add_columns()
     if(pColumn)
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pRenderer->property_xalign().set_value(0.0);
-      #else
-      pRenderer->set_property("xalign", 0.0f);
-      #endif
       
-      #ifdef GLIBMM_PROPERTIES_ENABLED  
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-      #else
-      pColumn->add_attribute(*pRenderer, "visible", m_columns.visible);
-      #endif
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
@@ -478,7 +432,6 @@ void Example_TreeView_TreeStore::add_columns()
 void Example_TreeView_TreeStore::on_realize()
 {
   m_TreeView.expand_all();
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //call base class:
   Window::on_realize();
 #endif

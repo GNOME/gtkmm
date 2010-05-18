@@ -108,12 +108,7 @@ void Example_Pixbufs::load_pixbufs()
 
   std::string filename_background = BACKGROUND_NAME;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   m_refPixbuf_Background = Gdk::Pixbuf::create_from_file(demo_find_file(filename_background));
-  #else
-  std::auto_ptr<Glib::Error> error;
-  m_refPixbuf_Background = Gdk::Pixbuf::create_from_file(demo_find_file(filename_background), error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   m_back_width = m_refPixbuf_Background->get_width();
   m_back_height = m_refPixbuf_Background->get_height();
@@ -122,12 +117,7 @@ void Example_Pixbufs::load_pixbufs()
   {
     std::string filename = image_names[i];
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_file(demo_find_file(filename));
-    #else
-    std::auto_ptr<Glib::Error> error;
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_file(demo_find_file(filename), error);
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     m_images[i] = pixbuf;
   }

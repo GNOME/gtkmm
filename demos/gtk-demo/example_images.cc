@@ -116,7 +116,6 @@ Example_Images::Example_Images()
 
 Example_Images::~Example_Images()
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     if(m_refPixbufLoader)
@@ -126,11 +125,6 @@ Example_Images::~Example_Images()
   {
     // ignore errors
   }
-  #else
-  std::auto_ptr<Glib::Error> error;
-  if(m_refPixbufLoader)
-      m_refPixbufLoader->close(error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void Example_Images::start_progressive_loading()
@@ -151,26 +145,15 @@ bool Example_Images::on_timeout()
     gsize bytes_read = 0;
     Glib::IOStatus status = Glib::IO_STATUS_NORMAL;
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
       status = m_image_stream->read(reinterpret_cast<char*>(&buf[0]), sizeof(buf), bytes_read);
     }
     catch(const Glib::Error& error)
     {
-    #else
-    std::auto_ptr<Glib::Error> error;
-    status = m_image_stream->read(reinterpret_cast<char*>(&buf[0]), sizeof(buf), bytes_read, error);
-    if(error.get())
-    {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
      
       Glib::ustring strMsg = "Failure reading image file 'alphatest.png': ";
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       strMsg += error.what();
-      #else
-      strMsg += error->what();
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
@@ -180,26 +163,15 @@ bool Example_Images::on_timeout()
       return false; // uninstall the timeout
     }
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
       m_refPixbufLoader->write(buf, bytes_read);
     }
     catch(const Glib::Error& error)
     {
-    #else
-    //std::auto_ptr<Glib::Error> error;
-    m_refPixbufLoader->write(buf, bytes_read, error);
-    if(error.get())
-    {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
       Glib::ustring strMsg = "Failed to load image: ";
 
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       strMsg += error.what();
-      #else
-      strMsg += error->what();
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
@@ -218,26 +190,15 @@ bool Example_Images::on_timeout()
        * it was incomplete.
        */
 
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try
       {
         m_refPixbufLoader->close();
       }
       catch(const Glib::Error& error)
       {
-      #else
-      std::auto_ptr<Glib::Error> error;
-      m_refPixbufLoader->close(error);
-      if(error.get())
-      {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Glib::ustring strMsg = "Failed to load image: ";
 
-        #ifdef GLIBMM_EXCEPTIONS_ENABLED
         strMsg += error.what();
-        #else
-        strMsg += error->what();
-        #endif //GLIBMM_EXCEPTIONS_ENABLED
 
         Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
         dialog.run();
@@ -252,26 +213,15 @@ bool Example_Images::on_timeout()
   }
   else
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
       m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png"), "r");
     }
     catch(const Glib::Error& error)
     {
-    #else
-    std::auto_ptr<Glib::Error> error;
-    m_image_stream = Glib::IOChannel::create_from_file(demo_find_file("alphatest.png"), "r", error);
-    if(error.get())
-    {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
 
       Glib::ustring strMsg = "Unable to open image file 'alphatest.png': ";
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       strMsg += error.what();
-      #else
-      strMsg += error->what();
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
@@ -279,20 +229,11 @@ bool Example_Images::on_timeout()
       return false; // uninstall the timeout
     }
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     m_image_stream->set_encoding(); // no encoding == binary
-    #else
-    m_image_stream->set_encoding("", error); // no encoding == binary
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     if(m_refPixbufLoader)
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       m_refPixbufLoader->close();
-      #else
-      std::auto_ptr<Glib::Error> error;
-      m_refPixbufLoader->close(error);
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
 
       m_refPixbufLoader.clear();
     }

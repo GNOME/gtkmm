@@ -113,11 +113,7 @@ Example_Menus::Example_Menus()
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));
 
   m_VBox_Sub2.pack_start(m_Button);
-#ifdef GLIBMM_PROPERTIES_ENABLED
   m_Button.property_can_default() = true;
-#else
-  m_Button.set_property("can_default", true);
-#endif
   m_Button.grab_default();
 
   show_all();
