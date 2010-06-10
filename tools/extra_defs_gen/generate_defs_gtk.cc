@@ -161,7 +161,6 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_PAGE_SETUP_UNIX_DIALOG )
             << get_defs( GTK_TYPE_PRINT_UNIX_DIALOG )
 #endif /* G_OS_WIN32 */
-            << get_defs( GTK_TYPE_PROGRESS )
             << get_defs( GTK_TYPE_PROGRESS_BAR )
             << get_defs( GTK_TYPE_RADIO_BUTTON )
             << get_defs( GTK_TYPE_RADIO_TOOL_BUTTON )
