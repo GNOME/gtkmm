@@ -18,7 +18,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS =			\
-	boxhelper/test			\
 	child_widget/test		\
 	child_widget2/test		\
 	child_widget_managed/test	\
@@ -32,7 +31,6 @@ check_PROGRAMS =			\
 	scrolledwindow/test		\
 	wrap_existing/test
 
-boxhelper_test_SOURCES             = boxhelper/main.cc
 child_widget_test_SOURCES          = child_widget/main.cc	\
                                      child_widget/testwindow.cc	\
                                      child_widget/testwindow.h
