@@ -49,9 +49,7 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
 
-democodedir = $(datadir)/$(GTKMM_MODULE_NAME)/demo
-democode_DATA = $(gtk_demo_gtkmm_demo_SOURCES)
-dist_democode_DATA =			\
+dist_noinst_DATA =			\
 	gtk-demo/alphatest.png		\
 	gtk-demo/apple-red.png		\
 	gtk-demo/background.jpg		\
