@@ -15,20 +15,16 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-include $(top_srcdir)/atk/src/filelist.am
-include $(top_srcdir)/atk/atkmm/filelist.am
 include $(top_srcdir)/gdk/src/filelist.am
 include $(top_srcdir)/gdk/gdkmm/filelist.am
 include $(top_srcdir)/gtk/src/filelist.am
 include $(top_srcdir)/gtk/gtkmm/filelist.am
 
-atkmm_files_h = $(atkmm_files_built_h) $(filter-out wrap_init.h,$(atkmm_files_extra_h))
 gdkmm_files_h = $(gdkmm_files_built_h) $(filter-out wrap_init.h,$(gdkmm_files_extra_h))
 gtkmm_files_h = $(gtkmm_files_built_h) $(filter-out wrap_init.h,$(gtkmm_files_extra_h))
 
 book_name = $(GTKMM_MODULE_NAME)
-doc_input = $(addprefix $(top_srcdir)/atk/atkmm/,$(atkmm_files_h)) \
-            $(addprefix $(top_srcdir)/gdk/gdkmm/,$(gdkmm_files_h)) \
+doc_input = $(addprefix $(top_srcdir)/gdk/gdkmm/,$(gdkmm_files_h)) \
             $(addprefix $(top_srcdir)/gtk/gtkmm/,$(gtkmm_files_h)) \
 	    $(top_srcdir)/gtk/gtkmm.h
 

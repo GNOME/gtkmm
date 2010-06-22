@@ -30,8 +30,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
-MM_PREREQ([0.8])
-MM_INIT_MODULE([atkmm-1.6])
+MM_PREREQ([0.9])
 MM_INIT_MODULE([gdkmm-3.0])
 MM_INIT_MODULE([gtkmm-3.0])
 
@@ -53,17 +52,21 @@ AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
 AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
-AC_SUBST([ATKMM_MODULES], ['glibmm-2.4 >= 2.24 atk >= 1.12'])
-
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.22 pangomm-1.4 >= 2.26 gtk+-3.0 >= 2.90.3'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
       [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-3.0"])
+
+# Offer the ability to omit some API from the library, to reduce the code size.
+# Note that there are other options in glibmm, which affect gtkmm.
+GTKMM_ARG_ENABLE_API_ATKMM
+
+AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
+      [GTKMM_MODULES="atkmm-1.6 >= 2.90.3 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
-PKG_CHECK_MODULES([ATKMM], [$ATKMM_MODULES])
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
 PKG_CHECK_MODULES([GTKMM], [$GTKMM_MODULES])
 
@@ -71,19 +74,8 @@ MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
 
-# Offer the ability to omit some API from the library, to reduce the code size.
-# Note that there are other options in glibmm, which affect gtkmm.
-GTKMM_ARG_ENABLE_API_ATKMM
-
-AS_IF([test "x$gtkmm_enable_api_atkmm" = xno],
-      [GTKMM_REQ_ATKMM= GTKMM_REQ_ATKMM_UNINST=],
-      [GTKMM_REQ_ATKMM=$ATKMM_MODULE_NAME GTKMM_REQ_ATKMM_UNINST=$ATKMM_MODULE_NAME-uninstalled])
-AC_SUBST([GTKMM_REQ_ATKMM])
-AC_SUBST([GTKMM_REQ_ATKMM_UNINST])
-AM_CONDITIONAL([GTKMM_ATKMM_ENABLED], [test "x$gtkmm_enable_api_atkmm" != xno])
-
 GTKMM_ARG_ENABLE_API_MAEMO_EXTENSIONS
-MM_ARG_DISABLE_DEPRECATED_API([ATKMM GDKMM GTKMM])
+MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
 
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
@@ -91,6 +83,7 @@ MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
+MM_ARG_WITH_TAGFILE_DOC([atkmm-1.6.tag], [atkmm-1.6])
 
 AC_LANG([C++])
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
@@ -99,14 +92,10 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -DGSEAL_ENABLE],
-                       [G PANGO ATK GDK GDK_PIXBUF GTK PANGOMM])
+                       [G PANGO ATK GDK GDK_PIXBUF GTK ATKMM PANGOMM])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
-                 atk/${ATKMM_MODULE_NAME}.pc:atk/atkmm.pc.in
-                 atk/${ATKMM_MODULE_NAME}-uninstalled.pc:atk/atkmm-uninstalled.pc.in
-                 atk/src/Makefile
-                 atk/atkmm/Makefile
                  gdk/${GDKMM_MODULE_NAME}.pc:gdk/gdkmm.pc.in
                  gdk/${GDKMM_MODULE_NAME}-uninstalled.pc:gdk/gdkmm-uninstalled.pc.in
                  gdk/src/Makefile
@@ -119,10 +108,8 @@ AC_CONFIG_FILES([Makefile
                  demos/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_Net2005/atkmm/atkmm.rc
                  MSVC_Net2005/gdkmm/gdkmm.rc
                  MSVC_Net2005/gtkmm/gtkmm.rc
-                 MSVC_Net2008/atkmm/atkmm.rc
                  MSVC_Net2008/gdkmm/gdkmm.rc
                  MSVC_Net2008/gtkmm/gtkmm.rc
                  win32_installer/gtkmm-installer.nsi])

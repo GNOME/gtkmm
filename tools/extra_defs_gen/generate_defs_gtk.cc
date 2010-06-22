@@ -22,7 +22,6 @@
 // We always need to generate the .defs for all types because the code
 // using deprecated API is generated unconditionally and only disabled
 // at compile time.
-#undef ATK_DISABLE_DEPRECATED
 #undef GDK_DISABLE_DEPRECATED
 #undef GTK_DISABLE_DEPRECATED
 
@@ -36,26 +35,6 @@
 int main(int argc, char** argv)
 {
   gtk_init(&argc, &argv);
-
-  void *const g_class_atk_no_op_object = g_type_class_ref(ATK_TYPE_NO_OP_OBJECT);
-
-  std::cout << get_defs( ATK_TYPE_OBJECT )
-            << get_defs( ATK_TYPE_COMPONENT )
-            << get_defs( ATK_TYPE_ACTION )
-            << get_defs( ATK_TYPE_EDITABLE_TEXT )
-            << get_defs( ATK_TYPE_HYPERLINK )
-            << get_defs( ATK_TYPE_HYPERTEXT )
-            << get_defs( ATK_TYPE_IMAGE )
-            << get_defs( ATK_TYPE_SELECTION )
-            << get_defs( ATK_TYPE_TABLE )
-            << get_defs( ATK_TYPE_TEXT )
-            << get_defs( ATK_TYPE_VALUE )
-            << get_defs( ATK_TYPE_REGISTRY )
-            << get_defs( ATK_TYPE_RELATION )
-            << get_defs( ATK_TYPE_RELATION_SET )
-            << get_defs( ATK_TYPE_STATE_SET );
-
-  g_type_class_unref(g_class_atk_no_op_object);
 
   std::cout << get_defs( GDK_TYPE_COLORMAP )
             << get_defs( GDK_TYPE_DRAG_CONTEXT )
