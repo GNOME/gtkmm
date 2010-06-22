@@ -18,17 +18,8 @@
 ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
-if GTKMM_ATKMM_ENABLED
-atk_maint_subdir = atk/src
-atk_built_subdir = atk/atkmm
-atk_atkmm_pcfile = atk/$(ATKMM_MODULE_NAME).pc
-else
-atk_maint_subdir =
-atk_built_subdir =
-atk_atkmm_pcfile =
-endif
 if MAINTAINER_MODE
-src_subdirs = tools $(atk_maint_subdir) gdk/src gtk/src
+src_subdirs = gdk/src gtk/src
 else
 src_subdirs =
 endif
@@ -37,12 +28,8 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) $(atk_built_subdir) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
+SUBDIRS = tools $(src_subdirs) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
 
-if GTKMM_ATKMM_ENABLED
-atkmm_includedir = $(includedir)/$(ATKMM_MODULE_NAME)
-atkmm_include_HEADERS = atk/atkmm.h
-endif
 gdkmm_includedir = $(includedir)/$(GDKMM_MODULE_NAME)
 gdkmm_include_HEADERS = gdk/gdkmm.h
 gdkmm_libincludedir = $(libdir)/$(GDKMM_MODULE_NAME)/include
@@ -54,7 +41,7 @@ gtkmm_libincludedir = $(libdir)/$(GTKMM_MODULE_NAME)/include
 nodist_gtkmm_libinclude_HEADERS = gtk/gtkmmconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
-nodist_pkgconfig_DATA = $(atk_atkmm_pcfile) gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
+pkgconfig_DATA = gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
 
 include $(srcdir)/MSVC_Net2005/filelist.am
 include $(srcdir)/MSVC_Net2008/filelist.am

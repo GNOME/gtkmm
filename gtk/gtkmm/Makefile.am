@@ -27,15 +27,8 @@ files_extra_cc = $(gtkmm_files_extra_cc)
 files_extra_h  = $(gtkmm_files_extra_h)
 files_extra_ph = $(gtkmm_files_extra_ph)
 
-if GTKMM_ATKMM_ENABLED
-atkmm_includes = -I$(top_builddir)/atk $(if $(srcdir:.=),-I$(top_srcdir)/atk)
-atkmm_libadd   = $(top_builddir)/atk/atkmm/libatkmm-$(ATKMM_API_VERSION).la
-else
-atkmm_includes =
-atkmm_libadd   =
-endif
-local_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk) $(atkmm_includes)
-local_libadd   = $(atkmm_libadd) $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
+local_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
+local_libadd   = $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
 
 include $(top_srcdir)/build/compile-binding.am
 

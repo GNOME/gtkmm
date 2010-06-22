@@ -48,21 +48,14 @@ refcount_dialog_test_SOURCES       = refcount_dialog/main.cc
 scrolledwindow_test_SOURCES        = scrolledwindow/main.cc
 wrap_existing_test_SOURCES         = wrap_existing/main.cc
 
-if GTKMM_ATKMM_ENABLED
-atkmm_includes = -I$(top_builddir)/atk $(if $(srcdir:.=),-I$(top_srcdir)/atk)
-atkmm_ldadd    = $(top_builddir)/atk/atkmm/libatkmm-$(ATKMM_API_VERSION).la
-else
-atkmm_includes =
-atkmm_ldadd    =
-endif
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
 gdkmm_ldadd    = $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
 
 gtkmm_includes = -I$(top_builddir)/gtk $(if $(srcdir:.=),-I$(top_srcdir)/gtk)
 gtkmm_ldadd    = $(top_builddir)/gtk/gtkmm/libgtkmm-$(GTKMM_API_VERSION).la
 
-local_includes = -I$(top_builddir) $(atkmm_includes) $(gdkmm_includes) $(gtkmm_includes)
-local_ldadd    = $(atkmm_ldadd) $(gdkmm_ldadd) $(gtkmm_ldadd)
+local_includes = -I$(top_builddir) $(gdkmm_includes) $(gtkmm_includes)
+local_ldadd    = $(gdkmm_ldadd) $(gtkmm_ldadd)
 
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
