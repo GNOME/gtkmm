@@ -341,7 +341,7 @@ void Example_TreeView_TreeStore::add_columns()
   }
 
   /* column for Alex */
-  { 
+  {
     int cols_count = m_TreeView.append_column_editable("Alex", m_columns.alex);
     Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
@@ -366,7 +366,7 @@ void Example_TreeView_TreeStore::add_columns()
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
       pRenderer->property_xalign().set_value(0.0);
-      
+
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
@@ -383,10 +383,10 @@ void Example_TreeView_TreeStore::add_columns()
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
       pRenderer->property_xalign().set_value(0.0);
-      
+
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
       pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
-      
+
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
       pColumn->set_fixed_width(50);
       pColumn->set_clickable();
@@ -401,7 +401,7 @@ void Example_TreeView_TreeStore::add_columns()
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
       pRenderer->property_xalign().set_value(0.0);
-      
+
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
@@ -418,7 +418,7 @@ void Example_TreeView_TreeStore::add_columns()
     {
       Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell_renderer());
       pRenderer->property_xalign().set_value(0.0);
-      
+
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
@@ -434,6 +434,4 @@ void Example_TreeView_TreeStore::on_realize()
   m_TreeView.expand_all();
   //call base class:
   Window::on_realize();
-#endif
 }
-
