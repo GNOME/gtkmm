@@ -64,7 +64,7 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-1.6 >= 2.90.3 $GTKMM_MODULES"])
+      [GTKMM_MODULES="atkmm-1.6 >= 2.21.1 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
