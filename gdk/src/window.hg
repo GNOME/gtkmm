@@ -21,7 +21,7 @@ _CONFIGINCLUDE(gdkmmconfig.h)
 #include <gdkmm/bitmap.h>
 //#include <gdkmm/cursor.h>
 #include <gdkmm/types.h>
-#include <gdkmm/region.h>
+#include <cairomm/region.h>
 #include <gdk/gdk.h>
 
 _DEFS(gdkmm,gdk)
@@ -109,19 +109,19 @@ public:
   _WRAP_METHOD(void remove_filter(GdkFilterFunc function, gpointer data), gdk_window_remove_filter)
 
   _WRAP_METHOD(void scroll(int dx, int dy), gdk_window_scroll)
-  _WRAP_METHOD(void move_region(const Region& region, int dx, int dy), gdk_window_move_region)
+  _WRAP_METHOD(void move_region(const Cairo::RefPtr<Cairo::Region>& region, int dx, int dy), gdk_window_move_region)
   _WRAP_METHOD(bool ensure_native(), gdk_window_ensure_native)
 
   _WRAP_METHOD(void shape_combine_mask(const Glib::RefPtr<Bitmap>& mask, int x, int y), gdk_window_shape_combine_mask)
   void unset_shape_combine_mask();
 
-  _WRAP_METHOD(void shape_combine_region(const Region& shape_region, int offset_x, int offset_y), gdk_window_shape_combine_region)
+  _WRAP_METHOD(void shape_combine_region(const Cairo::RefPtr<Cairo::Region>& shape_region, int offset_x, int offset_y), gdk_window_shape_combine_region)
   _WRAP_METHOD(void set_child_shapes(), gdk_window_set_child_shapes)
   _WRAP_METHOD(void set_composited(bool composited = TRUE), gdk_window_set_composited)
   _WRAP_METHOD(void merge_child_shapes(), gdk_window_merge_child_shapes)
 
   _WRAP_METHOD(void input_shape_combine_mask(const Glib::RefPtr<Bitmap>& mask, int x, int y), gdk_window_input_shape_combine_mask)
-  _WRAP_METHOD(void input_shape_combine_region (const Region& shape_region, int offset_x, int offset_y), gdk_window_input_shape_combine_region)
+  _WRAP_METHOD(void input_shape_combine_region (const Cairo::RefPtr<Cairo::Region>& shape_region, int offset_x, int offset_y), gdk_window_input_shape_combine_region)
   _WRAP_METHOD(void set_child_input_shapes(), gdk_window_set_child_input_shapes)
   _WRAP_METHOD(void merge_child_input_shapes(), gdk_window_merge_child_input_shapes)
 
@@ -136,7 +136,7 @@ public:
   _WRAP_METHOD(static void set_sm_client_id(const Glib::ustring& sm_client_id), gdk_set_sm_client_id)
   static void unset_sm_client_id();
   _WRAP_METHOD(void begin_paint_rect(const Rectangle& rectangle), gdk_window_begin_paint_rect)
-  _WRAP_METHOD(void begin_paint_region(const Region& region), gdk_window_begin_paint_region)
+  _WRAP_METHOD(void begin_paint_region(const Cairo::RefPtr<Cairo::Region>& region), gdk_window_begin_paint_region)
   _WRAP_METHOD(void end_paint(), gdk_window_end_paint)
   _WRAP_METHOD(void flush(), gdk_window_flush)
   _WRAP_METHOD(void set_title(const Glib::ustring& title), gdk_window_set_title)
@@ -227,10 +227,12 @@ public:
    */
   void invalidate(bool invalidate_children);
 
-  _WRAP_METHOD(void invalidate_region(const Region& region, bool invalidate_children = true), gdk_window_invalidate_region)
+  _WRAP_METHOD(void invalidate_region(const Cairo::RefPtr<Cairo::Region>& region, bool invalidate_children = true), gdk_window_invalidate_region)
 
-  _WRAP_METHOD(Region get_update_area(), gdk_window_get_update_area)
-  //This method should not have a const version - see the docs.
+#m4 _CONVERSION(`cairo_region_t*',`Cairo::RefPtr<Cairo::Region>',`Cairo::RefPtr<Cairo::Region>(new Cairo::Region(($3), true /* do not take ref */))')
+
+  //This method should not have a const version - see the docs
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_update_area(), gdk_window_get_update_area)
 
   _WRAP_METHOD(void freeze_updates(), gdk_window_freeze_updates)
   _WRAP_METHOD(void thaw_updates(), gdk_window_thaw_updates)
@@ -294,7 +296,7 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Window> get_offscreen_embedder(), gdk_offscreen_window_get_embedder, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Window> get_offscreen_embedder() const, gdk_offscreen_window_get_embedder, constversion, refreturn)
-  
+
    _WRAP_METHOD(void set_offscreen_embedder(const Glib::RefPtr<Window>& embedder), gdk_offscreen_window_set_embedder)
 
   _WRAP_METHOD(void redirect_to_drawable(const Glib::RefPtr<Drawable>& drawable, int src_x, int src_y, int dest_x, int dest_y, int width, int height), gdk_window_redirect_to_drawable)

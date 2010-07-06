@@ -22,6 +22,7 @@
 
 #include <gdkmm/pixbuf.h>
 #include <cairomm/context.h>
+#include <cairomm/region.h>
 
 namespace Gdk
 {
@@ -39,7 +40,7 @@ namespace Cairo
 
 /** Sets the specified Gdk::Color as the source color of the Cairo context.
  * @param @context The cairo context.
- * @param color The color to use as the source color. 
+ * @param color The color to use as the source color.
  *
  * @newin{2,10}
  */
@@ -68,7 +69,7 @@ void set_source_pixmap(const ::Cairo::RefPtr< ::Cairo::Context >& context, const
 /** Adds the given rectangle to the current path of the context.
  *
  * @param context A cairo context.
- * @param rectangle A rectangle to add to the path of the context. 
+ * @param rectangle A rectangle to add to the path of the context.
  *
  * @newin{2,10}
  */
@@ -77,15 +78,14 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
 /** Adds the given region to the current path of the context.
  *
  * @param context A cairo context.
- * @param region A region to add to the path of the context. 
+ * @param region A region to add to the path of the context.
  *
  * @newin{2,10}
  */
-void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region);
+void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region);
 
 } //namespace Cairo
 
 } //namespace Gdk
 
 #endif //_GDKMM_GENERAL_H
-

@@ -74,12 +74,11 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
   gdk_cairo_rectangle(context->cobj(), const_cast<GdkRectangle*>(rectangle.gobj()));
 }
 
-void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Region& region)
+void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region)
 {
-  gdk_cairo_region(context->cobj(), const_cast<GdkRegion*>(region.gobj()));
+  gdk_cairo_region(context->cobj(), (region ? region->cobj() : 0));
 }
 
 } //namespace Cairo
 
 } //namespace Gdk
-

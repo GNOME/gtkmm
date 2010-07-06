@@ -76,11 +76,8 @@ _CONVERSION(`Gdk::Rectangle&',`GdkRectangle*',($3).gobj())
 _CONVERSION(`const Rectangle&',`const GdkRectangle*',($3).gobj())
 _CONVERSION(`const Gdk::Rectangle&',`const GdkRectangle*',($3).gobj())
 _CONVERSION(`Font&',`GdkFont*',($3).gobj())
-#_CONVERSION(`Region&',`GdkRegion*',($3).gobj())
-_CONVERSION(`const Region&',`const GdkRegion*',($3).gobj())
-_CONVERSION(`const Gdk::Region&',`const GdkRegion*',($3).gobj())
-_CONVERSION(`const Region&',`GdkRegion*',const_cast<$2>(($3).gobj()))
-_CONVERSION(`const Gdk::Region&',`GdkRegion*',const_cast<$2>(($3).gobj()))
+_CONVERSION(`const Cairo::RefPtr<Cairo::Region>&',`const cairo_region_t*',`(($3) ? ($3)->cobj() : 0)')
+_CONVERSION(`const Cairo::RefPtr<const Cairo::Region>&',`cairo_region_t*',`(($3) ? ($3)->cobj() : 0)')
 
 _CONVERSION(`const Glib::RefPtr<Gdk::Colormap>&',`GdkColormap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Pixmap>&',`GdkPixmap*',__CONVERT_REFPTR_TO_P)
@@ -229,8 +226,6 @@ _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$
 
 _CONVERSION(GdkFont*, Gdk::Font, `Gdk::Font($3)')
 _CONVERSION(GdkEvent*, Event, `Event($3)')
-_CONVERSION(GdkRegion*, Region, `Region($3)')
-_CONVERSION(GdkRegion*, Gdk::Region, `Gdk::Region($3)')
 
 _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 

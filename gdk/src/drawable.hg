@@ -25,10 +25,10 @@
 #include <gdkmm/gc.h>
 #include <gdkmm/image.h>
 #include <gdkmm/color.h>
-#include <gdkmm/region.h>
 #include <gdkmm/rgbcmap.h>
 #include <gdkmm/types.h>
 #include <cairomm/context.h>
+#include <cairomm/region.h>
 //#include <gdkmm/pixbuf.h>
 
 
@@ -51,7 +51,7 @@ class Pixbuf;
  *
  * To use a drawable, create a concrete Drawable of the type you wish to use
  * and a Gdk::GC (graphics context) for that Drawable.  With the GC you can
- * draw lines, text, arcs and such. 
+ * draw lines, text, arcs and such.
  *
  * An alternative is to create a Cairo::Context with get_cairo_context()
  * while you handle the 'exposed' event of the drawable. For more about
@@ -108,19 +108,19 @@ public:
 
   /** Renders a rectangular portion of a pixbuf to a drawable.  The destination
    * drawable must have a colormap. All windows have a colormap, however, pixmaps
-   * only have colormap by default if they were created with a non-<tt>0</tt> window 
-   * argument. Otherwise a colormap must be set on them with 
+   * only have colormap by default if they were created with a non-<tt>0</tt> window
+   * argument. Otherwise a colormap must be set on them with
    * Gdk::Drawable::set_colormap().
-   * 
-   * On older X servers, rendering pixbufs with an alpha channel involves round 
+   *
+   * On older X servers, rendering pixbufs with an alpha channel involves round
    * trips to the X server, and may be somewhat slow.
-   * 
+   *
    * If GDK is built with the Sun mediaLib library, the gdk_draw_pixbuf
    * function is accelerated using mediaLib, which provides hardware
    * acceleration on Intel, AMD, and Sparc chipsets.  If desired, mediaLib
    * support can be turned off by setting the GDK_DISABLE_MEDIALIB environment
    * variable.
-   * 
+   *
    * @newin{2,16}
    * @param pixbuf A Gdk::Pixbuf.
    * @param src_x Source X coordinate within pixbuf.
@@ -145,9 +145,14 @@ public:
   // same as gdk_drawable_get_image().
   void copy_to_image(const Glib::RefPtr<Image>& image, int src_x, int src_y, int dest_x, int dest_y, int width, int height) const;
   _IGNORE(gdk_drawable_copy_to_image)
-  
-  _WRAP_METHOD(Region get_clip_region() const, gdk_drawable_get_clip_region)
-  _WRAP_METHOD(Region get_visible_region() const, gdk_drawable_get_visible_region)
+
+ #m4 _CONVERSION(`cairo_region_t*',`Cairo::RefPtr<Cairo::Region>',`Cairo::RefPtr<Cairo::Region>(new Cairo::Region($3, true /* do not take ref */))')
+
+  //This is const because it returns a copy (though that is not very clear from the C documentation)
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_clip_region() const, gdk_drawable_get_clip_region)
+
+  //This is const because it returns a copy (though that is not very clear from the C documentation)
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_visible_region() const, gdk_drawable_get_visible_region)
 
 
   // **** RGB stuff ****
@@ -202,4 +207,3 @@ public:
 };
 
 } // namespace Gdk
-
