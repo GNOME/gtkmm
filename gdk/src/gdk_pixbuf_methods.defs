@@ -1,12 +1,5 @@
 ;; -*- scheme -*-
 ; object definitions ...
-(define-object Pixbuf
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkPixbuf")
-  (gtype-id "GDK_TYPE_PIXBUF")
-)
-
 (define-object PixbufAnimation
   (in-module "Gdk")
   (parent "GObject")
@@ -98,9 +91,37 @@
   )
 )
 
+(define-flags PixdataType
+  (in-module "Gdk")
+  (c-name "GdkPixdataType")
+  (gtype-id "GDK_TYPE_PIXDATA_TYPE")
+  (values
+    '("color-type-rgb" "GDK_PIXDATA_COLOR_TYPE_RGB")
+    '("color-type-rgba" "GDK_PIXDATA_COLOR_TYPE_RGBA")
+    '("color-type-mask" "GDK_PIXDATA_COLOR_TYPE_MASK")
+    '("sample-width-8" "GDK_PIXDATA_SAMPLE_WIDTH_8")
+    '("sample-width-mask" "GDK_PIXDATA_SAMPLE_WIDTH_MASK")
+    '("encoding-raw" "GDK_PIXDATA_ENCODING_RAW")
+    '("encoding-rle" "GDK_PIXDATA_ENCODING_RLE")
+    '("encoding-mask" "GDK_PIXDATA_ENCODING_MASK")
+  )
+)
 
-;; From gdk-pixbuf-alias.h
-
+(define-flags PixdataDumpType
+  (in-module "Gdk")
+  (c-name "GdkPixdataDumpType")
+  (gtype-id "GDK_TYPE_PIXDATA_DUMP_TYPE")
+  (values
+    '("pixdata-stream" "GDK_PIXDATA_DUMP_PIXDATA_STREAM")
+    '("pixdata-struct" "GDK_PIXDATA_DUMP_PIXDATA_STRUCT")
+    '("macros" "GDK_PIXDATA_DUMP_MACROS")
+    '("gtypes" "GDK_PIXDATA_DUMP_GTYPES")
+    '("ctypes" "GDK_PIXDATA_DUMP_CTYPES")
+    '("static" "GDK_PIXDATA_DUMP_STATIC")
+    '("const" "GDK_PIXDATA_DUMP_CONST")
+    '("rle-decoder" "GDK_PIXDATA_DUMP_RLE_DECODER")
+  )
+)
 
 
 ;; From gdk-pixbuf-animation.h
@@ -595,10 +616,6 @@
 
 
 
-;; From gdk-pixbuf-i18n.h
-
-
-
 ;; From gdk-pixbuf-io.h
 
 (define-function gdk_pixbuf_get_formats
@@ -770,24 +787,6 @@
 
 
 
-;; From gdk-pixbuf-private.h
-
-
-
-;; From gdk-pixbuf-scaled-anim.h
-
-(define-function gdk_pixbuf_scaled_anim_get_type
-  (c-name "gdk_pixbuf_scaled_anim_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_pixbuf_scaled_anim_iter_get_type
-  (c-name "gdk_pixbuf_scaled_anim_iter_get_type")
-  (return-type "GType")
-)
-
-
-
 ;; From gdk-pixbuf-simple-anim.h
 
 (define-function gdk_pixbuf_simple_anim_get_type
@@ -941,6 +940,60 @@
   (return-type "GdkPixbuf*")
   (parameters
     '("gboolean" "horizontal")
+  )
+)
+
+
+
+;; From gdk-pixdata.h
+
+(define-method serialize
+  (of-object "GdkPixdata")
+  (c-name "gdk_pixdata_serialize")
+  (return-type "guint8*")
+  (parameters
+    '("guint*" "stream_length_p")
+  )
+)
+
+(define-method deserialize
+  (of-object "GdkPixdata")
+  (c-name "gdk_pixdata_deserialize")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "stream_length")
+    '("const-guint8*" "stream")
+    '("GError**" "error")
+  )
+)
+
+(define-method from_pixbuf
+  (of-object "GdkPixdata")
+  (c-name "gdk_pixdata_from_pixbuf")
+  (return-type "gpointer")
+  (parameters
+    '("const-GdkPixbuf*" "pixbuf")
+    '("gboolean" "use_rle")
+  )
+)
+
+(define-function gdk_pixbuf_from_pixdata
+  (c-name "gdk_pixbuf_from_pixdata")
+  (return-type "GdkPixbuf*")
+  (parameters
+    '("const-GdkPixdata*" "pixdata")
+    '("gboolean" "copy_pixels")
+    '("GError**" "error")
+  )
+)
+
+(define-method to_csource
+  (of-object "GdkPixdata")
+  (c-name "gdk_pixdata_to_csource")
+  (return-type "GString*")
+  (parameters
+    '("const-gchar*" "name")
+    '("GdkPixdataDumpType" "dump_type")
   )
 )
 

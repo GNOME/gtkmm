@@ -19,6 +19,40 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+// We use GdkSpanFunc in the (deprecated) API, so we must temporarily undef GDK_DISABLE_DEPRECATED.
+// We shouldn't have used that C type in the API anyway, but we can't break API.
+// Temporarily undef GDK_DISABLE_DEPRECATED, redefining it later if appropriate.
+// We need this to use _GtkBoxChild, which we use in our (deprecated) API.
+#if defined(GDK_DISABLE_DEPRECATED) && !defined(GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED)
+#undef GDK_DISABLE_DEPRECATED
+#define GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED 1
+#endif
+
+// This is for dragcontext which is often included after color.h, which we can't avoid.
+// We use GdkDragContext members in the (deprecated) API, for which there are no replacements,
+// so we must temporarily undef GSEAL_ENABLE.
+// Temporarily undef GSEAL_ENABLE, redefining it later if appropriate.
+#if defined(GSEAL_ENABLE) && !defined(GTKMM_GSEAL_ENABLE_UNDEFED)
+#undef GSEAL_ENABLE
+#define GTKMM_GSEAL_ENABLE_UNDEFED 1
+#endif
+
+#include <gdk/gdk.h>
+
+// Redefine GDK_DISABLE_DEPRECATED if it was defined before we temporarily undefed it:
+#if defined(GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED)
+#define GDK_DISABLE_DEPRECATED 1
+#undef GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED
+#endif
+
+// Redefine GSEAL_ENABLE if it was defined before we temporarily undefed it:
+#if defined(GTKMM_GSEAL_ENABLE_UNDEFED)
+#define GSEAL_ENABLE 1
+#undef GTKMM_GSEAL_ENABLE_UNDEFED
+#endif
+
+
+
 extern "C" { typedef struct _GdkRegion GdkRegion; }
 
 #include <glibmm/arrayhandle.h>
@@ -26,6 +60,10 @@ extern "C" { typedef struct _GdkRegion GdkRegion; }
 #include <gdkmm/rectangle.h>
 
 _DEFS(gdkmm,gdk)
+
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef GDK_DISABLE_DEPRECATED
+#m4 _POP()
 
 namespace Gdk
 {
@@ -62,16 +100,16 @@ public:
   _WRAP_METHOD(void union_(const Region& source2), gdk_region_union) //union is a keyword.
   _WRAP_METHOD(void subtract(const Region& source2), gdk_region_subtract)
   _WRAP_METHOD(void xor_(const Region& source2), gdk_region_xor) //xor is a keyword
-  
-  
+
+
 //Note: The spans parameter was made const in GTK+ 2.16, but we can't change that in our C++ API. TODO: Change it when we can do an ABI break.
 #m4 _CONVERSION(`GdkSpan*',`const GdkSpan*',`($3)')
   _WRAP_METHOD(void spans_intersect_foreach(GdkSpan* spans, int n_spans, bool sorted, GdkSpanFunc function, gpointer data), gdk_region_spans_intersect_foreach)
-  
+
 #m4begin
   _WRAP_EQUAL(gdk_region_equal, unconst)
 #m4end
 };
 
-} //namespace Gdk
 
+} //namespace Gdk
