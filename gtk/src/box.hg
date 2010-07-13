@@ -26,15 +26,18 @@ _PINCLUDE(gtkmm/private/container_p.h)
 #undef GSEAL_ENABLE
 #m4 _POP()
 
-#include <gtkmm/container.h>
-#include <glibmm/helperlist.h>
-
-
 // Temporarily undef GTK_DISABLE_DEPRECATED, redefining it later if appropriate.
 // We need this to use _GtkBoxChild, which we use in our (deprecated) API.
 #if defined(GTK_DISABLE_DEPRECATED) && !defined(GTKMM_GTK_DISABLE_DEPRECATED_UNDEFED)
 #undef GTK_DISABLE_DEPRECATED
 #define GTKMM_GTK_DISABLE_DEPRECATED_UNDEFED 1
+#endif
+
+// This is needed for gdkregion.h, for GdkSpanFunc, which we indirectly include.
+// Otherwise application code must be very careful of the include order.
+#if defined(GDK_DISABLE_DEPRECATED) && !defined(GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED)
+#undef GDK_DISABLE_DEPRECATED
+#define GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED 1
 #endif
 
 #include <gtk/gtk.h>  /* For _GtkBoxChild */
@@ -45,6 +48,16 @@ _PINCLUDE(gtkmm/private/container_p.h)
 #undef GTKMM_GTK_DISABLE_DEPRECATED_UNDEFED
 #endif
 
+// Redefine GDK_DISABLE_DEPRECATED if it was defined before we temporarily undefed it:
+#if defined(GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED)
+#define GDK_DISABLE_DEPRECATED 1
+#undef GTKMM_GDK_DISABLE_DEPRECATED_UNDEFED
+#endif
+
+
+
+#include <gtkmm/container.h>
+#include <glibmm/helperlist.h>
 
 namespace Gtk
 {

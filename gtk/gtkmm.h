@@ -88,6 +88,8 @@ extern const int gtkmm_micro_version;
 #include <giomm.h>
 #include <gdkmm.h>
 
+#include <gtkmm/box.h>
+#include <gtkmm/dialog.h>
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/accelkey.h>
@@ -100,7 +102,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/base.h>
 #include <gtkmm/bin.h>
 #include <gtkmm/border.h>
-#include <gtkmm/box.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
 #include <gtkmm/buttonbox.h>
@@ -125,7 +126,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/container.h>
 #include <gtkmm/curve.h>
-#include <gtkmm/dialog.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/editable.h>
 #include <gtkmm/entry.h>
