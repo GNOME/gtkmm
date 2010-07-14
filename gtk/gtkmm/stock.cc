@@ -19,7 +19,6 @@
  */
 
 #include <gtkmm/stock.h>
-#include <gtkmm/stockitem.h>
 #include <gtk/gtk.h>
 
 // Get rid of macro DELETE (from winnt.h).  We have some macro
@@ -171,4 +170,3 @@ Glib::SListHandle<Gtk::StockID,Gtk::StockID_Traits> get_ids()
 } // namespace Stock
 
 } // namespace Gtk
-

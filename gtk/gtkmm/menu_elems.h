@@ -2,7 +2,7 @@
 #ifndef _GTKMM_MENU_ELEMS_H
 #define _GTKMM_MENU_ELEMS_H
 /* menu_elems.h
- * 
+ *
  * Copyright (C) 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -20,8 +20,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gdk/gdkkeysyms.h>
-
 #include <gtkmm/container.h>
 #include <gtkmm/menuitem.h>
 #include <gtkmm/imagemenuitem.h>
@@ -31,6 +29,8 @@
 #include <gtkmm/separatormenuitem.h>
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/accelkey.h>
+#include <gdk/gdkkeysyms.h>
+
 
 namespace Gtk
 {

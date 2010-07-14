@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /* $Id$ */
 
-/* 
+/*
  *
  * Copyright 1998-2002 The gtkmm Development Team
  *
@@ -20,10 +20,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gtk/gtk.h>
-
 #include <gtkmm/menu_elems.h>
 #include <gtkmm/label.h>
+#include <gtk/gtk.h>
+
 
 #ifndef GLIBMM_WIN32
 #include <strings.h>
@@ -70,7 +70,7 @@ MenuElem::MenuElem(MenuItem& child)
 : Element(child)
 {}
 
-MenuElem::MenuElem(const Glib::ustring& label, 
+MenuElem::MenuElem(const Glib::ustring& label,
                    const CallSlot& slot)
 {
   set_child( manage(new MenuItem(label, true)) );
@@ -97,7 +97,7 @@ MenuElem::MenuElem(const Glib::ustring& label, Menu& submenu)
   child_->show();
 }
 
-MenuElem::MenuElem(const Glib::ustring& label, 
+MenuElem::MenuElem(const Glib::ustring& label,
                    const AccelKey& accel_key,
                    Gtk::Menu& submenu)
 {
@@ -283,4 +283,3 @@ TearoffMenuElem::TearoffMenuElem(const AccelKey& accel_key,
 } /* namespace Menu_Helpers */
 
 } /* namespace Gtk */
-
