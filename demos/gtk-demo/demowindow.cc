@@ -21,10 +21,10 @@
 #include "config.h"
 #endif
 
-#include "gtkmm/main.h"
+#include "demowindow.h"
 #include "gtkmm/cellrenderertext.h"
 #include "gtkmm/treeviewcolumn.h"
-#include "demowindow.h"
+#include "gtkmm/main.h"
 #include "textwidget.h"
 #include "demos.h"
 #include <vector>
@@ -229,7 +229,7 @@ bool DemoWindow::read_line (FILE *stream, GString *str)
 		  (c == '\r' && next_c == '\n') ||
 		  (c == '\n' && next_c == '\r')))
 	      ungetc (next_c, stream);
-	
+
 	    goto done;
 	  }
 	default:
@@ -316,11 +316,11 @@ void DemoWindow::load_file(const std::string& filename)
     	      refBufferInfo->apply_tag_by_name("title", start, end);
 
     	      start = end;
-      	
+
     	      state++;
     	    }
     	    break;
-  	
+
       	case 1:
       	  /* Reading body of info section */
       	  while (isspace (*p))
@@ -334,14 +334,14 @@ void DemoWindow::load_file(const std::string& filename)
       	  else
     	    {
     	      int len;
-        	
+
     	      while (*p == '*' || isspace (*p))
     		      p++;
 
     	      len = strlen (p);
     	      while (isspace (*(p + len - 1)))
     		     len--;
-        	
+
     	      if (len > 0)
                 {
                   if (in_para)
@@ -373,7 +373,7 @@ void DemoWindow::load_file(const std::string& filename)
     	    }
       	  else
       	    break;
-        	
+
       	case 3:
       	  /* Reading program body */
       	  start = refBufferSource->insert(start, p);
@@ -400,4 +400,3 @@ void DemoWindow::on_example_window_hide()
     }
   }
 }
-

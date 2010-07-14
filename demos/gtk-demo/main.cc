@@ -19,8 +19,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "gtkmm/main.h"
 #include "demowindow.h"
+#include "gtkmm/main.h"
 
 int main (int argc, char *argv[])
 {

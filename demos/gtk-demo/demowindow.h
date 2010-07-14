@@ -20,9 +20,9 @@
 #ifndef _DEMOWINDOW_H
 #define _DEMOWINDOW_H
 
+#include "gtkmm/box.h"
 #include "gtkmm/window.h"
 #include "gtkmm/notebook.h"
-#include "gtkmm/box.h"
 
 #include "gtkmm/treestore.h"
 #include "gtkmm/treeview.h"
@@ -64,4 +64,3 @@ protected:
 };
 
 #endif //_DEMOWINDOW_H
-
