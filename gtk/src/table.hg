@@ -20,77 +20,12 @@
 #include <glibmm/helperlist.h>
 #include <gtkmm/container.h>
 #include <gtkmm/enums.h>
-#include <gtk/gtk.h> /* for GtkTableChild */
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/container_p.h)
 
-#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
-//Allow us to set the struct fields.
-//TODO: We probably need to remove the STL-style children() API.
-#undef GSEAL_ENABLE
-#m4 _POP()
-
 namespace Gtk
 {
-
-class Table;
-
-namespace Table_Helpers
-{
-
-class Child : protected _GtkTableChild
-{
-private:
-  Child& operator=(const Child&); //Not implemented.
-  Child(const Child&); //Not implemented.
-
-public:
-  inline _GtkTableChild* gobj() {return (this);}
-  inline const _GtkTableChild* gobj() const {return (this);}
-
-  Widget* get_widget() const;
-
-  //TODO: Which of the GtkTableChild's fields are public API?
-  //Maybe we should remove some of these get()s or add some set()s.
-  //If get_widget() is the only accessor, then we should probably make
-  //the STL-style Table list contain Widgets instead of Childs.
-
-  guint16 get_left_attach() const;
-  guint16 get_right_attach() const;
-  guint16 get_top_attach() const;
-  guint16 get_bottom_attach() const;
-  guint16 get_xpadding() const;
-  guint16 get_ypadding() const;
-  bool get_xexpand() const;
-  bool get_yexpand() const;
-  bool get_xshrink() const;
-  bool get_yshrink() const;
-  bool get_xfill() const;
-  bool get_yfill() const;
-
-protected:
-  inline GtkTable* parent()
-    { return GTK_TABLE(gtk_widget_get_parent(gobj()->widget)); }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  friend class Dummy_; // silence the compiler (Child has only private ctors)
-#endif
-};
-
-
-#m4 include(list.m4)
-  GP_LIST(TableList,Table,GtkTable,Child,children)
-  //The standard iterator, instead of List_Cpp_Iterator,
-  //only works because Child is derived from _GtkTableChild.
-
-  GP_LIST_ELEM(Widget)
-  GP_LIST_NOINSERT()
-  GP_LIST_CONTAINER_REMOVE( get_widget )
-  GP_LIST_END()
-
-} // namespace Table_Helpers
-
 
 /** Pack widgets in regular patterns.
  * @ingroup Widgets
@@ -166,24 +101,13 @@ public:
 
   _WRAP_METHOD(void set_homogeneous(bool homogeneous = true), gtk_table_set_homogeneous)
   _WRAP_METHOD(bool get_homogeneous() const, gtk_table_get_homogeneous)
-  
+
   _WRAP_METHOD(void get_size(guint& rows, guint& columns) const, gtk_table_get_size)
-
-  typedef Table_Helpers::TableList TableList;
-
-
-  TableList& children();
-  const TableList& children() const;
 
   _WRAP_PROPERTY("n-rows", guint)
   _WRAP_PROPERTY("n-columns", guint)
   _WRAP_PROPERTY("column-spacing", guint)
   _WRAP_PROPERTY("row-spacing", guint)
-
-protected:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  mutable TableList children_proxy_;
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
 } // namespace Gtk
