@@ -19,6 +19,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <giomm/application.h>
 #include <gtkmm/window.h>
+#include <gtkmm/actiongroup.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(giomm/private/application_p.h)
@@ -29,23 +30,36 @@ namespace Gtk
 /** TODO
  */
 class Application
-  : public Gio::Application,
+  : public Gio::Application
 {
 protected:
   _CLASS_GOBJECT(Application, GtkApplication, GTK_APPLICATION, Gio::Application, GApplication)
-  _IMPLEMENTS_INTERFACE(Buildable)
 
 public:
-  //TODO: _WRAP_METHOD(static Glib::RefPtr<Application> create(int& argc, gchar**& argv, const Glib::ustring& appid), gtk_application_new)
+
+#m4 _CONVERSION(`int& ',`gint**',`&($3)')
+#m4 _CONVERSION(`char**&',`gchar***',`&($3)')
+  _WRAP_METHOD(static Glib::RefPtr<Application> create(const Glib::ustring& appid, int& argc, char**& argv), gtk_application_new)
+  
+  //TODO: Documentation
+  static Glib::RefPtr<Application> create(const Glib::ustring& appid);
   
   _WRAP_METHOD(void set_action_group(const Glib::RefPtr<ActionGroup>& group), gtk_application_set_action_group)
   
   _WRAP_METHOD(Window* get_window(), gtk_application_get_window)
   _WRAP_METHOD(const Window* get_window() const, gtk_application_get_window)
+  
+#m4 _CONVERSION(`const GSList*',`Glib::SListHandle<Window*>',`$2(const_cast<GSList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::SListHandle<Window*> get_windows(), gtk_application_get_windows)
+  
+#m4 _CONVERSION(`const GSList*',`Glib::SListHandle<const Window*>',`$2(const_cast<GSList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::SListHandle<const Window*> get_windows() const, gtk_application_get_windows)
     
   _WRAP_METHOD(void add_window(Window& window), gtk_application_add_window)
   _WRAP_METHOD(void run(), gtk_application_run)
   _WRAP_METHOD(void quit(), gtk_application_quit)
+  
+  _WRAP_PROPERTY("window", Gtk::Window*);
 };
 
 } // namespace Gtk
