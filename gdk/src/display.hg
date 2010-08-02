@@ -21,6 +21,7 @@
 
 #include <gdkmm/screen.h>
 #include <gdkmm/device.h>
+#include <gdkmm/devicemanager.h>
 #include <gdkmm/types.h> //For ModifierType
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -32,6 +33,7 @@ namespace Gdk
 _CC_INCLUDE(gdk/gdk.h)
 
 class Drawable;
+class DeviceManager;
 
  /** Gdk::Display object's purpose is two fold:
  *   To grab/ungrab keyboard focus and mouse pointer
@@ -63,9 +65,12 @@ public:
   _WRAP_METHOD(void pointer_ungrab(guint32 timestamp), gdk_display_pointer_ungrab)
   _WRAP_METHOD(void keyboard_ungrab(guint32 timestamp), gdk_display_keyboard_ungrab)
   _WRAP_METHOD(bool pointer_is_grabbed() const, gdk_display_pointer_is_grabbed)
+  _WRAP_METHOD(bool device_is_grabbed(const Glib::RefPtr<Device>& device) const, gdk_display_device_is_grabbed)
   _WRAP_METHOD(void beep(), gdk_display_beep)
   _WRAP_METHOD(void sync(), gdk_display_sync)
   _WRAP_METHOD(void	close(), gdk_display_close)
+
+  _IGNORE(gdk_display_list_devices) //deprecated
 
   //TODO: Use C++ Gdk::Event:
   //TODO: get_event() might remove the event - if so, then there should not be a const version:
@@ -96,6 +101,8 @@ public:
    *
    **/
   void get_pointer(Glib::RefPtr<Screen>& screen, int& x, int& y, ModifierType& mask);
+  
+  _IGNORE(gdk_display_get_core_pointer) //deprecated
 
   // In fact, any one of these gdk_display_get_pointer() args can be NULL, but we don't need so many overloads.
   /**
@@ -127,6 +134,18 @@ public:
    */
   Glib::RefPtr<const Window> get_window_at_pointer() const;
 
+  //TODO: Documentation
+  void get_device_state(const Glib::RefPtr<Device>& device, Glib::RefPtr<Screen>& screen, int& x, int& y, ModifierType& mask);
+  //TODO: Documentation
+  void get_device_state(const Glib::RefPtr<Device>& device, int& x, int& y, ModifierType& mask);
+  _IGNORE(gdk_display_get_device_state)
+   
+  _WRAP_METHOD(Glib::RefPtr<const Window> get_window_at_device_position(const Glib::RefPtr<Device>& device, int& win_x, int& win_y), gdk_display_get_window_at_device_position)
+  _WRAP_METHOD(void warp_device(const Glib::RefPtr<Device>& device, const Glib::RefPtr<Screen>& screen, int x, int y), gdk_display_warp_device)
+                           
+  _WRAP_METHOD(GdkDisplayDeviceHooks* set_device_hooks(const GdkDisplayDeviceHooks* new_hooks), dk_display_set_device_hooks)
+
+                                 
   _WRAP_METHOD(void warp_pointer(const Glib::RefPtr<Screen>& screen, int x, int y), gdk_display_warp_pointer)
 
   _WRAP_METHOD(GdkDisplayPointerHooks* set_pointer_hooks(const GdkDisplayPointerHooks* new_hooks), gdk_display_set_pointer_hooks)
@@ -220,6 +239,10 @@ public:
   _WRAP_METHOD(bool supports_shapes() const, gdk_display_supports_shapes)
   _WRAP_METHOD(bool supports_input_shapes() const, gdk_display_supports_input_shapes)
   _WRAP_METHOD(bool supports_composite() const, gdk_display_supports_composite)
+  
+  _WRAP_METHOD(Glib::RefPtr<DeviceManager> get_device_manager(), gdk_display_get_device_manager, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const DeviceManager> get_device_manager() const, gdk_display_get_device_manager, refreturn, constversion)
+
 
 
   /** The closed signal is emitted when the connection to the windowing
