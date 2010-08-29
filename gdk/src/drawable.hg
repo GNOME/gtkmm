@@ -22,10 +22,9 @@
 #include <pangomm/layout.h>
 #include <pangomm/layoutline.h>
 #include <pangomm/glyphstring.h>
-#include <gdkmm/gc.h>
-#include <gdkmm/image.h>
 #include <gdkmm/color.h>
 #include <gdkmm/rgbcmap.h>
+#include <gdkmm/visual.h>
 #include <gdkmm/types.h>
 #include <cairomm/context.h>
 #include <cairomm/region.h>
@@ -41,7 +40,6 @@ namespace Gdk
 
 _WRAP_ENUM(RgbDither, GdkRgbDither)
 
-class GC;
 class Pixbuf;
 
 /** Drawing Primitives.
@@ -75,31 +73,6 @@ public:
   _WRAP_METHOD(void set_colormap(const Glib::RefPtr<Colormap>& colormap), gdk_drawable_set_colormap)
   _WRAP_METHOD(Glib::RefPtr<Colormap> get_colormap(), gdk_drawable_get_colormap, refreturn)
   _WRAP_METHOD(Glib::RefPtr<Visual> get_visual(), gdk_drawable_get_visual, refreturn)
-
-  _WRAP_METHOD(void draw_point(const Glib::RefPtr<const GC>& gc, int x, int y), gdk_draw_point)
-  void draw_points(const Glib::RefPtr<const GC>& gc, const Glib::ArrayHandle<Point>& points);
-
-  _WRAP_METHOD(void draw_line(const Glib::RefPtr<const GC>& gc, int x1, int y1, int x2, int y2), gdk_draw_line)
-  void draw_lines(const Glib::RefPtr<const GC>& gc, const Glib::ArrayHandle<Point>& points);
-
-  _WRAP_METHOD(void draw_rectangle(const Glib::RefPtr<const GC>& gc, bool filled, int x, int y, int width, int height), gdk_draw_rectangle)
-  _WRAP_METHOD(void draw_arc(const Glib::RefPtr<const GC>& gc, bool filled, int x, int y, int width, int height, int angle1, int angle2), gdk_draw_arc)
-  void draw_polygon(const Glib::RefPtr<const GC>& gc, bool filled, const Glib::ArrayHandle<Point>& points);
-
-  _WRAP_METHOD(void draw_drawable(const Glib::RefPtr<const GC>& gc, const Glib::RefPtr<const Drawable>& src, int xsrc, int ysrc, int xdest, int ydest, int width = -1, int height = -1), gdk_draw_drawable)
-  _WRAP_METHOD(void draw_image(const Glib::RefPtr<const GC>& gc, const Glib::RefPtr<const Image>& image, int xsrc, int ysrc, int xdest, int ydest, int width = -1, int height = -1), gdk_draw_image)
-
-  //segs is an array, and this function will be used so little that it doesn't seem worth wrapping it to use a container of C++ types.
-  _WRAP_METHOD(void draw_segments(const Glib::RefPtr<const GC>& gc, const GdkSegment* segs, int nsegs), gdk_draw_segments) // TODO
-
-  //glyphs is not an array. I went down to pango_xft_render in pango and saw that PangoGlyphString here is not an array. -Bryan
-  _WRAP_METHOD(void draw_glyphs(const Glib::RefPtr<const GC>& gc, const Glib::RefPtr<const Pango::Font>& font, int x, int y, const Pango::GlyphString& glyphs), gdk_draw_glyphs)
-
-  _WRAP_METHOD(void draw_layout_line(const Glib::RefPtr<const GC>& gc, int x, int y, const Glib::RefPtr<const Pango::LayoutLine>& line), gdk_draw_layout_line)
-  _WRAP_METHOD(void draw_layout_line(const Glib::RefPtr<const GC>& gc, int x, int y, const Glib::RefPtr<const Pango::LayoutLine>& line, const Color& foreground, const Color& background), gdk_draw_layout_line_with_colors)
-
-  _WRAP_METHOD(void draw_layout(const Glib::RefPtr<const GC>& gc, int x, int y, const Glib::RefPtr<const Pango::Layout>& layout), gdk_draw_layout)
-  _WRAP_METHOD(void draw_layout(const Glib::RefPtr<const GC>& gc, int x, int y, const Glib::RefPtr<const Pango::Layout>& layout, const Color& foreground, const Color& background), gdk_draw_layout_with_colors)
 
   _WRAP_METHOD(void draw_pixbuf(const Glib::RefPtr<const GC>& gc, const Glib::RefPtr<const Pixbuf>& pixbuf,
     int src_x, int src_y, int dest_x, int dest_y,
@@ -138,14 +111,6 @@ public:
     int width, int height,
     RgbDither dither, int x_dither, int y_dither);
 
-  // Note: This has no 'refreturn' because get_image() returns a newly created Image object.
-  _WRAP_METHOD(Glib::RefPtr<Image> get_image(int x, int y, int width, int height) const, gdk_drawable_get_image)
-
-  // gdk_drawable_copy_to_image() returns a new GdkImage when the image parameter is NULL, but that seems to be much the
-  // same as gdk_drawable_get_image().
-  void copy_to_image(const Glib::RefPtr<Image>& image, int src_x, int src_y, int dest_x, int dest_y, int width, int height) const;
-  _IGNORE(gdk_drawable_copy_to_image)
-
  #m4 _CONVERSION(`cairo_region_t*',`Cairo::RefPtr<Cairo::Region>',`Cairo::RefPtr<Cairo::Region>(new Cairo::Region($3, true /* do not take ref */))')
 
   //This is const because it returns a copy (though that is not very clear from the C documentation)
@@ -154,47 +119,6 @@ public:
   //This is const because it returns a copy (though that is not very clear from the C documentation)
   _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_visible_region() const, gdk_drawable_get_visible_region)
 
-
-  // **** RGB stuff ****
-
-  _WRAP_METHOD(void draw_rgb_image(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* rgb_buf, int rowstride),
-               gdk_draw_rgb_image)
-
-  _WRAP_METHOD(void draw_rgb_image_dithalign(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* rgb_buf, int rowstride,
-                   int xdith, int ydith),
-               gdk_draw_rgb_image_dithalign)
-
-  _WRAP_METHOD(void draw_rgb_32_image(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* rgb_buf, int rowstride),
-               gdk_draw_rgb_32_image)
-
-  _WRAP_METHOD(void draw_rgb_32_image_dithalign(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* buf, int rowstride,
-                   int xdith, int ydith),
-               gdk_draw_rgb_32_image_dithalign)
-
-  _WRAP_METHOD(void draw_gray_image(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* rgb_buf, int rowstride),
-               gdk_draw_gray_image)
-
-  _WRAP_METHOD(void draw_indexed_image(
-                   const Glib::RefPtr<const GC>& gc,
-                   int x, int y, int width, int height,
-                   RgbDither dith, const guchar* rgb_buf, int rowstride,
-                   const RgbCmap& cmap),
-               gdk_draw_indexed_image)
 
   _WRAP_METHOD(Glib::RefPtr<Screen> get_screen(), gdk_drawable_get_screen, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Screen> get_screen() const, gdk_drawable_get_screen, refreturn, constversion)

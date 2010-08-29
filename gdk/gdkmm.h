@@ -26,7 +26,6 @@
 
 #include <gdkmm/types.h>
 #include <gdkmm/visual.h>
-#include <gdkmm/gc.h>
 #include <gdkmm/drawable.h>
 #include <gdkmm/window.h>
 #include <gdkmm/pixbuf.h>
@@ -35,7 +34,6 @@
 #include <gdkmm/pixbufloader.h>
 #include <gdkmm/pixmap.h>
 #include <gdkmm/bitmap.h>
-#include <gdkmm/image.h>
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/display.h>
