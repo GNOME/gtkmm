@@ -1,6 +1,6 @@
 // This is -*- C++ -*-
 
-/* 
+/*
  * gdkmm.h
  *
  * Copyright 2002 The gtkmm Development Team
@@ -40,7 +40,5 @@
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/screen.h>
 #include <gdkmm/general.h>
-#include <gdkmm/rgb.h>
 
 #endif /* _GDKMM_GDKMM_H_ */
-
