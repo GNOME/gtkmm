@@ -66,6 +66,12 @@
   (gtype-id "GTK_TYPE_CELL_LAYOUT")
 )
 
+(define-object CellSizeRequest
+  (in-module "Gtk")
+  (c-name "GtkCellSizeRequest")
+  (gtype-id "GTK_TYPE_CELL_SIZE_REQUEST")
+)
+
 (define-object Editable
   (in-module "Gtk")
   (c-name "GtkEditable")
@@ -86,10 +92,11 @@
   (gtype-id "GTK_TYPE_ENTRY_COMPLETION")
 )
 
-(define-object ExtendedLayout
+(define-object IMContext
   (in-module "Gtk")
-  (c-name "GtkExtendedLayout")
-  (gtype-id "GTK_TYPE_EXTENDED_LAYOUT")
+  (parent "GObject")
+  (c-name "GtkIMContext")
+  (gtype-id "GTK_TYPE_IM_CONTEXT")
 )
 
 (define-object IMContextSimple
@@ -536,13 +543,6 @@
   (parent "GtkWidget")
   (c-name "GtkProgressBar")
   (gtype-id "GTK_TYPE_PROGRESS_BAR")
-)
-
-(define-object Progress
-  (in-module "Gtk")
-  (parent "GtkWidget")
-  (c-name "GtkProgress")
-  (gtype-id "GTK_TYPE_PROGRESS")
 )
 
 (define-object Misc
@@ -1189,7 +1189,31 @@
   (gtype-id "GTK_TYPE_WINDOW_GROUP")
 )
 
+(define-object WrapBox
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkWrapBox")
+  (gtype-id "GTK_TYPE_WRAP_BOX")
+)
+
 ;; Enumerations and flags ...
+
+(define-enum License
+  (in-module "Gtk")
+  (c-name "GtkLicense")
+  (gtype-id "GTK_TYPE_LICENSE")
+  (values
+    '("unknown" "GTK_LICENSE_UNKNOWN")
+    '("custom" "GTK_LICENSE_CUSTOM")
+    '("gpl-2-0" "GTK_LICENSE_GPL_2_0")
+    '("gpl-3-0" "GTK_LICENSE_GPL_3_0")
+    '("lgpl-2-1" "GTK_LICENSE_LGPL_2_1")
+    '("lgpl-3-0" "GTK_LICENSE_LGPL_3_0")
+    '("bsd" "GTK_LICENSE_BSD")
+    '("mit-x11" "GTK_LICENSE_MIT_X11")
+    '("artistic" "GTK_LICENSE_ARTISTIC")
+  )
+)
 
 (define-flags AccelFlags
   (in-module "Gtk")
@@ -1241,7 +1265,6 @@
     '("show-day-names" "GTK_CALENDAR_SHOW_DAY_NAMES")
     '("no-month-change" "GTK_CALENDAR_NO_MONTH_CHANGE")
     '("show-week-numbers" "GTK_CALENDAR_SHOW_WEEK_NUMBERS")
-    '("week-start-monday" "GTK_CALENDAR_WEEK_START_MONDAY")
     '("show-details" "GTK_CALENDAR_SHOW_DETAILS")
   )
 )
@@ -1430,7 +1453,6 @@
   (c-name "GtkButtonBoxStyle")
   (gtype-id "GTK_TYPE_BUTTON_BOX_STYLE")
   (values
-    '("default-style" "GTK_BUTTONBOX_DEFAULT_STYLE")
     '("spread" "GTK_BUTTONBOX_SPREAD")
     '("edge" "GTK_BUTTONBOX_EDGE")
     '("start" "GTK_BUTTONBOX_START")
@@ -1733,7 +1755,6 @@
     '("single" "GTK_SELECTION_SINGLE")
     '("browse" "GTK_SELECTION_BROWSE")
     '("multiple" "GTK_SELECTION_MULTIPLE")
-    '("extended" "GTK_SELECTION_EXTENDED")
   )
 )
 
@@ -1760,26 +1781,6 @@
     '("prelight" "GTK_STATE_PRELIGHT")
     '("selected" "GTK_STATE_SELECTED")
     '("insensitive" "GTK_STATE_INSENSITIVE")
-  )
-)
-
-(define-enum SubmenuDirection
-  (in-module "Gtk")
-  (c-name "GtkSubmenuDirection")
-  (gtype-id "GTK_TYPE_SUBMENU_DIRECTION")
-  (values
-    '("left" "GTK_DIRECTION_LEFT")
-    '("right" "GTK_DIRECTION_RIGHT")
-  )
-)
-
-(define-enum SubmenuPlacement
-  (in-module "Gtk")
-  (c-name "GtkSubmenuPlacement")
-  (gtype-id "GTK_TYPE_SUBMENU_PLACEMENT")
-  (values
-    '("top-bottom" "GTK_TOP_BOTTOM")
-    '("left-right" "GTK_LEFT_RIGHT")
   )
 )
 
@@ -2018,6 +2019,29 @@
   )
 )
 
+(define-enum WrapAllocationMode
+  (in-module "Gtk")
+  (c-name "GtkWrapAllocationMode")
+  (gtype-id "GTK_TYPE_WRAP_ALLOCATION_MODE")
+  (values
+    '("free" "GTK_WRAP_ALLOCATE_FREE")
+    '("aligned" "GTK_WRAP_ALLOCATE_ALIGNED")
+    '("homogeneous" "GTK_WRAP_ALLOCATE_HOMOGENEOUS")
+  )
+)
+
+(define-enum WrapBoxSpreading
+  (in-module "Gtk")
+  (c-name "GtkWrapBoxSpreading")
+  (gtype-id "GTK_TYPE_WRAP_BOX_SPREADING")
+  (values
+    '("begin" "GTK_WRAP_BOX_SPREAD_BEGIN")
+    '("end" "GTK_WRAP_BOX_SPREAD_END")
+    '("even" "GTK_WRAP_BOX_SPREAD_EVEN")
+    '("expand" "GTK_WRAP_BOX_SPREAD_EXPAND")
+  )
+)
+
 (define-enum FileChooserAction
   (in-module "Gtk")
   (c-name "GtkFileChooserAction")
@@ -2109,7 +2133,6 @@
   (values
     '("empty" "GTK_IMAGE_EMPTY")
     '("pixmap" "GTK_IMAGE_PIXMAP")
-    '("image" "GTK_IMAGE_IMAGE")
     '("pixbuf" "GTK_IMAGE_PIXBUF")
     '("stock" "GTK_IMAGE_STOCK")
     '("icon-set" "GTK_IMAGE_ICON_SET")
@@ -2650,6 +2673,21 @@
   (parameters
     '("const-gchar*" "license")
   )
+)
+
+(define-method set_license_type
+  (of-object "GtkAboutDialog")
+  (c-name "gtk_about_dialog_set_license_type")
+  (return-type "none")
+  (parameters
+    '("GtkLicense" "license_type")
+  )
+)
+
+(define-method get_license_type
+  (of-object "GtkAboutDialog")
+  (c-name "gtk_about_dialog_get_license_type")
+  (return-type "GtkLicense")
 )
 
 (define-method get_wrap_license
@@ -5199,6 +5237,15 @@
   (return-type "gint")
 )
 
+(define-method get_day_is_marked
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_get_day_is_marked")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "day")
+  )
+)
+
 
 
 ;; From gtkcelleditable.h
@@ -5662,6 +5709,78 @@
 
 
 
+;; From gtkcellsizerequest.h
+
+(define-function gtk_cell_size_request_get_type
+  (c-name "gtk_cell_size_request_get_type")
+  (return-type "GType")
+)
+
+(define-method get_request_mode
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_request_mode")
+  (return-type "GtkSizeRequestMode")
+)
+
+(define-method get_width
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_width")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gint*" "minimum_size")
+    '("gint*" "natural_size")
+  )
+)
+
+(define-method get_height_for_width
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_height_for_width")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gint" "width")
+    '("gint*" "minimum_height")
+    '("gint*" "natural_height")
+  )
+)
+
+(define-method get_height
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_height")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gint*" "minimum_size")
+    '("gint*" "natural_size")
+  )
+)
+
+(define-method get_width_for_height
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_width_for_height")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gint" "height")
+    '("gint*" "minimum_width")
+    '("gint*" "natural_width")
+  )
+)
+
+(define-method get_size
+  (of-object "GtkCellSizeRequest")
+  (c-name "gtk_cell_size_request_get_size")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("GtkRequisition*" "minimum_size")
+    '("GtkRequisition*" "natural_size")
+  )
+)
+
+
+
 ;; From gtkcellview.h
 
 (define-function gtk_cell_view_get_type
@@ -5736,6 +5855,29 @@
   (parameters
     '("GtkTreePath*" "path")
     '("GtkRequisition*" "requisition")
+  )
+)
+
+(define-method get_desired_width_of_row
+  (of-object "GtkCellView")
+  (c-name "gtk_cell_view_get_desired_width_of_row")
+  (return-type "none")
+  (parameters
+    '("GtkTreePath*" "path")
+    '("gint*" "minimum_size")
+    '("gint*" "natural_size")
+  )
+)
+
+(define-method get_desired_height_for_width_of_row
+  (of-object "GtkCellView")
+  (c-name "gtk_cell_view_get_desired_height_for_width_of_row")
+  (return-type "none")
+  (parameters
+    '("GtkTreePath*" "path")
+    '("gint" "avail_size")
+    '("gint*" "minimum_size")
+    '("gint*" "natural_size")
   )
 )
 
@@ -8592,72 +8734,19 @@
   (return-type "GtkWidget*")
 )
 
-
-
-;; From gtkextendedlayout.h
-
-(define-function gtk_extended_layout_get_type
-  (c-name "gtk_extended_layout_get_type")
-  (return-type "GType")
+(define-method set_label_fill
+  (of-object "GtkExpander")
+  (c-name "gtk_expander_set_label_fill")
+  (return-type "none")
+  (parameters
+    '("gboolean" "label_fill")
+  )
 )
 
-(define-method is_height_for_width
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_is_height_for_width")
+(define-method get_label_fill
+  (of-object "GtkExpander")
+  (c-name "gtk_expander_get_label_fill")
   (return-type "gboolean")
-)
-
-(define-method get_desired_width
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_get_desired_width")
-  (return-type "none")
-  (parameters
-    '("gint*" "minimum_width")
-    '("gint*" "natural_width")
-  )
-)
-
-(define-method get_desired_height
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_get_desired_height")
-  (return-type "none")
-  (parameters
-    '("gint*" "minimum_height")
-    '("gint*" "natural_height")
-  )
-)
-
-(define-method get_width_for_height
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_get_width_for_height")
-  (return-type "none")
-  (parameters
-    '("gint" "height")
-    '("gint*" "minimum_width")
-    '("gint*" "natural_width")
-  )
-)
-
-(define-method get_height_for_width
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_get_height_for_width")
-  (return-type "none")
-  (parameters
-    '("gint" "width")
-    '("gint*" "minimum_height")
-    '("gint*" "natural_height")
-  )
-)
-
-(define-method get_desired_size
-  (of-object "GtkExtendedLayout")
-  (c-name "gtk_extended_layout_get_desired_size")
-  (return-type "none")
-  (parameters
-    '("gboolean" "request_natural")
-    '("GtkRequisition*" "minimum_size")
-    '("GtkRequisition*" "natural_size")
-  )
 )
 
 
@@ -9698,29 +9787,6 @@
   (of-object "GtkFrame")
   (c-name "gtk_frame_get_shadow_type")
   (return-type "GtkShadowType")
-)
-
-
-
-;; From gtkgc.h
-
-(define-function gtk_gc_get
-  (c-name "gtk_gc_get")
-  (return-type "GdkGC*")
-  (parameters
-    '("gint" "depth")
-    '("GdkColormap*" "colormap")
-    '("GdkGCValues*" "values")
-    '("GdkGCValuesMask" "values_mask")
-  )
-)
-
-(define-function gtk_gc_release
-  (c-name "gtk_gc_release")
-  (return-type "none")
-  (parameters
-    '("GdkGC*" "gc")
-  )
 )
 
 
@@ -11187,15 +11253,6 @@
   )
 )
 
-(define-function gtk_image_new_from_image
-  (c-name "gtk_image_new_from_image")
-  (return-type "GtkWidget*")
-  (parameters
-    '("GdkImage*" "image")
-    '("GdkBitmap*" "mask")
-  )
-)
-
 (define-function gtk_image_new_from_file
   (c-name "gtk_image_new_from_file")
   (return-type "GtkWidget*")
@@ -11268,16 +11325,6 @@
   (return-type "none")
   (parameters
     '("GdkPixmap*" "pixmap")
-    '("GdkBitmap*" "mask")
-  )
-)
-
-(define-method set_from_image
-  (of-object "GtkImage")
-  (c-name "gtk_image_set_from_image")
-  (return-type "none")
-  (parameters
-    '("GdkImage*" "gdk_image")
     '("GdkBitmap*" "mask")
   )
 )
@@ -11370,16 +11417,6 @@
   (return-type "none")
   (parameters
     '("GdkPixmap**" "pixmap")
-    '("GdkBitmap**" "mask")
-  )
-)
-
-(define-method get_image
-  (of-object "GtkImage")
-  (c-name "gtk_image_get_image")
-  (return-type "none")
-  (parameters
-    '("GdkImage**" "gdk_image")
     '("GdkBitmap**" "mask")
   )
 )
@@ -13905,6 +13942,18 @@
   (return-type "gboolean")
 )
 
+(define-method get_tab_hborder
+  (of-object "GtkNotebook")
+  (c-name "gtk_notebook_get_tab_hborder")
+  (return-type "guint16")
+)
+
+(define-method get_tab_vborder
+  (of-object "GtkNotebook")
+  (c-name "gtk_notebook_get_tab_vborder")
+  (return-type "guint16")
+)
+
 (define-method popup_enable
   (of-object "GtkNotebook")
   (c-name "gtk_notebook_popup_enable")
@@ -15822,126 +15871,6 @@
 
 
 
-;; From gtkprogress.h
-
-(define-function gtk_progress_get_type
-  (c-name "gtk_progress_get_type")
-  (return-type "GType")
-)
-
-(define-method set_show_text
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_show_text")
-  (return-type "none")
-  (parameters
-    '("gboolean" "show_text")
-  )
-)
-
-(define-method set_text_alignment
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_text_alignment")
-  (return-type "none")
-  (parameters
-    '("gfloat" "x_align")
-    '("gfloat" "y_align")
-  )
-)
-
-(define-method set_format_string
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_format_string")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "format")
-  )
-)
-
-(define-method set_adjustment
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_adjustment")
-  (return-type "none")
-  (parameters
-    '("GtkAdjustment*" "adjustment")
-  )
-)
-
-(define-method configure
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_configure")
-  (return-type "none")
-  (parameters
-    '("gdouble" "value")
-    '("gdouble" "min")
-    '("gdouble" "max")
-  )
-)
-
-(define-method set_percentage
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_percentage")
-  (return-type "none")
-  (parameters
-    '("gdouble" "percentage")
-  )
-)
-
-(define-method set_value
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_value")
-  (return-type "none")
-  (parameters
-    '("gdouble" "value")
-  )
-)
-
-(define-method get_value
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_get_value")
-  (return-type "gdouble")
-)
-
-(define-method set_activity_mode
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_set_activity_mode")
-  (return-type "none")
-  (parameters
-    '("gboolean" "activity_mode")
-  )
-)
-
-(define-method get_current_text
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_get_current_text")
-  (return-type "gchar*")
-)
-
-(define-method get_text_from_value
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_get_text_from_value")
-  (return-type "gchar*")
-  (parameters
-    '("gdouble" "value")
-  )
-)
-
-(define-method get_current_percentage
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_get_current_percentage")
-  (return-type "gdouble")
-)
-
-(define-method get_percentage_from_value
-  (of-object "GtkProgress")
-  (c-name "gtk_progress_get_percentage_from_value")
-  (return-type "gdouble")
-  (parameters
-    '("gdouble" "value")
-  )
-)
-
-
-
 ;; From gtkradioaction.h
 
 (define-function gtk_radio_action_get_type
@@ -16297,7 +16226,7 @@
   (c-name "gtk_range_set_min_slider_size")
   (return-type "none")
   (parameters
-    '("gboolean" "min_size")
+    '("gint" "min_size")
   )
 )
 
@@ -18528,6 +18457,16 @@
   )
 )
 
+(define-function gtk_distribute_natural_allocation
+  (c-name "gtk_distribute_natural_allocation")
+  (return-type "gint")
+  (parameters
+    '("gint" "extra_space")
+    '("guint" "n_requested_sizes")
+    '("GtkRequestedSize*" "sizes")
+  )
+)
+
 
 
 ;; From gtksocket.h
@@ -19368,23 +19307,6 @@
     '("gint" "y")
     '("gint" "width")
     '("gint" "height")
-  )
-)
-
-(define-function gtk_paint_polygon
-  (c-name "gtk_paint_polygon")
-  (return-type "none")
-  (parameters
-    '("GtkStyle*" "style")
-    '("GdkWindow*" "window")
-    '("GtkStateType" "state_type")
-    '("GtkShadowType" "shadow_type")
-    '("const-GdkRectangle*" "area")
-    '("GtkWidget*" "widget")
-    '("const-gchar*" "detail")
-    '("const-GdkPoint*" "points")
-    '("gint" "n_points")
-    '("gboolean" "fill")
   )
 )
 
@@ -20842,7 +20764,7 @@
   (parameters
     '("GtkWidget*" "widget")
     '("GdkDrawable*" "drawable")
-    '("GdkGC*" "cursor_gc")
+    '("gpointer" "cursor_gc")
     '("gint" "x_offset")
     '("gint" "y_offset")
     '("gint" "x")
@@ -26354,6 +26276,11 @@
 
 ;; From gtktypebuiltins.h
 
+(define-function gtk_license_get_type
+  (c-name "gtk_license_get_type")
+  (return-type "GType")
+)
+
 (define-function gtk_accel_flags_get_type
   (c-name "gtk_accel_flags_get_type")
   (return-type "GType")
@@ -26569,16 +26496,6 @@
   (return-type "GType")
 )
 
-(define-function gtk_submenu_direction_get_type
-  (c-name "gtk_submenu_direction_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_submenu_placement_get_type
-  (c-name "gtk_submenu_placement_get_type")
-  (return-type "GType")
-)
-
 (define-function gtk_toolbar_style_get_type
   (c-name "gtk_toolbar_style_get_type")
   (return-type "GType")
@@ -26676,6 +26593,16 @@
 
 (define-function gtk_size_request_mode_get_type
   (c-name "gtk_size_request_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_wrap_allocation_mode_get_type
+  (c-name "gtk_wrap_allocation_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_wrap_box_spreading_get_type
+  (c-name "gtk_wrap_box_spreading_get_type")
   (return-type "GType")
 )
 
@@ -29511,6 +29438,143 @@
   (of-object "GtkWindowGroup")
   (c-name "gtk_window_group_get_current_grab")
   (return-type "GtkWidget*")
+)
+
+
+
+;; From gtkwrapbox.h
+
+(define-function gtk_wrap_box_get_type
+  (c-name "gtk_wrap_box_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_wrap_box_new
+  (c-name "gtk_wrap_box_new")
+  (is-constructor-of "GtkWrapBox")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GtkWrapAllocationMode" "mode")
+    '("GtkWrapBoxSpreading" "spreading")
+    '("guint" "horizontal_spacing")
+    '("guint" "vertical_spacing")
+  )
+)
+
+(define-method set_allocation_mode
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_allocation_mode")
+  (return-type "none")
+  (parameters
+    '("GtkWrapAllocationMode" "mode")
+  )
+)
+
+(define-method get_allocation_mode
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_allocation_mode")
+  (return-type "GtkWrapAllocationMode")
+)
+
+(define-method set_spreading
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_spreading")
+  (return-type "none")
+  (parameters
+    '("GtkWrapBoxSpreading" "spreading")
+  )
+)
+
+(define-method get_spreading
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_spreading")
+  (return-type "GtkWrapBoxSpreading")
+)
+
+(define-method set_vertical_spacing
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_vertical_spacing")
+  (return-type "none")
+  (parameters
+    '("guint" "spacing")
+  )
+)
+
+(define-method get_vertical_spacing
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_vertical_spacing")
+  (return-type "guint")
+)
+
+(define-method set_horizontal_spacing
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_horizontal_spacing")
+  (return-type "none")
+  (parameters
+    '("guint" "spacing")
+  )
+)
+
+(define-method get_horizontal_spacing
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_horizontal_spacing")
+  (return-type "guint")
+)
+
+(define-method set_minimum_line_children
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_minimum_line_children")
+  (return-type "none")
+  (parameters
+    '("guint" "n_children")
+  )
+)
+
+(define-method get_minimum_line_children
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_minimum_line_children")
+  (return-type "guint")
+)
+
+(define-method set_natural_line_children
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_set_natural_line_children")
+  (return-type "none")
+  (parameters
+    '("guint" "n_children")
+  )
+)
+
+(define-method get_natural_line_children
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_get_natural_line_children")
+  (return-type "guint")
+)
+
+(define-method insert_child
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_insert_child")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gint" "index")
+    '("guint" "xpad")
+    '("guint" "ypad")
+    '("gboolean" "xexpand")
+    '("gboolean" "yexpand")
+    '("gboolean" "xfill")
+    '("gboolean" "yfill")
+  )
+)
+
+(define-method reorder_child
+  (of-object "GtkWrapBox")
+  (c-name "gtk_wrap_box_reorder_child")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("guint" "index")
+  )
 )
 
 

@@ -145,6 +145,8 @@ _CONV_ENUM(Gtk,PrintCapabilities)
 _CONV_ENUM(Gtk,DragResult)
 _CONV_ENUM(Gtk,NumberUpLayout)
 _CONV_ENUM(Gtk,EntryIconPosition)
+_CONV_ENUM(Gtk,WrapAllocationMode)
+_CONV_ENUM(Gtk,WrapBoxSpreading)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -668,4 +670,3 @@ _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CO
 
 
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
-
