@@ -160,7 +160,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/linkbutton.h>
 #include <gtkmm/main.h>
 #include <gtkmm/menu.h>
-#include <gtkmm/menu_elems.h>
 #include <gtkmm/menubar.h>
 #include <gtkmm/menuitem.h>
 #include <gtkmm/menushell.h>
