@@ -147,6 +147,7 @@ _CONV_ENUM(Gtk,NumberUpLayout)
 _CONV_ENUM(Gtk,EntryIconPosition)
 _CONV_ENUM(Gtk,WrapAllocationMode)
 _CONV_ENUM(Gtk,WrapBoxSpreading)
+_CONV_ENUM(Gtk,SizeRequestMode)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')

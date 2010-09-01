@@ -160,6 +160,7 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_SEPARATOR_TOOL_ITEM )
             << get_defs( GTK_TYPE_SETTINGS )
             << get_defs( GTK_TYPE_SIZE_GROUP )
+            << get_defs( GTK_TYPE_SIZE_REQUEST )
 #if !defined(G_OS_WIN32)
             << get_defs( GTK_TYPE_SOCKET )
 #endif /* G_OS_WIN32 */
