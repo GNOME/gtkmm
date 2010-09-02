@@ -146,6 +146,7 @@ _CONV_ENUM(Gtk,DragResult)
 _CONV_ENUM(Gtk,NumberUpLayout)
 _CONV_ENUM(Gtk,EntryIconPosition)
 _CONV_ENUM(Gtk,WrapAllocationMode)
+_CONV_ENUM(Gtk,WrapBoxPacking)
 _CONV_ENUM(Gtk,WrapBoxSpreading)
 _CONV_ENUM(Gtk,SizeRequestMode)
 
