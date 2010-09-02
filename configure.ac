@@ -93,7 +93,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -DGSEAL_ENABLE],
-                       [G PANGO ATK GDK GDK_PIXBUF GTK ATKMM PANGOMM])
+                       [G PANGO ATK GDK GDK_PIXBUF GTK ATKMM PANGOMM CAIROMM])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
