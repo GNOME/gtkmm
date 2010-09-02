@@ -162,6 +162,7 @@ _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
 #_CONVERSION(const Glib::RefPtr<const Gdk::Image>&,GdkImage*,__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(const Glib::RefPtr<const Gdk::GC>&,GdkGC*,__CONVERT_CONST_REFPTR_TO_P)
 
+_CONVERSION(`const Glib::RefPtr<const Gdk::Device>&', `GdkDevice*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Device))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Pixmap>&', `GdkPixmap*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Pixmap))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Window>&', `GdkWindow*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Window))
 _CONVERSION(`const Glib::RefPtr<const Window>&', `GdkWindow*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Window))
