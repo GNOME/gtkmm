@@ -134,6 +134,7 @@ _CONVERSION(`const Glib::RefPtr<Gdk::Screen>&',`GdkScreen*',__CONVERT_REFPTR_TO_
 _CONVERSION(`const Glib::RefPtr<Screen>&',`GdkScreen*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Device>&',`GdkDevice*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Device>&',`GdkDevice*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Device>&',`GdkDevice*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Device))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Screen>&',`GdkScreen*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Screen))
 
 define(`__CFR2P',`const_cast<$`'2>($`'3.gobj())')
