@@ -27,7 +27,7 @@ namespace Gtk
 {
 
 AccelKey::AccelKey()
-: key_(GDK_VoidSymbol),
+: key_(GDK_KEY_VoidSymbol),
   mod_((Gdk::ModifierType)0)
 {
 }
@@ -80,7 +80,7 @@ Glib::ustring AccelKey::get_path() const
 
 bool AccelKey::is_null() const
 {
-  return ( (key_ == GDK_VoidSymbol) || !(get_key() > 0) ); //both seem to be invalid.
+  return ( (key_ == GDK_KEY_VoidSymbol) || !(get_key() > 0) ); //both seem to be invalid.
 }
 
 Glib::ustring AccelKey::get_abbrev() const
