@@ -150,7 +150,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/image.h>
 #include <gtkmm/imagemenuitem.h>
 #include <gtkmm/infobar.h>
-#include <gtkmm/item.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/invisible.h>
 #include <gtkmm/label.h>
