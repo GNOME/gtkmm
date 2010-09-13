@@ -66,6 +66,7 @@ public:
    */
   void prepend_text(const Glib::ustring& text);
 
+#ifndef GTKMM_DISABLE_DEPRECATED
   //@deprecated Use get_entry()->get_text() to get the actual entered text.
   Glib::ustring get_active_text() const;
 
@@ -76,6 +77,7 @@ public:
   //TODO: Remove this when we can break API.
   /// @deprecated See clear_items(). Since 2.8.
   void clear();
+#endif //GTKMM_DISABLE_DEPRECATED
 
   /** Remove all items from the drop-down menu.
    */

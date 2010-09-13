@@ -80,12 +80,6 @@ void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
   }
 }
 
-//deprecated.
-void ComboBoxEntryText::clear()
-{
-  clear_items();
-}
-
 void ComboBoxEntryText::clear_items()
 {
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
@@ -118,6 +112,7 @@ void ComboBoxEntryText::remove_text(const Glib::ustring& text)
   }
 }
 
+#ifndef GTKMM_DISABLE_DEPRECATED
 Glib::ustring ComboBoxEntryText::get_active_text() const
 {
   Glib::ustring result;
@@ -154,6 +149,13 @@ void ComboBoxEntryText::set_active_text(const Glib::ustring& text)
   //Not found, so mark it as blank:
   unset_active();
 }
+
+//deprecated.
+void ComboBoxEntryText::clear()
+{
+  clear_items();
+}
+#endif //GTKMM_DISABLE_DEPRECATED
 
 
 } // namespace Gtk
