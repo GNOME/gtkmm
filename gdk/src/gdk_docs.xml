@@ -176,6 +176,8 @@ only the pixel values of the @values-&gt;foreground and @values-&gt;background
 are filled, use gdk_colormap_query_color() to obtain the rgb values
 if you need them.
 
+Deprecated: 2.22: Use Cairo for rendering.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -245,6 +247,10 @@ function is obsolete. See gdk_colormap_free_colors().
 <description>
 Create a pixmap from a XPM file.
 
+Deprecated: 2.22: Use a #GdkPixbuf instead. You can use
+gdk_pixbuf_new_from_file() to create it.
+If you must use a pixmap, use gdk_pixmap_new() to
+create it and Cairo to draw the pixbuf onto it.
 
 </description>
 <parameters>
@@ -271,6 +277,7 @@ in which case a default color will be used.
 </parameter>
 </parameters>
 <return> the #GdkPixmap
+
 </return>
 </function>
 
@@ -356,21 +363,29 @@ This function works on both toplevel and child windows.
 <return></return>
 </function>
 
-<function name="gdk_color_copy">
+<function name="gdk_app_launch_context_set_screen">
 <description>
-Makes a copy of a color structure. The result
-must be freed using gdk_color_free().
+Sets the screen on which applications will be launched when
+using this context. See also gdk_app_launch_context_set_display().
 
+If both @screen and @display are set, the @screen takes priority.
+If neither @screen or @display are set, the default screen and
+display are used.
+
+Since: 2.14
 
 </description>
 <parameters>
-<parameter name="color">
-<parameter_description> a #GdkColor.
+<parameter name="context">
+<parameter_description> a #GdkAppLaunchContext
+</parameter_description>
+</parameter>
+<parameter name="screen">
+<parameter_description> a #GdkScreen
 </parameter_description>
 </parameter>
 </parameters>
-<return> a copy of @color.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_event_get">
@@ -393,6 +408,8 @@ are pending. The returned #GdkEvent should be freed with gdk_event_free().
 Sets the clip mask for a graphics context from a
 rectangle. The clip mask is interpreted relative to the clip
 origin. (See gdk_gc_set_clip_origin()).
+
+Deprecated: 2.22: Use cairo_rectangle() and cairo_clip() in Cairo.
 
 </description>
 <parameters>
@@ -432,6 +449,7 @@ Since: 2.4
 <description>
 Create a new GC with the given initial values.
 
+Deprecated: 2.22: Use Cairo for rendering.
 
 </description>
 <parameters>
@@ -451,42 +469,28 @@ are set.
 </parameter>
 </parameters>
 <return> the new graphics context.
+
 </return>
 </function>
 
-<function name="gdk_window_constrain_size">
+<function name="gdk_image_get_visual">
 <description>
-Constrains a desired width and height according to a
-set of geometry hints (such as minimum and maximum size).
+Determines the visual that was used to create the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
 
 </description>
 <parameters>
-<parameter name="geometry">
-<parameter_description> a #GdkGeometry structure
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a mask indicating what portions of @geometry are set
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> desired width of window
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> desired height of the window
-</parameter_description>
-</parameter>
-<parameter name="new_width">
-<parameter_description> location to store resulting width
-</parameter_description>
-</parameter>
-<parameter name="new_height">
-<parameter_description> location to store resulting height
+<parameter name="image">
+<parameter_description> a #GdkImage
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a #GdkVisual
+
+</return>
 </function>
 
 <function name="gdk_drag_context_unref">
@@ -659,22 +663,6 @@ the default root window for the default display.
 </return>
 </function>
 
-<function name="gdk_gc_unref">
-<description>
-Decrement the reference count of @gc.
-
-Deprecated: 2.0: Use g_object_unref() instead.
-
-</description>
-<parameters>
-<parameter name="gc">
-<parameter_description> a #GdkGC
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_window_get_update_area">
 <description>
 Transfers ownership of the update area from @window to the caller
@@ -779,6 +767,26 @@ newly created, if one doesn't exist already.
 </return>
 </function>
 
+<function name="gdk_window_get_focus_on_map">
+<description>
+Determines whether or not the desktop environment should be hinted that the
+window does not want to receive input focus when it is mapped.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow.
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether or not the window wants to receive input focus when
+it is mapped.
+
+</return>
+</function>
+
 <function name="gdk_pango_attr_emboss_color_new">
 <description>
 Creates a new attribute specifying the color to emboss text with.
@@ -815,7 +823,7 @@ Returns the display of a #GdkDrawable.
 
 <function name="gdk_utf8_to_string_target">
 <description>
-Convert an UTF-8 string into the best possible representation
+Converts an UTF-8 string into the best possible representation
 as a STRING. The representation of characters not in STRING
 is not specified; it may be as pseudo-escape sequences
 \x{ABCD}, or it may be in some other form of approximation.
@@ -828,9 +836,10 @@ is not specified; it may be as pseudo-escape sequences
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly allocated string, or %NULL if the
+<return> the newly-allocated string, or %NULL if the
 conversion failed. (It should not fail for
-any properly formed UTF-8 string.)
+any properly formed UTF-8 string unless system
+limits like memory or file descriptors are exceeded.)
 </return>
 </function>
 
@@ -852,32 +861,85 @@ Since: 2.4
 </return>
 </function>
 
-<function name="gdk_colormap_query_color">
+<function name="gdk_drag_context_list_targets">
 <description>
-Locates the RGB color in @colormap corresponding to the given
-hardware pixel @pixel. @pixel must be a valid pixel in the
-colormap; it's a programmer error to call this function with a
-pixel which is not in the colormap. Hardware pixels are normally
-obtained from gdk_colormap_alloc_colors(), or from a #GdkImage. (A
-#GdkImage contains image data in hardware format, a #GdkPixbuf
-contains image data in a canonical 24-bit RGB format.)
+Retrieves the list of targets of the context.
 
-This function is rarely useful; it's used for example to
-implement the eyedropper feature in #GtkColorSelection.
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GList of targets
+
+</return>
+</function>
+
+<function name="gdk_device_get_source">
+<description>
+Determines the type of the device.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkInputSource
+
+</return>
+</function>
+
+<function name="gdk_set_pointer_hooks">
+<description>
+This function allows for hooking into the operation
+of getting the current location of the pointer. This
+is only useful for such low-level tools as an
+event recorder. Applications should never have any
+reason to use this facility.
+
+This function is not multihead safe. For multihead operation,
+see gdk_display_set_pointer_hooks().
 
 
 </description>
 <parameters>
-<parameter name="colormap">
-<parameter_description> a #GdkColormap
+<parameter name="new_hooks">
+<parameter_description> a table of pointers to functions for getting
+quantities related to the current pointer position,
+or %NULL to restore the default table.
 </parameter_description>
 </parameter>
-<parameter name="pixel">
-<parameter_description> pixel value in hardware display format
+</parameters>
+<return> the previous pointer hook table
+</return>
+</function>
+
+<function name="gdk_display_set_double_click_distance">
+<description>
+Sets the double click distance (two clicks within this distance
+count as a double click and result in a #GDK_2BUTTON_PRESS event).
+See also gdk_display_set_double_click_time().
+Applications should &lt;emphasis&gt;not&lt;/emphasis&gt; set this, it is a global 
+user-configured setting.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
-<parameter name="result">
-<parameter_description> #GdkColor with red, green, blue fields initialized
+<parameter name="distance">
+<parameter_description> distance in pixels
 </parameter_description>
 </parameter>
 </parameters>
@@ -899,6 +961,24 @@ Since: 2.2
 </parameter>
 </parameters>
 <return> the index
+
+</return>
+</function>
+
+<function name="gdk_device_get_mode">
+<description>
+Determines the mode of the device.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkInputSource
 
 </return>
 </function>
@@ -1077,23 +1157,40 @@ in @value, %FALSE otherwise.
 </return>
 </function>
 
-<function name="gdk_display_supports_cursor_color">
+<function name="gdk_image_get_pixels">
 <description>
-Returns %TRUE if multicolored cursors are supported
-on @display. Otherwise, cursors have only a forground
-and a background color.
+Returns a pointer to the pixel data of the image.
 
-Since: 2.4
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the pixel data of the image
+
+</return>
+</function>
+
+<function name="gdk_keymap_get_for_display">
+<description>
+Returns the #GdkKeymap attached to @display.
+
+Since: 2.2
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description> a #GdkDisplay
+<parameter_description> the #GdkDisplay.
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether cursors can have multiple colors.
-
+<return> the #GdkKeymap attached to @display.
 </return>
 </function>
 
@@ -1125,6 +1222,11 @@ Set a tile pixmap for a graphics context.
 This will only be used if the fill mode
 is %GDK_TILED.
 
+Deprecated: 2.22: The following code snippet sets a tiling #GdkPixmap
+as the source in Cairo:
+|[gdk_cairo_set_source_pixmap (cr, tile, ts_origin_x, ts_origin_y);
+cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);]|
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -1139,11 +1241,11 @@ is %GDK_TILED.
 <return></return>
 </function>
 
-<function name="gdk_gc_set_line_attributes">
+<function name="gdk_x11_gc_get_xgc">
 <description>
-Sets various attributes of how lines are drawn. See
-the corresponding members of #GdkGCValues for full
-explanations of the arguments.
+Returns the X GC of a #GdkGC.
+
+Deprecated: 2.22: #GdkGC has been replaced by #cairo_t.
 
 </description>
 <parameters>
@@ -1151,44 +1253,8 @@ explanations of the arguments.
 <parameter_description> a #GdkGC.
 </parameter_description>
 </parameter>
-<parameter name="line_width">
-<parameter_description> the width of lines.
-</parameter_description>
-</parameter>
-<parameter name="line_style">
-<parameter_description> the dash-style for lines.
-</parameter_description>
-</parameter>
-<parameter name="cap_style">
-<parameter_description> the manner in which the ends of lines are drawn.
-</parameter_description>
-</parameter>
-<parameter name="join_style">
-<parameter_description> the in which lines are joined together.
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
-</function>
-
-<function name="gdk_char_width">
-<description>
-Determines the width of a given character.
-
-Deprecated: 2.2: Use gdk_text_extents() instead.
-
-</description>
-<parameters>
-<parameter name="font">
-<parameter_description> a #GdkFont
-</parameter_description>
-</parameter>
-<parameter name="character">
-<parameter_description> the character to measure.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the width of the character in pixels.
+<return> an Xlib &lt;type&gt;GC&lt;/type&gt;.
 
 </return>
 </function>
@@ -1202,6 +1268,8 @@ then for pseudo-color colormaps (colormaps with a small modifiable
 number of colors), a colorcube will be allocated in the colormap.
 
 Calling this function for a GC without a colormap is an error.
+
+Deprecated: 2.22: Use gdk_cairo_set_source_color() instead.
 
 </description>
 <parameters>
@@ -1291,33 +1359,31 @@ should not be used. See gdk_color_change().
 <return></return>
 </function>
 
-<function name="gdk_cairo_reset_clip">
+<function name="gdk_font_from_description_for_display">
 <description>
-Resets the clip region for a Cairo context created by gdk_cairo_create().
+Loads a #GdkFont based on a Pango font description for use on @display. 
+This font will only be an approximation of the Pango font, and
+internationalization will not be handled correctly. This function
+should only be used for legacy code that cannot be easily converted
+to use Pango. Using Pango directly will produce better results.
 
-This resets the clip region to the &quot;empty&quot; state for the given drawable.
-This is required for non-native windows since a direct call to
-cairo_reset_clip() would unset the clip region inherited from the
-drawable (i.e. the window clip region), and thus let you e.g.
-draw outside your window.
-
-This is rarely needed though, since most code just create a new cairo_t
-using gdk_cairo_create() each time they want to draw something.
-
-Since: 2.18
+Since: 2.2
 
 </description>
 <parameters>
-<parameter name="cr">
-<parameter_description> a #cairo_t
+<parameter name="display">
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable
+<parameter name="font_desc">
+<parameter_description> a #PangoFontDescription.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the newly loaded font, or %NULL if the font
+cannot be loaded.
+
+</return>
 </function>
 
 <function name="gdk_set_double_click_time">
@@ -1361,6 +1427,8 @@ You should make no assumptions about the initial reference count.
 <description>
 Calls a function on each span in the intersection of @region and @spans.
 
+Deprecated: 2.22: There is no replacement.
+
 </description>
 <parameters>
 <parameter name="region">
@@ -1391,12 +1459,31 @@ Calls a function on each span in the intersection of @region and @spans.
 <return></return>
 </function>
 
-<function name="gdk_display_supports_shapes">
+<function name="gdk_image_get_byte_order">
 <description>
-Returns %TRUE if gdk_window_shape_combine_mask() can
-be used to create shaped windows on @display.
+Determines the byte order of the image.
 
-Since: 2.10
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkVisual
+
+</return>
+</function>
+
+<function name="gdk_display_get_name">
+<description>
+Gets the name of the display.
+
+Since: 2.2
 
 </description>
 <parameters>
@@ -1405,7 +1492,8 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if shaped windows are supported 
+<return> a string representing the display name. This string is owned
+by GDK and should not be modified or freed.
 
 </return>
 </function>
@@ -1468,6 +1556,10 @@ and locates the value in the array for a given axis use.
 <description>
 Create a pixmap from data in XPM format.
 
+Deprecated: 2.22: Use a #GdkPixbuf instead. You can use
+gdk_pixbuf_new_from_xpm_data() to create it.
+If you must use a pixmap, use gdk_pixmap_new() to
+create it and Cairo to draw the pixbuf onto it.
 
 </description>
 <parameters>
@@ -1494,6 +1586,7 @@ in which case a default color will be used.
 </parameter>
 </parameters>
 <return> the #GdkPixmap.
+
 </return>
 </function>
 
@@ -1775,6 +1868,28 @@ pixbuf with a reference count of 1 if no destination pixbuf was specified, or %N
 </return>
 </function>
 
+<function name="gdk_window_get_children">
+<description>
+Gets the list of children of @window known to GDK.
+This function only returns children created via GDK,
+so for example it's useless when used with the root window;
+it only returns windows an application created itself.
+
+The returned list must be freed, but the elements in the
+list need not be.
+
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> list of child windows inside @window
+</return>
+</function>
+
 <function name="gdk_screen_width_mm">
 <description>
 Returns the width of the default screen in millimeters.
@@ -1858,15 +1973,11 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_display_set_double_click_distance">
+<function name="gdk_display_get_n_screens">
 <description>
-Sets the double click distance (two clicks within this distance
-count as a double click and result in a #GDK_2BUTTON_PRESS event).
-See also gdk_display_set_double_click_time().
-Applications should &lt;emphasis&gt;not&lt;/emphasis&gt; set this, it is a global 
-user-configured setting.
+Gets the number of screen managed by the @display.
 
-Since: 2.4
+Since: 2.2
 
 </description>
 <parameters>
@@ -1874,33 +1985,9 @@ Since: 2.4
 <parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
-<parameter name="distance">
-<parameter_description> distance in pixels
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
-</function>
+<return> number of screens.
 
-<function name="gdk_drag_get_protocol">
-<description>
-Finds out the DND protocol supported by a window.
-
-
-</description>
-<parameters>
-<parameter name="xid">
-<parameter_description> the windowing system id of the destination window.
-</parameter_description>
-</parameter>
-<parameter name="protocol">
-<parameter_description> location where the supported DND protocol is returned.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the windowing system specific id for the window where
-the drop should happen. This may be @xid or the id of a proxy
-window, or zero if @xid doesn't support Drag and Drop.
 </return>
 </function>
 
@@ -2009,38 +2096,55 @@ Since: 2.2
 <return></return>
 </function>
 
-<function name="gdk_gc_set_colormap">
+<function name="gdk_region_rectangle">
 <description>
-Sets the colormap for the GC to the given colormap. The depth
-of the colormap's visual must match the depth of the drawable
-for which the GC was created.
+Creates a new region containing the area @rectangle.
+
 
 </description>
 <parameters>
-<parameter name="gc">
-<parameter_description> a #GdkGC
+<parameter name="rectangle">
+<parameter_description> a #GdkRectangle
 </parameter_description>
 </parameter>
-<parameter name="colormap">
-<parameter_description> a #GdkColormap
+</parameters>
+<return> a new region
+</return>
+</function>
+
+<function name="gdk_window_get_root_coords">
+<description>
+Obtains the position of a window position in root
+window coordinates. This is similar to
+gdk_window_get_origin() but allows you go pass
+in any position in the window, not just the origin.
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X coordinate in window
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y coordinate in window
+</parameter_description>
+</parameter>
+<parameter name="root_x">
+<parameter_description> return location for X coordinate
+</parameter_description>
+</parameter>
+<parameter name="root_y">
+<parameter_description> return location for Y coordinate
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_screen_height_mm">
-<description>
-Returns the height of the default screen in millimeters.
-Note that on many X servers this value will not be correct.
-
-
-</description>
-<parameters>
-</parameters>
-<return> the height of the default screen in millimeters,
-though it is not always correct.
-</return>
 </function>
 
 <function name="gdk_gc_set_font">
@@ -2308,6 +2412,9 @@ variable.
 
 Since: 2.2
 
+Deprecated: 2.22: Use gdk_cairo_set_source_pixbuf() and cairo_paint() or
+cairo_rectangle() and cairo_fill() instead.
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -2362,26 +2469,29 @@ Since: 2.2
 <return></return>
 </function>
 
-<function name="gdk_x11_atom_to_xatom_for_display">
+<function name="gdk_pixmap_foreign_new_for_display">
 <description>
-Converts from a #GdkAtom to the X atom for a #GdkDisplay
-with the same string value. The special value %GDK_NONE
-is converted to %None.
+Wraps a native pixmap in a #GdkPixmap.
+This may fail if the pixmap has been destroyed.
+
+For example in the X backend, a native pixmap handle is an Xlib
+&lt;type&gt;XID&lt;/type&gt;.
 
 Since: 2.2
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description> A #GdkDisplay
+<parameter_description> The #GdkDisplay where @anid is located.
 </parameter_description>
 </parameter>
-<parameter name="atom">
-<parameter_description> A #GdkAtom, or %GDK_NONE
+<parameter name="anid">
+<parameter_description> a native pixmap handle.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the X atom corresponding to @atom, or %None
+<return> the newly-created #GdkPixmap wrapper for the 
+native pixmap or %NULL if the pixmap has been destroyed.
 
 </return>
 </function>
@@ -2433,6 +2543,9 @@ Note that this function uses @color-&gt;pixel, use
 gdk_gc_set_rgb_fg_color() to specify the foreground 
 color as red, green, blue components.
 
+Deprecated: 2.22: Use gdk_cairo_set_source_color() to use a #GdkColor
+as the source in Cairo.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -2447,20 +2560,18 @@ color as red, green, blue components.
 <return></return>
 </function>
 
-<function name="gdk_event_get_time">
+<function name="gdk_screen_get_default">
 <description>
-Returns the time stamp from @event, if there is one; otherwise
-returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
+Gets the default screen for the default display. (See
+gdk_display_get_default ()).
 
+Since: 2.2
 
 </description>
 <parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
 </parameters>
-<return> time stamp field from @event
+<return> a #GdkScreen, or %NULL if there is no default display.
+
 </return>
 </function>
 
@@ -2601,26 +2712,6 @@ value has already been allocated.
 </return>
 </function>
 
-<function name="gdk_window_get_toplevel">
-<description>
-Gets the toplevel window that's an ancestor of @window.
-
-Any window type but %GDK_WINDOW_CHILD is considered a
-toplevel window, as is a %GDK_WINDOW_CHILD window that
-has a root window as parent.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> the toplevel window containing @window
-</return>
-</function>
-
 <function name="gdk_window_clear_area_e">
 <description>
 Like gdk_window_clear_area(), but also generates an expose event for
@@ -2700,6 +2791,9 @@ Offset attributes such as the clip and tile-stipple origins
 of the GC so that drawing at x - x_offset, y - y_offset with
 the offset GC  has the same effect as drawing at x, y with the original
 GC.
+
+Deprecated: 2.22: There is no direct replacement, as this is just a
+convenience function for gdk_gc_set_ts_origin and gdk_gc_set_clip_origin().
 
 </description>
 <parameters>
@@ -2787,6 +2881,26 @@ For example in the X backend, a native window handle is an Xlib
 </parameters>
 <return> the #GdkWindow wrapper for the native window, 
 or %NULL if there is none.
+</return>
+</function>
+
+<function name="gdk_image_get_bytes_per_pixel">
+<description>
+Determines the number of bytes per pixel of the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the bytes per pixel
+
 </return>
 </function>
 
@@ -3047,6 +3161,26 @@ Since: 2.2
 <return></return>
 </function>
 
+<function name="gdk_image_get_width">
+<description>
+Determines the width of the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the width
+
+</return>
+</function>
+
 <function name="gdk_query_depths">
 <description>
 This function returns the available bit depths for the default
@@ -3180,23 +3314,21 @@ was already set in @state.
 </return>
 </function>
 
-<function name="gdk_color_to_string">
+<function name="gdk_window_get_modal_hint">
 <description>
-Returns a textual specification of @color in the hexadecimal form
-&lt;literal&gt;rrrrggggbbbb&lt;/literal&gt;, where &lt;literal&gt;r&lt;/literal&gt;,
-&lt;literal&gt;g&lt;/literal&gt; and &lt;literal&gt;b&lt;/literal&gt; are hex digits
-representing the red, green and blue components respectively.
+Determines whether or not the window manager is hinted that @window
+has modal behaviour.
 
-Since: 2.12
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="color">
-<parameter_description> a #GdkColor
+<parameter name="window">
+<parameter_description> A toplevel #GdkWindow.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated text string
+<return> whether or not the window has the modal hint set.
 
 </return>
 </function>
@@ -3333,6 +3465,36 @@ The return value should not be freed.
 </return>
 </function>
 
+<function name="gdk_threads_add_timeout">
+<description>
+A wrapper for the common usage of gdk_threads_add_timeout_full() 
+assigning the default priority, #G_PRIORITY_DEFAULT.
+
+See gdk_threads_add_timeout_full().
+
+Since: 2.12
+
+</description>
+<parameters>
+<parameter name="interval">
+<parameter_description> the time between calls to the function, in milliseconds
+(1/1000ths of a second)
+</parameter_description>
+</parameter>
+<parameter name="function">
+<parameter_description> function to call
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description>     data to pass to @function
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source.
+
+</return>
+</function>
+
 <function name="gdk_x11_xatom_to_atom">
 <description>
 Convert from an X atom for the default display to the corresponding
@@ -3350,25 +3512,22 @@ Convert from an X atom for the default display to the corresponding
 </return>
 </function>
 
-<function name="gdk_window_invalidate_rect">
+<function name="gdk_gc_set_clip_mask">
 <description>
-A convenience wrapper around gdk_window_invalidate_region() which
-invalidates a rectangular region. See
-gdk_window_invalidate_region() for details.
+Sets the clip mask for a graphics context from a bitmap.
+The clip mask is interpreted relative to the clip
+origin. (See gdk_gc_set_clip_origin()).
+
+Deprecated: 2.22: Use cairo_mask() instead.
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="gc">
+<parameter_description> the #GdkGC.
 </parameter_description>
 </parameter>
-<parameter name="rect">
-<parameter_description> rectangle to invalidate or %NULL to invalidate the whole
-window
-</parameter_description>
-</parameter>
-<parameter name="invalidate_children">
-<parameter_description> whether to also invalidate child windows
+<parameter name="mask">
+<parameter_description> a bitmap.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3514,6 +3673,10 @@ to another, the colormaps should match.
 Create a pixmap from data in XPM format using a particular
 colormap.
 
+Deprecated: 2.22: Use a #GdkPixbuf instead. You can use
+gdk_pixbuf_new_from_xpm_data() to create it.
+If you must use a pixmap, use gdk_pixmap_new() to
+create it and Cairo to draw the pixbuf onto it.
 
 </description>
 <parameters>
@@ -3545,6 +3708,7 @@ in which case a default color will be used.
 </parameter>
 </parameters>
 <return> the #GdkPixmap.
+
 </return>
 </function>
 
@@ -3610,6 +3774,11 @@ Xlib calls mixed with GDK calls on the X11 platform. It may also
 matter for toplevel windows, because the window manager may choose
 to reparent them.
 
+Note that you should use gdk_window_get_effective_parent() when
+writing generic code that walks up a window hierarchy, because
+gdk_window_get_parent() will most likely not do what you expect if
+there are offscreen windows in the hierarchy.
+
 
 </description>
 <parameters>
@@ -3644,31 +3813,6 @@ ownership change notification is requested
 <return> whether #GdkEventOwnerChange events will 
 be sent.
 
-</return>
-</function>
-
-<function name="gdk_set_pointer_hooks">
-<description>
-This function allows for hooking into the operation
-of getting the current location of the pointer. This
-is only useful for such low-level tools as an
-event recorder. Applications should never have any
-reason to use this facility.
-
-This function is not multihead safe. For multihead operation,
-see gdk_display_set_pointer_hooks().
-
-
-</description>
-<parameters>
-<parameter name="new_hooks">
-<parameter_description> a table of pointers to functions for getting
-quantities related to the current pointer position,
-or %NULL to restore the default table.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the previous pointer hook table
 </return>
 </function>
 
@@ -3751,6 +3895,24 @@ coordinates of X11.
 <return></return>
 </function>
 
+<function name="gdk_visual_get_colormap_size">
+<description>
+Returns the size of a colormap for this visual.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="visual">
+<parameter_description> A #GdkVisual.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The size of a colormap that is suitable for @visual.
+
+</return>
+</function>
+
 <function name="gdk_pango_attr_stipple_new">
 <description>
 Creates a new attribute containing a stipple bitmap to be used when
@@ -3765,6 +3927,25 @@ rendering the text.
 </parameter>
 </parameters>
 <return> new #PangoAttribute
+</return>
+</function>
+
+<function name="gdk_window_has_native">
+<description>
+Checks whether the window has a native window or not. Note that
+you can use gdk_window_ensure_native() if a native window is needed.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the %window has a native window, %FALSE otherwise.
+
 </return>
 </function>
 
@@ -3786,6 +3967,24 @@ requests the restack, does not guarantee it.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_drawable_get_display">
+<description>
+Gets the #GdkDisplay associated with a #GdkDrawable.
+
+Since: 2.2
+
+</description>
+<parameters>
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkDisplay associated with @drawable
+
+</return>
 </function>
 
 <function name="gdk_window_set_hints">
@@ -3861,6 +4060,24 @@ Since: 2.14
 </parameter>
 </parameters>
 <return> the ID (greater than 0) of the event source.
+
+</return>
+</function>
+
+<function name="gdk_window_is_input_only">
+<description>
+Determines whether or not the window is an input only window.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @window is input only
 
 </return>
 </function>
@@ -4014,6 +4231,22 @@ Since: 2.4
 </return>
 </function>
 
+<function name="gdk_gc_unref">
+<description>
+Decrement the reference count of @gc.
+
+Deprecated: 2.0: Use g_object_unref() instead.
+
+</description>
+<parameters>
+<parameter name="gc">
+<parameter_description> a #GdkGC
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_test_render_sync">
 <description>
 This function retrives a pixel from @window to force the windowing
@@ -4126,6 +4359,18 @@ pointer grabbed.
 Draws a line, using the foreground color and other attributes of 
 the #GdkGC.
 
+Deprecated: 2.22: Use cairo_line_to() and cairo_stroke() instead.
+Be aware that the default line width in Cairo is 2 pixels and that your
+coordinates need to describe the center of the line. To draw a single
+pixel wide pixel-aligned line, you would use:
+|[cairo_set_line_width (cr, 1.0);
+cairo_set_line_cap (cr, CAIRO_LINE_CAP_SQUARE);
+cairo_move_to (cr, 0.5, 0.5);
+cairo_line_to (cr, 9.5, 0.5);
+cairo_stroke (cr);]|
+See also &lt;ulink url=&quot;http://cairographics.org/FAQ/#sharp_lines&quot;&gt;the Cairo
+FAQ&lt;/ulink&gt; on this topic.
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -4176,28 +4421,43 @@ This function is called by the drag source.
 <return></return>
 </function>
 
-<function name="gdk_drawable_set_data">
+<function name="gdk_window_input_shape_combine_mask">
 <description>
-This function is equivalent to g_object_set_data(),
-the #GObject variant should be used instead.
+Like gdk_window_shape_combine_mask(), but the shape applies
+only to event handling. Mouse events which happen while
+the pointer position corresponds to an unset bit in the
+mask will be passed on the window below @window.
 
+An input shape is typically used with RGBA windows.
+The alpha channel of the window defines which pixels are
+invisible and allows for nicely antialiased borders,
+and the input shape controls where the window is
+&quot;clickable&quot;.
+
+On the X11 platform, this requires version 1.1 of the
+shape extension.
+
+On the Win32 platform, this functionality is not present and the
+function does nothing.
+
+Since: 2.10
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
-<parameter name="key">
-<parameter_description> name to store the data under
+<parameter name="mask">
+<parameter_description> shape mask, or %NULL
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> arbitrary data
+<parameter name="x">
+<parameter_description> X position of shape mask with respect to @window
 </parameter_description>
 </parameter>
-<parameter name="destroy_func">
-<parameter_description> function to free @data, or %NULL
+<parameter name="y">
+<parameter_description> Y position of shape mask with respect to @window
 </parameter_description>
 </parameter>
 </parameters>
@@ -4281,8 +4541,9 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GSList of #GdkDisplay objects.
-Free this list with g_slist_free() when you are done with it.
+<return> a newly allocated
+#GSList of #GdkDisplay objects. Free this list with g_slist_free() when you
+are done with it.
 
 </return>
 </function>
@@ -4327,6 +4588,41 @@ Since: 2.10
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_x11_screen_supports_net_wm_hint">
+<description>
+This function is specific to the X11 backend of GDK, and indicates
+whether the window manager supports a certain hint from the
+Extended Window Manager Hints Specification. You can find this
+specification on 
+&lt;ulink url=&quot;http://www.freedesktop.org&quot;&gt;http://www.freedesktop.org&lt;/ulink&gt;.
+
+When using this function, keep in mind that the window manager
+can change over time; so you shouldn't use this function in
+a way that impacts persistent application state. A common bug
+is that your application can start up before the window manager
+does when the user logs in, and before the window manager starts
+gdk_x11_screen_supports_net_wm_hint() will return %FALSE for every property.
+You can monitor the window_manager_changed signal on #GdkScreen to detect
+a window manager change.
+
+Since: 2.2
+
+</description>
+<parameters>
+<parameter name="screen">
+<parameter_description> the relevant #GdkScreen.
+</parameter_description>
+</parameter>
+<parameter name="property">
+<parameter_description> a property atom.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the window manager supports @property
+
+</return>
 </function>
 
 <function name="gdk_window_begin_resize_drag">
@@ -4392,81 +4688,41 @@ Since: 2.4
 <return></return>
 </function>
 
-<function name="gdk_cursor_new_from_pixmap">
+<function name="gdk_cursor_get_display">
 <description>
-Creates a new cursor from a given pixmap and mask. Both the pixmap and mask
-must have a depth of 1 (i.e. each pixel has only 2 values - on or off).
-The standard cursor size is 16 by 16 pixels. You can create a bitmap 
-from inline data as in the below example.
+Returns the display on which the #GdkCursor is defined.
 
-&lt;example&gt;&lt;title&gt;Creating a custom cursor&lt;/title&gt;
-&lt;programlisting&gt;
-/&lt;!-- --&gt;* This data is in X bitmap format, and can be created with the 'bitmap'
-utility. *&lt;!-- --&gt;/
-define cursor1_width 16
-define cursor1_height 16
-static unsigned char cursor1_bits[] = {
-0x80, 0x01, 0x40, 0x02, 0x20, 0x04, 0x10, 0x08, 0x08, 0x10, 0x04, 0x20,
-0x82, 0x41, 0x41, 0x82, 0x41, 0x82, 0x82, 0x41, 0x04, 0x20, 0x08, 0x10,
-0x10, 0x08, 0x20, 0x04, 0x40, 0x02, 0x80, 0x01};
-
-static unsigned char cursor1mask_bits[] = {
-0x80, 0x01, 0xc0, 0x03, 0x60, 0x06, 0x30, 0x0c, 0x18, 0x18, 0x8c, 0x31,
-0xc6, 0x63, 0x63, 0xc6, 0x63, 0xc6, 0xc6, 0x63, 0x8c, 0x31, 0x18, 0x18,
-0x30, 0x0c, 0x60, 0x06, 0xc0, 0x03, 0x80, 0x01};
-
-
-GdkCursor *cursor;
-GdkPixmap *source, *mask;
-GdkColor fg = { 0, 65535, 0, 0 }; /&lt;!-- --&gt;* Red. *&lt;!-- --&gt;/
-GdkColor bg = { 0, 0, 0, 65535 }; /&lt;!-- --&gt;* Blue. *&lt;!-- --&gt;/
-
-
-source = gdk_bitmap_create_from_data (NULL, cursor1_bits,
-cursor1_width, cursor1_height);
-mask = gdk_bitmap_create_from_data (NULL, cursor1mask_bits,
-cursor1_width, cursor1_height);
-cursor = gdk_cursor_new_from_pixmap (source, mask, &amp;fg, &amp;bg, 8, 8);
-g_object_unref (source);
-g_object_unref (mask);
-
-
-gdk_window_set_cursor (widget-&gt;window, cursor);
-&lt;/programlisting&gt;
-&lt;/example&gt;
-
+Since: 2.2
 
 </description>
 <parameters>
-<parameter name="source">
-<parameter_description> the pixmap specifying the cursor.
-</parameter_description>
-</parameter>
-<parameter name="mask">
-<parameter_description> the pixmap specifying the mask, which must be the same size as 
-@source.
-</parameter_description>
-</parameter>
-<parameter name="fg">
-<parameter_description> the foreground color, used for the bits in the source which are 1.
-The color does not have to be allocated first. 
-</parameter_description>
-</parameter>
-<parameter name="bg">
-<parameter_description> the background color, used for the bits in the source which are 0.
-The color does not have to be allocated first.
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> the horizontal offset of the 'hotspot' of the cursor. 
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the vertical offset of the 'hotspot' of the cursor.
+<parameter name="cursor">
+<parameter_description> a #GdkCursor.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GdkCursor.
+<return> the #GdkDisplay associated to @cursor
+
+</return>
+</function>
+
+<function name="gdk_image_get_height">
+<description>
+Determines the height of the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the height
+
 </return>
 </function>
 
@@ -4474,6 +4730,9 @@ The color does not have to be allocated first.
 <description>
 Draws a #GdkImage onto a drawable.
 The depth of the #GdkImage must match the depth of the #GdkDrawable.
+
+Deprecated: 2.22: Do not use #GdkImage anymore, instead use Cairo image
+surfaces.
 
 </description>
 <parameters>
@@ -4535,6 +4794,35 @@ presses into account.
 </return>
 </function>
 
+<function name="gdk_device_get_key">
+<description>
+If @index has a valid keyval, this function will
+fill in @keyval and @modifiers with the keyval settings.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GdkDevice.
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> the index of the macro button to get.
+</parameter_description>
+</parameter>
+<parameter name="keyval">
+<parameter_description> return value for the keyval.
+</parameter_description>
+</parameter>
+<parameter name="modifiers">
+<parameter_description> return value for modifiers.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_window_set_composited">
 <description>
 Sets a #GdkWindow as composited, or unsets it. Composited
@@ -4577,34 +4865,49 @@ Since: 2.12
 <return></return>
 </function>
 
-<function name="gdk_spawn_command_line_on_screen">
+<function name="gdk_window_set_icon_name">
 <description>
-Like g_spawn_command_line_async(), except the child process is
-spawned in such an environment that on calling gdk_display_open()
-it would be returned a #GdkDisplay with @screen as the default
-screen.
+Windows may have a name used while minimized, distinct from the
+name they display in their titlebar. Most of the time this is a bad
+idea from a user interface standpoint. But you can set such a name
+with this function, if you like.
 
-This is useful for applications which wish to launch an application
-on a specific screen.
+After calling this with a non-%NULL @name, calls to gdk_window_set_title()
+will not update the icon title.
 
-Since: 2.4
+Using %NULL for @name unsets the icon title; further calls to
+gdk_window_set_title() will again update the icon title as well.
 
 </description>
 <parameters>
-<parameter name="screen">
-<parameter_description> a #GdkScreen
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow
 </parameter_description>
 </parameter>
-<parameter name="command_line">
-<parameter_description> a command line
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for errors
+<parameter name="name">
+<parameter_description> name of window while iconified (minimized)
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on success, %FALSE if error is set.
+<return></return>
+</function>
+
+<function name="gdk_image_get_image_type">
+<description>
+Determines the type of a given image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkImageType of the image
 
 </return>
 </function>
@@ -4630,6 +4933,53 @@ Since: 2.6
 <parameter name="color">
 <parameter_description> the color to use, or %NULL to unset a previously
 set override color.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_event_new">
+<description>
+Creates a new event of the given type. All fields are set to 0.
+
+Since: 2.2
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a #GdkEventType 
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated #GdkEvent. The returned #GdkEvent 
+should be freed with gdk_event_free().
+
+</return>
+</function>
+
+<function name="gdk_window_reparent">
+<description>
+Reparents @window into the given @new_parent. The window being
+reparented will be unmapped as a side effect.
+
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="new_parent">
+<parameter_description> new parent to move @window into
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X location inside the new parent
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y location inside the new parent
 </parameter_description>
 </parameter>
 </parameters>
@@ -4748,6 +5098,10 @@ Gets the event mask for @window. See gdk_window_set_events().
 <description>
 Create a pixmap from a XPM file using a particular colormap.
 
+Deprecated: 2.22: Use a #GdkPixbuf instead. You can use
+gdk_pixbuf_new_from_file() to create it.
+If you must use a pixmap, use gdk_pixmap_new() to
+create it and Cairo to draw the pixbuf onto it.
 
 </description>
 <parameters>
@@ -4779,6 +5133,7 @@ in which case a default color will be used.
 </parameter>
 </parameters>
 <return> the #GdkPixmap.
+
 </return>
 </function>
 
@@ -4806,24 +5161,22 @@ See gtk_window_set_transient_for() if you're using #GtkWindow or
 <return></return>
 </function>
 
-<function name="gdk_window_destroy">
+<function name="gdk_visual_get_bits_per_rgb">
 <description>
-Destroys the window system resources associated with @window and decrements @window's
-reference count. The window system resources for all children of @window are also
-destroyed, but the children's reference counts are not decremented.
+Returns the number of significant bits per red, green and blue value.
 
-Note that a window will not be destroyed automatically when its reference count
-reaches zero. You must call this function yourself before that happens.
-
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="visual">
+<parameter_description> a #GdkVisual
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The number of significant bits per color value for @visual.
+
+</return>
 </function>
 
 <function name="gdk_events_pending">
@@ -4844,6 +5197,11 @@ Sets whether copying non-visible portions of a drawable
 using this graphics context generate exposure events
 for the corresponding regions of the destination
 drawable. (See gdk_draw_drawable()).
+
+Deprecated: 2.22: There is no replacement. If you need to control
+exposures, you must use drawing operations of the underlying window
+system or use gdk_window_invalidate_rect(). Cairo will never
+generate exposures.
 
 </description>
 <parameters>
@@ -5068,6 +5426,8 @@ number of colors), a colorcube will be allocated in the colormap.
 
 Calling this function for a GC without a colormap is an error.
 
+Deprecated: 2.22: Use gdk_cairo_set_source_color() instead.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -5239,29 +5599,52 @@ On Windows, reliably maximizes the window.
 <return></return>
 </function>
 
-<function name="gdk_app_launch_context_set_screen">
+<function name="gdk_visual_get_depth">
 <description>
-Sets the screen on which applications will be launched when
-using this context. See also gdk_app_launch_context_set_display().
+Returns the bit depth of this visual.
 
-If both @screen and @display are set, the @screen takes priority.
-If neither @screen or @display are set, the default screen and
-display are used.
-
-Since: 2.14
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="context">
-<parameter_description> a #GdkAppLaunchContext
-</parameter_description>
-</parameter>
-<parameter name="screen">
-<parameter_description> a #GdkScreen
+<parameter name="visual">
+<parameter_description> A #GdkVisual.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The bit depth of this visual.
+
+</return>
+</function>
+
+<function name="gdk_rectangle_intersect">
+<description>
+Calculates the intersection of two rectangles. It is allowed for
+@dest to be the same as either @src1 or @src2. If the rectangles 
+do not intersect, @dest's width and height is set to 0 and its x 
+and y values are undefined. If you are only interested in whether
+the rectangles intersect, but not in the intersecting area itself,
+pass %NULL for @dest.
+
+
+</description>
+<parameters>
+<parameter name="src1">
+<parameter_description> a #GdkRectangle
+</parameter_description>
+</parameter>
+<parameter name="src2">
+<parameter_description> a #GdkRectangle
+</parameter_description>
+</parameter>
+<parameter name="dest">
+<parameter_description> return location for the
+intersection of @src1 and @src2, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the rectangles intersect.
+</return>
 </function>
 
 <function name="gdk_window_process_all_updates">
@@ -5417,6 +5800,8 @@ the optimal one in those previous versions. GdkRGB can now render to
 drawables with any visual.
 
 Since: 2.2
+
+Deprecated: 2.22: Use gdk_screen_get_system_visual()
 
 </description>
 <parameters>
@@ -5621,6 +6006,10 @@ Draws an arc or a filled 'pie slice'. The arc is defined by the bounding
 rectangle of the entire ellipse, and the start and end angles of the part 
 of the ellipse to be drawn.
 
+Deprecated: 2.22: Use cairo_arc() and cairo_fill() or cairo_stroke()
+instead. Note that arcs just like any drawing operation in Cairo are
+antialiased unless you call cairo_set_antialias().
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -5740,53 +6129,121 @@ Since: 2.2
 <return></return>
 </function>
 
-<function name="gdk_gc_set_clip_mask">
+<function name="gdk_drawable_get_image">
 <description>
-Sets the clip mask for a graphics context from a bitmap.
-The clip mask is interpreted relative to the clip
-origin. (See gdk_gc_set_clip_origin()).
+A #GdkImage stores client-side image data (pixels). In contrast,
+#GdkPixmap and #GdkWindow are server-side
+objects. gdk_drawable_get_image() obtains the pixels from a
+server-side drawable as a client-side #GdkImage.  The format of a
+#GdkImage depends on the #GdkVisual of the current display, which
+makes manipulating #GdkImage extremely difficult; therefore, in
+most cases you should use gdk_pixbuf_get_from_drawable() instead of
+this lower-level function. A #GdkPixbuf contains image data in a
+canonicalized RGB format, rather than a display-dependent format.
+Of course, there's a convenience vs. speed tradeoff here, so you'll
+want to think about what makes sense for your application.
+
+@x, @y, @width, and @height define the region of @drawable to
+obtain as an image.
+
+You would usually copy image data to the client side if you intend
+to examine the values of individual pixels, for example to darken
+an image or add a red tint. It would be prohibitively slow to
+make a round-trip request to the windowing system for each pixel,
+so instead you get all of them at once, modify them, then copy
+them all back at once.
+
+If the X server or other windowing system backend is on the local
+machine, this function may use shared memory to avoid copying
+the image data.
+
+If the source drawable is a #GdkWindow and partially offscreen
+or obscured, then the obscured portions of the returned image
+will contain undefined data.
+
+Deprecated: 2.22: Use @drawable as the source and draw to a Cairo image
+surface if you want to download contents to the client.
 
 </description>
 <parameters>
-<parameter name="gc">
-<parameter_description> the #GdkGC.
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable
 </parameter_description>
 </parameter>
-<parameter name="mask">
-<parameter_description> a bitmap.
+<parameter name="x">
+<parameter_description> x coordinate on @drawable
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> y coordinate on @drawable
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width of region to get
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height or region to get
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkImage containing the contents of @drawable
+
+</return>
+</function>
+
+<function name="gdk_window_invalidate_rect">
+<description>
+A convenience wrapper around gdk_window_invalidate_region() which
+invalidates a rectangular region. See
+gdk_window_invalidate_region() for details.
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> rectangle to invalidate or %NULL to invalidate the whole
+window
+</parameter_description>
+</parameter>
+<parameter name="invalidate_children">
+<parameter_description> whether to also invalidate child windows
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gdk_rectangle_intersect">
+<function name="gdk_window_resize">
 <description>
-Calculates the intersection of two rectangles. It is allowed for
-@dest to be the same as either @src1 or @src2. If the rectangles 
-do not intersect, @dest's width and height is set to 0 and its x 
-and y values are undefined. If you are only interested in whether
-the rectangles intersect, but not in the intersecting area itself,
-pass %NULL for @dest.
+Resizes @window; for toplevel windows, asks the window manager to resize
+the window. The window manager may not allow the resize. When using GTK+,
+use gtk_window_resize() instead of this low-level GDK function.
 
+Windows may not be resized below 1x1.
+
+If you're also planning to move the window, use gdk_window_move_resize()
+to both move and resize simultaneously, for a nicer visual effect.
 
 </description>
 <parameters>
-<parameter name="src1">
-<parameter_description> a #GdkRectangle
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
-<parameter name="src2">
-<parameter_description> a #GdkRectangle
+<parameter name="width">
+<parameter_description> new width of the window
 </parameter_description>
 </parameter>
-<parameter name="dest">
-<parameter_description> return location for the intersection of @src1 and @src2, or %NULL
+<parameter name="height">
+<parameter_description> new height of the window
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the rectangles intersect.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_device_get_state">
@@ -5816,20 +6273,20 @@ or %NULL.
 <return></return>
 </function>
 
-<function name="gdk_drawable_get_display">
+<function name="gdk_device_get_has_cursor">
 <description>
-Gets the #GdkDisplay associated with a #GdkDrawable.
+Determines whether the pointer follows device motion.
 
-Since: 2.2
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable
+<parameter name="device">
+<parameter_description> a #GdkDevice
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GdkDisplay associated with @drawable
+<return> %TRUE if the pointer follows device motion
 
 </return>
 </function>
@@ -5864,6 +6321,10 @@ results in a filled rectangle 20 pixels wide and 20 pixels high. Calling
 &lt;literal&gt;gdk_draw_rectangle (window, gc, FALSE, 0, 0, 20, 20)&lt;/literal&gt; 
 results in an outlined rectangle with corners at (0, 0), (0, 20), (20, 20),
 and (20, 0), which makes it 21 pixels wide and 21 pixels high.
+
+Deprecated: 2.22: Use cairo_rectangle() and cairo_fill() or cairo_stroke()
+instead. For stroking, the same caveats for converting code apply as for
+gdk_draw_line().
 
 </description>
 <parameters>
@@ -5926,35 +6387,6 @@ if your application pretends to be multiple applications.
 <return></return>
 </function>
 
-<function name="gdk_window_resize">
-<description>
-Resizes @window; for toplevel windows, asks the window manager to resize
-the window. The window manager may not allow the resize. When using GTK+,
-use gtk_window_resize() instead of this low-level GDK function.
-
-Windows may not be resized below 1x1.
-
-If you're also planning to move the window, use gdk_window_move_resize()
-to both move and resize simultaneously, for a nicer visual effect.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> new width of the window
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> new height of the window
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_x11_grab_server">
 <description>
 Call gdk_x11_display_grab() on the default display. 
@@ -5996,6 +6428,9 @@ Examples of keyvals are #GDK_a, #GDK_Enter, #GDK_F1, etc.
 <description>
 Draws a point, using the foreground color and other attributes of 
 the #GdkGC.
+
+Deprecated: 2.22: Use cairo_rectangle() and cairo_fill() or 
+cairo_move_to() and cairo_stroke() instead.
 
 </description>
 <parameters>
@@ -6072,6 +6507,38 @@ Returns the display of a #GdkFont.
 </return>
 </function>
 
+<function name="gdk_visual_get_red_pixel_details">
+<description>
+Obtains values that are needed to calculate red pixel values in TrueColor
+and DirectColor.  The &quot;mask&quot; is the significant bits within the pixel.
+The &quot;shift&quot; is the number of bits left we must shift a primary for it
+to be in position (according to the &quot;mask&quot;).  Finally, &quot;precision&quot; refers
+to how much precision the pixel value contains for a particular primary.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="visual">
+<parameter_description> A #GdkVisual.
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> A pointer to a #guint32 to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="shift">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="precision">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_draw_trapezoids">
 <description>
 Draws a set of anti-aliased trapezoids. The trapezoids are
@@ -6081,6 +6548,9 @@ rotated underlines and backgrouds when rendering a PangoLayout and is
 likely not useful for applications.
 
 Since: 2.6
+
+Deprecated: 2.22: Use Cairo path contruction functions and cairo_fill()
+instead.
 
 </description>
 <parameters>
@@ -6242,21 +6712,69 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_window_get_state">
+<function name="gdk_visual_get_green_pixel_details">
 <description>
-Gets the bitwise OR of the currently active window state flags,
-from the #GdkWindowState enumeration.
+Obtains values that are needed to calculate green pixel values in TrueColor
+and DirectColor.  The &quot;mask&quot; is the significant bits within the pixel.
+The &quot;shift&quot; is the number of bits left we must shift a primary for it
+to be in position (according to the &quot;mask&quot;).  Finally, &quot;precision&quot; refers
+to how much precision the pixel value contains for a particular primary.
 
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="visual">
+<parameter_description> a #GdkVisual
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> A pointer to a #guint32 to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="shift">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="precision">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> window state bitfield
-</return>
+<return></return>
+</function>
+
+<function name="gdk_rgb_find_color">
+<description>
+@colormap should be the colormap for the graphics context and
+drawable you're using to draw. If you're drawing to a #GtkWidget,
+call gtk_widget_get_colormap().
+
+@color should have its %red, %green, and %blue fields initialized;
+gdk_rgb_find_color() will fill in the %pixel field with the best
+matching pixel from a color cube. The color is then ready to be
+used for drawing, e.g. you can call gdk_gc_set_foreground() which
+expects %pixel to be initialized.
+
+In many cases, you can avoid this whole issue by calling
+gdk_gc_set_rgb_fg_color() or gdk_gc_set_rgb_bg_color(), which
+do not expect %pixel to be initialized in advance. If you use those
+functions, there's no need for gdk_rgb_find_color().
+
+Deprecated: 2.22: Cairo handles colors automatically.
+
+</description>
+<parameters>
+<parameter name="colormap">
+<parameter_description> a #GdkColormap
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> a #GdkColor
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_x11_screen_get_screen_number">
@@ -6274,6 +6792,25 @@ Since: 2.2
 </parameters>
 <return> the position of @screen among the screens of
 its display.
+</return>
+</function>
+
+<function name="gdk_drag_context_get_actions">
+<description>
+Determines the bitmask of actions proposed by the source if
+gdk_drag_context_suggested_action() returns GDK_ACTION_ASK.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkDragAction flags
+
 </return>
 </function>
 
@@ -6360,6 +6897,8 @@ transformation matrix to that passed in to this function.
 See also gdk_draw_glyphs(), gdk_draw_layout().
 
 Since: 2.6
+
+Deprecated: 2.22: Use pango_cairo_show_glyphs() instead.
 
 </description>
 <parameters>
@@ -6734,41 +7273,46 @@ is gtk_widget_create_pango_layout().
 <return></return>
 </function>
 
-<function name="gdk_cursor_unref">
+<function name="gdk_window_process_updates">
 <description>
-Removes a reference from @cursor, deallocating the cursor
-if no references remain.
+Sends one or more expose events to @window. The areas in each
+expose event will cover the entire update area for the window (see
+gdk_window_invalidate_region() for details). Normally GDK calls
+gdk_window_process_all_updates() on your behalf, so there's no
+need to call this function unless you want to force expose events
+to be delivered immediately and synchronously (vs. the usual
+case, where GDK delivers them in an idle handler). Occasionally
+this is useful to produce nicer scrolling behavior, for example.
 
 
 </description>
 <parameters>
-<parameter name="cursor">
-<parameter_description> a #GdkCursor
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="update_children">
+<parameter_description> whether to also process updates for child windows
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gdk_screen_set_font_options">
+<function name="gdk_window_focus">
 <description>
-Sets the default font options for the screen. These
-options will be set on any #PangoContext's newly created
-with gdk_pango_context_get_for_screen(). Changing the
-default set of font options does not affect contexts that
-have already been created.
+Sets keyboard focus to @window. In most cases, gtk_window_present() 
+should be used on a #GtkWindow, rather than calling this function.
 
-Since: 2.10
 
 </description>
 <parameters>
-<parameter name="screen">
-<parameter_description> a #GdkScreen
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
-<parameter name="options">
-<parameter_description> a #cairo_font_options_t, or %NULL to unset any
-previously set default font options.
+<parameter name="timestamp">
+<parameter_description> timestamp of the event triggering the window focus
 </parameter_description>
 </parameter>
 </parameters>
@@ -6778,6 +7322,10 @@ previously set default font options.
 <function name="gdk_draw_segments">
 <description>
 Draws a number of unconnected lines.
+
+Deprecated: 2.22: Use cairo_move_to(), cairo_line_to() and cairo_stroke()
+instead. See the documentation of gdk_draw_line() for notes on line drawing
+with Cairo.
 
 </description>
 <parameters>
@@ -6801,6 +7349,26 @@ end points of the lines to be drawn.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_window_get_composited">
+<description>
+Determines whether @window is composited.
+
+See gdk_window_set_composited().
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the window is composited.
+
+</return>
 </function>
 
 <function name="gdk_window_begin_paint_region">
@@ -6859,21 +7427,59 @@ gdk_window_begin_paint_region().
 <return></return>
 </function>
 
-<function name="gdk_list_visuals">
+<function name="gdk_x11_register_standard_event_type">
 <description>
-Lists the available visuals for the default screen.
-(See gdk_screen_list_visuals())
-A visual describes a hardware image data format.
-For example, a visual might support 24-bit color, or 8-bit color,
-and might expect pixels to be in a certain format.
+Registers interest in receiving extension events with type codes
+between @event_base and &lt;literal&gt;event_base + n_events - 1&lt;/literal&gt;.
+The registered events must have the window field in the same place
+as core X events (this is not the case for e.g. XKB extension events).
 
-Call g_list_free() on the return value when you're finished with it.
+If an event type is registered, events of this type will go through
+global and window-specific filters (see gdk_window_add_filter()). 
+Unregistered events will only go through global filters.
+GDK may register the events of some X extensions on its own.
 
+This function should only be needed in unusual circumstances, e.g.
+when filtering XInput extension events on the root window.
+
+Since: 2.4
 
 </description>
 <parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="event_base">
+<parameter_description> first event type code to register
+</parameter_description>
+</parameter>
+<parameter name="n_events">
+<parameter_description> number of event type codes to register
+</parameter_description>
+</parameter>
 </parameters>
-<return> a list of visuals; the list must be freed, but not its contents
+<return></return>
+</function>
+
+<function name="gdk_color_to_string">
+<description>
+Returns a textual specification of @color in the hexadecimal form
+&lt;literal&gt;&#35;rrrrggggbbbb&lt;/literal&gt;, where &lt;literal&gt;r&lt;/literal&gt;,
+&lt;literal&gt;g&lt;/literal&gt; and &lt;literal&gt;b&lt;/literal&gt; are hex digits
+representing the red, green and blue components respectively.
+
+Since: 2.12
+
+</description>
+<parameters>
+<parameter name="color">
+<parameter_description> a #GdkColor
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated text string
+
 </return>
 </function>
 
@@ -6898,43 +7504,32 @@ Since: 2.6
 </return>
 </function>
 
-<function name="gdk_pixbuf_render_pixmap_and_mask_for_colormap">
+<function name="gdk_colormap_query_color">
 <description>
-Creates a pixmap and a mask bitmap which are returned in the @pixmap_return
-and @mask_return arguments, respectively, and renders a pixbuf and its
-corresponding tresholded alpha mask to them.  This is merely a convenience
-function; applications that need to render pixbufs with dither offsets or to
-given drawables should use gdk_draw_pixbuf(), and gdk_pixbuf_render_threshold_alpha().
+Locates the RGB color in @colormap corresponding to the given
+hardware pixel @pixel. @pixel must be a valid pixel in the
+colormap; it's a programmer error to call this function with a
+pixel which is not in the colormap. Hardware pixels are normally
+obtained from gdk_colormap_alloc_colors(), or from a #GdkImage. (A
+#GdkImage contains image data in hardware format, a #GdkPixbuf
+contains image data in a canonical 24-bit RGB format.)
 
-The pixmap that is created uses the #GdkColormap specified by @colormap.
-This colormap must match the colormap of the window where the pixmap
-will eventually be used or an error will result.
+This function is rarely useful; it's used for example to
+implement the eyedropper feature in #GtkColorSelection.
 
-If the pixbuf does not have an alpha channel, then *@mask_return will be set
-to %NULL.
 
 </description>
 <parameters>
-<parameter name="pixbuf">
-<parameter_description> A pixbuf.
-</parameter_description>
-</parameter>
 <parameter name="colormap">
-<parameter_description> A #GdkColormap
+<parameter_description> a #GdkColormap
 </parameter_description>
 </parameter>
-<parameter name="pixmap_return">
-<parameter_description> Location to store a pointer to the created pixmap,
-or %NULL if the pixmap is not needed.
+<parameter name="pixel">
+<parameter_description> pixel value in hardware display format
 </parameter_description>
 </parameter>
-<parameter name="mask_return">
-<parameter_description> Location to store a pointer to the created mask,
-or %NULL if the mask is not needed.
-</parameter_description>
-</parameter>
-<parameter name="alpha_threshold">
-<parameter_description> Threshold value for opacity values.
+<parameter name="result">
+<parameter_description> #GdkColor with red, green, blue fields initialized
 </parameter_description>
 </parameter>
 </parameters>
@@ -6968,7 +7563,7 @@ pixel_format is unsupported.
 <function name="gdk_text_property_to_utf8_list">
 <description>
 Convert a text property in the giving encoding to
-a list of UTF-8 strings.
+a list of UTF-8 strings. 
 
 
 </description>
@@ -7065,6 +7660,8 @@ A GC will have a colormap if the drawable for which it was created
 has a colormap, or if a colormap was set explicitely with
 gdk_gc_set_colormap.
 
+Deprecated: 2.22: There is no replacement. Cairo handles colormaps
+automatically, so there is no need to care about them.
 
 </description>
 <parameters>
@@ -7074,6 +7671,7 @@ gdk_gc_set_colormap.
 </parameter>
 </parameters>
 <return> the colormap of @gc, or %NULL if @gc doesn't have one.
+
 </return>
 </function>
 
@@ -7186,11 +7784,11 @@ keyboard group and level. See gdk_keymap_translate_keyboard_state().
 </parameter_description>
 </parameter>
 <parameter name="keys">
-<parameter_description> return location for array of #GdkKeymapKey, or NULL
+<parameter_description> return location for array of #GdkKeymapKey, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="keyvals">
-<parameter_description> return location for array of keyvals, or NULL
+<parameter_description> return location for array of keyvals, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="n_entries">
@@ -7251,6 +7849,8 @@ Sets the clip mask for a graphics context from a region structure.
 The clip mask is interpreted relative to the clip origin. (See
 gdk_gc_set_clip_origin()).
 
+Deprecated: 2.22: Use gdk_cairo_region() and cairo_clip() in Cairo.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -7308,30 +7908,37 @@ allocated.
 </return>
 </function>
 
-<function name="gdk_region_equal">
+<function name="gdk_screen_set_font_options">
 <description>
-Finds out if the two regions are the same.
+Sets the default font options for the screen. These
+options will be set on any #PangoContext's newly created
+with gdk_pango_context_get_for_screen(). Changing the
+default set of font options does not affect contexts that
+have already been created.
 
+Since: 2.10
 
 </description>
 <parameters>
-<parameter name="region1">
-<parameter_description> a #GdkRegion
+<parameter name="screen">
+<parameter_description> a #GdkScreen
 </parameter_description>
 </parameter>
-<parameter name="region2">
-<parameter_description> a #GdkRegion
+<parameter name="options">
+<parameter_description> a #cairo_font_options_t, or %NULL to unset any
+previously set default font options.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @region1 and @region2 are equal.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_region_shrink">
 <description>
 Resizes a region by the specified amount.
 Positive values shrink the region. Negative values expand it.
+
+Deprecated: 2.22: There is no replacement for this function.
 
 </description>
 <parameters>
@@ -7416,11 +8023,36 @@ Since: 2.2
 </return>
 </function>
 
+<function name="gdk_window_get_effective_parent">
+<description>
+Obtains the parent of @window, as known to GDK. Works like
+gdk_window_get_parent() for normal windows, but returns the
+window's embedder for offscreen windows.
+
+See also: gdk_offscreen_window_get_embedder()
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> effective parent of @window
+
+</return>
+</function>
+
 <function name="gdk_region_rect_equal">
 <description>
 Finds out if a regions is the same as a rectangle.
 
 Since: 2.18
+
+Deprecated: 2.22: Use gdk_region_new_rect() and gdk_region_equal() to 
+achieve the same effect.
 
 </description>
 <parameters>
@@ -7484,6 +8116,11 @@ Note that this function uses @color-&gt;pixel, use
 gdk_gc_set_rgb_bg_color() to specify the background 
 color as red, green, blue components.
 
+Deprecated: 2.22: Use gdk_cairo_set_source_color() to use a #GdkColor
+as the source in Cairo. Note that if you want to draw a background and a
+foreground in Cairo, you need to call drawing functions (like cairo_fill())
+twice.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -7496,6 +8133,24 @@ color as red, green, blue components.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_drag_context_get_suggested_action">
+<description>
+Determines the suggested drag action of the context.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDragAction value
+
+</return>
 </function>
 
 <function name="gdk_window_move_resize">
@@ -7531,81 +8186,26 @@ move, then resize, if you don't use gdk_window_move_resize().)
 <return></return>
 </function>
 
-<function name="gdk_cursor_new_for_display">
+<function name="gdk_screen_list_visuals">
 <description>
-Creates a new cursor from the set of builtin cursors.
-Some useful ones are:
-&lt;itemizedlist&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;right_ptr.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_RIGHT_PTR (right-facing arrow)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;crosshair.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_CROSSHAIR (crosshair)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;xterm.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_XTERM (I-beam)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;watch.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_WATCH (busy)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;fleur.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_FLEUR (for moving objects)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;hand1.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_HAND1 (a right-pointing hand)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;hand2.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_HAND2 (a left-pointing hand)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;left_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_LEFT_SIDE (resize left side)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;right_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_RIGHT_SIDE (resize right side)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_left_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_LEFT_CORNER (resize northwest corner)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_right_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_RIGHT_CORNER (resize northeast corner)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_left_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_LEFT_CORNER (resize southwest corner)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_right_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_RIGHT_CORNER (resize southeast corner)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_SIDE (resize top side)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_SIDE (resize bottom side)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;sb_h_double_arrow.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_SB_H_DOUBLE_ARROW (move vertical splitter)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;sb_v_double_arrow.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_SB_V_DOUBLE_ARROW (move horizontal splitter)
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;listitem&gt;&lt;para&gt;
-#GDK_BLANK_CURSOR (Blank cursor). Since 2.16
-&lt;/para&gt;&lt;/listitem&gt;
-&lt;/itemizedlist&gt;
+Lists the available visuals for the specified @screen.
+A visual describes a hardware image data format.
+For example, a visual might support 24-bit color, or 8-bit color,
+and might expect pixels to be in a certain format.
+
+Call g_list_free() on the return value when you're finished with it.
 
 Since: 2.2
 
 </description>
 <parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay for which the cursor will be created
-</parameter_description>
-</parameter>
-<parameter name="cursor_type">
-<parameter_description> cursor to create
+<parameter name="screen">
+<parameter_description> the relevant #GdkScreen.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GdkCursor
+<return> a list of visuals; the list must be freed, but not its 
+contents
 
 </return>
 </function>
@@ -7674,23 +8274,19 @@ The hint must be set before the window is mapped.
 <return></return>
 </function>
 
-<function name="gdk_display_supports_cursor_alpha">
+<function name="gdk_x11_drawable_get_xid">
 <description>
-Returns %TRUE if cursors can use an 8bit alpha channel
-on @display. Otherwise, cursors are restricted to bilevel
-alpha (i.e. a mask).
+Returns the X resource (window or pixmap) belonging to a #GdkDrawable.
 
-Since: 2.4
 
 </description>
 <parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable.
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether cursors can have alpha channels.
-
+<return> the ID of @drawable's X resource.
 </return>
 </function>
 
@@ -7715,6 +8311,7 @@ Returns the display of a #GdkColormap.
 Like gdk_draw_rgb_32_image(), but allows you to specify the dither
 offsets. See gdk_draw_rgb_image_dithalign() for more details.
 
+Deprecated: 2.22: Cairo handles colors automatically.
 
 </description>
 <parameters>
@@ -7776,7 +8373,7 @@ implementing a custom widget.)
 The @color must be allocated; gdk_rgb_find_color() is the best way
 to allocate a color.
 
-See also gdk_window_set_back_pixmap().
+See also gdk_window_set_background_pixmap().
 
 </description>
 <parameters>
@@ -7951,59 +8548,54 @@ gdk_window_clear().
 <return></return>
 </function>
 
-<function name="gdk_string_measure">
+<function name="gdk_screen_get_rgba_colormap">
 <description>
-Determines the distance from the origin to the rightmost
-portion of a nul-terminated string when drawn. This is not the
-correct value for determining the origin of the next
-portion when drawing text in multiple pieces.
-See gdk_string_width().
+Gets a colormap to use for creating windows or pixmaps with an
+alpha channel. The windowing system on which GTK+ is running
+may not support this capability, in which case %NULL will
+be returned. Even if a non-%NULL value is returned, its
+possible that the window's alpha channel won't be honored
+when displaying the window on the screen: in particular, for
+X an appropriate windowing manager and compositing manager
+must be running to provide appropriate display.
 
+This functionality is not implemented in the Windows backend.
+
+For setting an overall opacity for a top-level window, see
+gdk_window_set_opacity().
+
+Since: 2.8
 
 </description>
 <parameters>
-<parameter name="font">
-<parameter_description> a #GdkFont
-</parameter_description>
-</parameter>
-<parameter name="string">
-<parameter_description> the nul-terminated string to measure.
+<parameter name="screen">
+<parameter_description> a #GdkScreen.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the right bearing of the string in pixels.
-</return>
-</function>
-
-<function name="gdk_screen_get_default">
-<description>
-Gets the default screen for the default display. (See
-gdk_display_get_default ()).
-
-Since: 2.2
-
-</description>
-<parameters>
-</parameters>
-<return> a #GdkScreen, or %NULL if there is no default display.
+<return> a colormap to use for windows with
+an alpha channel or %NULL if the capability is not available.
 
 </return>
 </function>
 
-<function name="gdk_keymap_get_for_display">
+<function name="gdk_display_supports_cursor_color">
 <description>
-Returns the #GdkKeymap attached to @display.
+Returns %TRUE if multicolored cursors are supported
+on @display. Otherwise, cursors have only a forground
+and a background color.
 
-Since: 2.2
+Since: 2.4
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description> the #GdkDisplay.
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GdkKeymap attached to @display.
+<return> whether cursors can have multiple colors.
+
 </return>
 </function>
 
@@ -8118,29 +8710,26 @@ Deprecated: 2.0: Use g_object_unref() instead.
 <return></return>
 </function>
 
-<function name="gdk_pixmap_foreign_new_for_display">
+<function name="gdk_x11_atom_to_xatom_for_display">
 <description>
-Wraps a native pixmap in a #GdkPixmap.
-This may fail if the pixmap has been destroyed.
-
-For example in the X backend, a native pixmap handle is an Xlib
-&lt;type&gt;XID&lt;/type&gt;.
+Converts from a #GdkAtom to the X atom for a #GdkDisplay
+with the same string value. The special value %GDK_NONE
+is converted to %None.
 
 Since: 2.2
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description> The #GdkDisplay where @anid is located.
+<parameter_description> A #GdkDisplay
 </parameter_description>
 </parameter>
-<parameter name="anid">
-<parameter_description> a native pixmap handle.
+<parameter name="atom">
+<parameter_description> A #GdkAtom, or %GDK_NONE
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly-created #GdkPixmap wrapper for the 
-native pixmap or %NULL if the pixmap has been destroyed.
+<return> the X atom corresponding to @atom, or %None
 
 </return>
 </function>
@@ -8152,6 +8741,8 @@ there's no need to use this function, images are created with the
 correct colormap if you get the image from a drawable. If you
 create the image from scratch, use the colormap of the drawable you
 intend to render the image to.
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
 
 </description>
 <parameters>
@@ -8188,21 +8779,27 @@ gdk_window_begin_paint_region() for details.
 <return></return>
 </function>
 
-<function name="gdk_cursor_get_display">
+<function name="gdk_event_get_root_coords">
 <description>
-Returns the display on which the #GdkCursor is defined.
+Extract the root window relative x/y coordinates from an event.
 
-Since: 2.2
 
 </description>
 <parameters>
-<parameter name="cursor">
-<parameter_description> a #GdkCursor.
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="x_root">
+<parameter_description> location to put root window x coordinate
+</parameter_description>
+</parameter>
+<parameter name="y_root">
+<parameter_description> location to put root window y coordinate
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GdkDisplay associated to @cursor
-
+<return> %TRUE if the event delivered root window coordinates
 </return>
 </function>
 
@@ -8265,7 +8862,7 @@ Since: 2.2
 
 <function name="gdk_utf8_to_compound_text">
 <description>
-Convert from UTF-8 to compound text.
+Convert from UTF-8 to compound text. 
 
 
 </description>
@@ -8315,20 +8912,49 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_x11_gc_get_xgc">
+<function name="gdk_char_width">
 <description>
-Returns the X GC of a #GdkGC.
+Determines the width of a given character.
 
+Deprecated: 2.2: Use gdk_text_extents() instead.
+
+</description>
+<parameters>
+<parameter name="font">
+<parameter_description> a #GdkFont
+</parameter_description>
+</parameter>
+<parameter name="character">
+<parameter_description> the character to measure.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the width of the character in pixels.
+
+</return>
+</function>
+
+<function name="gdk_gc_set_colormap">
+<description>
+Sets the colormap for the GC to the given colormap. The depth
+of the colormap's visual must match the depth of the drawable
+for which the GC was created.
+
+Deprecated: 2.22: There is no replacement. Cairo handles colormaps
+automatically, so there is no need to care about them.
 
 </description>
 <parameters>
 <parameter name="gc">
-<parameter_description> a #GdkGC.
+<parameter_description> a #GdkGC
+</parameter_description>
+</parameter>
+<parameter name="colormap">
+<parameter_description> a #GdkColormap
 </parameter_description>
 </parameter>
 </parameters>
-<return> an Xlib &lt;type&gt;GC&lt;/type&gt;.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_event_free">
@@ -8336,7 +8962,7 @@ Returns the X GC of a #GdkGC.
 Frees a #GdkEvent, freeing or decrementing any resources associated with it.
 Note that this function should only be called with events returned from
 functions such as gdk_event_peek(), gdk_event_get(),
-gdk_event_get_graphics_expose() and gdk_event_copy().
+gdk_event_get_graphics_expose() and gdk_event_copy() and gdk_event_new().
 
 </description>
 <parameters>
@@ -8411,21 +9037,24 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_event_new">
+<function name="gdk_device_get_axis_use">
 <description>
-Creates a new event of the given type. All fields are set to 0.
+Returns the axis use for @index.
 
-Since: 2.2
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="type">
-<parameter_description> a #GdkEventType 
+<parameter name="device">
+<parameter_description> a #GdkDevice.
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> the index of the axis.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GdkEvent. The returned #GdkEvent 
-should be freed with gdk_event_free().
+<return> a #GdkAxisUse specifying how the axis is used.
 
 </return>
 </function>
@@ -8465,6 +9094,26 @@ Since: 2.14
 </parameters>
 <return> the width of the monitor, or -1 if not available
 
+</return>
+</function>
+
+<function name="gdk_color_equal">
+<description>
+Compares two colors. 
+
+
+</description>
+<parameters>
+<parameter name="colora">
+<parameter_description> a #GdkColor.
+</parameter_description>
+</parameter>
+<parameter name="colorb">
+<parameter_description> another #GdkColor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two colors compare equal
 </return>
 </function>
 
@@ -8546,6 +9195,25 @@ with g_free().
 </return>
 </function>
 
+<function name="gdk_window_get_accept_focus">
+<description>
+Determines whether or not the desktop environment shuld be hinted that
+the window does not want to receive input focus.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow.
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether or not the window should receive input focus.
+
+</return>
+</function>
+
 <function name="gdk_x11_colormap_foreign_new">
 <description>
 If xcolormap refers to a colormap previously known to GTK+,
@@ -8571,26 +9239,6 @@ with gdk_x11_colormap_foreign_new(), unref'ing the last
 reference to the object will only free the #GdkColoramp
 object and not call XFreeColormap()
 
-</return>
-</function>
-
-<function name="gdk_color_equal">
-<description>
-Compares two colors. 
-
-
-</description>
-<parameters>
-<parameter name="colora">
-<parameter_description> a #GdkColor.
-</parameter_description>
-</parameter>
-<parameter name="colorb">
-<parameter_description> another #GdkColor.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the two colors compare equal
 </return>
 </function>
 
@@ -8654,103 +9302,82 @@ To make the cursor invisible, use %GDK_BLANK_CURSOR.
 </return>
 </function>
 
-<function name="gdk_rgb_find_color">
+<function name="gdk_window_get_state">
 <description>
-@colormap should be the colormap for the graphics context and
-drawable you're using to draw. If you're drawing to a #GtkWidget,
-call gtk_widget_get_colormap().
-
-@color should have its %red, %green, and %blue fields initialized;
-gdk_rgb_find_color() will fill in the %pixel field with the best
-matching pixel from a color cube. The color is then ready to be
-used for drawing, e.g. you can call gdk_gc_set_foreground() which
-expects %pixel to be initialized.
-
-In many cases, you can avoid this whole issue by calling
-gdk_gc_set_rgb_fg_color() or gdk_gc_set_rgb_bg_color(), which
-do not expect %pixel to be initialized in advance. If you use those
-functions, there's no need for gdk_rgb_find_color().
+Gets the bitwise OR of the currently active window state flags,
+from the #GdkWindowState enumeration.
 
 
 </description>
 <parameters>
-<parameter name="colormap">
-<parameter_description> a #GdkColormap
-</parameter_description>
-</parameter>
-<parameter name="color">
-<parameter_description> a #GdkColor
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
-</function>
-
-<function name="gdkx_visual_get">
-<description>
-Returns a #GdkVisual corresponding to a X visual. 
-
-
-</description>
-<parameters>
-<parameter name="xvisualid">
-<parameter_description> a X visual id.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkVisual.
+<return> window state bitfield
 </return>
 </function>
 
-<function name="gdk_x11_register_standard_event_type">
+<function name="gdk_list_visuals">
 <description>
-Registers interest in receiving extension events with type codes
-between @event_base and &lt;literal&gt;event_base + n_events - 1&lt;/literal&gt;.
-The registered events must have the window field in the same place
-as core X events (this is not the case for e.g. XKB extension events).
+Lists the available visuals for the default screen.
+(See gdk_screen_list_visuals())
+A visual describes a hardware image data format.
+For example, a visual might support 24-bit color, or 8-bit color,
+and might expect pixels to be in a certain format.
 
-If an event type is registered, events of this type will go through
-global and window-specific filters (see gdk_window_add_filter()). 
-Unregistered events will only go through global filters.
-GDK may register the events of some X extensions on its own.
+Call g_list_free() on the return value when you're finished with it.
 
-This function should only be needed in unusual circumstances, e.g.
-when filtering XInput extension events on the root window.
-
-Since: 2.4
 
 </description>
 <parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="event_base">
-<parameter_description> first event type code to register
-</parameter_description>
-</parameter>
-<parameter name="n_events">
-<parameter_description> number of event type codes to register
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> a list of visuals; the list must be freed, but not its contents
+</return>
 </function>
 
-<function name="gdk_cairo_set_source_color">
+<function name="gdk_window_coords_from_parent">
 <description>
-Sets the specified #GdkColor as the source color of @cr.
+Transforms window coordinates from a parent window to a child
+window, where the parent window is the normal parent as returned by
+gdk_window_get_parent() for normal windows, and the window's
+embedder as returned by gdk_offscreen_window_get_embedder() for
+offscreen windows.
 
-Since: 2.8
+For normal windows, calling this function is equivalent to subtracting
+the return values of gdk_window_get_position() from the parent coordinates.
+For offscreen windows however (which can be arbitrarily transformed),
+this function calls the GdkWindow::from-embedder: signal to translate
+the coordinates.
+
+You should always use this function when writing generic code that
+walks down a window hierarchy.
+
+See also: gdk_window_coords_to_parent()
+
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="cr">
-<parameter_description> a #cairo_t
+<parameter name="window">
+<parameter_description> a child window
 </parameter_description>
 </parameter>
-<parameter name="color">
-<parameter_description> a #GdkColor
+<parameter name="parent_x">
+<parameter_description> X coordinate in parent's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="parent_y">
+<parameter_description> Y coordinate in parent's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> return location for X coordinate in child's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> return location for Y coordinate in child's coordinate system
 </parameter_description>
 </parameter>
 </parameters>
@@ -8795,6 +9422,9 @@ The list is statically allocated and should not be freed.
 Draws a number of points, using the foreground color and other 
 attributes of the #GdkGC.
 
+Deprecated: 2.22: Use @n_points calls to cairo_rectangle() and
+cairo_fill() instead.
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -8817,19 +9447,23 @@ attributes of the #GdkGC.
 <return></return>
 </function>
 
-<function name="gdk_x11_drawable_get_xid">
+<function name="gdk_display_supports_cursor_alpha">
 <description>
-Returns the X resource (window or pixmap) belonging to a #GdkDrawable.
+Returns %TRUE if cursors can use an 8bit alpha channel 
+on @display. Otherwise, cursors are restricted to bilevel 
+alpha (i.e. a mask).
 
+Since: 2.4
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable.
+<parameter name="display">
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
 </parameters>
-<return> the ID of @drawable's X resource.
+<return> whether cursors can have alpha channels.
+
 </return>
 </function>
 
@@ -8944,28 +9578,24 @@ Return the best available visual type for the default GDK screen.
 </return>
 </function>
 
-<function name="gdk_event_get_root_coords">
+<function name="gdk_cairo_set_source_color">
 <description>
-Extract the root window relative x/y coordinates from an event.
+Sets the specified #GdkColor as the source color of @cr.
 
+Since: 2.8
 
 </description>
 <parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
+<parameter name="cr">
+<parameter_description> a #cairo_t
 </parameter_description>
 </parameter>
-<parameter name="x_root">
-<parameter_description> location to put root window x coordinate
-</parameter_description>
-</parameter>
-<parameter name="y_root">
-<parameter_description> location to put root window y coordinate
+<parameter name="color">
+<parameter_description> a #GdkColor
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the event delivered root window coordinates
-</return>
+<return></return>
 </function>
 
 <function name="gdk_window_get_root_origin">
@@ -8992,62 +9622,57 @@ window coordinates.
 <return></return>
 </function>
 
-<function name="gdk_window_process_updates">
+<function name="gdk_cursor_unref">
 <description>
-Sends one or more expose events to @window. The areas in each
-expose event will cover the entire update area for the window (see
-gdk_window_invalidate_region() for details). Normally GDK calls
-gdk_window_process_all_updates() on your behalf, so there's no
-need to call this function unless you want to force expose events
-to be delivered immediately and synchronously (vs. the usual
-case, where GDK delivers them in an idle handler). Occasionally
-this is useful to produce nicer scrolling behavior, for example.
+Removes a reference from @cursor, deallocating the cursor
+if no references remain.
 
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="update_children">
-<parameter_description> whether to also process updates for child windows
+<parameter name="cursor">
+<parameter_description> a #GdkCursor
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gdk_font_from_description_for_display">
+<function name="gdk_cairo_reset_clip">
 <description>
-Loads a #GdkFont based on a Pango font description for use on @display. 
-This font will only be an approximation of the Pango font, and
-internationalization will not be handled correctly. This function
-should only be used for legacy code that cannot be easily converted
-to use Pango. Using Pango directly will produce better results.
+Resets the clip region for a Cairo context created by gdk_cairo_create().
 
-Since: 2.2
+This resets the clip region to the &quot;empty&quot; state for the given drawable.
+This is required for non-native windows since a direct call to
+cairo_reset_clip() would unset the clip region inherited from the
+drawable (i.e. the window clip region), and thus let you e.g.
+draw outside your window.
+
+This is rarely needed though, since most code just create a new cairo_t
+using gdk_cairo_create() each time they want to draw something.
+
+Since: 2.18
 
 </description>
 <parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
+<parameter name="cr">
+<parameter_description> a #cairo_t
 </parameter_description>
 </parameter>
-<parameter name="font_desc">
-<parameter_description> a #PangoFontDescription.
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly loaded font, or %NULL if the font
-cannot be loaded.
-
-</return>
+<return></return>
 </function>
 
 <function name="gdk_draw_polygon">
 <description>
 Draws an outlined or filled polygon.
+
+Deprecated: 2.22: Use cairo_line_to() or cairo_append_path() and
+cairo_fill() or cairo_stroke() instead.
 
 </description>
 <parameters>
@@ -9220,6 +9845,24 @@ an equal number of times to begin processing exposes.
 <return></return>
 </function>
 
+<function name="gdk_device_get_name">
+<description>
+Determines the name of the device.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> a name
+
+</return>
+</function>
+
 <function name="gdk_screen_get_active_window">
 <description>
 Returns the screen's currently active window.
@@ -9375,6 +10018,8 @@ call this function.
 
 Since: 2.2
 
+Deprecated: 2.22: Use gdk_screen_get_system_colormap()
+
 </description>
 <parameters>
 <parameter name="screen">
@@ -9404,21 +10049,40 @@ Since: 2.14
 <return></return>
 </function>
 
-<function name="gdk_display_open_default_libgtk_only">
+<function name="gdk_draw_string">
 <description>
-Opens the default display specified by command line arguments or
-environment variables, sets it as the default display, and returns
-it.  gdk_parse_args must have been called first. If the default
-display has previously been set, simply returns that. An internal
-function that should not be used by applications.
+Draws a string of characters in the given font or fontset.
 
+Deprecated: 2.4: Use gdk_draw_layout() instead.
 
 </description>
 <parameters>
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable (a #GdkWindow or a #GdkPixmap).
+</parameter_description>
+</parameter>
+<parameter name="font">
+<parameter_description> a #GdkFont.
+</parameter_description>
+</parameter>
+<parameter name="gc">
+<parameter_description> a #GdkGC.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the left edge of the text.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the baseline of the text.
+</parameter_description>
+</parameter>
+<parameter name="string">
+<parameter_description>  the string of characters to draw.
+</parameter_description>
+</parameter>
 </parameters>
-<return> the default display, if it could be opened,
-otherwise %NULL.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_visual_get_best">
@@ -9559,45 +10223,30 @@ though the amount of data is limited to 20 bytes.
 </return>
 </function>
 
-<function name="gdk_colors_alloc">
+<function name="gdk_window_set_override_redirect">
 <description>
-Allocates colors from a colormap. This function
-is obsolete. See gdk_colormap_alloc_colors().
-For full documentation of the fields, see 
-the Xlib documentation for &lt;function&gt;XAllocColorCells()&lt;/function&gt;.
+An override redirect window is not under the control of the window manager.
+This means it won't have a titlebar, won't be minimizable, etc. - it will
+be entirely under the control of the application. The window manager
+can't see the override redirect window at all.
+
+Override redirect should only be used for short-lived temporary
+windows, such as popup menus. #GtkMenu uses an override redirect
+window in its implementation, for example.
 
 
 </description>
 <parameters>
-<parameter name="colormap">
-<parameter_description> a #GdkColormap.
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow
 </parameter_description>
 </parameter>
-<parameter name="contiguous">
-<parameter_description> if %TRUE, the colors should be allocated
-in contiguous color cells.
-</parameter_description>
-</parameter>
-<parameter name="planes">
-<parameter_description> an array in which to store the plane masks.
-</parameter_description>
-</parameter>
-<parameter name="nplanes">
-<parameter_description> the number of planes to allocate. (Or zero,
-to indicate that the color allocation should not be planar.)
-</parameter_description>
-</parameter>
-<parameter name="pixels">
-<parameter_description> an array into which to store allocated pixel values.
-</parameter_description>
-</parameter>
-<parameter name="npixels">
-<parameter_description> the number of pixels in each plane to allocate.
+<parameter name="override_redirect">
+<parameter_description> %TRUE if window should be override redirect
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the allocation was successful
-</return>
+<return></return>
 </function>
 
 <function name="gdk_window_hide">
@@ -9727,6 +10376,26 @@ withdraws toplevel windows before hiding them.
 <return></return>
 </function>
 
+<function name="gdk_image_get_depth">
+<description>
+Determines the depth of the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the depth
+
+</return>
+</function>
+
 <function name="gdk_window_deiconify">
 <description>
 Attempt to deiconify (unminimize) @window. On X11 the window manager may
@@ -9822,6 +10491,20 @@ Always use gdk_x11_colormap_foreign_new() instead.
 <return> the existing #GdkColormap object if it was
 already known to GTK+, otherwise warns and return
 %NULL.
+</return>
+</function>
+
+<function name="gdk_app_launch_context_new">
+<description>
+Creates a new #GdkAppLaunchContext.
+
+Since: 2.14
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GdkAppLaunchContext
+
 </return>
 </function>
 
@@ -9988,7 +10671,7 @@ the frame) in root window coordinates, use gdk_window_get_origin().
 </description>
 <parameters>
 <parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter_description> a toplevel #GdkWindow
 </parameter_description>
 </parameter>
 <parameter name="rect">
@@ -9999,29 +10682,30 @@ the frame) in root window coordinates, use gdk_window_get_origin().
 <return></return>
 </function>
 
-<function name="gdk_gc_set_fill">
+<function name="gdk_visual_get_byte_order">
 <description>
-Set the fill mode for a graphics context.
+Returns the byte order of this visual.
+
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="gc">
-<parameter_description> a #GdkGC.
-</parameter_description>
-</parameter>
-<parameter name="fill">
-<parameter_description> the new fill mode.
+<parameter name="visual">
+<parameter_description> A #GdkVisual.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> A #GdkByteOrder stating the byte order of @visual.
+
+</return>
 </function>
 
-<function name="gdk_display_get_name">
+<function name="gdk_display_supports_shapes">
 <description>
-Gets the name of the display.
+Returns %TRUE if gdk_window_shape_combine_mask() can
+be used to create shaped windows on @display.
 
-Since: 2.2
+Since: 2.10
 
 </description>
 <parameters>
@@ -10030,8 +10714,7 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string representing the display name. This string is owned
-by GDK and should not be modified or freed.
+<return> %TRUE if shaped windows are supported 
 
 </return>
 </function>
@@ -10045,12 +10728,57 @@ it's simply the visual GdkRGB would have chosen as the optimal one
 in those previous versions. GdkRGB can now render to drawables with
 any visual.
 
+Deprecated: 2.22: Use gdk_get_system_visual()
 
 </description>
 <parameters>
 </parameters>
 <return> The #GdkVisual chosen by GdkRGB.
+
 </return>
+</function>
+
+<function name="gdk_pixbuf_render_pixmap_and_mask_for_colormap">
+<description>
+Creates a pixmap and a mask bitmap which are returned in the @pixmap_return
+and @mask_return arguments, respectively, and renders a pixbuf and its
+corresponding tresholded alpha mask to them.  This is merely a convenience
+function; applications that need to render pixbufs with dither offsets or to
+given drawables should use gdk_draw_pixbuf(), and gdk_pixbuf_render_threshold_alpha().
+
+The pixmap that is created uses the #GdkColormap specified by @colormap.
+This colormap must match the colormap of the window where the pixmap
+will eventually be used or an error will result.
+
+If the pixbuf does not have an alpha channel, then *@mask_return will be set
+to %NULL.
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> A pixbuf.
+</parameter_description>
+</parameter>
+<parameter name="colormap">
+<parameter_description> A #GdkColormap
+</parameter_description>
+</parameter>
+<parameter name="pixmap_return">
+<parameter_description> Location to store a pointer to the created pixmap,
+or %NULL if the pixmap is not needed.
+</parameter_description>
+</parameter>
+<parameter name="mask_return">
+<parameter_description> Location to store a pointer to the created mask,
+or %NULL if the mask is not needed.
+</parameter_description>
+</parameter>
+<parameter name="alpha_threshold">
+<parameter_description> Threshold value for opacity values.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_window_set_startup_id">
@@ -10075,17 +10803,49 @@ Since: 2.12
 <return></return>
 </function>
 
-<function name="gdk_window_set_child_shapes">
+<function name="gdk_window_coords_to_parent">
 <description>
-Sets the shape mask of @window to the union of shape masks
-for all children of @window, ignoring the shape mask of @window
-itself. Contrast with gdk_window_merge_child_shapes() which includes
-the shape mask of @window in the masks to be merged.
+Transforms window coordinates from a child window to its parent
+window, where the parent window is the normal parent as returned by
+gdk_window_get_parent() for normal windows, and the window's
+embedder as returned by gdk_offscreen_window_get_embedder() for
+offscreen windows.
+
+For normal windows, calling this function is equivalent to adding
+the return values of gdk_window_get_position() to the child coordinates.
+For offscreen windows however (which can be arbitrarily transformed),
+this function calls the GdkWindow::to-embedder: signal to translate
+the coordinates.
+
+You should always use this function when writing generic code that
+walks up a window hierarchy.
+
+See also: gdk_window_coords_from_parent()
+
+Since: 2.22
 
 </description>
 <parameters>
 <parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter_description> a child window
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X coordinate in child's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y coordinate in child's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="parent_x">
+<parameter_description> return location for X coordinate
+in parent's coordinate system, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="parent_y">
+<parameter_description> return location for Y coordinate
+in parent's coordinate system, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -10169,78 +10929,28 @@ or %NULL if the name cannot be determined
 </return>
 </function>
 
-<function name="gdk_window_input_shape_combine_mask">
+<function name="gdk_drawable_set_data">
 <description>
-Like gdk_window_shape_combine_mask(), but the shape applies
-only to event handling. Mouse events which happen while
-the pointer position corresponds to an unset bit in the
-mask will be passed on the window below @window.
+This function is equivalent to g_object_set_data(),
+the #GObject variant should be used instead.
 
-An input shape is typically used with RGBA windows.
-The alpha channel of the window defines which pixels are
-invisible and allows for nicely antialiased borders,
-and the input shape controls where the window is
-&quot;clickable&quot;.
-
-On the X11 platform, this requires version 1.1 of the
-shape extension.
-
-On the Win32 platform, this functionality is not present and the
-function does nothing.
-
-Since: 2.10
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable
 </parameter_description>
 </parameter>
-<parameter name="mask">
-<parameter_description> shape mask, or %NULL
+<parameter name="key">
+<parameter_description> name to store the data under
 </parameter_description>
 </parameter>
-<parameter name="x">
-<parameter_description> X position of shape mask with respect to @window
+<parameter name="data">
+<parameter_description> arbitrary data
 </parameter_description>
 </parameter>
-<parameter name="y">
-<parameter_description> Y position of shape mask with respect to @window
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_x11_display_set_cursor_theme">
-<description>
-Sets the cursor theme from which the images for cursor
-should be taken. 
-
-If the windowing system supports it, existing cursors created 
-with gdk_cursor_new(), gdk_cursor_new_for_display() and 
-gdk_cursor_new_for_name() are updated to reflect the theme 
-change. Custom cursors constructed with gdk_cursor_new_from_pixmap() 
-or gdk_cursor_new_from_pixbuf() will have to be handled
-by the application (GTK+ applications can learn about 
-cursor theme changes by listening for change notification
-for the corresponding #GtkSetting).
-
-Since: 2.8
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="theme">
-<parameter_description> the name of the cursor theme to use, or %NULL to unset
-a previously set value 
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> the cursor size to use, or 0 to keep the previous size
+<parameter name="destroy_func">
+<parameter_description> function to free @data, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -10462,6 +11172,24 @@ gdk_window_set_cursor() to unset the cursor of the window
 </return>
 </function>
 
+<function name="gdk_device_get_n_axes">
+<description>
+Gets the number of axes of a device.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GdkDevice.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of axes of @device
+
+</return>
+</function>
+
 <function name="gdk_text_height">
 <description>
 Determines the total height of a given string.
@@ -10547,6 +11275,43 @@ Since: 2.2
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_window_destroy">
+<description>
+Destroys the window system resources associated with @window and decrements @window's
+reference count. The window system resources for all children of @window are also
+destroyed, but the children's reference counts are not decremented.
+
+Note that a window will not be destroyed automatically when its reference count
+reaches zero. You must call this function yourself before that happens.
+
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_display_open_default_libgtk_only">
+<description>
+Opens the default display specified by command line arguments or
+environment variables, sets it as the default display, and returns
+it.  gdk_parse_args must have been called first. If the default
+display has previously been set, simply returns that. An internal
+function that should not be used by applications.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the default display, if it could be opened,
+otherwise %NULL.
+</return>
 </function>
 
 <function name="gdk_event_send_client_message_for_display">
@@ -10709,7 +11474,7 @@ close to @window.
 
 <function name="gdk_keymap_get_caps_lock_state">
 <description>
-Returns whether the Caps Lock modifer is locked.
+Returns whether the Caps Lock modifer is locked. 
 
 Since: 2.16
 
@@ -10768,6 +11533,8 @@ Determines how the current pixel values and the
 pixel values being drawn are combined to produce
 the final pixel values.
 
+Deprecated: 2.22: Use cairo_set_operator() with Cairo.
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -10808,6 +11575,84 @@ It's deprecated for that reason.
 </parameter>
 </parameters>
 <return> not meaningful
+</return>
+</function>
+
+<function name="gdk_cursor_new_from_pixmap">
+<description>
+Creates a new cursor from a given pixmap and mask. Both the pixmap and mask
+must have a depth of 1 (i.e. each pixel has only 2 values - on or off).
+The standard cursor size is 16 by 16 pixels. You can create a bitmap 
+from inline data as in the below example.
+
+&lt;example&gt;&lt;title&gt;Creating a custom cursor&lt;/title&gt;
+&lt;programlisting&gt;
+/&lt;!-- --&gt;* This data is in X bitmap format, and can be created with the 'bitmap'
+utility. *&lt;!-- --&gt;/
+&#35;define cursor1_width 16
+&#35;define cursor1_height 16
+static unsigned char cursor1_bits[] = {
+0x80, 0x01, 0x40, 0x02, 0x20, 0x04, 0x10, 0x08, 0x08, 0x10, 0x04, 0x20,
+0x82, 0x41, 0x41, 0x82, 0x41, 0x82, 0x82, 0x41, 0x04, 0x20, 0x08, 0x10,
+0x10, 0x08, 0x20, 0x04, 0x40, 0x02, 0x80, 0x01};
+
+static unsigned char cursor1mask_bits[] = {
+0x80, 0x01, 0xc0, 0x03, 0x60, 0x06, 0x30, 0x0c, 0x18, 0x18, 0x8c, 0x31,
+0xc6, 0x63, 0x63, 0xc6, 0x63, 0xc6, 0xc6, 0x63, 0x8c, 0x31, 0x18, 0x18,
+0x30, 0x0c, 0x60, 0x06, 0xc0, 0x03, 0x80, 0x01};
+
+
+GdkCursor *cursor;
+GdkPixmap *source, *mask;
+GdkColor fg = { 0, 65535, 0, 0 }; /&lt;!-- --&gt;* Red. *&lt;!-- --&gt;/
+GdkColor bg = { 0, 0, 0, 65535 }; /&lt;!-- --&gt;* Blue. *&lt;!-- --&gt;/
+
+
+source = gdk_bitmap_create_from_data (NULL, cursor1_bits,
+cursor1_width, cursor1_height);
+mask = gdk_bitmap_create_from_data (NULL, cursor1mask_bits,
+cursor1_width, cursor1_height);
+cursor = gdk_cursor_new_from_pixmap (source, mask, &amp;fg, &amp;bg, 8, 8);
+g_object_unref (source);
+g_object_unref (mask);
+
+
+gdk_window_set_cursor (widget-&gt;window, cursor);
+&lt;/programlisting&gt;
+&lt;/example&gt;
+
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the pixmap specifying the cursor.
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> the pixmap specifying the mask, which must be the same size as 
+@source.
+</parameter_description>
+</parameter>
+<parameter name="fg">
+<parameter_description> the foreground color, used for the bits in the source which are 1.
+The color does not have to be allocated first. 
+</parameter_description>
+</parameter>
+<parameter name="bg">
+<parameter_description> the background color, used for the bits in the source which are 0.
+The color does not have to be allocated first.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the horizontal offset of the 'hotspot' of the cursor. 
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the vertical offset of the 'hotspot' of the cursor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GdkCursor.
 </return>
 </function>
 
@@ -10908,6 +11753,23 @@ enable.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_event_get_time">
+<description>
+Returns the time stamp from @event, if there is one; otherwise
+returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> time stamp field from @event
+</return>
 </function>
 
 <function name="gdk_keyval_to_unicode">
@@ -11022,6 +11884,79 @@ or %NULL if there is none.
 </return>
 </function>
 
+<function name="gdk_app_launch_context_set_display">
+<description>
+Sets the display on which applications will be launched when
+using this context. See also gdk_app_launch_context_set_screen().
+
+Since: 2.14
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkAppLaunchContext
+</parameter_description>
+</parameter>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_drawable_copy_to_image">
+<description>
+Copies a portion of @drawable into the client side image structure
+@image. If @image is %NULL, creates a new image of size @width x @height
+and copies into that. See gdk_drawable_get_image() for further details.
+
+Since: 2.4
+
+Deprecated: 2.22: Use @drawable as the source and draw to a Cairo image
+surface if you want to download contents to the client.
+
+</description>
+<parameters>
+<parameter name="drawable">
+<parameter_description> a #GdkDrawable
+</parameter_description>
+</parameter>
+<parameter name="image">
+<parameter_description> a #GdkDrawable, or %NULL if a new @image should be created.
+</parameter_description>
+</parameter>
+<parameter name="src_x">
+<parameter_description> x coordinate on @drawable
+</parameter_description>
+</parameter>
+<parameter name="src_y">
+<parameter_description> y coordinate on @drawable
+</parameter_description>
+</parameter>
+<parameter name="dest_x">
+<parameter_description> x coordinate within @image. Must be 0 if @image is %NULL
+</parameter_description>
+</parameter>
+<parameter name="dest_y">
+<parameter_description> y coordinate within @image. Must be 0 if @image is %NULL
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width of region to get
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height or region to get
+</parameter_description>
+</parameter>
+</parameters>
+<return> @image, or a new a #GdkImage containing the contents
+of @drawable
+
+</return>
+</function>
+
 <function name="gdk_pango_renderer_new">
 <description>
 Creates a new #PangoRenderer for @screen. Normally you can use the
@@ -11060,37 +11995,44 @@ Since: 2.12
 </return>
 </function>
 
-<function name="gdk_x11_screen_supports_net_wm_hint">
+<function name="gdk_string_measure">
 <description>
-This function is specific to the X11 backend of GDK, and indicates
-whether the window manager supports a certain hint from the
-Extended Window Manager Hints Specification. You can find this
-specification on 
-&lt;ulink url=&quot;http://www.freedesktop.org&quot;&gt;http://www.freedesktop.org&lt;/ulink&gt;.
+Determines the distance from the origin to the rightmost
+portion of a nul-terminated string when drawn. This is not the
+correct value for determining the origin of the next
+portion when drawing text in multiple pieces.
+See gdk_string_width().
 
-When using this function, keep in mind that the window manager
-can change over time; so you shouldn't use this function in
-a way that impacts persistent application state. A common bug
-is that your application can start up before the window manager
-does when the user logs in, and before the window manager starts
-gdk_x11_screen_supports_net_wm_hint() will return %FALSE for every property.
-You can monitor the window_manager_changed signal on #GdkScreen to detect
-a window manager change.
-
-Since: 2.2
 
 </description>
 <parameters>
-<parameter name="screen">
-<parameter_description> the relevant #GdkScreen.
+<parameter name="font">
+<parameter_description> a #GdkFont
 </parameter_description>
 </parameter>
-<parameter name="property">
-<parameter_description> a property atom.
+<parameter name="string">
+<parameter_description> the nul-terminated string to measure.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the window manager supports @property
+<return> the right bearing of the string in pixels.
+</return>
+</function>
+
+<function name="gdk_drag_context_get_selected_action">
+<description>
+Determines the action chosen by the drag destination.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDragAction value
 
 </return>
 </function>
@@ -11212,6 +12154,11 @@ the GC. The tile or stipple will be aligned such
 that the upper left corner of the tile or stipple
 will coincide with this point.
 
+Deprecated: 2.22: You can set the origin for tiles and stipples in Cairo
+by changing the source's matrix using cairo_pattern_set_matrix(). Or you
+can specify it with gdk_cairo_set_source_pixmap() as shown in the example
+for gdk_gc_set_tile().
+
 </description>
 <parameters>
 <parameter name="gc">
@@ -11281,40 +12228,22 @@ but very few honor all possible combinations of bits.
 <return></return>
 </function>
 
-<function name="gdk_draw_string">
+<function name="gdk_window_is_shaped">
 <description>
-Draws a string of characters in the given font or fontset.
+Determines whether or not the window is shaped.
 
-Deprecated: 2.4: Use gdk_draw_layout() instead.
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable (a #GdkWindow or a #GdkPixmap).
-</parameter_description>
-</parameter>
-<parameter name="font">
-<parameter_description> a #GdkFont.
-</parameter_description>
-</parameter>
-<parameter name="gc">
-<parameter_description> a #GdkGC.
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> the x coordinate of the left edge of the text.
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the y coordinate of the baseline of the text.
-</parameter_description>
-</parameter>
-<parameter name="string">
-<parameter_description>  the string of characters to draw.
+<parameter name="window">
+<parameter_description> a toplevel #GdkWindow
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if @window is shaped
+
+</return>
 </function>
 
 <function name="gdk_threads_add_idle">
@@ -11342,26 +12271,52 @@ Since: 2.12
 </return>
 </function>
 
-<function name="gdk_window_set_override_redirect">
+<function name="gdk_x11_display_set_cursor_theme">
 <description>
-An override redirect window is not under the control of the window manager.
-This means it won't have a titlebar, won't be minimizable, etc. - it will
-be entirely under the control of the application. The window manager
-can't see the override redirect window at all.
+Sets the cursor theme from which the images for cursor
+should be taken. 
 
-Override redirect should only be used for short-lived temporary
-windows, such as popup menus. #GtkMenu uses an override redirect
-window in its implementation, for example.
+If the windowing system supports it, existing cursors created 
+with gdk_cursor_new(), gdk_cursor_new_for_display() and 
+gdk_cursor_new_for_name() are updated to reflect the theme 
+change. Custom cursors constructed with gdk_cursor_new_from_pixmap() 
+or gdk_cursor_new_from_pixbuf() will have to be handled
+by the application (GTK+ applications can learn about 
+cursor theme changes by listening for change notification
+for the corresponding #GtkSetting).
 
+Since: 2.8
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a toplevel #GdkWindow
+<parameter name="display">
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
-<parameter name="override_redirect">
-<parameter_description> %TRUE if window should be override redirect
+<parameter name="theme">
+<parameter_description> the name of the cursor theme to use, or %NULL to unset
+a previously set value 
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the cursor size to use, or 0 to keep the previous size
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_init">
+<description>
+
+</description>
+<parameters>
+<parameter name="argc">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="argv">
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -11388,6 +12343,38 @@ Since: 2.2
 <return></return>
 </function>
 
+<function name="gdk_visual_get_blue_pixel_details">
+<description>
+Obtains values that are needed to calculate blue pixel values in TrueColor
+and DirectColor.  The &quot;mask&quot; is the significant bits within the pixel.
+The &quot;shift&quot; is the number of bits left we must shift a primary for it
+to be in position (according to the &quot;mask&quot;).  Finally, &quot;precision&quot; refers
+to how much precision the pixel value contains for a particular primary.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="visual">
+<parameter_description> a #GdkVisual
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> A pointer to a #guint32 to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="shift">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="precision">
+<parameter_description> A pointer to a #gint to be filled in, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_add_option_entries_libgtk_only">
 <description>
 Appends gdk option entries to the passed in option group. This is
@@ -11401,6 +12388,47 @@ not public API and must not be used by applications.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_colors_alloc">
+<description>
+Allocates colors from a colormap. This function
+is obsolete. See gdk_colormap_alloc_colors().
+For full documentation of the fields, see 
+the Xlib documentation for &lt;function&gt;XAllocColorCells()&lt;/function&gt;.
+
+
+</description>
+<parameters>
+<parameter name="colormap">
+<parameter_description> a #GdkColormap.
+</parameter_description>
+</parameter>
+<parameter name="contiguous">
+<parameter_description> if %TRUE, the colors should be allocated
+in contiguous color cells.
+</parameter_description>
+</parameter>
+<parameter name="planes">
+<parameter_description> an array in which to store the plane masks.
+</parameter_description>
+</parameter>
+<parameter name="nplanes">
+<parameter_description> the number of planes to allocate. (Or zero,
+to indicate that the color allocation should not be planar.)
+</parameter_description>
+</parameter>
+<parameter name="pixels">
+<parameter_description> an array into which to store allocated pixel values.
+</parameter_description>
+</parameter>
+<parameter name="npixels">
+<parameter_description> the number of pixels in each plane to allocate.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the allocation was successful
+</return>
 </function>
 
 <function name="gdk_window_foreign_new">
@@ -11568,31 +12596,36 @@ cairo_destroy() when you are done drawing.
 </return>
 </function>
 
-<function name="gdk_window_set_icon_name">
+<function name="gdk_spawn_command_line_on_screen">
 <description>
-Windows may have a name used while minimized, distinct from the
-name they display in their titlebar. Most of the time this is a bad
-idea from a user interface standpoint. But you can set such a name
-with this function, if you like.
+Like g_spawn_command_line_async(), except the child process is
+spawned in such an environment that on calling gdk_display_open()
+it would be returned a #GdkDisplay with @screen as the default
+screen.
 
-After calling this with a non-%NULL @name, calls to gdk_window_set_title()
-will not update the icon title.
+This is useful for applications which wish to launch an application
+on a specific screen.
 
-Using %NULL for @name unsets the icon title; further calls to
-gdk_window_set_title() will again update the icon title as well.
+Since: 2.4
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a toplevel #GdkWindow
+<parameter name="screen">
+<parameter_description> a #GdkScreen
 </parameter_description>
 </parameter>
-<parameter name="name">
-<parameter_description> name of window while iconified (minimized)
+<parameter name="command_line">
+<parameter_description> a command line
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for errors
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE on success, %FALSE if error is set.
+
+</return>
 </function>
 
 <function name="gdk_event_peek">
@@ -11614,6 +12647,9 @@ gdk_event_free().
 <description>
 Copy the set of values from one graphics context
 onto another graphics context.
+
+Deprecated: 2.22: Use Cairo for drawing. cairo_save() and cairo_restore()
+can be helpful in cases where you'd have copied a #GdkGC.
 
 </description>
 <parameters>
@@ -11637,11 +12673,13 @@ data to one colormap and visual, but in the current version it can
 render to any colormap and visual. So there's no need to call this
 function.
 
+Deprecated: 2.22: Use gdk_get_system_colormap()
 
 </description>
 <parameters>
 </parameters>
 <return> the preferred colormap
+
 </return>
 </function>
 
@@ -11703,6 +12741,7 @@ Since: 2.2
 <description>
 Returns the display of a #GdkGC.
 
+Deprecated: 2.22: #GdkGC has been replaced by #cairo_t.
 
 </description>
 <parameters>
@@ -11712,6 +12751,7 @@ Returns the display of a #GdkGC.
 </parameter>
 </parameters>
 <return> an Xlib &lt;type&gt;Display*&lt;/type&gt;.
+
 </return>
 </function>
 
@@ -11719,6 +12759,7 @@ Returns the display of a #GdkGC.
 <description>
 Create a new graphics context with default values. 
 
+Deprecated: 2.22: Use Cairo for rendering.
 
 </description>
 <parameters>
@@ -11729,6 +12770,7 @@ with drawables of the same depth as this one.
 </parameter>
 </parameters>
 <return> the new graphics context.
+
 </return>
 </function>
 
@@ -11754,6 +12796,24 @@ Since: 2.4
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_display_is_closed">
+<description>
+Finds out if the display has been closed.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the display is closed.
+
+</return>
 </function>
 
 <function name="gdk_pango_layout_line_get_clip_region">
@@ -11910,6 +12970,24 @@ expected to have their alpha channels drawn correctly on the screen.
 </return>
 </function>
 
+<function name="gdk_drag_context_get_source_window">
+<description>
+Returns the #GdkWindow where the DND operation started.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkWindow
+
+</return>
+</function>
+
 <function name="gdk_keymap_translate_keyboard_state">
 <description>
 Translates the contents of a #GdkEventKey into a keyval, effective
@@ -11932,7 +13010,7 @@ be masked out.
 &lt;/para&gt;
 &lt;informalexample&gt;&lt;programlisting&gt;
  / * We want to ignore irrelevant modifiers like ScrollLock * / 
-define ALL_ACCELS_MASK (GDK_CONTROL_MASK | GDK_SHIFT_MASK | GDK_MOD1_MASK)
+&#35;define ALL_ACCELS_MASK (GDK_CONTROL_MASK | GDK_SHIFT_MASK | GDK_MOD1_MASK)
 gdk_keymap_translate_keyboard_state (keymap, event-&gt;hardware_keycode,
 event-&gt;state, event-&gt;group,
 &amp;keyval, NULL, NULL, &amp;consumed);
@@ -12105,6 +13183,10 @@ a color drawable. The way to draw a bitmap is to set the bitmap as
 the stipple on the #GdkGC, set the fill mode to %GDK_STIPPLED, and 
 then draw the rectangle.
 
+Deprecated: 2.22: Use gdk_cairo_set_source_pixmap(), cairo_rectangle()
+and cairo_fill() to draw pixmap on top of other drawables. Also keep
+in mind that the limitations on allowed sources do not apply to Cairo.
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -12147,25 +13229,48 @@ then draw the rectangle.
 <return></return>
 </function>
 
-<function name="gdk_window_end_paint">
+<function name="gdk_window_create_similar_surface">
 <description>
-Indicates that the backing store created by the most recent call to
-gdk_window_begin_paint_region() should be copied onscreen and
-deleted, leaving the next-most-recent backing store or no backing
-store at all as the active paint region. See
-gdk_window_begin_paint_region() for full details. It is an error to
-call this function without a matching
-gdk_window_begin_paint_region() first.
+Create a new surface that is as compatible as possible with the
+given @window. For example the new surface will have the same
+fallback resolution and font options as @window. Generally, the new
+surface will also use the same backend as @window, unless that is
+not possible for some reason. The type of the returned surface may
+be examined with cairo_surface_get_type().
 
+Initially the surface contents are all 0 (transparent if contents
+have transparency, black otherwise.)
+
+Since: 2.22
 
 </description>
 <parameters>
 <parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter_description> window to make new surface similar to
+</parameter_description>
+</parameter>
+<parameter name="content">
+<parameter_description> the content for the new surface
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width of the new surface
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height of the new surface
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a pointer to the newly allocated surface. The caller
+owns the surface and should call cairo_surface_destroy() when done
+with it.
+
+This function always returns a valid pointer, but it will return a
+pointer to a &quot;nil&quot; surface if @other is already in an error state
+or any other error occurs.
+
+</return>
 </function>
 
 <function name="gdk_event_get_graphics_expose">
@@ -12259,64 +13364,42 @@ Since: 2.14
 <return></return>
 </function>
 
-<function name="gdk_drawable_get_image">
+<function name="gdk_gc_set_line_attributes">
 <description>
-A #GdkImage stores client-side image data (pixels). In contrast,
-#GdkPixmap and #GdkWindow are server-side
-objects. gdk_drawable_get_image() obtains the pixels from a
-server-side drawable as a client-side #GdkImage.  The format of a
-#GdkImage depends on the #GdkVisual of the current display, which
-makes manipulating #GdkImage extremely difficult; therefore, in
-most cases you should use gdk_pixbuf_get_from_drawable() instead of
-this lower-level function. A #GdkPixbuf contains image data in a
-canonicalized RGB format, rather than a display-dependent format.
-Of course, there's a convenience vs. speed tradeoff here, so you'll
-want to think about what makes sense for your application.
+Sets various attributes of how lines are drawn. See
+the corresponding members of #GdkGCValues for full
+explanations of the arguments.
 
-@x, @y, @width, and @height define the region of @drawable to
-obtain as an image.
-
-You would usually copy image data to the client side if you intend
-to examine the values of individual pixels, for example to darken
-an image or add a red tint. It would be prohibitively slow to
-make a round-trip request to the windowing system for each pixel,
-so instead you get all of them at once, modify them, then copy
-them all back at once.
-
-If the X server or other windowing system backend is on the local
-machine, this function may use shared memory to avoid copying
-the image data.
-
-If the source drawable is a #GdkWindow and partially offscreen
-or obscured, then the obscured portions of the returned image
-will contain undefined data.
-
+Deprecated: 2.22: Use the Cairo functions cairo_set_line_width(),
+cairo_set_line_join(), cairo_set_line_cap() and cairo_set_dash()
+to affect the stroking behavior in Cairo. Keep in mind that the default
+attributes of a #cairo_t are different from the default attributes of
+a #GdkGC.
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable
+<parameter name="gc">
+<parameter_description> a #GdkGC.
 </parameter_description>
 </parameter>
-<parameter name="x">
-<parameter_description> x coordinate on @drawable
+<parameter name="line_width">
+<parameter_description> the width of lines.
 </parameter_description>
 </parameter>
-<parameter name="y">
-<parameter_description> y coordinate on @drawable
+<parameter name="line_style">
+<parameter_description> the dash-style for lines.
 </parameter_description>
 </parameter>
-<parameter name="width">
-<parameter_description> width of region to get
+<parameter name="cap_style">
+<parameter_description> the manner in which the ends of lines are drawn.
 </parameter_description>
 </parameter>
-<parameter name="height">
-<parameter_description> height or region to get
+<parameter name="join_style">
+<parameter_description> the in which lines are joined together.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GdkImage containing the contents of @drawable
-</return>
+<return></return>
 </function>
 
 <function name="gdk_gc_set_clip_origin">
@@ -12324,6 +13407,9 @@ will contain undefined data.
 Sets the origin of the clip mask. The coordinates are
 interpreted relative to the upper-left corner of
 the destination drawable of the current operation.
+
+Deprecated: 2.22: Use cairo_translate() before applying the clip path in
+Cairo.
 
 </description>
 <parameters>
@@ -12341,6 +13427,24 @@ the destination drawable of the current operation.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_cursor_get_cursor_type">
+<description>
+Returns the cursor type for this cursor.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="cursor">
+<parameter_description>  a #GdkCursor
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkCursorType
+
+</return>
 </function>
 
 <function name="gdk_color_change">
@@ -12369,43 +13473,45 @@ and the new value in the remaining fields.
 </return>
 </function>
 
-<function name="gdk_window_get_children">
+<function name="gdk_image_get_bits_per_pixel">
 <description>
-Gets the list of children of @window known to GDK.
-This function only returns children created via GDK,
-so for example it's useless when used with the root window;
-it only returns windows an application created itself.
+Determines the number of bits per pixel of the image.
 
-The returned list must be freed, but the elements in the
-list need not be.
+Since: 2.22
 
+Deprecated: 2.22: #GdkImage should not be used anymore.
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="image">
+<parameter_description> a #GdkImage
 </parameter_description>
 </parameter>
 </parameters>
-<return> list of child windows inside @window
+<return> the bits per pixel
+
 </return>
 </function>
 
-<function name="gdk_display_get_n_screens">
+<function name="gdk_drag_get_protocol">
 <description>
-Gets the number of screen managed by the @display.
+Finds out the DND protocol supported by a window.
 
-Since: 2.2
 
 </description>
 <parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
+<parameter name="xid">
+<parameter_description> the windowing system id of the destination window.
+</parameter_description>
+</parameter>
+<parameter name="protocol">
+<parameter_description> location where the supported DND protocol is returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> number of screens.
-
+<return> the windowing system specific id for the window where
+the drop should happen. This may be @xid or the id of a proxy
+window, or zero if @xid doesn't support Drag and Drop.
 </return>
 </function>
 
@@ -12792,6 +13898,7 @@ lot about internationalized text handling, which you don't want to
 understand; thus, use gdk_draw_layout() instead of this function,
 gdk_draw_layout() handles the details.
 
+Deprecated: 2.22: Use pango_cairo_show_glyphs() instead.
 
 </description>
 <parameters>
@@ -12847,17 +13954,28 @@ Determines the width of a given string.
 </return>
 </function>
 
-<function name="gdk_app_launch_context_new">
+<function name="gdk_window_get_toplevel">
 <description>
-Creates a new #GdkAppLaunchContext.
+Gets the toplevel window that's an ancestor of @window.
 
-Since: 2.14
+Any window type but %GDK_WINDOW_CHILD is considered a
+toplevel window, as is a %GDK_WINDOW_CHILD window that
+has a root window as parent.
+
+Note that you should use gdk_window_get_effective_toplevel() when
+you want to get to a window's toplevel as seen on screen, because
+gdk_window_get_toplevel() will most likely not do what you expect
+if there are offscreen windows in the hierarchy.
+
 
 </description>
 <parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
 </parameters>
-<return> a new #GdkAppLaunchContext
-
+<return> the toplevel window containing @window
 </return>
 </function>
 
@@ -12914,38 +14032,33 @@ Since: 2.8
 </return>
 </function>
 
-<function name="gdk_window_reparent">
+<function name="gdk_visual_get_visual_type">
 <description>
-Reparents @window into the given @new_parent. The window being
-reparented will be unmapped as a side effect.
+Returns the type of visual this is (PseudoColor, TrueColor, etc).
 
+Since: 2.22
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="new_parent">
-<parameter_description> new parent to move @window into
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X location inside the new parent
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y location inside the new parent
+<parameter name="visual">
+<parameter_description> A #GdkVisual.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> A #GdkVisualType stating the type of @visual.
+
+</return>
 </function>
 
 <function name="gdk_gc_set_subwindow">
 <description>
 Sets how drawing with this GC on a window will affect child
 windows of that window. 
+
+Deprecated: 2.22: There is no replacement. If you need to control
+subwindows, you must use drawing operations of the underlying window
+system manually. Cairo will always use %GDK_INCLUDE_INFERIORS on sources
+and masks and %GDK_CLIP_BY_CHILDREN on targets.
 
 </description>
 <parameters>
@@ -13026,6 +14139,8 @@ Gets the metrics of a nul-terminated string.
 Creates a new #GdkRegion using the polygon defined by a 
 number of points.
 
+Deprecated: 2.22: There is no replacement. For working with paths, please
+use Cairo.
 
 </description>
 <parameters>
@@ -13044,6 +14159,7 @@ polygon overlaps itself.
 </parameter>
 </parameters>
 <return> a new #GdkRegion based on the given polygon
+
 </return>
 </function>
 
@@ -13075,6 +14191,12 @@ windowing system. Don't worry about it unless you have to.
 Set the stipple bitmap for a graphics context. The
 stipple will only be used if the fill mode is
 %GDK_STIPPLED or %GDK_OPAQUE_STIPPLED.
+
+Deprecated: 2.22: Stippling has no direct replacement in Cairo. If you
+want to achieve an identical look, you can use the stipple bitmap as a
+mask. Most likely, this involves rendering the source to an intermediate
+surface using cairo_push_group() first, so that you can then use
+cairo_mask() to achieve the stippled look.
 
 </description>
 <parameters>
@@ -13206,39 +14328,18 @@ of the text in characters.)
 <return></return>
 </function>
 
-<function name="gdk_window_get_root_coords">
+<function name="gdk_screen_height_mm">
 <description>
-Obtains the position of a window position in root
-window coordinates. This is similar to
-gdk_window_get_origin() but allows you go pass
-in any position in the window, not just the origin.
+Returns the height of the default screen in millimeters.
+Note that on many X servers this value will not be correct.
 
-Since: 2.18
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X coordinate in window
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y coordinate in window
-</parameter_description>
-</parameter>
-<parameter name="root_x">
-<parameter_description> return location for X coordinate
-</parameter_description>
-</parameter>
-<parameter name="root_y">
-<parameter_description> return location for Y coordinate
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> the height of the default screen in millimeters,
+though it is not always correct.
+</return>
 </function>
 
 <function name="gdk_window_add_filter">
@@ -13270,24 +14371,24 @@ in X ClientMessage events.
 <return></return>
 </function>
 
-<function name="gdk_window_focus">
+<function name="gdk_region_equal">
 <description>
-Sets keyboard focus to @window. In most cases, gtk_window_present() 
-should be used on a #GtkWindow, rather than calling this function.
+Finds out if the two regions are the same.
 
 
 </description>
 <parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="region1">
+<parameter_description> a #GdkRegion
 </parameter_description>
 </parameter>
-<parameter name="timestamp">
-<parameter_description> timestamp of the event triggering the window focus
+<parameter name="region2">
+<parameter_description> a #GdkRegion
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if @region1 and @region2 are equal.
+</return>
 </function>
 
 <function name="gdk_window_fullscreen">
@@ -13343,37 +14444,6 @@ Since: 2.2
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_screen_get_rgba_colormap">
-<description>
-Gets a colormap to use for creating windows or pixmaps with an
-alpha channel. The windowing system on which GTK+ is running
-may not support this capability, in which case %NULL will
-be returned. Even if a non-%NULL value is returned, its
-possible that the window's alpha channel won't be honored
-when displaying the window on the screen: in particular, for
-X an appropriate windowing manager and compositing manager
-must be running to provide appropriate display.
-
-This functionality is not implemented in the Windows backend.
-
-For setting an overall opacity for a top-level window, see
-gdk_window_set_opacity().
-
-Since: 2.8
-
-</description>
-<parameters>
-<parameter name="screen">
-<parameter_description> a #GdkScreen.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a colormap to use for windows with
-an alpha channel or %NULL if the capability is not available.
-
-</return>
 </function>
 
 <function name="gdk_event_request_motions">
@@ -13454,6 +14524,7 @@ will have a colormap if the drawable from which it was created has
 a colormap, or if a colormap was set explicitely with
 gdk_image_set_colormap().
 
+Deprecated: 2.22: #GdkImage should not be used anymore.
 
 </description>
 <parameters>
@@ -13463,6 +14534,7 @@ gdk_image_set_colormap().
 </parameter>
 </parameters>
 <return> colormap for the image
+
 </return>
 </function>
 
@@ -13490,26 +14562,81 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_screen_list_visuals">
+<function name="gdk_cursor_new_for_display">
 <description>
-Lists the available visuals for the specified @screen.
-A visual describes a hardware image data format.
-For example, a visual might support 24-bit color, or 8-bit color,
-and might expect pixels to be in a certain format.
-
-Call g_list_free() on the return value when you're finished with it.
+Creates a new cursor from the set of builtin cursors.
+Some useful ones are:
+&lt;itemizedlist&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;right_ptr.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_RIGHT_PTR (right-facing arrow)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;crosshair.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_CROSSHAIR (crosshair)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;xterm.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_XTERM (I-beam)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;watch.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_WATCH (busy)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;fleur.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_FLEUR (for moving objects)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;hand1.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_HAND1 (a right-pointing hand)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;hand2.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_HAND2 (a left-pointing hand)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;left_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_LEFT_SIDE (resize left side)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;right_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_RIGHT_SIDE (resize right side)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_left_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_LEFT_CORNER (resize northwest corner)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_right_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_RIGHT_CORNER (resize northeast corner)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_left_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_LEFT_CORNER (resize southwest corner)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_right_corner.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_RIGHT_CORNER (resize southeast corner)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;top_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_TOP_SIDE (resize top side)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;bottom_side.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_BOTTOM_SIDE (resize bottom side)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;sb_h_double_arrow.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_SB_H_DOUBLE_ARROW (move vertical splitter)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+&lt;inlinegraphic format=&quot;PNG&quot; fileref=&quot;sb_v_double_arrow.png&quot;&gt;&lt;/inlinegraphic&gt; #GDK_SB_V_DOUBLE_ARROW (move horizontal splitter)
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+#GDK_BLANK_CURSOR (Blank cursor). Since 2.16
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;/itemizedlist&gt;
 
 Since: 2.2
 
 </description>
 <parameters>
-<parameter name="screen">
-<parameter_description> the relevant #GdkScreen.
+<parameter name="display">
+<parameter_description> the #GdkDisplay for which the cursor will be created
+</parameter_description>
+</parameter>
+<parameter name="cursor_type">
+<parameter_description> cursor to create
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of visuals; the list must be freed, but not its 
-contents
+<return> a new #GdkCursor
 
 </return>
 </function>
@@ -13772,25 +14899,20 @@ artifacts and unnecessary invalidations.
 <return></return>
 </function>
 
-<function name="gdk_app_launch_context_set_display">
+<function name="gdkx_visual_get">
 <description>
-Sets the display on which applications will be launched when
-using this context. See also gdk_app_launch_context_set_screen().
+Returns a #GdkVisual corresponding to a X visual. 
 
-Since: 2.14
 
 </description>
 <parameters>
-<parameter name="context">
-<parameter_description> a #GdkAppLaunchContext
-</parameter_description>
-</parameter>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
+<parameter name="xvisualid">
+<parameter_description> a X visual id.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GdkVisual.
+</return>
 </function>
 
 <function name="gdk_display_pointer_ungrab">
@@ -13807,6 +14929,28 @@ Since: 2.2
 </parameter>
 <parameter name="time_">
 <parameter_description> a timestap (e.g. %GDK_CURRENT_TIME).
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gc_set_fill">
+<description>
+Set the fill mode for a graphics context.
+
+Deprecated: 2.22: You can achieve tiling in Cairo by using
+cairo_pattern_set_extend() on the source. For stippling, see the
+deprecation comments on gdk_gc_set_stipple().
+
+</description>
+<parameters>
+<parameter name="gc">
+<parameter_description> a #GdkGC.
+</parameter_description>
+</parameter>
+<parameter name="fill">
+<parameter_description> the new fill mode.
 </parameter_description>
 </parameter>
 </parameters>
@@ -13929,22 +15073,6 @@ Since: 2.6
 <return></return>
 </function>
 
-<function name="gdk_region_rectangle">
-<description>
-Creates a new region containing the area @rectangle.
-
-
-</description>
-<parameters>
-<parameter name="rectangle">
-<parameter_description> a #GdkRectangle
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new region
-</return>
-</function>
-
 <function name="gdk_window_set_role">
 <description>
 When using GTK+, typically you should use gtk_window_set_role() instead
@@ -13973,6 +15101,29 @@ non-interchangeable kind of window.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_window_get_effective_toplevel">
+<description>
+Gets the toplevel window that's an ancestor of @window.
+
+Works like gdk_window_get_toplevel(), but treats an offscreen window's
+embedder as its parent, using gdk_window_get_effective_parent().
+
+See also: gdk_offscreen_window_get_embedder()
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the effective toplevel window containing @window
+
+</return>
 </function>
 
 <function name="gdk_get_show_events">
@@ -14102,6 +15253,9 @@ The way in which joins between lines are draw is determined by the
 #GdkCapStyle value in the #GdkGC. This can be set with
 gdk_gc_set_line_attributes().
 
+Deprecated: 2.22: Use cairo_line_to() and cairo_stroke() instead. See the
+documentation of gdk_draw_line() for notes on line drawing with Cairo.
+
 </description>
 <parameters>
 <parameter name="drawable">
@@ -14185,53 +15339,25 @@ gdk_color_copy().
 <return></return>
 </function>
 
-<function name="gdk_drawable_copy_to_image">
+<function name="gdk_window_end_paint">
 <description>
-Copies a portion of @drawable into the client side image structure
-@image. If @image is %NULL, creates a new image of size @width x @height
-and copies into that. See gdk_drawable_get_image() for further details.
+Indicates that the backing store created by the most recent call to
+gdk_window_begin_paint_region() should be copied onscreen and
+deleted, leaving the next-most-recent backing store or no backing
+store at all as the active paint region. See
+gdk_window_begin_paint_region() for full details. It is an error to
+call this function without a matching
+gdk_window_begin_paint_region() first.
 
-Since: 2.4
 
 </description>
 <parameters>
-<parameter name="drawable">
-<parameter_description> a #GdkDrawable
-</parameter_description>
-</parameter>
-<parameter name="image">
-<parameter_description> a #GdkDrawable, or %NULL if a new @image should be created.
-</parameter_description>
-</parameter>
-<parameter name="src_x">
-<parameter_description> x coordinate on @drawable
-</parameter_description>
-</parameter>
-<parameter name="src_y">
-<parameter_description> y coordinate on @drawable
-</parameter_description>
-</parameter>
-<parameter name="dest_x">
-<parameter_description> x coordinate within @image. Must be 0 if @image is %NULL
-</parameter_description>
-</parameter>
-<parameter name="dest_y">
-<parameter_description> y coordinate within @image. Must be 0 if @image is %NULL
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width of region to get
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height or region to get
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
 </parameters>
-<return> @image, or a new a #GdkImage containing the contents
-of @drawable
-
-</return>
+<return></return>
 </function>
 
 <function name="gdk_gc_set_dashes">
@@ -14246,6 +15372,8 @@ be changed with gdk_gc_set_line_attributes().)
 The @dash_offset defines the phase of the pattern, 
 specifying how many pixels into the dash-list the pattern 
 should actually begin.
+
+Deprecated: 2.22: Use cairo_set_dash() to set the dash in Cairo.
 
 </description>
 <parameters>
@@ -14413,11 +15541,11 @@ structure. The color is &lt;emphasis&gt;not&lt;/emphasis&gt; allocated, you
 must call gdk_colormap_alloc_color() yourself. The string can
 either one of a large set of standard names. (Taken from the X11
 &lt;filename&gt;rgb.txt&lt;/filename&gt; file), or it can be a hex value in the
-form 'rgb' 'rrggbb' 'rrrgggbbb' or
-'rrrrggggbbbb' where 'r', 'g' and 'b' are hex digits of the
+form '&#35;rgb' '&#35;rrggbb' '&#35;rrrgggbbb' or
+'&#35;rrrrggggbbbb' where 'r', 'g' and 'b' are hex digits of the
 red, green, and blue components of the color, respectively. (White
-in the four forms is 'fff' 'ffffff' 'fffffffff' and
-'ffffffffffff')
+in the four forms is '&#35;fff' '&#35;ffffff' '&#35;fffffffff' and
+'&#35;ffffffffffff')
 
 
 </description>
@@ -14432,6 +15560,27 @@ in the four forms is 'fff' 'ffffff' 'fffffffff' and
 </parameter>
 </parameters>
 <return> %TRUE if the parsing succeeded.
+</return>
+</function>
+
+<function name="gdk_window_get_background_pattern">
+<description>
+Gets the pattern used to clear the background on @window. If @window
+does not have its own background and reuses the parent's, %NULL is
+returned and you'll have to query it yourself.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a window
+</parameter_description>
+</parameter>
+</parameters>
+<return> The pattern to use for the background or %NULL to use the
+parent's background.
+
 </return>
 </function>
 
@@ -14514,6 +15663,7 @@ set as the new value for @gc. If you're only setting a few values
 on @gc, calling individual &quot;setter&quot; functions is likely more
 convenient.
 
+Deprecated: 2.22: Use Cairo for rendering.
 
 </description>
 <parameters>
@@ -14551,17 +15701,17 @@ Since: 2.2
 </return>
 </function>
 
-<function name="gdk_init">
+<function name="gdk_window_set_child_shapes">
 <description>
+Sets the shape mask of @window to the union of shape masks
+for all children of @window, ignoring the shape mask of @window
+itself. Contrast with gdk_window_merge_child_shapes() which includes
+the shape mask of @window in the masks to be merged.
 
 </description>
 <parameters>
-<parameter name="argc">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="argv">
-<parameter_description>
+<parameter name="window">
+<parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
 </parameters>
@@ -14670,33 +15820,55 @@ When implementing a #GtkWidget, you should call this function on the widget's
 <return></return>
 </function>
 
-<function name="gdk_threads_add_timeout">
+<function name="gdk_window_constrain_size">
 <description>
-A wrapper for the common usage of gdk_threads_add_timeout_full() 
-assigning the default priority, #G_PRIORITY_DEFAULT.
-
-See gdk_threads_add_timeout_full().
-
-Since: 2.12
+Constrains a desired width and height according to a
+set of geometry hints (such as minimum and maximum size).
 
 </description>
 <parameters>
-<parameter name="interval">
-<parameter_description> the time between calls to the function, in milliseconds
-(1/1000ths of a second)
+<parameter name="geometry">
+<parameter_description> a #GdkGeometry structure
 </parameter_description>
 </parameter>
-<parameter name="function">
-<parameter_description> function to call
+<parameter name="flags">
+<parameter_description> a mask indicating what portions of @geometry are set
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description>     data to pass to @function
+<parameter name="width">
+<parameter_description> desired width of window
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> desired height of the window
+</parameter_description>
+</parameter>
+<parameter name="new_width">
+<parameter_description> location to store resulting width
+</parameter_description>
+</parameter>
+<parameter name="new_height">
+<parameter_description> location to store resulting height
 </parameter_description>
 </parameter>
 </parameters>
-<return> the ID (greater than 0) of the event source.
+<return></return>
+</function>
 
+<function name="gdk_color_copy">
+<description>
+Makes a copy of a color structure. The result
+must be freed using gdk_color_free().
+
+
+</description>
+<parameters>
+<parameter name="color">
+<parameter_description> a #GdkColor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a copy of @color.
 </return>
 </function>
 
@@ -14748,6 +15920,26 @@ Determines the width of a given wide-character string.
 </parameter>
 </parameters>
 <return> the width of the string in pixels.
+</return>
+</function>
+
+<function name="gdk_image_get_bytes_per_line">
+<description>
+Determines the number of bytes per line of the image.
+
+Since: 2.22
+
+Deprecated: 2.22: #GdkImage should not be used anymore.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GdkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the bytes per line
+
 </return>
 </function>
 
