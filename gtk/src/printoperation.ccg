@@ -74,6 +74,22 @@ run_page_setup_dialog(Window& parent,
 
 }
 
+Glib::RefPtr<PageSetup>
+run_page_setup_dialog(Window& parent,
+                      const Glib::RefPtr<const PrintSettings>& print_settings)
+{
+  // Specify the exact type with template specialization, to avoid possible
+  // ambiguities between the const and non-const versions of unwrap() reported
+  // by Sun's compiler (specifying unwrap<const Object> was reported
+  // not to work):
+  return Glib::wrap(
+    gtk_print_run_page_setup_dialog(
+      parent.gobj(),
+      0,
+      const_cast<GtkPrintSettings*>(Glib::unwrap<PrintSettings>(print_settings))));
+
+}
+
 void
 run_page_setup_dialog_async(Window& parent,
                             const Glib::RefPtr<const PageSetup>& page_setup,
@@ -89,6 +105,25 @@ run_page_setup_dialog_async(Window& parent,
   gtk_print_run_page_setup_dialog_async(
     parent.gobj(),
     const_cast<GtkPageSetup*>(Glib::unwrap<PageSetup>(page_setup)),
+    const_cast<GtkPrintSettings*>(Glib::unwrap<PrintSettings>(print_settings)),
+    &SignalProxy_PrintSetupDone_gtk_callback,
+    slot_copy);
+}
+
+void
+run_page_setup_dialog_async(Window& parent,
+                            const Glib::RefPtr<const PrintSettings>& print_settings,
+                            const SlotPrintSetupDone& slot)
+{
+  SlotPrintSetupDone* slot_copy = new SlotPrintSetupDone(slot);
+
+  // Specify the exact type with template specialization, to avoid possible
+  // ambiguities between the const and non-const versions of unwrap() reported
+  // by Sun's compiler (specifying unwrap<const Object> was reported
+  // not to work):
+  gtk_print_run_page_setup_dialog_async(
+    parent.gobj(),
+    0,
     const_cast<GtkPrintSettings*>(Glib::unwrap<PrintSettings>(print_settings)),
     &SignalProxy_PrintSetupDone_gtk_callback,
     slot_copy);
