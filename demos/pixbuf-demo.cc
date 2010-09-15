@@ -36,6 +36,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/style.h>
 #include <gtkmm/window.h>
+#include <gdkmm/general.h>
 
 namespace
 {
@@ -127,15 +128,13 @@ DemoRenderArea::~DemoRenderArea()
  */
 bool DemoRenderArea::on_expose_event(GdkEventExpose* event)
 {
-  const int rowstride = current_frame_->get_rowstride();
-  const size_t offset = rowstride * event->area.y + 3 * event->area.x;
+  Glib::RefPtr<Gdk::Window> window = get_window();
+  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+  Gdk::Cairo::set_source_pixbuf(cr, current_frame_);
 
-  get_window()->draw_rgb_image_dithalign(
-      get_style()->get_black_gc(),
-      event->area.x, event->area.y, event->area.width, event->area.height,
-      Gdk::RGB_DITHER_NORMAL,
-      &current_frame_->get_pixels()[offset], rowstride,
-      event->area.x, event->area.y);
+  const Gdk::Rectangle rectangle(&(event->area));
+  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
+  cr->fill();
 
   return true; // stop signal emission
 }
@@ -217,4 +216,3 @@ int main(int argc, char** argv)
   }
   return EXIT_SUCCESS;
 }
-

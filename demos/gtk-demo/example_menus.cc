@@ -67,21 +67,22 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_MenuBar, Gtk::PACK_SHRINK);
 
   {
-    using namespace Gtk::Menu_Helpers;
-    MenuList items = m_MenuBar.items();
-
-    items.push_back(MenuElem("test\nline2"));
-    Gtk::MenuItem* pMenuItem = &items.back();
+    //Note:: It's generally easier to use the Gtk::UIManager API.
+    Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
     pMenuItem->set_submenu( *(create_menu(2, true)) );
+    m_MenuBar.append(*pMenuItem);
+    pMenuItem->show();
 
-    items.push_back(MenuElem("foo"));
-    pMenuItem = &items.back();
+    pMenuItem = Gtk::manage(new Gtk::MenuItem("foo"));
     pMenuItem->set_submenu( *(create_menu(3, true)) );
+    m_MenuBar.append(*pMenuItem);
+    pMenuItem->show();
 
-    items.push_back(MenuElem("bar"));
-    pMenuItem = &items.back();
+    pMenuItem = Gtk::manage(new Gtk::MenuItem("bar"));
     pMenuItem->set_submenu( *(create_menu(4, true)) );
     pMenuItem->set_right_justified();
+    m_MenuBar.append(*pMenuItem);
+    pMenuItem->show();
   }
 
 
@@ -92,16 +93,24 @@ Example_Menus::Example_Menus()
     Gtk::Menu* pMenu = create_menu(1, false);
     pMenu->set_accel_group(get_accel_group());
 
-    using namespace Gtk::Menu_Helpers;
-    MenuList items = pMenu->items();
+    Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::SeparatorMenuItem());
+    pMenu->append(*pMenuItem);
+    pMenuItem->show();
 
-    items.push_back(SeparatorElem());
-    items.push_back( CheckMenuElem("Accelerate Me", Gtk::AccelKey(GDK_F1, Gdk::ModifierType(0))) );
-    items.push_back( CheckMenuElem("Accelerator Locked") );
-    items.back().add_accelerator("activate", get_accel_group(), GDK_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
-    items.push_back( CheckMenuElem("Accelerator Frozen") );
-    items.back().add_accelerator("activate", get_accel_group(), GDK_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
-    items.back().add_accelerator("activate", get_accel_group(), GDK_F3, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
+    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerate Me"));
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE );
+    pMenu->append(*pMenuItem);
+    pMenuItem->show();
+
+    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Locked"));
+    pMenu->append(*pMenuItem);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
+    pMenuItem->show();
+
+    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Frozen"));
+    pMenu->append(*pMenuItem);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
+    pMenuItem->show();
   }
 
   m_VBox1.pack_start(m_Separator, Gtk::PACK_SHRINK);
@@ -131,13 +140,11 @@ Gtk::Menu* Example_Menus::create_menu(gint depth, bool tearoff)
   Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
 
   {
-    using namespace Gtk::Menu_Helpers;
-
-    MenuList items = pMenu->items();
-
     if(tearoff)
     {
-      items.push_back(TearoffMenuElem());
+      Gtk::MenuItem* menu_item = Gtk::manage(new Gtk::TearoffMenuItem());
+      pMenu->append(*menu_item);
+      menu_item->show();
     }
 
     Gtk::RadioMenuItem::Group radiogroup;
@@ -147,18 +154,16 @@ Gtk::Menu* Example_Menus::create_menu(gint depth, bool tearoff)
       char buf[32];
       sprintf(buf, "item %2d - %d", depth, j);
 
-      items.push_back(RadioMenuElem(radiogroup, buf));
+      Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::RadioMenuItem(radiogroup, buf));
+      pMenu->append(*pMenuItem);
+      pMenuItem->show();
 
-      Gtk::MenuItem* pMenuItem = &items.back();
-      if(pMenuItem)
-      {
-        if(i == 3)
-          pMenuItem->set_sensitive(false);
+      if(i == 3)
+        pMenuItem->set_sensitive(false);
 
-        Gtk::Menu* pSubMenu = create_menu(depth - 1, true);
-        if(pSubMenu)
-         pMenuItem->set_submenu(*pSubMenu);
-      }
+      Gtk::Menu* pSubMenu = create_menu(depth - 1, true);
+      if(pSubMenu)
+        pMenuItem->set_submenu(*pSubMenu);
     }
   }
 
@@ -169,5 +174,3 @@ void Example_Menus::on_button_clicked()
 {
   hide();
 }
-
-
