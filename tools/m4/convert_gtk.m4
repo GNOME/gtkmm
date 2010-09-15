@@ -65,6 +65,7 @@ _CONVERSION(`guint',`ui_merge_id',`$3')
 
 # Enums: TODO: It would be nice if gmmproc knew about these automatically.
 _CONV_ENUM(Gtk,AccelFlags)
+_CONV_ENUM(Gtk,Align)
 _CONV_ENUM(Gtk,ArrowType)
 _CONV_ENUM(Gtk,AttachOptions)
 _CONV_ENUM(Gtk,ButtonBoxStyle)
@@ -654,7 +655,7 @@ _CONVERSION(`CellRenderer*',`GtkCellRenderer*',__FP2P)
 _CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
 _CONVERSION(`GtkAction*',`const Glib::RefPtr<Action>&',`Glib::wrap($3, true)')
 
-_CONVERSION(`AlignmentEnum',`float',`_gtkmm_align_float_from_enum($3)')
+_CONVERSION(`Align',`float',`_gtkmm_align_float_from_enum($3)')
 
 # Used by AboutDialog:
 #_CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`($3).data())')
