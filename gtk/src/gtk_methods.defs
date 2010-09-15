@@ -818,16 +818,9 @@
   (gtype-id "GTK_TYPE_SCROLLED_WINDOW")
 )
 
-(define-object Item
-  (in-module "Gtk")
-  (parent "GtkBin")
-  (c-name "GtkItem")
-  (gtype-id "GTK_TYPE_ITEM")
-)
-
 (define-object MenuItem
   (in-module "Gtk")
-  (parent "GtkItem")
+  (parent "GtkBin")
   (c-name "GtkMenuItem")
   (gtype-id "GTK_TYPE_MENU_ITEM")
 )
@@ -865,6 +858,13 @@
   (parent "GtkMenuItem")
   (c-name "GtkImageMenuItem")
   (gtype-id "GTK_TYPE_IMAGE_MENU_ITEM")
+)
+
+(define-object Item
+  (in-module "Gtk")
+  (parent "GtkBin")
+  (c-name "GtkItem")
+  (gtype-id "GTK_TYPE_ITEM")
 )
 
 (define-object HandleBox
@@ -1387,28 +1387,15 @@
   )
 )
 
-(define-enum AnchorType
+(define-enum Align
   (in-module "Gtk")
-  (c-name "GtkAnchorType")
-  (gtype-id "GTK_TYPE_ANCHOR_TYPE")
+  (c-name "GtkAlign")
+  (gtype-id "GTK_TYPE_ALIGN")
   (values
-    '("center" "GTK_ANCHOR_CENTER")
-    '("north" "GTK_ANCHOR_NORTH")
-    '("north-west" "GTK_ANCHOR_NORTH_WEST")
-    '("north-east" "GTK_ANCHOR_NORTH_EAST")
-    '("south" "GTK_ANCHOR_SOUTH")
-    '("south-west" "GTK_ANCHOR_SOUTH_WEST")
-    '("south-east" "GTK_ANCHOR_SOUTH_EAST")
-    '("west" "GTK_ANCHOR_WEST")
-    '("east" "GTK_ANCHOR_EAST")
-    '("n" "GTK_ANCHOR_N")
-    '("nw" "GTK_ANCHOR_NW")
-    '("ne" "GTK_ANCHOR_NE")
-    '("s" "GTK_ANCHOR_S")
-    '("sw" "GTK_ANCHOR_SW")
-    '("se" "GTK_ANCHOR_SE")
-    '("w" "GTK_ANCHOR_W")
-    '("e" "GTK_ANCHOR_E")
+    '("fill" "GTK_ALIGN_FILL")
+    '("start" "GTK_ALIGN_START")
+    '("end" "GTK_ALIGN_END")
+    '("center" "GTK_ALIGN_CENTER")
   )
 )
 
@@ -1806,17 +1793,6 @@
   )
 )
 
-(define-enum Visibility
-  (in-module "Gtk")
-  (c-name "GtkVisibility")
-  (gtype-id "GTK_TYPE_VISIBILITY")
-  (values
-    '("none" "GTK_VISIBILITY_NONE")
-    '("partial" "GTK_VISIBILITY_PARTIAL")
-    '("full" "GTK_VISIBILITY_FULL")
-  )
-)
-
 (define-enum WindowPosition
   (in-module "Gtk")
   (c-name "GtkWindowPosition")
@@ -2047,9 +2023,7 @@
   (gtype-id "GTK_TYPE_WRAP_BOX_PACKING")
   (values
     '("h-expand" "GTK_WRAP_BOX_H_EXPAND")
-    '("h-fill" "GTK_WRAP_BOX_H_FILL")
     '("v-expand" "GTK_WRAP_BOX_V_EXPAND")
-    '("v-fill" "GTK_WRAP_BOX_V_FILL")
   )
 )
 
@@ -2258,7 +2232,6 @@
     '("child-visible" "PRIVATE_GTK_CHILD_VISIBLE")
     '("redraw-on-alloc" "PRIVATE_GTK_REDRAW_ON_ALLOC")
     '("alloc-needed" "PRIVATE_GTK_ALLOC_NEEDED")
-    '("request-needed" "PRIVATE_GTK_REQUEST_NEEDED")
     '("width-request-needed" "PRIVATE_GTK_WIDTH_REQUEST_NEEDED")
     '("height-request-needed" "PRIVATE_GTK_HEIGHT_REQUEST_NEEDED")
   )
@@ -7113,9 +7086,28 @@
   )
 )
 
+(define-method handle_border_width
+  (of-object "GtkContainerClass")
+  (c-name "gtk_container_class_handle_border_width")
+  (return-type "none")
+)
+
 
 
 ;; From gtkdebug.h
+
+(define-function gtk_get_debug_flags
+  (c-name "gtk_get_debug_flags")
+  (return-type "guint")
+)
+
+(define-function gtk_set_debug_flags
+  (c-name "gtk_set_debug_flags")
+  (return-type "none")
+  (parameters
+    '("guint" "flags")
+  )
+)
 
 
 
@@ -12639,6 +12631,31 @@
 
 ;; From gtkmain.h
 
+(define-function gtk_get_major_version
+  (c-name "gtk_get_major_version")
+  (return-type "guint")
+)
+
+(define-function gtk_get_minor_version
+  (c-name "gtk_get_minor_version")
+  (return-type "guint")
+)
+
+(define-function gtk_get_micro_version
+  (c-name "gtk_get_micro_version")
+  (return-type "guint")
+)
+
+(define-function gtk_get_binary_age
+  (c-name "gtk_get_binary_age")
+  (return-type "guint")
+)
+
+(define-function gtk_get_interface_age
+  (c-name "gtk_get_interface_age")
+  (return-type "guint")
+)
+
 (define-function gtk_check_version
   (c-name "gtk_check_version")
   (return-type "const-gchar*")
@@ -15986,6 +16003,15 @@
   (return-type "none")
   (parameters
     '("GSList*" "group")
+  )
+)
+
+(define-method join_group
+  (of-object "GtkRadioButton")
+  (c-name "gtk_radio_button_join_group")
+  (return-type "none")
+  (parameters
+    '("GtkRadioButton*" "group_source")
   )
 )
 
@@ -26315,8 +26341,8 @@
   (return-type "GType")
 )
 
-(define-function gtk_anchor_type_get_type
-  (c-name "gtk_anchor_type_get_type")
+(define-function gtk_align_get_type
+  (c-name "gtk_align_get_type")
   (return-type "GType")
 )
 
@@ -26472,11 +26498,6 @@
 
 (define-function gtk_update_type_get_type
   (c-name "gtk_update_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_visibility_get_type
-  (c-name "gtk_visibility_get_type")
   (return-type "GType")
 )
 
@@ -27986,6 +28007,96 @@
   (of-object "GtkWidget")
   (c-name "gtk_widget_get_accessible")
   (return-type "AtkObject*")
+)
+
+(define-method get_h_align
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_h_align")
+  (return-type "GtkAlign")
+)
+
+(define-method set_h_align
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_h_align")
+  (return-type "none")
+  (parameters
+    '("GtkAlign" "align")
+  )
+)
+
+(define-method get_v_align
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_v_align")
+  (return-type "GtkAlign")
+)
+
+(define-method set_v_align
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_v_align")
+  (return-type "none")
+  (parameters
+    '("GtkAlign" "align")
+  )
+)
+
+(define-method get_margin_left
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_margin_left")
+  (return-type "int")
+)
+
+(define-method set_margin_left
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_margin_left")
+  (return-type "none")
+  (parameters
+    '("int" "margin")
+  )
+)
+
+(define-method get_margin_right
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_margin_right")
+  (return-type "int")
+)
+
+(define-method set_margin_right
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_margin_right")
+  (return-type "none")
+  (parameters
+    '("int" "margin")
+  )
+)
+
+(define-method get_margin_top
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_margin_top")
+  (return-type "int")
+)
+
+(define-method set_margin_top
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_margin_top")
+  (return-type "none")
+  (parameters
+    '("int" "margin")
+  )
+)
+
+(define-method get_margin_bottom
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_margin_bottom")
+  (return-type "int")
+)
+
+(define-method set_margin_bottom
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_margin_bottom")
+  (return-type "none")
+  (parameters
+    '("int" "margin")
+  )
 )
 
 (define-method set_colormap
@@ -29520,15 +29631,13 @@
   (return-type "guint")
 )
 
-(define-method insert_child_with_padding
+(define-method insert_child
   (of-object "GtkWrapBox")
-  (c-name "gtk_wrap_box_insert_child_with_padding")
+  (c-name "gtk_wrap_box_insert_child")
   (return-type "none")
   (parameters
     '("GtkWidget*" "widget")
     '("gint" "index")
-    '("guint" "horizontal_padding")
-    '("guint" "vertical_padding")
     '("GtkWrapBoxPacking" "packing")
   )
 )
