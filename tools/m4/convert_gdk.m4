@@ -67,6 +67,7 @@ _CONV_ENUM(Gdk,WMFunction)
 _CONV_ENUM(Gdk,GrabStatus)
 _CONV_ENUM(Gdk,PixbufRotation)
 
+_CONVERSION(`guint32&',`guint32*',`&($3)')
 
 _CONVERSION(`Gdk::EventMask',`gint',`$3')
 _CONVERSION(`gint',`Gdk::EventMask',`static_cast<Gdk::EventMask>($3)')
