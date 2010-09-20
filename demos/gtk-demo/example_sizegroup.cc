@@ -134,7 +134,7 @@ void Example_SizeGroup::add_row(Gtk::Table& table, int row,
                                 const std::list<Glib::ustring>& options)
 {
   Gtk::Label* pLabel = Gtk::manage(new Gtk::Label(label_text, true));
-  pLabel->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_BOTTOM);
+  pLabel->set_alignment(Gtk::ALIGN_START, Gtk::ALIGN_END);
 
   table.attach(*pLabel, 0, 1, row, row + 1, Gtk::EXPAND|Gtk::FILL, Gtk::AttachOptions(0));
 

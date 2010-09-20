@@ -35,7 +35,7 @@ Gtk::Window* do_colorsel()
 Example_ColorSel::Example_ColorSel()
 : m_VBox(false, 8),
   m_Button("_Change the above color", true),
-  m_Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_BOTTOM, 0.0, 0.0)
+  m_Alignment(Gtk::ALIGN_END, Gtk::ALIGN_END, 0.0, 0.0)
 {
   set_title("Color Selection");
   set_border_width(8);
@@ -96,4 +96,3 @@ void Example_ColorSel::on_button_clicked()
     m_DrawingArea.modify_bg(Gtk::STATE_NORMAL, m_Color);
   }
 }
-
