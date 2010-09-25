@@ -88,8 +88,10 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_CLIPBOARD )
             << get_defs( GTK_TYPE_COLOR_BUTTON )
             << get_defs( GTK_TYPE_COLOR_SELECTION )
+            << get_defs( GTK_TYPE_COLOR_SELECTION_DIALOG )
             << get_defs( GTK_TYPE_COMBO ) /* Deprecated */
             << get_defs( GTK_TYPE_COMBO_BOX )
+            << get_defs( GTK_TYPE_COMBO_BOX_ENTRY )
             << get_defs( GTK_TYPE_CONTAINER )
             << get_defs( GTK_TYPE_CTREE ) /* Deprecated */
             << get_defs( GTK_TYPE_CELL_VIEW )
