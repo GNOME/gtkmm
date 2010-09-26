@@ -22,34 +22,6 @@
 #include <gtkmm/label.h>
 #include <algorithm>
 
-namespace
-{
-extern "C"
-{
-static GtkNotebook* SignalProxy_WindowCreation_gtk_callback(GtkNotebook*, GtkWidget* page,
-                                                            int x, int y, void* data)
-{
-  Gtk::Notebook::SlotWindowCreation *const
-    slot = static_cast<Gtk::Notebook::SlotWindowCreation*>(data);
-  try
-  {
-    return Glib::unwrap((*slot)(Glib::wrap(page), x, y));
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  return 0;
-}
-
-static void SignalProxy_WindowCreation_gtk_callback_destroy(void* data)
-{
-  delete static_cast<Gtk::Notebook::SlotWindowCreation*>(data);
-}
-
-} // extern "C"
-} // anonymous namespace
-
 namespace Gtk
 {
 
@@ -112,14 +84,6 @@ int Notebook::append_page(Widget& child)
 int Notebook::insert_page(Widget& child, int position)
 {
   return gtk_notebook_insert_page(gobj(), child.gobj(), 0 /* see GTK+ docs */, position);
-}
-
-typedef sigc::slot<Widget*, int, int> SlotWindowCreation;
-
-void Notebook::set_window_creation_hook(const SlotWindowCreation& slot)
-{
-  SlotWindowCreation* slot_copy = new SlotWindowCreation(slot);
-  gtk_notebook_set_window_creation_hook(&SignalProxy_WindowCreation_gtk_callback, slot_copy, &SignalProxy_WindowCreation_gtk_callback_destroy);
 }
 
 } //namespace Gtk
