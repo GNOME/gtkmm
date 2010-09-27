@@ -153,7 +153,6 @@ _CONVERSION(`Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap($3)')
 _CONVERSION(`const Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap(const_cast<Gdk::Rectangle*>($3))')
 _CONVERSION(`GdkRectangle*',`Gdk::Rectangle*',`&Glib::wrap($3)')
 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle*',`&Glib::wrap($3)')
-_CONVERSION(`GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
 
 # Special treatment for the Sun Forte compiler
 #_CONVERSION(const Glib::RefPtr<const Gdk::Pixmap>&,GdkPixmap*,__CONVERT_CONST_REFPTR_TO_P)

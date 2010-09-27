@@ -17,10 +17,8 @@
 
 _CONFIGINCLUDE(gtkmmconfig.h)
 
-#include <gtkmm/object.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/celleditable.h>
-#include <gtkmm/cellsizerequest.h>
 
 _DEFS(gtkmm,gtk)
 _PH_INCLUDE(gtkmm/private/object_p.h)
@@ -40,21 +38,25 @@ _WRAP_ENUM(CellRendererMode, GtkCellRendererMode)
  * @ingroup TreeView
  */
 class CellRenderer :
-  public Gtk::Object,
-  public CellSizeRequest
+  public Gtk::Object
 {
-  _CLASS_GTKOBJECT(CellRenderer,GtkCellRenderer,GTK_CELL_RENDERER,Gtk::Object,GtkObject)
-  _IMPLEMENTS_INTERFACE(CellSizeRequest)
+  _CLASS_GTKOBJECT(CellRenderer,GtkCellRenderer,GTK_CELL_RENDERER,Gtk::Object,GObject)
 public:
 
   _IGNORE(gtk_cell_renderer_get_size) //Deprecated
 
+  _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_cell_renderer_get_request_mode)
+  _WRAP_METHOD(void get_preferred_width(Widget& widget, int& minimum_width, int& natural_width) const, gtk_cell_renderer_get_preferred_width)
+  _WRAP_METHOD(void get_preferred_height_for_width(Widget& widget, int width, int& minimum_height, int& natural_height) const, gtk_cell_renderer_get_preferred_height_for_width)
+  _WRAP_METHOD(void get_preferred_height(Widget& widget, int& minimum_height, int& natural_height) const, gtk_cell_renderer_get_preferred_height)
+  _WRAP_METHOD(void get_preferred_width_for_height(Widget& widget, int height, int& minimum_width, int& natural_width) const, gtk_cell_renderer_get_preferred_width_for_height)
+  _WRAP_METHOD(void get_preferred_size(Widget& widget, Requisition& minimum_size, Requisition& natural_size) const, gtk_cell_renderer_get_preferred_size)
+
   _WRAP_METHOD(void render(
-                  const Glib::RefPtr<Gdk::Window>& window,
+                  const Cairo::RefPtr<Cairo::Context>& cr,
                   Widget& widget,
                   const Gdk::Rectangle& background_area,
                   const Gdk::Rectangle& cell_area,
-                  const Gdk::Rectangle& expose_area,
                   CellRendererState flags), gtk_cell_renderer_render)
 
   _WRAP_METHOD(bool activate(
@@ -148,15 +150,17 @@ protected:
 
 #m4begin
 dnl This extra conversion does the extra reference, often needed by code for vfuncs and signal.
-_CONVERSION(`GdkDrawable*',`const Glib::RefPtr<Gdk::Drawable>&', `Glib::wrap($3, true)')
+_CONVERSION(`cairo_t*',`const Cairo::RefPtr<Cairo::Context>&',`Cairo::RefPtr<Cairo::Context>(new Cairo::Context($3, false /* has_reference */))')
 #m4end
 
+#m4 _CONVERSION(`const GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
+#m4 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
+
   _WRAP_VFUNC(void render(
-                  const Glib::RefPtr<Gdk::Drawable>& window,
+                  const Cairo::RefPtr<Cairo::Context>& cr,
                   Widget& widget,
                   const Gdk::Rectangle& background_area,
                   const Gdk::Rectangle& cell_area,
-                  const Gdk::Rectangle& expose_area,
                   CellRendererState flags), render)
 
   _WRAP_VFUNC(bool activate(

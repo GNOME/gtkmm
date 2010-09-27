@@ -64,10 +64,6 @@ void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const
   gdk_cairo_set_source_pixbuf(context->cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
 }
 
-void set_source_pixmap(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixmap>& pixmap, double pixmap_x, double pixmap_y)
-{
-  gdk_cairo_set_source_pixmap(context->cobj(), pixmap->gobj(), pixmap_x, pixmap_y);
-}
 
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle)
 {

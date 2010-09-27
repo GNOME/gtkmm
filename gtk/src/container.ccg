@@ -138,7 +138,7 @@ void Container_Class::remove_callback(GtkContainer* self, GtkWidget* p0)
   g_warning("Container_Class::remove_callback_custom() C self=%p: C child=%p\n", (void*)self, (void*)p0);
   g_warning("gtypename self: %s\n, gtypename child: %s", G_OBJECT_TYPE_NAME(G_OBJECT(self)), G_OBJECT_TYPE_NAME(G_OBJECT(p0)));
 #endif
-  
+
   //Don't call wrap() on a GTK+ instance whose gtkmm instance has been deleted - just call the original C callback.
   const bool gtkmm_child_already_deleted = Glib::_gobject_cppinstance_already_deleted((GObject*)p0);
 
@@ -216,27 +216,8 @@ void Container::remove(Widget& widget)
   //before being added to the first container.
   if(widget.is_managed_())
     widget.reference();
-    
+
   gtk_container_remove(gobj(), widget.gobj());
 }
 
-// static
-void Container_Class::destroy_callback(GtkObject* self)
-{
-#ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Container_Class::destroy_callback() gobject_=%10X\n", self);
-  if(self)
-    g_warning("gtypename: %s\n", G_OBJECT_TYPE_NAME(G_OBJECT(self)));
-#endif
-
-  //Call the normal C destroy implementation, such as gtk_button_destroy:
-  //This will chain to gtk_container_destroy(), which will gtk_widget_destroy() any remaining child widgets.
-  GtkObjectClass *const base = static_cast<GtkObjectClass*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
-
-  if(base->destroy)
-    (*base->destroy)(self);
-}
-
 } // namespace Gtk
-

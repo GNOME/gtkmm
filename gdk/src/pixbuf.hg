@@ -20,8 +20,6 @@
 _CONFIGINCLUDE(gdkmmconfig.h)
 
 #include <gdkmm/drawable.h>
-#include <gdkmm/pixmap.h>
-#include <gdkmm/bitmap.h>
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/types.h>
 #include <giomm/inputstream.h>
@@ -32,6 +30,8 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gdk
 {
+
+class Window;
 
 _CC_INCLUDE(gdk-pixbuf/gdk-pixbuf.h)
 _WRAP_ENUM(Colorspace, GdkColorspace)
@@ -61,65 +61,14 @@ class Pixbuf : public Glib::Object
 {
   _CLASS_GOBJECT(Pixbuf, GdkPixbuf, GDK_PIXBUF, Glib::Object, GObject)
   _IGNORE(gdk_pixbuf_ref, gdk_pixbuf_unref, gdk_pixbuf_render_pixmap_and_mask,
-      gdk_pixbuf_render_pixmap_and_mask_for_colormap,
       gdk_pixbuf_get_from_image,
       gdk_pixbuf_set_option, gdk_pixbuf_get_option, gdk_pixbuf_non_anim_new)
 
 protected:
 
+
   /** Creates a pixbuf object from a drawable.
    *
-   * Transfers image data from a Drawable and converts it to an RGB(A)
-   * representation inside a Pixbuf. In other words, copies
-   * image data from a server-side drawable to a client-side RGB(A) buffer.
-   * This allows you to efficiently read individual pixels on the client side.
-   *
-   * If the drawable @src has no colormap (See Gdk::Drawable::get_colormap()),
-   * then a suitable colormap must be specified. Otherwise, you may use the
-   * constructor that takes no colormap argument.
-   * Typically a Gdk::Window or a pixmap created by passing a Gdk:Window
-   * to the Gdk::Pixbuf constructor will already have a colormap associated with
-   * it.  If the drawable is a bitmap (1 bit per pixel pixmap),
-   * then a colormap is not required; pixels with a value of 1 are
-   * assumed to be white, and pixels with a value of 0 are assumed to be
-   * black. For taking screenshots, Gdk::Colormap::get_system() returns
-   * the correct colormap to use.
-   *
-   * This will create an RGB pixbuf with 8 bits per channel and no
-   * alpha, with the same size specified by the @a width and @a height
-   * arguments.
-   *
-   * If the specified drawable is a pixmap, then the requested source
-   * rectangle must be completely contained within the pixmap, otherwise
-   * the constructor will fail. For pixmaps only (not for windows)
-   * passing -1 for width or height is allowed to mean the full width
-   * or height of the pixmap.
-   *
-   * If the specified drawable is a window, and the window is off the
-   * screen, then there is no image data in the obscured/offscreen
-   * regions to be placed in the pixbuf. The contents of portions of the
-   * pixbuf corresponding to the offscreen region are undefined.
-   *
-   * If the window you're obtaining data from is partially obscured by
-   * other windows, then the contents of the pixbuf areas corresponding
-   * to the obscured regions are undefined.
-   *
-   * See alo Gdk::Drawable::get_image().
-   *
-   * @param src Source drawable.
-   * @param cmap: A colormap.
-   * @param src_x Source X coordinate within drawable.
-   * @param src_y Source Y coordinate within drawable.
-   * @param width Width in pixels of region to get.
-   * @param height Height in pixels of region to get.
-   *
-   * @newin{2,12}
-   */
-   Pixbuf(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
-         int src_x, int src_y, int width, int height);
-
-  /** Creates a pixbuf object from a drawable, using the colormap from the drawable.
-   *
    * @param src Source drawable.
    * @param src_x Source X coordinate within drawable.
    * @param src_y Source Y coordinate within drawable.
@@ -128,9 +77,9 @@ protected:
    *
    * @newin{2,12}
    */
-   Pixbuf(const Glib::RefPtr<Drawable>& src,
+   Pixbuf(const Glib::RefPtr<Window>& src,
          int src_x, int src_y, int width, int height);
-   _IGNORE(gdk_pixbuf_get_from_drawable)
+   _IGNORE(gdk_pixbuf_get_from_window)
 
    //TODO: Documentation:
    /** @newin{2,30}
@@ -145,57 +94,6 @@ public:
 
   /** Creates a pixbuf object from a drawable.
    *
-   * Transfers image data from a Drawable and converts it to an RGB(A)
-   * representation inside a Pixbuf. In other words, copies
-   * image data from a server-side drawable to a client-side RGB(A) buffer.
-   * This allows you to efficiently read individual pixels on the client side.
-   *
-   * If the drawable @src has no colormap (See Gdk::Drawable::get_colormap()),
-   * then a suitable colormap must be specified. Otherwise, you may use the
-   * constructor that takes no colormap argument.
-   * Typically a Gdk::Window or a pixmap created by passing a Gdk:Window
-   * to the Gdk::Pixbuf constructor will already have a colormap associated with
-   * it.  If the drawable is a bitmap (1 bit per pixel pixmap),
-   * then a colormap is not required; pixels with a value of 1 are
-   * assumed to be white, and pixels with a value of 0 are assumed to be
-   * black. For taking screenshots, Gdk::Colormap::get_system() returns
-   * the correct colormap to use.
-   *
-   * This will create an RGB pixbuf with 8 bits per channel and no
-   * alpha, with the same size specified by the @a width and @a height
-   * arguments.
-   *
-   * If the specified drawable is a pixmap, then the requested source
-   * rectangle must be completely contained within the pixmap, otherwise
-   * the constructor will fail. For pixmaps only (not for windows)
-   * passing -1 for width or height is allowed to mean the full width
-   * or height of the pixmap.
-   *
-   * If the specified drawable is a window, and the window is off the
-   * screen, then there is no image data in the obscured/offscreen
-   * regions to be placed in the pixbuf. The contents of portions of the
-   * pixbuf corresponding to the offscreen region are undefined.
-   *
-   * If the window you're obtaining data from is partially obscured by
-   * other windows, then the contents of the pixbuf areas corresponding
-   * to the obscured regions are undefined.
-   *
-   * See alo Gdk::Drawable::get_image().
-   *
-   * @param src Source drawable.
-   * @param cmap: A colormap.
-   * @param src_x Source X coordinate within drawable.
-   * @param src_y Source Y coordinate within drawable.
-   * @param width Width in pixels of region to get.
-   * @param height Height in pixels of region to get.
-   *
-   * @newin{2,12}
-   */
-  _WRAP_CREATE(const Glib::RefPtr<Drawable>& src, const Glib::RefPtr<Colormap>& cmap,
-               int src_x, int src_y, int width, int height)
-
-  /** Creates a pixbuf object from a drawable, using the colormap from the drawable.
-   *
    * @param src Source drawable.
    * @param src_x Source X coordinate within drawable.
    * @param src_y Source Y coordinate within drawable.
@@ -204,7 +102,7 @@ public:
    *
    * @newin{2,12}
    */
-  _WRAP_CREATE(const Glib::RefPtr<Drawable>& src,
+  _WRAP_CREATE(const Glib::RefPtr<Window>& src,
                int src_x, int src_y, int width, int height)
 
    //TODO: Documentation
@@ -494,22 +392,8 @@ gboolean gdk_pixbuf_save_to_callbackv   (GdkPixbuf  *pixbuf,
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> rotate_simple(PixbufRotation angle) const, gdk_pixbuf_rotate_simple)
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> flip(bool horizontal = true) const, gdk_pixbuf_flip)
 
-  _WRAP_METHOD(void render_threshold_alpha(const Glib::RefPtr<Gdk::Bitmap>& bitmap,
-                                          int src_x, int src_y,
-                                          int dest_x, int dest_y,
-                                          int width, int height,
-                                          int alpha_threshold), gdk_pixbuf_render_threshold_alpha)
-
   //Use Gdk::Drawable::draw_pixbuf() instead of gdk_pixbuf_render_to_drawable(), gdk_pixbuf_render_to_drawable_alpha().
   _IGNORE(gdk_pixbuf_render_to_drawable, gdk_pixbuf_render_to_drawable_alpha,)
-
-  void render_pixmap_and_mask_for_colormap(const Glib::RefPtr<Colormap>& colormap,
-                                           Glib::RefPtr<Pixmap>& pixmap_return,
-                                           Glib::RefPtr<Bitmap>& mask_return,
-                                           int alpha_threshold);
-
-  void render_pixmap_and_mask(Glib::RefPtr<Pixmap>& pixmap_return,
-                              Glib::RefPtr<Bitmap>& mask_return, int alpha_threshold);
 
   _WRAP_METHOD(Glib::ustring get_option(const Glib::ustring& key) const, gdk_pixbuf_get_option)
 

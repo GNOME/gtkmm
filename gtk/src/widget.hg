@@ -26,6 +26,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <atkmm/implementor.h>
 #endif //GTKMM_ATKMM_ENABLED
 
+#include <gtkmm/object.h>
 #include <gtkmm/buildable.h>
 #include <gdkmm/event.h>
 #include <gdkmm/types.h>
@@ -38,10 +39,8 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 //#include <gtkmm/style.h>
 #include <gtkmm/targetlist.h>
 #include <gtkmm/rc.h>
-#include <gtkmm/object.h>
 #include <gtkmm/clipboard.h>
-#include <gtkmm/sizerequest.h>
-//#include <gtkmm/action.h>
+#include <gtkmm/requisition.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/object_p.h)
@@ -79,6 +78,7 @@ typedef Gdk::Rectangle Allocation;
 /** @defgroup Widgets Widgets
  */
 
+//TODO: Deal with the GtkObject->GObject change:
 /** Abstract Widget (Base class for all widgets)
  *
  * As the base class of all widgets this contains all of the properties
@@ -97,16 +97,14 @@ typedef Gdk::Rectangle Allocation;
  * a Gdk::Window.
  */
 class Widget
-: public Object,
-  public Buildable,
-  public SizeRequest
+: public Gtk::Object,
+  public Buildable
 #ifdef GTKMM_ATKMM_ENABLED
   ,public Atk::Implementor
 #endif //GTKMM_ATKMM_ENABLED
 {
-  _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Gtk::Object,GtkObject)
+  _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Gtk::Object,GObject)
   _IMPLEMENTS_INTERFACE(Buildable)
-  _IMPLEMENTS_INTERFACE(SizeRequest)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
   _IGNORE(gtk_widget_set, gtk_widget_queue_clear, gtk_widget_queue_clear_area, gtk_widget_draw,
           gtk_widget_set_uposition, gtk_widget_set_usize, gtk_widget_set_visual, gtk_widget_push_visual,
@@ -117,7 +115,7 @@ public:
   friend class Main;
   _CUSTOM_DTOR
 
-  _WRAP_METHOD(bool set_scroll_adjustments(Adjustment& hadjustment, Adjustment& vadjustment), gtk_widget_set_scroll_adjustments)
+  _WRAP_METHOD(bool set_scroll_adjustments(const Glib::RefPtr<Adjustment>& hadjustment, const Glib::RefPtr<Adjustment>& vadjustment), gtk_widget_set_scroll_adjustments)
 
   _WRAP_METHOD(void show(), gtk_widget_show)
   _WRAP_METHOD(void show_now(), gtk_widget_show_now)
@@ -136,6 +134,14 @@ public:
   _WRAP_METHOD(void size_allocate(const Allocation& allocation), gtk_widget_size_allocate)
 
   _IGNORE(gtk_widget_size_request) //deprecated
+
+  _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_widget_get_request_mode)
+  _WRAP_METHOD(void get_preferred_width(int& minimum_width, int& natural_width) const, gtk_widget_get_preferred_width)
+  _WRAP_METHOD(void get_preferred_height_for_width(int width, int& minimum_height, int& natural_height) const, gtk_widget_get_preferred_height_for_width)
+  _WRAP_METHOD(void get_preferred_height(int& minimum_height, int& natural_height) const, gtk_widget_get_preferred_height)
+  _WRAP_METHOD(void get_preferred_width_for_height(int height, int& minimum_width, int& natural_width) const, gtk_widget_get_preferred_width_for_height)
+  _WRAP_METHOD(void get_preferred_size(Requisition& minimum_size, Requisition& natural_size) const, gtk_widget_get_preferred_size)
+
 
   _WRAP_METHOD(void add_accelerator(const Glib::ustring& accel_signal, const Glib::RefPtr<AccelGroup>& accel_group,
                guint accel_key, Gdk::ModifierType accel_mods, AccelFlags accel_flags), gtk_widget_add_accelerator)
@@ -280,7 +286,6 @@ public:
   _WRAP_METHOD(Widget* get_ancestor(GType widget_type), gtk_widget_get_ancestor)
   _WRAP_METHOD(const Widget* get_ancestor(GType widget_type) const, gtk_widget_get_ancestor, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Colormap> get_colormap(), gtk_widget_get_colormap, refreturn)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Visual> get_visual(), gtk_widget_get_visual, refreturn)
 
@@ -305,27 +310,6 @@ public:
   _WRAP_METHOD(bool get_support_multidevice() const, gtk_widget_get_support_multidevice)
   _WRAP_METHOD(void set_support_multidevice(bool support_multidevice = true), gtk_widget_set_support_multidevice)
 
- /** Create a Gdk::Pixmap of the contents of the widget and its children.
-  *
-  * Works even if the widget is obscured. The depth and visual of the
-  * resulting pixmap is dependent on the widget being snapshot and likely
-  * differs from those of a target widget displaying the pixmap.
-  * The function Gdk::Pixbuf::get_from_drawable() can be used to convert
-  * the pixmap to a visual independant representation.
-  *
-  * The snapshot area used by this function is the widget's allocation plus
-  * any extra space occupied by additional windows belonging to this widget
-  * (such as the arrows of a spin button).
-  * Thus, the resulting snapshot pixmap is possibly larger than the allocation.
-  *
-  * The returned pixmap can be empty.
-  *
-  * @result A Gdk::Pixmap snapshot of the widget
-  *
-  * @newin{2,14}
-  */
-  Glib::RefPtr<Gdk::Pixmap> get_snapshot() const;
-
   _WRAP_METHOD(Glib::RefPtr<Atk::Object> get_accessible(), gtk_widget_get_accessible, refreturn, ifdef GTKMM_ATKMM_ENABLED)
   _WRAP_METHOD(Glib::RefPtr<const Atk::Object> get_accessible() const, gtk_widget_get_accessible, refreturn, constversion, ifdef GTKMM_ATKMM_ENABLED)
 
@@ -342,7 +326,6 @@ public:
   _WRAP_METHOD(int get_margin_bottom() const, gtk_widget_get_margin_bottom)
   _WRAP_METHOD(void set_margin_bottom(int margin), gtk_widget_set_margin_bottom)
 
-  _WRAP_METHOD(void set_colormap(const Glib::RefPtr<const Gdk::Colormap> &colormap), gtk_widget_set_colormap)
   _WRAP_METHOD(Gdk::EventMask get_events() const, gtk_widget_get_events)
   _WRAP_METHOD(Gdk::EventMask get_device_events(const Glib::RefPtr<const Gdk::Device>& device) const, gtk_widget_get_device_events)
   _WRAP_METHOD(void get_pointer(int &x, int &y) const, gtk_widget_get_pointer)
@@ -475,18 +458,13 @@ public:
 
   _WRAP_METHOD(void reset_rc_styles(),gtk_widget_reset_rc_styles)
 
-  // PUSH/POP - these are used to create widgets.  Hidden arguments to override the defaults.
-  _WRAP_METHOD(static void push_colormap(const Glib::RefPtr<const Gdk::Colormap>& cmap), gtk_widget_push_colormap)
-  _WRAP_METHOD(static void pop_colormap(), gtk_widget_pop_colormap)
 
   _WRAP_METHOD(static void push_composite_child(), gtk_widget_push_composite_child)
   _WRAP_METHOD(static void pop_composite_child(), gtk_widget_pop_composite_child)
 
 /* DEFAULTS */
 
-  _WRAP_METHOD(static void set_default_colormap(const Glib::RefPtr<const Gdk::Colormap>& colormap), gtk_widget_set_default_colormap)
   _WRAP_METHOD(static Glib::RefPtr<Style> get_default_style(), gtk_widget_get_default_style, refreturn)
-  _WRAP_METHOD(static Glib::RefPtr<Gdk::Colormap> get_default_colormap(), gtk_widget_get_default_colormap, refreturn)
   _WRAP_METHOD(static Glib::RefPtr<Gdk::Visual> get_default_visual(), gtk_widget_get_default_visual, refreturn)
 
 /* Directionality of Text */
@@ -546,7 +524,6 @@ public:
 
   _WRAP_METHOD(void drag_source_unset(), gtk_drag_source_unset)
 
-  _WRAP_METHOD(void drag_source_set_icon(const Glib::RefPtr<Gdk::Colormap>& colormap, const Glib::RefPtr<Gdk::Pixmap>& pixmap, const Glib::RefPtr<Gdk::Bitmap>& mask), gtk_drag_source_set_icon)
   _WRAP_METHOD(void drag_source_set_icon(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_drag_source_set_icon_pixbuf)
   _WRAP_METHOD(void drag_source_set_icon(const StockID& stock_id), gtk_drag_source_set_icon_stock)
   _WRAP_METHOD(void drag_source_set_icon(const Glib::ustring& icon_name), gtk_drag_source_set_icon_name)

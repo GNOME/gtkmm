@@ -18,6 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gdkmm/window.h>
 #include <gdk/gdk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
@@ -48,21 +49,12 @@ static void pixbuf_destroy_data_callback(guint8* pixels, void* user_data)
 namespace Gdk
 {
 
-Pixbuf::Pixbuf(const Glib::RefPtr<Drawable>& src,
-               const Glib::RefPtr<Colormap>& cmap,
+Pixbuf::Pixbuf(const Glib::RefPtr<Window>& src,
                int src_x, int src_y,
                int width, int height)
 :
-  Object((GObject*) gdk_pixbuf_get_from_drawable(
-      0, src->gobj(), cmap->gobj(), src_x, src_y, 0, 0, width, height))
-{}
-
-Pixbuf::Pixbuf(const Glib::RefPtr<Drawable>& src,
-               int src_x, int src_y,
-               int width, int height)
-:
-  Object((GObject*) gdk_pixbuf_get_from_drawable(
-      0, src->gobj(), 0, src_x, src_y, 0, 0, width, height))
+  Object((GObject*) gdk_pixbuf_get_from_window(
+      0, src->gobj(), src_x, src_y, 0, 0, width, height))
 {}
 
 Pixbuf::Pixbuf(const Cairo::RefPtr<Cairo::Surface>& src,
@@ -116,35 +108,6 @@ Glib::RefPtr<Pixbuf> Pixbuf::create_from_stream_at_scale(const Glib::RefPtr<Gio:
 
   return retvalue;
 }
-
-void Pixbuf::render_pixmap_and_mask_for_colormap(const Glib::RefPtr<Colormap>& colormap,
-                                                 Glib::RefPtr<Pixmap>& pixmap_return,
-                                                 Glib::RefPtr<Bitmap>& mask_return,
-                                                 int alpha_threshold)
-{
-  GdkPixmap* pPixmap = 0;
-  GdkBitmap* pBitmap = 0;
-
-  gdk_pixbuf_render_pixmap_and_mask_for_colormap(
-      gobj(), colormap->gobj(), &pPixmap, &pBitmap, alpha_threshold);
-
-  pixmap_return = Glib::wrap((GdkPixmapObject*) pPixmap);
-  mask_return   = Glib::RefPtr<Gdk::Bitmap>::cast_dynamic(Glib::wrap((GdkPixmapObject*) pBitmap));
-}
-
-void Pixbuf::render_pixmap_and_mask(Glib::RefPtr<Pixmap>& pixmap_return,
-                                    Glib::RefPtr<Bitmap>& mask_return,
-                                    int alpha_threshold)
-{
-  GdkPixmap* pPixmap = 0;
-  GdkBitmap* pBitmap = 0;
-
-  gdk_pixbuf_render_pixmap_and_mask(gobj(), &pPixmap, &pBitmap, alpha_threshold);
-
-  pixmap_return = Glib::wrap((GdkPixmapObject*) pPixmap);
-  mask_return   = Glib::RefPtr<Gdk::Bitmap>::cast_dynamic(Glib::wrap((GdkPixmapObject*) pBitmap));
-}
-
 
 void Pixbuf::save(const std::string& filename, const Glib::ustring& type)
 {

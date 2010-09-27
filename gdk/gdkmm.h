@@ -32,8 +32,6 @@
 #include <gdkmm/pixbufanimation.h>
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/pixbufloader.h>
-#include <gdkmm/pixmap.h>
-#include <gdkmm/bitmap.h>
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/display.h>
