@@ -53,7 +53,7 @@ protected:
   virtual void load_pixbufs();
 
   //signal handlers:
-  virtual bool on_drawingarea_expose(GdkEventExpose *event);
+  virtual bool on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr);
   virtual bool on_timeout();
 
   //Member widgets:
@@ -86,7 +86,7 @@ Example_Pixbufs::Example_Pixbufs()
 
   set_size_request(m_back_width, m_back_height);
   m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
-  m_DrawingArea.signal_expose_event().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_expose));
+  m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
   add(m_DrawingArea);
 
   m_TimeoutConnection = Glib::signal_timeout().connect(
@@ -123,16 +123,11 @@ void Example_Pixbufs::load_pixbufs()
   }
 }
 
-/* Expose callback for the drawing area */
-bool Example_Pixbufs::on_drawingarea_expose(GdkEventExpose *event)
+/* Draw callback for the drawing area */
+bool Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-  Glib::RefPtr<Gdk::Window> window = get_window();
-  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
   Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf_Background);
-
-  const Gdk::Rectangle rectangle(&(event->area));
-  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
-  cr->fill();
+  cr->paint();
 
   return true;
 }

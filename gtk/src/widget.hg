@@ -245,6 +245,9 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_window(), gtk_widget_get_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_window() const, gtk_widget_get_window, refreturn, constversion)
 
+  _WRAP_METHOD(int get_allocated_width() const, gtk_widget_get_allocated_width)
+  _WRAP_METHOD(int get_allocated_height() const, gtk_widget_get_allocated_height)
+
   /** Retrieves the widget's location.
    * @return The widget's allocated area.
    */
@@ -252,6 +255,7 @@ public:
   _IGNORE(gtk_widget_get_allocation)
 
 #m4 _CONVERSION(`const Allocation&',`const GtkAllocation*',`($3).gobj()')
+#m4 _CONVERSION(`const Allocation&',`const GdkRectangle*',`($3).gobj()')
   _WRAP_METHOD(void set_allocation(const Allocation& allocation), gtk_widget_set_allocation)
 
   _WRAP_METHOD(Container* get_parent(), gtk_widget_get_parent)
@@ -607,7 +611,11 @@ public:
   //_WRAP(meth|sig|impl,void unrealize_(),gtk_widget_unrealize,"unrealize")
   _WRAP_SIGNAL(void unrealize(),"unrealize")
 
+//TODO: Use a Requisition& instead?
   _WRAP_SIGNAL(void size_request(Requisition* requisition), "size_request")
+
+#m4 _CONVERSION(`Allocation&',`GdkRectangle*',`($2)($3.gobj())')
+#m4 _CONVERSION(`GdkRectangle*',`Allocation&',`($2)(Glib::wrap($3))')
   _WRAP_SIGNAL(void size_allocate(Allocation& allocation), "size_allocate")
 
 // Changed signals -- inform widget of internal changes.
@@ -689,6 +697,7 @@ dnl
   _POP()
 #m4end
 
+#m4 _CONVERSION(`cairo_t*',`const Cairo::RefPtr<Cairo::Context>&',`Cairo::RefPtr<Cairo::Context>(new Cairo::Context($3, false /* has_reference */))')
   _WRAP_SIGNAL(bool draw(const Cairo::RefPtr<Cairo::Context>& cr), "draw")
 
   /// Event triggered by a key press will widget has focus.

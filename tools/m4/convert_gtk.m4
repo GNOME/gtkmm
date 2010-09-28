@@ -510,7 +510,6 @@ _CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
 
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
 
-_CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 #_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 
 #TargetList
@@ -531,7 +530,6 @@ _CONVERSION(`GtkRequisition', `Requisition', `($2)($3)')
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
-_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 _CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
 
 _CONVERSION(`GtkEntry*',`Entry*',__RP2P)

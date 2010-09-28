@@ -5,7 +5,7 @@
  *
  * This demo has two drawing areas. The checkerboard area shows
  * how you can just draw something; all you have to do is write
- * a signal handler for expose_event, as shown here.
+ * a signal handler for draw, as shown here.
  *
  * The "scribble" area is a bit more advanced, and shows how to handle
  * events such as button presses and mouse motion. Click the mouse
@@ -23,8 +23,8 @@ public:
 
 protected:
   //signal handlers:
-  bool on_drawingarea_checkerboard_expose_event(GdkEventExpose* event);
-  bool on_drawingarea_scribble_expose_event(GdkEventExpose* event);
+  bool on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+  bool on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr);
   bool on_drawingarea_scribble_configure_event(GdkEventConfigure* event);
   bool on_drawingarea_scribble_motion_notify_event(GdkEventMotion* event);
   bool on_drawingarea_scribble_button_press_event(GdkEventButton* event);
@@ -69,8 +69,8 @@ Example_DrawingArea::Example_DrawingArea()
   m_DrawingArea_Checkerboard.set_size_request(100, 100);
   m_Frame_Checkerboard.add(m_DrawingArea_Checkerboard);
 
-  m_DrawingArea_Checkerboard.signal_expose_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_checkerboard_expose_event));
+  m_DrawingArea_Checkerboard.signal_draw().connect(
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_checkerboard_draw));
 
   /*
    * Create the scribble area
@@ -86,8 +86,8 @@ Example_DrawingArea::Example_DrawingArea()
   m_Frame_Scribble.add(m_DrawingArea_Scribble);
 
   /* Signals used to handle backing pixmap */
-  m_DrawingArea_Scribble.signal_expose_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_expose_event));
+  m_DrawingArea_Scribble.signal_draw().connect(
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_draw));
   m_DrawingArea_Scribble.signal_configure_event().connect(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event));
 
@@ -111,32 +111,27 @@ Example_DrawingArea::~Example_DrawingArea()
 {
 }
 
-bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpose* event)
+bool Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
   enum { CHECK_SIZE = 10, SPACING = 2 };
 
-  /* At the start of an expose handler, a clip region of event->area
-   * is set on the window, and event->area has been cleared to the
+  /* At the start of a draw handler, a clip region has been set on
+   * the Cairo context, and the contents have been cleared to the
    * widget's background color. The docs for
-   * gdk_window_begin_paint_region() give more details on how this
+   * Gdk::Window::begin_paint_region() give more details on how this
    * works.
    */
 
-  Glib::RefPtr<Gdk::Window> window = get_window();
-  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
-
-  const Gdk::Rectangle rectangle(&(event->area));
-  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
-  cr->clip();
-
   int xcount = 0;
+
+  const int width = m_DrawingArea_Checkerboard.get_allocated_width();
+  const int height = m_DrawingArea_Checkerboard.get_allocated_height();
   int i = SPACING;
-  const int width = m_DrawingArea_Checkerboard.get_allocation().get_width();
   while (i < width)
   {
     int j = SPACING;
     int ycount = xcount % 2; /* start with even/odd depending on row */
-    while (j < m_DrawingArea_Checkerboard.get_allocation().get_height())
+    while (j < height)
     {
       if (ycount % 2)
         cr->set_source_rgb(0.45777, 0, 0.45777);
@@ -164,15 +159,10 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpos
   return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_expose_event(GdkEventExpose* event)
+bool Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-  Glib::RefPtr<Gdk::Window> window = get_window();
-  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
   cr->set_source(m_surface, 0, 0); //TODO: Add =0 default parameters to cairomm.
-
-  const Gdk::Rectangle rectangle(&(event->area));
-  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
-  cr->clip();
+  cr->paint();
 
   return false;
 }
