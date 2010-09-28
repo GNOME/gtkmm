@@ -121,13 +121,13 @@ void Object::_release_c_instance()
         //TODO: The "destroy" signal had been removed. Use a GWeakRef instead?
         //Because we called disconnect_cpp_wrapper() our dispose callback will not be called, because the qdata has been removed.
         //So we'll connect a callback again, just so that gobject_disposed_ gets set for use later in this same method.
-        const gulong connection_id_destroy = g_signal_connect (object,  "destroy", G_CALLBACK (&callback_destroy_), this);
+        g_object_weak_ref (object, &Object::callback_weak_notify_, this);
 
         GLIBMM_DEBUG_UNREFERENCE(this, object);
         g_object_unref(object);
 
         if(!gobject_disposed_) //or if(g_signal_handler_is_connected(object, connection_id_destroy))
-          g_signal_handler_disconnect(object, connection_id_destroy);
+          g_object_weak_unref(object, &Object::callback_weak_notify_, this);
 
         //destroy_notify() should have been called after the final g_object_unref() or g_object_run_dispose(), so gobject_disposed_ could now be true.
 
@@ -298,7 +298,7 @@ void Object::set_manage()
   referenced_ = false;
 }
 
-void Object::callback_destroy_(GObject*, void* data) //static
+void Object::callback_weak_notify_(void* data, GObject* /* gobject */) //static
 {
   //This is only used for a short time, then disconnected.
 
@@ -307,6 +307,8 @@ void Object::callback_destroy_(GObject*, void* data) //static
   {
     cppObject->gobject_disposed_ = true;
   }
+
+  //TODO: Do we need to do this?: g_object_weak_unref(gobject, &Object::callback_weak_notify_, data);
 }
 
 bool Object::is_managed_() const

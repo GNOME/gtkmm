@@ -123,7 +123,7 @@ protected:
   virtual void destroy_notify_(); //override.
   void disconnect_cpp_wrapper();
   void _release_c_instance();
-  static void callback_destroy_(GObject* gobject, void* data); //only connected for a short time.
+  static void callback_weak_notify_(void* data, GObject* gobject); //only connected for a short time.
 
   // set if flags used by derived classes.
   bool referenced_; // = not managed.
