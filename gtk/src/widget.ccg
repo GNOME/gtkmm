@@ -435,7 +435,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
     g_warning("Widget_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");
     #endif
 
-    // Always hide widgets on gtk_object_destroy(), regardless of whether
+    // Always hide widgets on object destruction, regardless of whether
     // the widget is managed or not.  This is done for consistency so that
     // connecting to signal_hide() is guaranteed to work.
     gtk_widget_hide(pWidget);
@@ -471,19 +471,9 @@ Glib::ustring Widget::drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>
   return Gdk::AtomString::to_cpp_type(gtk_drag_dest_find_target(const_cast<GtkWidget*>(gobj()), Glib::unwrap(context), 0 /* See GTK+ docs */));
 }
 
-void Widget::unset_shape_combine_mask()
+void Widget::draw_insertion_cursor(const Cairo::RefPtr<Cairo::Context>& cr, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow)
 {
-  gtk_widget_shape_combine_mask(gobj(), 0, 0, 0); /* See GTK+ docs */
-}
-
-void Widget::unset_input_shape_combine_mask()
-{
-  gtk_widget_input_shape_combine_mask(gobj(), 0, 0, 0); /* See GTK+ docs */
-}
-
-void Widget::draw_insertion_cursor(Glib::RefPtr<Gdk::Drawable> drawable, const Gdk::Rectangle& area, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow)
-{
-  gtk_draw_insertion_cursor(gobj(), drawable->gobj(), const_cast<GdkRectangle*>(area.gobj()), const_cast<GdkRectangle*>(location.gobj()), is_primary, (GtkTextDirection)direction, draw_arrow);
+  gtk_draw_insertion_cursor(gobj(), cr->cobj(), const_cast<GdkRectangle*>(location.gobj()), is_primary, (GtkTextDirection)direction, draw_arrow);
 }
 
 Requisition Widget::get_requisition() const

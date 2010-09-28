@@ -351,8 +351,8 @@ _CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const PixbufFormat> >',__FL2H_SHALLOW)
 _CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
-_CONVERSION(`GSList*',`Glib::SListHandle<RecentFilter*>',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle<const RecentFilter*>', __FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RecentFilter> >',__FL2H_SHALLOW)
+_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const RecentFilter> >', __FL2H_SHALLOW)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 
@@ -546,11 +546,9 @@ _CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))'
 
 #RecentFilter
 _CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
-_CONVERSION(`const RecentFilter&', `GtkRecentFilter*', __FCR2P)
-_CONVERSION(`GtkRecentFilter*',`RecentFilter*', `Glib::wrap($3)')
-_CONVERSION(`GtkRecentFilter*',`const RecentFilter*', `Glib::wrap($3)')
-_CONVERSION(`GtkRecentFilter*', `RecentFilter&', `*Glib::wrap($3)')
-_CONVERSION(`GtkRecentFilter*', `const RecentFilter&', `*Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<RecentFilter>&', `GtkRecentFilter*', __CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkRecentFilter*',`Glib::RefPtr<RecentFilter>', `Glib::wrap($3)')
+_CONVERSION(`GtkRecentFilter*',`Glib::RefPtr<const RecentFilter>', `Glib::wrap($3)')
 
 #RecentInfo
 _CONVERSION(`GtkRecentInfo*',`Glib::RefPtr<RecentInfo>',`Glib::wrap($3)')

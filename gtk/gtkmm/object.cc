@@ -15,6 +15,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gtkmm/object.h>
+#include <gtkmm/private/object_p.h>
 #include <glibmm/quark.h>
 #include <gtk/gtk.h>
 
@@ -23,17 +25,15 @@ namespace Gtk
 {
 
 Object::Object(const Glib::ConstructParams& construct_params)
-:
-  Glib::Object(construct_params)
+: Glib::Object(construct_params)
 {
    gobject_disposed_ = false;
 
   _init_unmanage(); //We don't like the GTK+ default memory management - we want to be in control._)
 }
 
-Object::Object(GtkObject* castitem)
-:
-  Glib::Object((GObject*) castitem)
+Object::Object(GObject* castitem)
+: Glib::Object(castitem)
 {
   gobject_disposed_ = false;
 
@@ -73,17 +73,17 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
        //g_object_ref(gobject_);
 
        //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
-       //We do an extra unref() in Window::_destroy_c_instance() to take care of that.
+       //We do an extra unref() in Window::_release_c_instance() to take care of that.
 
-       referenced_ = false; //Managed. We should not try to unfloat GtkObjects that we did not instantiate.
+       referenced_ = false; //Managed. We should not try to unfloat GObjects that we did not instantiate.
     }
   }
 }
 
-void Object::_destroy_c_instance()
+void Object::_release_c_instance()
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::_destroy_c_instance() this=%10X, gobject_=%10X\n", this, gobject_);
+  g_warning("Gtk::Object::_release_c_instance() this=%10X, gobject_=%10X\n", this, gobject_);
     if(gobject_)
       g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
@@ -91,11 +91,11 @@ void Object::_destroy_c_instance()
   cpp_destruction_in_progress_ = true;
 
   // remove our hook.
-  GtkObject* object = gobj();
+  GObject* object = gobj();
 
   if (object)
   {
-    g_assert(GTK_IS_OBJECT(object));
+    g_assert(G_IS_OBJECT(object));
 
     disconnect_cpp_wrapper();
     //Unfortunately this means that our dispose callback will not be called, because the qdata has been removed.
@@ -128,8 +128,11 @@ void Object::_destroy_c_instance()
         if(!gobject_disposed_) //or if(g_signal_handler_is_connected(object, connection_id_destroy))
           g_signal_handler_disconnect(object, connection_id_destroy);
 
-        //destroy_notify() should have been called after the final g_object_unref() or gtk_object_destroy(), so gobject_disposed_ should now be true.
+        //destroy_notify() should have been called after the final g_object_unref() or gtk_object_destroy(), so gobject_disposed_ could now be true.
 
+        /* TODO: How can we do this with GTK+ 3? Note that it's not an issue for GtkWidgets,
+         * because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
+         *
         //If the C instance still isn't dead then insist, by calling gtk_object_destroy().
         //This is necessary because even a manage()d widget is refed when added to a container.
         // <danielk> That's simply not true.  But references might be taken elsewhere,
@@ -137,26 +140,31 @@ void Object::_destroy_c_instance()
         if (!gobject_disposed_)
         {
           #ifdef GLIBMM_DEBUG_REFCOUNTING
-          g_warning("Gtk::Object::_destroy_c_instance(): Calling gtk_object_destroy(): gobject_=%10X, gtypename=%s\n", object, G_OBJECT_TYPE_NAME(object));
+          g_warning("Gtk::Object::_release_c_instance(): Calling gtk_object_destroy(): gobject_=%10X, gtypename=%s\n", object, G_OBJECT_TYPE_NAME(object));
           #endif
 
-          g_assert(GTK_IS_OBJECT(object));
+          g_assert(G_IS_OBJECT(object));
           gtk_object_destroy(object); //Container widgets can respond to this.
         }
+        */
       }
       else
       {
+         /* TODO: How can we do this with GTK+ 3? Note that it's not an issue for GtkWidgets,
+         * because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
+         *
         //It's manag()ed, but the coder decided to delete it before deleting its parent.
         //That should be OK because the Container can respond to that.
         #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("Gtk::Object::_destroy_c_instance(): Calling gtk_object_destroy(): gobject_=%10X\n", gobject_);
+        g_warning("Gtk::Object::_release_c_instance(): Calling gtk_object_destroy(): gobject_=%10X\n", gobject_);
         #endif
 
         if (!gobject_disposed_)
         {
-          g_assert(GTK_IS_OBJECT(object));
+          g_assert(G_IS_OBJECT(object));
           gtk_object_destroy(object);
         }
+        */
       }
     }
 
@@ -171,7 +179,7 @@ Object::~Object()
   #endif
 
   //This has probably been called already from Gtk::Object::_destroy(), which is called from derived destructors.
-  _destroy_c_instance();
+  _release_c_instance();
 }
 
 void Object::disconnect_cpp_wrapper()
@@ -253,7 +261,7 @@ void Object::destroy_()
     cpp_destruction_in_progress_ = true;
 
     //destroy the C instance:
-    _destroy_c_instance();
+    _release_c_instance();
   }
 
   //The C++ destructor will be reached later. This function was called by a destructor.
@@ -315,17 +323,6 @@ bool Object::is_managed_() const
 namespace
 {
 } // anonymous namespace
-
-
-namespace Glib
-{
-
-Gtk::Object* wrap(GObject* object, bool take_copy)
-{
-  return dynamic_cast<Gtk::Object *> (Glib::wrap_auto ((GObject*)(object), take_copy));
-}
-
-} /* namespace Glib */
 
 namespace Gtk
 {

@@ -58,7 +58,6 @@ namespace Gtk
 
 _CC_INCLUDE(gtk/gtk.h)
 _WRAP_ENUM(DestDefaults, GtkDestDefaults)
-_WRAP_ENUM(WidgetFlags, GtkWidgetFlags)
 _WRAP_ENUM(WidgetHelpType, GtkWidgetHelpType)
 _WRAP_ENUM(DragResult, GtkDragResult)
 
@@ -97,13 +96,13 @@ typedef Gdk::Rectangle Allocation;
  * a Gdk::Window.
  */
 class Widget
-: public Gtk::Object,
+: public Object,
   public Buildable
 #ifdef GTKMM_ATKMM_ENABLED
   ,public Atk::Implementor
 #endif //GTKMM_ATKMM_ENABLED
 {
-  _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Gtk::Object,GObject)
+  _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Object,GObject)
   _IMPLEMENTS_INTERFACE(Buildable)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
   _IGNORE(gtk_widget_set, gtk_widget_queue_clear, gtk_widget_queue_clear_area, gtk_widget_draw,
@@ -475,12 +474,6 @@ public:
   _WRAP_METHOD(static void set_default_direction(TextDirection dir), gtk_widget_set_default_direction)
   _WRAP_METHOD(static TextDirection get_default_direction(), gtk_widget_get_default_direction)
 
-/* Shape masking */
-  _WRAP_METHOD(void shape_combine_mask(const Glib::RefPtr<const Gdk::Bitmap>& shape_mask, int offset_x = 0, int offset_y = 0), gtk_widget_shape_combine_mask)
-  void unset_shape_combine_mask();
-  _WRAP_METHOD(void input_shape_combine_mask(const Glib::RefPtr<const Gdk::Bitmap>& shape_mask, int offset_x = 0, int offset_y = 0), gtk_widget_input_shape_combine_mask)
-  void unset_input_shape_combine_mask();
-
   // must be realized
   _WRAP_METHOD(void reset_shapes(),gtk_widget_reset_shapes)
 
@@ -553,8 +546,8 @@ public:
   _WRAP_METHOD(void map(), gtk_widget_map)
   _WRAP_METHOD(void unmap(), gtk_widget_unmap)
 
-  //TODO: The drawable should be passed by reference, when we can break API/ABI, but it's not the end of the world. murrayc.
-  void draw_insertion_cursor(Glib::RefPtr<Gdk::Drawable> drawable, const Gdk::Rectangle& area, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow = true);
+  //TODO: Documentation:
+  void draw_insertion_cursor(const Cairo::RefPtr<Cairo::Context>& cr, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow = true);
   _IGNORE(gtk_draw_insertion_cursor)
 
   // Gtk+ 2.12 tooltip API
@@ -696,16 +689,7 @@ dnl
   _POP()
 #m4end
 
-  /// Event triggered by window requiring a refresh.
-  //- Expose events cover a rectangular area that was covered
-  //- or obscured by another window.  That area is now exposed
-  //- and thus is needs to be redrawn.
-  //-
-  //- If the application is not capable of redrawing sections
-  //- it should watch the count field and only draw on the last
-  //- even indicated.  This is important for things such as
-  //- Gtk::DrawingArea.
-  _WRAP_SIGNAL(bool expose_event(GdkEventExpose* event), "expose_event")
+  _WRAP_SIGNAL(bool draw(const Cairo::RefPtr<Cairo::Context>& cr), "draw")
 
   /// Event triggered by a key press will widget has focus.
   _WRAP_SIGNAL(bool key_press_event(GdkEventKey* event), "key_press_event")

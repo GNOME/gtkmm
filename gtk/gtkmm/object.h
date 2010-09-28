@@ -122,7 +122,7 @@ protected:
   void _init_unmanage(bool is_toplevel = false);
   virtual void destroy_notify_(); //override.
   void disconnect_cpp_wrapper();
-  void _destroy_c_instance();
+  void _release_c_instance();
   static void callback_destroy_(GObject* gobject, void* data); //only connected for a short time.
 
   // set if flags used by derived classes.

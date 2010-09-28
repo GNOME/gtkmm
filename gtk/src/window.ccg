@@ -68,21 +68,21 @@ void Window::destroy_()
 
   if ( !cpp_destruction_in_progress_ ) //see comment below.
   {
-    //Prevent destroy_notify_() from running as a possible side-effect of gtk_object_destroy.
+    //Prevent destroy_notify_() from running as a possible side-effect of object destruction.
     //We can't predict whether destroy_notify_() will really be run, so we'll disconnect the C++ instance here.
     cpp_destruction_in_progress_ = true;
 
     //destroy the C instance:
-    _destroy_c_instance();
+    _release_c_instance();
   }
 
   //The C++ destructor will be reached later. This function was called by a destructor.
 }
 
-void Window::_destroy_c_instance()
+void Window::_release_c_instance()
 {
-  //We override this,
-  //because though top-level windows can only be destroyed with gtk_widget_destroy, according to Owen Taylor. murrayc.
+  //We override this, (though it's not virtual - we just call it from this class),
+  //because top-level windows can only be destroyed with gtk_widget_destroy, according to Owen Taylor. murrayc.
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Gtk::Window::_destroy_c_instance() gobject_=%10X\n", gobject_);
   #endif
@@ -90,7 +90,7 @@ void Window::_destroy_c_instance()
   cpp_destruction_in_progress_ = true;
 
   // remove our hook.
-  GtkObject* object = (GtkObject*)gobj();
+  GtkWidget* object = GTK_WIDGET(gobj());
   if (object)
   {
     disconnect_cpp_wrapper();
@@ -102,7 +102,7 @@ void Window::_destroy_c_instance()
     if (!gobject_disposed_)
     {
       //Windows can not be unrefed. They are "self-owning".
-      gtk_object_destroy(object);
+      gtk_widget_destroy(object);
     }
 
     //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
@@ -156,7 +156,7 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");
     #endif
 
-    // Always hide widgets on gtk_object_destroy(), regardless of whether
+    // Always hide widgets on object destruction, regardless of whether
     // the widget is managed or not.  This is done for consistency so that
     // connecting to signal_hide() is guaranteed to work.
     //gtk_widget_hide(pWidget);
