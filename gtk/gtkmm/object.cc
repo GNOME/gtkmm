@@ -118,9 +118,10 @@ void Object::_release_c_instance()
         g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
         #endif
 
+        //TODO: The "destroy" signal had been removed. Use a GWeakRef instead?
         //Because we called disconnect_cpp_wrapper() our dispose callback will not be called, because the qdata has been removed.
         //So we'll connect a callback again, just so that gobject_disposed_ gets set for use later in this same method.
-        gulong connection_id_destroy = g_signal_connect (object, "destroy", G_CALLBACK (&callback_destroy_), this);
+        const gulong connection_id_destroy = g_signal_connect (object,  "destroy", G_CALLBACK (&callback_destroy_), this);
 
         GLIBMM_DEBUG_UNREFERENCE(this, object);
         g_object_unref(object);
@@ -128,43 +129,38 @@ void Object::_release_c_instance()
         if(!gobject_disposed_) //or if(g_signal_handler_is_connected(object, connection_id_destroy))
           g_signal_handler_disconnect(object, connection_id_destroy);
 
-        //destroy_notify() should have been called after the final g_object_unref() or gtk_object_destroy(), so gobject_disposed_ could now be true.
+        //destroy_notify() should have been called after the final g_object_unref() or g_object_run_dispose(), so gobject_disposed_ could now be true.
 
-        /* TODO: How can we do this with GTK+ 3? Note that it's not an issue for GtkWidgets,
-         * because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
-         *
-        //If the C instance still isn't dead then insist, by calling gtk_object_destroy().
+        // Note that this is not an issue for GtkWidgets,
+        // because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
+        //
+        //If the C instance still isn't dead then insist, by calling g_object_run_dispose().
         //This is necessary because even a manage()d widget is refed when added to a container.
         // <danielk> That's simply not true.  But references might be taken elsewhere,
-        // and gtk_object_destroy() just tells everyone "drop your refs, please!".
+        // and g_object_run_dispose() just tells everyone "drop your refs, please!".
         if (!gobject_disposed_)
         {
           #ifdef GLIBMM_DEBUG_REFCOUNTING
-          g_warning("Gtk::Object::_release_c_instance(): Calling gtk_object_destroy(): gobject_=%10X, gtypename=%s\n", object, G_OBJECT_TYPE_NAME(object));
+          g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%10X, gtypename=%s\n", object, G_OBJECT_TYPE_NAME(object));
           #endif
 
           g_assert(G_IS_OBJECT(object));
-          gtk_object_destroy(object); //Container widgets can respond to this.
+          g_object_run_dispose(object); //Container widgets can respond to this.
         }
-        */
       }
       else
       {
-         /* TODO: How can we do this with GTK+ 3? Note that it's not an issue for GtkWidgets,
-         * because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
-         *
         //It's manag()ed, but the coder decided to delete it before deleting its parent.
         //That should be OK because the Container can respond to that.
         #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("Gtk::Object::_release_c_instance(): Calling gtk_object_destroy(): gobject_=%10X\n", gobject_);
+        g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%10X\n", gobject_);
         #endif
 
         if (!gobject_disposed_)
         {
           g_assert(G_IS_OBJECT(object));
-          gtk_object_destroy(object);
+          g_object_run_dispose(object);
         }
-        */
       }
     }
 
@@ -223,7 +219,7 @@ void Object::destroy_notify_()
   //This also stops us from destroying it again in the destructor when it calls destroy_().
   gobject_disposed_ = true;
 
-  if(!cpp_destruction_in_progress_) //This function might have been called as a side-effect of destroy() when it called gtk_object_destroy().
+  if(!cpp_destruction_in_progress_) //This function might have been called as a side-effect of destroy() when it called g_object_run_dispose().
   {
     if (!referenced_) //If it's manage()ed.
     {
@@ -256,7 +252,7 @@ void Object::destroy_()
 
   if ( !cpp_destruction_in_progress_ ) //see comment below.
   {
-    //Prevent destroy_notify_() from running as a possible side-effect of gtk_object_destroy.
+    //Prevent destroy_notify_() from running as a possible side-effect of g_object_run_dispose.
     //We can't predict whether destroy_notify_() will really be run, so we'll disconnect the C++ instance here.
     cpp_destruction_in_progress_ = true;
 
