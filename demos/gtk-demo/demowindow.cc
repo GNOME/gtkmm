@@ -211,7 +211,9 @@ bool DemoWindow::read_line (FILE *stream, GString *str)
 
 #ifdef HAVE_GETC_UNLOCKED
       c = getc_unlocked (stream);
-#endif //GLIBMM_PROPERTIES_ENABLED
+#else
+	  c = getc(stream);
+#endif //HAVE_GETC_UNLOCKED
       if (c == EOF)
 	goto done;
       else
@@ -224,7 +226,9 @@ bool DemoWindow::read_line (FILE *stream, GString *str)
 	  {
 #ifdef HAVE_GETC_UNLOCKED
 	    int next_c = getc_unlocked (stream);
-#endif //GLIBMM_PROPERTIES_ENABLED
+#else
+	    int next_c = getc(stream);
+#endif //HAVE_GETC_UNLOCKED
 	    if (!(next_c == EOF ||
 		  (c == '\r' && next_c == '\n') ||
 		  (c == '\n' && next_c == '\r')))
