@@ -166,6 +166,7 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_SOCKET )
 #endif /* G_OS_WIN32 */
             << get_defs( GTK_TYPE_SPINNER )
+            << get_defs( GTK_TYPE_SPREAD_TABLE )
             << get_defs( GTK_TYPE_SPIN_BUTTON )
             << get_defs( GTK_TYPE_STATUSBAR )
             << get_defs( GTK_TYPE_STATUS_ICON )
