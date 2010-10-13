@@ -47,6 +47,8 @@
 ; Defines
 
 !define PRODUCT_NAME "gtkmm"
+; TODO: Should choose between gtkmm32 and gtkmm64 or somesuch when we can break compatibility (with gtkmm3 maybe)
+!define PRODUCT_PLATFORM_NAME "gtkmm"
 !define PRODUCT_SMNAME "Gtkmm"
 !ifdef RUNTIME_ONLY
   !define PRODUCT_FULLNAME "gtkmm Runtime Environment"
@@ -69,9 +71,8 @@
   !define BINDIR "bin"
 !endif
 
-!define GTKMM_COMMONDIR          "$COMMONFILES\${PRODUCT_NAME}\${PRODUCT_API_VERSION}"
 !define GTKMM_REG_KEY	         "Software\gtkmm\${PRODUCT_API_VERSION}"
-!define GTKMM_UNINSTALL_KEY	 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define GTKMM_UNINSTALL_KEY	 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}"
 !define GTKMM_UNINSTALL_EXE	 "gtkmm-uninst.exe"
 
 ;--------------------------------
@@ -128,7 +129,7 @@ Var USE_GTKDIR
 
 ; Remember the installer language
 !define MUI_LANGDLL_REGISTRY_ROOT "HKCU"
-!define MUI_LANGDLL_REGISTRY_KEY "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}"
+!define MUI_LANGDLL_REGISTRY_KEY "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
 
 !define MUI_CUSTOMFUNCTION_GUIINIT CustomPreviousVersion
@@ -148,7 +149,7 @@ Page custom CustomPagePathQuestion
   !insertmacro MUI_PAGE_COMPONENTS
 !endif
 !define MUI_STARTMENUPAGE_NODISABLE
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Gtkmm"
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Gtkmm";
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM"
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "${GTKMM_UNINSTALL_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "NSIS:StartMenuDir"
@@ -182,9 +183,9 @@ OutFile "${INSTALLER_NAME}"
 ;InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 ; Use a default path which has no spaces in it, pkg-config fails otherwise.
 ; see http://lists.freedesktop.org/archives/pkg-config/2007-September/000224.html
-InstallDir "C:\${PRODUCT_NAME}"
+InstallDir "C:\${PRODUCT_PLATFORM_NAME}"
 ; Get installation folder from registry if available
-InstallDirRegKey HKLM Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION} "Path"
+InstallDirRegKey HKLM Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION} "Path"
 
 ;--------------------------------
 ; Installer Sections
@@ -212,6 +213,8 @@ Section "Runtime" SecGTKRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
+
+  File ${BINDIR}\libgcc_s_sjlj-1.dll
 
   ; These break when stripped, therefore we always load them from bin/
   File bin\zlib1.dll
@@ -249,7 +252,8 @@ Section "Runtime" SecGTKRuntime
 
   SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
   File /r lib\gtk-2.0\2.10.0\engines
-;  File /r lib\gtk-2.0\2.10.0\loaders
+  SetOutPath $INSTDIR\lib\gdk-pixbuf-2.0\2.10.0
+  File /r lib\gdk-pixbuf-2.0\2.10.0\loaders
 
   SetOutPath $INSTDIR\lib\gtk-2.0
   File /r lib\gtk-2.0\modules
@@ -261,10 +265,10 @@ Section "Runtime" SecGTKRuntime
   ; TODO: Add others... libiconv, fontconfig, libxml2, tiff... however note
   ; that some contain devel-only things.
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-2.24.0
-  File /r share\doc\cairo_1.8.10-1_win32
-  File /r share\doc\pango-1.28.0
-  File /r share\doc\gtk+-2.20.0
+  File /r share\doc\glib-2.26.0
+  File /r share\doc\cairo_1.10.0-1_win32
+  File /r share\doc\pango-1.28.3
+  File /r share\doc\gtk+-2.22.0
 
   SetOutPath $INSTDIR\share
   File /r share\locale
@@ -274,6 +278,8 @@ Section "Runtime" SecGTKRuntime
 
 !ifndef RUNTIME_ONLY
   SetOutPath $INSTDIR\redist
+
+  File bin_stripped\libgcc_s_sjlj-1.dll
 
   ; These are broken when stripped:
   File bin\zlib1.dll
@@ -341,6 +347,7 @@ Section "Development" SecGTKDevelopment
   File /r include\cairo
   File /r include\atk-1.0
   File /r include\pango-1.0
+  File /r include\gdk-pixbuf-2.0
   File /r include\gtk-2.0
   File /r include\libglade-2.0
   File /r include\gail-1.0
@@ -380,7 +387,7 @@ Section "Development" SecGTKDevelopment
 ;  File lib\charset.lib
 ;  File lib\iconv.lib
 ;  File lib\libiconv.a
-  File lib\intl.def
+  File lib\libintl.def
   File lib\intl.lib
   File lib\libintl.dll.a
 ;  File lib\libtiff.def Is no longer provided by the bundle since 2.16.6
@@ -391,7 +398,7 @@ Section "Development" SecGTKDevelopment
   File lib\libpng14.dll.a
   File lib\zlib.def
   File lib\zdll.lib
-  File lib\libz.a
+  File lib\libz.dll.a
   File lib\libfreetype.dll.a
   File lib\libexpat.def
   File lib\expat.lib
@@ -477,9 +484,9 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\gail.pc
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-dev-2.24.0
-  File /r share\doc\pango-dev-1.28.0
-  File /r share\doc\gtk+-dev-2.20.0
+  File /r share\doc\glib-dev-2.26.0
+  File /r share\doc\pango-dev-1.28.3
+  File /r share\doc\gtk+-dev-2.22.0
 
   SetOutPath $INSTDIR\share\xml
   File /r share\xml\libglade
@@ -534,11 +541,14 @@ Section "Runtime" SecSigcRuntime
   File ${BINDIR}\libsigc-2.0-0.dll
   File MSVC\sigc-vc80-2_0.dll
   File MSVC\sigc-vc90-2_0.dll
+  File MSVC\sigc-vc100-2_0.dll
   !ifndef RUNTIME_ONLY
     File MSVC\sigc-vc80-d-2_0.dll
     File MSVC\sigc-vc90-d-2_0.dll
+    File MSVC\sigc-vc100-d-2_0.dll
     File MSVC\sigc-vc80-d-2_0.pdb
     File MSVC\sigc-vc90-d-2_0.pdb
+    File MSVC\sigc-vc100-d-2_0.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libsigc-2.0-0.dll
@@ -559,8 +569,10 @@ Section "Development" SecSigcDevelopment
   File /r lib\sigc++-2.0
   File MSVC\sigc-vc80-2_0.lib
   File MSVC\sigc-vc90-2_0.lib
+  File MSVC\sigc-vc100-2_0.lib
   File MSVC\sigc-vc80-d-2_0.lib
   File MSVC\sigc-vc90-d-2_0.lib
+  File MSVC\sigc-vc100-d-2_0.lib
   
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\sigc++-2.0.pc
@@ -594,11 +606,14 @@ Section "Runtime" SecCairommRuntime
   File ${BINDIR}\libcairomm-1.0-1.dll
   File MSVC\cairomm-vc80-1_0.dll
   File MSVC\cairomm-vc90-1_0.dll
+  File MSVC\cairomm-vc100-1_0.dll
   !ifndef RUNTIME_ONLY
     File MSVC\cairomm-vc80-d-1_0.dll
     File MSVC\cairomm-vc90-d-1_0.dll
+    File MSVC\cairomm-vc100-d-1_0.dll
     File MSVC\cairomm-vc80-d-1_0.pdb
     File MSVC\cairomm-vc90-d-1_0.pdb
+    File MSVC\cairomm-vc100-d-1_0.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libcairomm-1.0-1.dll
@@ -618,8 +633,10 @@ Section "Development" SecCairommDevelopment
   File lib\libcairomm-1.0.dll.a
   File MSVC\cairomm-vc80-1_0.lib
   File MSVC\cairomm-vc90-1_0.lib
+  File MSVC\cairomm-vc100-1_0.lib
   File MSVC\cairomm-vc80-d-1_0.lib
   File MSVC\cairomm-vc90-d-1_0.lib
+  File MSVC\cairomm-vc100-d-1_0.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\cairomm-1.0.pc
@@ -654,17 +671,23 @@ Section "Runtime" SecGlibmmRuntime
   File ${BINDIR}\libglibmm_generate_extra_defs-2.4-1.dll
   File MSVC\glibmm-vc80-2_4.dll
   File MSVC\glibmm-vc90-2_4.dll
+  File MSVC\glibmm-vc100-2_4.dll
   File MSVC\giomm-vc80-2_4.dll
   File MSVC\giomm-vc90-2_4.dll
+  File MSVC\giomm-vc100-2_4.dll
   !ifndef RUNTIME_ONLY
     File MSVC\glibmm-vc80-d-2_4.dll
     File MSVC\glibmm-vc90-d-2_4.dll
+    File MSVC\glibmm-vc100-d-2_4.dll
     File MSVC\glibmm-vc80-d-2_4.pdb
     File MSVC\glibmm-vc90-d-2_4.pdb
+    File MSVC\glibmm-vc100-d-2_4.pdb
     File MSVC\giomm-vc80-d-2_4.dll
     File MSVC\giomm-vc90-d-2_4.dll
+    File MSVC\giomm-vc100-d-2_4.dll
     File MSVC\giomm-vc80-d-2_4.pdb
     File MSVC\giomm-vc90-d-2_4.pdb
+    File MSVC\giomm-vc100-d-2_4.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libglibmm-2.4-1.dll
@@ -690,12 +713,16 @@ Section "Development" SecGlibmmDevelopment
   File /r lib\giomm-2.4
   File MSVC\glibmm-vc80-2_4.lib
   File MSVC\glibmm-vc90-2_4.lib
+  File MSVC\glibmm-vc100-2_4.lib
   File MSVC\glibmm-vc80-d-2_4.lib
   File MSVC\glibmm-vc90-d-2_4.lib
+  File MSVC\glibmm-vc100-d-2_4.lib
   File MSVC\giomm-vc80-2_4.lib
   File MSVC\giomm-vc90-2_4.lib
+  File MSVC\giomm-vc100-2_4.lib
   File MSVC\giomm-vc80-d-2_4.lib
   File MSVC\giomm-vc90-d-2_4.lib
+  File MSVC\giomm-vc100-d-2_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\glibmm-2.4.pc
@@ -734,12 +761,15 @@ Section "Runtime" SecPangommRuntime
   File ${BINDIR}\libpangomm-1.4-1.dll
   File MSVC\pangomm-vc80-1_4.dll
   File MSVC\pangomm-vc90-1_4.dll
+  File MSVC\pangomm-vc100-1_4.dll
 
   !ifndef RUNTIME_ONLY
     File MSVC\pangomm-vc80-d-1_4.dll
     File MSVC\pangomm-vc90-d-1_4.dll
+    File MSVC\pangomm-vc100-d-1_4.dll
     File MSVC\pangomm-vc80-d-1_4.pdb
     File MSVC\pangomm-vc90-d-1_4.pdb
+    File MSVC\pangomm-vc100-d-1_4.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libpangomm-1.4-1.dll
@@ -761,8 +791,10 @@ Section "Development" SecPangommDevelopment
   
   File MSVC\pangomm-vc80-1_4.lib
   File MSVC\pangomm-vc90-1_4.lib
+  File MSVC\pangomm-vc100-1_4.lib
   File MSVC\pangomm-vc80-d-1_4.lib
   File MSVC\pangomm-vc90-d-1_4.lib
+  File MSVC\pangomm-vc100-d-1_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\pangomm-1.4.pc
@@ -784,6 +816,75 @@ SectionEnd
 
 SubSectionEnd
 
+SubSection "atkmm"
+
+Section "Runtime" SecAtkmmRuntime
+!ifndef RUNTIME_ONLY
+  SectionIn 1 2 RO
+!else
+  SectionIn RO
+!endif
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\bin
+  File ${BINDIR}\libatkmm-1.6-1.dll
+  File MSVC\atkmm-vc80-1_6.dll
+  File MSVC\atkmm-vc90-1_6.dll
+  File MSVC\atkmm-vc100-1_6.dll
+
+  !ifndef RUNTIME_ONLY
+    File MSVC\atkmm-vc80-d-1_6.dll
+    File MSVC\atkmm-vc90-d-1_6.dll
+    File MSVC\atkmm-vc100-d-1_6.dll
+    File MSVC\atkmm-vc80-d-1_6.pdb
+    File MSVC\atkmm-vc90-d-1_6.pdb
+    File MSVC\atkmm-vc100-d-1_6.pdb
+
+    SetOutPath $INSTDIR\redist
+    File bin_stripped\libatkmm-1.6-1.dll
+  !endif
+
+SectionEnd
+
+!ifndef RUNTIME_ONLY
+Section "Development" SecAtkmmDevelopment
+  SectionIn 1
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\include
+  File /r include\atkmm-1.6
+
+  SetOutPath $INSTDIR\lib
+  File lib\libatkmm-1.6.dll.a
+  File /r lib\atkmm-1.6
+  
+  File MSVC\atkmm-vc80-1_6.lib
+  File MSVC\atkmm-vc90-1_6.lib
+  File MSVC\atkmm-vc100-1_6.lib
+  File MSVC\atkmm-vc80-d-1_6.lib
+  File MSVC\atkmm-vc90-d-1_6.lib
+  File MSVC\atkmm-vc100-d-1_6.lib
+
+  SetOutPath $INSTDIR\lib\pkgconfig
+  File lib\pkgconfig\atkmm-1.6.pc
+  
+SectionEnd
+
+Section "Documentation" SecAtkmmDocumentation
+  SectionIn 1
+  SetOverwrite ifnewer
+
+  SetOutPath $INSTDIR\share\doc
+  File /r share\doc\atkmm-1.6
+
+  SetOutPath $INSTDIR\share\devhelp\books
+  File /r share\devhelp\books\atkmm-1.6
+
+SectionEnd
+!endif
+
+SubSectionEnd
+
 SubSection "gtkmm"
 
 Section "Runtime" SecGtkmmRuntime
@@ -793,35 +894,33 @@ Section "Runtime" SecGtkmmRuntime
   SectionIn RO
 !endif
   SetOverwrite ifnewer
-  
+
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libatkmm-1.6-1.dll
   File ${BINDIR}\libgdkmm-2.4-1.dll
   File ${BINDIR}\libgtkmm-2.4-1.dll
 
-  File MSVC\atkmm-vc80-1_6.dll
-  File MSVC\atkmm-vc90-1_6.dll
   File MSVC\gdkmm-vc80-2_4.dll
   File MSVC\gdkmm-vc90-2_4.dll
+  File MSVC\gdkmm-vc100-2_4.dll
   File MSVC\gtkmm-vc80-2_4.dll
   File MSVC\gtkmm-vc90-2_4.dll
+  File MSVC\gtkmm-vc100-2_4.dll
 
   !ifndef RUNTIME_ONLY
-    File MSVC\atkmm-vc80-d-1_6.dll
-    File MSVC\atkmm-vc90-d-1_6.dll
-    File MSVC\atkmm-vc80-d-1_6.pdb
-    File MSVC\atkmm-vc90-d-1_6.pdb
     File MSVC\gdkmm-vc80-d-2_4.dll
     File MSVC\gdkmm-vc90-d-2_4.dll
+    File MSVC\gdkmm-vc100-d-2_4.dll
     File MSVC\gdkmm-vc80-d-2_4.pdb
     File MSVC\gdkmm-vc90-d-2_4.pdb
+    File MSVC\gdkmm-vc100-d-2_4.pdb
     File MSVC\gtkmm-vc80-d-2_4.dll
     File MSVC\gtkmm-vc90-d-2_4.dll
+    File MSVC\gtkmm-vc100-d-2_4.dll
     File MSVC\gtkmm-vc80-d-2_4.pdb
     File MSVC\gtkmm-vc90-d-2_4.pdb
+    File MSVC\gtkmm-vc100-d-2_4.pdb
 
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libatkmm-1.6-1.dll
     File bin_stripped\libgdkmm-2.4-1.dll
     File bin_stripped\libgtkmm-2.4-1.dll
   !endif
@@ -834,40 +933,39 @@ Section "Development" SecGtkmmDevelopment
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\include
-  File /r include\atkmm-1.6
   File /r include\gtkmm-2.4
   File /r include\gdkmm-2.4
 
   SetOutPath $INSTDIR\lib
-  File lib\libatkmm-1.6.dll.a
   File lib\libgdkmm-2.4.dll.a
   File lib\libgtkmm-2.4.dll.a
   File /r lib\gtkmm-2.4
   File /r lib\gdkmm-2.4
   
-  File MSVC\atkmm-vc80-1_6.lib
-  File MSVC\atkmm-vc90-1_6.lib
-  File MSVC\atkmm-vc80-d-1_6.lib
-  File MSVC\atkmm-vc90-d-1_6.lib
   File MSVC\gdkmm-vc80-2_4.lib
   File MSVC\gdkmm-vc90-2_4.lib
+  File MSVC\gdkmm-vc100-2_4.lib
   File MSVC\gdkmm-vc80-d-2_4.lib
   File MSVC\gdkmm-vc90-d-2_4.lib
+  File MSVC\gdkmm-vc100-d-2_4.lib
   File MSVC\gtkmm-vc80-2_4.lib
   File MSVC\gtkmm-vc90-2_4.lib
+  File MSVC\gtkmm-vc100-2_4.lib
   File MSVC\gtkmm-vc80-d-2_4.lib
   File MSVC\gtkmm-vc90-d-2_4.lib
+  File MSVC\gtkmm-vc100-d-2_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
-  File lib\pkgconfig\atkmm-1.6.pc
-  File lib\pkgconfig\gtkmm-2.4.pc
   File lib\pkgconfig\gdkmm-2.4.pc
+  File lib\pkgconfig\gtkmm-2.4.pc
   
   SetOutPath $INSTDIR\MSVC
   File MSVC\gtkmm-vc80-2_4.vsprops
   File MSVC\gtkmm-vc90-2_4.vsprops
+  File MSVC\gtkmm-vc100-2_4.props
   File MSVC\gtkmm-vc80-d-2_4.vsprops
   File MSVC\gtkmm-vc90-d-2_4.vsprops
+  File MSVC\gtkmm-vc100-d-2_4.props
   File MSVC\gtkmm-2.4.vsprops
   File MSVC\gtkmm-2.4d.vsprops
 
@@ -878,7 +976,7 @@ Section "Demo" SecGtkmmDemo
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\gtkmm-demo
-  File /oname=gtkmm-demo.exe demo\demo.exe
+  File demo\gtkmm-demo.exe
   File demo\*.cc
   File demo\*.png
   File demo\*.jpg
@@ -913,11 +1011,14 @@ Section "Runtime" SecLibglademmRuntime
   File ${BINDIR}\libglademm-2.4-1.dll
   File MSVC\glademm-vc80-2_4.dll
   File MSVC\glademm-vc90-2_4.dll
+  File MSVC\glademm-vc100-2_4.dll
   !ifndef RUNTIME_ONLY
     File MSVC\glademm-vc80-d-2_4.dll
     File MSVC\glademm-vc90-d-2_4.dll
+    File MSVC\glademm-vc100-d-2_4.dll
     File MSVC\glademm-vc80-d-2_4.pdb
     File MSVC\glademm-vc90-d-2_4.pdb
+    File MSVC\glademm-vc100-d-2_4.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libglademm-2.4-1.dll
@@ -938,8 +1039,10 @@ Section "Development" SecLibglademmDevelopment
   File /r lib\libglademm-2.4
   File MSVC\glademm-vc80-2_4.lib
   File MSVC\glademm-vc90-2_4.lib
+  File MSVC\glademm-vc100-2_4.lib
   File MSVC\glademm-vc80-d-2_4.lib
   File MSVC\glademm-vc90-d-2_4.lib
+  File MSVC\glademm-vc100-d-2_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\libglademm-2.4.pc
@@ -973,11 +1076,14 @@ Section "Runtime" SecLibxmlRuntime
   File ${BINDIR}\libxml++-2.6-2.dll
   File MSVC\xml++-vc80-2_6.dll
   File MSVC\xml++-vc90-2_6.dll
+  File MSVC\xml++-vc100-2_6.dll
   !ifndef RUNTIME_ONLY
     File MSVC\xml++-vc80-d-2_6.dll
     File MSVC\xml++-vc90-d-2_6.dll
+    File MSVC\xml++-vc100-d-2_6.dll
     File MSVC\xml++-vc80-d-2_6.pdb
     File MSVC\xml++-vc90-d-2_6.pdb
+    File MSVC\xml++-vc100-d-2_6.pdb
 
     SetOutPath $INSTDIR\redist
     File bin_stripped\libxml++-2.6-2.dll
@@ -998,8 +1104,10 @@ Section "Development" SecLibxmlDevelopment
   File /r lib\libxml++-2.6
   File MSVC\xml++-vc80-2_6.lib
   File MSVC\xml++-vc90-2_6.lib
+  File MSVC\xml++-vc100-2_6.lib
   File MSVC\xml++-vc80-d-2_6.lib
   File MSVC\xml++-vc90-d-2_6.lib
+  File MSVC\xml++-vc100-d-2_6.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\libxml++-2.6.pc
@@ -1017,38 +1125,6 @@ SectionEnd
 !endif
 
 SubSectionEnd
-
-!ifndef RUNTIME_ONLY
-;Section "glade--" SecGlademm
-;  SectionIn 1
-;  SetOverwrite ifnewer
-;
-;  SetOutPath $INSTDIR\bin
-;  File bin_stripped\glade--.exe
-;  File bin_stripped\glademm-embed.exe
-;
-;SectionEnd
-
-;Section "gideon" SecGideon
-;  SectionIn 1
-;  SetOverwrite ifnewer
-;
-;  SetOutPath $INSTDIR\bin
-;  File bin\gideon.exe
-;  File bin\libgideon.dll
-;  File bin\libguiloader.dll
-;  File bin\libguiloader-c++.dll
-;  SetOutPath $INSTDIR\include
-;  File /r include\gideon
-;  File /r include\guiloader
-;  File /r include\guiloader-c++
-;  SetOutPath $INSTDIR\lib
-;  File lib\libgideon.dll.a
-;  File lib\libguiloader.dll.a
-;  File lib\libguiloader-c++.dll.a
-;
-;SectionEnd
-!endif
 
 Section -Post SecPost
 
@@ -1083,25 +1159,25 @@ Section -Post SecPost
 
   ; Registry + Add/Remove Entry
   StrCmp $CONTEXT "1" 0 +11
-  WriteRegStr HKLM "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Path" "$INSTDIR"
-  WriteRegStr HKLM "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Version" "${PRODUCT_VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_FULLNAME} ${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayIcon" "$INSTDIR\gtkmm.ico"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "Publisher" "${PRODUCT_PUBLISHER}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\${GTKMM_UNINSTALL_EXE}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayVersion" "${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "NSIS:StartMenuDir" "$ICONS_GROUP"
+  WriteRegStr HKLM "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Path" "$INSTDIR"
+  WriteRegStr HKLM "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Version" "${PRODUCT_VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayName" "${PRODUCT_FULLNAME} ${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}" ; TODO: separate display name for 32 and 64 bit
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayIcon" "$INSTDIR\gtkmm.ico"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "Publisher" "${PRODUCT_PUBLISHER}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "UninstallString" "$INSTDIR\${GTKMM_UNINSTALL_EXE}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayVersion" "${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "NSIS:StartMenuDir" "$ICONS_GROUP"
   Goto +10
-  WriteRegStr HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Path" "$INSTDIR"
-  WriteRegStr HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Version" "${PRODUCT_VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_FULLNAME} ${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayIcon" "$INSTDIR\gtkmm.ico"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "Publisher" "${PRODUCT_PUBLISHER}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\${GTKMM_UNINSTALL_EXE}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayVersion" "${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "NSIS:StartMenuDir" "$ICONS_GROUP"
+  WriteRegStr HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Path" "$INSTDIR"
+  WriteRegStr HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Version" "${PRODUCT_VERSION}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayName" "${PRODUCT_FULLNAME} ${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayIcon" "$INSTDIR\gtkmm.ico"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "Publisher" "${PRODUCT_PUBLISHER}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "UninstallString" "$INSTDIR\${GTKMM_UNINSTALL_EXE}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayVersion" "${PRODUCT_VERSION}-${PRODUCT_VERSION_INSTALLER}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "NSIS:StartMenuDir" "$ICONS_GROUP"
 
 !ifndef RUNTIME_ONLY
   IfFileExists "$INSTDIR\share\doc\*.*" "" +2
@@ -1151,8 +1227,14 @@ Section -Post SecPost
   IfFileExists "$INSTDIR\share\doc\pangomm-1.4\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\pangomm Reference Manual.lnk" "$INSTDIR\share\doc\pangomm-1.4\reference\html\index.html"
 
+  IfFileExists "$INSTDIR\share\doc\atkmm-1.6\reference\html\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\atkmm Reference Manual.lnk" "$INSTDIR\share\doc\atkmm-1.6\reference\html\index.html"
+
   IfFileExists "$INSTDIR\share\doc\gtkmm-2.4\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\gtkmm Reference Manual.lnk" "$INSTDIR\share\doc\gtkmm-2.4\reference\html\index.html"
+
+  IfFileExists "$INSTDIR\share\doc\gtkmm-2.4\tutorial\html\index.html" "" +2
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\Programming with gtkmm.lnk" "$INSTDIR\share\doc\gtkmm-2.4\tutorial\html\index.html"
 
   IfFileExists "$INSTDIR\share\doc\gnomemm-2.6\libglademm-2.4\docs\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglademm Reference Manual.lnk" "$INSTDIR\share\doc\gnomemm-2.6\libglademm-2.4\docs\reference\html\index.html"     
@@ -1172,22 +1254,10 @@ Section -Post SecPost
        WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe" "Path" "$INSTDIR\bin"
        Pop $OUTDIR
        
-;  IfFileExists "$INSTDIR\bin\gideon.exe" "" +11
-;       Push $OUTDIR
-;       SetOutPath "$INSTDIR\bin"
-;       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Gideon.lnk" "$INSTDIR\bin\gideon.exe" "" "$INSTDIR\gtkmm.ico"
-;       StrCmp $CONTEXT "1" 0 +4
-;       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe" "" "$INSTDIR\bin\gideon.exe"
-;       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe" "Path" "$INSTDIR\bin"
-;       Goto +3
-;       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe" "" "$INSTDIR\bin\gideon.exe"
-;       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe" "Path" "$INSTDIR\bin"
-;       Pop $OUTDIR
-   
 !endif  ; RUNTIME_ONLY
 
   ; GTKMM_BASEPATH environment variable
-  Push "GTKMM_BASEPATH"
+  Push "GTKMM_BASEPATH" ;
   Push "$INSTDIR"
   Push $CONTEXT
   Call WriteEnvStr
@@ -1223,7 +1293,7 @@ Section Uninstall SecUninstall
 done:
  
   ClearErrors
-  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName"
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "DisplayName"
   IfErrors continue
   StrCpy $CONTEXT "1"
   SetShellVarContext all
@@ -1233,11 +1303,11 @@ done:
   
 continue:
   StrCmp $CONTEXT "1" 0 +4
-  ReadRegStr $INSTDIR HKLM "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Path"
-  ReadRegStr $ICONS_GROUP HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "NSIS:StartMenuDir"
+  ReadRegStr $INSTDIR HKLM "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Path"
+  ReadRegStr $ICONS_GROUP HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "NSIS:StartMenuDir"
   Goto +3
-  ReadRegStr $INSTDIR HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Path"
-  ReadRegStr $ICONS_GROUP HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "NSIS:StartMenuDir"
+  ReadRegStr $INSTDIR HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Path"
+  ReadRegStr $ICONS_GROUP HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" "NSIS:StartMenuDir"
   
   ;Remove shortcut
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
@@ -1260,7 +1330,9 @@ continue:
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libsigc++ Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\glibmm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\pangomm Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\atkmm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\gtkmm Reference Manual.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\Programming with gtkmm.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libglademm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\cairomm Reference Manual.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Documentation\libxml++ Reference Manual.lnk"
@@ -1275,24 +1347,23 @@ continue:
   SetAutoClose true
   
   ; Delete language selection
-  DeleteRegValue HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}" "Installer Language"
-  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}"
-  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_NAME}"
+  DeleteRegValue HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}" "Installer Language"
+  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
+  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_PLATFORM_NAME}"
   
   StrCmp $CONTEXT "1" 0 +8
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe"
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe"
-  DeleteRegKey HKLM "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}"
-  DeleteRegKey /ifempty  HKLM "Software\${PRODUCT_NAME}"
-  ReadRegStr $R0 HKLM "Software\GTK\2.0" "PATH"
+  DeleteRegKey HKLM "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
+  DeleteRegKey /ifempty  HKLM "Software\${PRODUCT_PLATFORM_NAME}"
+  ReadRegStr $R0 HKLM "Software\GTK\2.0" "PATH"; ???
   Goto +7
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe"
-  DeleteRegKey HKCU "Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION}"
-  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_NAME}"
-  ReadRegStr $R0 HKCU "Software\GTK\2.0" "PATH"
+  DeleteRegKey HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
+  DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_PLATFORM_NAME}"
+  ReadRegStr $R0 HKCU "Software\GTK\2.0" "PATH"; ???
   
   ; Remove gtkmm from PATH
   StrCmp $R0 $INSTDIR +4
@@ -1307,6 +1378,7 @@ continue:
 
 !ifndef RUNTIME_ONLY
   ; redist
+  Delete $INSTDIR\redist\libgcc_s_sjlj-1.dll
   Delete $INSTDIR\redist\zlib1.dll
   Delete $INSTDIR\redist\intl.dll
 ;  Delete $INSTDIR\redist\iconv.dll
@@ -1342,8 +1414,8 @@ continue:
   Delete $INSTDIR\redist\libcairomm-1.0-1.dll
   Delete $INSTDIR\redist\libglibmm-2.4-1.dll
   Delete $INSTDIR\redist\libgiomm-2.4-1.dll
-  Delete $INSTDIR\redist\libatkmm-1.6-1.dll
   Delete $INSTDIR\redist\libpangomm-1.4-1.dll
+  Delete $INSTDIR\redist\libatkmm-1.6-1.dll
   Delete $INSTDIR\redist\libgdkmm-2.4-1.dll
   Delete $INSTDIR\redist\libgtkmm-2.4-1.dll
   Delete $INSTDIR\redist\libglademm-2.4-1.dll
@@ -1372,8 +1444,9 @@ continue:
   RMDir /r $INSTDIR\include\libpng14
   RMDIR /r $INSTDIR\include\glib-2.0
   RMDIR /r $INSTDIR\include\cairo
-  RMDIR /r $INSTDIR\include\atk-1.0
   RMDIR /r $INSTDIR\include\pango-1.0
+  RMDIR /r $INSTDIR\include\atk-1.0
+  RMDir /r $INSTDIR\include\gdk-pixbuf-2.0
   RMDIR /r $INSTDIR\include\gtk-2.0
   RMDIR /r $INSTDIR\include\libglade-2.0
   RMDir /r $INSTDIR\include\gail-1.0
@@ -1401,10 +1474,10 @@ continue:
   RMDir /r $INSTDIR\include\cairomm-1.0
   RMDir /r $INSTDIR\include\glibmm-2.4
   RMDir /r $INSTDIR\include\giomm-2.4
+  RMDir /r $INSTDIR\include\pangomm-1.4
   RMDir /r $INSTDIR\include\atkmm-1.6
   RMDir /r $INSTDIR\include\gdkmm-2.4
   RMDir /r $INSTDIR\include\gtkmm-2.4
-  RMDir /r $INSTDIR\include\pangomm-1.4
   RMDir /r $INSTDIR\include\libglademm-2.4
   RMDir /r $INSTDIR\include\libxml++-2.6
 
@@ -1417,6 +1490,7 @@ continue:
   RMDir /r $INSTDIR\lib\sigc++-2.0
   RMDir /r $INSTDIR\lib\glibmm-2.4
   RMDir /r $INSTDIR\lib\giomm-2.4
+  RMDir /r $INSTDIR\lib\atkmm-1.6
   RMDir /r $INSTDIR\lib\pangomm-1.4
   RMDir /r $INSTDIR\lib\gdkmm-2.4
   RMDir /r $INSTDIR\lib\gtkmm-2.4
@@ -1431,7 +1505,7 @@ continue:
   Delete $INSTDIR\lib\libintl.dll.a
 ;  Delete $INSTDIR\lib\libtiff.dll.a
   Delete $INSTDIR\lib\libpng14.dll.a
-  Delete $INSTDIR\lib\libz.a
+  Delete $INSTDIR\lib\libz.dll.a
   Delete $INSTDIR\lib\libfreetype.dll.a
   Delete $INSTDIR\lib\libexpat.dll.a
   Delete $INSTDIR\lib\libfontconfig.dll.a
@@ -1441,11 +1515,11 @@ continue:
   Delete $INSTDIR\lib\libgthread-2.0.dll.a
   Delete $INSTDIR\lib\libgio-2.0.dll.a
   Delete $INSTDIR\lib\libcairo.dll.a
-  Delete $INSTDIR\lib\libatk-1.0.dll.a
   Delete $INSTDIR\lib\libpango-1.0.dll.a
   Delete $INSTDIR\lib\libpangocairo-1.0.dll.a
   Delete $INSTDIR\lib\libpangoft2-1.0.dll.a
   Delete $INSTDIR\lib\libpangowin32-1.0.dll.a
+  Delete $INSTDIR\lib\libatk-1.0.dll.a
   Delete $INSTDIR\lib\libgailutil.dll.a
   Delete $INSTDIR\lib\libgdk-win32-2.0.dll.a
   Delete $INSTDIR\lib\libgdk_pixbuf-2.0.dll.a
@@ -1455,16 +1529,16 @@ continue:
   Delete $INSTDIR\lib\libsigc-*.dll.a
   Delete $INSTDIR\lib\libcairomm-*.dll.a
   Delete $INSTDIR\lib\libglibmm-*.dll.a
-  Delete $INSTDIR\lib\libgiomm-*.dll.a
   Delete $INSTDIR\lib\libglibmm_generate_extra_defs-*.dll.a
+  Delete $INSTDIR\lib\libgiomm-*.dll.a
+  Delete $INSTDIR\lib\libpangomm-*.dll.a
   Delete $INSTDIR\lib\libatkmm-*.dll.a
   Delete $INSTDIR\lib\libgdkmm-*.dll.a
   Delete $INSTDIR\lib\libgtkmm-*.dll.a
-  Delete $INSTDIR\lib\libpangomm-*.dll.a
   Delete $INSTDIR\lib\libglademm-*.dll.a
   Delete $INSTDIR\lib\libxml++-*.dll.a
  
-  Delete $INSTDIR\lib\intl.def
+  Delete $INSTDIR\lib\libintl.def
   Delete $INSTDIR\lib\intl.lib
 ;  Delete $INSTDIR\lib\libtiff.def
 ;  Delete $INSTDIR\lib\libtiff.lib
@@ -1488,8 +1562,6 @@ continue:
   Delete $INSTDIR\lib\gio-2.0.lib
   Delete $INSTDIR\lib\cairo.def
   Delete $INSTDIR\lib\cairo.lib
-  Delete $INSTDIR\lib\atk-1.0.def
-  Delete $INSTDIR\lib\atk-1.0.lib
   Delete $INSTDIR\lib\pango-1.0.def
   Delete $INSTDIR\lib\pango-1.0.lib
   Delete $INSTDIR\lib\pangocairo-1.0.def
@@ -1498,6 +1570,8 @@ continue:
   Delete $INSTDIR\lib\pangoft2-1.0.lib
   Delete $INSTDIR\lib\pangowin32-1.0.def
   Delete $INSTDIR\lib\pangowin32-1.0.lib
+  Delete $INSTDIR\lib\atk-1.0.def
+  Delete $INSTDIR\lib\atk-1.0.lib
   Delete $INSTDIR\lib\gailutil.lib
   Delete $INSTDIR\lib\gdk-win32-2.0.lib
   Delete $INSTDIR\lib\gdk_pixbuf-2.0.lib
@@ -1508,10 +1582,10 @@ continue:
   Delete $INSTDIR\lib\cairomm-*.lib
   Delete $INSTDIR\lib\glibmm-*.lib
   Delete $INSTDIR\lib\giomm-*.lib
+  Delete $INSTDIR\lib\pangomm-*.lib
   Delete $INSTDIR\lib\atkmm-*.lib
   Delete $INSTDIR\lib\gdkmm-*.lib
   Delete $INSTDIR\lib\gtkmm-*.lib
-  Delete $INSTDIR\lib\pangomm-*.lib
   Delete $INSTDIR\lib\glademm-*.lib
   Delete $INSTDIR\lib\xml++-*.lib
 
@@ -1533,11 +1607,11 @@ continue:
   Delete $INSTDIR\lib\pkgconfig\cairo-svg.pc
   Delete $INSTDIR\lib\pkgconfig\cairo-win32.pc
   Delete $INSTDIR\lib\pkgconfig\cairo-win32-font.pc
-  Delete $INSTDIR\lib\pkgconfig\atk.pc
   Delete $INSTDIR\lib\pkgconfig\pango.pc
   Delete $INSTDIR\lib\pkgconfig\pangocairo.pc
   Delete $INSTDIR\lib\pkgconfig\pangoft2.pc
   Delete $INSTDIR\lib\pkgconfig\pangowin32.pc
+  Delete $INSTDIR\lib\pkgconfig\atk.pc
   Delete $INSTDIR\lib\pkgconfig\gdk-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gdk-pixbuf-2.0.pc
   Delete $INSTDIR\lib\pkgconfig\gdk-win32-2.0.pc
@@ -1550,10 +1624,10 @@ continue:
   Delete $INSTDIR\lib\pkgconfig\cairomm-*.pc
   Delete $INSTDIR\lib\pkgconfig\glibmm-*.pc
   Delete $INSTDIR\lib\pkgconfig\giomm-*.pc
+  Delete $INSTDIR\lib\pkgconfig\pangomm-*.pc
   Delete $INSTDIR\lib\pkgconfig\atkmm-*.pc
   Delete $INSTDIR\lib\pkgconfig\gdkmm-*.pc
   Delete $INSTDIR\lib\pkgconfig\gtkmm-*.pc
-  Delete $INSTDIR\lib\pkgconfig\pangomm-*.pc
   Delete $INSTDIR\lib\pkgconfig\libglademm-*.pc
   Delete $INSTDIR\lib\pkgconfig\libxml++-*.pc
   RMDir $INSTDIR\lib\pkgconfig
@@ -1562,9 +1636,9 @@ continue:
 
 ;  RMDir /r $INSTDIR\share\doc\libiconv
 
-  RMDir /r $INSTDIR\share\doc\glib-dev-2.24.0
-  RMDir /r $INSTDIR\share\doc\pango-dev-1.28.0
-  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.20.0
+  RMDir /r $INSTDIR\share\doc\glib-dev-2.26.0
+  RMDir /r $INSTDIR\share\doc\pango-dev-1.28.3
+  RMDir /r $INSTDIR\share\doc\gtk+-dev-2.22.0
 
   RMDir /r $INSTDIR\share\xml\libglade
   RMDir $INSTDIR\share\xml
@@ -1595,6 +1669,7 @@ continue:
   RMDir /r $INSTDIR\share\doc\cairomm-1.0
   RMDir /r $INSTDIR\share\doc\glibmm-2.4
   RMDir /r $INSTDIR\share\doc\pangomm-1.4
+  RMDir /r $INSTDIR\share\doc\atkmm-1.6
   RMDir /r $INSTDIR\share\doc\gtkmm-2.4
   RMDir /r $INSTDIR\share\doc\gnomemm-2.6\libglademm-2.4
   RMDir $INSTDIR\share\doc\gnomemm-2.6
@@ -1602,8 +1677,9 @@ continue:
   RMDir $INSTDIR\share\doc
   
   RMDir /r $INSTDIR\share\devhelp\books\glibmm-2.4
-  RMDir /r $INSTDIR\share\devhelp\books\gtkmm-2.4
+  RMDir /r $INSTDIR\share\devhelp\books\atkmm-1.6
   RMDir /r $INSTDIR\share\devhelp\books\pangomm-1.4
+  RMDir /r $INSTDIR\share\devhelp\books\gtkmm-2.4
   RMDir /r $INSTDIR\share\devhelp\books\libglademm-2.4
   RMDir $INSTDIR\share\devhelp\books
   RMDir $INSTDIR\share\devhelp
@@ -1613,8 +1689,10 @@ continue:
   
   Delete $INSTDIR\MSVC\gtkmm-vc80-2_4.vsprops
   Delete $INSTDIR\MSVC\gtkmm-vc90-2_4.vsprops
+  Delete $INSTDIR\MSVC\gtkmm-vc100-2_4.props
   Delete $INSTDIR\MSVC\gtkmm-vc80-d-2_4.vsprops
   Delete $INSTDIR\MSVC\gtkmm-vc90-d-2_4.vsprops
+  Delete $INSTDIR\MSVC\gtkmm-vc100-d-2_4.props
   Delete $INSTDIR\MSVC\gtkmm-2.4.vsprops
   Delete $INSTDIR\MSVC\gtkmm-2.4d.vsprops
   RMDir $INSTDIR\MSVC
@@ -1628,28 +1706,13 @@ continue:
 
   RMDir $INSTDIR\gtkmm-demo
   
-  ; glade--
-  Delete $INSTDIR\bin\glade--.exe
-  Delete $INSTDIR\bin\glademm-embed.exe
-  
-  ; gideon
-  Delete $INSTDIR\bin\gideon.exe
-  Delete $INSTDIR\bin\libgideon.dll
-  Delete $INSTDIR\bin\libguiloader.dll
-  Delete $INSTDIR\bin\libguiloader-*.dll
-  RMDir /r $INSTDIR\include\gideon
-  RMDir /r $INSTDIR\include\guiloader
-  RMDir /r $INSTDIR\include\guiloader-c++
-  Delete $INSTDIR\lib\libgideon.dll.a
-  Delete $INSTDIR\lib\libguiloader.dll.a
-  Delete $INSTDIR\lib\libguiloader-c++.dll.a
-  
   RMDir $INSTDIR\include
 
 !endif
 
   ; bin
 
+  Delete $INSTDIR\bin\libgcc_s_sjlj-1.dll
   Delete $INSTDIR\bin\zlib1.dll
   Delete $INSTDIR\bin\intl.dll
 ;  Delete $INSTDIR\bin\iconv.dll
@@ -1668,11 +1731,11 @@ continue:
   Delete $INSTDIR\bin\libgthread-2.0-0.dll
   Delete $INSTDIR\bin\libgio-2.0-0.dll
   Delete $INSTDIR\bin\libcairo-2.dll
-  Delete $INSTDIR\bin\libatk-1.0-0.dll
   Delete $INSTDIR\bin\libpango-1.0-0.dll
   Delete $INSTDIR\bin\libpangocairo-1.0-0.dll
   Delete $INSTDIR\bin\libpangoft2-1.0-0.dll
   Delete $INSTDIR\bin\libpangowin32-1.0-0.dll
+  Delete $INSTDIR\bin\libatk-1.0-0.dll
   Delete $INSTDIR\bin\libgailutil-18.dll
   Delete $INSTDIR\bin\libgdk-win32-2.0-0.dll
   Delete $INSTDIR\bin\libgdk_pixbuf-2.0-0.dll
@@ -1683,9 +1746,10 @@ continue:
   Delete $INSTDIR\bin\gtk-update-icon-cache.exe
   Delete $INSTDIR\bin\gtk-demo.exe
 
+  RMDir /r $INSTDIR\lib\gdk-pixbuf-2.0\2.10.0
+  RMDir $INSTDIR\lib\gdk-pixbuf-2.0
   RMDir /r $INSTDIR\lib\gtk-2.0\2.10.0
   RMDir /r $INSTDIR\lib\gtk-2.0\modules
-;  RMDir /r $INSTDIR\lib\gtk-2.0\loaders
   RMDir $INSTDIR\lib\gtk-2.0
   RMDir $INSTDIR\lib
   
@@ -1732,10 +1796,10 @@ continue:
   RMDir $INSTDIR\bin
   
   ; share (non-development files)
-  RMDir /r $INSTDIR\share\doc\glib-2.24.0
-  RMDir /r $INSTDIR\share\doc\cairo_1.8.10-1_win32
-  RMDir /r $INSTDIR\share\doc\pango-1.28.0
-  RMDir /r $INSTDIR\share\doc\gtk+-2.20.0
+  RMDir /r $INSTDIR\share\doc\glib-2.26.0
+  RMDir /r $INSTDIR\share\doc\cairo_1.10.0-1_win32
+  RMDir /r $INSTDIR\share\doc\pango-1.28.3
+  RMDir /r $INSTDIR\share\doc\gtk+-2.22.0
   RMDir $INSTDIR\share\doc
 
   RMdir /r $INSTDIR\share\locale
@@ -1745,7 +1809,7 @@ continue:
   RMDir $INSTDIR\share
 
   ; GTKMM_BASEPATH environment variable
-  Push "GTKMM_BASEPATH"
+  Push "GTKMM_BASEPATH";
   Push $CONTEXT
   Call un.DeleteEnvStr
   
@@ -1767,6 +1831,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecCairommRuntime} "cairomm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGlibmmRuntime} "glibmm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommRuntime} "pangomm Runtime Libraries"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecAtkmmRuntime} "atkmm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmRuntime} "gtkmm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibglademmRuntime} "libglademm Runtime Libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibxmlRuntime} "libxml++ Runtime Libraries"
@@ -1785,6 +1850,8 @@ SectionEnd
 
   !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommDevelopment} "pangomm development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecPangommDocumentation} "pangomm Documentation"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecAtkmmDevelopment} "atkmm development headers and import libraries"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecAtkmmDocumentation} "atkmm Documentation"
 
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmDevelopment} "gtkmm development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGtkmmDocumentation} "gtkmm Documentation"
@@ -1795,8 +1862,6 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibxmlDevelopment} "libxml++ development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecLibxmlDocumentation} "libxml++ Documentation"
   
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecGlademm} "glade-- executable"
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecGideon} "gideon executable"
 !endif
   
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -1812,6 +1877,7 @@ Function EnableGTKInstaller
   !insertmacro UnselectSection ${SecSigcRuntime}
   !insertmacro UnselectSection ${SecCairommRuntime}
   !insertmacro UnselectSection ${SecGlibmmRuntime}
+  !insertmacro UnselectSection ${SecAtkmmRuntime}
   !insertmacro UnselectSection ${SecPangommRuntime}
   !insertmacro UnselectSection ${SecGtkmmRuntime}
   !insertmacro UnselectSection ${SecLibglademmRuntime}
@@ -1833,6 +1899,9 @@ Function EnableGTKInstaller
   !insertmacro UnselectSection ${SecPangommDevelopment}
   !insertmacro UnselectSection ${SecPangommDocumentation}
 
+  !insertmacro UnselectSection ${SecAtkmmDevelopment}
+  !insertmacro UnselectSection ${SecAtkmmDocumentation}
+
   !insertmacro UnselectSection ${SecGtkmmDevelopment}
   !insertmacro UnselectSection ${SecGtkmmDemo}
   !insertmacro UnselectSection ${SecGtkmmDocumentation}
@@ -1843,8 +1912,6 @@ Function EnableGTKInstaller
   !insertmacro UnselectSection ${SecLibxmlDevelopment}
   !insertmacro UnselectSection ${SecLibxmlDocumentation}
   
-;  !insertmacro UnselectSection ${SecGlademm}
-;  !insertmacro UnselectSection ${SecGideon}
 !endif
   
   !insertmacro UnselectSection ${SecPost}
@@ -1860,6 +1927,7 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecCairommRuntime}
   !insertmacro SelectSection ${SecGlibmmRuntime}
   !insertmacro SelectSection ${SecPangommRuntime}
+  !insertmacro SelectSection ${SecAtkmmRuntime}
   !insertmacro SelectSection ${SecGtkmmRuntime}
   !insertmacro SelectSection ${SecLibglademmRuntime}
   !insertmacro SelectSection ${SecLibxmlRuntime}
@@ -1880,6 +1948,9 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecPangommDevelopment}
   !insertmacro SelectSection ${SecPangommDocumentation}
 
+  !insertmacro SelectSection ${SecAtkmmDevelopment}
+  !insertmacro SelectSection ${SecAtkmmDocumentation}
+
   !insertmacro SelectSection ${SecGtkmmDevelopment}
   !insertmacro SelectSection ${SecGtkmmDemo}
   !insertmacro SelectSection ${SecGtkmmDocumentation}
@@ -1890,8 +1961,6 @@ Function DisableGTKInstaller
   !insertmacro SelectSection ${SecLibxmlDevelopment}
   !insertmacro SelectSection ${SecLibxmlDocumentation}
   
-;  !insertmacro SelectSection ${SecGlademm}
-;  !insertmacro SelectSection ${SecGideon}
 !endif
   
   !insertmacro SelectSection ${SecPost}
@@ -1943,9 +2012,9 @@ Function CustomSetTargetDirectory
 
   IfSilent 0 +2
     StrCmp $USE_GTKDIR "1" 0 done
-  ReadRegStr $R0 HKLM Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION} "Path"
+  ReadRegStr $R0 HKLM Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION} "Path"
   StrCmp $R0 "" "" done
-  ReadRegStr $R0 HKCU Software\${PRODUCT_NAME}\${PRODUCT_API_VERSION} "Path"
+  ReadRegStr $R0 HKCU Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION} "Path"
   StrCmp $R0 "" "" done
   ReadRegStr $R0 HKLM "Software\GTK\2.0" "Path"
   StrCmp $R0 "" "" +3
@@ -1962,22 +2031,22 @@ Function CustomPreviousVersion
   ; Get installer location
   ClearErrors
   ReadRegStr $R0 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
   "UninstallString"
   IfErrors 0 +2
   ReadRegStr $R0 HKCU \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
   "UninstallString"
   StrCmp $R0 "" done
 
   ; Get current installed version
   ClearErrors
   ReadRegStr $R1 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
   "DisplayVersion"
   IfErrors 0 +2
   ReadRegStr $R1 HKCU \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
   "DisplayVersion"
 
   ; Extract package and installer versions
@@ -2010,11 +2079,11 @@ Function CustomPreviousVersion
     Delete "$TEMP\$R0"
     ; Check that the user completed the uninstallation by examining the registry
     ReadRegStr $R0 HKLM \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
     "UninstallString"
     IfErrors 0 +2
     ReadRegStr $R0 HKCU \
-    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" \
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}" \
     "UninstallString"
     StrCmp $R0 "" done abortInstall
     
