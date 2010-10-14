@@ -199,8 +199,7 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_VIEWPORT )
             << get_defs( GTK_TYPE_VOLUME_BUTTON )
             << get_defs( GTK_TYPE_WIDGET )
-            << get_defs( GTK_TYPE_WINDOW )
-            << get_defs( GTK_TYPE_WRAP_BOX );
+            << get_defs( GTK_TYPE_WINDOW );
 
 
   return 0;
