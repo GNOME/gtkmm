@@ -206,81 +206,6 @@ void GtkMainConnectionNode::list_notify_all()
 namespace Gtk
 {
 
-/**** Gtk::RunSig **********************************************************/
-
-sigc::connection RunSig::connect(const RunSig::SlotType& slot)
-{
-  GtkMainConnectionNode *const conn_node = new GtkMainConnectionNode(slot);
-  const sigc::connection connection(*conn_node->get_slot());
-
-  // The callback will be invoked the next time gtk_main() is called.
-  gtk_init_add(&RunSig::gtk_callback, conn_node);
-
-  conn_node->install(0, 0, false); // there's no gtk_init_remove()
-  return connection;
-}
-
-// static
-gboolean RunSig::gtk_callback(gpointer data)
-{
-  GtkMainConnectionNode *const conn_node =
-      static_cast<GtkMainConnectionNode*>(data);
-
-  if(GtkMainConnectionNode::list_remove(conn_node))
-  {
-    try
-    {
-      // Recreate the specific SlotType from the generic slot_base.
-      SlotType* pSlot = static_cast<SlotType*>(conn_node->get_slot());
-      (*pSlot)();
-    }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke();
-    }
-
-    // We don't need it anymore, since RunSig is a one-shot signal.
-    GtkMainConnectionNode::destroy_notify_handler(conn_node);
-  }
-
-  return 0;
-}
-
-
-/**** Gtk::QuitSig *********************************************************/
-
-sigc::connection QuitSig::connect(const QuitSig::SlotType& slot, guint main_level)
-{
-  GtkMainConnectionNode *const conn_node = new GtkMainConnectionNode(slot);
-  const sigc::connection connection(*conn_node->get_slot());
-
-  const guint conn_id = gtk_quit_add_full(
-      main_level, &QuitSig::gtk_callback, 0 /* marshaller */,
-      conn_node, &GtkMainConnectionNode::destroy_notify_handler);
-
-  conn_node->install(conn_id, &gtk_quit_remove, true);
-  return connection;
-}
-
-// static
-gboolean QuitSig::gtk_callback(gpointer data)
-{
-  try
-  {
-    // Call the slot:
-    GtkMainConnectionNode* node = static_cast<GtkMainConnectionNode*>(data);
-    SlotType* pSlot = static_cast<SlotType*>(node->get_slot());
-    (*pSlot)();
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-
-  return 0;
-}
-
-
 /**** Gtk::KeySnooperSig ***************************************************/
 
 sigc::connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
@@ -315,8 +240,6 @@ gint KeySnooperSig::gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer
 
 /**** Gtk::Main -- static data *********************************************/
 
-RunSig        Main::signal_run_;
-QuitSig       Main::signal_quit_;
 KeySnooperSig Main::signal_key_snooper_;
 Main*         Main::instance_ = 0;
 
@@ -486,16 +409,6 @@ bool Main::events_pending()
 
 
 /**** Gtk::Main -- static signal accessors *********************************/
-
-RunSig& Main::signal_run()
-{
-  return signal_run_;
-}
-
-QuitSig& Main::signal_quit()
-{
-  return signal_quit_;
-}
 
 KeySnooperSig& Main::signal_key_snooper()
 {

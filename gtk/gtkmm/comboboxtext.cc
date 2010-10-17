@@ -59,10 +59,10 @@ void ComboBoxText::append_text(const Glib::ustring& text)
   }
 }
 
-void ComboBoxText::insert_text(int position, const Glib::ustring& text)
+void ComboBoxText::insert_text(int /* position */, const Glib::ustring& /* text */)
 {
   //TODO: We should not use gtk_combo_box_insert_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
-  gtk_combo_box_insert_text(gobj(), position, text.c_str());
+  //We will reimplement this class anyway as a wrapper of GtkComboBoxText. gtk_combo_box_insert_text(gobj(), position, text.c_str());
 }
 
 void ComboBoxText::prepend_text(const Glib::ustring& text)
