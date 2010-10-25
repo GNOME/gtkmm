@@ -99,7 +99,7 @@ _CONVERSION(`const Rectangle&',`const GdkRectangle*',($3).gobj())
 _CONVERSION(`const Gdk::Rectangle&',`const GdkRectangle*',($3).gobj())
 _CONVERSION(`Font&',`GdkFont*',($3).gobj())
 _CONVERSION(`const Cairo::RefPtr<Cairo::Region>&',`const cairo_region_t*',`(($3) ? ($3)->cobj() : 0)')
-_CONVERSION(`const Cairo::RefPtr<const Cairo::Region>&',`cairo_region_t*',`(($3) ? ($3)->cobj() : 0)')
+_CONVERSION(`const Cairo::RefPtr<const Cairo::Region>&',`cairo_region_t*',`const_cast<cairo_region_t*>(($3) ? ($3)->cobj() : 0)')
 
 _CONVERSION(`const Glib::RefPtr<Gdk::Colormap>&',`GdkColormap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Pixmap>&',`GdkPixmap*',__CONVERT_REFPTR_TO_P)
