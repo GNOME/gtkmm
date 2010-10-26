@@ -56,7 +56,7 @@ void Display::get_device_state(const Glib::RefPtr<Device>& device, int& x, int& 
   gdk_display_get_device_state(gobj(), Glib::unwrap(device), 0, &x, &y, &cMask);
   mask = (ModifierType)cMask;
 }
-   
+
 void Display::get_pointer(Glib::RefPtr<Screen>& screen, int& x, int& y, ModifierType& mask)
 {
   GdkScreen* cScreen = 0;
@@ -96,35 +96,38 @@ Glib::RefPtr<const Window> Display::get_window_at_pointer() const
 
 GdkDisplayPointerHooks*  Display::unset_pointer_hooks()
 {
-  return gdk_display_set_pointer_hooks(gobj(), 0 /* See GDK docs */);  
+  return gdk_display_set_pointer_hooks(gobj(), 0 /* See GDK docs */);
 }
 
- void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_)
- {
-   gdk_display_store_clipboard(gobj(), clipboard_window->gobj(), time_, 0 /* see the C docs */, 0);
- }
-  
- void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_, const Glib::StringArrayHandle& targets)
+GdkDisplayDeviceHooks*  Display::unset_device_hooks()
+{
+  return gdk_display_set_device_hooks(gobj(), 0 /* See GDK docs */);
+}
+
+void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_)
+{
+  gdk_display_store_clipboard(gobj(), clipboard_window->gobj(), time_, 0 /* see the C docs */, 0);
+}
+
+void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_, const Glib::StringArrayHandle& targets)
  {
    //Put it into a real container that we can use:
    std::vector<Glib::ustring> targets_copy = targets;
-   
+
    //Create array of target GdkAtoms from target strings:
    if(!targets_copy.empty())
    {
      GdkAtom* pAtoms = new GdkAtom[targets_copy.size()];
-     
+
      for(guint i = 0; i < targets_copy.size(); ++i)
      {
        *pAtoms = Gdk::AtomString::to_c_type(targets_copy[i]);
      }
- 
+
      gdk_display_store_clipboard(gobj(), clipboard_window->gobj(), time_, 0 /* see the C docs */, 0);
-     
+
      delete[] pAtoms;
    }
  }
 
 } //Gdk
-
-
