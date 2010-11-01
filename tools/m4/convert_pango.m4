@@ -134,7 +134,6 @@ _CONVERSION(`const Glib::RefPtr<Context>&',`PangoContext*',__CONVERT_REFPTR_TO_P
 _CONVERSION(`PangoLayout*',`Glib::RefPtr<Pango::Layout>',Glib::wrap($3))
 _CONVERSION(`PangoLayout*',`Glib::RefPtr<const Pango::Layout>',Glib::wrap($3))
 _CONVERSION(`PangoLayout*',`Glib::RefPtr<Layout>',Glib::wrap($3))
-_CONVERSION(`PangoLayout*',`const Glib::RefPtr<Pango::Layout>&',Glib::wrap($3))
 _CONVERSION(`const Glib::RefPtr<Layout>&',`PangoLayout*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Pango::Layout>&',`PangoLayout*',__CONVERT_REFPTR_TO_P)
 # Special treatment for the Sun Forte compiler
