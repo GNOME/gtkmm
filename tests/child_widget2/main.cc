@@ -9,7 +9,7 @@ private:
   Gtk::VBox vbox;
 };
 
-MyWindow::MyWindow() : 
+MyWindow::MyWindow() :
   b("hello"),
   vbox()
 {
@@ -21,7 +21,7 @@ MyWindow::MyWindow() :
 int main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  
+
   MyWindow window;
   kit.run(window);
 
