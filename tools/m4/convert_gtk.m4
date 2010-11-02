@@ -152,6 +152,7 @@ _CONV_ENUM(Gtk,WrapAllocationMode)
 _CONV_ENUM(Gtk,WrapBoxPacking)
 _CONV_ENUM(Gtk,WrapBoxSpreading)
 _CONV_ENUM(Gtk,SizeRequestMode)
+_CONV_ENUM(Gtk,ScrollablePolicy)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
