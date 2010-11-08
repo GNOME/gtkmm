@@ -83,7 +83,7 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
 void Object::_release_c_instance()
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::_release_c_instance() this=%10X, gobject_=%10X\n", this, gobject_);
+  g_warning("Gtk::Object::_release_c_instance() this=%p, gobject_=%p\n", (void*)(Glib::ObjectBase*)this, (void*)gobject_);
     if(gobject_)
       g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
@@ -141,7 +141,7 @@ void Object::_release_c_instance()
         if (!gobject_disposed_)
         {
           #ifdef GLIBMM_DEBUG_REFCOUNTING
-          g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%10X, gtypename=%s\n", object, G_OBJECT_TYPE_NAME(object));
+          g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p, gtypename=%s\n", (void*)object, G_OBJECT_TYPE_NAME(object));
           #endif
 
           g_assert(G_IS_OBJECT(object));
@@ -153,7 +153,7 @@ void Object::_release_c_instance()
         //It's manag()ed, but the coder decided to delete it before deleting its parent.
         //That should be OK because the Container can respond to that.
         #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%10X\n", gobject_);
+        g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p\n", (void*)gobject_);
         #endif
 
         if (!gobject_disposed_)
@@ -171,7 +171,7 @@ void Object::_release_c_instance()
 Object::~Object()
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::~Object() gobject_=%10X\n", gobject_);
+  g_warning("Gtk::Object::~Object() gobject_=%p\n", (void*)gobject_);
   #endif
 
   //This has probably been called already from Gtk::Object::_destroy(), which is called from derived destructors.
@@ -183,7 +183,7 @@ void Object::disconnect_cpp_wrapper()
   //GTKMM_LIFECYCLE:
 
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::disconnect_cpp_wrapper() this=%10X, gobject_=%10X\n", this, gobject_);
+  g_warning("Gtk::Object::disconnect_cpp_wrapper() this=%p, gobject_=%p\n", (void*)(Glib::ObjectBase*)this, (void*)gobject_);
     if(gobject_)
       g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
@@ -210,7 +210,7 @@ void Object::destroy_notify_()
   //GTKMM_LIFECYCLE
 
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::destroy_notify_: this=%10X, gobject_=%10X\n", this, gobject_);
+  g_warning("Gtk::Object::destroy_notify_: this=%p, gobject_=%p\n", (void*)(Glib::ObjectBase*)this, (void*)gobject_);
   if(gobject_)
     g_warning("  gtypename=%s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
@@ -245,7 +245,7 @@ void Object::destroy_()
   //GTKMM_LIFECYCLE
 
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Object::destroy_(): gobject_: %10X\n", gobject_);
+  g_warning("Gtk::Object::destroy_(): gobject_: %p\n", (void*)gobject_);
   if(gobject_)
    g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
