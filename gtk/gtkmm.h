@@ -142,6 +142,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontbutton.h>
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/grid.h>
 //#include <gtkmm/rc.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/iconset.h>
