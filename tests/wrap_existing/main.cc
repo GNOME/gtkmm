@@ -23,7 +23,7 @@ int main(int argc, char**argv)
   Gtk::Main app(&argc, &argv);
 
   Gtk::Dialog* pDialog = new Gtk::Dialog();
-  Gtk::VBox* pBox = pDialog->get_vbox();
+  Gtk::Box* pBox = pDialog->get_vbox();
 
   //Set a quark and a callback:
   initialize_quark();
