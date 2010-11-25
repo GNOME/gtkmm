@@ -21,6 +21,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm/comboboxentry.h>
 
 namespace Gtk
@@ -29,13 +31,16 @@ namespace Gtk
 //This is a C++ convenience class that is equivalent to the gtk_combo_box_entry_new_text() C convenience function.
 //This is copy/paste/search/replaced from ComboBoxText, but the only alternative I see is to use multiple inheritance.
 //murrayc.
+//In gtkmm-3.0 we simply wrap GtkComboBoxText, which is also in GTK+ 2.24.
+//But this C++ class was created before GtkComboBoxText existed and we want to avoid changing the ABI. 
 
 /** This is a specialisation of the ComboBoxEntry which has one column of text (a simple list),
  * and appropriate methods for setting and getting the text.
  *
+ * @deprecated Instead use ComboBoxText with has_entry = true.
+ *
  * @ingroup Widgets
  */
-
 class ComboBoxEntryText
 : public ComboBoxEntry
 {
@@ -66,7 +71,6 @@ public:
    */
   void prepend_text(const Glib::ustring& text);
 
-#ifndef GTKMM_DISABLE_DEPRECATED
   //@deprecated Use get_entry()->get_text() to get the actual entered text.
   Glib::ustring get_active_text() const;
 
@@ -77,7 +81,6 @@ public:
   //TODO: Remove this when we can break API.
   /// @deprecated See clear_items(). Since 2.8.
   void clear();
-#endif //GTKMM_DISABLE_DEPRECATED
 
   /** Remove all items from the drop-down menu.
    */
@@ -107,6 +110,7 @@ protected:
 
 } // namespace Gtk
 
+#endif //GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_COMBOBOXENTRYTEXT_H */
 

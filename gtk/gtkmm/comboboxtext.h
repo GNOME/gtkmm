@@ -40,7 +40,6 @@ namespace Gtk
  *
  * @ingroup Widgets
  */
-
 class ComboBoxText
 : public ComboBox
 {
@@ -57,7 +56,15 @@ protected:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
+
+  /** Creates a new empty ComboBoxText, without an entry.
+   */
   ComboBoxText();
+  
+  /** Creates a new empty ComboBoxText, optionally with an entry.
+   * @param has_entry If this is true then this will have an Entry widget.
+   */
+  explicit ComboBoxText(bool has_entry); //In gtkmm 3.0 has_entry has a default value but we already have a default constructor here.
 
   /** Add an item to the end of the drop-down list.
    * @param text The text for the item.

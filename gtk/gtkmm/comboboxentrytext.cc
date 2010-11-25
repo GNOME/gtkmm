@@ -20,11 +20,17 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm/comboboxentrytext.h>
 
 #include <gtkmm/liststore.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtk/gtk.h>
+
+//Allow us to use deprecated GTK+ API.
+//This whole C++ class is deprecated anyway.
+#undef GTK_DISABLE_DEPRECATED
 
 namespace Gtk
 {
@@ -112,7 +118,6 @@ void ComboBoxEntryText::remove_text(const Glib::ustring& text)
   }
 }
 
-#ifndef GTKMM_DISABLE_DEPRECATED
 Glib::ustring ComboBoxEntryText::get_active_text() const
 {
   Glib::ustring result;
@@ -155,8 +160,8 @@ void ComboBoxEntryText::clear()
 {
   clear_items();
 }
-#endif //GTKMM_DISABLE_DEPRECATED
 
+#endif //GTKMM_DISABLE_DEPRECATED
 
 } // namespace Gtk
 
