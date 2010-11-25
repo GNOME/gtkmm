@@ -27,6 +27,8 @@ namespace Gtk
 {
 
 //This is a C++ convenience class that is equivalent to the gtk_combo_box_new_text() C convenience function.
+//In gtkmm-3.0 we simply wrap GtkComboBoxText, which is also in GTK+ 2.24.
+//But this C++ class was created before GtkComboBoxText existed and we want to avoid changing the ABI. 
 
 /** This is a specialisation of the ComboBox which has one column of text (a simple list),
  * and appropriate methods for setting and getting the text.
