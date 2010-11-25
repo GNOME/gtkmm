@@ -22,15 +22,17 @@
 
 #ifndef GTKMM_DISABLE_DEPRECATED
 
+
+//Allow us to use deprecated GTK+ API.
+//This whole C++ class is deprecated anyway.
+#undef GTK_DISABLE_DEPRECATED
+
 #include <gtkmm/comboboxentrytext.h>
 
 #include <gtkmm/liststore.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtk/gtk.h>
 
-//Allow us to use deprecated GTK+ API.
-//This whole C++ class is deprecated anyway.
-#undef GTK_DISABLE_DEPRECATED
 
 namespace Gtk
 {

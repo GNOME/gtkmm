@@ -20,6 +20,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+
+//Allow us to use deprecated GTK+ API.
+//This whole C++ class is deprecated anyway.
+#undef GTK_DISABLE_DEPRECATED
+
 #include <gtkmm/comboboxtext.h>
 
 #include <gtkmm/liststore.h>
