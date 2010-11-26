@@ -56,7 +56,9 @@ TargetEntry::TargetEntry(const TargetEntry& src)
 
 TargetEntry::~TargetEntry()
 {
-  g_free(gobject_.target);
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=565665#c10 about the 
+  //const_cast<>.
+  g_free(const_cast<char*>(gobject_.target));
 }
 
 TargetEntry& TargetEntry::operator=(const TargetEntry& src)
