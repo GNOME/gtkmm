@@ -201,7 +201,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/recentfilter.h>
 #include <gtkmm/recentinfo.h>
 #include <gtkmm/recentmanager.h>
-#include <gtkmm/ruler.h>
 #include <gtkmm/scale.h>
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/scrolledwindow.h>
