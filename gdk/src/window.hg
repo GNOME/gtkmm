@@ -23,6 +23,8 @@ _CONFIGINCLUDE(gdkmmconfig.h)
 #include <cairomm/region.h>
 #include <cairomm/pattern.h>
 #include <gdkmm/visual.h>
+#include <gdkmm/rgba.h>
+#include <cairomm/context.h>
 #include <gdk/gdk.h>
 
 _DEFS(gdkmm,gdk)
@@ -148,9 +150,10 @@ public:
   _WRAP_METHOD(void set_startup_id(const Glib::ustring& startup_id), gdk_window_set_startup_id)
   _WRAP_METHOD(void set_transient_for(const Glib::RefPtr<Window>& parent), gdk_window_set_transient_for)
   _WRAP_METHOD(void set_background(const Color& color), gdk_window_set_background)
-  
+  _WRAP_METHOD(void set_background(const RGBA& color), gdk_window_set_background_rgba)
+
 #m4 _CONVERSION(`const Cairo::RefPtr<Cairo::Pattern>&',`cairo_pattern_t*',`($3)->cobj()')
-  _WRAP_METHOD(void set_background_pattern(const Cairo::RefPtr<Cairo::Pattern>& pattern), gdk_window_set_background_pattern)
+  _WRAP_METHOD(void set_background(const Cairo::RefPtr<Cairo::Pattern>& pattern), gdk_window_set_background_pattern)
 
   #m4 _CONVERSION(`cairo_pattern_t*',`Cairo::RefPtr<Cairo::Pattern>',`Cairo::RefPtr<Cairo::Pattern>(new Cairo::Pattern($3, false /* take reference */))')
   _WRAP_METHOD(Cairo::RefPtr<Cairo::Pattern> get_background_pattern(), gdk_window_get_background_pattern)
@@ -339,6 +342,17 @@ public:
 
   _WRAP_METHOD(void set_support_multidevice(bool support_multidevice = true), gdk_window_set_support_multidevice)
   _WRAP_METHOD(bool get_support_multidevice(), gdk_window_get_support_multidevice)
+
+   #m4 _CONVERSION(`cairo_region_t*',`Cairo::RefPtr<Cairo::Region>',`Cairo::RefPtr<Cairo::Region>(new Cairo::Region($3, true /* do not take ref */))')
+
+  //This is const because it returns a copy (though that is not very clear from the C documentation)
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_clip_region() const, gdk_window_get_clip_region)
+
+  //This is const because it returns a copy (though that is not very clear from the C documentation)
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Region> get_visible_region() const, gdk_window_get_visible_region)
+
+  #m4 _CONVERSION(`cairo_t*',`Cairo::RefPtr<Cairo::Context>',`Cairo::RefPtr<Cairo::Context>(new Cairo::Context($3, true /* has_reference */))')
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> create_cairo_context(), gdk_cairo_create)
 
   //TODO: Wrap these? Find out when they are emitted and if they are useful outside of GTK+, and improve the C docs.
   //_WRAP_SIGNAL(Glib::RefPtr<Gdk::Window> pick_embedded_child(double x, double y), pick-embedded-child, no_default_handler)

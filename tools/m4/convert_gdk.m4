@@ -91,6 +91,8 @@ _CONVERSION(`GdkColor',`Gdk::Color', `Gdk::Color(const_cast<GdkColor*>(&($3)), t
 # Ref (gdkmm) -> Ptr (gtk+)
 _CONVERSION(`Color&',`GdkColor*',($3).gobj())
 _CONVERSION(`const Gdk::Color&',`const GdkColor*',`($3).gobj()')
+_CONVERSION(`const RGBA&',`const GdkRGBA*',`($3).gobj()')
+_CONVERSION(`const RGBA&',`GdkRGBA*',`const_cast<RGBA&>($3).gobj()')
 _CONVERSION(`const Gdk::RGBA&',`const GdkRGBA*',`($3).gobj()')
 _CONVERSION(`const Color&',`const GdkColor*',`($3).gobj()')
 _CONVERSION(`const Cursor&',`GdkCursor*',const_cast<GdkCursor*>(($3).gobj()))
