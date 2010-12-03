@@ -153,7 +153,7 @@ Gtk::ComboBoxText* Example_SizeGroup::create_combobox(const std::list<Glib::ustr
 
   for(type_listStrings::const_iterator iter = strings.begin(); iter != strings.end(); iter++)
   {
-    pCombo->append_text(*iter);
+    pCombo->append(*iter);
   }
 
   return pCombo;

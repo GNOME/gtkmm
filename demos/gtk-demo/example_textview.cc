@@ -381,9 +381,9 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     else if (i == 1)
     {
       Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
-      pCombo->append_text("Option 1");
-      pCombo->append_text("Option 2");
-      pCombo->append_text("Option 3");
+      pCombo->append("Option 1");
+      pCombo->append("Option 2");
+      pCombo->append("Option 3");
 
       pWidget = pCombo;
     }
