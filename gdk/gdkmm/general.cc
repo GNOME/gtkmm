@@ -19,6 +19,7 @@
  */
 
 #include <gdkmm/general.h>
+#include <gdkmm/color.h>
 #include <gdk/gdk.h>
 
 namespace Gdk

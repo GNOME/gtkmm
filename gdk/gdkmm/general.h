@@ -21,6 +21,7 @@
 #define _GDKMM_GENERAL_H
 
 #include <gdkmm/pixbuf.h>
+#include <gdkmm/color.h>
 #include <cairomm/context.h>
 #include <cairomm/region.h>
 

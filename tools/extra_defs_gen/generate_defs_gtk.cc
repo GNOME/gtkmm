@@ -41,7 +41,6 @@ int main(int argc, char** argv)
 #if !defined(G_OS_WIN32)
             << get_defs( GDK_TYPE_DISPLAY_MANAGER )
 #endif /* G_OS_WIN32 */
-            << get_defs( GDK_TYPE_DRAWABLE )
             << get_defs( GDK_TYPE_PIXBUF )
             << get_defs( GDK_TYPE_PIXBUF_ANIMATION )
             << get_defs( GDK_TYPE_PIXBUF_LOADER )

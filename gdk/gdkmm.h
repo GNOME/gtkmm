@@ -26,7 +26,6 @@
 
 #include <gdkmm/types.h>
 #include <gdkmm/visual.h>
-#include <gdkmm/drawable.h>
 #include <gdkmm/window.h>
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/pixbufanimation.h>
