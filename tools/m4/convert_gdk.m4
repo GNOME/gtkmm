@@ -182,10 +182,10 @@ _CONVERSION(`const Glib::RefPtr<const GC>&', `GdkGC*',__CONVERT_CONST_REFPTR_TO_
 #_CONVERSION(`const Glib::RefPtr<const Display>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
 
 
-_CONVERSION(`GdkWindow*',`Glib::RefPtr<Window>', `Glib::wrap((GdkWindowObject*)($3))')
-_CONVERSION(`GdkWindow*',`Glib::RefPtr<const Window>', `Glib::wrap((GdkWindowObject*)($3))')
-_CONVERSION(`GdkWindow*',`Glib::RefPtr<Gdk::Window>', `Glib::wrap((GdkWindowObject*)($3))')
-_CONVERSION(`GdkWindow*',`Glib::RefPtr<const Gdk::Window>', `Glib::wrap((GdkWindowObject*)($3))')
+_CONVERSION(`GdkWindow*',`Glib::RefPtr<Window>', `Glib::wrap($3)')
+_CONVERSION(`GdkWindow*',`Glib::RefPtr<const Window>', `Glib::wrap($3)')
+_CONVERSION(`GdkWindow*',`Glib::RefPtr<Gdk::Window>', `Glib::wrap($3)')
+_CONVERSION(`GdkWindow*',`Glib::RefPtr<const Gdk::Window>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
