@@ -92,6 +92,8 @@ _CONVERSION(`GdkColor',`Gdk::Color', `Gdk::Color(const_cast<GdkColor*>(&($3)), t
 _CONVERSION(`Color&',`GdkColor*',($3).gobj())
 _CONVERSION(`const Gdk::Color&',`const GdkColor*',`($3).gobj()')
 _CONVERSION(`const RGBA&',`const GdkRGBA*',`($3).gobj()')
+_CONVERSION(`RGBA&',`GdkRGBA*',`($3).gobj()')
+_CONVERSION(`Gdk::RGBA&',`GdkRGBA*',`($3).gobj()')
 _CONVERSION(`const RGBA&',`GdkRGBA*',`const_cast<RGBA&>($3).gobj()')
 _CONVERSION(`const Gdk::RGBA&',`const GdkRGBA*',`($3).gobj()')
 _CONVERSION(`const Color&',`const GdkColor*',`($3).gobj()')

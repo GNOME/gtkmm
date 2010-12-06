@@ -152,6 +152,9 @@ _CONV_ENUM(Gtk,WrapBoxPacking)
 _CONV_ENUM(Gtk,WrapBoxSpreading)
 _CONV_ENUM(Gtk,SizeRequestMode)
 _CONV_ENUM(Gtk,ScrollablePolicy)
+_CONV_ENUM(Gtk,RegionFlags)
+_CONV_ENUM(Gtk,JunctionSides)
+_CONV_ENUM(Gtk,StateFlags)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -167,6 +170,7 @@ _CONVERSION(`SortType&',`GtkSortType*',`(($2) &($3))')
 _CONVERSION(`SortType*',`GtkSortType*',`(($2) ($3))')
 _CONVERSION(`GtkSortType*',`SortType*',`(($2) ($3))')
 _CONVERSION(`guint8',`Gtk::StateType',`static_cast<StateType>($3)')
+_CONVERSION(`RegionFlags&',`GtkRegionFlags*',`(($2) &($3))')
 
 
 
@@ -542,6 +546,7 @@ _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
 _CONVERSION(`Gtk::Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`GtkBorder*',`Gtk::Border&',`Glib::wrap($3)')
 _CONVERSION(`const Border&',`const GtkBorder*',__FR2P)
+_CONVERSION(`Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))')
 
 #RecentFilter

@@ -19,80 +19,10 @@
  */
 
 #include <gtkmm/widget.h>
-#include <gtkmm/rc.h>
 #include <gtk/gtk.h>
 
 
 namespace Gtk
 {
-
-/*
-Design notes:
-
-Okay these are my notes on how a GtkStyle works.
-They are not meant to be taken as documentation as I didn't
-write the code.
-
-styles keeps a copy of itself for each color depth.  Thus
-changing a style after it has been attached wont work!
-
-At allocation time a Gtk Style has
-  - all GC set to 0 as they will be allocated later
-  - has all color values set to default values.
-  - a ref count of 1 and an attach count of 0 (floating?)
-  - a properly referenced font.
-  - colormap and depth are invalid.
-  - The style list and rcstyle are 0. (??? styles wasn't set explicitly!)
-
-It returns to this state if the style is detatched from
-all widgets.
-
-Attach acts to sink the object removing it from the floating state.
-
-attaching a style for the first time initializes it.
-Initializing a style
-  - sets the colormap and depth.
-  - sets the mid colors. (thus allowing user to set these would be pointless)
-  - gets black and white from the colormap.
-  - allocates all the colors.
-  - uses gtk_gc_get to share a gc if there is a matching one.
-
-Conclusions, we need to rework the concept of Gdk to allow
-for const objects.
-
-*/
-
-void Style::set_font(const Pango::FontDescription& font_desc)
-{
-  g_return_if_fail(font_desc.gobj() != 0);
-
-  // It will be freed when it goes out of scope.
-  const Pango::FontDescription fontBefore (gobj()->font_desc, false);
-
-  gobj()->font_desc = font_desc.gobj_copy();
-}
-
-Pango::FontDescription Style::get_font() const
-{
-  // Direct struct access seems the only way.
-  return Pango::FontDescription(gobj()->font_desc, true); // true = make a copy.
-}
-
-void Style::set_xthickness(int xthickness)
-{
-  gobj()->xthickness = xthickness;
-}
-
-void Style::set_ythickness(int ythickness)
-{
-  gobj()->ythickness = ythickness;
-}
-
-IconSet Style::lookup_icon_set(const Gtk::StockID& stock_id)
-{
-  GtkIconSet* pIconSet = gtk_style_lookup_icon_set(gobj(), stock_id.get_c_str());
-  return IconSet(pIconSet, true); //true = take_copy.
-
-}
 
 } // namespace Gtk

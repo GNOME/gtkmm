@@ -1,6 +1,4 @@
-/* $Id: style.hg,v 1.11 2006/11/23 14:47:48 murrayc Exp $ */
-
-/* Copyright (C) 1998-2002 The gtkmm Development Team
+/* Copyright (C) 2010 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,39 +15,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-// This is for including the config header before any code (such as
-// the #ifndef GTKMM_DISABLE_DEPRECATED in deprecated classes) is generated:
-_CONFIGINCLUDE(gtkmmconfig.h)
-
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gtk/gtk.h)
-#m4begin
 
-m4_define(`_STYLE_MEMBER_COLOR',`dnl
-void set_$1(Gtk::StateType state, const Gdk::Color& color);
-  Gdk::Color get_$1(Gtk::StateType state) const;
-_PUSH(SECTION_CC)
-void Style::set_$1(StateType state, const Gdk::Color& color)
-{
-  gobj()->$1[state] = *color.gobj();
-}
-
-Gdk::Color Style::get_$1(StateType state) const
-{
-  return Gdk::Color(const_cast<GdkColor*>(&gobj()->$1[state]), true);
-}
-
-_POP()
-')dnl
-
-#m4end
-
-#include <pangomm/fontdescription.h>
-#include <pangomm/layout.h>
-
-#include <gdkmm/types.h>
+#include <gtkmm/enums.h>
 #include <gdkmm/window.h>
+#include <gdkmm/screen.h>
 
 #include <gtkmm/enums.h>
 #include <gtkmm/iconsource.h>
@@ -60,467 +32,111 @@ _POP()
 namespace Gtk
 {
 
-class Widget;
-class RcStyle;
-
-
-class Style : public Glib::Object
+class StyleContext : public Glib::Object
 {
-  _CLASS_GOBJECT(Style, GtkStyle, GTK_STYLE, Glib::Object, GObject)
-  _IGNORE(gtk_style_ref, gtk_style_unref, gtk_style_get_font, gtk_style_set_font)
-
+  _CLASS_GOBJECT(StyleContext, GtkStyleContext, GTK_STYLE_CONTEXT, Glib::Object, GObject)
 protected:
   _CTOR_DEFAULT()
 
 public:
   _WRAP_CREATE()
-  _IGNORE(gtk_style_new)
+  _IGNORE(gtk_style_context_new)
+  
+  _WRAP_METHOD(static void add_provider_for_screen(const Glib::RefPtr<Gdk::Screen>& screen, GtkStyleProvider *provider, guint priority), gtk_style_context_add_provider_for_screen)
+  _WRAP_METHOD(static void remove_provider_for_screen(const Glib::RefPtr<Gdk::Screen>& screen, GtkStyleProvider *provider), gtk_style_context_remove_provider_for_screen)
 
-  _STYLE_MEMBER_COLOR(fg)
-  _STYLE_MEMBER_COLOR(bg)
-  _STYLE_MEMBER_COLOR(light)
-  _STYLE_MEMBER_COLOR(dark)
-  _STYLE_MEMBER_COLOR(mid)
-  _STYLE_MEMBER_COLOR(text)
-  _STYLE_MEMBER_COLOR(base)
-  _STYLE_MEMBER_COLOR(text_aa)
+  _WRAP_METHOD(void add_provider(GtkStyleProvider *provider, guint priority), gtk_style_context_add_provider)
 
-  _MEMBER_SET(black, black, Gdk::Color, GdkColor)
-  _MEMBER_GET(black, black, Gdk::Color, GdkColor)
-  _MEMBER_SET(white, white, Gdk::Color, GdkColor)
-  _MEMBER_GET(white, white, Gdk::Color, GdkColor)
+  _WRAP_METHOD(void remove_provider(GtkStyleProvider *provider), gtk_style_context_remove_provider)
 
-  void set_font(const Pango::FontDescription& font_desc);
+  _WRAP_METHOD(void context_save(), gtk_style_context_save)
+  _WRAP_METHOD(void context_restore(), gtk_style_context_restore)
 
-  // These are only available after being attached to a window.
-  Pango::FontDescription get_font() const;
+/* TODO:
+  _WRAP_METHOD(void get_property (
+                                     const Glib::ustring& property,
+                                     StateFlags    state,
+                                     GValue          *value), tk_style_context_get_property)
+  _WRAP_METHOD(void get_valist   (
+                                     StateFlags    state,
+                                     va_list          args), gtk_style_context_get_valist)
+  _WRAP_METHOD(void get          (
+                                     StateFlags    state,
+                                     ...) G_GNUC_NULL_TERMINATED;
+*/
 
-  void set_xthickness(int xthickness);
-  _MEMBER_GET(xthickness, xthickness, int, gint)
+  _WRAP_METHOD(void set_state(StateFlags flags), gtk_style_context_set_state)
+  _WRAP_METHOD(StateFlags get_state() const, gtk_style_context_get_state)
 
-  void set_ythickness(int ythickness);
-  _MEMBER_GET(ythickness, ythickness, int, gint)
+  _WRAP_METHOD(bool state_is_running(GtkStateType state, gdouble* progress), gtk_style_context_state_is_running)
 
-  _WRAP_METHOD(void paint_arrow(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  ArrowType                         arrow_type,
-                  bool                              fill,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_arrow)
+  _WRAP_METHOD(void set_path(GtkWidgetPath   *path), gtk_style_context_set_path)
+  _WRAP_METHOD(const GtkWidgetPath* get_path(), gtk_style_context_get_path)
 
-  _WRAP_METHOD(void paint_box(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_box)
+  //TODO: _WRAP_METHOD(GList * list_classes (), gtk_style_context_list_classes)
 
-  _WRAP_METHOD(void paint_box_gap(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height,
-                  PositionType                      gap_side,
-                  int                               gap_x,
-                  int                               gap_width) const, gtk_paint_box_gap)
+  _WRAP_METHOD(void add_class(const Glib::ustring& class_name), gtk_style_context_add_class)
+  _WRAP_METHOD(void remove_class(const Glib::ustring& class_name), gtk_style_context_remove_class)
+  _WRAP_METHOD(bool has_class(const Glib::ustring& class_name), gtk_style_context_has_class)
 
-  _WRAP_METHOD(void paint_check(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_check)
+  _WRAP_METHOD(GList* list_regions (), gtk_style_context_list_regions)
 
-  _WRAP_METHOD(void paint_diamond(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_diamond)
+  _WRAP_METHOD(void add_region(const Glib::ustring& region_name, RegionFlags flags), gtk_style_context_add_region)
+  _WRAP_METHOD(void remove_region(const Glib::ustring& region_name), gtk_style_context_remove_region)
+  _WRAP_METHOD(bool has_region(const Glib::ustring& region_name, RegionFlags& flags_return), gtk_style_context_has_region)
+/*
+  _WRAP_METHOD(void get_style_property (
+                                           const Glib::ustring& property_name,
+                                           GValue          *value), gtk_style_context_get_style_property)
+  _WRAP_METHOD(void get_style_valist   (
+                                           va_list          args), gtk_style_context_get_style_valis)
+  _WRAP_METHOD(void get_style          (
+                                           ...), gtk_style_context_get_style)
+*/
 
-  _WRAP_METHOD(void paint_extension(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height,
-                  PositionType                      gap_side) const, gtk_paint_extension)
+  _WRAP_METHOD(GtkIconSet* lookup_icon_set(const Glib::ustring& stock_id), gtk_style_context_lookup_icon_set)
 
-  _WRAP_METHOD(void paint_flat_box(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_flat_box)
+/* TODO: Move this to Iconset?
+  _WRAP_METHOD(GdkPixbuf  * gtk_icon_set_render_icon_pixbuf   (GtkIconSet      *icon_set,
+                                                GtkStyleContext *context,
+                                                GtkIconSize      size), gtk_icon_set_render_icon_pixbuf)
+*/
 
-  _WRAP_METHOD(void paint_focus(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_focus)
+  _WRAP_METHOD(void set_screen(const Glib::RefPtr<Gdk::Screen>& screen), gtk_style_context_set_screen)
+                                          
+  //TODO: _WRAP_METHOD(Glib::RefPtr<Gdk::Screen> get_screen(), gtk_style_context_get_screen, refreturn)
+  //TODO: _WRAP_METHOD(Glib::RefPtr<const Gdk::Screen> get_screen() const , gtk_style_context_get_screen, refreturn, constversion)
 
-  _WRAP_METHOD(void paint_handle(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height,
-                  Orientation                       orientation) const, gtk_paint_handle)
+  _WRAP_METHOD(void set_direction(TextDirection direction), gtk_style_context_set_direction)
+  _WRAP_METHOD(TextDirection get_direction() const, gtk_style_context_get_direction)
 
-  _WRAP_METHOD(void paint_hline(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x1,
-                  int                               x2,
-                  int                               y) const, gtk_paint_hline)
+  _WRAP_METHOD(void set_junction_sides(JunctionSides sides), gtk_style_context_set_junction_sides)
+  _WRAP_METHOD(JunctionSides get_junction_sides() const, gtk_style_context_get_junction_sides)
 
-  _WRAP_METHOD(void paint_option(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_option)
+  _WRAP_METHOD(bool lookup_color(const Glib::ustring& color_name, Gdk::RGBA& color), gtk_style_context_lookup_color)
 
-  _WRAP_METHOD(void paint_shadow(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_shadow)
+  _WRAP_METHOD(void notify_state_change(const Glib::RefPtr<Gdk::Window>& window, gpointer region_id, GtkStateType state, bool state_value), gtk_style_context_notify_state_change)
+  _WRAP_METHOD(void push_animatable_region(gpointer region_id), gtk_style_context_push_animatable_region)
+  _WRAP_METHOD(void pop_animatable_region(), gtk_style_context_pop_animatable_region)
 
-  _WRAP_METHOD(void paint_shadow_gap(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height,
-                  PositionType                      gap_side,
-                  int                               gap_x,
-                  int                               gap_width) const, gtk_paint_shadow_gap)
+/* Some helper functions to retrieve most common properties */
+  _WRAP_METHOD(void get_color(StateFlags state, Gdk::RGBA& color) const, gtk_style_context_get_color)
+  _WRAP_METHOD(void get_background_color(StateFlags state, Gdk::RGBA& color) const, gtk_style_context_get_background_color)
+  _WRAP_METHOD(void get_border_color(StateFlags state, Gdk::RGBA& color) const, gtk_style_context_get_border_color)
 
-  _WRAP_METHOD(void paint_slider(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height,
-                  Orientation                       orientation) const, gtk_paint_slider)
+  _WRAP_METHOD(void get_border(StateFlags state, Border& border) const, gtk_style_context_get_border)
+  _WRAP_METHOD(void get_padding(StateFlags state, Border& padding) const, gtk_style_context_get_padding)
+  _WRAP_METHOD(void get_margin (StateFlags state, Border& margin) const, gtk_style_context_get_margin)
 
-  _WRAP_METHOD(void paint_tab(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  ShadowType                        shadow_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_tab)
+  _WRAP_METHOD(void invalidate(), gtk_style_context_invalidate)
+  //TODO: _WRAP_METHOD(void reset_widgets(const Glib::RefPtr<Gdk::Screen>& screen), gtk_style_context_reset_widgets)
 
+  _WRAP_METHOD(void set_background(const Glib::RefPtr<Gdk::Window>& window), gtk_style_context_set_background)
+  
+  _WRAP_SIGNAL(void changed(), "changed")
 
-  _WRAP_METHOD(void paint_vline(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               y1,
-                  int                               y2,
-                  int                               x) const, gtk_paint_vline)
-
-  _WRAP_METHOD(void paint_expander(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  int                               x,
-                  int                               y,
-                  ExpanderStyle                     expander_style) const, gtk_paint_expander)
-
-  _WRAP_METHOD(void paint_layout(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                      state_type,
-                  bool                                use_text,
-                  Widget&                             widget,
-                  const Glib::ustring&                detail,
-                  int                                 x,
-                  int                                 y,
-                  const Glib::RefPtr<Pango::Layout>&  layout) const, gtk_paint_layout)
-
-  _WRAP_METHOD(void paint_resize_grip(
-                  const Cairo::RefPtr<Cairo::Context>& cr,
-                  Gtk::StateType                    state_type,
-                  Widget&                           widget,
-                  const Glib::ustring&              detail,
-                  Gdk::WindowEdge                   edge,
-                  int                               x,
-                  int                               y,
-                  int                               width,
-                  int                               height) const, gtk_paint_resize_grip)
-
-
-  _WRAP_METHOD(Glib::RefPtr<Style> copy(), gtk_style_copy, deprecated "Use the const version")
-  _WRAP_METHOD(Glib::RefPtr<Style> copy() const, gtk_style_copy)
-
-  _WRAP_METHOD(Glib::RefPtr<Style> attach(const Glib::RefPtr<Gdk::Window>& window), gtk_style_attach)
-  _WRAP_METHOD(void detach(), gtk_style_detach)
-
-  _WRAP_METHOD(void set_background(const Glib::RefPtr<Gdk::Window>& window, Gtk::StateType state_type), gtk_style_set_background)
-
-  _WRAP_METHOD(void apply_default_background(const Cairo::RefPtr<Cairo::Context>& cr,
-                const Glib::RefPtr<Gdk::Window>& window,
-	              Gtk::StateType state_type,
-	              int x, int y, int width, int height), gtk_style_apply_default_background)
-
-  _WRAP_METHOD_DOCS_ONLY(gtk_style_lookup_icon_set)
-  IconSet lookup_icon_set(const Gtk::StockID& stock_id);
-
-  _CONVERSION(`Gdk::Color&',`GdkColor*',`($3).gobj()')
-  _WRAP_METHOD(bool lookup_color(const Glib::ustring& color_name, Gdk::Color& color) const, gtk_style_lookup_color)
-
-
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> render_icon(const IconSource& source,
-                                       Gtk::TextDirection direction, Gtk::StateType state, Gtk::IconSize size,
-                                       Gtk::Widget& widget, const Glib::ustring& detail), gtk_style_render_icon)
-
-  _IGNORE(gtk_style_get, gtk_style_get_valist)
-  _WRAP_METHOD(void get_style_property_value(GType widget_type, const Glib::ustring& property_name, Glib::ValueBase& value), gtk_style_get_style_property)
-
-  /** Queries the value of a style property corresponding to a
-   * widget class in the given style.
-   *
-   * @param widget_type the GType of a descendant of GtkWidget.
-   * @param property_name The name of the style property to get.
-   * @param value: An output parameter in which  the value of the property being queried will be stored.
-   *
-   * @newin{2,16}
-   */
-  template <class PropertyType>
-  void get_style_property(GType widget_type, const Glib::ustring& property_name, PropertyType& value) const;
-
-
-protected:
-  _WRAP_VFUNC(void realize(), realize)
-  _WRAP_VFUNC(void unrealize(), unrealize)
-
-#m4 _CONVERSION(`GtkStyle*',`const Glib::RefPtr<Style>&',`Glib::wrap($3, true)')
-  _WRAP_VFUNC(void copy(const Glib::RefPtr<Style>& src), copy)
-
-#m4 _CONVERSION(`GtkStyle*', `Glib::RefPtr<Style>', `Glib::wrap($3, true)')
-  _WRAP_VFUNC(Glib::RefPtr<Style> clone(), clone)
-#m4 _CONVERSION(`GtkStyle*', `Glib::RefPtr<Style>', `Glib::wrap($3)')
-
-#m4 _CONVERSION(`GtkRcStyle*',`const Glib::RefPtr<RcStyle>&',`Glib::wrap($3, true)')
-  _WRAP_VFUNC(void init_from_rc(const Glib::RefPtr<RcStyle>& rc_style), init_from_rc)
-
-
-#m4 _CONVERSION(`GdkWindow*',`const Glib::RefPtr<Gdk::Window>&', `Glib::wrap(($3), true)')
-  _WRAP_VFUNC(void set_background(const Glib::RefPtr<Gdk::Window>& window, Gtk::StateType state_type), set_background)
-
-#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
-  _WRAP_VFUNC(Glib::RefPtr<Gdk::Pixbuf> render_icon(const IconSource& source,
-                                 TextDirection direction,
-                                 Gtk::StateType state,
-                                 IconSize size,
-                                 Widget* widget,
-                                 const Glib::ustring& detail), render_icon)
-
-#m4 _CONVERSION(`cairo_t*',`const Cairo::RefPtr<Cairo::Context>&',`Cairo::RefPtr<Cairo::Context>(new Cairo::Context($3, false /* has_reference */))')
-  _WRAP_VFUNC(void draw_hline(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x1, int x2, int y), draw_hline)
-  _WRAP_VFUNC(void draw_vline(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int y1, int y2, int x), draw_vline)
-  _WRAP_VFUNC(void draw_shadow(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x,  int y, int width, int height), draw_shadow)
-  _WRAP_VFUNC(void draw_arrow(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         Gtk::ArrowType arrow_type, bool fill,
-               int x,  int y, int width, int height), draw_arrow)
-  _WRAP_VFUNC(void draw_diamond(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height), draw_diamond)
-  _WRAP_VFUNC(void draw_box(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height), draw_box)
-  _WRAP_VFUNC(void draw_flat_box(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width,  int height), draw_flat_box)
-  _WRAP_VFUNC(void draw_check(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x,  int y, int width, int height), draw_check)
-  _WRAP_VFUNC(void draw_option(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y,  int width, int height), draw_option)
-  _WRAP_VFUNC(void draw_tab(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width,  int height), draw_tab)
-  _WRAP_VFUNC(void draw_shadow_gap(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height,
-         Gtk::PositionType gap_side, int gap_x, int gap_width), draw_shadow_gap)
-  _WRAP_VFUNC(void draw_box_gap(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x,  int y, int width, int height,
-         Gtk::PositionType gap_side, int gap_x, int gap_width), draw_box_gap)
-  _WRAP_VFUNC(void draw_extension(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height,
-         PositionType gap_side), draw_extension)
-  _WRAP_VFUNC(void draw_focus(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height), draw_focus)
-  _WRAP_VFUNC(void draw_slider(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width,  int height,
-         Orientation orientation), draw_slider)
-  _WRAP_VFUNC(void draw_handle(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         ShadowType shadow_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, int width, int height,
-         Orientation orientation), draw_handle)
-  _WRAP_VFUNC(void draw_expander(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y, ExpanderStyle expander_style), draw_expander)
-#m4 _CONVERSION(`PangoLayout*',`const Glib::RefPtr<Pango::Layout>&',Glib::wrap($3, true))
-  _WRAP_VFUNC(void draw_layout(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         bool use_text,
-         Widget* widget,
-         const Glib::ustring& detail,
-         int x, int y,
-         const Glib::RefPtr<Pango::Layout>& layout), draw_layout)
-  _WRAP_VFUNC(void draw_resize_grip(const Cairo::RefPtr<Cairo::Context>& cr,
-         Gtk::StateType state_type,
-         Widget* widget,
-         const Glib::ustring& detail,
-         Gdk::WindowEdge edge,
-         int x, int y,  int width, int height), draw_resize_grip)
-
-  _WRAP_SIGNAL(void realize(), realize)
-  _WRAP_SIGNAL(void unrealize(), unrealize)
+  _WRAP_PROPERTY("screen", Glib::RefPtr<Gdk::Screen>)
+  _WRAP_PROPERTY("direction", TextDirection)
 };
-
-
-template <class PropertyType> inline
-void Style::get_style_property(GType widget_type, const Glib::ustring& property_name, PropertyType& value) const
-{
-  Glib::Value<PropertyType> property_value;
-  property_value.init(Glib::Value<PropertyType>::value_type());
-
-  //We cast away the const.
-  //TODO: Either this get_style_property() should be non-const,
-  //or get_style_property_value() should be const.
-  //We can't really have both const and unconst versions of them because output parameters can't be const.
-  //Bug https://bugzilla.gnome.org/show_bug.cgi?id=594171
-  Style* unconst_this = const_cast<Style*>(this);
-  unconst_this->get_style_property_value(widget_type, property_name, property_value);
-
-  value = property_value.get();
-}
 
 } // namespace Gtk
