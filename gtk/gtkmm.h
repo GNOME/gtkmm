@@ -143,7 +143,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/grid.h>
-//#include <gtkmm/rc.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/iconset.h>
 #include <gtkmm/iconfactory.h>
@@ -216,7 +215,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stock.h>
 #include <gtkmm/stockid.h>
 #include <gtkmm/stockitem.h>
-#include <gtkmm/style.h>
+#include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/table.h>
 #include <gtkmm/tearoffmenuitem.h>

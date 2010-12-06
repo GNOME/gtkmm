@@ -204,14 +204,10 @@ _CONVERSION(`GtkWindow*',`const Window*',__RP2P)
 _CONVERSION(`GtkToolItem*',`const ToolItem*',__RP2P)
 
 # Style:
-_CONVERSION(`GtkStyle*',`Glib::RefPtr<Style>',`Glib::wrap($3)')
-_CONVERSION(`GtkStyle*',`Glib::RefPtr<const Style>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Style>&',`GtkStyle*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`Glib::RefPtr<Style>',`GtkStyle*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`GtkRcStyle*',`Glib::RefPtr<RcStyle>',`Glib::wrap($3)')
-_CONVERSION(`GtkRcStyle*',`Glib::RefPtr<const RcStyle>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<RcStyle>&',`GtkRcStyle*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`Glib::RefPtr<RcStyle>',`GtkRcStyle*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkStyleContext*',`Glib::RefPtr<StyleContext>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<StyleContext>&',`GtkStyleContext*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkStyleProvider*',`Glib::RefPtr<StyleProvider>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<StyleProvider>&',`GtkStyleProvider*',__CONVERT_REFPTR_TO_P)
 
 # AccelGroup:
 _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<AccelGroup>',`Glib::wrap($3)')

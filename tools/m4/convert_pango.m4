@@ -61,6 +61,7 @@ _CONVERSION(`const PangoFontDescription*',`FontDescription',`FontDescription(con
 _CONVERSION(`Pango::FontDescription&',`PangoFontDescription*',`($3).gobj()')
 _CONVERSION(`FontDescription&',`PangoFontDescription*',`($3).gobj()')
 _CONVERSION(`const FontDescription&',`const PangoFontDescription*',`($3).gobj()')
+_CONVERSION(`const Pango::FontDescription&',`const PangoFontDescription*',`($3).gobj()')
 _CONVERSION(`const Pango::FontDescription&',`PangoFontDescription*',`const_cast<PangoFontDescription*>(`($3).gobj()')')
 _CONVERSION(`const FontDescription&',`PangoFontDescription*',`const_cast<PangoFontDescription*>(`($3).gobj()')')
 
