@@ -665,5 +665,6 @@ _CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CO
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 
 
-
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
+
+_CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')

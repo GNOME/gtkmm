@@ -247,6 +247,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/uimanager.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/widget.h>
+#include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
 
 #endif /* #ifndef GTKMM_H */
