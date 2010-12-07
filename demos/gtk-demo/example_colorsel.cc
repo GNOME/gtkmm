@@ -61,7 +61,7 @@ Example_ColorSel::Example_ColorSel()
 
   // set the color
   m_Color.set_rgba(0, 0, 1, 1);
-  m_DrawingArea.override_background_color((Gtk::StateFlags)0, m_Color);
+  m_DrawingArea.override_background_color(m_Color);
 
   m_Frame.add(m_DrawingArea);
 
@@ -95,7 +95,7 @@ void Example_ColorSel::on_button_clicked()
   {
     m_Color = pColorSel->get_current_rgba();
 
-    m_DrawingArea.override_background_color((Gtk::StateFlags)0, m_Color);
+    m_DrawingArea.override_background_color(m_Color);
   }
 }
 
