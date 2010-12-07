@@ -209,6 +209,8 @@ _CONVERSION(`const Glib::RefPtr<StyleContext>&',`GtkStyleContext*',__CONVERT_REF
 _CONVERSION(`GtkStyleProvider*',`Glib::RefPtr<StyleProvider>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<StyleProvider>&',`GtkStyleProvider*',__CONVERT_REFPTR_TO_P)
 
+_CONVERSION(`GtkCssProvider*',`Glib::RefPtr<CssProvider>',`Glib::wrap($3)')
+
 # AccelGroup:
 _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<AccelGroup>',`Glib::wrap($3)')
 _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<const AccelGroup>',`Glib::wrap($3)')
