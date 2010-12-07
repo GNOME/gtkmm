@@ -53,13 +53,15 @@ Example_ColorSel::Example_ColorSel()
   // set a fixed size
   m_DrawingArea.set_size_request(200, 200);
 
+  /* TODO: Is this still necessary? It is not in the C version now.
   // Unset the background pixmap (as used by pixmap themes)
   // because it takes precedence over the background color.
   m_DrawingArea.modify_bg_pixmap(Gtk::STATE_NORMAL, "<none>");
+  */
 
   // set the color
   m_Color.set_rgba(0, 0, 1, 1);
-  m_DrawingArea.modify_bg(Gtk::STATE_NORMAL, m_Color);
+  m_DrawingArea.override_background_color((Gtk::StateFlags)0, m_Color);
 
   m_Frame.add(m_DrawingArea);
 
@@ -93,7 +95,7 @@ void Example_ColorSel::on_button_clicked()
   {
     m_Color = pColorSel->get_current_rgba();
 
-    m_DrawingArea.override_background_color(Gtk::STATE_NORMAL, m_Color);
+    m_DrawingArea.override_background_color((Gtk::StateFlags)0, m_Color);
   }
 }
 

@@ -197,7 +197,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
   if(event && event->window)
   {
     const Glib::RefPtr<Gdk::Window> refWindow =
-        Glib::wrap((GdkWindowObject*) event->window, true); // true == take_copy
+        Glib::wrap(event->window, true); // true == take_copy
 
     if(refWindow)
     {

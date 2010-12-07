@@ -457,8 +457,8 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
 
   /* Event box is to add a black border around each child view */
   Gtk::EventBox* pEventBox = Gtk::manage( new Gtk::EventBox());
-  Gdk::Color color("black");
-  pEventBox->modify_bg(Gtk::STATE_NORMAL, color);
+  Gdk::RGBA color("black");
+  pEventBox->override_background_color((Gtk::StateFlags)0, color);
 
   Gtk::Alignment* pAlign = Gtk::manage( new Gtk::Alignment(0.5, 0.5, 1.0, 1.0));
   pAlign->set_border_width(1);

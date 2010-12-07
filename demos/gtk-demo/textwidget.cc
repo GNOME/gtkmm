@@ -43,7 +43,7 @@ TextWidget::TextWidget(bool is_source)
   {
 #ifndef G_OS_WIN32
     Pango::FontDescription fontDesc("Courier 12");
-    m_TextView.modify_font(fontDesc);
+    m_TextView.override_font(fontDesc);
 #endif /* G_OS_WIN32 */
     m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
 
