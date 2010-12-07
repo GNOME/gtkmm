@@ -47,6 +47,15 @@ namespace Cairo
  */
 void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
 
+/** Sets the specified Gdk::RGBA as the source color of the Cairo context.
+ * @param @context The cairo context.
+ * @param color The color to use as the source color.
+ *
+ * @newin{3,0}
+ */
+void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color);
+
+
 /** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixbuf_x, pixbuf_y.
  * @param @context The cairo context.
  * @param pixbuf A Gdk::Pixbuf

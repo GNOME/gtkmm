@@ -60,6 +60,11 @@ void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const 
   gdk_cairo_set_source_color(context->cobj(), const_cast<GdkColor*>(color.gobj()));
 }
 
+void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color)
+{
+  gdk_cairo_set_source_rgba(context->cobj(), const_cast<GdkRGBA*>(color.gobj()));
+}
+
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y)
 {
   gdk_cairo_set_source_pixbuf(context->cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
