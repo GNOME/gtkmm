@@ -34,7 +34,6 @@
 #include <gdkmm/rectangle.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/main.h>
-#include <gtkmm/style.h>
 #include <gtkmm/window.h>
 #include <gdkmm/general.h>
 

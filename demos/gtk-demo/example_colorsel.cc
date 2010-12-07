@@ -22,7 +22,7 @@ protected:
   Gtk::Frame m_Frame;
   Gtk::DrawingArea m_DrawingArea;
   Gtk::Button m_Button;
-  Gdk::Color m_Color;
+  Gdk::RGBA m_Color;
   Gtk::Alignment m_Alignment;
 };
 
@@ -58,7 +58,7 @@ Example_ColorSel::Example_ColorSel()
   m_DrawingArea.modify_bg_pixmap(Gtk::STATE_NORMAL, "<none>");
 
   // set the color
-  m_Color.set_rgb(0, 0, 65535);
+  m_Color.set_rgba(0, 0, 1, 1);
   m_DrawingArea.modify_bg(Gtk::STATE_NORMAL, m_Color);
 
   m_Frame.add(m_DrawingArea);
@@ -83,17 +83,17 @@ void Example_ColorSel::on_button_clicked()
 
   Gtk::ColorSelection *const pColorSel = dialog.get_color_selection();
 
-  pColorSel->set_previous_color(m_Color);
-  pColorSel->set_current_color(m_Color);
+  pColorSel->set_previous_rgba(m_Color);
+  pColorSel->set_current_rgba(m_Color);
   pColorSel->set_has_palette();
 
   const int response = dialog.run();
 
   if(response == Gtk::RESPONSE_OK)
   {
-    m_Color = pColorSel->get_current_color();
+    m_Color = pColorSel->get_current_rgba();
 
-    m_DrawingArea.modify_bg(Gtk::STATE_NORMAL, m_Color);
+    m_DrawingArea.override_background_color(Gtk::STATE_NORMAL, m_Color);
   }
 }
 
