@@ -16,6 +16,7 @@
 ## License along with this library; if not, write to the Free
 ## Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+include(class_gtkobject.m4)
 include(convert_base.m4)
 include(convert_gtk.m4)
 include(convert_pango.m4)
