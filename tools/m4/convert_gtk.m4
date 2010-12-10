@@ -282,7 +282,7 @@ _CONVERSION(`GtkWidget*',`const HButtonBox*',`Glib::wrap((GtkHButtonBox*)($3))')
 _CONVERSION(`GtkWidget*',`const ComboDropDown*',`Glib::wrap((GtkList*)($3))')
 _CONVERSION(`GtkWidget*',`const FileChooserDialog*',`Glib::wrap((GtkFileChooserDialog*)($3))')
 
-_CONVERSION(`RadioButton&',`GtkRadioButton*',__FR2P)
+_CONVERSION(`RadioButton&',`GtkRadioButton*',`($3).gobj()')
 
 # Ptr (gtk+) -> Ref (Gtkmm)
 _CONVERSION(`GtkWidget*', `Widget&', `*Glib::wrap($3)')
