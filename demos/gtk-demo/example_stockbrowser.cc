@@ -162,7 +162,7 @@ Glib::RefPtr<Gtk::TreeModel> Example_StockBrowser::create_model()
     }
 
     // Populate icon column:
-    row[m_columns.icon] = render_icon(stockid, Gtk::ICON_SIZE_MENU);
+    row[m_columns.icon] = render_icon_pixbuf(stockid, Gtk::ICON_SIZE_MENU);
   }
 
   return refStore;
