@@ -53,8 +53,9 @@ AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-# The extra cairomm check is because gdkmm requires a newer cairomm than pangomm requires.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.27.0 pangomm-1.4 >= 2.26 gtk+-3.0 >= 2.91.6 cairomm-1.0 >= 1.9.2'])
+# The extra cairomm-1.0 check is because gdkmm requires a newer cairomm than pangomm requires.
+# The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-3.0 requires.
+AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.27.0 pangomm-1.4 >= 2.26 gtk+-3.0 >= 2.91.6 cairomm-1.0 >= 1.9.2 gdk-pixbuf-2.0 >= 2.22.1'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
