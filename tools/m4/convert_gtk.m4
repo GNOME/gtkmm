@@ -494,6 +494,8 @@ _CONVERSION(`GtkActionGroup*',`Glib::RefPtr<ActionGroup>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<ActionGroup>&',`GtkActionGroup*',__CONVERT_REFPTR_TO_P($3))
 
 _CONVERSION(`GtkApplication*',`Glib::RefPtr<Application>',`Glib::wrap($3)')
+_CONVERSION(`GtkApplication*',`Glib::RefPtr<const Application>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Application>&',`GtkApplication*',__CONVERT_REFPTR_TO_P($3))
 
 _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<EntryCompletion>',`Glib::wrap($3)')
 _CONVERSION(`GtkEntryCompletion*',`Glib::RefPtr<const EntryCompletion>',`Glib::wrap($3)')
