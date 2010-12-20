@@ -109,6 +109,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
 #include <gtkmm/buttonbox.h>
+#include <gtkmm/cellarea.h>
+#include <gtkmm/cellareabox.h>
+#include <gtkmm/cellareacontext.h>
 #include <gtkmm/cellview.h>
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/checkmenuitem.h>
