@@ -217,6 +217,11 @@ _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<const AccelGroup>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<AccelGroup>&',`GtkAccelGroup*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Gtk::Object&',`GObject*', `($3).Glib::Object::gobj()')
 
+_CONVERSION(`GtkCellAreaContext*',`Glib::RefPtr<CellAreaContext>',`Glib::wrap($3)')
+_CONVERSION(`GtkCellAreaContext*',`Glib::RefPtr<const CellAreaContext>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<CellAreaContext>&',`GtkCellAreaContext*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const CellAreaContext>&',`GtkCellAreaContext*',__CONVERT_CONST_REFPTR_TO_P)
+
 #
 # Ptr (Gtkmm) -> Ptr (gtk+)
 _CONVERSION(`const Glib::RefPtr<Adjustment>&',`GtkAdjustment*',__CONVERT_REFPTR_TO_P)
@@ -624,6 +629,7 @@ _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P($
 
 
 # Used by Signals:
+# TODO: Move these to the .hg files.
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
 # For the return values of methods, we use the optional refreturn parameter instead.
 _CONVERSION(`GtkTextIter*',`const TextIter&',Glib::wrap($3))
