@@ -217,6 +217,9 @@ _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<const AccelGroup>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<AccelGroup>&',`GtkAccelGroup*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Gtk::Object&',`GObject*', `($3).Glib::Object::gobj()')
 
+_CONVERSION(`GtkCellArea*',`Glib::RefPtr<CellArea>',`Glib::wrap($3)')
+_CONVERSION(`GtkCellArea*',`Glib::RefPtr<const CellArea>',`Glib::wrap($3)')
+
 _CONVERSION(`GtkCellAreaContext*',`Glib::RefPtr<CellAreaContext>',`Glib::wrap($3)')
 _CONVERSION(`GtkCellAreaContext*',`Glib::RefPtr<const CellAreaContext>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<CellAreaContext>&',`GtkCellAreaContext*',__CONVERT_REFPTR_TO_P)
