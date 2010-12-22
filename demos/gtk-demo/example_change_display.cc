@@ -388,8 +388,11 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   Gtk::Window* toplevel = 0;
 
-  if( m_pPopup->get_window()->pointer_grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME)
-     == Gdk::GRAB_SUCCESS )
+  //TODO: Find a suitable replacement for this:
+  //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
+  //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
+  const Gdk::GrabStatus grabbed = Gdk::GRAB_SUCCESS;
+  if(grabbed == Gdk::GRAB_SUCCESS )
   {
     m_popup_clicked = false;
     m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );

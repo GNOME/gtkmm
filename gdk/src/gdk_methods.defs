@@ -1,54 +1,5 @@
 ;; -*- scheme -*-
 ; object definitions ...
-(define-object DeviceManager
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkDeviceManager")
-  (gtype-id "GDK_TYPE_DEVICE_MANAGER")
-)
-
-(define-object Display
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkDisplay")
-  (gtype-id "GDK_TYPE_DISPLAY")
-)
-
-(define-object DisplayManager
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkDisplayManager")
-  (gtype-id "GDK_TYPE_DISPLAY_MANAGER")
-)
-
-(define-object DragContext
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkDragContext")
-  (gtype-id "GDK_TYPE_DRAG_CONTEXT")
-)
-
-(define-object Keymap
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkKeymap")
-  (gtype-id "GDK_TYPE_KEYMAP")
-)
-
-(define-object PixmapObject
-  (in-module "Gdk")
-  (parent "GdkDrawable")
-  (c-name "GdkPixmapObject")
-  (gtype-id "GDK_TYPE_PIXMAP_OBJECT")
-)
-
-(define-object Screen
-  (in-module "Gdk")
-  (parent "GObject")
-  (c-name "GdkScreen")
-  (gtype-id "GDK_TYPE_SCREEN")
-)
-
 ;; Enumerations and flags ...
 
 (define-enum ExtensionMode
@@ -775,6 +726,10 @@
 
 
 
+;; From gdkconfig.h
+
+
+
 ;; From gdkcursor.h
 
 (define-function gdk_cursor_get_type
@@ -811,6 +766,15 @@
   )
 )
 
+(define-function gdk_cursor_new_from_name
+  (c-name "gdk_cursor_new_from_name")
+  (return-type "GdkCursor*")
+  (parameters
+    '("GdkDisplay*" "display")
+    '("const-gchar*" "name")
+  )
+)
+
 (define-method get_display
   (of-object "GdkCursor")
   (c-name "gdk_cursor_get_display")
@@ -827,15 +791,6 @@
   (of-object "GdkCursor")
   (c-name "gdk_cursor_unref")
   (return-type "none")
-)
-
-(define-function gdk_cursor_new_from_name
-  (c-name "gdk_cursor_new_from_name")
-  (return-type "GdkCursor*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "name")
-  )
 )
 
 (define-method get_image
@@ -1027,6 +982,12 @@
   (return-type "GdkDevice*")
 )
 
+(define-method list_slave_devices
+  (of-object "GdkDevice")
+  (c-name "gdk_device_list_slave_devices")
+  (return-type "GList*")
+)
+
 (define-method get_device_type
   (of-object "GdkDevice")
   (c-name "gdk_device_get_device_type")
@@ -1053,6 +1014,17 @@
   (return-type "none")
   (parameters
     '("guint32" "time_")
+  )
+)
+
+(define-method warp
+  (of-object "GdkDevice")
+  (c-name "gdk_device_warp")
+  (return-type "none")
+  (parameters
+    '("GdkScreen*" "screen")
+    '("gint" "x")
+    '("gint" "y")
   )
 )
 
@@ -1231,6 +1203,12 @@
   )
 )
 
+(define-method has_pending
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_has_pending")
+  (return-type "gboolean")
+)
+
 (define-method add_client_message_filter
   (of-object "GdkDisplay")
   (c-name "gdk_display_add_client_message_filter")
@@ -1263,12 +1241,6 @@
 (define-function gdk_display_get_default
   (c-name "gdk_display_get_default")
   (return-type "GdkDisplay*")
-)
-
-(define-method get_core_pointer
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_get_core_pointer")
-  (return-type "GdkDevice*")
 )
 
 (define-method get_pointer
@@ -1325,18 +1297,6 @@
     '("GdkDevice*" "device")
     '("gint*" "win_x")
     '("gint*" "win_y")
-  )
-)
-
-(define-method warp_device
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_warp_device")
-  (return-type "none")
-  (parameters
-    '("GdkDevice*" "device")
-    '("GdkScreen*" "screen")
-    '("gint" "x")
-    '("gint" "y")
   )
 )
 
@@ -1448,10 +1408,25 @@
   (return-type "gboolean")
 )
 
+(define-method notify_startup_complete
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_notify_startup_complete")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "startup_id")
+  )
+)
+
 (define-method get_device_manager
   (of-object "GdkDisplay")
   (c-name "gdk_display_get_device_manager")
   (return-type "GdkDeviceManager*")
+)
+
+(define-method get_app_launch_context
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_app_launch_context")
+  (return-type "GdkAppLaunchContext*")
 )
 
 
@@ -1489,6 +1464,15 @@
   (return-type "GSList*")
 )
 
+(define-method open_display
+  (of-object "GdkDisplayManager")
+  (c-name "gdk_display_manager_open_display")
+  (return-type "GdkDisplay*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
 
 
 ;; From gdkdnd.h
@@ -1496,12 +1480,6 @@
 (define-function gdk_drag_context_get_type
   (c-name "gdk_drag_context_get_type")
   (return-type "GType")
-)
-
-(define-function gdk_drag_context_new
-  (c-name "gdk_drag_context_new")
-  (is-constructor-of "GdkDragContext")
-  (return-type "GdkDragContext*")
 )
 
 (define-method set_device
@@ -1549,6 +1527,18 @@
   (return-type "GdkWindow*")
 )
 
+(define-method get_dest_window
+  (of-object "GdkDragContext")
+  (c-name "gdk_drag_context_get_dest_window")
+  (return-type "GdkWindow*")
+)
+
+(define-method get_protocol
+  (of-object "GdkDragContext")
+  (c-name "gdk_drag_context_get_protocol")
+  (return-type "GdkDragProtocol")
+)
+
 (define-function gdk_drag_status
   (c-name "gdk_drag_status")
   (return-type "none")
@@ -1564,7 +1554,7 @@
   (return-type "none")
   (parameters
     '("GdkDragContext*" "context")
-    '("gboolean" "ok")
+    '("gboolean" "accepted")
     '("guint32" "time_")
   )
 )
@@ -1596,6 +1586,16 @@
   )
 )
 
+(define-function gdk_drag_begin_for_device
+  (c-name "gdk_drag_begin_for_device")
+  (return-type "GdkDragContext*")
+  (parameters
+    '("GdkWindow*" "window")
+    '("GdkDevice*" "device")
+    '("GList*" "targets")
+  )
+)
+
 (define-function gdk_drag_get_protocol_for_display
   (c-name "gdk_drag_get_protocol_for_display")
   (return-type "GdkNativeWindow")
@@ -1613,28 +1613,6 @@
     '("GdkDragContext*" "context")
     '("GdkWindow*" "drag_window")
     '("GdkScreen*" "screen")
-    '("gint" "x_root")
-    '("gint" "y_root")
-    '("GdkWindow**" "dest_window")
-    '("GdkDragProtocol*" "protocol")
-  )
-)
-
-(define-function gdk_drag_get_protocol
-  (c-name "gdk_drag_get_protocol")
-  (return-type "GdkNativeWindow")
-  (parameters
-    '("GdkNativeWindow" "xid")
-    '("GdkDragProtocol*" "protocol")
-  )
-)
-
-(define-function gdk_drag_find_window
-  (c-name "gdk_drag_find_window")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("GdkWindow*" "drag_window")
     '("gint" "x_root")
     '("gint" "y_root")
     '("GdkWindow**" "dest_window")
@@ -1970,6 +1948,21 @@
 (define-method get_device
   (of-object "GdkEvent")
   (c-name "gdk_event_get_device")
+  (return-type "GdkDevice*")
+)
+
+(define-method set_source_device
+  (of-object "GdkEvent")
+  (c-name "gdk_event_set_source_device")
+  (return-type "none")
+  (parameters
+    '("GdkDevice*" "device")
+  )
+)
+
+(define-method get_source_device
+  (of-object "GdkEvent")
+  (c-name "gdk_event_get_source_device")
   (return-type "GdkDevice*")
 )
 
@@ -2359,11 +2352,6 @@
   (return-type "none")
 )
 
-(define-function gdk_set_locale
-  (c-name "gdk_set_locale")
-  (return-type "gchar*")
-)
-
 (define-function gdk_enable_multidevice
   (c-name "gdk_enable_multidevice")
   (return-type "none")
@@ -2497,6 +2485,11 @@
   (return-type "none")
 )
 
+(define-function gdk_disable_multidevice
+  (c-name "gdk_disable_multidevice")
+  (return-type "none")
+)
+
 
 
 ;; From gdkpango.h
@@ -2563,74 +2556,6 @@
     '("int" "src_y")
     '("int" "width")
     '("int" "height")
-  )
-)
-
-
-
-;; From gdkpixmap.h
-
-(define-function gdk_pixmap_get_type
-  (c-name "gdk_pixmap_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_pixmap_new
-  (c-name "gdk_pixmap_new")
-  (is-constructor-of "GdkPixmap")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkDrawable*" "drawable")
-    '("gint" "width")
-    '("gint" "height")
-    '("gint" "depth")
-  )
-)
-
-(define-function gdk_pixmap_foreign_new
-  (c-name "gdk_pixmap_foreign_new")
-  (is-constructor-of "GdkPixmapForeign")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_pixmap_lookup
-  (c-name "gdk_pixmap_lookup")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_pixmap_foreign_new_for_display
-  (c-name "gdk_pixmap_foreign_new_for_display")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_pixmap_lookup_for_display
-  (c-name "gdk_pixmap_lookup_for_display")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_pixmap_foreign_new_for_screen
-  (c-name "gdk_pixmap_foreign_new_for_screen")
-  (return-type "GdkPixmap*")
-  (parameters
-    '("GdkScreen*" "screen")
-    '("GdkNativeWindow" "anid")
-    '("gint" "width")
-    '("gint" "height")
-    '("gint" "depth")
   )
 )
 
@@ -2721,67 +2646,6 @@
   )
 )
 
-(define-function gdk_text_property_to_text_list
-  (c-name "gdk_text_property_to_text_list")
-  (return-type "gint")
-  (parameters
-    '("GdkAtom" "encoding")
-    '("gint" "format")
-    '("const-guchar*" "text")
-    '("gint" "length")
-    '("gchar***" "list")
-  )
-)
-
-(define-function gdk_text_property_to_utf8_list
-  (c-name "gdk_text_property_to_utf8_list")
-  (return-type "gint")
-  (parameters
-    '("GdkAtom" "encoding")
-    '("gint" "format")
-    '("const-guchar*" "text")
-    '("gint" "length")
-    '("gchar***" "list")
-  )
-)
-
-(define-function gdk_utf8_to_compound_text
-  (c-name "gdk_utf8_to_compound_text")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "str")
-    '("GdkAtom*" "encoding")
-    '("gint*" "format")
-    '("guchar**" "ctext")
-    '("gint*" "length")
-  )
-)
-
-(define-function gdk_string_to_compound_text
-  (c-name "gdk_string_to_compound_text")
-  (return-type "gint")
-  (parameters
-    '("const-gchar*" "str")
-    '("GdkAtom*" "encoding")
-    '("gint*" "format")
-    '("guchar**" "ctext")
-    '("gint*" "length")
-  )
-)
-
-(define-function gdk_text_property_to_text_list_for_display
-  (c-name "gdk_text_property_to_text_list_for_display")
-  (return-type "gint")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkAtom" "encoding")
-    '("gint" "format")
-    '("const-guchar*" "text")
-    '("gint" "length")
-    '("gchar***" "list")
-  )
-)
-
 (define-function gdk_text_property_to_utf8_list_for_display
   (c-name "gdk_text_property_to_utf8_list_for_display")
   (return-type "gint")
@@ -2800,48 +2664,6 @@
   (return-type "gchar*")
   (parameters
     '("const-gchar*" "str")
-  )
-)
-
-(define-function gdk_string_to_compound_text_for_display
-  (c-name "gdk_string_to_compound_text_for_display")
-  (return-type "gint")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "str")
-    '("GdkAtom*" "encoding")
-    '("gint*" "format")
-    '("guchar**" "ctext")
-    '("gint*" "length")
-  )
-)
-
-(define-function gdk_utf8_to_compound_text_for_display
-  (c-name "gdk_utf8_to_compound_text_for_display")
-  (return-type "gboolean")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "str")
-    '("GdkAtom*" "encoding")
-    '("gint*" "format")
-    '("guchar**" "ctext")
-    '("gint*" "length")
-  )
-)
-
-(define-function gdk_free_text_list
-  (c-name "gdk_free_text_list")
-  (return-type "none")
-  (parameters
-    '("gchar**" "list")
-  )
-)
-
-(define-function gdk_free_compound_text
-  (c-name "gdk_free_compound_text")
-  (return-type "none")
-  (parameters
-    '("guchar*" "ctext")
   )
 )
 
@@ -3925,41 +3747,6 @@
   )
 )
 
-(define-function gdk_window_foreign_new
-  (c-name "gdk_window_foreign_new")
-  (is-constructor-of "GdkWindowForeign")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_window_lookup
-  (c-name "gdk_window_lookup")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_window_foreign_new_for_display
-  (c-name "gdk_window_foreign_new_for_display")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkNativeWindow" "anid")
-  )
-)
-
-(define-function gdk_window_lookup_for_display
-  (c-name "gdk_window_lookup_for_display")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkNativeWindow" "anid")
-  )
-)
-
 (define-method has_native
   (of-object "GdkWindow")
   (c-name "gdk_window_has_native")
@@ -4030,14 +3817,6 @@
   (parameters
     '("const-GdkGeometry*" "geometry")
     '("GdkWindowHints" "geom_mask")
-  )
-)
-
-(define-function gdk_set_sm_client_id
-  (c-name "gdk_set_sm_client_id")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "sm_client_id")
   )
 )
 
@@ -4384,6 +4163,25 @@
   (return-type "GdkEventMask")
   (parameters
     '("GdkDevice*" "device")
+  )
+)
+
+(define-method set_source_events
+  (of-object "GdkWindow")
+  (c-name "gdk_window_set_source_events")
+  (return-type "none")
+  (parameters
+    '("GdkInputSource" "source")
+    '("GdkEventMask" "event_mask")
+  )
+)
+
+(define-method get_source_events
+  (of-object "GdkWindow")
+  (c-name "gdk_window_get_source_events")
+  (return-type "GdkEventMask")
+  (parameters
+    '("GdkInputSource" "source")
   )
 )
 
@@ -4740,342 +4538,5 @@
 
 
 ;; From gdkx.h
-
-(define-function gdk_x11_window_get_xid
-  (c-name "gdk_x11_window_get_xid")
-  (return-type "Window")
-  (parameters
-    '("GdkWindow*" "window")
-  )
-)
-
-(define-function gdk_x11_cursor_get_xdisplay
-  (c-name "gdk_x11_cursor_get_xdisplay")
-  (return-type "Display*")
-  (parameters
-    '("GdkCursor*" "cursor")
-  )
-)
-
-(define-function gdk_x11_cursor_get_xcursor
-  (c-name "gdk_x11_cursor_get_xcursor")
-  (return-type "Cursor")
-  (parameters
-    '("GdkCursor*" "cursor")
-  )
-)
-
-(define-function gdk_x11_display_get_xdisplay
-  (c-name "gdk_x11_display_get_xdisplay")
-  (return-type "Display*")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_visual_get_xvisual
-  (c-name "gdk_x11_visual_get_xvisual")
-  (return-type "Visual*")
-  (parameters
-    '("GdkVisual*" "visual")
-  )
-)
-
-(define-function gdk_x11_screen_get_xscreen
-  (c-name "gdk_x11_screen_get_xscreen")
-  (return-type "Screen*")
-  (parameters
-    '("GdkScreen*" "screen")
-  )
-)
-
-(define-function gdk_x11_screen_get_screen_number
-  (c-name "gdk_x11_screen_get_screen_number")
-  (return-type "int")
-  (parameters
-    '("GdkScreen*" "screen")
-  )
-)
-
-(define-function gdk_x11_window_set_user_time
-  (c-name "gdk_x11_window_set_user_time")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "window")
-    '("guint32" "timestamp")
-  )
-)
-
-(define-function gdk_x11_window_move_to_current_desktop
-  (c-name "gdk_x11_window_move_to_current_desktop")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "window")
-  )
-)
-
-(define-function gdk_x11_screen_get_window_manager_name
-  (c-name "gdk_x11_screen_get_window_manager_name")
-  (return-type "const-char*")
-  (parameters
-    '("GdkScreen*" "screen")
-  )
-)
-
-(define-function gdk_x11_get_default_root_xwindow
-  (c-name "gdk_x11_get_default_root_xwindow")
-  (return-type "Window")
-)
-
-(define-function gdk_x11_get_default_xdisplay
-  (c-name "gdk_x11_get_default_xdisplay")
-  (return-type "Display*")
-)
-
-(define-function gdk_x11_get_default_screen
-  (c-name "gdk_x11_get_default_screen")
-  (return-type "gint")
-)
-
-(define-function gdk_x11_screen_lookup_visual
-  (c-name "gdk_x11_screen_lookup_visual")
-  (return-type "GdkVisual*")
-  (parameters
-    '("GdkScreen*" "screen")
-    '("VisualID" "xvisualid")
-  )
-)
-
-(define-function gdkx_visual_get
-  (c-name "gdkx_visual_get")
-  (return-type "GdkVisual*")
-  (parameters
-    '("VisualID" "xvisualid")
-  )
-)
-
-(define-function gdk_xid_table_lookup_for_display
-  (c-name "gdk_xid_table_lookup_for_display")
-  (return-type "gpointer")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("XID" "xid")
-  )
-)
-
-(define-function gdk_x11_get_server_time
-  (c-name "gdk_x11_get_server_time")
-  (return-type "guint32")
-  (parameters
-    '("GdkWindow*" "window")
-  )
-)
-
-(define-function gdk_x11_display_get_user_time
-  (c-name "gdk_x11_display_get_user_time")
-  (return-type "guint32")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_display_get_startup_notification_id
-  (c-name "gdk_x11_display_get_startup_notification_id")
-  (return-type "const-gchar*")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_display_set_startup_notification_id
-  (c-name "gdk_x11_display_set_startup_notification_id")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "startup_id")
-  )
-)
-
-(define-function gdk_x11_display_set_cursor_theme
-  (c-name "gdk_x11_display_set_cursor_theme")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "theme")
-    '("const-gint" "size")
-  )
-)
-
-(define-function gdk_x11_display_broadcast_startup_message
-  (c-name "gdk_x11_display_broadcast_startup_message")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-char*" "message_type")
-  )
-  (varargs #t)
-)
-
-(define-function gdk_x11_screen_supports_net_wm_hint
-  (c-name "gdk_x11_screen_supports_net_wm_hint")
-  (return-type "gboolean")
-  (parameters
-    '("GdkScreen*" "screen")
-    '("GdkAtom" "property")
-  )
-)
-
-(define-function gdk_x11_screen_get_monitor_output
-  (c-name "gdk_x11_screen_get_monitor_output")
-  (return-type "XID")
-  (parameters
-    '("GdkScreen*" "screen")
-    '("gint" "monitor_num")
-  )
-)
-
-(define-function gdk_xid_table_lookup
-  (c-name "gdk_xid_table_lookup")
-  (return-type "gpointer")
-  (parameters
-    '("XID" "xid")
-  )
-)
-
-(define-function gdk_net_wm_supports
-  (c-name "gdk_net_wm_supports")
-  (return-type "gboolean")
-  (parameters
-    '("GdkAtom" "property")
-  )
-)
-
-(define-function gdk_x11_grab_server
-  (c-name "gdk_x11_grab_server")
-  (return-type "none")
-)
-
-(define-function gdk_x11_ungrab_server
-  (c-name "gdk_x11_ungrab_server")
-  (return-type "none")
-)
-
-(define-function gdk_x11_lookup_xdisplay
-  (c-name "gdk_x11_lookup_xdisplay")
-  (return-type "GdkDisplay*")
-  (parameters
-    '("Display*" "xdisplay")
-  )
-)
-
-(define-function gdk_x11_atom_to_xatom_for_display
-  (c-name "gdk_x11_atom_to_xatom_for_display")
-  (return-type "Atom")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("GdkAtom" "atom")
-  )
-)
-
-(define-function gdk_x11_xatom_to_atom_for_display
-  (c-name "gdk_x11_xatom_to_atom_for_display")
-  (return-type "GdkAtom")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("Atom" "xatom")
-  )
-)
-
-(define-function gdk_x11_get_xatom_by_name_for_display
-  (c-name "gdk_x11_get_xatom_by_name_for_display")
-  (return-type "Atom")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-gchar*" "atom_name")
-  )
-)
-
-(define-function gdk_x11_get_xatom_name_for_display
-  (c-name "gdk_x11_get_xatom_name_for_display")
-  (return-type "const-gchar*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("Atom" "xatom")
-  )
-)
-
-(define-function gdk_x11_atom_to_xatom
-  (c-name "gdk_x11_atom_to_xatom")
-  (return-type "Atom")
-  (parameters
-    '("GdkAtom" "atom")
-  )
-)
-
-(define-function gdk_x11_xatom_to_atom
-  (c-name "gdk_x11_xatom_to_atom")
-  (return-type "GdkAtom")
-  (parameters
-    '("Atom" "xatom")
-  )
-)
-
-(define-function gdk_x11_get_xatom_by_name
-  (c-name "gdk_x11_get_xatom_by_name")
-  (return-type "Atom")
-  (parameters
-    '("const-gchar*" "atom_name")
-  )
-)
-
-(define-function gdk_x11_get_xatom_name
-  (c-name "gdk_x11_get_xatom_name")
-  (return-type "const-gchar*")
-  (parameters
-    '("Atom" "xatom")
-  )
-)
-
-(define-function gdk_x11_display_grab
-  (c-name "gdk_x11_display_grab")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_display_ungrab
-  (c-name "gdk_x11_display_ungrab")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_display_error_trap_push
-  (c-name "gdk_x11_display_error_trap_push")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_display_error_trap_pop_ignored
-  (c-name "gdk_x11_display_error_trap_pop_ignored")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-function gdk_x11_register_standard_event_type
-  (c-name "gdk_x11_register_standard_event_type")
-  (return-type "none")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("gint" "event_base")
-    '("gint" "n_events")
-  )
-)
 
 

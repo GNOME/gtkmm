@@ -138,8 +138,6 @@ public:
   _WRAP_METHOD(bool get_modal_hint() const, gdk_window_get_modal_hint)
   _WRAP_METHOD(void set_modal_hint(bool modal = true), gdk_window_set_modal_hint)
   _WRAP_METHOD(void set_geometry_hints(const Geometry& geometry, WindowHints geom_mask), gdk_window_set_geometry_hints)
-  _WRAP_METHOD(static void set_sm_client_id(const Glib::ustring& sm_client_id), gdk_set_sm_client_id)
-  static void unset_sm_client_id();
   _WRAP_METHOD(void begin_paint_rect(const Rectangle& rectangle), gdk_window_begin_paint_rect)
   _WRAP_METHOD(void begin_paint_region(const Cairo::RefPtr<Cairo::Region>& region), gdk_window_begin_paint_region)
   _WRAP_METHOD(void end_paint(), gdk_window_end_paint)
@@ -160,25 +158,22 @@ public:
   _WRAP_METHOD(Cairo::RefPtr<const Cairo::Pattern> get_background_pattern() const, gdk_window_get_background_pattern)
 
 
-#m4 _CONVERSION(const Cursor&,GdkCursor*,const_cast<GdkCursor*>(($3).gobj()))
-  _WRAP_METHOD(void set_cursor(const Cursor& cursor), gdk_window_set_cursor)
+  _WRAP_METHOD(void set_cursor(const Glib::RefPtr<Cursor>& cursor), gdk_window_set_cursor)
 
   /** Use the parent window's cursor.
    * For top-level windows this means that it will use the default cursor for the ROOT window.
    */
   void set_cursor();
 
-  _WRAP_METHOD(void set_device_cursor(const Glib::RefPtr<Device>& device, const Cursor& cursor), gdk_window_set_device_cursor)
+  _WRAP_METHOD(void set_device_cursor(const Glib::RefPtr<Device>& device, const Glib::RefPtr<Cursor>& cursor), gdk_window_set_device_cursor)
 
   /** Use the parent window's cursor.
    * For top-level windows this means that it will use the default cursor for the ROOT window.
    */
   void set_device_cursor(const Glib::RefPtr<Device>& device);
 
-  //TODO: GdkCursor is a ref-counted boxed type,
-  //so we could add a copy constructor and then return by value.
-  //We would also need a Cursor::operator bool() to check for a null value.
-  //TODO: _WRAP_METHOD(Cursor get_cursor(), gdk_window_get_cursor)
+  _WRAP_METHOD(Glib::RefPtr<Cursor> get_cursor(), gdk_window_get_cursor, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Cursor> get_cursor() const, gdk_window_get_cursor, refreturn, constversion)
 
   _WRAP_METHOD(void get_user_data(gpointer* data), gdk_window_get_user_data)
   _WRAP_METHOD(void get_geometry(int& x, int& y, int& width, int& height) const, gdk_window_get_geometry)
@@ -289,32 +284,7 @@ public:
   _WRAP_METHOD(void fullscreen(), gdk_window_fullscreen)
   _WRAP_METHOD(void unfullscreen(), gdk_window_unfullscreen)
 
-  _WRAP_METHOD(GrabStatus pointer_grab(bool owner_events, EventMask event_mask, const Glib::RefPtr<const Window>& confine_to, const Cursor& cursor, guint32 time_), gdk_pointer_grab)
-
-  /** Grabs the pointer to a specific window.
-   * Requires a corresponding call to pointer_ungrab().
-   *
-   * Arguments:
-   * @param owner_events Specifies whether events will be reported as is, or relative to the window.
-   * @param event_mask Masks only interesting events.
-   * @param cursor Changes the cursor for the duration of the grab.
-   * @param timestamp Specifies the time.
-   */
-  GrabStatus pointer_grab(bool owner_events, EventMask event_mask, const Cursor& cursor, guint32 timestamp);
-
-  /** Grabs the pointer to a specific window.
-   * Requires a corresponding call to pointer_ungrab().
-   *
-   * Arguments:
-   * @param owner_events Specifies whether events will be reported as is, or relative to the window.
-   * @param event_mask Masks only interesting events.
-   * @param timestamp Specifies the time.
-   */
-  GrabStatus pointer_grab(bool owner_events, EventMask event_mask, guint32 timestamp);
-
-  _WRAP_METHOD(static void pointer_ungrab(guint32 timestamp), gdk_pointer_ungrab)
-  _WRAP_METHOD(GrabStatus keyboard_grab(bool owner_events, guint32 timestamp), gdk_keyboard_grab)
-  _WRAP_METHOD(static void keyboard_ungrab(guint32 timestamp), gdk_keyboard_ungrab)
+  _IGNORE(gdk_pointer_grab, gdk_pointer_ungrab, gdk_keyboard_grab, gdk_keyboard_ungrab) //deprecated
 
   _WRAP_METHOD(void set_keep_above(bool setting = true), gdk_window_set_keep_above)
   _WRAP_METHOD(void set_keep_below(bool setting = true), gdk_window_set_keep_below)
@@ -359,7 +329,7 @@ public:
   //_WRAP_SIGNAL(Glib::RefPtr<Gdk::Window> from_embedder(double embedder_x, double embedder_y, double& offscreen_x, double& offscreen_y), from-embedder, no_default_handler)
 
 
-  //TODO: _WRAP_PROPERTY("cursor", Cursor)
+  _WRAP_PROPERTY("cursor", Glib::RefPtr<Cursor>)
 };
 
 } // namespace Gdk
