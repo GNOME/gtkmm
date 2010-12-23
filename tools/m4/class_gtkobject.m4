@@ -14,12 +14,6 @@ define(`__CPPPARENT__',`$4')
 define(`__CPARENT__',`$5')
 define(`__PCAST__',`($5*)')
 
-dnl Some C types, e.g. GdkWindow or GdkPixmap, are a typedef to their base type,
-dnl rather than the real instance type.  That is really ugly, yes.  We get around
-dnl the problem by supporting optional __REAL_* arguments to this macro.
-define(`__REAL_CNAME__',ifelse(`$6',,__CNAME__,`$6'))
-define(`__REAL_CPARENT__',ifelse(`$7',,__CPARENT__,`$7'))
-
 
 dnl
 dnl ----------------------- Constructors -------------------------
@@ -183,7 +177,7 @@ public:
   typedef __CPPNAME__ CppObjectType;
   typedef __CPPNAME__`'_Class CppClassType;
   typedef __CNAME__ BaseObjectType;
-  typedef __REAL_CNAME__`'Class BaseClassType;
+  typedef __CNAME__`'Class BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   virtual ~__CPPNAME__`'();
