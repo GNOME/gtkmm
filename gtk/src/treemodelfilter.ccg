@@ -142,9 +142,20 @@ void TreeModelFilter::set_modify_func(const TreeModelColumnRecord& columns, cons
     &SignalProxy_Modify_gtk_callback_destroy);
 }
 
-void TreeModelFilter::set_value_impl(const iterator& /* row */, int /* column */, const Glib::ValueBase& /* value */)
+void TreeModelFilter::set_value_impl(const iterator& row, int column, const Glib::ValueBase& value)
 {
-  g_warning("Attempt to set a value of a row in a TreeModelFilter instead of in the child model.");
+  // Avoid two extra ref/unref cycles -- we don't store the child
+  // model pointer anywhere, so it's OK to do this _internally_.
+
+  TreeModel *const child_model = dynamic_cast<TreeModel*>(
+      Glib::wrap_auto((GObject*) gtk_tree_model_filter_get_model(gobj()), false));
+
+  TreeIter child_iter (child_model);
+
+  gtk_tree_model_filter_convert_iter_to_child_iter(
+      gobj(), child_iter.gobj(), const_cast<GtkTreeIter*>(row.gobj()));
+
+  child_model->set_value_impl(child_iter, column, value);
 }
 
 
