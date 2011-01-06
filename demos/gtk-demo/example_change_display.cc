@@ -384,7 +384,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   m_pPopup->show();
 
-  Gdk::Cursor cursor(refDisplay, Gdk::CROSSHAIR);
+  Glib::RefPtr<Gdk::Cursor> cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
 
   Gtk::Window* toplevel = 0;
 
