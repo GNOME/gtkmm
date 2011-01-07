@@ -74,6 +74,7 @@ PKG_CHECK_MODULES([GTKMM], [$GTKMM_MODULES])
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
+MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-1.4 atkmm-1.6])
 
 GTKMM_ARG_ENABLE_API_MAEMO_EXTENSIONS
 MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
@@ -92,8 +93,8 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra -DGSEAL_ENABLE],
-                       [G PANGO ATK GDK GDK_PIXBUF GTK ATKMM PANGOMM])
+                       [-pedantic -Wall -Wextra  -Wno-long-long -DGSEAL_ENABLE],
+                       [G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
