@@ -19,7 +19,12 @@
 include(class_gtkobject.m4)
 include(convert_base.m4)
 include(convert_gtk.m4)
-include(convert_pango.m4)
 include(convert_gdk.m4)
+
+# From atkmm: The path to this is obtained in configure.ac:
 include(convert_atk.m4)
+
+# From pangomm: The path to this is obtained in configure.ac:
+include(convert_pango.m4)
+
 include(convert_glib.m4)
