@@ -262,7 +262,7 @@ void Example_StockBrowser::on_selection_changed()
     }
     else
     {
-      m_Image.clear();
+      m_Image.reset();
     }
   }
   else
@@ -271,7 +271,7 @@ void Example_StockBrowser::on_selection_changed()
     m_Label_Symbol.set_text("");
     m_Label_ID.set_text("");
     m_Label_Accel.set_text("");
-    m_Image.clear();
+    m_Image.reset();
   }
 }
 

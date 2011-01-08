@@ -299,7 +299,7 @@ void Example_ChangeDisplay::on_treeview_display_selection_changed()
   if(iter)
     m_refCurrentDisplay = (*iter)[m_columns_display.m_display];
   else
-    m_refCurrentDisplay.clear();
+    m_refCurrentDisplay.reset();
 
   fill_screens();  
 }
@@ -311,7 +311,7 @@ void Example_ChangeDisplay::on_treeview_screen_selection_changed()
   if(iter)
     m_refCurrentScreen = (*iter)[m_columns_screen.m_screen];
   else
-    m_refCurrentScreen.clear();
+    m_refCurrentScreen.reset();
 }
 
 /* Fills in the screen list based on the current display
