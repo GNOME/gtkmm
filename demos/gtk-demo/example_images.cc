@@ -158,7 +158,7 @@ bool Example_Images::on_timeout()
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
 
-      m_image_stream.clear();
+      m_image_stream.reset();
 
       return false; // uninstall the timeout
     }
@@ -176,14 +176,14 @@ bool Example_Images::on_timeout()
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
       dialog.run();
 
-      m_image_stream.clear();
+      m_image_stream.reset();
 
       return false; // uninstall the timeout
     }
 
     if(status == Glib::IO_STATUS_EOF)
     {
-      m_image_stream.clear();
+      m_image_stream.reset();
 
       /* Errors can happen on close, e.g. if the image
        * file was truncated we'll know on close that
@@ -203,12 +203,12 @@ bool Example_Images::on_timeout()
         Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
         dialog.run();
 
-        m_refPixbufLoader.clear();
+        m_refPixbufLoader.reset();
 
         return false; // uninstall the timeout
       }
 
-      m_refPixbufLoader.clear();
+      m_refPixbufLoader.reset();
     }
   }
   else
@@ -235,7 +235,7 @@ bool Example_Images::on_timeout()
     {
       m_refPixbufLoader->close();
 
-      m_refPixbufLoader.clear();
+      m_refPixbufLoader.reset();
     }
 
     m_refPixbufLoader = Gdk::PixbufLoader::create();
