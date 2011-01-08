@@ -54,7 +54,7 @@ AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.24 pangomm-1.4 >= 2.26 gtk+-2.0 >= 2.22.0'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.24 pangomm-1.4 >= 2.27.1 gtk+-2.0 >= 2.22.0'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -65,7 +65,7 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-1.6 >= 2.21.1 $GTKMM_MODULES"])
+      [GTKMM_MODULES="atkmm-1.6 >= 2.22.2 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
