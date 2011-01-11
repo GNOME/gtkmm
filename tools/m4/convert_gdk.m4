@@ -188,6 +188,7 @@ _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Pixmap>', `Glib::wrap((GdkPixmapObj
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkPixmap*',`Glib::RefPtr<Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkCursor*',`Glib::RefPtr<Cursor>', `Glib::wrap($3)')
+_CONVERSION(`GdkCursor*',`Glib::RefPtr<const Cursor>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<Gdk::Visual>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<Visual>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<const Visual>', `Glib::wrap($3)')

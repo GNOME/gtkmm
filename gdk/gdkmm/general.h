@@ -22,6 +22,8 @@
 
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/color.h>
+#include <gdkmm/rectangle.h>
+#include <gdkmm/rgba.h>
 #include <cairomm/context.h>
 #include <cairomm/region.h>
 
