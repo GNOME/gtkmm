@@ -273,3 +273,5 @@ _CONVERSION(`GdkEvent*',`const GdkEvent*',`($2)($3)')
 
 
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
+
+_CONVERSION(`const Widgetpath&',`GtkWidgetPath*',`const_cast<WidgetPath&>($3).gobj()')
