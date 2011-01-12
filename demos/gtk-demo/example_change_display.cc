@@ -415,10 +415,11 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 }
 
 // Finds the toplevel window under the mouse pointer, if any.
-Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& display)
+Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& /* display */)
 {
   //TODO: This needs to use Device::get_window_at_position(), when we can figure that out.
   //See https://bugzilla.gnome.org/show_bug.cgi?id=638907
+  /*
   Glib::RefPtr<Gdk::Window> refPointerWindow = display->get_window_at_pointer();
 
   if (refPointerWindow)
@@ -434,6 +435,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
     if(pWidget)
       return pWidget->get_toplevel();
   }
+  */
 
   return 0;
 }
