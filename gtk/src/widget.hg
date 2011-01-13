@@ -223,7 +223,6 @@ public:
   _WRAP_METHOD(bool is_sensitive() const, gtk_widget_is_sensitive)
   _WRAP_METHOD(void set_visible(bool visible = true), gtk_widget_set_visible)
   _WRAP_METHOD(bool get_visible() const, gtk_widget_get_visible)
-  _WRAP_METHOD(void set_has_window(bool has_window = true), gtk_widget_set_has_window)
   _WRAP_METHOD(bool get_has_window() const, gtk_widget_get_has_window)
   _WRAP_METHOD(bool get_is_toplevel() const, gtk_widget_is_toplevel)
   _WRAP_METHOD(bool get_is_drawable() const, gtk_widget_is_drawable)
@@ -239,24 +238,6 @@ public:
 
   _WRAP_METHOD(void set_child_visible(bool is_visible = true), gtk_widget_set_child_visible)
   _WRAP_METHOD(bool get_child_visible() const, gtk_widget_get_child_visible)
-
-  /** Sets a widget's window. This function should only be used in a
-   * widget's Gtk::Widget::on_realize() implementation. The %window passed is
-   * usually either a new window created with Gdk::Window::create(), or the
-   * window of its parent widget as returned by get_parent_window().
-   * 
-   * Widgets must indicate whether they will create their own Gdk::Window
-   * by calling set_has_window(). This is usually done in the
-   * widget's constructor.
-   *
-   * This function should only be called by custom widget implementations,
-   * and they should call it in their on_realize() function.
-   * 
-   * @newin{2,18}
-   * @param window A Gdk::Window.
-   */
-  void set_window(const Glib::RefPtr<Gdk::Window>& window);
-  _IGNORE(gtk_widget_set_window)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_window(), gtk_widget_get_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_window() const, gtk_widget_get_window, refreturn, constversion)
@@ -514,23 +495,6 @@ public:
   _WRAP_METHOD(bool is_composited() const, gtk_widget_is_composited)
 
   _IGNORE(gtk_widget_get_action) //deprecated
-
-  //TODO: Move this to protected when we can break API:
-  /**  Retrieves the widget's requisition.
-   *
-   * This method should only be used by widget implementations in
-   * order to discover whether the widget's requisition has actually
-   * changed after some internal state change (so that they can call
-   * queue_resize() instead of queue_draw()).
-   *
-   * Normally, size_request() should be used.
-   *
-   * @result The widget's requisition.
-   *
-   * @@newin{2,20}
-   */
-  Requisition get_requisition() const;
-  _IGNORE(gtk_widget_get_requisition)
 
   _WRAP_METHOD(bool in_destruction() const, gtk_widget_in_destruction)
   
@@ -837,6 +801,7 @@ dnl
   _WRAP_PROPERTY("margin", int)
 
 protected:
+
   //comment in GTK+ header: "seldomly overidden"
   _WRAP_VFUNC(void dispatch_child_properties_changed(guint, GParamSpec**), "dispatch_child_properties_changed")
 
@@ -852,6 +817,43 @@ protected:
   _WRAP_METHOD(void set_mapped(bool mapped = true), gtk_widget_set_mapped)
   _WRAP_METHOD(void set_realized(bool realized = true), gtk_widget_set_realized)
 
+  _WRAP_METHOD(void set_has_window(bool has_window = true), gtk_widget_set_has_window)
+  
+  /** Sets a widget's window. This function should only be used in a
+   * widget's Gtk::Widget::on_realize() implementation. The %window passed is
+   * usually either a new window created with Gdk::Window::create(), or the
+   * window of its parent widget as returned by get_parent_window().
+   * 
+   * Widgets must indicate whether they will create their own Gdk::Window
+   * by calling set_has_window(). This is usually done in the
+   * widget's constructor.
+   *
+   * This function should only be called by custom widget implementations,
+   * and they should call it in their on_realize() function.
+   * 
+   * @newin{2,18}
+   * @param window A Gdk::Window.
+   */
+  void set_window(const Glib::RefPtr<Gdk::Window>& window);
+  _IGNORE(gtk_widget_set_window)
+  
+  //TODO: Move this to protected when we can break API:
+  /**  Retrieves the widget's requisition.
+   *
+   * This method should only be used by widget implementations in
+   * order to discover whether the widget's requisition has actually
+   * changed after some internal state change (so that they can call
+   * queue_resize() instead of queue_draw()).
+   *
+   * Normally, size_request() should be used.
+   *
+   * @result The widget's requisition.
+   *
+   * @@newin{2,20}
+   */
+  Requisition get_requisition() const;
+  _IGNORE(gtk_widget_get_requisition)
+  
   _IGNORE(gtk_widget_style_attach) //deprecated
   _IGNORE(gtk_widget_get_child_requisition) //deprecated.
 
@@ -861,6 +863,7 @@ protected:
                gtk_widget_style_get_property)
 
   void realize_if_needed();
+
 
 #m4begin
 dnl// Hook in custom hierarchy_changed callback.
