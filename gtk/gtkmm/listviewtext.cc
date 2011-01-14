@@ -88,7 +88,7 @@ Glib::ustring ListViewText::get_column_title(guint column) const
   return get_column(column)->get_title();
 }
 
-guint ListViewText::append_text(const Glib::ustring& column_one_value)
+guint ListViewText::append(const Glib::ustring& column_one_value)
 {
   Gtk::TreeModel::Row newRow = *(m_model->append());
 
@@ -97,14 +97,14 @@ guint ListViewText::append_text(const Glib::ustring& column_one_value)
   return size() - 1;
 }
 
-void ListViewText::prepend_text(const Glib::ustring& column_one_value)
+void ListViewText::prepend(const Glib::ustring& column_one_value)
 {
   Gtk::TreeModel::Row newRow = *(m_model->prepend());
 
   newRow[m_model_columns.m_columns[0]] = column_one_value;
 }
 
-void ListViewText::insert_text(guint row, const Glib::ustring& column_one_value)
+void ListViewText::insert(guint row, const Glib::ustring& column_one_value)
 {
   g_return_if_fail( row < size() );
 

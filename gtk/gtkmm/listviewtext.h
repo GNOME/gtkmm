@@ -61,18 +61,18 @@ public:
    * @param column_one_value the new text for the new row, column 0
    * @return the number of the row added
    */
-  guint append_text(const Glib::ustring& column_one_value = Glib::ustring());
+  guint append(const Glib::ustring& column_one_value = Glib::ustring());
 
   /** Insert a new row at the beginning of the list
    * @param column_one_value the new text for the new row, column 0
    */
-  void prepend_text(const Glib::ustring& column_one_value = Glib::ustring());
+  void prepend(const Glib::ustring& column_one_value = Glib::ustring());
 
   /** Insert a new row at an arbitrary position in the list
    * @param row The row number
    * @param column_one_value the new text for the new row, column 0
    */
-  void insert_text(guint row, const Glib::ustring& column_one_value = Glib::ustring());
+  void insert(guint row, const Glib::ustring& column_one_value = Glib::ustring());
 
   /// Discard all row:
   void clear_items();
