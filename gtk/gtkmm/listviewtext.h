@@ -57,22 +57,47 @@ public:
    */
   Glib::ustring get_column_title(guint column) const;
 
+#ifndef GTKMM_DISABLE_DEPRECATED
   /** Add a new row at the end of the list
    * @param column_one_value the new text for the new row, column 0
    * @return the number of the row added
+   *
+   * @deprecated Use append().
    */
   guint append_text(const Glib::ustring& column_one_value = Glib::ustring());
 
   /** Insert a new row at the beginning of the list
    * @param column_one_value the new text for the new row, column 0
+   *
+   * @deprecated Use prepend().
    */
   void prepend_text(const Glib::ustring& column_one_value = Glib::ustring());
 
   /** Insert a new row at an arbitrary position in the list
    * @param row The row number
    * @param column_one_value the new text for the new row, column 0
+   *
+   * @deprecated Use insert().
    */
   void insert_text(guint row, const Glib::ustring& column_one_value = Glib::ustring());
+#endif //GTKMM_DISABLE_DEPRECATED  
+  
+  /** Add a new row at the end of the list
+   * @param column_one_value the new text for the new row, column 0
+   * @return the number of the row added
+   */
+  guint append(const Glib::ustring& column_one_value = Glib::ustring());
+
+  /** Insert a new row at the beginning of the list
+   * @param column_one_value the new text for the new row, column 0
+   */
+  void prepend(const Glib::ustring& column_one_value = Glib::ustring());
+
+  /** Insert a new row at an arbitrary position in the list
+   * @param row The row number
+   * @param column_one_value the new text for the new row, column 0
+   */
+  void insert(guint row, const Glib::ustring& column_one_value = Glib::ustring());
 
   /// Discard all row:
   void clear_items();
