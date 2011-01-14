@@ -37,7 +37,7 @@ protected:
   Gtk::Label m_Label_Checkerboard, m_Label_Scribble;
   Gtk::DrawingArea m_DrawingArea_Checkerboard, m_DrawingArea_Scribble;
 
-  Glib::RefPtr<Gdk::Pixmap> m_refPixmap_Scribble;
+  Cairo::RefPtr<Cairo::Surface> m_surface;
 };
 
 //Called by DemoWindow;
@@ -111,7 +111,7 @@ Example_DrawingArea::~Example_DrawingArea()
 {
 }
 
-bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpose*)
+bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpose* event)
 {
   enum { CHECK_SIZE = 10, SPACING = 2 };
 
@@ -122,46 +122,33 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpos
    * works.
    */
 
-  /* It would be a bit more efficient to keep these
-   * GC's around instead of recreating on each expose, but
-   * this is the lazy/slow way.
-   */
-  Glib::RefPtr<Gdk::GC> refGC1 = Gdk::GC::create(m_DrawingArea_Checkerboard.get_window());
-  Gdk::Color color;
-  color.set_red(30000);
-  color.set_green(0);
-  color.set_blue(30000);
-  refGC1->set_rgb_fg_color(color);
+  Glib::RefPtr<Gdk::Window> window = get_window();
+  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
 
-  Glib::RefPtr<Gdk::GC> refGC2 = Gdk::GC::create(m_DrawingArea_Checkerboard.get_window());
-  color.set_red(65535);
-  color.set_green(65535);
-  color.set_blue(65535);
-  refGC2->set_rgb_fg_color(color);
+  const Gdk::Rectangle rectangle(&(event->area));
+  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
+  cr->clip();
 
-  gint xcount = 0;
-  gint i = SPACING;
-  while (i < m_DrawingArea_Checkerboard.get_allocation().get_width())
+  int xcount = 0;
+  int i = SPACING;
+  const int width = m_DrawingArea_Checkerboard.get_allocation().get_width();
+  while (i < width)
   {
-    gint j = SPACING;
-    gint ycount = xcount % 2; /* start with even/odd depending on row */
+    int j = SPACING;
+    int ycount = xcount % 2; /* start with even/odd depending on row */
     while (j < m_DrawingArea_Checkerboard.get_allocation().get_height())
     {
-      Glib::RefPtr<Gdk::GC> refGC;
-    	
       if (ycount % 2)
-        refGC = refGC1;
+        cr->set_source_rgb(0.45777, 0, 0.45777);
       else
-        refGC = refGC2;
+        cr->set_source_rgb(1, 1, 1);
 
       /* If we're outside event->area, this will do nothing.
        * It might be mildly more efficient if we handled
        * the clipping ourselves, but again we're feeling lazy.
        */
-      m_DrawingArea_Checkerboard.get_window()->draw_rectangle(refGC,
-    		      true,
-    		      i, j,
-    		      CHECK_SIZE, CHECK_SIZE);
+      cr->rectangle(i, j, CHECK_SIZE, CHECK_SIZE);
+      cr->fill();
 
       j += CHECK_SIZE + SPACING;
       ++ycount;
@@ -179,36 +166,26 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_expose_event(GdkEventExpos
 
 bool Example_DrawingArea::on_drawingarea_scribble_expose_event(GdkEventExpose* event)
 {
-  /* We use the "foreground GC" for the widget since it already exists,
-   * but honestly any GC would work. The only thing to worry about
-   * is whether the GC has an inappropriate clip region set.
-   */
-  m_DrawingArea_Scribble.get_window()->draw_drawable(
-      m_DrawingArea_Scribble.get_style()->get_fg_gc(m_DrawingArea_Scribble.get_state()),
-      m_refPixmap_Scribble,
-      // Only copy the area that was exposed:
-      event->area.x, event->area.y,
-      event->area.x, event->area.y,
-      event->area.width, event->area.height);
+  Glib::RefPtr<Gdk::Window> window = get_window();
+  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+  cr->set_source(m_surface, 0, 0); //TODO: Add =0 default parameters to cairomm.
+
+  const Gdk::Rectangle rectangle(&(event->area));
+  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
+  cr->clip();
 
   return false;
 }
 
 bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfigure*)
 {
-  m_refPixmap_Scribble = Gdk::Pixmap::create(
-      m_DrawingArea_Scribble.get_window(),
-      m_DrawingArea_Scribble.get_allocation().get_width(),
-      m_DrawingArea_Scribble.get_allocation().get_height(),
-      -1);
-
-  /* Initialize the pixmap to white */
-  m_refPixmap_Scribble->draw_rectangle(
-      m_DrawingArea_Scribble.get_style()->get_white_gc(),
-      true,
-      0, 0,
-      m_DrawingArea_Scribble.get_allocation().get_width(),
-      m_DrawingArea_Scribble.get_allocation().get_height());
+  const Gtk::Allocation allocation = m_DrawingArea_Scribble.get_allocation();
+  m_surface =
+    m_DrawingArea_Scribble.get_window()->create_similar_surface(
+      Cairo::CONTENT_COLOR, allocation.get_width(), allocation.get_height());
+  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+  cr->set_source_rgb(1, 1, 1);
+  cr->paint();
 
   /* We've handled the configure event, no need for further processing. */
   return true;
@@ -216,7 +193,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfig
 
 bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMotion* event)
 {
-  if(!m_refPixmap_Scribble)
+  if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
 
   /* This call is very important; it requests the next motion event.  If you
@@ -250,7 +227,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
 
 bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(GdkEventButton* event)
 {
-  if(!m_refPixmap_Scribble)
+  if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
 
   if(event->button == 1)
@@ -266,13 +243,9 @@ void Example_DrawingArea::scribble_draw_brush(int x, int y)
 {
   const Gdk::Rectangle update_rect (x - 3, y - 3, 6, 6);
 
-  // Paint to the pixmap, where we store our state.
-  //
-  m_refPixmap_Scribble->draw_rectangle(
-      m_DrawingArea_Scribble.get_style()->get_black_gc(),
-      true,
-      update_rect.get_x(), update_rect.get_y(),
-      update_rect.get_width(), update_rect.get_height());
+  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+  Gdk::Cairo::add_rectangle_to_path(cr, update_rect);
+  cr->fill();
 
   // Now invalidate the affected region of the drawing area.
   m_DrawingArea_Scribble.get_window()->invalidate_rect(update_rect, false);

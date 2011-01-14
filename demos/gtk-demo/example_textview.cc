@@ -136,14 +136,6 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refBuffer->create_tag("blue_foreground")->property_foreground() = "blue";
   refBuffer->create_tag("red_background")->property_background() = "red";
 
-  enum { gray50_width = 2, gray50_height = 2 };
-  static const char gray50_bits[] = { 0x02, 0x01 };
-
-  Glib::RefPtr<Gdk::Bitmap> refStipple = Gdk::Bitmap::create(gray50_bits, gray50_width, gray50_height);
-
-  refBuffer->create_tag("background_stipple")->property_background_stipple() = refStipple;
-  refBuffer->create_tag("foreground_stipple")->property_foreground_stipple() = refStipple;
-
   refBuffer->create_tag("big_gap_before_line")->property_pixels_above_lines() = 30;
   refBuffer->create_tag("big_gap_after_line")->property_pixels_below_lines() = 30;
   refBuffer->create_tag("double_spaced_line")->property_pixels_inside_wrap() = 10;
@@ -224,18 +216,10 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert_with_tag(iter, "a red background", "red_background");
   iter = refBuffer->insert(iter, " or even ");
 
-
   typedef const char* type_constpch;
   {
-    type_constpch tag_names[] = {"red_background", "background_stipple", 0};
-    iter = refBuffer->insert_with_tags_by_name(iter, "a stippled red background", tag_names);
-  }
-
-  iter = refBuffer->insert(iter, " or ");
-
-  {
-    type_constpch tag_names[] = {"blue_foreground", "red_background", "foreground_stipple", 0};
-    iter = refBuffer->insert_with_tags_by_name(iter, "a stippled blue foreground on solid red background", tag_names);
+    type_constpch tag_names[] = {"blue_foreground", "red_background", 0};
+    iter = refBuffer->insert_with_tags_by_name(iter, "a blue foreground on red background", tag_names);
   }
 
   iter = refBuffer->insert(iter, " (select that to read it) can be used.\n\n");
@@ -312,7 +296,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 					    "wide_margins");
 
   iter = refBuffer->insert_with_tag(iter, "Internationalization. ", "heading");
-	
+
   iter = refBuffer->insert(iter,
       "You can put all sorts of Unicode text in the buffer.\n\nGerman (Deutsch S\xC3\xBC""d) "
       "Gr\xC3\xBC\xC3\x9F Gott\nGreek (\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA"
@@ -397,9 +381,9 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     else if (i == 1)
     {
       Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
-      pCombo->append_text("Option 1");
-      pCombo->append_text("Option 2");
-      pCombo->append_text("Option 3");
+      pCombo->append("Option 1");
+      pCombo->append("Option 2");
+      pCombo->append("Option 3");
 
       pWidget = pCombo;
     }

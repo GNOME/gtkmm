@@ -55,7 +55,7 @@ protected:
   virtual void query_change_display();
   virtual Gtk::Widget* find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& display);
   virtual Gtk::Window* query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
-  
+
   //signal handlers:
   virtual void on_button_display_open();
   virtual void on_button_display_close();
@@ -66,7 +66,7 @@ protected:
   virtual void on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display);
 
   virtual bool on_popup_button_release_event(GdkEventButton* event);
-        
+
   virtual void on_response(int response_id);
 
 
@@ -89,7 +89,7 @@ protected:
     ModelColumns_Screen() { add(m_number); add(m_screen); }
   };
   ModelColumns_Screen m_columns_screen;
-  
+
   Gtk::VBox m_VBox;
   Gtk::Frame m_Frame_Display, m_Frame_Screen;
   Gtk::TreeView m_TreeView_Display, m_TreeView_Screen;
@@ -100,13 +100,13 @@ protected:
 
   Glib::RefPtr<Gtk::SizeGroup> m_refSizeGroup_Display, m_refSizeGroup_Screen;
 
-  
+
   Glib::RefPtr<Gdk::Display> m_refCurrentDisplay;
   Glib::RefPtr<Gdk::Screen> m_refCurrentScreen;
 
   Popup* m_pPopup;
 
-  bool m_popup_clicked;                                                                                       
+  bool m_popup_clicked;
 };
 
 
@@ -122,13 +122,11 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   m_pPopup(0),
   m_popup_clicked(false)
 {
-  set_has_separator(false);
-  
   add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
   add_button("Change", Gtk::RESPONSE_OK);
 
   set_default_size(300, 400);
-  
+
   m_VBox.set_border_width(8);
   get_vbox()->pack_start(m_VBox);
 
@@ -155,7 +153,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
     m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
   }
-  
+
   //Screen:
   {
     setup_frame(m_Frame_Screen, m_TreeView_Screen, m_ButtonBox_Screen);
@@ -221,7 +219,7 @@ void Example_ChangeDisplay::initialize_displays()
   for(type_listDisplays::iterator iter = listDisplays.begin(); iter != listDisplays.end(); ++iter)
   {
     Glib::RefPtr<Gdk::Display> refDisplay = *iter;
-      
+
     Gtk::TreeRow row = *(m_refListStore_Display->append());
     row[m_columns_display.m_name] = refDisplay->get_name();;
     row[m_columns_display.m_display] = refDisplay;
@@ -230,7 +228,7 @@ void Example_ChangeDisplay::initialize_displays()
       sigc::bind<-1>( sigc::mem_fun(*this, &Example_ChangeDisplay::on_display_closed), refDisplay) );
   }
 
-#endif   
+#endif
 }
 
 void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<Gdk::Display> display)
@@ -273,7 +271,7 @@ void Example_ChangeDisplay::on_button_display_open()
     if (response_id != Gtk::RESPONSE_OK)
       break;
 
-    Glib::ustring new_screen_name = entry.get_text(); 
+    Glib::ustring new_screen_name = entry.get_text();
 
     if( !new_screen_name.empty() )
     {
@@ -301,7 +299,7 @@ void Example_ChangeDisplay::on_treeview_display_selection_changed()
   else
     m_refCurrentDisplay.reset();
 
-  fill_screens();  
+  fill_screens();
 }
 
 void Example_ChangeDisplay::on_treeview_screen_selection_changed()
@@ -323,11 +321,11 @@ void Example_ChangeDisplay::fill_screens()
   if(m_refCurrentScreen)
   {
     int n_screens = m_refCurrentDisplay->get_n_screens();
-   
+
     for (int i = 0; i < n_screens; i++)
     {
       Glib::RefPtr<Gdk::Screen> refScreen = m_refCurrentDisplay->get_screen(i);
-      
+
       Gtk::TreeModel::Row row = *(m_refListStore_Screen->append());
       row[m_columns_screen.m_number] = i;
       row[m_columns_screen.m_screen] = refScreen;
@@ -381,7 +379,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
     delete m_pPopup;
     m_pPopup = 0;
   }
-   
+
   m_pPopup = new Popup(screen, prompt);
 
   m_pPopup->show();
@@ -389,13 +387,16 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
   Gdk::Cursor cursor(refDisplay, Gdk::CROSSHAIR);
 
   Gtk::Window* toplevel = 0;
-  
-  if( m_pPopup->get_window()->pointer_grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME)
-     == Gdk::GRAB_SUCCESS )
+
+  //TODO: Find a suitable replacement for this:
+  //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
+  //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
+  const Gdk::GrabStatus grabbed = Gdk::GRAB_SUCCESS;
+  if(grabbed == Gdk::GRAB_SUCCESS )
   {
     m_popup_clicked = false;
     m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
-    
+
 
     // Process events until clicked is set by button_release_event_cb.
     // We pass in may_block=true since we want to wait if there
@@ -466,12 +467,10 @@ Popup::Popup(const Glib::RefPtr<Gdk::Screen> screen, const Glib::ustring& prompt
 Popup::~Popup()
 {
 }
- 
+
 
 // called by DemoWindow
 Gtk::Window* do_change_display()
 {
   return new Example_ChangeDisplay();
 }
-
-

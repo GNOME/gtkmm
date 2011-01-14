@@ -34,8 +34,8 @@
 #include <gdkmm/rectangle.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/main.h>
-#include <gtkmm/style.h>
 #include <gtkmm/window.h>
+#include <gdkmm/general.h>
 
 namespace
 {
@@ -73,7 +73,7 @@ public:
   virtual ~DemoRenderArea();
 
 protected:
-  virtual bool on_expose_event(GdkEventExpose* event);
+  virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 private:
   Glib::RefPtr<const Gdk::Pixbuf>                 background_;
@@ -122,27 +122,20 @@ DemoRenderArea::~DemoRenderArea()
 {}
 
 /*
- * Expose event handler of the widget.  Just fill the exposed
+ * Draw handler of the widget.  Just fill the exposed
  * area with the corresponding pixmap data from current_frame_.
  */
-bool DemoRenderArea::on_expose_event(GdkEventExpose* event)
+bool DemoRenderArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-  const int rowstride = current_frame_->get_rowstride();
-  const size_t offset = rowstride * event->area.y + 3 * event->area.x;
-
-  get_window()->draw_rgb_image_dithalign(
-      get_style()->get_black_gc(),
-      event->area.x, event->area.y, event->area.width, event->area.height,
-      Gdk::RGB_DITHER_NORMAL,
-      &current_frame_->get_pixels()[offset], rowstride,
-      event->area.x, event->area.y);
+  Gdk::Cairo::set_source_pixbuf(cr, current_frame_);
+  cr->paint();
 
   return true; // stop signal emission
 }
 
 /*
  * Generate the next frame of the animation and store it into current_frame_.
- * The expose_event handler accesses that buffer to do the actual drawing.
+ * The draw handler accesses that buffer to do the actual drawing.
  */
 void DemoRenderArea::generate_next_frame()
 {
@@ -190,7 +183,7 @@ void DemoRenderArea::generate_next_frame()
   frame_num_ = (frame_num_ + 1) % CYCLE_LEN;
 
   // Tell GTK+ the widget should be redrawn soon.  This will trigger the
-  // expose_event signal if the widget is actually mapped on the screen.
+  // draw signal if the widget is actually mapped on the screen.
   queue_draw();
 }
 
@@ -217,4 +210,3 @@ int main(int argc, char** argv)
   }
   return EXIT_SUCCESS;
 }
-

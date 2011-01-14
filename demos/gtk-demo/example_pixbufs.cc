@@ -126,19 +126,13 @@ void Example_Pixbufs::load_pixbufs()
 /* Expose callback for the drawing area */
 bool Example_Pixbufs::on_drawingarea_expose(GdkEventExpose *event)
 {
-  gint rowstride = m_refPixbuf->get_rowstride();
+  Glib::RefPtr<Gdk::Window> window = get_window();
+  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+  Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf_Background);
 
-  const guchar* pixels = m_refPixbuf->get_pixels() + (rowstride * event->area.y) + (event->area.x * 3);
-
-  Glib::RefPtr<Gdk::Window> refWindow = m_DrawingArea.get_window();
-  Glib::RefPtr<Gdk::GC> refGC = m_DrawingArea.get_style()->get_black_gc();
-
-  refWindow->draw_rgb_image_dithalign(refGC,
-				event->area.x, event->area.y,
-				event->area.width, event->area.height,
-				Gdk::RGB_DITHER_NORMAL,
-				pixels, rowstride,
-				event->area.x, event->area.y);
+  const Gdk::Rectangle rectangle(&(event->area));
+  Gdk::Cairo::add_rectangle_to_path(cr, rectangle);
+  cr->fill();
 
   return true;
 }

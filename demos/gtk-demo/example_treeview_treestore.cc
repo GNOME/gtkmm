@@ -173,9 +173,6 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   add_columns();
   m_ScrolledWindow.add(m_TreeView);
 
-#ifndef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
-  signal_realize().connect(sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_realize), false);
-#endif
   show_all();
 }
 
