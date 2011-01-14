@@ -59,4 +59,30 @@ void Window::restack(bool above)
   gdk_window_restack(gobj(), NULL, above);
 }
 
+Glib::RefPtr<DragContext> Window::drag_begin(const Glib::StringArrayHandle& targets))
+{
+  Glib::RefPtr<DragContext> result;
+  
+  //Put it into a real container that we can use:
+  std::vector<Glib::ustring> targets_copy = targets;
+   
+  //Create array of target GdkAtoms from target strings:
+  if(!targets_copy.empty())
+  {
+    GdkAtom* pAtoms = new GdkAtom[targets_copy.size()];
+
+    for(guint i = 0; i < targets_copy.size(); ++i)
+    {
+      *pAtoms = Gdk::AtomString::to_c_type(targets_copy[i]);
+    }
+
+    result = Glib::wrap(gdk_drag_begin(gobj(), targets), true);
+
+    delete[] pAtoms;
+  }
+
+  return result;
+}
+
+
 } // namespace Gdk
