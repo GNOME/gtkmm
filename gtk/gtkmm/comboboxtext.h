@@ -69,14 +69,35 @@ public:
   /** Add an item to the end of the drop-down list.
    * @param text The text for the item.
    */
-  void append_text(const Glib::ustring& text);
-
-  void insert_text(int position, const Glib::ustring& text);
+  void append(const Glib::ustring& text);
+  
+  void insert(int position, const Glib::ustring& text);
 
   /** Add an item to the beginning of the drop-down list.
    * @param text The text for the item.
    */
+  void prepend(const Glib::ustring& text);
+  
+#ifndef GTKMM_DISABLE_DEPRECATED
+  /** Add an item to the end of the drop-down list.
+   * @param text The text for the item.
+   *
+   * @deprecated Use append().
+   */
+  void append_text(const Glib::ustring& text);
+  
+  /**
+   * @deprecated Use insert().
+   */
+  void insert_text(int position, const Glib::ustring& text);
+
+  /** Add an item to the beginning of the drop-down list.
+   * @param text The text for the item.
+   *
+   * @deprecated Use prepend().
+   */
   void prepend_text(const Glib::ustring& text);
+#endif //GTKMM_DISABLE_DEPRECATED
 
   /** Get the currently-chosen item.
    * @result The text of the active item.

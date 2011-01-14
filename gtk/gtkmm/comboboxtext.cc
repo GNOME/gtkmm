@@ -54,8 +54,7 @@ ComboBoxText::ComboBoxText(GtkComboBox* castitem)
   pack_start(m_text_columns.m_column);
 }
 
-
-void ComboBoxText::append_text(const Glib::ustring& text)
+void ComboBoxText::append(const Glib::ustring& text)
 {
   //We can not use gtk_combo_box_append_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
 
@@ -71,13 +70,30 @@ void ComboBoxText::append_text(const Glib::ustring& text)
   }
 }
 
+#ifndef GTKMM_DISABLE_DEPRECATED
+void ComboBoxText::append_text(const Glib::ustring& text)
+{
+  append(text);
+}
+
+void ComboBoxText::prepend_text(const Glib::ustring& text)
+{
+  append(text);
+}
+
 void ComboBoxText::insert_text(int position, const Glib::ustring& text)
+{
+  insert(position, text);
+}
+#endif //GTKMM_DISABLE_DEPRECATED
+
+void ComboBoxText::insert(int position, const Glib::ustring& text)
 {
   //TODO: We should not use gtk_combo_box_insert_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
   gtk_combo_box_insert_text(gobj(), position, text.c_str());
 }
 
-void ComboBoxText::prepend_text(const Glib::ustring& text)
+void ComboBoxText::prepend(const Glib::ustring& text)
 {
   //We can not use gtk_combo_box_prepend_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
 
