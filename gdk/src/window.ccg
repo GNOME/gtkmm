@@ -59,26 +59,27 @@ void Window::restack(bool above)
   gdk_window_restack(gobj(), NULL, above);
 }
 
-Glib::RefPtr<DragContext> Window::drag_begin(const Glib::StringArrayHandle& targets))
+Glib::RefPtr<DragContext> Window::drag_begin(const Glib::StringArrayHandle& targets)
 {
   Glib::RefPtr<DragContext> result;
   
   //Put it into a real container that we can use:
   std::vector<Glib::ustring> targets_copy = targets;
    
-  //Create array of target GdkAtoms from target strings:
+  //Create GList from target strings:
   if(!targets_copy.empty())
   {
-    GdkAtom* pAtoms = new GdkAtom[targets_copy.size()];
-
+    GList* list = 0;
+    
     for(guint i = 0; i < targets_copy.size(); ++i)
     {
-      *pAtoms = Gdk::AtomString::to_c_type(targets_copy[i]);
+      GdkAtom atom = Gdk::AtomString::to_c_type(targets_copy[i]);
+      list = g_list_append (list, GUINT_TO_POINTER (atom));
     }
 
-    result = Glib::wrap(gdk_drag_begin(gobj(), targets), true);
+    result = Glib::wrap(gdk_drag_begin(gobj(), list), true);
 
-    delete[] pAtoms;
+    g_list_free(list);
   }
 
   return result;
