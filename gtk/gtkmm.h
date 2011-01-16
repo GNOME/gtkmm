@@ -171,6 +171,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/misc.h>
 #include <gtkmm/notebook.h>
+#include <gtkmm/numerableicon.h>
 #include <gtkmm/object.h>
 #include <gtkmm/offscreenwindow.h>
 #include <gtkmm/paned.h>
