@@ -87,6 +87,31 @@ void Application::on_activate_showwindow()
 {
   if(m_main_window)
     m_main_window->show();
+  
+  m_main_window = 0; //We don't need to remember this anymore.
+}
+
+void Application::on_window_hide(Window* window)
+{
+  //Tell GtkApplication to forget the window.
+  //This can cause run() to return, if it is the last window.
+  //Otherwise, GtkApplication waits for the window to be _destroyed_,
+  //which is just not something that it should care about:
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639931
+  if(window && window->get_application()) //We check that it's still in an application anyway.
+    remove_window(*window);
+}
+
+void Application::add_window(Window& window)
+{
+  //Respond to window hiding, not destruction:
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639931
+  window.signal_hide().connect(
+    sigc::bind(
+      sigc::mem_fun(*this, &Application::on_window_hide),
+      &window));
+    
+  gtk_application_add_window(gobj(), (window).gobj()); 
 }
 
 int Application::run(int argc, char** argv)
@@ -94,8 +119,7 @@ int Application::run(int argc, char** argv)
   return Gio::Application::run(argc, argv);
 }
 
-
-int Application::run(Gtk::Window& window, int argc, char** argv)
+int Application::run(Window& window, int argc, char** argv)
 {
   add_window(window);
   
@@ -112,7 +136,7 @@ int Application::run(Gtk::Window& window, int argc, char** argv)
   return result;
 }
 
-int Application::run(Gtk::Window& window)
+int Application::run(Window& window)
 {
   g_assert(m_argc);
   g_assert(m_argv);
