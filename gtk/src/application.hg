@@ -37,12 +37,38 @@ protected:
   _CLASS_GOBJECT(Application, GtkApplication, GTK_APPLICATION, Gio::Application, GApplication)
 
 protected:
-#m4 _CONVERSION(`Gio::ApplicationFlags',`GApplicationFlags',`(GApplicationFlags)($3)')
-  _WRAP_CTOR(Application(const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE), gtk_application_new)
 
+  /** Creates a new Application instance.
+   * This constructor calls g_type_init() for you.
+   * You should call run() with your main() function's argc and argv parameters
+   * to initialize gtkmm too.
+   *
+   * @param application_id A valid application id
+   * @param flags The application flags
+   */
+  explicit Application(const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE);
+  _IGNORE(gtk_application_new)
+
+  //This constructor does not correspond to anything in the C API.
+  //We added it so we can choose to always initialize gtkmm as early as possible.
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639925
+  /** Creates a new Application instance.
+   * This constructor initializes gtkmm for you, so you should call run() 
+   * without specifying the the argc and argv parameters again. 
+   * 
+   * @param argc The parameter received by your main() function.
+   * @param argv The parameter received by your main() function.
+   * @param application_id A valid application id
+   * @param flags The application flags
+   */
+  explicit Application(int argc, char** argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE);
+  
 public:
 
+#m4 _CONVERSION(`Gio::ApplicationFlags',`GApplicationFlags',`(GApplicationFlags)($3)')
   _WRAP_CREATE(const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE)
+  
+  _WRAP_CREATE(int argc, char** argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle<Window*>',`$2($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle<Window*> get_windows(), gtk_application_get_windows)
@@ -52,6 +78,64 @@ public:
 
   _WRAP_METHOD(void add_window(Window& window), gtk_application_add_window)
   _WRAP_METHOD(void remove_window(Window& window), gtk_application_remove_window)
+
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   * 
+   * @newin{2,28}
+   */
+  int run(int argc, char** argv);
+  
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   *
+   * @param window The window to show. This method will return when the window is hidden.
+   * 
+   * @newin{2,28}
+   */
+  int run(Gtk::Window& window, int argc, char** argv);
+
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   *
+   * @param window The window to show. This method will return when the window is hidden.
+   * 
+   * @newin{2,28}
+   */
+  int run(Gtk::Window& window);
+  
+private:
+  /** This is just a way to call Glib::init() (which calls g_type_init()) before
+   * calling application_class_.init(), so that 
+   * gtk_application_get_type() will always succeed.
+   * See https://bugzilla.gnome.org/show_bug.cgi?id=639925
+   */
+  const Glib::Class& custom_class_init();
+  
+  void on_activate_showwindow();
+  
+  ///We show the window in the activate signal handler.
+  Gtk::Window* m_main_window;
+  
+  //We need these to call g_application_run(), 
+  //even if we have already called gtk_init().
+  int m_argc;
+  char** m_argv;
 };
 
 } // namespace Gtk
