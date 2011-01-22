@@ -20,6 +20,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <gdkmm/devicemanager.h>
 #include <gdkmm/window.h>
 #include <gdk/gdk.h>
@@ -47,25 +49,16 @@ void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window,
   gdk_display_store_clipboard(gobj(), clipboard_window->gobj(), time_, 0 /* see the C docs */, 0);
 }
 
-void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_, const Glib::StringArrayHandle& targets)
- {
-   //Put it into a real container that we can use:
-   std::vector<Glib::ustring> targets_copy = targets;
-
-   //Create array of target GdkAtoms from target strings:
-   if(!targets_copy.empty())
-   {
-     GdkAtom* pAtoms = new GdkAtom[targets_copy.size()];
-
-     for(guint i = 0; i < targets_copy.size(); ++i)
-     {
-       *pAtoms = Gdk::AtomString::to_c_type(targets_copy[i]);
-     }
-
-     gdk_display_store_clipboard(gobj(), clipboard_window->gobj(), time_, 0 /* see the C docs */, 0);
-
-     delete[] pAtoms;
-   }
+void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_, const std::vector<std::string>& targets)
+{
+  if (!targets.size ())
+  {
+    gdk_display_store_clipboard (gobj(),
+                                 Glib::unwrap (clipboard_window),
+                                 time_,
+                                 Glib::ArrayHandler<std::string, AtomStringTraits>::vector_to_array (targets).data (),
+                                 targets.size ());
+  }
  }
 
 } //Gdk
