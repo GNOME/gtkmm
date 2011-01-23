@@ -19,6 +19,8 @@
 
 _DEFS(gtkmm,gtk)
 
+#include <vector>
+
 #include <gdkmm/display.h>
 #include <gdkmm/pixbuf.h>
 
@@ -79,11 +81,12 @@ public:
   _WRAP_METHOD(bool set_pixbuf(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_selection_data_set_pixbuf)
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(), gtk_selection_data_get_pixbuf)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Pixbuf> get_pixbuf() const, gtk_selection_data_get_pixbuf, constversion)
-  
+
 #dnl The constness of gtk_selection_data_set_uris() is not quite right:
-#m4 _CONVERSION(`const Glib::StringArrayHandle&',`gchar**',`const_cast<char**>(($3).data())') 
-  _WRAP_METHOD(bool set_uris(const Glib::StringArrayHandle& uris), gtk_selection_data_set_uris)
-  _WRAP_METHOD(Glib::StringArrayHandle get_uris() const, gtk_selection_data_get_uris)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`gchar**',`const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array ($3).data())') 
+  _WRAP_METHOD(bool set_uris(const std::vector<Glib::ustring>& uris), gtk_selection_data_set_uris)
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector ($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_uris() const, gtk_selection_data_get_uris)
 
 
   _WRAP_METHOD(const guchar* get_data() const, gtk_selection_data_get_data)
@@ -91,8 +94,8 @@ public:
 
   std::string get_data_as_string() const;
 
-  //TODO: Change the return type to std::string, when we can break ABI:
-  _WRAP_METHOD(GdkAtom get_selection() const, gtk_selection_data_get_selection)
+#m4 _CONVERSION(`GdkAtom',`std::string',`Gdk::AtomString::to_cpp_type ($3)')
+  _WRAP_METHOD(std::string get_selection() const, gtk_selection_data_get_selection)
 
   /** Retrieves the target of the selection.
    *
@@ -102,7 +105,7 @@ public:
   _IGNORE(gtk_selection_data_get_target)
 
   /// See also Gtk::Clipboard::request_targets()
-  Gdk::ArrayHandle_AtomString get_targets() const;
+  std::vector<std::string> get_targets() const;
   _IGNORE(gtk_selection_data_get_targets)
 
   /** Returns the type of the data as set by SelectionData::set().

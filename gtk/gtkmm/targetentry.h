@@ -69,7 +69,7 @@ protected:
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-struct TargetEntry_Traits
+struct TargetEntryTraits
 {
   typedef TargetEntry CppType;
   typedef GtkTargetEntry CType;
@@ -87,8 +87,6 @@ struct TargetEntry_Traits
   static void release_c_type(const CType&) {}
 };
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-typedef Glib::ArrayHandle< TargetEntry, TargetEntry_Traits > ArrayHandle_TargetEntry;
 
 } /* namespace Gtk */
 

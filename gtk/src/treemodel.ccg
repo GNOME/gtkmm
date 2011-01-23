@@ -18,6 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
 #include <gtkmm/treeiter.h>
 #include <gtkmm/treepath.h>
 #include <gtk/gtk.h>
@@ -590,16 +592,22 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
 
 
 
-void TreeModel::rows_reordered(const Path& path, const iterator& iter, const Glib::ArrayHandle<int>& new_order)
+void TreeModel::rows_reordered(const Path& path, const iterator& iter, const std::vector<int>& new_order)
 {
   //The size of the array seems to be based on the known number of children. murrayc.
-  gtk_tree_model_rows_reordered(gobj(), const_cast<GtkTreePath*>((path).gobj()), const_cast<GtkTreeIter*>((iter).gobj()), const_cast<int*>(new_order.data()));
+  gtk_tree_model_rows_reordered(gobj(),
+                                const_cast<GtkTreePath*>((path).gobj()),
+                                const_cast<GtkTreeIter*>((iter).gobj()),
+                                const_cast<int*>(Glib::ArrayHandler<int>::vector_to_data (new_order).data ()));
 }
 
-void TreeModel::rows_reordered(const Path& path, const Glib::ArrayHandle<int>& new_order)
+void TreeModel::rows_reordered(const Path& path, const std::vector<int>& new_order)
 {
   //The size of the array seems to be based on the known number of children. murrayc.
-  gtk_tree_model_rows_reordered(gobj(), const_cast<GtkTreePath*>((path).gobj()), 0, const_cast<int*>(new_order.data()));
+  gtk_tree_model_rows_reordered(gobj(),
+                                const_cast<GtkTreePath*>((path).gobj()),
+                                0,
+                                const_cast<int*>(Glib::ArrayHandler<int>::vector_to_array (new_order).data ()));
 }
 
 } // namespace Gtk
