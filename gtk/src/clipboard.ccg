@@ -19,6 +19,8 @@
 
 #include <glibmm/vectorutils.h>
 
+#include <gdkmm/types.h>
+
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/selectiondata_private.h>
 #include <glibmm/utility.h> //For ScopedPtr<>.
@@ -114,7 +116,7 @@ static void SignalProxy_TargetsReceived_gtk_callback(GtkClipboard*, GdkAtom* ato
   try
   {
     // TODO: check if the ownership is good.
-    (*slot) (Glib::ArrayHandler<std::string, AtomStringTraits>::array_to_vector (names, n_atoms > 0 ? n_atoms : 0, Glib::OWNERSHIP_NONE));
+    (*slot) (Glib::ArrayHandler<std::string, Gdk::AtomStringTraits>::array_to_vector (atoms, n_atoms > 0 ? n_atoms : 0, Glib::OWNERSHIP_NONE));
   }
   catch (...)
   {
@@ -204,7 +206,7 @@ bool Clipboard::set(const std::vector<TargetEntry>& targets,
 
   return gtk_clipboard_set_with_data(
       gobj(),
-      Glib::ArrayHandler<TargetEntry, TargetEntry_Traits>::vector_to_array (targets).data (),
+      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array (targets).data (),
       targets.size(),
       &SignalProxy_GetClear_gtk_callback_get,
       &SignalProxy_GetClear_gtk_callback_clear,
@@ -286,12 +288,12 @@ std::vector<std::string> Clipboard::wait_for_targets() const
     n_targets = 0;
   }
 
-  return Glib::ArrayHandler<std::string, AtomStringTraits>::array_to_vector (atoms, n_targets, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<std::string, Gdk::AtomStringTraits>::array_to_vector (atoms, n_targets, Glib::OWNERSHIP_SHALLOW);
 }
 
 void Clipboard::set_can_store(const std::vector<TargetEntry>& targets)
 {
-  gtk_clipboard_set_can_store( gobj(), Glib::ArrayHandler<TargetEntry, TargetEntry_Traits>::vector_to_array (targets).data (), targets.size() );
+  gtk_clipboard_set_can_store( gobj(), Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array (targets).data (), targets.size() );
 }
 
 void Clipboard::set_can_store()

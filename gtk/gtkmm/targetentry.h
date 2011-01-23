@@ -25,7 +25,6 @@
 
 #include <glibmm/utility.h>
 #include <glibmm/ustring.h>
-#include <glibmm/arrayhandle.h>
 #include <gtkmm/enums.h>
 #include <gtk/gtk.h> //For GtkTargetEntry.
 
