@@ -162,9 +162,9 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image)
   return (image.gobj() != 0);
 }
 
-Glib::SListHandle<Gtk::StockID,Gtk::StockID_Traits> get_ids()
+std::vector<Gtk::StockID> get_ids()
 {
-  return Glib::SListHandle<Gtk::StockID,Gtk::StockID_Traits>(
+  return Glib::SListHandler<Gtk::StockID,Gtk::StockID_Traits>::array_to_vector (
       gtk_stock_list_ids(), Glib::OWNERSHIP_DEEP);
 }
 
