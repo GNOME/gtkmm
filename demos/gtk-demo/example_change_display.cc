@@ -213,7 +213,7 @@ void Example_ChangeDisplay::initialize_displays()
 #ifndef G_OS_WIN32
   Glib::RefPtr<Gdk::DisplayManager> refDisplayManager = Gdk::DisplayManager::get();
 
-  typedef std::list< Glib::RefPtr<Gdk::Display> > type_listDisplays;
+  typedef std::vector< Glib::RefPtr<Gdk::Display> > type_listDisplays;
   type_listDisplays listDisplays = refDisplayManager->list_displays();
 
   for(type_listDisplays::iterator iter = listDisplays.begin(); iter != listDisplays.end(); ++iter)

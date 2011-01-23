@@ -216,9 +216,11 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert_with_tag(iter, "a red background", "red_background");
   iter = refBuffer->insert(iter, " or even ");
 
-  typedef const char* type_constpch;
   {
-    type_constpch tag_names[] = {"blue_foreground", "red_background", 0};
+    std::vector<Glib::ustring> tag_names;
+
+    tag_names.push_back ("blue_foreground");
+    tag_names.push_back ("red_background");
     iter = refBuffer->insert_with_tags_by_name(iter, "a blue foreground on red background", tag_names);
   }
 
@@ -250,7 +252,10 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert(iter, "You can adjust the amount of space before each line.\n");
 
   {
-    type_constpch tag_names[] = {"big_gap_before_line", "wide_margins", 0};
+    std::vector<Glib::ustring> tag_names;
+
+    tag_names.push_back ("big_gap_before_line");
+    tag_names.push_back ("wide_margins");
     iter = refBuffer->insert_with_tags_by_name(iter,
   					    "This line has a whole lot of space before it.\n", tag_names);
     iter = refBuffer->insert_with_tags_by_name(iter,
@@ -258,7 +263,10 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   }
 
   {
-    type_constpch tag_names[] = {"double_spaced_line", "wide_margins", 0};
+    std::vector<Glib::ustring> tag_names;
+
+    tag_names.push_back ("double_spaced_line");
+    tag_names.push_back ("wide_margins");
     iter = refBuffer->insert_with_tags_by_name(iter,
   					    "You can also adjust the amount of space between wrapped lines; this line has extra space between each wrapped line in the same paragraph. To show off wrapping, some filler text: the quick brown fox jumped over the lazy dog. Blah blah blah blah blah blah blah blah blah.\n",
   					    tag_names);
