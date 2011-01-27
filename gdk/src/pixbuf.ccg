@@ -18,6 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
 #include <gdkmm/window.h>
 #include <gdk/gdk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -119,14 +121,15 @@ void Pixbuf::save(const std::string& filename, const Glib::ustring& type)
 
 
 void Pixbuf::save(const std::string& filename, const Glib::ustring& type,
-                  const Glib::StringArrayHandle& option_keys,
-                  const Glib::StringArrayHandle& option_values)
+                  const std::vector<Glib::ustring>& option_keys,
+                  const std::vector<Glib::ustring>& option_values)
 {
   GError* gerror = 0;
 
   gdk_pixbuf_savev(
       gobj(), filename.c_str(), type.c_str(),
-      const_cast<char**>(option_keys.data()), const_cast<char**>(option_values.data()),
+      const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array(option_keys).data ()),
+      const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array(option_values).data ()),
       &gerror);
 
   if(gerror)
@@ -150,24 +153,25 @@ void Pixbuf::save_to_buffer(gchar*& buffer, gsize& buffer_size,
 
 void Pixbuf::save_to_buffer(gchar*& buffer, gsize& buffer_size,
                             const Glib::ustring& type,
-                            const Glib::StringArrayHandle& option_keys,
-                            const Glib::StringArrayHandle& option_values)
+                            const std::vector<Glib::ustring>& option_keys,
+                            const std::vector<Glib::ustring>& option_values)
 {
   GError* gerror = 0;
 
   gdk_pixbuf_save_to_bufferv(
       gobj(), &buffer, &buffer_size,
       type.c_str(),
-      const_cast<char**>(option_keys.data()), const_cast<char**>(option_values.data()),
+      const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array(option_keys).data ()),
+      const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array(option_values).data ()),
       &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 }
 
-Pixbuf::SListHandle_PixbufFormat Pixbuf::get_formats()
+std::vector<PixbufFormat> Pixbuf::get_formats()
 {
-  return SListHandle_PixbufFormat(gdk_pixbuf_get_formats(), Glib::OWNERSHIP_SHALLOW);
+  return Glib::SListHandler<PixbufFormat, PixbufFormatTraits>::slist_to_vector(gdk_pixbuf_get_formats(), Glib::OWNERSHIP_SHALLOW);
 }
 
 } // namespace Gdk

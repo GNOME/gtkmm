@@ -105,7 +105,7 @@ inline bool operator!=(const StockID& lhs, const StockID& rhs)
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-struct StockID_Traits : public Glib::Container_Helpers::TypeTraits<Glib::ustring>
+struct StockIDTraits : public Glib::Container_Helpers::TypeTraits<Glib::ustring>
 {
   typedef Gtk::StockID CppType;
 

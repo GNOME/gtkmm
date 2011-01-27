@@ -18,6 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
 #include <gtkmm/treeview.h>
 #include <gtk/gtk.h>
 
@@ -163,18 +165,18 @@ void TreeSelection::selected_foreach(const SlotForeachPathAndIter& slot) const
   gtk_tree_selection_selected_foreach(const_cast<GtkTreeSelection*>(gobj()), &proxy_foreach_selection_path_and_iter_callback, &slot_copy);
 }
 
-TreeSelection::ListHandle_Path TreeSelection::get_selected_rows() const
+std::vector<TreeModel::Path> TreeSelection::get_selected_rows() const
 {
-  return ListHandle_Path(gtk_tree_selection_get_selected_rows(
+  return Glib::ListHandler<TreeModel::Path, TreePathTraits>::list_to_vector(gtk_tree_selection_get_selected_rows(
       const_cast<GtkTreeSelection*>(gobj()), 0), Glib::OWNERSHIP_DEEP);
 }
 
-TreeSelection::ListHandle_Path TreeSelection::get_selected_rows(Glib::RefPtr<TreeModel>& model)
+std::vector<TreeModel::Path> TreeSelection::get_selected_rows(Glib::RefPtr<TreeModel>& model)
 {
   GtkTreeModel* model_gobject = 0;
 
-  const ListHandle_Path result (gtk_tree_selection_get_selected_rows(
-      const_cast<GtkTreeSelection*>(gobj()), &model_gobject), Glib::OWNERSHIP_DEEP);
+  const std::vector<TreeModel::Path> result (Glib::ListHandler<TreeModel::Path, TreePathTraits>::list_to_vector(gtk_tree_selection_get_selected_rows(
+      const_cast<GtkTreeSelection*>(gobj()), &model_gobject), Glib::OWNERSHIP_DEEP));
 
   model = Glib::wrap(model_gobject, true);
   return result;

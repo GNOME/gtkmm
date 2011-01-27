@@ -17,6 +17,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
+#include <gdkmm/types.h>
+
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/selectiondata_private.h>
 #include <glibmm/utility.h> //For ScopedPtr<>.
@@ -111,15 +115,8 @@ static void SignalProxy_TargetsReceived_gtk_callback(GtkClipboard*, GdkAtom* ato
 
   try
   {
-    // TODO: This conversion should normally be performed in a custom
-    // Traits implementation.  Alternatively, a real container could
-    // have been used as the argument instead of handle.
-    const unsigned int n_names = (n_atoms > 0) ? n_atoms : 0;
-    char** names = g_new(char*, n_names);
-
-    std::transform(&atoms[0], &atoms[n_names], &names[0], &gdk_atom_name);
-
-    (*slot)(Glib::StringArrayHandle(names, n_names, Glib::OWNERSHIP_DEEP));
+    // TODO: check if the ownership is good.
+    (*slot) (Glib::ArrayHandler<Glib::ustring, Gdk::AtomStringTraits>::array_to_vector(atoms, n_atoms > 0 ? n_atoms : 0, Glib::OWNERSHIP_NONE));
   }
   catch (...)
   {
@@ -169,8 +166,9 @@ static void SignalProxy_UrisReceived_gtk_callback(GtkClipboard*, gchar** uris, v
 
   try
   {
+    // TODO: check if the ownetship is good. krnowak.
     //Handle: Does this take ownership? It should probalby copy. murrayc.
-    (*the_slot)( Glib::StringArrayHandle(uris) );
+    (*the_slot)( Glib::ArrayHandler<Glib::ustring>::array_to_vector(uris, Glib::OWNERSHIP_NONE) );
   }
   catch(...)
   {
@@ -200,14 +198,16 @@ static void SignalProxy_ImageReceived_gtk_callback(GtkClipboard*, GdkPixbuf* ima
 namespace Gtk
 {
 
-bool Clipboard::set(const ArrayHandle_TargetEntry& targets,
+bool Clipboard::set(const std::vector<TargetEntry>& targets,
                     const SlotGet& slot_get, const SlotClear& slot_clear)
 {
   // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
   SignalProxy_GetClear *const pSignalProxy = new SignalProxy_GetClear(slot_get, slot_clear);
 
   return gtk_clipboard_set_with_data(
-      gobj(), targets.data(), targets.size(),
+      gobj(),
+      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data (),
+      targets.size(),
       &SignalProxy_GetClear_gtk_callback_get,
       &SignalProxy_GetClear_gtk_callback_clear,
       pSignalProxy);
@@ -278,30 +278,22 @@ SelectionData Clipboard::wait_for_contents(const Glib::ustring& target) const
   return SelectionData(cData, false /* take_copy */);
 }
 
-Glib::StringArrayHandle Clipboard::wait_for_targets() const
+std::vector<Glib::ustring> Clipboard::wait_for_targets() const
 {
-  char**   names = 0;
-  GdkAtom* atoms = 0;
-  int  n_targets = 0;
+  GdkAtom* atoms (0);
+  int n_targets (0);
 
-  // TODO: This works, but is not the intended way to use the array handles.
-  // Normally one would define custom Traits for the conversion, but that is
-  // not possible here because it would break binary compatibility.
-  if (gtk_clipboard_wait_for_targets(const_cast<GtkClipboard*>(gobj()), &atoms, &n_targets))
+  if (!gtk_clipboard_wait_for_targets(const_cast<GtkClipboard*>(gobj()), &atoms, &n_targets))
   {
-    names = g_new(char*, n_targets);
-    std::transform(&atoms[0], &atoms[n_targets], &names[0], &gdk_atom_name);
-    g_free(atoms);
-  }
-  else
     n_targets = 0;
+  }
 
-  return Glib::StringArrayHandle(names, n_targets, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::ustring, Gdk::AtomStringTraits>::array_to_vector(atoms, n_targets, Glib::OWNERSHIP_SHALLOW);
 }
 
-void Clipboard::set_can_store(const ArrayHandle_TargetEntry& targets)
+void Clipboard::set_can_store(const std::vector<TargetEntry>& targets)
 {
-  gtk_clipboard_set_can_store( gobj(), targets.data(), targets.size() );
+  gtk_clipboard_set_can_store( gobj(), Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data (), targets.size() );
 }
 
 void Clipboard::set_can_store()

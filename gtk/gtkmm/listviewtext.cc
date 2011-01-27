@@ -163,7 +163,7 @@ guint ListViewText::get_num_columns() const
 ListViewText::SelectionList ListViewText::get_selected()
 {
   Glib::RefPtr<Gtk::TreeSelection> selected = get_selection();
-  Gtk::TreeSelection::ListHandle_Path selectedRows = selected->get_selected_rows();
+  std::vector<TreeModel::Path> selectedRows = selected->get_selected_rows();
 
   // Reserve space
   SelectionList selectionList;
@@ -171,7 +171,7 @@ ListViewText::SelectionList ListViewText::get_selected()
 
   // Save selected rows
 
-  for(Gtk::TreeSelection::ListHandle_Path::const_iterator iter = selectedRows.begin(); iter != selectedRows.end(); ++iter)
+  for (std::vector<TreeModel::Path>::const_iterator iter = selectedRows.begin(); iter != selectedRows.end(); ++iter)
   {
     selectionList.push_back( *((*iter).begin()) );
   }

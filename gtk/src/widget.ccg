@@ -18,6 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
 #include <gtkmm/adjustment.h>
 #include <gtkmm/window.h>
 #include <gtkmm/accelgroup.h>
@@ -294,24 +296,26 @@ void Widget::drag_dest_set(DestDefaults flags, Gdk::DragAction actions)
   gtk_drag_dest_set(gobj(), (GtkDestDefaults)flags, 0, 0, (GdkDragAction)actions);
 }
 
-void Widget::drag_dest_set(const ArrayHandle_TargetEntry& targets,
+void Widget::drag_dest_set(const std::vector<TargetEntry>& targets,
                            DestDefaults flags, Gdk::DragAction actions)
 {
   // I've used Gdk::ACTION_COPY as the default, because Gdk::ACTION_DEFAULT means that
   // it's never a drag destination, so it would seem like this method didn't work. murrayc.
   gtk_drag_dest_set(
       gobj(), (GtkDestDefaults)flags,
-      targets.data(), targets.size(), (GdkDragAction)actions);
+      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data(),
+      targets.size(), (GdkDragAction)actions);
 }
 
-void Widget::drag_source_set(const ArrayHandle_TargetEntry& targets,
+void Widget::drag_source_set(const std::vector<TargetEntry>& targets,
                              Gdk::ModifierType start_button_mask, Gdk::DragAction actions)
 {
   // I've used Gdk::MODIFIER_MASK as the default, because it seems
   // to mean 'whatever is possible in the context'. murrayc.
   gtk_drag_source_set(
       gobj(), (GdkModifierType)start_button_mask,
-      targets.data(), targets.size(), (GdkDragAction)actions);
+      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data(),
+      targets.size(), (GdkDragAction)actions);
 }
 
 Widget* Widget::drag_get_source_widget(const Glib::RefPtr<Gdk::DragContext>& context) //static

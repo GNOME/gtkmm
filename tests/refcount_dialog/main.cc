@@ -42,9 +42,9 @@ void MyWindow::on_button_clicked()
     std::cout << "After d.run()" << std::endl;
   }
 
-   std::cout << "before list_toplevel" << std::endl;
-  std::list<Gtk::Window*> toplevelwindows = list_toplevels();
-   std::cout << "after list_toplevel" << std::endl;
+  std::cout << "before list_toplevel" << std::endl;
+  std::vector<Gtk::Window*> toplevelwindows = list_toplevels();
+  std::cout << "after list_toplevel" << std::endl;
 
   std::cout << "toplevelwindows.size = " << toplevelwindows.size() << std::endl;
 }

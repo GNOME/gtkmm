@@ -217,7 +217,7 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image)
   *
   * @return list of all known stock IDs.
   */
-Glib::SListHandle<Gtk::StockID,Gtk::StockID_Traits> get_ids();
+std::vector<Gtk::StockID> get_ids();
 
 } // namespace Stock
 

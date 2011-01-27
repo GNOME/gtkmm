@@ -18,6 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/vectorutils.h>
+
 #include <gtk/gtk.h>
 
 
@@ -34,7 +36,7 @@ static void global_change_palette_hook_callback(GdkScreen* screen, const GdkColo
   {
     (*global_change_palette_hook)(
         Glib::wrap(screen, true),
-        Gdk::ArrayHandle_Color(colors, n_colors, Glib::OWNERSHIP_NONE));
+        Glib::ArrayHandler<Gdk::Color, Gdk::ColorTraits>::array_to_vector(colors, n_colors, Glib::OWNERSHIP_NONE));
   }
   catch(...)
   {
@@ -43,12 +45,14 @@ static void global_change_palette_hook_callback(GdkScreen* screen, const GdkColo
 }
 
 static void old_change_palette_hook_callback(const Glib::RefPtr<Gdk::Screen>& screen,
-                                      const Gdk::ArrayHandle_Color&    colors,
+                                      const std::vector<Gdk::Color>&    colors,
                                       GtkColorSelectionChangePaletteWithScreenFunc func)
 {
   g_return_if_fail(func != 0);
 
-  (*func)(Glib::unwrap(screen), colors.data(), colors.size());
+  (*func)(Glib::unwrap(screen),
+          Glib::ArrayHandler<Gdk::Color, Gdk::ColorTraits>::vector_to_array(colors).data(),
+          colors.size());
 }
 
 } // anonymous namespace
@@ -86,20 +90,20 @@ Gdk::RGBA ColorSelection::get_previous_rgba() const
 }
 
 // static
-Gdk::ArrayHandle_Color ColorSelection::palette_from_string(const Glib::ustring& str)
+std::vector<Gdk::Color> ColorSelection::palette_from_string(const Glib::ustring& str)
 {
   GdkColor* colors = 0;
   int     n_colors = 0;
 
   gtk_color_selection_palette_from_string(str.c_str(), &colors, &n_colors);
 
-  return Gdk::ArrayHandle_Color(colors, n_colors, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<Gdk::Color, Gdk::ColorTraits>::array_to_vector(colors, n_colors, Glib::OWNERSHIP_SHALLOW);
 }
 
 // static
-Glib::ustring ColorSelection::palette_to_string(const Gdk::ArrayHandle_Color& colors)
+Glib::ustring ColorSelection::palette_to_string(const std::vector<Gdk::Color>& colors)
 {
-  if(char *const str = gtk_color_selection_palette_to_string(colors.data(), colors.size()))
+  if(char *const str = gtk_color_selection_palette_to_string(Glib::ArrayHandler<Gdk::Color, Gdk::ColorTraits>::vector_to_array(colors).data (), colors.size()))
     return Glib::ustring(Glib::ScopedPtr<char>(str).get());
   else
     return Glib::ustring();

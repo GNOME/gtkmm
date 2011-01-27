@@ -15,9 +15,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gtk/gtk.h>
+#include <glibmm/vectorutils.h>
 
-#include <vector>
+#include <gtk/gtk.h>
 
 #include <glib.h>
 
@@ -119,39 +119,21 @@ PrintSettings::PageRange::PageRange(int start_, int end_)
   end(end_)
 {}
 
-Glib::ArrayHandle<PrintSettings::PageRange> PrintSettings::get_page_ranges() const
+std::vector<PrintSettings::PageRange> PrintSettings::get_page_ranges() const
 {
-  int num_ranges;
+  int num_ranges (0);
   GtkPageRange* page_ranges =
     gtk_print_settings_get_page_ranges(const_cast<GtkPrintSettings*>(gobj()), &num_ranges);
-  std::vector<PrintSettings::PageRange> v(num_ranges);
 
-  for (int i = 0; i < num_ranges; ++i)
-  {
-    v.push_back(PrintSettings::PageRange(page_ranges[i].start, page_ranges[i].end));
-  }
-
-  g_free(page_ranges);
-
-  Glib::ArrayHandle<PrintSettings::PageRange> ah(v);
-
-  return ah;
+  // no need for deep ownership.
+  return Glib::ArrayHandler<PageRange, PageRangeTraits>::array_to_vector(page_ranges, num_ranges, Glib::OWNERSHIP_SHALLOW);
 }
 
-void PrintSettings::set_page_ranges(const Glib::ArrayHandle<PrintSettings::PageRange>& page_ranges)
+void PrintSettings::set_page_ranges(const std::vector<PrintSettings::PageRange>& page_ranges)
 {
-  int n = page_ranges.size();
-  GtkPageRange* ranges = g_new0(GtkPageRange, n);
-  std::vector<PrintSettings::PageRange> v_ranges(page_ranges);
-
-  for (int i = 0; i < n; ++i)
-  {
-    ranges[i].start = v_ranges[i].start;
-    ranges[i].end = v_ranges[i].end;
-  }
-
-  gtk_print_settings_set_page_ranges(const_cast<GtkPrintSettings*>(gobj()), ranges, n);
-  g_free(ranges);
+  gtk_print_settings_set_page_ranges(gobj(),
+                                     Glib::ArrayHandler<PageRange, PageRangeTraits>::vector_to_array(page_ranges).data (),
+                                     page_ranges.size ());
 }
 
 
