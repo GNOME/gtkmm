@@ -97,6 +97,12 @@ public:
    * @deprecated Use prepend().
    */
   void prepend_text(const Glib::ustring& text);
+  
+  /** Remove all items from the drop-down menu.
+   *
+   * @deprecated Use remove_all().
+   */
+  void clear_items();
 #endif //GTKMM_DISABLE_DEPRECATED
 
   /** Get the currently-chosen item.
@@ -116,8 +122,8 @@ public:
 
   /** Remove all items from the drop-down menu.
    */
-  void clear_items();
-
+  void remove_all();
+  
   /** Remove the specified item if it is in the drop-down menu.
    * @text The text of the item that should be removed.
    */

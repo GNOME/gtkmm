@@ -129,10 +129,15 @@ Glib::ustring ComboBoxText::get_active_text() const
 //deprecated.
 void ComboBoxText::clear()
 {
-  clear_items();
+  remove_all();
 }
 
 void ComboBoxText::clear_items()
+{
+  remove_all();
+}
+
+void ComboBoxText::remove_all()
 {
   //Ideally, we would just store the ListStore as a member variable, but we forgot to do that and not it would break the ABI.
   Glib::RefPtr<Gtk::TreeModel> model = get_model();
@@ -141,6 +146,7 @@ void ComboBoxText::clear_items()
   if(list_model)  
     list_model->clear();
 }
+
 
 void ComboBoxText::remove_text(const Glib::ustring& text)
 {
