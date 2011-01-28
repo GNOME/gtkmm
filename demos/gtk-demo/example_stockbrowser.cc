@@ -237,10 +237,12 @@ void Example_StockBrowser::on_selection_changed()
     if(icon) //If there's a stock icon:
     {
       // find the largest size the icon comes in:
-      const Gtk::IconSet iconset = Gtk::IconSet::lookup_default(stockid);
+      const Glib::RefPtr<const Gtk::IconSet> iconset = Gtk::IconSet::lookup_default(stockid);
 
       typedef std::vector<Gtk::IconSize> type_vecSizes;
-      type_vecSizes sizes = iconset.get_sizes();
+      type_vecSizes sizes;
+      if(iconset)
+        sizes = iconset->get_sizes();
 
       Gtk::IconSize best_size = Gtk::ICON_SIZE_INVALID;
       int biggest_pixelcount = 0;
