@@ -202,7 +202,7 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
   *
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
   */
-bool lookup(const Gtk::StockID& stock_id, Gtk::IconSet& iconset);
+bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
 
 /** Receive an Image of the registered stock id with the correct size.
   * @param stock_id StockID to search for.

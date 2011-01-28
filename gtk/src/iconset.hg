@@ -33,8 +33,7 @@ namespace Gtk
 class StyleContext;
 class Widget;
 
-//TODO: Is _CLASS_BOXEDTYPE the appropriate thing to use here.
-//This seems to be reference-counted, not copied.
+
 
 /** This manages a set of variants of a particular icon 
  * An IconSet contains variants for different sizes and widget states. 
@@ -42,12 +41,16 @@ class Widget;
  */
 class IconSet
 {
-  _CLASS_BOXEDTYPE(IconSet, GtkIconSet, gtk_icon_set_new, gtk_icon_set_ref, gtk_icon_set_unref)
+  //GtkIconSet is registered as a boxed type, but it has ref/unref functions instead of copy/free,
+  //so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(IconSet, GtkIconSet, gtk_icon_set_new, gtk_icon_set_ref, gtk_icon_set_unref)
   _IGNORE(gtk_icon_set_ref, gtk_icon_set_unref, gtk_icon_set_get_sizes)
-public:
-  explicit IconSet(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
 
-  _WRAP_METHOD(IconSet copy() const, gtk_icon_set_copy)
+public:
+  //TODO: Documentation
+  static Glib::RefPtr<IconSet> create(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
+
+  _WRAP_METHOD(Glib::RefPtr<IconSet> copy() const, gtk_icon_set_copy)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> render_icon_pixbuf(const Glib::RefPtr<StyleContext>& context, IconSize size), gtk_icon_set_render_icon_pixbuf)
   _IGNORE(gtk_icon_set_render_icon) //deprecated.
@@ -56,16 +59,7 @@ public:
 
   std::vector<IconSize> get_sizes() const;
 
-  /** Looks for an icon in the list of default icon factories.
-   * @param stock_id StockID to search for
-   *
-   * For display to the user, you should use Style::lookup_icon_set() on the Style 
-   * for the widget that will display the icon, instead of using this function directly, 
-   * so that themes are taken into account
-   *
-   * @returns an IconSet
-   */
-  static IconSet lookup_default(const Gtk::StockID& stock_id);
+  _WRAP_METHOD(static Glib::RefPtr<IconSet> lookup_default(const Gtk::StockID& stock_id), gtk_icon_factory_lookup_default, refreturn)
 };
 
 } /* namespace Gtk */

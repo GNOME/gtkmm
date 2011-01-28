@@ -150,10 +150,10 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item)
   return Gtk::StockItem::lookup(stock_id, item);
 }
 
-bool lookup(const Gtk::StockID& stock_id, Gtk::IconSet& iconset)
+bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<IconSet>& iconset)
 {
-  iconset = Gtk::IconSet::lookup_default(stock_id);
-  return (iconset.gobj() != 0);
+  iconset = IconSet::lookup_default(stock_id);
+  return (iconset && (iconset->gobj() != 0));
 }
 
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image)

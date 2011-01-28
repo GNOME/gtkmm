@@ -26,9 +26,10 @@
 namespace Gtk
 {
 
-IconSet::IconSet(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf)
+Glib::RefPtr<IconSet> IconSet::create(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf)
 {
-  gobject_ = gtk_icon_set_new_from_pixbuf(Glib::unwrap(pixbuf));
+  // See the comment at the top of this file, if you want to know why the cast works.
+  return Glib::RefPtr<IconSet>(reinterpret_cast<IconSet*>(gtk_icon_set_new_from_pixbuf(Glib::unwrap(pixbuf))));
 }
 
 std::vector<IconSize> IconSet::get_sizes() const
@@ -38,12 +39,6 @@ std::vector<IconSize> IconSet::get_sizes() const
   gtk_icon_set_get_sizes(const_cast<GtkIconSet*>(gobj()), &pSizes, &n_sizes);
 
   return Glib::ArrayHandler<IconSize, IconSizeTraits>::array_to_vector(pSizes, n_sizes, Glib::OWNERSHIP_SHALLOW);
-}
-
-IconSet IconSet::lookup_default(const Gtk::StockID& stock_id) //static
-{
-  GtkIconSet* pIconSet = gtk_icon_factory_lookup_default(stock_id.get_string().c_str());
-  return IconSet(pIconSet, true); //true = take_copy.
 }
 
 } /* namespace Gtk */

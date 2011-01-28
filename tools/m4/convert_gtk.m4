@@ -386,9 +386,10 @@ _CONVERSION(Gtk::Notebook_Helpers::Page*,GtkNotebookPage*,`($1)((void*)($3))',`(
 
 _CONVERSION(`GtkSettings*',`Glib::RefPtr<Settings>', Glib::wrap($3))
 
-_CONVERSION(`IconSet&',`GtkIconSet*',__FR2P)
-_CONVERSION(`const IconSet&',`GtkIconSet*',`const_cast<GtkIconSet*>(($3).gobj())')
-_CONVERSION(`GtkIconSet*',`IconSet',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<IconSet>&',`GtkIconSet*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`const Glib::RefPtr<IconSet>&',`GtkIconSet*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GtkIconSet*',`Glib::RefPtr<IconSet>',`Glib::wrap($3)')
+
 _CONVERSION(`IconSource&',`GtkIconSource*',__FR2P)
 _CONVERSION(`const IconSource&',`const GtkIconSource*',__FR2P)
 _CONVERSION(`const GtkIconSource*',`const IconSource&',`Glib::wrap(const_cast<GtkIconSource*>($3), true)')
@@ -474,7 +475,6 @@ _CONVERSION(`const TreeModelColumnBase&',`int',`($3).index`'()')
 _CONVERSION(`GtkTreePath*',`TreePath', `Gtk::TreePath($3, false)')
 _CONVERSION(`GtkTreePath*',`Path', `Gtk::TreePath($3, false)')
 _CONVERSION(`GtkTreePath*',`TreeModel::Path', `Gtk::TreePath($3, false)')
-_CONVERSION(`GtkIconSet*&',`GtkIconSet**',`&($3)')
 _CONVERSION(`GtkIconSize&',`GtkIconSize*',`&($3)')
 _CONVERSION(`GtkCellEditable*',`CellEditable*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
 _CONVERSION(`CellEditable*',`GtkCellEditable*',`Glib::unwrap($3)')
