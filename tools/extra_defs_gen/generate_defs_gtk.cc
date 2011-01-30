@@ -28,6 +28,11 @@
 #include <glibmm_generate_extra_defs/generate_extra_defs.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+
+#ifdef GDK_WINDOWING_X11
+#include <gtk/gtkx.h>
+#endif
+
 #ifndef G_OS_WIN32
 # include <gtk/gtkunixprint.h>
 #endif
@@ -133,8 +138,10 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_OFFSCREEN_WINDOW )
             << get_defs( GTK_TYPE_ORIENTABLE )
             << get_defs( GTK_TYPE_PANED )
-#if !defined(G_OS_WIN32)
+#ifdef GDK_WINDOWING_X11
             << get_defs( GTK_TYPE_PLUG )
+#endif
+#if !defined(G_OS_WIN32) 
             << get_defs( GTK_TYPE_PRINTER )
             << get_defs( GTK_TYPE_PRINT_JOB )
 #endif /* G_OS_WIN32 */
@@ -167,9 +174,9 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_SEPARATOR_TOOL_ITEM )
             << get_defs( GTK_TYPE_SETTINGS )
             << get_defs( GTK_TYPE_SIZE_GROUP )
-#if !defined(G_OS_WIN32)
+#ifdef GDK_WINDOWING_X11
             << get_defs( GTK_TYPE_SOCKET )
-#endif /* G_OS_WIN32 */
+#endif
             << get_defs( GTK_TYPE_SPINNER )
             << get_defs( GTK_TYPE_SPIN_BUTTON )
             << get_defs( GTK_TYPE_STATUSBAR )
