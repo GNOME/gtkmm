@@ -126,11 +126,13 @@ Glib::ustring ComboBoxText::get_active_text() const
   return result;
 }
 
+#ifndef GTKMM_DISABLE_DEPRECATED
 //deprecated.
 void ComboBoxText::clear()
 {
   remove_all();
 }
+#endif //GTKMM_DISABLE_DEPRECATED
 
 void ComboBoxText::clear_items()
 {
