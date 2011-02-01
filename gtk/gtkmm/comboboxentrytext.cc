@@ -50,7 +50,7 @@ ComboBoxEntryText::ComboBoxEntryText(GtkComboBoxEntry* castitem)
   set_text_column(m_text_columns.m_column);
 }
 
-void ComboBoxEntryText::append_text(const Glib::ustring& text)
+void ComboBoxEntryText::append(const Glib::ustring& text)
 {
   //We can not use gtk_combo_box_append_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
 
@@ -66,13 +66,13 @@ void ComboBoxEntryText::append_text(const Glib::ustring& text)
   }
 }
 
-void ComboBoxEntryText::insert_text(int position, const Glib::ustring& text)
+void ComboBoxEntryText::insert(int position, const Glib::ustring& text)
 {
   //TODO: We should not use gtk_combo_box_insert_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
   gtk_combo_box_insert_text(GTK_COMBO_BOX(gobj()), position, text.c_str());
 }
 
-void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
+void ComboBoxEntryText::prepend(const Glib::ustring& text)
 {
   //We can not use gtk_combo_box_prepend_text() here, because that can only be used if gtk_combo_box_new_text() has been used.
 
@@ -87,6 +87,23 @@ void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
     row[m_text_columns.m_column] = text;
   }
 }
+
+
+void ComboBoxEntryText::append_text(const Glib::ustring& text)
+{
+  append(text);
+}
+
+void ComboBoxEntryText::insert_text(int position, const Glib::ustring& text)
+{
+  insert(position, text);
+}
+
+void ComboBoxEntryText::prepend_text(const Glib::ustring& text)
+{
+  prepend(text);
+}
+
 
 void ComboBoxEntryText::clear_items()
 {
