@@ -37,6 +37,8 @@ namespace Gtk
 /** This is a specialisation of the ComboBoxEntry which has one column of text (a simple list),
  * and appropriate methods for setting and getting the text.
  *
+ * You should not call set_model() or attempt to pack more cells into this combo box via its CellLayout base class.
+ *
  * @deprecated Instead use ComboBoxText with has_entry = true.
  *
  * @ingroup Widgets
