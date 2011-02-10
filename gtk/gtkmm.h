@@ -98,6 +98,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/alignment.h>
+#include <gtkmm/appchooserbutton.h>
+#include <gtkmm/appchooserdialog.h>
+#include <gtkmm/appchooserwidget.h>
 #include <gtkmm/application.h>
 #include <gtkmm/arrow.h>
 #include <gtkmm/aspectframe.h>
