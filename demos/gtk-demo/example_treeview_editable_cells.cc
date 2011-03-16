@@ -39,11 +39,11 @@ protected:
   virtual void add_items();
   virtual void liststore_add_item(const CellItem_Product& foo);
 
-  //We only have these signal handlers here, because the append_column_editable() convenience methods do not work with 
+  //We only have these signal handlers here, because the append_column_editable() convenience methods do not work with
   //the IRIX MipsPro compiler.
   virtual void on_column_number_edited(const Glib::ustring& path_string, const Glib::ustring& new_text);
   virtual void on_column_product_edited(const Glib::ustring& path_string, const Glib::ustring& new_text);
-  
+
   //Member widgets:
   Gtk::VBox m_VBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
@@ -191,14 +191,14 @@ void Example_TreeView_EditableCells::liststore_add_item(const CellItem_Product& 
   row[m_columns.product]  = foo.m_product;
 }
 
-//We only have these signal handlers here, because the append_column_editable() convenience methods do not work with 
+//We only have these signal handlers here, because the append_column_editable() convenience methods do not work with
 //the IRIX MipsPro compiler.
 void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring& path_string, const Glib::ustring& new_text)
 {
   Gtk::TreePath path(path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView._get_base_model();
+  Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView.get_model();
   if(refModel)
   {
     Gtk::TreeModel::iterator iter = refModel->get_iter(path);
@@ -207,7 +207,7 @@ void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring
       //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
       char* pchEnd = 0;
       int new_value = (int) strtod(new_text.c_str(), &pchEnd);
-  
+
       //Store the user's new text in the model:
       Gtk::TreeRow row = *iter;
       row[m_columns.number] = new_value;
@@ -220,7 +220,7 @@ void Example_TreeView_EditableCells::on_column_product_edited(const Glib::ustrin
   Gtk::TreePath path(path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView._get_base_model();
+  Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView.get_model();
   if(refModel)
   {
     Gtk::TreeModel::iterator iter = refModel->get_iter(path);
@@ -245,7 +245,7 @@ void Example_TreeView_EditableCells::add_columns()
   //And this is the way that works with the IRIX MipsPro compiler too:
   {
     Gtk::TreeView::Column* pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Number", m_columns.number));
-  
+
     //connect signal handlers for auto-storing of edited cell data
     Gtk::CellRenderer* pCellRenderer = pViewColumn->get_first_cell();
     Gtk::CellRendererText* pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
@@ -253,17 +253,17 @@ void Example_TreeView_EditableCells::add_columns()
     {
       //Set the appropriate property,
       pCellRenderText->property_editable() = true;
-    
+
       //Connect to the appropriate signal, sending the model_column too,
       pCellRenderText->signal_edited().connect( sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_column_number_edited) );
     }
-  
+
     m_TreeView.append_column(*pViewColumn);
   }
-  
+
   {
     Gtk::TreeView::Column* pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Product", m_columns.product));
-  
+
     //connect signal handlers for auto-storing of edited cell data
     Gtk::CellRenderer* pCellRenderer = pViewColumn->get_first_cell();
     Gtk::CellRendererText* pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
@@ -271,15 +271,15 @@ void Example_TreeView_EditableCells::add_columns()
     {
       //Set the appropriate property,
       pCellRenderText->property_editable() = true;
-    
+
       //Connect to the appropriate signal, sending the model_column too,
       pCellRenderText->signal_edited().connect( sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_column_product_edited) );
     }
-  
+
     m_TreeView.append_column(*pViewColumn);
   }
-  
-  
+
+
 }
 
 
