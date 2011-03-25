@@ -37,3 +37,10 @@ dist_noinst_DATA +=				\
 	reference/widget_hierarchy.dia		\
 	reference/widget_hierarchy.html		\
 	reference/widget_hierarchy.png
+
+# These are copied here by mm-common:
+dist_noinst_DATA += \
+	doc-install.pl \
+	doc-postprocess.pl \
+	tagfile-to-devhelp2.xsl \
+	doxygen.css
