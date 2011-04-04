@@ -59,9 +59,9 @@ StockID& StockID::operator=(const StockID& other)
   return *this;
 }
 
-StockID::operator void*() const
+StockID::operator const void*() const
 {
-  return (void*)!(id_.empty());
+  return (const void*)!(id_.empty());
 }
   
 bool StockID::equal(const StockID& rhs) const

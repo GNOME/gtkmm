@@ -70,7 +70,7 @@ public:
 
   /** Tests whether the StockID is not empty.
    */
-  operator void*() const;
+  operator const void*() const;
 
   /** Check if two StockIDs are equal.
    * @param rhs Another StockID.
