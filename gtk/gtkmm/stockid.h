@@ -68,9 +68,19 @@ public:
    */
   StockID& operator=(const StockID& other);
 
+  /** This typedef is just to make it more obvious that 
+   * our operator const void* should be used like operator bool().
+   */ 
+  typedef const void* BoolExpr;
+
   /** Tests whether the StockID is not empty.
+   * For instance,
+   * @code
+   * if(stockid)
+   *   do_something()
+   * @endcode
    */
-  operator const void*() const;
+  operator BoolExpr() const;
 
   /** Check if two StockIDs are equal.
    * @param rhs Another StockID.
