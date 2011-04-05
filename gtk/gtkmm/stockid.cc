@@ -61,9 +61,9 @@ StockID& StockID::operator=(const StockID& other)
 
 StockID::operator const void*() const
 {
-  return (const void*)!(id_.empty());
+  return !(id_.empty()) ? GINT_TO_POINTER(1) : 0 ;
 }
-  
+
 bool StockID::equal(const StockID& rhs) const
 {
   // Do an exact per-byte comparison:
@@ -82,4 +82,3 @@ const char* StockID::get_c_str() const
 }
 
 } // namespace Gtk
-
