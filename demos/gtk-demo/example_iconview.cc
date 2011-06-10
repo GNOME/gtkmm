@@ -47,7 +47,7 @@ protected:
   std::string m_parent;
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::Toolbar m_Toolbar;
   Gtk::ToolButton m_ButtonUp, m_ButtonHome;
   Gtk::ScrolledWindow m_ScrolledWindow;
@@ -61,7 +61,8 @@ Gtk::Window* do_iconview()
 }
 
 Example_IconView::Example_IconView()
-: m_ButtonUp(Gtk::Stock::GO_UP),
+: m_VBox(Gtk::ORIENTATION_VERTICAL),
+  m_ButtonUp(Gtk::Stock::GO_UP),
   m_ButtonHome(Gtk::Stock::HOME)
 {
   set_title("Icon View");

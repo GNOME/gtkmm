@@ -37,9 +37,9 @@ protected:
  
    
   //Member widgets:
-  Gtk::VBox m_Box1;
-  Gtk::VBox m_Box2;
-  Gtk::HSeparator m_Separator;
+  Gtk::Box m_Box1;
+  Gtk::Box m_Box2;
+  Gtk::Separator m_Separator;
   Gtk::Label m_Label;
   Gtk::Button m_Button;
   Glib::RefPtr<Gtk::UIManager> m_refUIManager;
@@ -55,7 +55,9 @@ Gtk::Window* do_ui_manager()
 
 
 Example_UIManager::Example_UIManager()
-: m_Box2(false, 10),
+: m_Box1(Gtk::ORIENTATION_VERTICAL),
+  m_Box2(Gtk::ORIENTATION_VERTICAL, 10),
+  m_Separator(Gtk::ORIENTATION_HORIZONTAL),
   m_Label("Type\n<alt>\nto start"),
   m_Button("close")
 {

@@ -46,7 +46,7 @@ protected:
   virtual void treestore_add_item(const CellItem_Holiday& foo);
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Label m_Label;
   Gtk::TreeView m_TreeView;
@@ -146,7 +146,7 @@ Gtk::Window* do_treeview_treestore()
 
 
 Example_TreeView_TreeStore::Example_TreeView_TreeStore()
-: m_VBox(false, 8),
+: m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_Label("Jonathan's Holiday Card Planning Sheet")
 {
   set_title("Card planning sheet");

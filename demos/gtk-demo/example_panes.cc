@@ -49,14 +49,14 @@ Example_Panes::Example_Panes()
   set_title("Panes");
   set_border_width(0);
 
-  Gtk::VBox *const pVBox = new Gtk::VBox();
+  Gtk::Box *const pVBox = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
   add(*Gtk::manage(pVBox));
 
-  Gtk::VPaned *const pVPaned = new Gtk::VPaned();
+  Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::ORIENTATION_VERTICAL);
   pVBox->pack_start(*Gtk::manage(pVPaned));
   pVPaned->set_border_width(5);
 
-  Gtk::HPaned *const pHPaned = new Gtk::HPaned();
+  Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::ORIENTATION_HORIZONTAL);
   pVPaned->add1(*Gtk::manage(pHPaned));
 
   Gtk::Frame *const pFrame1 = new Gtk::Frame();

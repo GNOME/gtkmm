@@ -46,7 +46,7 @@ protected:
 
 
   //Member widgets
-  Gtk::VPaned m_VPaned;
+  Gtk::Paned m_VPaned;
   Gtk::TextView m_View1;
   Gtk::TextView* m_pView2;
   Gtk::ScrolledWindow m_ScrolledWindow1, m_ScrolledWindow2;
@@ -64,6 +64,7 @@ Gtk::Window* do_textview()
 }
 
 Example_TextView::Example_TextView()
+: m_VPaned(Gtk::ORIENTATION_VERTICAL)
 {
   set_default_size(450, 450);
   set_title("Text View");
@@ -397,7 +398,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 2)
     {
-      Gtk::HScale* pHScale = Gtk::manage( new Gtk::HScale() );
+      Gtk::Scale* pHScale = Gtk::manage( new Gtk::Scale(Gtk::ORIENTATION_HORIZONTAL) );
       pHScale->set_range(0, 100);
       pHScale->set_size_request(70, -1);
 

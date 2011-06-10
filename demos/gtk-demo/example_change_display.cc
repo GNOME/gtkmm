@@ -90,11 +90,11 @@ protected:
   };
   ModelColumns_Screen m_columns_screen;
 
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::Frame m_Frame_Display, m_Frame_Screen;
   Gtk::TreeView m_TreeView_Display, m_TreeView_Screen;
   Glib::RefPtr<Gtk::ListStore> m_refListStore_Display,  m_refListStore_Screen;
-  Gtk::VBox m_ButtonBox_Display, m_ButtonBox_Screen;
+  Gtk::Box m_ButtonBox_Display, m_ButtonBox_Screen;
 
   Gtk::Button m_Button_Display_Open, m_Button_Display_Close;
 
@@ -114,10 +114,10 @@ protected:
 
 Example_ChangeDisplay::Example_ChangeDisplay()
 : Gtk::Dialog("Change Screen or display"),
-  m_VBox(false, 5),
+  m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
   m_Frame_Display("Display"),
   m_Frame_Screen("Screen"),
-  m_ButtonBox_Display(false, 5), m_ButtonBox_Screen(false, 5),
+  m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5), m_ButtonBox_Screen(Gtk::ORIENTATION_VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
   m_pPopup(0),
   m_popup_clicked(false)
@@ -189,7 +189,7 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
 {
-  Gtk::HBox* pHBox = Gtk::manage( new Gtk::HBox(false, 8) );
+  Gtk::Box* pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
   pHBox->set_border_width(8);
   frame.add(*pHBox);
 

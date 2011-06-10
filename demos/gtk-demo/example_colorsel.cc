@@ -18,7 +18,7 @@ protected:
   virtual void on_button_clicked();
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::Frame m_Frame;
   Gtk::DrawingArea m_DrawingArea;
   Gtk::Button m_Button;
@@ -33,7 +33,7 @@ Gtk::Window* do_colorsel()
 }
 
 Example_ColorSel::Example_ColorSel()
-: m_VBox(false, 8),
+: m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_Button("_Change the above color", true),
   m_Alignment(Gtk::ALIGN_END, Gtk::ALIGN_END, 0.0, 0.0)
 {

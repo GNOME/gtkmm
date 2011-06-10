@@ -21,9 +21,10 @@
 #include "config.h"
 #endif
 
-#include "gtkmm/main.h"
-#include "gtkmm/cellrenderertext.h"
-#include "gtkmm/treeviewcolumn.h"
+#include <gtkmm/main.h>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/box.h>
 #include "demowindow.h"
 #include "textwidget.h"
 #include "demos.h"
@@ -73,7 +74,8 @@ const DemoColumns& demo_columns()
 
 
 DemoWindow::DemoWindow()
-: m_TextWidget_Info(false),
+: m_HBox(Gtk::ORIENTATION_HORIZONTAL),
+  m_TextWidget_Info(false),
   m_TextWidget_Source(true)
 {
   m_pWindow_Example = 0;

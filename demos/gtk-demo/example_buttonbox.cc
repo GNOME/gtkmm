@@ -18,8 +18,8 @@ protected:
 
   //Member widgets:
   Gtk::Frame m_Frame_Horizontal, m_Frame_Vertical;
-  Gtk::VBox m_VBox_Main, m_VBox;
-  Gtk::HBox m_HBox;
+  Gtk::Box m_VBox_Main, m_VBox;
+  Gtk::Box m_HBox;
 };
 
 //Called by DemoWindow;
@@ -30,7 +30,10 @@ Gtk::Window* do_buttonbox()
 
 Example_ButtonBox::Example_ButtonBox()
 : m_Frame_Horizontal("Horizontal Button Boxes"),
-  m_Frame_Vertical("Vertical Button Boxes")
+  m_Frame_Vertical("Vertical Button Boxes"),
+  m_VBox_Main(Gtk::ORIENTATION_VERTICAL),
+  m_VBox(Gtk::ORIENTATION_VERTICAL),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL)
 {
   set_title("Button Boxes");
   set_border_width(10);
@@ -70,9 +73,9 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
 
   Gtk::ButtonBox* pButtonBox = 0;
   if (horizontal)
-    pButtonBox = Gtk::manage(new Gtk::HButtonBox());
+    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_HORIZONTAL));
   else
-    pButtonBox = Gtk::manage(new Gtk::VButtonBox());
+    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_VERTICAL));
 
   pButtonBox->set_border_width(5);
   pFrame->add(*pButtonBox);

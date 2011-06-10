@@ -33,7 +33,7 @@ protected:
 
   //Member widgets:
   Gtk::Frame m_Frame_Checkerboard, m_Frame_Scribble;
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::Label m_Label_Checkerboard, m_Label_Scribble;
   Gtk::DrawingArea m_DrawingArea_Checkerboard, m_DrawingArea_Scribble;
 
@@ -48,7 +48,7 @@ Gtk::Window* do_drawingarea()
 
 Example_DrawingArea::Example_DrawingArea()
 :
-  m_VBox(false, 8)
+  m_VBox(Gtk::ORIENTATION_VERTICAL, 8)
 {
   set_title("Drawing Area");
   set_border_width(8);

@@ -6,12 +6,12 @@ public:
   MyWindow();
 private:
   Gtk::Button b;
-  Gtk::VBox vbox;
+  Gtk::Box vbox;
 };
 
 MyWindow::MyWindow() :
   b("hello"),
-  vbox()
+  vbox(Gtk::ORIENTATION_VERTICAL)
 {
   add(vbox);
   vbox.pack_start(b);

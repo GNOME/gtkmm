@@ -30,7 +30,7 @@ protected:
   virtual void on_loader_area_updated(int x, int y, int width, int height);
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::Label m_Label_Image, m_Label_Animation, m_Label_Progressive;
   Gtk::Frame m_Frame_Image, m_Frame_Animation, m_Frame_Progressive;
   Gtk::Alignment m_Alignment_Image, m_Alignment_Animation, m_Alignment_Progressive;
@@ -48,7 +48,7 @@ Gtk::Window* do_images()
 
 Example_Images::Example_Images()
 :
-  m_VBox                (false, 8),
+  m_VBox                (Gtk::ORIENTATION_VERTICAL, 8),
   m_Alignment_Image     (0.5, 0.5, 0, 0),
   m_Alignment_Animation (0.5, 0.5, 0, 0),
   m_image_stream        (0)

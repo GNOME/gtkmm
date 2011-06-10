@@ -27,8 +27,8 @@ protected:
 
   //Child widgets:
   Gtk::Frame m_Frame;
-  Gtk::VBox m_VBox;
-  Gtk::HBox m_HBox;
+  Gtk::Box m_VBox;
+  Gtk::Box m_HBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Glib::RefPtr<Gtk::TreeModel> m_refTreeModel;
   Gtk::TreeView m_TreeView;
@@ -64,8 +64,8 @@ Gtk::Window* do_stock_browser()
 Example_StockBrowser::Example_StockBrowser()
 :
   m_Frame("Selected Item"),
-  m_VBox(false, 8),
-  m_HBox(false, 8),
+  m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_START, 0.0, 0.0)
 {
   set_title("Stock Icons and Items");

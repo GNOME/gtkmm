@@ -20,8 +20,8 @@ protected:
 
   //Member widgets:
   Gtk::Frame m_Frame;
-  Gtk::VBox m_VBox, m_VBox2;
-  Gtk::HBox m_HBox, m_HBox2;
+  Gtk::Box m_VBox, m_VBox2;
+  Gtk::Box m_HBox, m_HBox2;
   Gtk::Button m_Button_Message, m_Button_Interactive;
   Gtk::Table m_Table;
   Gtk::Label m_Label1, m_Label2;
@@ -41,7 +41,7 @@ public:
 
 protected:
   //Member widgets:
-  Gtk::HBox m_HBox;
+  Gtk::Box m_HBox;
   Gtk::Table m_Table;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
@@ -58,8 +58,8 @@ Gtk::Window* do_dialog()
 
 Example_Dialog::Example_Dialog()
 : m_Frame("Dialogs"),
-  m_VBox(false, 8),
-  m_HBox(false, 8), m_HBox2(false, 8),
+  m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8), m_HBox2(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Button_Message("_Message Dialog", true), m_Button_Interactive("_Interactive Dialog", true),
   m_Table(2, 2, false),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2")
@@ -79,7 +79,7 @@ Example_Dialog::Example_Dialog()
   m_VBox.pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
   m_HBox.pack_start(m_Button_Message, Gtk::PACK_SHRINK);
-  m_VBox.pack_start(*(Gtk::manage(new Gtk::HSeparator())), Gtk::PACK_SHRINK);
+  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL))), Gtk::PACK_SHRINK);
 
 
   /* Interactive dialog*/
@@ -134,7 +134,7 @@ void Example_Dialog::on_button_interactive()
 
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
 : Gtk::Dialog("Interactive Dialog", parent, true),
-  m_HBox(false, 8),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Table(2, 2, false),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
   m_Image(Gtk::Stock::DIALOG_QUESTION, Gtk::ICON_SIZE_DIALOG)

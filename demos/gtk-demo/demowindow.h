@@ -49,7 +49,7 @@ protected:
 
   //Member widgets:
   Gtk::Notebook m_Notebook;
-  Gtk::HBox m_HBox;
+  Gtk::Box m_HBox;
 
   Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
   Gtk::TreeView m_TreeView;

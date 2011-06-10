@@ -34,8 +34,8 @@ protected:
 
   //Member widgets:
   Gtk::Frame m_Frame_Color, m_Frame_Line;
-  Gtk::VBox m_VBox;
-  Gtk::HBox m_HBox;
+  Gtk::Box m_VBox;
+  Gtk::Box m_HBox;
   Glib::RefPtr<Gtk::SizeGroup> m_refSizeGroup;
   Gtk::Table m_Table_Color, m_Table_Line;
   Gtk::CheckButton m_CheckButton;
@@ -51,7 +51,8 @@ Example_SizeGroup::Example_SizeGroup()
 : Gtk::Dialog("Gtk::SizeGroup"),
   m_Frame_Color("Color Options"),
   m_Frame_Line("Line Options"),
-  m_VBox(false, 5),
+  m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
   m_Table_Color(2, 2), m_Table_Line(2, 2),
   m_CheckButton("_Enable grouping", true)
 {

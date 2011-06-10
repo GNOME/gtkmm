@@ -37,7 +37,7 @@ protected:
   virtual void liststore_add_item(const CellItem_Bug& foo);
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Label m_Label;
   Gtk::TreeView m_TreeView;
@@ -102,7 +102,7 @@ Gtk::Window* do_treeview_liststore()
 
 
 Example_TreeView_ListStore::Example_TreeView_ListStore()
-: m_VBox(false, 8),
+: m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_Label("This is the bug list (note: not based on real data, it would be nice to have a nice ODBC interface to bugzilla or so, though).")
 {
   set_title("Gtk::ListStore demo");

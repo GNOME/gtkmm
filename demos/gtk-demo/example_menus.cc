@@ -42,9 +42,9 @@ protected:
 
   //Member widgets:
   Gtk::Frame m_Frame_Horizontal, m_Frame_Vertical;
-  Gtk::VBox m_VBox1, m_VBox_Sub1, m_VBox_Sub2;
+  Gtk::Box m_VBox1, m_VBox_Sub1, m_VBox_Sub2;
   Gtk::MenuBar m_MenuBar;
-  Gtk::HSeparator m_Separator;
+  Gtk::Separator m_Separator;
   Gtk::Button m_Button;
 };
 
@@ -55,8 +55,10 @@ Gtk::Window* do_menus()
 }
 
 Example_Menus::Example_Menus()
-: m_VBox_Sub1(false, 10),
-  m_VBox_Sub2(false, 10),
+: m_VBox1(Gtk::ORIENTATION_VERTICAL),
+  m_VBox_Sub1(Gtk::ORIENTATION_VERTICAL, 10),
+  m_VBox_Sub2(Gtk::ORIENTATION_VERTICAL, 10),
+  m_Separator(Gtk::ORIENTATION_HORIZONTAL),
   m_Button("close")
 {
   set_title("menus");

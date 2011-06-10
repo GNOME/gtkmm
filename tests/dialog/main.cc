@@ -19,7 +19,7 @@ private:
 AppWindow::AppWindow()
     : m_label (NULL)
 {
-    Gtk::Box* vbox = manage (new Gtk::VBox (false, 5));
+    Gtk::Box* vbox = manage (new Gtk::Box (Gtk::ORIENTATION_VERTICAL, 5));
     add(*vbox);
 
     Gtk::Button* button = Gtk::manage (new Gtk::Button ("Delete Label"));

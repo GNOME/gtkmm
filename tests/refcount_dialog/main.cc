@@ -20,12 +20,13 @@ public:
   void on_button_clicked();
 
 protected:
-  Gtk::HBox m_Box;
+  Gtk::Box m_Box;
   Gtk::Button m_Button;
 };
 
 MyWindow::MyWindow()
-: m_Button("Show Dialog")
+: m_Box(Gtk::ORIENTATION_HORIZONTAL),
+  m_Button("Show Dialog")
 {
   set_size_request(200, 200);
 

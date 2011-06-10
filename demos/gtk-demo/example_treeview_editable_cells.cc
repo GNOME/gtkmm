@@ -45,12 +45,12 @@ protected:
   virtual void on_column_product_edited(const Glib::ustring& path_string, const Glib::ustring& new_text);
 
   //Member widgets:
-  Gtk::VBox m_VBox;
+  Gtk::Box m_VBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Label m_Label;
   Gtk::TreeView m_TreeView;
   Glib::RefPtr<Gtk::ListStore> m_refListStore;
-  Gtk::HBox m_HBox;
+  Gtk::Box m_HBox;
   Gtk::Button m_Button_Add, m_Button_Remove;
 
   typedef std::vector<CellItem_Product> type_vecItems;
@@ -99,9 +99,9 @@ Gtk::Window* do_treeview_editable_cells()
 
 
 Example_TreeView_EditableCells::Example_TreeView_EditableCells()
-: m_VBox(false, 5),
+: m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
   m_Label("Shopping list (you can edit the cells!)"),
-  m_HBox(true, 4),
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 4),
   m_Button_Add("Add item"),
   m_Button_Remove("Remove item")
 {
