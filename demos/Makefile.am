@@ -76,7 +76,7 @@ local_ldadd    = $(gdkmm_ldadd) $(gtkmm_ldadd)
 local_cppflags = -DDEMOCODEDIR=\""$(democodedir)"\"
 
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS) $(local_cppflags)
-AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGTKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED
+AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED
 
 pixbuf_demo_LDADD         = $(GTKMM_LIBS) $(local_ldadd)
 gtk_demo_gtkmm_demo_LDADD = $(GTKMM_LIBS) $(local_ldadd)
