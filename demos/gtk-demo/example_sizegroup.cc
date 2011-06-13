@@ -59,7 +59,7 @@ Example_SizeGroup::Example_SizeGroup()
   set_resizable(false);
   add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
 
-  get_vbox()->pack_start(m_VBox);
+  get_content_area()->pack_start(m_VBox);
   m_VBox.set_border_width(5);
 
   m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL),

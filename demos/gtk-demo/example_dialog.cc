@@ -143,7 +143,7 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   add_button("_Non-stock Button", Gtk::RESPONSE_CANCEL);
 
   m_HBox.set_border_width(8);
-  get_vbox()->pack_start(m_HBox, Gtk::PACK_SHRINK);
+  get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);
 
   m_Table.set_row_spacings(4);

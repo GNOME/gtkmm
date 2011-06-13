@@ -128,7 +128,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   set_default_size(300, 400);
 
   m_VBox.set_border_width(8);
-  get_vbox()->pack_start(m_VBox);
+  get_content_area()->pack_start(m_VBox);
 
 
   //Display:
@@ -257,8 +257,8 @@ void Example_ChangeDisplay::on_button_display_open()
 
   Gtk::Label label("Please enter the name of\nthe new display\n");
 
-  dialog.get_vbox()->add(label);
-  dialog.get_vbox()->add(entry);
+  dialog.get_content_area()->add(label);
+  dialog.get_content_area()->add(entry);
 
   entry.grab_focus();
 
