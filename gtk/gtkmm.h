@@ -154,6 +154,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/hvbuttonbox.h>
 #include <gtkmm/hvpaned.h>
 #include <gtkmm/hvscale.h>
+#include <gtkmm/hvscrollbar.h>
 #include <gtkmm/hvseparator.h>
 #include <gtkmm/iconset.h>
 #include <gtkmm/iconfactory.h>
