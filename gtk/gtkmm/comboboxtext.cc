@@ -77,7 +77,7 @@ void ComboBoxText::append_text(const Glib::ustring& text)
 
 void ComboBoxText::prepend_text(const Glib::ustring& text)
 {
-  append(text);
+  prepend(text);
 }
 
 void ComboBoxText::insert_text(int position, const Glib::ustring& text)
