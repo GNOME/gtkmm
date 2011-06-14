@@ -119,7 +119,7 @@ public:
 
   //There is a clear() method in the CellLayout base class, so this would cause confusion.
   //TODO: Remove this when we can break API.
-  /// @deprecated See clear_items(). Since 2.8.
+  /// @deprecated Use remove_all(). Since 2.8.
   void clear();
 
   /** Remove all items from the drop-down menu.

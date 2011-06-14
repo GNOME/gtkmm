@@ -22,7 +22,6 @@
 
 
 //Allow us to use deprecated GTK+ API.
-//This whole C++ class is deprecated anyway.
 #undef GTK_DISABLE_DEPRECATED
 
 #include <gtkmm/comboboxtext.h>
@@ -132,12 +131,12 @@ void ComboBoxText::clear()
 {
   remove_all();
 }
-#endif //GTKMM_DISABLE_DEPRECATED
 
 void ComboBoxText::clear_items()
 {
   remove_all();
 }
+#endif //GTKMM_DISABLE_DEPRECATED
 
 void ComboBoxText::remove_all()
 {
