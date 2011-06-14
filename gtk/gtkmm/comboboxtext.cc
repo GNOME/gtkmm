@@ -43,14 +43,20 @@ ComboBoxText::ComboBoxText(bool has_entry)
 : ComboBox(has_entry)
 {
   set_model( Gtk::ListStore::create(m_text_columns) );
-  pack_start(m_text_columns.m_column);
+  if (has_entry)
+    set_entry_text_column(m_text_columns.m_column);
+  else
+    pack_start(m_text_columns.m_column);
 }
 
 ComboBoxText::ComboBoxText(GtkComboBox* castitem)
 : Gtk::ComboBox(castitem)
 {
   set_model( Gtk::ListStore::create(m_text_columns) );
-  pack_start(m_text_columns.m_column);
+  if (gtk_combo_box_get_has_entry(castitem))
+    set_entry_text_column(m_text_columns.m_column);
+  else
+    pack_start(m_text_columns.m_column);
 }
 
 void ComboBoxText::append(const Glib::ustring& text)
