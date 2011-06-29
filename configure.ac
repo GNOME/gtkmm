@@ -99,7 +99,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra  -Wno-long-long -DGSEAL_ENABLE],
+                       [-pedantic -Wall -Wextra -Wformat-security -Wno-long-long -DGSEAL_ENABLE],
                        [G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM])
 
 AC_CONFIG_FILES([Makefile
