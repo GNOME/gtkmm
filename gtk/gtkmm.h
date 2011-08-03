@@ -101,6 +101,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/appchooserbutton.h>
 #include <gtkmm/appchooserdialog.h>
 #include <gtkmm/appchooserwidget.h>
+#include <gtkmm/application.h>
 #include <gtkmm/arrow.h>
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
