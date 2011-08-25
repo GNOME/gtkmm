@@ -147,6 +147,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filefilter.h>
 #include <gtkmm/fixed.h>
 #include <gtkmm/fontbutton.h>
+#include <gtkmm/fontchooser.h>
+#include <gtkmm/fontchooserdialog.h>
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/grid.h>
