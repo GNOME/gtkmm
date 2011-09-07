@@ -64,6 +64,9 @@ namespace TreeView_Private
   template <class ColumnType> inline
   void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column);
 
+  template <class ColumnType> inline
+  void _connect_auto_store_numeric_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column);
+
   template<class ColumnType> inline
   void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
@@ -88,7 +91,8 @@ class TreeModel;
  * The View can show all of the model's columns, or just some, and it can show them in various ways.
  * You must provide the TreeModel in the constructor, or with set_model().
  *
- * Add View columns with append_column(), append_column_editable(), insert_column(), or insert_column_editable().
+ * Add View columns with append_column(), append_column_editable(), append_column_numeric(),
+ * append_column_numeric_editable(), insert_column(), or insert_column_editable().
  *
  * You can manipulate the selection by obtaining the @link Gtk::TreeSelection Gtk::TreeView::Selection@endlink from get_selection().
  *
@@ -250,7 +254,7 @@ public:
    * code to automatically store user changes in the model.  To intercept the
    * user's change and implement non-default logic, or if the compiler can't
    * instantiate appropriate code for your model type, you should use
-   * append_column() and connect a signal handler to the CellRenderer.
+   * insert_column() and connect a signal handler to the CellRenderer.
    *
    * @param title The text to be used in the title header of this column.
    * @param model_column The column in the TreeModel that will be rendered by this View column.
@@ -896,7 +900,7 @@ int TreeView::append_column_numeric_editable(const Glib::ustring& title, const T
   CellRenderer *const cell = get_column_cell_renderer(cols_count - 1);
   if(cell)
   {
-    TreeView_Private::_connect_auto_store_editable_signal_handler<ColumnType>(this, cell, model_column);
+    TreeView_Private::_connect_auto_store_numeric_editable_signal_handler<ColumnType>(this, cell, model_column);
   }
 
   return cols_count;
@@ -950,6 +954,34 @@ namespace TreeView_Private
 //Template specializations, for different model column types:
 //TODO: Move these specializations into the .ccg file - I tried, but the int specialization was not used by the compiler. murrayc.
 
+// append_column_editable<>() and insert_column_editable<>() call template function
+// _connect_auto_store_editable_signal_handler<ColumnType>().
+// There are 3 versions of _connect_auto_store_editable_signal_handler<>():
+//
+// 1. The default version for string data. It connects
+//    CellRendererText::signal_edited() to template function
+//    _auto_store_on_cellrenderer_text_edited_string<ColumnType>().
+//
+// 2. A bool specialization. It connects CellRendererToggle::signal_toggled()
+//    to function _auto_store_on_cellrenderer_toggle_edited_with_model().
+//
+// 3. Several identical (except for the type name) specializations for numeric data.
+//    They call _connect_auto_store_numeric_editable_signal_handler<ColumnType>(),
+//    which connects CellRendererText::signal_edited() to template function
+//    _auto_store_on_cellrenderer_text_edited_numerical<ColumnType>().
+//
+// We need all those specializations with identical implementations, because we
+// chose to avoid multiple specializations for the string types by dealing with
+// string types in the default implementation.
+//
+// With these numeric specializations append_column_editable<>() and
+// insert_column_editable<>() can be used for the same numeric types as
+// append_column<>() and insert_column<>(). Those are fundamental types in the
+// GType system, and Glib registers conversion functions from those types to
+// gchararray with g_value_register_transform_func().
+// 'short' is not one of those types. It can be handled only by
+// append_column_numeric<>() and append_column_numeric_editable<>().
+
 #ifdef GTKMM_HAVE_SIGC_BIND
 
 //bool specialization:
@@ -985,166 +1017,42 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<int>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<int>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-
-  }
+  _connect_auto_store_numeric_editable_signal_handler<int>(this_p, pCellRenderer, model_column);
 }
 
 //unsigned int specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<unsigned int>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<unsigned int>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-
-  }
+  _connect_auto_store_numeric_editable_signal_handler<unsigned int>(this_p, pCellRenderer, model_column);
 }
 
 //long specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<long>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<long>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-
-  }
+  _connect_auto_store_numeric_editable_signal_handler<long>(this_p, pCellRenderer, model_column);
 }
 
 //unsigned long specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<unsigned long>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<unsigned long>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-
-  }
+  _connect_auto_store_numeric_editable_signal_handler<unsigned long>(this_p, pCellRenderer, model_column);
 }
 
 //float specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<float>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<float>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-  }
+  _connect_auto_store_numeric_editable_signal_handler<float>(this_p, pCellRenderer, model_column);
 }
 
 //double specialization:
 template<> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<double>& model_column)
 {
-  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
-  if(pCellText)
-  {
-    //Set the appropriate property,
-    pCellText->property_editable() = true;
-
-    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
-    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<double>;
-
-    //Connect to the appropriate signal, sending the model_column too,
-    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
-    pCellText->signal_edited().connect(
-      sigc::bind<-1>(
-        sigc::bind<-1>(
-          sigc::ptr_fun(fptr),
-          this_p->get_model() ),
-        model_column.index()
-      )
-    );
-  }
+  _connect_auto_store_numeric_editable_signal_handler<double>(this_p, pCellRenderer, model_column);
 }
 
 #endif //GTKMM_HAVE_SIGC_BIND
@@ -1166,7 +1074,7 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 
   //The different CellRenderers have different "edited" signals,
   //and numerical values need to convert the text value to a number,
-  //so there are specializations for this tempate.
+  //so there are specializations for this template.
 
   Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
 
@@ -1186,6 +1094,35 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
     pCellText->signal_edited().connect(
       sigc::bind<-1>(
         sigc::bind<-1>( theslot, this_p->get_model()),
+        model_column.index()
+      )
+    );
+  }
+}
+
+template<class ColumnType> inline
+void _connect_auto_store_numeric_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer,  const Gtk::TreeModelColumn<ColumnType>& model_column)
+{
+  //The different CellRenderers have different "edited" signals,
+  //and numerical values need to convert the text value to a number.
+
+  Gtk::CellRendererText* pCellText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
+  if(pCellText)
+  {
+    //Set the appropriate property.
+    pCellText->property_editable() = true;
+
+    //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
+    typedef void (*type_fptr)(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
+    type_fptr fptr = _auto_store_on_cellrenderer_text_edited_numerical<ColumnType>;
+
+    //Connect to the appropriate signal, sending the model_column too.
+    //We use bind<-1> twice here, instead of using bind() once, because some compilers need the extra hint.
+    pCellText->signal_edited().connect(
+      sigc::bind<-1>(
+        sigc::bind<-1>(
+          sigc::ptr_fun(fptr),
+          this_p->get_model() ),
         model_column.index()
       )
     );
