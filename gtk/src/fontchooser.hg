@@ -16,21 +16,27 @@
  */
 
 _DEFS(gtkmm,gtk)
-_PINCLUDE(gtkmm/private/box_p.h)
+_PINCLUDE(glibmm/private/interface_p.h)
 
+#include <glibmm/interface.h>
+#include <pangomm/fontface.h>
+#include <pangomm/fontdescription.h>
+#include <pangomm/fontfamily.h>
 
-#include <gtkmm/box.h>
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+typedef struct _GtkFontChooserIface GtkFontChooserIface;
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 namespace Gtk
 {
 
-/** A widget for selecting fonts.
+/** An interface implemented by widgets displaying fonts.
  *
- * The Gtk::FontChooser widget lists the available fonts, styles and
- * sizes, allowing the user to select a font. It is used in the
- * Gtk::FontChooserDialog widget to provide a dialog box for selecting
- * fonts.
+ * FontChooser widgets list the available fonts, styles and
+ * sizes, allowing the user to select a font.
  *
  * To set the font which is initially selected, use set_font_name().
  *
@@ -38,35 +44,45 @@ namespace Gtk
  *
  * To change the text which is shown in the preview area, use set_preview_text().
  * 
- * @ingroup Widgets
+ * @ingroup FontChooser
  * @newin{3,2}
  */
-class FontChooser : public Box
+class FontChooser : public Glib::Interface
 {
-  _CLASS_GTKOBJECT(FontChooser, GtkFontChooser, GTK_FONT_CHOOSER, Gtk::Box, GtkBox)
-  _IGNORE(gtk_font_chooser_get_font) //deprecated
+  _CLASS_INTERFACE(FontChooser, GtkFontChooser, GTK_FONT_CHOOSER, GtkFontChooserIface)
 public:
-  _CTOR_DEFAULT()
 
-  _WRAP_METHOD(Glib::RefPtr<Pango::FontFamily> get_family(), gtk_font_chooser_get_family, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Pango::FontFamily> get_family() const, gtk_font_chooser_get_family, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontFamily> get_font_family(), gtk_font_chooser_get_font_family, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Pango::FontFamily> get_font_family() const, gtk_font_chooser_get_font_family, refreturn, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<Pango::FontFace> get_face(), gtk_font_chooser_get_face, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Pango::FontFace> get_face() const, gtk_font_chooser_get_face, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontFace> get_font_face(), gtk_font_chooser_get_font_face, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Pango::FontFace> get_font_face() const, gtk_font_chooser_get_font_face, refreturn, constversion)
 
-  _WRAP_METHOD(int get_size() const, gtk_font_chooser_get_size)
+  _WRAP_METHOD(int get_font_size() const, gtk_font_chooser_get_font_size)
 
-  _WRAP_METHOD(Glib::ustring get_font_name() const, gtk_font_chooser_get_font_name)
-  _WRAP_METHOD(bool set_font_name(const Glib::ustring& fontname), gtk_font_chooser_set_font_name)
+#m4 _CONVERSION(`PangoFontDescription*',`Pango::FontDescription',`Glib::wrap(const_cast<PangoFontDescription*>($3), false)')
+  _WRAP_METHOD(Pango::FontDescription get_font_desc() const, gtk_font_chooser_get_font_desc)
+  _WRAP_METHOD(void set_font_desc(const Pango::FontDescription& font_desc), gtk_font_chooser_set_font_desc)
+                                                            
+  _WRAP_METHOD(Glib::ustring get_font() const, gtk_font_chooser_get_font)
+  _WRAP_METHOD(void set_font(const Glib::ustring& font), gtk_font_chooser_set_font)
   _WRAP_METHOD(Glib::ustring get_preview_text() const, gtk_font_chooser_get_preview_text)
   _WRAP_METHOD(void set_preview_text(const Glib::ustring& fontname),gtk_font_chooser_set_preview_text)
   
   _WRAP_METHOD(bool get_show_preview_entry() const, gtk_font_chooser_get_show_preview_entry)
   _WRAP_METHOD(void set_show_preview_entry(bool show_preview_entry = true), gtk_font_chooser_set_show_preview_entry)
 
+/* TODO:
+void             gtk_font_chooser_set_filter_func          (GtkFontChooser   *fontchooser,
+                                                            GtkFontFilterFunc filter,
+                                                            gpointer          user_data,
+                                                            GDestroyNotify    destroy);
+*/
 
-  //Note: The GdkFont "font" property is deprecated, or should be.
-  _WRAP_PROPERTY("font_name", Glib::ustring)
+  _WRAP_SIGNAL(void font_activated(const Glib::ustring& fontname), "font-activated")
+
+  _WRAP_PROPERTY("font", Glib::ustring)
+  _WRAP_PROPERTY("font-desc", Pango::FontDescription)
   _WRAP_PROPERTY("preview_text", Glib::ustring)
   _WRAP_PROPERTY("show-preview-entry", bool)
 };

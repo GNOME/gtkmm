@@ -192,6 +192,12 @@
   (gtype-id "GTK_TYPE_ENTRY_COMPLETION")
 )
 
+(define-object FontChooser
+  (in-module "Gtk")
+  (c-name "GtkFontChooser")
+  (gtype-id "GTK_TYPE_FONT_CHOOSER")
+)
+
 (define-object IMContext
   (in-module "Gtk")
   (parent "GObject")
@@ -1093,11 +1099,11 @@
   (gtype-id "GTK_TYPE_FONT_SELECTION")
 )
 
-(define-object FontChooser
+(define-object FontChooserWidget
   (in-module "Gtk")
   (parent "GtkBox")
-  (c-name "GtkFontChooser")
-  (gtype-id "GTK_TYPE_FONT_CHOOSER")
+  (c-name "GtkFontChooserWidget")
+  (gtype-id "GTK_TYPE_FONT_CHOOSER_WIDGET")
 )
 
 (define-object FileChooserWidget
@@ -2862,8 +2868,6 @@
   )
 )
 
-
-
 ;; From gtkaccelgroup.h
 
 (define-function gtk_accel_group_get_type
@@ -4117,6 +4121,21 @@
   (of-object "GtkAppChooserButton")
   (c-name "gtk_app_chooser_button_get_heading")
   (return-type "const-gchar*")
+)
+
+(define-method set_show_default_item
+  (of-object "GtkAppChooserButton")
+  (c-name "gtk_app_chooser_button_set_show_default_item")
+  (return-type "none")
+  (parameters
+    '("gboolean" "setting")
+  )
+)
+
+(define-method get_show_default_item
+  (of-object "GtkAppChooserButton")
+  (c-name "gtk_app_chooser_button_get_show_default_item")
+  (return-type "gboolean")
 )
 
 
@@ -11121,42 +11140,6 @@
   )
 )
 
-(define-method get_font_chooser
-  (of-object "GtkFontChooserDialog")
-  (c-name "gtk_font_chooser_dialog_get_font_chooser")
-  (return-type "GtkWidget*")
-)
-
-(define-method get_font_name
-  (of-object "GtkFontChooserDialog")
-  (c-name "gtk_font_chooser_dialog_get_font_name")
-  (return-type "gchar*")
-)
-
-(define-method set_font_name
-  (of-object "GtkFontChooserDialog")
-  (c-name "gtk_font_chooser_dialog_set_font_name")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "fontname")
-  )
-)
-
-(define-method get_preview_text
-  (of-object "GtkFontChooserDialog")
-  (c-name "gtk_font_chooser_dialog_get_preview_text")
-  (return-type "const-gchar*")
-)
-
-(define-method set_preview_text
-  (of-object "GtkFontChooserDialog")
-  (c-name "gtk_font_chooser_dialog_set_preview_text")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "text")
-  )
-)
-
 
 
 ;; From gtkfontchooser.h
@@ -11166,40 +11149,49 @@
   (return-type "GType")
 )
 
-(define-function gtk_font_chooser_new
-  (c-name "gtk_font_chooser_new")
-  (is-constructor-of "GtkFontChooser")
-  (return-type "GtkWidget*")
-)
-
-(define-method get_family
+(define-method get_font_family
   (of-object "GtkFontChooser")
-  (c-name "gtk_font_chooser_get_family")
+  (c-name "gtk_font_chooser_get_font_family")
   (return-type "PangoFontFamily*")
 )
 
-(define-method get_face
+(define-method get_font_face
   (of-object "GtkFontChooser")
-  (c-name "gtk_font_chooser_get_face")
+  (c-name "gtk_font_chooser_get_font_face")
   (return-type "PangoFontFace*")
 )
 
-(define-method get_size
+(define-method get_font_size
   (of-object "GtkFontChooser")
-  (c-name "gtk_font_chooser_get_size")
+  (c-name "gtk_font_chooser_get_font_size")
   (return-type "gint")
 )
 
-(define-method get_font_name
+(define-method get_font_desc
   (of-object "GtkFontChooser")
-  (c-name "gtk_font_chooser_get_font_name")
+  (c-name "gtk_font_chooser_get_font_desc")
+  (return-type "PangoFontDescription*")
+)
+
+(define-method set_font_desc
+  (of-object "GtkFontChooser")
+  (c-name "gtk_font_chooser_set_font_desc")
+  (return-type "none")
+  (parameters
+    '("const-PangoFontDescription*" "font_desc")
+  )
+)
+
+(define-method get_font
+  (of-object "GtkFontChooser")
+  (c-name "gtk_font_chooser_get_font")
   (return-type "gchar*")
 )
 
-(define-method set_font_name
+(define-method set_font
   (of-object "GtkFontChooser")
-  (c-name "gtk_font_chooser_set_font_name")
-  (return-type "gboolean")
+  (c-name "gtk_font_chooser_set_font")
+  (return-type "none")
   (parameters
     '("const-gchar*" "fontname")
   )
@@ -11208,7 +11200,7 @@
 (define-method get_preview_text
   (of-object "GtkFontChooser")
   (c-name "gtk_font_chooser_get_preview_text")
-  (return-type "const-gchar*")
+  (return-type "gchar*")
 )
 
 (define-method set_preview_text
@@ -11241,9 +11233,24 @@
   (return-type "none")
   (parameters
     '("GtkFontFilterFunc" "filter")
-    '("gpointer" "data")
+    '("gpointer" "user_data")
     '("GDestroyNotify" "destroy")
   )
+)
+
+
+
+;; From gtkfontchooserwidget.h
+
+(define-function gtk_font_chooser_widget_get_type
+  (c-name "gtk_font_chooser_widget_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_font_chooser_widget_new
+  (c-name "gtk_font_chooser_widget_new")
+  (is-constructor-of "GtkFontChooserWidget")
+  (return-type "GtkWidget*")
 )
 
 
