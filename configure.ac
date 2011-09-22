@@ -44,8 +44,7 @@ AC_SUBST([LIBGTKMM_SO_VERSION], [2:0:1])
 
 AC_PROG_CXX
 AC_DISABLE_STATIC
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 AC_MSG_CHECKING([for native Windows host])
 AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
