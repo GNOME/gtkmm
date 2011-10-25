@@ -31,6 +31,8 @@ check_PROGRAMS =			\
 	scrolledwindow/test		\
 	wrap_existing/test
 
+TESTS =	test_validate_docs_xhtml.sh
+
 child_widget_test_SOURCES          = child_widget/main.cc	\
                                      child_widget/testwindow.cc	\
                                      child_widget/testwindow.h
