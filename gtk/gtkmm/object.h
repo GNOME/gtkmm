@@ -18,8 +18,6 @@
 #ifndef _GTKMM_OBJECT_H
 #define _GTKMM_OBJECT_H
 
-
-#include <glibmm.h>
 #include <glibmm/object.h>
 #include <gtkmm/base.h>
 #include <gtkmmconfig.h>

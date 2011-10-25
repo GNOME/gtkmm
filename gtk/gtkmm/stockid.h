@@ -23,7 +23,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <glibmm.h>
+#include <glibmm/ustring.h>
+#include <glibmm/containerhandle_shared.h>
 
 namespace Gtk
 {

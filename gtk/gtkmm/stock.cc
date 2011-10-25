@@ -20,6 +20,7 @@
 
 #include <gtkmm/stock.h>
 #include <gtkmm/stockitem.h>
+#include <glibmm/vectorutils.h>
 #include <gtk/gtk.h>
 
 // Get rid of macro DELETE (from winnt.h).  We have some macro
