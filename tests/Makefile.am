@@ -60,3 +60,5 @@ local_ldadd    = $(gdkmm_ldadd) $(gtkmm_ldadd)
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)
 LDADD       = $(GTKMM_LIBS) $(local_ldadd)
+
+EXTRA_DIST = test_validate_docs_xhtml.sh
