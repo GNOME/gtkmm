@@ -23,7 +23,7 @@ protected:
   Gtk::Box m_VBox, m_VBox2;
   Gtk::Box m_HBox, m_HBox2;
   Gtk::Button m_Button_Message, m_Button_Interactive;
-  Gtk::Table m_Table;
+  Gtk::Grid m_Table;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
 
@@ -42,7 +42,7 @@ public:
 protected:
   //Member widgets:
   Gtk::Box m_HBox;
-  Gtk::Table m_Table;
+  Gtk::Grid m_Table;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
   Gtk::Image m_Image;
@@ -61,7 +61,6 @@ Example_Dialog::Example_Dialog()
   m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8), m_HBox2(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Button_Message("_Message Dialog", true), m_Button_Interactive("_Interactive Dialog", true),
-  m_Table(2, 2, false),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2")
 {
   m_count = 0;
@@ -89,8 +88,8 @@ Example_Dialog::Example_Dialog()
   m_VBox2.pack_start(m_Button_Interactive, Gtk::PACK_SHRINK);
 
 
-  m_Table.set_row_spacings(4);
-  m_Table.set_col_spacings(4);
+  m_Table.set_row_spacing(4);
+  m_Table.set_column_spacing(4);
   m_HBox2.pack_start(m_Table, Gtk::PACK_SHRINK);
 
   m_Table.attach(m_Label1, 0, 1, 0, 1);
@@ -135,7 +134,6 @@ void Example_Dialog::on_button_interactive()
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
 : Gtk::Dialog("Interactive Dialog", parent, true),
   m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
-  m_Table(2, 2, false),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
   m_Image(Gtk::Stock::DIALOG_QUESTION, Gtk::ICON_SIZE_DIALOG)
 {
@@ -146,8 +144,8 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);
 
-  m_Table.set_row_spacings(4);
-  m_Table.set_col_spacings(4);
+  m_Table.set_row_spacing(4);
+  m_Table.set_column_spacing(4);
   m_HBox.pack_start(m_Table);
 
   m_Table.attach(m_Label1, 0, 1, 0, 1);

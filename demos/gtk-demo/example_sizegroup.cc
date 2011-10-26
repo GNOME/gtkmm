@@ -3,7 +3,7 @@
  * GtkSizeGroup provides a mechanism for grouping a number of
  * widgets together so they all request the same amount of space.
  * This is typically useful when you want a column of widgets to
- * have the same size, but you can't use a GtkTable widget.
+ * have the same size, but you can't use a GtkGrid widget.
  *
  * Note that size groups only affect the amount of space requested,
  * not the size that the widgets finally receive. If you want the
@@ -27,7 +27,7 @@ protected:
   virtual void on_checkbutton_toggled();
 
   typedef std::list<Glib::ustring> type_listStrings;
-  virtual void add_row(Gtk::Table& table, int row, const Glib::RefPtr<Gtk::SizeGroup>& size_group, const Glib::ustring& label_text, const std::list<Glib::ustring>& options);
+  virtual void add_row(Gtk::Grid& table, int row, const Glib::RefPtr<Gtk::SizeGroup>& size_group, const Glib::ustring& label_text, const std::list<Glib::ustring>& options);
   virtual Gtk::ComboBoxText* create_combobox(const std::list<Glib::ustring>& strings);
 
   virtual void on_response(int response_id);
@@ -37,7 +37,7 @@ protected:
   Gtk::Box m_VBox;
   Gtk::Box m_HBox;
   Glib::RefPtr<Gtk::SizeGroup> m_refSizeGroup;
-  Gtk::Table m_Table_Color, m_Table_Line;
+  Gtk::Grid m_Table_Color, m_Table_Line;
   Gtk::CheckButton m_CheckButton;
 };
 
@@ -53,7 +53,6 @@ Example_SizeGroup::Example_SizeGroup()
   m_Frame_Line("Line Options"),
   m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
   m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
-  m_Table_Color(2, 2), m_Table_Line(2, 2),
   m_CheckButton("_Enable grouping", true)
 {
   set_resizable(false);
@@ -69,8 +68,8 @@ Example_SizeGroup::Example_SizeGroup()
   m_VBox.pack_start(m_Frame_Color);
 
   m_Table_Color.set_border_width(5);
-  m_Table_Color.set_row_spacings(5);
-  m_Table_Color.set_col_spacings(10);
+  m_Table_Color.set_row_spacing(5);
+  m_Table_Color.set_column_spacing(10);
   m_Frame_Color.add(m_Table_Color);
 
   type_listStrings color_options;
@@ -86,8 +85,8 @@ Example_SizeGroup::Example_SizeGroup()
   m_VBox.pack_start(m_Frame_Line, Gtk::PACK_SHRINK);
 
   m_Table_Line.set_border_width(5);
-  m_Table_Line.set_row_spacings(5);
-  m_Table_Line.set_col_spacings(10);
+  m_Table_Line.set_row_spacing(5);
+  m_Table_Line.set_column_spacing(10);
   m_Frame_Line.add(m_Table_Line);
 
 
@@ -129,7 +128,7 @@ void Example_SizeGroup::on_checkbutton_toggled()
   m_refSizeGroup->set_mode(new_mode);
 }
 
-void Example_SizeGroup::add_row(Gtk::Table& table, int row,
+void Example_SizeGroup::add_row(Gtk::Grid& table, int row,
                                 const Glib::RefPtr<Gtk::SizeGroup>& size_group,
                                 const Glib::ustring& label_text,
                                 const std::list<Glib::ustring>& options)
@@ -137,13 +136,14 @@ void Example_SizeGroup::add_row(Gtk::Table& table, int row,
   Gtk::Label* pLabel = Gtk::manage(new Gtk::Label(label_text, true));
   pLabel->set_alignment(Gtk::ALIGN_START, Gtk::ALIGN_END);
 
-  table.attach(*pLabel, 0, 1, row, row + 1, Gtk::EXPAND|Gtk::FILL, Gtk::AttachOptions(0));
+  table.attach(*pLabel, 0, 1, row, row + 1);
+  pLabel->set_hexpand();
 
   Gtk::ComboBoxText* pComboBoxText = create_combobox(options);
   pLabel->set_mnemonic_widget(*pComboBoxText);
   size_group->add_widget(*pComboBoxText);
 
-  table.attach(*pComboBoxText, 1, 2, row, row + 1, Gtk::AttachOptions(0), Gtk::AttachOptions(0));
+  table.attach(*pComboBoxText, 1, 2, row, row + 1);
 }
 
 /* Convenience function to create an option menu holding a number of strings

@@ -187,7 +187,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
     return false; // paranoia check, in case we haven't gotten a configure event
 
   /* This call is very important; it requests the next motion event.  If you
-   * don't call Gdk::Window::get_pointer() you'll only get a single motion
+   * don't call Gdk::Window::get_device_position() you'll only get a single motion
    * event.  The reason is that we specified Gdk::POINTER_MOTION_HINT_MASK to
    * Gtk::Widget::add_events().  If we hadn't specified that, we could just use
    * event->x, event->y as the pointer location. But we'd also get deluged in
@@ -203,8 +203,8 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
     {
       int x = 0, y = 0;
       Gdk::ModifierType state = Gdk::ModifierType(0);
-
-      refWindow->get_pointer(x, y, state);
+      const Glib::RefPtr<const Gdk::Device> device = Glib::wrap(event->device);
+      refWindow->get_device_position(device, x, y, state);
 
       if((state & Gdk::BUTTON1_MASK) != 0)
         scribble_draw_brush(x, y);

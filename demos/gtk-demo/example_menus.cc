@@ -11,8 +11,7 @@
  * There are several kinds of menu item, including plain GtkMenuItem,
  * GtkCheckMenuItem which can be checked/unchecked, GtkRadioMenuItem
  * which is a check menu item that's in a mutually exclusive group,
- * GtkSeparatorMenuItem which is a separator bar, GtkTearoffMenuItem
- * which allows a GtkMenu to be torn off, and GtkImageMenuItem which
+ * GtkSeparatorMenuItem which is a separator bar, and GtkImageMenuItem which
  * can place a GtkImage or other widget next to the menu text.
  *
  * A GtkMenuItem can have a submenu, which is simply a GtkMenu to pop
@@ -38,7 +37,7 @@ protected:
   //signal handlers:
   virtual void on_button_clicked();
 
-  virtual Gtk::Menu* create_menu(gint depth, bool tearoff);
+  virtual Gtk::Menu* create_menu(gint depth);
 
   //Member widgets:
   Gtk::Frame m_Frame_Horizontal, m_Frame_Vertical;
@@ -71,17 +70,17 @@ Example_Menus::Example_Menus()
   {
     //Note:: It's generally easier to use the Gtk::UIManager API.
     Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
-    pMenuItem->set_submenu( *(create_menu(2, true)) );
+    pMenuItem->set_submenu( *(create_menu(2)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::MenuItem("foo"));
-    pMenuItem->set_submenu( *(create_menu(3, true)) );
+    pMenuItem->set_submenu( *(create_menu(3)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::MenuItem("bar"));
-    pMenuItem->set_submenu( *(create_menu(4, true)) );
+    pMenuItem->set_submenu( *(create_menu(4)) );
     pMenuItem->set_right_justified();
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
@@ -92,7 +91,7 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_VBox_Sub1);
 
   {
-    Gtk::Menu* pMenu = create_menu(1, false);
+    Gtk::Menu* pMenu = create_menu(1);
     pMenu->set_accel_group(get_accel_group());
 
     Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::SeparatorMenuItem());
@@ -134,7 +133,7 @@ Example_Menus::~Example_Menus()
 {
 }
 
-Gtk::Menu* Example_Menus::create_menu(gint depth, bool tearoff)
+Gtk::Menu* Example_Menus::create_menu(gint depth)
 {
   if (depth < 1)
     return 0;
@@ -142,13 +141,6 @@ Gtk::Menu* Example_Menus::create_menu(gint depth, bool tearoff)
   Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
 
   {
-    if(tearoff)
-    {
-      Gtk::MenuItem* menu_item = Gtk::manage(new Gtk::TearoffMenuItem());
-      pMenu->append(*menu_item);
-      menu_item->show();
-    }
-
     Gtk::RadioMenuItem::Group radiogroup;
 
     for(int i = 0, j = 1; i < 5; i++, j++)
@@ -163,7 +155,7 @@ Gtk::Menu* Example_Menus::create_menu(gint depth, bool tearoff)
       if(i == 3)
         pMenuItem->set_sensitive(false);
 
-      Gtk::Menu* pSubMenu = create_menu(depth - 1, true);
+      Gtk::Menu* pSubMenu = create_menu(depth - 1);
       if(pSubMenu)
         pMenuItem->set_submenu(*pSubMenu);
     }

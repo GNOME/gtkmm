@@ -98,7 +98,7 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
 {
   set_border_width(4);
 
-  Gtk::Table *const pTable = new Gtk::Table(3, 2, true);
+  Gtk::Grid *const pTable = new Gtk::Grid();
   add(*Gtk::manage(pTable));
 
   pTable->attach(*Gtk::manage(new Gtk::Label(label1)), 0, 1, 0, 1);

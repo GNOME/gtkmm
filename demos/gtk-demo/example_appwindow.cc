@@ -18,7 +18,7 @@ protected:
   virtual void on_text_mark_set(const Gtk::TextBuffer::iterator& new_location, const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
 
   //Member widgets:
-  Gtk::Table m_Table;
+  Gtk::Grid m_Grid;
   Gtk::Menu m_Menubar;
   Gtk::Toolbar m_Toolbar;
   Gtk::ScrolledWindow m_ScrolledWindow;
@@ -35,11 +35,10 @@ Gtk::Window* do_appwindow()
 
 
 Example_AppWindow::Example_AppWindow()
-: m_Table(1, 4)
 {
   set_title("Application Window");
 
-  add(m_Table);
+  add(m_Grid);
 
 /*
   //Menu:
@@ -91,8 +90,8 @@ Example_AppWindow::Example_AppWindow()
     list_bar.push_front(MenuElem("_Preferences", *pMenuPreferences));
     list_bar.push_front(MenuElem("_File", *pMenuFile));
 
-    //Add the menu bar to the Table:
-    m_Table.attach(m_Menubar,
+    //Add the menu bar to the Grid:
+    m_Grid.attach(m_Menubar,
                     // X direction             Y direction
                     0, 1,                      0, 1,
                     Gtk::FILL|Gtk::EXPAND, Gtk::AttachOptions(0)
@@ -102,17 +101,16 @@ Example_AppWindow::Example_AppWindow()
 */
   //Toolbar:
   {
-    m_Table.attach(m_Toolbar,
+    m_Toolbar.set_hexpand();
+    m_Grid.attach(m_Toolbar,
                    /* X direction */       /* Y direction */
-                   0, 1,                   1, 2,
-                   Gtk::FILL|Gtk::EXPAND, Gtk::AttachOptions(0)
-                   );
+                   0, 1,                   1, 2);
   }
 
 
   m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_IN);
-  m_Table.attach(m_ScrolledWindow,
+  m_Grid.attach(m_ScrolledWindow,
                  /* X direction */       /* Y direction */
                  0, 1,                   2, 3);
 
@@ -122,12 +120,10 @@ Example_AppWindow::Example_AppWindow()
 
 
   /* Create statusbar */
-
-  m_Table.attach(m_Statusbar,
+   m_Statusbar.set_hexpand();
+  m_Grid.attach(m_Statusbar,
                  /* X direction */       /* Y direction */
-                 0, 1,                   3, 4,
-                 Gtk::FILL|Gtk::EXPAND, Gtk::AttachOptions(0)
-                 );
+                 0, 1,                   3, 4);
 
 
   /* Show text widget info in the statusbar */
