@@ -25,6 +25,7 @@
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/box.h>
+#include <glibmm/convert.h>
 #include "demowindow.h"
 #include "textwidget.h"
 #include "demos.h"
