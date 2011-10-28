@@ -46,9 +46,44 @@ AC_PROG_CXX
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
 
-AC_MSG_CHECKING([for native Windows host])
-AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
-AC_MSG_RESULT([$gtkmm_host_windows])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+gdk_target_win32=no
+gdk_target_quartz=no
+gdk_target_x11=no
+gdk_target_wayland=no
+gdk_target_broadway=no
+for target in `$PKG_CONFIG --variable=targets gtk+-3.0`; do
+    case "$target" in 
+       win32)
+          gdk_target_win32=yes
+	  ;;
+       quartz)
+          gdk_target_quartz=yes
+	  ;;
+       x11)
+          gdk_target_x11=yes
+	  ;;
+       broadway)
+          gdk_target_broadway=yes
+	  ;;
+       wayland)
+          gdk_target_wayland=yes
+	  ;;
+    esac;
+done
+AM_CONDITIONAL([GDK_TARGET_WIN32], [test "x$gdk_target_win32" = xyes])
+AM_CONDITIONAL([GDK_TARGET_QUARTZ], [test "x$gdk_target_quartz" = xyes])
+AM_CONDITIONAL([GDK_TARGET_X11], [test "x$gdk_target_x11" = xyes])
+AM_CONDITIONAL([GDK_TARGET_BROADWAY], [test "x$gdk_target_broadway" = xyes])
+AM_CONDITIONAL([GDK_TARGET_WAYLAND], [test "x$gdk_target_wayland" = xyes])
+
+if [ "x$GDK_TARGET_WIN32" = xyes ]; then
+   AC_MSG_CHECKING([for native Windows host])
+   AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
+   AC_MSG_RESULT([$gtkmm_host_windows])
+else
+    gtkmm_host_windows = no
+fi
 AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
 
 # TODO: What exactly does this do?  If both static and shared libraries
