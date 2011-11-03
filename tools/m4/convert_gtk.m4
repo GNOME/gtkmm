@@ -613,9 +613,9 @@ _CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REF
 _CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`($2)$3')
 _CONVERSION(`GtkPrintStatus',`PrintStatus',`($2)$3')
 
-_CONVERSION(`const Cairo::RefPtr<Cairo::Context>&',`cairo_t*',`($3)->cobj()')
-_CONVERSION(`const Cairo::RefPtr<const Cairo::Context>&',`cairo_t*',`const_cast<cairo_t*>(($3)->cobj())')
-_CONVERSION(`const Cairo::FontOptions&',`const cairo_font_options_t*',`($3).cobj()')
+_CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Context>&',`cairo_t*',`($3)->cobj()')
+_CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Context>&',`cairo_t*',`const_cast<cairo_t*>(($3)->cobj())')
+_CONVERSION(`const ::Cairo::FontOptions&',`const cairo_font_options_t*',`($3).cobj()')
 
 
 #Printer
