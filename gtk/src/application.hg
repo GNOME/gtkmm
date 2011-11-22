@@ -1,0 +1,179 @@
+/* Copyright (C) 2003 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <vector>
+
+#include <giomm/application.h>
+#include <gtkmm/actiongroup.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(giomm/private/application_p.h)
+
+namespace Gtk
+{
+
+class Window;
+
+/** TODO
+ */
+class Application
+  : public Gio::Application
+{
+protected:
+  _CLASS_GOBJECT(Application, GtkApplication, GTK_APPLICATION, Gio::Application, GApplication)
+
+protected:
+
+  /** Creates a new Application instance.
+   * This constructor calls g_type_init() for you.
+   * You should call run() with your main() function's argc and argv parameters
+   * to initialize gtkmm too.
+   *
+   * @param application_id A valid application id
+   * @param flags The application flags
+   */
+  explicit Application(const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE);
+  _IGNORE(gtk_application_new)
+
+  //This constructor does not correspond to anything in the C API.
+  //We added it so we can choose to always initialize gtkmm as early as possible.
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639925
+  /** Creates a new Application instance.
+   * This constructor initializes gtkmm for you, so you should call run() 
+   * without specifying the the argc and argv parameters again. 
+   * 
+   * @param argc The parameter received by your main() function.
+   * @param argv The parameter received by your main() function.
+   * @param application_id A valid application id
+   * @param flags The application flags
+   */
+  explicit Application(int argc, char** argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE);
+  
+public:
+
+#m4 _CONVERSION(`Gio::ApplicationFlags',`GApplicationFlags',`(GApplicationFlags)($3)')
+  _WRAP_CREATE(const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE)
+  
+  _WRAP_CREATE(int argc, char** argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags = Gio::APPLICATION_FLAGS_NONE)
+
+#m4 _CONVERSION(`GList*',`std::vector<Window*>',`Glib::ListHandler<Window*>::list_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Window*> get_windows(), gtk_application_get_windows)
+
+#m4 _CONVERSION(`GList*',`std::vector<const Window*>',`Glib::ListHandler<const Window*>::list_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<const Window*> get_windows() const, gtk_application_get_windows)
+
+  /** Adds a window to the Gtk::Application.
+   * 
+   * If all the windows managed by Gtk::Application are closed, the
+   * Gtk::Application will call quit(), and quit
+   * the application.
+   * 
+   * If your application uses only a single toplevel window, you can
+   * use get_window(). If you are using a sub-class
+   * of Gtk::Application you should call create_window()
+   * to let the Gtk::Application instance create a Gtk::Window and add
+   * it to the list of toplevels of the application. You should call
+   * this function only to add Gtk::Window<!-- -->s that you created
+   * directly using new Gtk::Window.
+   * 
+   * @newin{3,0}
+   * @param window A toplevel window to add to the application.
+   */
+  void add_window(Window& window);
+  _IGNORE(gtk_application_add_window)
+
+  _WRAP_METHOD(void remove_window(Window& window), gtk_application_remove_window)
+
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   * 
+   * @newin{3,0}
+   */
+  int run(int argc, char** argv);
+  
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   *
+   * @param window The window to show. This method will return when the window is hidden.
+   * 
+   * @newin{3,0}
+   */
+  int run(Window& window, int argc, char** argv);
+
+  //TODO: If argc and argv are necessary at all, document the need to call that constructor first.
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639925#c4
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   *
+   * @param window The window to show. This method will return when the window is hidden.
+   * 
+   * @newin{3,0}
+   */
+  int run(Window& window);
+
+  //TODO: If argc and argv are necessary at all, document the need to call that constructor first.
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=639925#c4
+  /** Starts the application.
+   * 
+   * The default implementation of this virtual function will simply run
+   * a main loop.
+   * 
+   * It is an error to call this function if @a application is a proxy for
+   * a remote application.
+   * 
+   * @newin{3,0}
+   */
+  int run();
+  
+private:
+  /** This is just a way to call Glib::init() (which calls g_type_init()) before
+   * calling application_class_.init(), so that 
+   * gtk_application_get_type() will always succeed.
+   * See https://bugzilla.gnome.org/show_bug.cgi?id=639925
+   */
+  const Glib::Class& custom_class_init();
+  
+  void on_activate_showwindow();
+  void on_window_hide(Window*);
+  
+  ///We show the window in the activate signal handler.
+  Window* m_main_window;
+  
+  //We need these to call g_application_run(), 
+  //even if we have already called gtk_init().
+  int m_argc;
+  char** m_argv;
+};
+
+} // namespace Gtk
