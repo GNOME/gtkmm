@@ -77,12 +77,12 @@ AM_CONDITIONAL([GDK_TARGET_X11], [test "x$gdk_target_x11" = xyes])
 AM_CONDITIONAL([GDK_TARGET_BROADWAY], [test "x$gdk_target_broadway" = xyes])
 AM_CONDITIONAL([GDK_TARGET_WAYLAND], [test "x$gdk_target_wayland" = xyes])
 
-if [ "x$GDK_TARGET_WIN32" = xyes ]; then
+if test "x$gdk_target_win32" = xyes ; then
    AC_MSG_CHECKING([for native Windows host])
    AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
    AC_MSG_RESULT([$gtkmm_host_windows])
 else
-    gtkmm_host_windows = no
+   gtkmm_host_windows=no
 fi
 AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
 
