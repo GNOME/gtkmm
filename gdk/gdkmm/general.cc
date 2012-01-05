@@ -18,9 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+//Allow use of deprecated API,
+//in the API that we also deprecate, but cannot remove yet:
+#undef GDK_DISABLE_DEPRECATED
+#define GDK_DISABLE_DEPRECATION_WARNINGS 1
+
 #include <gdkmm/general.h>
 #include <gdkmm/color.h>
 #include <gdk/gdk.h>
+
 
 namespace Gdk
 {
@@ -54,11 +60,14 @@ void flush()
 namespace Cairo
 {
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 
 void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color)
 {
   gdk_cairo_set_source_color(context->cobj(), const_cast<GdkColor*>(color.gobj()));
 }
+
+#endif //GDKMM_DISABLE_DEPRECATED
 
 void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color)
 {
