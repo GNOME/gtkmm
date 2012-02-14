@@ -31,9 +31,8 @@
 #include <gdkmm/wrap_init.h>
 #include <gtkmm/wrap_init.h>
 
-namespace Gtk
+namespace
 {
-
 
 static void init_gtkmm_internals()
 {
@@ -56,9 +55,14 @@ static void init_gtkmm_internals()
   }
 }
 
+} // anonymous namespace
+
+namespace Gtk
+{
+
 const Glib::Class& Application::custom_class_init()
 {
-  Glib::init();
+  init_gtkmm_internals();
   return application_class_.init();
 }
 
@@ -82,36 +86,18 @@ Application::Application(int argc, char** argv, const Glib::ustring& application
   m_argc(argc),
   m_argv(argv)
 {
+  gtk_init(&argc, &argv);
 }
 
 Glib::RefPtr<Application> Application::create(const Glib::ustring& application_id, Gio::ApplicationFlags flags)
 {
-  //Let the constructor succeed:
-  init_gtkmm();
-  
   return Glib::RefPtr<Application>( new Application(application_id, flags) );
 }
 
 Glib::RefPtr<Application> Application::create(int argc, char** argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags)
 {
-  //Let the constructor succeed:
-  init_gtkmm(argc, argv);
-  
   return Glib::RefPtr<Application>( new Application(argc, argv, application_id, flags) );
 }
-
-void Application::init_gtkmm()
-{
-  gtk_init(0, 0);
-  init_gtkmm_internals();
-}
-
-void Application::init_gtkmm(int& argc, char**& argv)
-{
-  gtk_init(&argc, &argv);
-  init_gtkmm_internals();
-}
-
 
 void Application::on_activate_showwindow()
 {
