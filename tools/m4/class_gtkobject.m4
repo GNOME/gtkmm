@@ -186,6 +186,7 @@ public:
   typedef __REAL_CNAME__`'Class BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+_IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
