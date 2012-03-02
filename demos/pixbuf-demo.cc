@@ -192,7 +192,8 @@ int main(int argc, char** argv)
 {
   try
   {
-    Gtk::Main main_instance (&argc, &argv);
+    Glib::RefPtr<Gtk::Application> app =
+      Gtk::Application::create(argc, argv, "org.gtkmm.demos.pixbuf-demo");
 
     Gtk::Window window;
     window.add(*Gtk::manage(new DemoRenderArea()));
@@ -200,12 +201,11 @@ int main(int argc, char** argv)
     window.set_resizable(false);
     window.show_all();
 
-    Gtk::Main::run(window);
+    return app->run(window);
   }
   catch(const Glib::Error& error)
   {
     std::cerr << error.what() << std::endl;
     return EXIT_FAILURE;
   }
-  return EXIT_SUCCESS;
 }
