@@ -129,6 +129,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrenderertoggle.h>
 #include <gtkmm/colorbutton.h>
+#include <gtkmm/colorchooser.h>
+#include <gtkmm/colorchooserdialog.h>
 #include <gtkmm/colorselection.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
