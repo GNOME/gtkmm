@@ -45,8 +45,10 @@ ExampleWindow::~ExampleWindow()
 
 int main(int argc, char* argv[])
 {
-    Gtk::Main kit(argc, argv);
-    ExampleWindow window;
-    kit.run(window);
-    return 0;
+   Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "org.gtkmm.test");
+
+  ExampleWindow window;
+  return app->run(window);
 }

@@ -33,6 +33,8 @@ MyWindow::MyWindow()
   m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
   m_Box.pack_start(m_Button);
   add(m_Box);
+
+  show_all_children();
 }
 
 void MyWindow::on_button_clicked()
@@ -52,10 +54,10 @@ void MyWindow::on_button_clicked()
 
 int main(int argc, char* argv[])
 {
-  Gtk::Main kit(argc, argv);
+  Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "org.gtkmm.test");
 
   MyWindow win;
-  win.show_all();
-  kit.run(win);
-  return 0;
+  return app->run(win);
 }

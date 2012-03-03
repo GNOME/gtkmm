@@ -50,8 +50,9 @@ void AppWindow::on_button_clicked()
 
 int main(int argc, char *argv[])
 {
-    Gtk::Main kit(&argc, &argv);
-    AppWindow app;
-    Gtk::Main::run(app);
-    return(0);
+  Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "org.gtkmm.test");
+  AppWindow window;
+  return app->run(window);
 }

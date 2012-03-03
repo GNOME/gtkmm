@@ -20,7 +20,9 @@ void on_object_qdata_destroyed(gpointer data)
 
 int main(int argc, char**argv)
 {
-  Gtk::Main app(&argc, &argv);
+  Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "org.gtkmm.test");
 
   Gtk::Dialog* pDialog = new Gtk::Dialog();
   Gtk::Box* pBox = pDialog->get_content_area();

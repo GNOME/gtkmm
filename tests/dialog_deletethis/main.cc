@@ -1,6 +1,8 @@
 #include <gtkmm.h>
 #include <iostream>
 
+Glib::RefPtr<Gtk::Application> app;
+
 //This is _not_ a good example of coding with gtkmm.
 class Dlg : public sigc::trackable
 {
@@ -34,7 +36,7 @@ class Dlg : public sigc::trackable
 
     void quit() {
       delete this; //This is _not_ a good example of coding with gtkmm.
-      Gtk::Main::quit();
+      app->quit();
     }
 
   private:
@@ -43,11 +45,12 @@ class Dlg : public sigc::trackable
 
 int main (int argc, char **argv)
 {
-  Gtk::Main kit (argc, argv);
+  app = Gtk::Application::create(argc, argv,
+    "org.gtkmm.test");
 
   new Dlg(); //Not a Gtk::Dialog - it creates one in its constructor.
 
-  Gtk::Main::run();
+  return app->run();
 }
 
   

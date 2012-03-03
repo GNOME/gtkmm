@@ -21,10 +21,10 @@
 
 int main(int argc, char *argv[])
 {
-  Gtk::Main kit(argc, argv);
+  Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "org.gtkmm.test");
 
   TestWindow testWindow;
-  kit.run(testWindow); //Shows the window and returns when it is closed.
-
-  return 0;
+  return app->run(testWindow); //Shows the window and returns when it is closed.
 }

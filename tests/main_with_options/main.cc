@@ -103,7 +103,9 @@ int main(int argc, char *argv[])
   
   try
   {
-    Gtk::Main main_instance(argc, argv, context);
+    Glib::RefPtr<Gtk::Application> app =
+      Gtk::Application::create(argc, argv,
+        "org.gtkmm.test");
   
     //Here we can see the parsed values of our custom command-line arguments:
 
@@ -125,13 +127,12 @@ int main(int argc, char *argv[])
     //Any standard GTK+ command-line arguments will have an effect on this window:
     //Try --name="bobble" to change the window's title to "bobble", for instance.
     Gtk::Window testWindow;
-    main_instance.run(testWindow); //Shows the window and returns when it is closed.
+    return app->run(testWindow); //Shows the window and returns when it is closed.
   }
   catch(const Glib::Error& ex)
   {
-    std::cout << "Exception: " << ex.what() << std::endl;
+    std::cerr << "Exception: " << ex.what() << std::endl;
   }
-
 
   return 0;
 }
