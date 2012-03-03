@@ -155,6 +155,7 @@ _CONV_ENUM(Gtk,ScrollablePolicy)
 _CONV_ENUM(Gtk,RegionFlags)
 _CONV_ENUM(Gtk,JunctionSides)
 _CONV_ENUM(Gtk,StateFlags)
+_CONV_ENUM(Gtk,ApplicationInhibitFlags)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
@@ -231,6 +232,7 @@ _CONVERSION(`const Glib::RefPtr<const CellAreaContext>&',`GtkCellAreaContext*',_
 _CONVERSION(`const Glib::RefPtr<Adjustment>&',`GtkAdjustment*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Gtk::Widget*',`GtkWidget*',__FP2P)
 _CONVERSION(`Widget*',`GtkWidget*',__FP2P)
+_CONVERSION(`Window*',`GtkWindow*',__FP2P)
 _CONVERSION(`Menu*',`GtkMenu*',__FP2P)
 
 #
@@ -681,6 +683,11 @@ _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CO
 
 _CONVERSION(`const Glib::RefPtr<Gio::AppInfo>&',`GAppInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::AppInfo))
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<Gio::AppInfo>',`Glib::wrap($3)')
+
+_CONVERSION(`const Glib::RefPtr<Gio::MenuModel>&',`GMenuModel*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Gio::MenuModel>&',`GMenuModel*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GMenuModel*',`Glib::RefPtr<Gio::MenuModel>',`Glib::wrap($3)')
+_CONVERSION(`GMenuModel*',`Glib::RefPtr<const Gio::MenuModel>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
 
