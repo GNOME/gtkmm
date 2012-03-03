@@ -71,7 +71,6 @@ Application::Application(const Glib::ustring& application_id, Gio::ApplicationFl
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
   Glib::ObjectBase(0),
   Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", application_id.c_str(), "flags", GApplicationFlags(flags), static_cast<char*>(0))),
-  m_main_window(0),
   m_argc(0),
   m_argv(0)
 {
@@ -82,7 +81,6 @@ Application::Application(int& argc, char**& argv, const Glib::ustring& applicati
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
   Glib::ObjectBase(0),
   Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", application_id.c_str(), "flags", GApplicationFlags(flags), static_cast<char*>(0))),
-  m_main_window(0),
   m_argc(argc),
   m_argv(argv)
 {
@@ -97,14 +95,6 @@ Glib::RefPtr<Application> Application::create(const Glib::ustring& application_i
 Glib::RefPtr<Application> Application::create(int& argc, char**& argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags)
 {
   return Glib::RefPtr<Application>( new Application(argc, argv, application_id, flags) );
-}
-
-void Application::on_activate_showwindow()
-{
-  if(m_main_window)
-    m_main_window->show();
-  
-  m_main_window = 0; //We don't need to remember this anymore.
 }
 
 void Application::on_window_hide(Window* window)
@@ -138,17 +128,9 @@ int Application::run(int argc, char** argv)
 int Application::run(Window& window, int argc, char** argv)
 {
   add_window(window);
-  
-  //Show the window when the application starts.
-  //We could just call show() now,
-  //but GApplication currently warns if we don't connect to the activate signal,
-  //which seems very C-centric. See https://bugzilla.gnome.org/show_bug.cgi?id=640042
-  m_main_window = &window;
-  signal_activate().connect(
-    sigc::mem_fun(*this, &Application::on_activate_showwindow));
+  window.show();
 
   const int result = Gio::Application::run(argc, argv);
-  init_gtkmm_internals(); //TODO: This is too late. We want to do this as soon as possible, but it can't be done before gtk_init(argc, argv).
   return result;
 }
 
@@ -158,17 +140,9 @@ int Application::run(Window& window)
   g_assert(m_argv);
 
   add_window(window);
-  
-  //Show the window when the application starts.
-  //We could just call show() now,
-  //but GApplication currently warns if we don't connect to the activate signal,
-  //which seems very C-centric. See https://bugzilla.gnome.org/show_bug.cgi?id=640042
-  m_main_window = &window;
-  signal_activate().connect(
-    sigc::mem_fun(*this, &Application::on_activate_showwindow));
+  window.show();
 
   const int result = Gio::Application::run(m_argc, m_argv);
-  init_gtkmm_internals();  //TODO: This is too late. We want to do this as soon as possible, but it can't be done before gtk_init(argc, argv).
   return result;
 }
 
@@ -178,7 +152,6 @@ int Application::run()
   g_assert(m_argv);
 
   const int result = Gio::Application::run(m_argc, m_argv);
-  init_gtkmm_internals();  //TODO: This is too late. We want to do this as soon as possible, but it can't be done before gtk_init(argc, argv).
   return result;
 }
 
