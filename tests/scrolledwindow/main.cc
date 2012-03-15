@@ -2,9 +2,8 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 
-void on_viewport_destroyed(GtkWidget* widget, gpointer)
+void on_viewport_destroyed(GtkWidget*, gpointer)
 {
-  GTK_VIEWPORT(widget);
   g_warning("viewport destroyed");
 }
 
