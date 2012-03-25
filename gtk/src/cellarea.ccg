@@ -18,8 +18,64 @@
 #include <gtk/gtk.h>
 
 
+namespace //anonymous namespace
+{
+
+static gboolean proxy_foreach_callback(GtkCellRenderer* cell, void* data)
+{
+  typedef Gtk::CellArea::SlotForeach SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    return slot(Glib::wrap(cell));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return FALSE;
+}
+
+static gboolean proxy_foreach_alloc_callback(GtkCellRenderer* cell, const GdkRectangle* cell_area, const GdkRectangle* cell_background, void* data)
+{
+  typedef Gtk::CellArea::SlotForeachAlloc SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    return slot(Glib::wrap(cell), Glib::wrap(cell_area), Glib::wrap(cell_background));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return FALSE;
+}
+
+
+} //anonymous namespace
+
+
+
 namespace Gtk
 {
+
+void CellArea::foreach(const SlotForeach& slot)
+{
+  SlotForeach slot_copy(slot);
+  gtk_cell_area_foreach(const_cast<GtkCellArea*>(gobj()), &proxy_foreach_callback, &slot_copy);
+}
+
+void CellArea::foreach(const Glib::RefPtr<CellAreaContext>& context, Widget* widget, const Gdk::Rectangle& cell_area, const Gdk::Rectangle& background_area, const SlotForeachAlloc& slot)
+{
+  SlotForeachAlloc slot_copy(slot);
+  gtk_cell_area_foreach_alloc(const_cast<GtkCellArea*>(gobj()), Glib::unwrap(context), Glib::unwrap(widget), cell_area.gobj(), background_area.gobj(), &proxy_foreach_alloc_callback, &slot_copy);
+}
+
+
 //These vfunc callbacks are custom implemented because we want the output
 //arguments of the C++ vfuncs to be int& (not int*), and the vfunc_callback
 //functions may be called from gtk+ with a NULL pointer.
@@ -206,6 +262,7 @@ void CellArea_Class::get_preferred_width_for_height_vfunc_callback(GtkCellArea* 
   if(base && base->get_preferred_width_for_height)
     (*base->get_preferred_width_for_height)(self, context, widget, height, minimum_width, natural_width);
 }
+
 
 } //namespace Gtk
 
