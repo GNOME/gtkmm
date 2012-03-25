@@ -41,7 +41,8 @@ int main(int argc, char** argv)
 {
   gtk_init(&argc, &argv);
 
-  std::cout << get_defs( GDK_TYPE_DRAG_CONTEXT )
+  std::cout << get_defs( GDK_TYPE_APP_LAUNCH_CONTEXT )
+            << get_defs( GDK_TYPE_DRAG_CONTEXT )
             << get_defs( GDK_TYPE_DISPLAY )
 #if !defined(G_OS_WIN32)
             << get_defs( GDK_TYPE_DISPLAY_MANAGER )

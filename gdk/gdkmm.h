@@ -30,6 +30,7 @@
 #include <gdkmm/pixbufanimation.h>
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/pixbufloader.h>
+#include <gdkmm/applaunchcontext.h>
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/display.h>
