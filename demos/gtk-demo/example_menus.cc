@@ -81,7 +81,6 @@ Example_Menus::Example_Menus()
 
     pMenuItem = Gtk::manage(new Gtk::MenuItem("bar"));
     pMenuItem->set_submenu( *(create_menu(4)) );
-    pMenuItem->set_right_justified();
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
   }
