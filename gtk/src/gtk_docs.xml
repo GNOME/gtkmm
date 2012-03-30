@@ -355,35 +355,6 @@ if at least one item has been added to the menu.
 <return></return>
 </signal>
 
-<signal name="GtkApplication::quit">
-<description>
-Emitted when the session manager wants the application to quit
-(generally because the user is logging out). The application
-should exit as soon as possible after receiving this signal; if
-it does not, the session manager may choose to forcibly kill it.
-
-Normally, an application would only be sent a ::quit if there
-are no inhibitors (see gtk_application_inhibit()).
-However, this is not guaranteed; in some situations the
-session manager may decide to end the session without giving
-applications a chance to object.
-
-To receive this signal, you need to set the
-#GtkApplication:register-session property
-when creating the application object.
-
-Since: 3.4
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the #GtkApplication
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <signal name="GtkApplication::window-added">
 <description>
 Emitted when a #GtkWindow is added to @application through
@@ -1142,6 +1113,29 @@ Since: 2.4
 <parameters>
 <parameter name="widget">
 <parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkColorChooser::color-activated">
+<description>
+Emitted when a color is activated from the color chooser.
+This usually happens when the user clicks a color swatch,
+or a color is selected and the user presses one of the keys
+Space, Shift+Space, Return or Enter.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> the color
 </parameter_description>
 </parameter>
 </parameters>
@@ -10433,7 +10427,8 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="domain">
-<parameter_description> the translation domain to use for g_dgettext() calls
+<parameter_description> the translation domain to use for g_dgettext()
+calls, or %NULL to use the domain set with textdomain()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11165,9 +11160,9 @@ Since: 2.16
 <function name="gtk_activatable_sync_action_properties">
 <description>
 This is called to update the activatable completely, this is called
-internally when the #GtkActivatable::related-action property is set
+internally when the #GtkActivatable:related-action property is set
 or unset and by the implementing class when
-#GtkActivatable::use-action-appearance changes.
+#GtkActivatable:use-action-appearance changes.
 
 Since: 2.16
 
@@ -12475,38 +12470,6 @@ Since: 3.0
 <return></return>
 </function>
 
-<function name="gtk_application_end_session">
-<description>
-Requests that the session manager end the current session.
-@style indicates how the session should be ended, and
-@request_confirmation indicates whether or not the user should be
-given a chance to confirm the action. Both of these parameters are
-merely hints though; the session manager may choose to ignore them.
-
-Since: 3.4
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the #GtkApplication
-</parameter_description>
-</parameter>
-<parameter name="style">
-<parameter_description> the desired kind of session end
-</parameter_description>
-</parameter>
-<parameter name="request_confirmation">
-<parameter_description> whether or not the user should get a chance
-to confirm the action
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the request was sent; %FALSE if it could not
-be sent (eg, because it could not connect to the session manager)
-
-</return>
-</function>
-
 <function name="gtk_application_get_app_menu">
 <description>
 Returns the menu model that has been set with
@@ -12656,8 +12619,8 @@ This function calls g_type_init() for you. gtk_init() is called
 as soon as the application gets registered as the primary instance.
 
 Concretely, gtk_init() is called in the default handler for the
-startup() signal. Therefore, #GtkApplication subclasses should
-chain up in their startup() handler before using any GTK+ API.
+#GApplication:startup signal. Therefore, #GtkApplication subclasses should
+chain up in their #GApplication:startup handler before using any GTK+ API.
 
 Note that commandline arguments are not passed to gtk_init().
 All GTK+ functionality that is available via commandline arguments
@@ -12753,6 +12716,11 @@ window or document.  For example, you would expect to see
 If supported, the application menu will be rendered by the desktop
 environment.
 
+You might call this method in your #GApplication:startup signal handler.
+
+Use the base #GActionMap interface to add actions, to respond to the user
+selecting these menu items.
+
 Since: 3.4
 
 </description>
@@ -12782,6 +12750,11 @@ menu will be presented as if it were the first item of the menubar.
 Other environments treat the two as completely separate -- for
 example, the application menu may be rendered by the desktop shell
 while the menubar (if set) remains in each individual window.
+
+You might call this method in your #GApplication:startup signal handler.
+
+Use the base #GActionMap interface to add actions, to respond to the user
+selecting these menu items.
 
 Since: 3.4
 
@@ -20604,9 +20577,11 @@ Returns the current alpha value.
 
 Since: 2.4
 
+Deprecated: 3.4: Use gtk_color_chooser_get_rgba() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20622,11 +20597,11 @@ Sets @color to be the current color in the #GtkColorButton widget.
 
 Since: 2.4
 
-Deprecated: 3.4: Use gtk_color_button_get_rgba() instead.
+Deprecated: 3.4: Use gtk_color_chooser_get_rgba() instead.
 
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20644,9 +20619,11 @@ Sets @rgba to be the current color in the #GtkColorButton widget.
 
 Since: 3.0
 
+Deprecated: 3.4: Use gtk_color_chooser_get_rgba() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20666,7 +20643,7 @@ Since: 2.4
 
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20682,9 +20659,11 @@ Does the color selection dialog use the alpha channel ?
 
 Since: 2.4
 
+Deprecated: 3.4: Use gtk_color_chooser_get_use_alpha() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20758,9 +20737,11 @@ Sets the current opacity to be @alpha.
 
 Since: 2.4
 
+Deprecated: 3.4: Use gtk_color_chooser_set_rgba() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20778,11 +20759,11 @@ Sets the current color to be @color.
 
 Since: 2.4
 
-Deprecated: Use gtk_color_button_set_rgba() instead.
+Deprecated: Use gtk_color_chooser_set_rgba() instead.
 
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20800,9 +20781,11 @@ Sets the current color to be @rgba.
 
 Since: 3.0
 
+Deprecated: 3.4: Use gtk_color_chooser_set_rgba() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20822,7 +20805,7 @@ Since: 2.4
 
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20840,9 +20823,11 @@ Sets whether or not the color button should use the alpha channel.
 
 Since: 2.4
 
+Deprecated: 3.4: Use gtk_color_chooser_set_use_alpha() instead.
+
 </description>
 <parameters>
-<parameter name="color_button">
+<parameter name="button">
 <parameter_description> a #GtkColorButton
 </parameter_description>
 </parameter>
@@ -20852,6 +20837,170 @@ Since: 2.4
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_color_chooser_add_palette">
+<description>
+Adds a palette to the color chooser. If @orientation is horizontal,
+the colors are grouped in rows, with @colors_per_line colors
+in each row. If @horizontal is %FALSE, the colors are grouped
+in columns instead.
+
+The default color palette of #GtkColorChooserWidget has
+27 colors, organized in columns of 3 colors. The default gray
+palette has 9 grays in a single row.
+
+The layout of the color chooser widget works best when the
+palettes have 9-10 columns.
+
+Calling this function for the first time has the
+side effect of removing the default color and gray palettes
+from the color chooser.
+
+If @colors is %NULL, removes all previously added palettes.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkColorChooser
+</parameter_description>
+</parameter>
+<parameter name="orientation">
+<parameter_description> %GTK_ORIENTATION_HORIZONTAL if the palette should
+be displayed in rows, %GTK_ORIENTATION_VERTICAL for columns
+</parameter_description>
+</parameter>
+<parameter name="colors_per_line">
+<parameter_description> the number of colors to show in each row/column
+</parameter_description>
+</parameter>
+<parameter name="n_colors">
+<parameter_description> the total number of elements in @colors
+</parameter_description>
+</parameter>
+<parameter name="colors">
+<parameter_description> the colors of the palette, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_color_chooser_dialog_new">
+<description>
+Creates a new #GtkColorChooserDialog.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="title">
+<parameter_description> Title of the dialog, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="parent">
+<parameter_description> Transient parent of the dialog, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkColorChooserDialog
+
+</return>
+</function>
+
+<function name="gtk_color_chooser_get_rgba">
+<description>
+Gets the currently-selected color.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkColorChooser
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> return location for the color
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_color_chooser_get_use_alpha">
+<description>
+Returns whether the color chooser shows the alpha channel.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkColorChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the color chooser uses the alpha channel,
+%FALSE if not
+
+</return>
+</function>
+
+<function name="gtk_color_chooser_set_rgba">
+<description>
+Sets the color.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkColorChooser
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> the new color
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_color_chooser_set_use_alpha">
+<description>
+Sets whether or not the color chooser should use the alpha channel.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkColorChooser
+</parameter_description>
+</parameter>
+<parameter name="use_alpha">
+<parameter_description> %TRUE if color chooser should use alpha channel, %FALSE if not
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_color_chooser_widget_new">
+<description>
+Creates a new #GtkColorChooserWidget.
+
+Since: 3.4
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkColorChooserWidget
+
+</return>
 </function>
 
 <function name="gtk_color_selection_dialog_get_color_selection">
@@ -21114,7 +21263,7 @@ Installs a global function to be called whenever the user
 tries to modify the palette in a color selection.
 
 This function should save the new palette contents, and update
-the #GtkSettings::gtk-color-palette GtkSettings property so all
+the #GtkSettings:gtk-color-palette GtkSettings property so all
 GtkColorSelection widgets will be modified.
 
 Since: 2.2
@@ -22249,7 +22398,7 @@ active text. Must be freed with g_free().
 <description>
 Inserts @text at @position in the list of strings stored in @combo_box.
 If @id is non-%NULL then it is used as the ID of the row.  See
-#GtkComboBox::id-column.
+#GtkComboBox:id-column.
 
 If @position is negative then @text is appended.
 
@@ -25144,6 +25293,7 @@ Draws a text caret on @cr at @location. This is not a style function
 but merely a convenience function for drawing the standard cursor shape.
 
 Since: 3.0
+Deprecated: 3.4: Use gtk_render_insertion_cursor() instead.
 
 </description>
 <parameters>
@@ -32846,7 +32996,8 @@ Since: 2.14
 <function name="gtk_hsv_to_rgb">
 <description>
 Converts a color from HSV space to RGB.
-Input values must be in the [0.0, 1.0] range; 
+
+Input values must be in the [0.0, 1.0] range;
 output values will be in the same range.
 
 Since: 2.14
@@ -36165,7 +36316,7 @@ can use this function to have #GtkIconView handle these automatically
 for you. @column should be set to the column in @icon_view's model
 containing the tooltip texts, or -1 to disable this feature.
 
-When enabled, #GtkWidget::has-tooltip will be set to %TRUE and
+When enabled, #GtkWidget:has-tooltip will be set to %TRUE and
 @icon_view will connect a #GtkWidget::query-tooltip signal handler.
 
 Note that the signal handler sets the text with gtk_tooltip_set_markup(),
@@ -39504,8 +39655,8 @@ values, you need to call gtk_list_store_set() or gtk_list_store_set_value().
 <function name="gtk_list_store_insert_with_values">
 <description>
 Creates a new row at @position. @iter will be changed to point to this new
-row. If @position is larger than the number of rows on the list, then the
-new row will be appended to the list. The row will be filled with the
+row. If @position is -1, or larger than the number of rows in the list, then
+the new row will be appended to the list. The row will be filled with the
 values given to this function.
 
 Calling
@@ -39535,7 +39686,8 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 to append after existing
+rows
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -43566,7 +43718,7 @@ The widget will be stacked on top of the main widget
 added with gtk_container_add().
 
 The position at which @widget is placed is determined
-from its #GtkWidget::halign and #GtkWidget::valign properties.
+from its #GtkWidget:halign and #GtkWidget:valign properties.
 
 Since: 3.2
 
@@ -47237,7 +47389,7 @@ Since: 2.10
 
 <function name="gtk_print_operation_get_embed_page_setup">
 <description>
-Gets the value of #GtkPrintOperation::embed-page-setup property.
+Gets the value of #GtkPrintOperation:embed-page-setup property.
 
 Since: 2.18
 
@@ -47278,7 +47430,7 @@ Since: 2.10
 
 <function name="gtk_print_operation_get_has_selection">
 <description>
-Gets the value of #GtkPrintOperation::has-selection property.
+Gets the value of #GtkPrintOperation:has-selection property.
 
 Since: 2.18
 
@@ -47387,7 +47539,7 @@ of the print operation
 
 <function name="gtk_print_operation_get_support_selection">
 <description>
-Gets the value of #GtkPrintOperation::support-selection property.
+Gets the value of #GtkPrintOperation:support-selection property.
 
 Since: 2.18
 
@@ -49703,7 +49855,7 @@ Since: 2.10
 
 <function name="gtk_print_unix_dialog_get_embed_page_setup">
 <description>
-Gets the value of #GtkPrintUnixDialog::embed-page-setup property.
+Gets the value of #GtkPrintUnixDialog:embed-page-setup property.
 
 Since: 2.18
 
@@ -49721,7 +49873,7 @@ Since: 2.18
 
 <function name="gtk_print_unix_dialog_get_has_selection">
 <description>
-Gets the value of #GtkPrintUnixDialog::has-selection property.
+Gets the value of #GtkPrintUnixDialog:has-selection property.
 
 Since: 2.18
 
@@ -49739,7 +49891,7 @@ Since: 2.18
 
 <function name="gtk_print_unix_dialog_get_manual_capabilities">
 <description>
-Gets the value of #GtkPrintUnixDialog::manual-capabilities property.
+Gets the value of #GtkPrintUnixDialog:manual-capabilities property.
 
 Since: 2.18
 
@@ -49832,7 +49984,7 @@ Since: 2.10
 
 <function name="gtk_print_unix_dialog_get_support_selection">
 <description>
-Gets the value of #GtkPrintUnixDialog::support-selection property.
+Gets the value of #GtkPrintUnixDialog:support-selection property.
 
 Since: 2.18
 
@@ -55491,6 +55643,7 @@ be freed with gtk_requisition_free().
 <function name="gtk_rgb_to_hsv">
 <description>
 Converts a color from RGB space to HSV.
+
 Input values must be in the [0.0, 1.0] range;
 output values will be in the same range.
 
@@ -56248,6 +56401,25 @@ A widget supports scrolling natively if it implements the
 <return></return>
 </function>
 
+<function name="gtk_scrolled_window_get_capture_button_press">
+<description>
+Return whether button presses are captured during kinetic
+scrolling. See gtk_scrolled_window_set_capture_button_press().
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if button presses are captured during kinetic scrolling
+
+</return>
+</function>
+
 <function name="gtk_scrolled_window_get_hadjustment">
 <description>
 Returns the horizontal scrollbar's adjustment, used to connect the
@@ -56281,6 +56453,24 @@ Since: 2.8
 </parameters>
 <return> the horizontal scrollbar of the scrolled window,
 or %NULL if it does not have one.
+
+</return>
+</function>
+
+<function name="gtk_scrolled_window_get_kinetic_scrolling">
+<description>
+Returns the specified kinetic scrolling behavior.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the scrolling behavior flags.
 
 </return>
 </function>
@@ -56444,6 +56634,36 @@ will cause the scrolled window to create them for you.
 </return>
 </function>
 
+<function name="gtk_scrolled_window_set_capture_button_press">
+<description>
+Changes the behaviour of @scrolled_window wrt. to the initial
+event that possibly starts kinetic scrolling. When @capture_button_press
+is set to %TRUE, the event is captured by the scrolled window, and
+then later replayed if it is meant to go to the child widget.
+
+This should be enabled if any child widgets perform non-reversible
+actions on #GtkWidget::button-press-event. If they don't, and handle
+additionally handle #GtkWidget::grab-broken-event, it might be better
+to set @capture_button_press to %FALSE.
+
+This setting only has an effect if kinetic scrolling is enabled.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="capture_button_press">
+<parameter_description> %TRUE to capture button presses
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_scrolled_window_set_hadjustment">
 <description>
 Sets the #GtkAdjustment for the horizontal scrollbar.
@@ -56456,6 +56676,28 @@ Sets the #GtkAdjustment for the horizontal scrollbar.
 </parameter>
 <parameter name="hadjustment">
 <parameter_description> horizontal scroll adjustment
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scrolled_window_set_kinetic_scrolling">
+<description>
+Turns kinetic scrolling on or off.
+Kinetic scrolling only applies to devices with source
+%GDK_SOURCE_TOUCHSCREEN.
+
+Since: 3.4
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="kinetic_scrolling">
+<parameter_description> %TRUE to enable kinetic scrolling
 </parameter_description>
 </parameter>
 </parameters>
@@ -61477,6 +61719,7 @@ style settings affecting @path
 Looks up a widget style property as defined by @provider for
 the widget represented by @path.
 
+Since: 3.0
 
 </description>
 <parameters>
@@ -61502,6 +61745,7 @@ the widget represented by @path.
 </parameter>
 </parameters>
 <return> %TRUE if the property was found and has a value, %FALSE otherwise
+
 </return>
 </function>
 
@@ -70253,185 +70497,6 @@ Since: 3.0
 </return>
 </function>
 
-<function name="gtk_timeline_get_direction">
-<description>
-Returns the direction of the timeline.
-
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return> direction
-</return>
-</function>
-
-<function name="gtk_timeline_get_fps">
-<description>
-Returns the number of frames per second.
-
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return> frames per second
-</return>
-</function>
-
-<function name="gtk_timeline_get_loop">
-<description>
-Returns whether the timeline loops to the
-beginning when it has reached the end.
-
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the timeline loops
-</return>
-</function>
-
-<function name="gtk_timeline_is_running">
-<description>
-Returns whether the timeline is running or not.
-
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the timeline is running
-</return>
-</function>
-
-<function name="gtk_timeline_new">
-<description>
-Creates a new #GtkTimeline with the specified number of frames.
-
-
-</description>
-<parameters>
-<parameter name="duration">
-<parameter_description> duration in milliseconds for the timeline
-</parameter_description>
-</parameter>
-</parameters>
-<return> the newly created #GtkTimeline
-</return>
-</function>
-
-<function name="gtk_timeline_pause">
-<description>
-Pauses the timeline.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_timeline_rewind">
-<description>
-Rewinds the timeline.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_timeline_set_direction">
-<description>
-Sets the direction of the timeline.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-<parameter name="direction">
-<parameter_description> direction
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_timeline_set_fps">
-<description>
-Sets the number of frames per second that
-the timeline will play.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-<parameter name="fps">
-<parameter_description> frames per second
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_timeline_set_loop">
-<description>
-Sets whether the timeline loops to the beginning
-when it has reached the end.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-<parameter name="loop">
-<parameter_description> %TRUE to make the timeline loop
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_timeline_start">
-<description>
-Runs the timeline from the current frame.
-
-</description>
-<parameters>
-<parameter name="timeline">
-<parameter_description> A #GtkTimeline
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_toggle_action_get_active">
 <description>
 Returns the checked state of the toggle action.
@@ -71380,7 +71445,7 @@ only icons &lt;/listitem&gt;
 show text&lt;/listitem&gt;
 &lt;listitem&gt; GTK_TOOLBAR_BOTH_HORIZ, meaning the tool item should show
 both an icon and a label, arranged horizontally (however, note the 
-#GtkToolButton::has_text_horizontally that makes tool buttons not
+#GtkToolButton:has_text_horizontally property that makes tool buttons not
 show labels when the toolbar style is GTK_TOOLBAR_BOTH_HORIZ.
 &lt;/listitem&gt;
 &lt;/itemizedlist&gt;
@@ -75990,7 +76055,7 @@ gtk_tree_store_set() or gtk_tree_store_set_value().
 <function name="gtk_tree_store_insert_with_values">
 <description>
 Creates a new row at @position. @iter will be changed to point to this
-new row. If @position is larger than the number of rows on the list, then
+new row. If @position is -1, or larger than the number of rows on the list, then
 the new row will be appended to the list. The row will be filled with
 the values given to this function.
 
@@ -76025,7 +76090,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 to append after existing rows
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -77385,8 +77450,8 @@ older one.
 
 <function name="gtk_tree_view_column_set_clickable">
 <description>
-Sets the header to be active if @active is %TRUE.  When the header is active,
-then it can take keyboard focus, and can be clicked.
+Sets the header to be active if @clickable is %TRUE.  When the header is
+active, then it can take keyboard focus, and can be clicked.
 
 </description>
 <parameters>
@@ -79600,7 +79665,7 @@ Sets the visibility state of the headers.
 
 <function name="gtk_tree_view_set_hover_expand">
 <description>
-Enables of disables the hover expansion mode of @tree_view.
+Enables or disables the hover expansion mode of @tree_view.
 Hover expansion makes rows expand or collapse if the pointer 
 moves over them.
 
@@ -80468,6 +80533,10 @@ was found.
 Inserts an action group into the list of action groups associated 
 with @manager. Actions in earlier groups hide actions with the same 
 name in later groups. 
+
+If @pos is larger than the number of action groups in @manager, or
+negative, @action_group will be inserted at the end of the internal
+list.
 
 Since: 2.4
 
@@ -87776,7 +87845,7 @@ the window manager to save your window sizes and positions.
 </parameter_description>
 </parameter>
 <parameter name="root_x">
-<parameter_description> eturn location for X coordinate of
+<parameter_description> return location for X coordinate of
 gravity-determined reference point, or %NULL
 </parameter_description>
 </parameter>
