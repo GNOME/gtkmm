@@ -26,6 +26,14 @@
 namespace Gtk
 {
 
+TreePath::TreePath(GtkTreePath* gobject, bool make_a_copy)
+:
+  // For BoxedType wrappers, make_a_copy is true by default.  The static
+  // BoxedType wrappers must always take a copy, thus make_a_copy = true
+  // ensures identical behaviour if the default argument is used.
+  gobject_ (gobject ? (make_a_copy ? gtk_tree_path_copy(gobject) : gobject) : gtk_tree_path_new())
+{}
+
 TreePath::TreePath(TreePath::size_type n, TreePath::value_type value)
 :
   gobject_(gtk_tree_path_new())
@@ -37,13 +45,19 @@ TreePath::TreePath(TreePath::size_type n, TreePath::value_type value)
 TreePath::TreePath(const Glib::ustring& path)
 :
   gobject_ (gtk_tree_path_new_from_string(path.c_str()))
-{}
+{
+  if (!gobject_)
+    gobject_ = gtk_tree_path_new();
+}
 
 TreePath::TreePath(const TreeModel::iterator& iter)
 :
   // The GtkTreePath* is always newly created.
   gobject_ (gtk_tree_model_get_path(iter.get_model_gobject(), const_cast<GtkTreeIter*>(iter.gobj())))
-{}
+{
+  if (!gobject_)
+    gobject_ = gtk_tree_path_new();
+}
 
 TreePath& TreePath::operator=(const TreeModel::iterator& iter)
 {
@@ -70,9 +84,6 @@ TreePath::operator const void*() const
 
 bool TreePath::empty() const
 {
-  if(!gobject_)
-    return true;
-
   return (gtk_tree_path_get_depth(gobject_) == 0);
 }
 
