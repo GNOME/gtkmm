@@ -52,25 +52,22 @@ gdk_target_quartz=no
 gdk_target_x11=no
 gdk_target_wayland=no
 gdk_target_broadway=no
-for target in `$PKG_CONFIG --variable=targets gtk+-3.0`; do
-    case "$target" in 
-       win32)
-          gdk_target_win32=yes
-	  ;;
-       quartz)
-          gdk_target_quartz=yes
-	  ;;
-       x11)
-          gdk_target_x11=yes
-	  ;;
-       broadway)
-          gdk_target_broadway=yes
-	  ;;
-       wayland)
-          gdk_target_wayland=yes
-	  ;;
-    esac;
-done
+backends=`$PKG_CONFIG --variable=targets gtk+-3.0`
+m4_foreach([mytarget], [[win32], [quartz], [x11], [wayland], [broadway]], [
+    AC_ARG_ENABLE(mytarget-backend,
+                  AS_HELP_STRING([--enable-mytarget-backend@<:@=yes|no|check@:>@], [enable mytarget gdk target @<:@default=check@:>@]),
+                  [], [enableval=check])
+    if test x$enableval != xno; then
+        for target in $backends; do
+            if test x$target = [x]mytarget; then
+                [gdk_target_]mytarget=yes
+            fi
+        done
+        if test x$enableval = xyes && test x$[gdk_target_]mytarget = xno; then
+            AC_MSG_ERROR([Requested mytarget backend not supported by installed gdk])
+        fi
+    fi
+])
 AM_CONDITIONAL([GDK_TARGET_WIN32], [test "x$gdk_target_win32" = xyes])
 AM_CONDITIONAL([GDK_TARGET_QUARTZ], [test "x$gdk_target_quartz" = xyes])
 AM_CONDITIONAL([GDK_TARGET_X11], [test "x$gdk_target_x11" = xyes])
