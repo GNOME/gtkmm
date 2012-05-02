@@ -157,15 +157,17 @@ public:
   _WRAP_METHOD(void add_region(const Glib::ustring& region_name, RegionFlags flags), gtk_style_context_add_region)
   _WRAP_METHOD(void remove_region(const Glib::ustring& region_name), gtk_style_context_remove_region)
   _WRAP_METHOD(bool has_region(const Glib::ustring& region_name, RegionFlags& flags_return), gtk_style_context_has_region)
-/*
-  _WRAP_METHOD(void get_style_property (
-                                           const Glib::ustring& property_name,
-                                           GValue          *value), gtk_style_context_get_style_property)
-  _WRAP_METHOD(void get_style_valist   (
-                                           va_list          args), gtk_style_context_get_style_valis)
-  _WRAP_METHOD(void get_style          (
-                                           ...), gtk_style_context_get_style)
-*/
+  
+  /** Gets the value of a style property
+   * @param property_name The name of a style property.
+   * @param value Location to return the property value.
+   */
+  template <class PropertyType>
+  void get_style_property(const Glib::ustring& property_name, PropertyType& value) const;
+  
+  _WRAP_METHOD(void get_style_property_value(
+                   const Glib::ustring& property_name, Glib::ValueBase& value) const,
+               gtk_style_context_get_style_property)
 
   _WRAP_METHOD(Glib::RefPtr<IconSet> lookup_icon_set(const Glib::ustring& stock_id), gtk_style_context_lookup_icon_set, refreturn)
 
@@ -248,4 +250,18 @@ public:
   _WRAP_PROPERTY("parent", Glib::RefPtr<StyleContext>)
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template <class PropertyType>
+void StyleContext::get_style_property(const Glib::ustring& property_name, PropertyType& value) const
+{
+  Glib::Value<PropertyType> property_value;
+  property_value.init(Glib::Value<PropertyType>::value_type());
+
+  this->get_style_property_value(property_name, property_value);
+
+  value = property_value.get();
+}
+
+#endif
 } // namespace Gtk
