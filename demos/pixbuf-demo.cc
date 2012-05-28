@@ -193,7 +193,7 @@ int main(int argc, char** argv)
   try
   {
     Glib::RefPtr<Gtk::Application> app =
-      Gtk::Application::create(argc, argv, "org.gtkmm.demos.pixbuf-demo");
+      Gtk::Application::create(argc, argv);
 
     Gtk::Window window;
     window.add(*Gtk::manage(new DemoRenderArea()));

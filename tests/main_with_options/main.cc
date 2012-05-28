@@ -104,8 +104,7 @@ int main(int argc, char *argv[])
   try
   {
     Glib::RefPtr<Gtk::Application> app =
-      Gtk::Application::create(argc, argv,
-        "org.gtkmm.test");
+      Gtk::Application::create(argc, argv);
   
     //Here we can see the parsed values of our custom command-line arguments:
 

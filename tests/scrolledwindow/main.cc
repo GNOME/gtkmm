@@ -58,8 +58,7 @@ protected:
 int main ( int argc, char *argv[] ) {
   
   Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv,
-      "org.gtkmm.test");
+    Gtk::Application::create(argc, argv);
 
   Instance instance;
 }
