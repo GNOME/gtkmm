@@ -19,6 +19,11 @@ _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gtk/gtk.h)
 
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef GTK_DISABLE_DEPRECATED
+#define GDK_DISABLE_DEPRECATION_WARNINGS 1
+#m4 _POP()
+
 #include <gtkmm/styleprovider.h>
 #include <gtkmm/border.h>
 #include <gtkmm/enums.h>
@@ -29,7 +34,9 @@ _PINCLUDE(gtk/gtk.h)
 #include <gtkmm/iconsource.h>
 #include <gtkmm/iconset.h>
 #include <gtkmm/widgetpath.h>
+#include <pangomm/context.h>
 #include <pangomm/fontdescription.h>
+#include <pangomm/layout.h>
 #include <gtkmmconfig.h>
 
 
@@ -39,7 +46,6 @@ namespace Gtk
 class IconSet;
 
 //TODO: Add (and translate to C++) the code examples from the C documentation.
-//TODO: Find a way to show the headings as headings in this doxygen comment.
 /** This object stores styling information affecting a widget defined by WidgetPath.
  *
  * In order to construct the final style information, StyleContext
@@ -62,7 +68,7 @@ class IconSet;
  * Settings::property_gtk_theme_name() setting or a hierarchy change in the rendered
  * widget.
  *
- * Transition animations
+ * <h2>Transition animations</h2>
  * 
  * StyleContext has built-in support for state change transitions.
  * Note that these animations respect the Settings::property_gtk_enable_animations()
@@ -132,7 +138,7 @@ public:
   _WRAP_METHOD(void set_state(StateFlags flags), gtk_style_context_set_state)
   _WRAP_METHOD(StateFlags get_state() const, gtk_style_context_get_state)
 
-  _WRAP_METHOD(bool state_is_running(StateType state, gdouble* progress), gtk_style_context_state_is_running)
+  _WRAP_METHOD(bool state_is_running(StateType state, gdouble* progress), gtk_style_context_state_is_running, deprecated "This function always returns <tt>false</tt>.")
 
   _WRAP_METHOD(void set_path(const WidgetPath& path), gtk_style_context_set_path)
   
@@ -171,11 +177,7 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<IconSet> lookup_icon_set(const Glib::ustring& stock_id), gtk_style_context_lookup_icon_set, refreturn)
 
-/* TODO: Move this to Iconset?
-  _WRAP_METHOD(GdkPixbuf  * gtk_icon_set_render_icon_pixbuf   (const Glib::RefPtr<IconSet>& con_set,
-                                                GtkStyleContext *context,
-                                                GtkIconSize      size), gtk_icon_set_render_icon_pixbuf)
-*/
+  // gtk_icon_set_render_icon_pixbuf() in gtkstylecontext.h is wrapped in IconSet::render_icon_pixbuf().
 
   _WRAP_METHOD(void set_screen(const Glib::RefPtr<Gdk::Screen>& screen), gtk_style_context_set_screen)
                                           
@@ -190,14 +192,13 @@ public:
 
   _WRAP_METHOD(bool lookup_color(const Glib::ustring& color_name, Gdk::RGBA& color), gtk_style_context_lookup_color)
 
-  //TODO: region_id can be NULL.
-  _WRAP_METHOD(void notify_state_change(const Glib::RefPtr<Gdk::Window>& window, gpointer region_id, StateType state, bool state_value), gtk_style_context_notify_state_change)
+  _WRAP_METHOD(void notify_state_change(const Glib::RefPtr<Gdk::Window>& window, gpointer region_id, StateType state, bool state_value), gtk_style_context_notify_state_change, deprecated "This function does nothing.")
   
-  _WRAP_METHOD(void cancel_animations(gpointer region_id), gtk_style_context_cancel_animations)
-  _WRAP_METHOD(void scroll_animations(const Glib::RefPtr<Gdk::Window>& window, int dx, int dy), gtk_style_context_scroll_animations)
+  _WRAP_METHOD(void cancel_animations(gpointer region_id), gtk_style_context_cancel_animations, deprecated "This function does nothing.")
+  _WRAP_METHOD(void scroll_animations(const Glib::RefPtr<Gdk::Window>& window, int dx, int dy), gtk_style_context_scroll_animations, deprecated "This function does nothing.")
   
-  _WRAP_METHOD(void push_animatable_region(gpointer region_id), gtk_style_context_push_animatable_region)
-  _WRAP_METHOD(void pop_animatable_region(), gtk_style_context_pop_animatable_region)
+  _WRAP_METHOD(void push_animatable_region(gpointer region_id), gtk_style_context_push_animatable_region, deprecated "This function does nothing.")
+  _WRAP_METHOD(void pop_animatable_region(), gtk_style_context_pop_animatable_region, deprecated "This function does nothing.")
 
   //TODO: Documentation
   Gdk::RGBA get_color(StateFlags state = (StateFlags)0) const;
@@ -233,7 +234,8 @@ public:
   _WRAP_METHOD(void render_frame(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x,  double y, double width, double height), gtk_render_frame)
   _WRAP_METHOD(void render_expander(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, double width, double height), gtk_render_expander)
   _WRAP_METHOD(void render_focus(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, double width, double height), gtk_render_focus)
-  _WRAP_METHOD(void render_layout(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y,  PangoLayout     *layout), gtk_render_layout)
+  _WRAP_METHOD(void render_layout(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, PangoLayout* layout), gtk_render_layout, deprecated "Use the render_layout() taking a const Glib::RefPtr<Pango::Layout>& layout.")
+  _WRAP_METHOD(void render_layout(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, const Glib::RefPtr<Pango::Layout>& layout), gtk_render_layout)
   _WRAP_METHOD(void render_line(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x0, double y0,  double x1, double y1), gtk_render_line)
   _WRAP_METHOD(void render_slider(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, double width, double height,  Orientation orientation), gtk_render_slider)
   _WRAP_METHOD(void render_frame_gap(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, double width, double height,  PositionType  gap_side, double xy0_gap, double xy1_gap), gtk_render_frame_gap)
@@ -241,6 +243,8 @@ public:
   _WRAP_METHOD(void render_handle(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, double width, double height), gtk_render_handle)
   _WRAP_METHOD(void render_activity(const ::Cairo::RefPtr< ::Cairo::Context>& cr,  double x,  double y, double width, double height), gtk_render_activity)
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> render_icon_pixbuf(const IconSource& source, IconSize size), gtk_render_icon_pixbuf)
+  _WRAP_METHOD(void render_icon(const ::Cairo::RefPtr< ::Cairo::Context>& cr, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double x, double y), gtk_render_icon)
+  _WRAP_METHOD(void render_insertion_cursor(const ::Cairo::RefPtr< ::Cairo::Context>& cr, double x, double y, const Glib::RefPtr<Pango::Layout>& layout, int index, Pango::Direction direction), gtk_render_insertion_cursor)
                                     
   
   _WRAP_SIGNAL(void changed(), "changed")
