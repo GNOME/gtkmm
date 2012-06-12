@@ -128,11 +128,18 @@ int Application::run(int argc, char** argv)
 int Application::run(Window& window, int argc, char** argv)
 {
   add_window(window);
-  window.show();
+  
+  //We cannot show the window until GApplication::activate has been
+  //called, or we will crash because the application has not been "registered".
+  signal_activate().connect(
+    sigc::bind(
+      sigc::mem_fun(*this, &Application::on_activate_show_main_window),
+      &window));
 
   const int result = Gio::Application::run(argc, argv);
   return result;
 }
+
 
 int Application::run(Window& window)
 {
@@ -140,7 +147,13 @@ int Application::run(Window& window)
   g_assert(m_argv);
 
   add_window(window);
-  window.show();
+
+  //We cannot show the window until GApplication::activate has been
+  //called, or we will crash because the application has not been "registered".
+  signal_activate().connect(
+    sigc::bind(
+      sigc::mem_fun(*this, &Application::on_activate_show_main_window),
+      &window));
 
   const int result = Gio::Application::run(m_argc, m_argv);
   return result;
@@ -153,6 +166,12 @@ int Application::run()
 
   const int result = Gio::Application::run(m_argc, m_argv);
   return result;
+}
+
+void Application::on_activate_show_main_window(Window* window)
+{
+  if(window)
+    window->show();
 }
 
 
