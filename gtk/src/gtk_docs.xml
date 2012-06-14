@@ -54,7 +54,7 @@ The accel-activate signal is an implementation detail of
 
 <signal name="GtkAccelGroup::accel-changed">
 <description>
-The accel-changed signal is emitted when a #GtkAccelGroupEntry
+The accel-changed signal is emitted when an entry
 is added to or removed from the accel group.
 
 Widgets like #GtkAccelLabel which display an associated
@@ -1451,12 +1451,13 @@ should point after the newly inserted text.
 
 <signal name="GtkEntry::activate">
 <description>
-A  &lt;link linkend=&quot;keybinding-signals&quot;&gt;keybinding signal&lt;/link&gt;
-which gets emitted when the user activates the entry.
+The ::activate signal is emitted when the user hits
+the Enter key.
 
-Applications should not connect to it, but may emit it with
-g_signal_emit_by_name() if they need to control activation 
-programmatically.
+While this signal is used as a
+&lt;link linkend=&quot;keybinding-signals&quot;&gt;keybinding signal&lt;/link&gt;,
+it is also commonly used by applications to intercept
+activation of entries.
 
 The default bindings for this signal are all forms of the Enter key.
 
@@ -2928,7 +2929,7 @@ completed within a menu shell.
 The ::show-menu signal is emitted before the menu is shown.
 
 It can be used to populate the menu on demand, using 
-gtk_menu_tool_button_get_menu(). 
+gtk_menu_tool_button_set_menu().
 
 Note that even if you populate the menu dynamically in this way, 
 you must set an empty menu on the #GtkMenuToolButton beforehand,
@@ -8882,6 +8883,9 @@ with the canonical @accel_key and @accel_mods for this path.
 To change the accelerator during runtime programatically, use
 gtk_accel_map_change_entry().
 
+Set @accel_key and @accel_mods to 0 to request a removal of
+the accelerator.
+
 Note that @accel_path string will be stored in a #GQuark. Therefore, if you
 pass a static string, you can save some memory by interning it first with 
 g_intern_static_string().
@@ -12442,7 +12446,7 @@ or %NULL if the action does not accept an activation parameter
 
 <function name="gtk_application_add_window">
 <description>
-Adds a window from @application.
+Adds a window to @application.
 
 This call is equivalent to setting the #GtkWindow:application
 property of @window to @application.
@@ -12504,6 +12508,27 @@ Since: 3.4
 </parameter>
 </parameters>
 <return> the menubar for windows of @application
+
+</return>
+</function>
+
+<function name="gtk_application_get_window_by_id">
+<description>
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GtkApplication
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> an identifier number
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkApplicationWindow with ID @id, or
+%NULL if there is no window with this ID
 
 </return>
 </function>
@@ -12613,6 +12638,9 @@ Since: 3.4
 
 <function name="gtk_application_new">
 <description>
+@application_id (allow-none): The application ID.
+@flags: the application flags
+
 Creates a new #GtkApplication instance.
 
 This function calls g_type_init() for you. gtk_init() is called
@@ -12630,20 +12658,17 @@ problem. If you absolutely must support GTK+ commandline arguments,
 you can explicitly call gtk_init() before creating the application
 instance.
 
-The application id must be valid. See g_application_id_is_valid().
+If non-%NULL, the application ID must be valid.  See
+g_application_id_is_valid().
+
+If no application ID is given then some features (most notably application 
+uniqueness) will be disabled. A null application ID is only allowed with 
+GTK+ 3.6 or later.
 
 Since: 3.0
 
 </description>
 <parameters>
-<parameter name="application_id">
-<parameter_description> the application id
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> the application flags
-</parameter_description>
-</parameter>
 </parameters>
 <return> a new #GtkApplication instance
 
@@ -12707,6 +12732,10 @@ Since: 3.0
 <description>
 Sets or unsets the application menu for @application.
 
+This can only be done in the primary instance of the application,
+after it has been registered.  #GApplication:startup is a good place
+to call this.
+
 The application menu is a single menu containing items that typically
 impact the application as a whole, rather than acting on a specific
 window or document.  For example, you would expect to see
@@ -12715,8 +12744,6 @@ window or document.  For example, you would expect to see
 
 If supported, the application menu will be rendered by the desktop
 environment.
-
-You might call this method in your #GApplication:startup signal handler.
 
 Use the base #GActionMap interface to add actions, to respond to the user
 selecting these menu items.
@@ -12743,6 +12770,10 @@ Sets or unsets the menubar for windows of @application.
 
 This is a menubar in the traditional sense.
 
+This can only be done in the primary instance of the application,
+after it has been registered.  #GApplication:startup is a good place
+to call this.
+
 Depending on the desktop environment, this may appear at the top of
 each window, or at the top of the screen.  In some environments, if
 both the application menu and the menubar are set, the application
@@ -12750,8 +12781,6 @@ menu will be presented as if it were the first item of the menubar.
 Other environments treat the two as completely separate -- for
 example, the application menu may be rendered by the desktop shell
 while the menubar (if set) remains in each individual window.
-
-You might call this method in your #GApplication:startup signal handler.
 
 Use the base #GActionMap interface to add actions, to respond to the user
 selecting these menu items.
@@ -12791,6 +12820,26 @@ Since: 3.4
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_application_window_get_id">
+<description>
+Returns the unique ID of the window. If the window has not yet been added to
+a #GtkApplication, returns &lt;literal&gt;0&lt;/literal&gt;.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkApplicationWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the unique ID for @window, or &lt;literal&gt;0&lt;/literal&gt; if the window
+has not yet been added to a #GtkApplication
+
+</return>
 </function>
 
 <function name="gtk_application_window_get_show_menubar">
@@ -15237,6 +15286,25 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="gtk_button_get_always_show_image">
+<description>
+Returns whether the button will ignore the #GtkSettings:gtk-button-images
+setting and always show the image, if available.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="button">
+<parameter_description> a #GtkButton
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the button will always show the image
+
+</return>
+</function>
+
 <function name="gtk_button_get_event_window">
 <description>
 Returns the button's event window if it is realized, %NULL otherwise.
@@ -15530,6 +15598,30 @@ Since: 2.4
 <parameter name="yalign">
 <parameter_description> the vertical position of the child, 0.0 is top aligned, 
 1.0 is bottom aligned
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_button_set_always_show_image">
+<description>
+If %TRUE, the button will ignore the #GtkSettings:gtk-button-images
+setting and always show the image, if available.
+
+Use this property if the button  would be useless or hard to use
+without the image.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="button">
+<parameter_description> a #GtkButton
+</parameter_description>
+</parameter>
+<parameter name="always_show">
+<parameter_description> %TRUE if the menuitem should always show the image
 </parameter_description>
 </parameter>
 </parameters>
@@ -20358,9 +20450,9 @@ converted into text form.)
 <function name="gtk_clipboard_wait_for_targets">
 <description>
 Returns a list of targets that are present on the clipboard, or %NULL
-if there aren't any targets available. The returned list must be 
+if there aren't any targets available. The returned list must be
 freed with g_free().
-This function waits for the data to be received using the main 
+This function waits for the data to be received using the main
 loop, so events, timeouts, etc, may be dispatched during the wait.
 
 Since: 2.4
@@ -23634,7 +23726,7 @@ Since: 3.2
 <function name="gtk_css_section_get_file">
 <description>
 Gets the file that @section was parsed from. If no such file exists,
-for example because the CSS was loaded via 
+for example because the CSS was loaded via
 @gtk_css_provider_load_from_data(), then %NULL is returned.
 
 Since: 3.2
@@ -23646,8 +23738,8 @@ Since: 3.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GFile that @section was parsed from or %NULL if
-@section was parsed from other data.
+<return> the #GFile that @section was parsed from
+or %NULL if @section was parsed from other data
 
 </return>
 </function>
@@ -26890,8 +26982,9 @@ gtk_entry_set_inner_border() for more information.
 
 Since: 2.10
 
-Deprecated: 3.4: Use the standard border and padding CSS properties;
-the value returned by this function is ignored by #GtkEntry.
+Deprecated: 3.4: Use the standard border and padding CSS properties (through
+objects like #GtkStyleContext and #GtkCssProvider); the value returned by
+this function is ignored by #GtkEntry.
 
 </description>
 <parameters>
@@ -27732,8 +27825,9 @@ pixel-exact positioning of the entry is important.
 
 Since: 2.10
 
-Deprecated: 3.4: Use the standard border and padding CSS properties;
-the value set with this function is ignored by #GtkEntry.
+Deprecated: 3.4: Use the standard border and padding CSS properties (through
+objects like #GtkStyleContext and #GtkCssProvider); the value set with
+this function is ignored by #GtkEntry.
 
 </description>
 <parameters>
@@ -31506,11 +31600,13 @@ Deprecated: 3.2: Use #GtkFontChooser
 <description>
 Creates a new #GtkFontSelection.
 
+Deprecated: 3.2: Use #GtkFontChooserWidget instead
 
 </description>
 <parameters>
 </parameters>
-<return> a n ew #GtkFontSelection
+<return> a new #GtkFontSelection
+
 </return>
 </function>
 
@@ -36594,7 +36690,7 @@ stored in this location with g_free().
 </parameter_description>
 </parameter>
 <parameter name="cursor_index">
-<parameter_description> (out) location to store byte index of the insertion
+<parameter_description> location to store byte index of the insertion
 cursor within @text.
 </parameter_description>
 </parameter>
@@ -39917,9 +40013,10 @@ Since: 2.2
 </parameter_description>
 </parameter>
 <parameter name="new_order">
-<parameter_description> an array of integers mapping the new position of each child
-to its old position before the re-ordering,
-i.e. @new_order&lt;literal&gt;[newpos] = oldpos&lt;/literal&gt;.
+<parameter_description> an array of integers mapping the new
+position of each child to its old position before the re-ordering,
+i.e. @new_order&lt;literal&gt;[newpos] = oldpos&lt;/literal&gt;. It must have
+exactly as many items as the list store's length.
 </parameter_description>
 </parameter>
 </parameters>
@@ -45774,7 +45871,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -45796,7 +45893,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -45818,7 +45915,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -45840,7 +45937,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -45881,7 +45978,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -45961,7 +46058,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for the return value
+<parameter_description> the unit for the return value, not %GTK_UNIT_NONE
 </parameter_description>
 </parameter>
 </parameters>
@@ -46059,7 +46156,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="unit">
-<parameter_description> the unit for @width and @height
+<parameter_description> the unit for @width and @height. not %GTK_UNIT_NONE.
 </parameter_description>
 </parameter>
 </parameters>
@@ -56863,6 +56960,21 @@ Since: 2.10
 <return></return>
 </function>
 
+<function name="gtk_search_entry_new">
+<description>
+Creates a #GtkSearchEntry, with a find icon when the search field is
+empty, and a clear icon when it isn't.
+
+Since: 3.6
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkSearchEntry
+
+</return>
+</function>
+
 <function name="gtk_selection_add_target">
 <description>
 Appends a specified target to the list of supported targets for a 
@@ -59846,6 +59958,10 @@ Since: 3.0
 <function name="gtk_style_context_add_provider">
 <description>
 Adds a style provider to @context, to be used in style construction.
+Note that a style provider added by this function only affects
+the style of the widget to which @context belongs. If you want
+to affect the style of all widgets, use
+gtk_style_context_add_provider_for_screen().
 
 &lt;note&gt;&lt;para&gt;If both priorities are the same, A #GtkStyleProvider
 added through this function takes precedence over another added
@@ -59878,8 +59994,7 @@ between %GTK_STYLE_PROVIDER_PRIORITY_FALLBACK and
 <function name="gtk_style_context_add_provider_for_screen">
 <description>
 Adds a global style provider to @screen, which will be used
-in style construction for all #GtkStyleContext&lt;!-- --&gt;s under
-@screen.
+in style construction for all #GtkStyleContexts under @screen.
 
 GTK+ uses this to make styling information from #GtkSettings
 available.
@@ -59970,6 +60085,8 @@ so this should be only used in complex widgets with different
 animatable regions.
 
 Since: 3.0
+
+Deprecated: 3.6: This function does nothing.
 
 </description>
 <parameters>
@@ -60670,6 +60787,8 @@ is why the style places the transition under the :hover pseudo-class.
 
 Since: 3.0
 
+Deprecated: 3.6: This function does nothing.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -60705,6 +60824,8 @@ See gtk_style_context_push_animatable_region().
 
 Since: 3.0
 
+Deprecated: 3.6: This function does nothing.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -60728,6 +60849,8 @@ The @region_id used must be unique in @context so the theming engine
 can uniquely identify rendered elements subject to a state transition.
 
 Since: 3.0
+
+Deprecated: 3.6: This function does nothing.
 
 </description>
 <parameters>
@@ -60889,6 +61012,8 @@ areas for any ongoing animation are scrolled together
 with it.
 
 Since: 3.0
+
+Deprecated: 3.6: This function does nothing.
 
 </description>
 <parameters>
@@ -61099,6 +61224,8 @@ run from 0 to 1 when @state is being set and from 1 to 0 when
 it's being unset.
 
 Since: 3.0
+
+Deprecated: 3.6: This function always returns %FALSE
 
 </description>
 <parameters>
@@ -65831,6 +65958,29 @@ instead of backward.
 </return>
 </function>
 
+<function name="gtk_text_iter_backward_text_chars">
+<description>
+Moves backward by @count text characters (pixbufs, widgets,
+etc. do not count as characters for this). Equivalent to moving
+through the results of gtk_text_iter_get_text (), rather than
+gtk_text_iter_get_slice ().
+
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GtkTextIter
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> number of chars to move
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @iter moved and is dereferenceable
+</return>
+</function>
+
 <function name="gtk_text_iter_backward_to_tag_toggle">
 <description>
 Moves backward to the next toggle (on or off) of the
@@ -66533,7 +66683,7 @@ negative, moves backward instead of forward.
 
 <function name="gtk_text_iter_forward_text_chars">
 <description>
-Moves backward by @count text characters (pixbufs, widgets,
+Moves forward by @count text characters (pixbufs, widgets,
 etc. do not count as characters for this). Equivalent to moving
 through the results of gtk_text_iter_get_text (), rather than
 gtk_text_iter_get_slice ().
@@ -70476,6 +70626,8 @@ run from 0 to 1 when @state is being set to %TRUE and from 1 to 0 when
 it's being set to %FALSE.
 
 Since: 3.0
+
+Deprecated: 3.6: Always returns %FALSE
 
 </description>
 <parameters>
@@ -75203,8 +75355,8 @@ model emitted the #GtkTreeModel::row-inserted signal.
 Creates a row reference based on @path.
 
 This reference will keep pointing to the node pointed to
-by @path, so long as it exists. It listens to all signals
-emitted by @model, and updates its path appropriately. If
+by @path, so long as it exists. Any changes that occur on @model are
+propagated, and the path is updated appropriately. If
 @path isn't a valid path in @model, then %NULL is returned.
 
 
