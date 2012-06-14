@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Note that docextract_to_xml.py should be in PATH for this script to work and
+# Note that 
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
-# jhbuild sources.  The script assumes that it resides in the tools/gen_scripts
-# directory and the XML file will be placed in gtk/src.
+# jhbuild sources. The XML files will be placed in gtk/src.
 
-if [ -z "$JHBUILD_SOURCES" -o ! -x "`which docextract_to_xml.py`" ]; then
-  echo -e "JHBUILD_SOURCES must contain path to jhbuild sources and \
-docextract_to_xml.py\nneeds to be executable and in PATH."
+if [ -z "$JHBUILD_SOURCES" ]; then
+  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
   exit 1;
 fi
 
@@ -19,4 +17,5 @@ for dir in "$PREFIX"/gtk+/gtk; do
   PARAMS="$PARAMS -s $dir"
 done
 
-docextract_to_xml.py $PARAMS > "$OUT_DIR/gtk_docs.xml"
+DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
+$DOCEXTRACT_TO_XML_PY $PARAMS > "$OUT_DIR/gtk_docs.xml"
