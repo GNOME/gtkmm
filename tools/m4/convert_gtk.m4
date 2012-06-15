@@ -692,3 +692,4 @@ _CONVERSION(`GMenuModel*',`Glib::RefPtr<const Gio::MenuModel>',`Glib::wrap($3)')
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
 
 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
+_CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
