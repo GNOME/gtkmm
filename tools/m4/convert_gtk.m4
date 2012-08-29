@@ -156,6 +156,8 @@ _CONV_ENUM(Gtk,RegionFlags)
 _CONV_ENUM(Gtk,JunctionSides)
 _CONV_ENUM(Gtk,StateFlags)
 _CONV_ENUM(Gtk,ApplicationInhibitFlags)
+_CONV_ENUM(Gtk,InputPurpose)
+_CONV_ENUM(Gtk,InputHints)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
