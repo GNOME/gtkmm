@@ -129,13 +129,12 @@ int Application::run(int argc, char** argv)
 
 int Application::run(Window& window, int argc, char** argv)
 {
-  add_window(window);
-  
-  //We cannot show the window until GApplication::activate has been
-  //called, or we will crash because the application has not been "registered".
+  //We cannot add and show the window until the GApplication::activate signal
+  //has been emitted, or we will crash because the application has not been
+  //registered. (At least if window is an ApplicationWindow.)
   signal_activate().connect(
     sigc::bind(
-      sigc::mem_fun(*this, &Application::on_activate_show_main_window),
+      sigc::mem_fun(*this, &Application::on_activate_add_and_show_main_window),
       &window));
 
   const int result = Gio::Application::run(argc, argv);
@@ -148,13 +147,12 @@ int Application::run(Window& window)
   g_assert(m_argc);
   g_assert(m_argv);
 
-  add_window(window);
-
-  //We cannot show the window until GApplication::activate has been
-  //called, or we will crash because the application has not been "registered".
+  //We cannot add and show the window until the GApplication::activate signal
+  //has been emitted, or we will crash because the application has not been
+  //registered. (At least if window is an ApplicationWindow.)
   signal_activate().connect(
     sigc::bind(
-      sigc::mem_fun(*this, &Application::on_activate_show_main_window),
+      sigc::mem_fun(*this, &Application::on_activate_add_and_show_main_window),
       &window));
 
   const int result = Gio::Application::run(m_argc, m_argv);
@@ -170,10 +168,13 @@ int Application::run()
   return result;
 }
 
-void Application::on_activate_show_main_window(Window* window)
+void Application::on_activate_add_and_show_main_window(Window* window)
 {
   if(window)
+  {
+    add_window(*window);
     window->show();
+  }
 }
 
 
