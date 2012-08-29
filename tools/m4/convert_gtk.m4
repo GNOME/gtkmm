@@ -691,7 +691,7 @@ _CONVERSION(`const Glib::RefPtr<const Gio::MenuModel>&',`GMenuModel*',__CONVERT_
 _CONVERSION(`GMenuModel*',`Glib::RefPtr<Gio::MenuModel>',`Glib::wrap($3)')
 _CONVERSION(`GMenuModel*',`Glib::RefPtr<const Gio::MenuModel>',`Glib::wrap($3)')
 
-_CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::AppInfo))
+_CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::ActionGroup))
 
 _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
 
