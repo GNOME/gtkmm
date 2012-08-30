@@ -174,6 +174,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/invisible.h>
 #include <gtkmm/label.h>
 #include <gtkmm/layout.h>
+#include <gtkmm/levelbar.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/listviewtext.h>
 #include <gtkmm/linkbutton.h>
