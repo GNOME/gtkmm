@@ -57,6 +57,7 @@ _CONVERSION(`gpointer&',`gpointer*',`&($3)')
 _CONVERSION(`void*&',`gpointer*',`&($3)')
 
 _CONVERSION(`time_t&',`time_t*',`&($3)')
+_CONVERSION(`time_t',`std::time_t',`$3')
 
 _CONVERSION(`GError*&',`GError**',`&($3)')
 
