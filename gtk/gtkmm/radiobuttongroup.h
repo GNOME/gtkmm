@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <glibmm/object.h> //For RefPtr<> and size_t
+#include <glibmm/object.h> //For Glib::RefPtr<> and std::size_t
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C"
@@ -69,7 +69,7 @@ protected:
   void add(const Glib::RefPtr<RadioAction>& item);
   void add(RadioToolButton& item);
 
-  void* operator new(size_t); // not implemented
+  void* operator new(std::size_t); // not implemented
 
   GSList* group_;
 };

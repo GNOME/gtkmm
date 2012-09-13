@@ -173,7 +173,7 @@ Glib::RefPtr<Gtk::TreeModel> Example_StockBrowser::create_model()
 Glib::ustring Example_StockBrowser::id_to_symbol(const Gtk::StockID& stockid)
 {
   static const char prefix[] = "gtk-";
-  const size_t prefix_length = sizeof(prefix) - 1;
+  const std::size_t prefix_length = sizeof(prefix) - 1;
 
   const Glib::ustring id = stockid.get_string();
   Glib::ustring::const_iterator id_pos = id.begin();
