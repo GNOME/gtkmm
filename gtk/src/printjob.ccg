@@ -56,4 +56,22 @@ void PrintJob::send(const SlotPrintJobComplete& slot)
   gtk_print_job_send(gobj(), &SignalProxy_Custom_gtk_callback, slot_copy, &SignalProxy_Custom_gtk_callback_destroy);
 }
 
+std::vector<PrintSettings::PageRange> PrintJob::get_page_ranges() const
+{
+  int num_ranges (0);
+  GtkPageRange* page_ranges =
+    gtk_print_job_get_page_ranges(const_cast<GtkPrintJob*>(gobj()), &num_ranges);
+
+  // no need for deep ownership.
+  return Glib::ArrayHandler<PrintSettings::PageRange, PrintSettings::PageRangeTraits>::array_to_vector(page_ranges, num_ranges, Glib::OWNERSHIP_SHALLOW);
+}
+
+void PrintJob::set_page_ranges(const std::vector<PrintSettings::PageRange>& page_ranges)
+{
+  gtk_print_job_set_page_ranges(gobj(),
+    Glib::ArrayHandler<PrintSettings::PageRange, PrintSettings::PageRangeTraits>::vector_to_array(page_ranges).data (),
+    page_ranges.size ());
+}
+
+
 } // namespace Gtk
