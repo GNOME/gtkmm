@@ -88,16 +88,30 @@ public:
    */
   typedef sigc::slot<void, Widget&> ForeachSlot;
 
-  /** Operate on contained items
-   * This is largely an internal used mainly for things like
-   * creating duplicates of internal lists and other such
-   * operations.  The result is lossy as it only gets the
-   * the main child and not its external pieces.
+  /** Operate on contained items.
    *
-   * For example notebook pages contain a page, a label, and
-   * a menu item.  But this only operates on the pages.
+   * Invokes the @a slot on each non-internal child of the container. See
+   * forall() for details on what constitutes an
+   * "internal" child.  Most applications should use foreach()
+   * rather than forall().
    */
   void foreach(const ForeachSlot& slot);
+  _IGNORE(gtk_container_foreach)
+
+
+  /** Operate on contained items, including internal children.
+   *
+   * Invokes the @ slot on each child of the container, including children
+   * that are considered "internal" (implementation details of the
+   * container). "Internal" children generally weren't added by the user
+   * of the container, but were added by the container implementation
+   * itself.  Most applications should use foreach(),
+   * rather than forall().
+   *
+   * @newin{3,6}
+   */
+  void forall(const ForeachSlot& slot);
+  _IGNORE(gtk_container_forall)
 
   /// (internal) Operate on contained items (see foreach())
   //_WRAP_METHOD(void foreach_(GtkCallback callback,gpointer data),gtk_container_foreach)
@@ -110,8 +124,7 @@ public:
 #m4 _CONVERSION(`GList*',`std::vector<const Widget*>',`Glib::ListHandler<const Widget*>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(std::vector<const Widget*> get_children() const, gtk_container_get_children)
 
-  //TODO: See https://bugzilla.gnome.org/show_bug.cgi?id=630800
-  //_WRAP_METHOD(void propagate_expose(Widget& child, GdkEventExpose* event), gtk_container_propagate_expose)
+  _WRAP_METHOD(void propagate_draw(Widget& child, const ::Cairo::RefPtr< ::Cairo::Context>& cr), gtk_container_propagate_draw)
 
 #m4 _CONVERSION(`const std::vector<Widget*>&',`GList*',`Glib::ListHandler<Widget*>::vector_to_list($3).data ()')
   _WRAP_METHOD(void set_focus_chain(const std::vector<Widget*>& focusable_widgets),
@@ -136,6 +149,9 @@ public:
   /// Sets the focus on a child
   _WRAP_METHOD(void set_focus_child(Widget& widget),gtk_container_set_focus_child)
 
+  _WRAP_METHOD(Widget* get_focus_child(), gtk_container_get_focus_child)
+  _WRAP_METHOD(const Widget* get_focus_child() const, gtk_container_get_focus_child, constversion)
+
   _WRAP_METHOD(void set_focus_vadjustment(const Glib::RefPtr<Adjustment>& adjustment),
                gtk_container_set_focus_vadjustment)
 
@@ -156,6 +172,8 @@ public:
   _WRAP_METHOD(void resize_children(), gtk_container_resize_children)
 
   _WRAP_METHOD(GType child_type() const, gtk_container_child_type)
+
+  _WRAP_METHOD(WidgetPath get_path_for_child(const Widget& child) const, gtk_container_get_path_for_child)
 
   // Ignore functions such as gtk_container_class_install_child_property(),  which I think are for themes, like the GtkWidget style properties.
   _IGNORE(gtk_container_class_install_child_property, gtk_container_class_find_child_property, gtk_container_class_list_child_properties,
