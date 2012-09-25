@@ -243,8 +243,8 @@ Since: 2.4
 
 <signal name="GtkAdjustment::changed">
 <description>
-Emitted when one or more of the #GtkAdjustment fields have been changed,
-other than the value field.
+Emitted when one or more of the #GtkAdjustment properties have been
+changed, other than the #GtkAdjustment:value property.
 
 </description>
 <parameters>
@@ -258,7 +258,7 @@ other than the value field.
 
 <signal name="GtkAdjustment::value-changed">
 <description>
-Emitted when the #GtkAdjustment value field has been changed.
+Emitted when the #GtkAdjustment:value property has been changed.
 
 </description>
 <parameters>
@@ -1099,8 +1099,7 @@ Since: 2.6
 <signal name="GtkColorButton::color-set">
 <description>
 The ::color-set signal is emitted when the user selects a color.
-When handling this signal, use gtk_color_button_get_color() and
-gtk_color_button_get_alpha() (or gtk_color_button_get_rgba()) to
+When handling this signal, use gtk_color_button_get_rgba() to
 find out which color was just selected.
 
 Note that this signal is only emitted when the &lt;emphasis&gt;user&lt;/emphasis&gt;
@@ -2696,6 +2695,31 @@ to this signal and append your menuitems to the @menu.
 </parameter>
 <parameter name="menu">
 <parameter_description> the menu that is being populated
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkLevelBar::offset-changed">
+<description>
+Emitted when an offset specified on the bar changes value as an
+effect to gtk_level_bar_add_offset_value() being called.
+
+The signal supports detailed connections; you can connect to the
+detailed signal &quot;changed::x&quot; in order to only receive callbacks when
+the value of offset &quot;x&quot; changes.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of the offset that changed value
 </parameter_description>
 </parameter>
 </parameters>
@@ -5155,7 +5179,7 @@ to this signal and append your menuitems to the @menu.
 
 </description>
 <parameters>
-<parameter name="entry">
+<parameter name="text_view">
 <parameter_description> The text view on which the signal is emitted
 </parameter_description>
 </parameter>
@@ -6225,7 +6249,7 @@ override what the default handler did.
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6246,7 +6270,7 @@ handler is responsible for deleting the data that has been dropped. What
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6268,7 +6292,7 @@ gtk_selection_data_set_text().
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6298,16 +6322,17 @@ to call gdk_drag_status() and &lt;emphasis&gt;not&lt;/emphasis&gt; finish the dr
 If the data was received in response to a #GtkWidget::drag-drop signal
 (and this is the last target to be received), the handler for this
 signal is expected to process the received data and then call
-gtk_drag_finish(), setting the @success parameter depending on whether
-the data was processed successfully.
+gtk_drag_finish(), setting the @success parameter depending on
+whether the data was processed successfully.
 
-The handler may inspect and modify @drag_context-&gt;action before calling
-gtk_drag_finish(), e.g. to implement %GDK_ACTION_ASK as shown in the
-following example:
+The handler may inspect the selected action with
+gdk_drag_context_get_selected_action() before calling
+gtk_drag_finish(), e.g. to implement %GDK_ACTION_ASK as
+shown in the following example:
 |[
 void
 drag_data_received (GtkWidget          *widget,
-GdkDragContext     *drag_context,
+GdkDragContext     *context,
 gint                x,
 gint                y,
 GtkSelectionData   *data,
@@ -6316,7 +6341,12 @@ guint               time)
 {
 if ((data-&gt;length &gt;= 0) &amp;&amp; (data-&gt;format == 8))
 {
-if (drag_context-&gt;action == GDK_ACTION_ASK)
+GdkDragAction action;
+
+/ * handle data here * /
+
+action = gdk_drag_context_get_selected_action (context);
+if (action == GDK_ACTION_ASK)
 {
 GtkWidget *dialog;
 gint response;
@@ -6331,16 +6361,15 @@ response = gtk_dialog_run (GTK_DIALOG (dialog));
 gtk_widget_destroy (dialog);
 
 if (response == GTK_RESPONSE_YES)
-drag_context-&gt;action = GDK_ACTION_MOVE;
+action = GDK_ACTION_MOVE;
 else
-drag_context-&gt;action = GDK_ACTION_COPY;
+action = GDK_ACTION_COPY;
 }
 
-gtk_drag_finish (drag_context, TRUE, FALSE, time);
-return;
+gtk_drag_finish (context, TRUE, action == GDK_ACTION_MOVE, time);
 }
-
-gtk_drag_finish (drag_context, FALSE, FALSE, time);
+else
+gtk_drag_finish (context, FALSE, FALSE, time);
 }
 ]|
 
@@ -6350,7 +6379,7 @@ gtk_drag_finish (drag_context, FALSE, FALSE, time);
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6399,7 +6428,7 @@ or more of the supported targets.
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6432,7 +6461,7 @@ things done in #GtkWidget::drag-begin.
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6456,7 +6485,7 @@ Since: 2.12
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6483,7 +6512,7 @@ with gtk_drag_unhighlight()
 <parameter_description> the object which received the signal.
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6497,7 +6526,7 @@ with gtk_drag_unhighlight()
 
 <signal name="GtkWidget::drag-motion">
 <description>
-The drag-motion signal is emitted on the drop site when the user
+The ::drag-motion signal is emitted on the drop site when the user
 moves the cursor over the widget during a drag. The signal handler
 must determine whether the cursor position is in a drop zone or not.
 If it is not in a drop zone, it returns %FALSE and no further processing
@@ -6520,11 +6549,11 @@ an &quot;enter&quot; signal. Upon an &quot;enter&quot;, the handler will typical
 the drop site with gtk_drag_highlight().
 |[
 static void
-drag_motion (GtkWidget *widget,
+drag_motion (GtkWidget      *widget,
 GdkDragContext *context,
-gint x,
-gint y,
-guint time)
+gint            x,
+gint            y,
+guint           time)
 {
 GdkAtom target;
 
@@ -6541,7 +6570,7 @@ if (target == GDK_NONE)
 gdk_drag_status (context, 0, time);
 else
 {
-private_data-&gt;pending_status = context-&gt;suggested_action;
+private_data-&gt;pending_status = gdk_drag_context_get_suggested_action (context);
 gtk_drag_get_data (widget, context, target, time);
 }
 
@@ -6565,7 +6594,7 @@ private_data-&gt;suggested_action = 0;
 
 / * We are getting this data due to a request in drag_motion,
 * rather than due to a request in drag_drop, so we are just
-* supposed to call gdk_drag_status (), not actually paste in
+* supposed to call gdk_drag_status(), not actually paste in
 * the data.
 * /
 str = gtk_selection_data_get_text (selection_data);
@@ -6588,7 +6617,7 @@ else
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="drag_context">
+<parameter name="context">
 <parameter_description> the drag context
 </parameter_description>
 </parameter>
@@ -6635,7 +6664,10 @@ Since: 3.0
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE to stop other handlers from being invoked for the event.
+   % %FALSE to propagate the event further.
+
+</return>
 </signal>
 
 <signal name="GtkWidget::enter-notify-event">
@@ -7047,7 +7079,9 @@ automatically for all new windows.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE to stop other handlers from being invoked for the event.
+%FALSE to propagate the event further.
+</return>
 </signal>
 
 <signal name="GtkWidget::motion-notify-event">
@@ -7459,7 +7493,9 @@ this signal.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE to stop other handlers from being invoked for the event.
+%FALSE to propagate the event further.
+</return>
 </signal>
 
 <signal name="GtkWidget::size-allocate">
@@ -8836,6 +8872,36 @@ accelerators are added or removed from the associated widget.
 </parameters>
 <return> always returns %FALSE.
 </return>
+</function>
+
+<function name="gtk_accel_label_set_accel">
+<description>
+Manually sets a keyval and modifier mask as the accelerator rendered
+by @accel_label.
+
+If a keyval and modifier are explicitly set then these values are
+used regardless of any associated accel closure or widget.
+
+Providing an @accelerator_key of 0 removes the manual setting.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+<parameter name="accelerator_key">
+<parameter_description> a keyval, or 0
+</parameter_description>
+</parameter>
+<parameter name="accelerator_mods">
+<parameter_description> the modifier mask for the accel
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_accel_label_set_accel_closure">
@@ -10228,6 +10294,25 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="gtk_action_group_get_accel_group">
+<description>
+Gets the accelerator group.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="action_group">
+<parameter_description> a #GtkActionGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return> the accelerator group associated with this action
+group or %NULL if there is none.
+
+</return>
+</function>
+
 <function name="gtk_action_group_get_action">
 <description>
 Looks up an action in the action group by name.
@@ -10362,6 +10447,26 @@ Since: 2.4
 </parameter>
 <parameter name="action">
 <parameter_description> an action
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_action_group_set_accel_group">
+<description>
+Sets the accelerator group to be used by every action in this group.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="action_group">
+<parameter_description> a #GtkActionGroup
+</parameter_description>
+</parameter>
+<parameter name="accel_group">
+<parameter_description> a #GtkAccelGroup to set or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -11198,7 +11303,7 @@ Since: 2.16
 <description>
 Emits a #GtkAdjustment::changed signal from the #GtkAdjustment.
 This is typically called by the owner of the #GtkAdjustment after it has
-changed any of the #GtkAdjustment fields other than the value.
+changed any of the #GtkAdjustment properties other than the value.
 
 </description>
 <parameters>
@@ -11212,7 +11317,7 @@ changed any of the #GtkAdjustment fields other than the value.
 
 <function name="gtk_adjustment_clamp_page">
 <description>
-Updates the #GtkAdjustment #GtkAdjustment:value to ensure that the range
+Updates the #GtkAdjustment:value property to ensure that the range
 between @lower and @upper is in the current page (i.e. between
 #GtkAdjustment:value and #GtkAdjustment:value + #GtkAdjustment:page_size).
 If the range is larger than the page size, then only the start of it will
@@ -11241,9 +11346,9 @@ A #GtkAdjustment::changed signal will be emitted if the value is changed.
 <description>
 Sets all properties of the adjustment at once.
 
-Use this function to avoid multiple emissions of the &quot;changed&quot;
+Use this function to avoid multiple emissions of the #GtkAdjustment::changed
 signal. See gtk_adjustment_set_lower() for an alternative way
-of compressing multiple emissions of &quot;changed&quot; into one.
+of compressing multiple emissions of #GtkAdjustment::changed into one.
 
 Since: 2.14
 
@@ -11447,16 +11552,16 @@ Creates a new #GtkAdjustment.
 Sets the minimum value of the adjustment.
 
 When setting multiple adjustment properties via their individual
-setters, multiple &quot;changed&quot; signals will be emitted. However, since
-the emission of the &quot;changed&quot; signal is tied to the emission of the
-&quot;GObject::notify&quot; signals of the changed properties, it's possible
-to compress the &quot;changed&quot; signals into one by calling
+setters, multiple #GtkAdjustment::changed signals will be emitted. However, since
+the emission of the #GtkAdjustment::changed signal is tied to the emission of the
+#GObject::notify signals of the changed properties, it's possible
+to compress the #GtkAdjustment::changed signals into one by calling
 g_object_freeze_notify() and g_object_thaw_notify() around the
 calls to the individual setters.
 
 Alternatively, using a single g_object_set() for all the properties
 to change, or using gtk_adjustment_configure() has the same effect
-of compressing &quot;changed&quot; emissions.
+of compressing #GtkAdjustment::changed emissions.
 
 Since: 2.14
 
@@ -11479,7 +11584,7 @@ Since: 2.14
 Sets the page increment of the adjustment.
 
 See gtk_adjustment_set_lower() about how to compress multiple
-emissions of the &quot;changed&quot; signal when setting multiple adjustment
+emissions of the #GtkAdjustment::changed signal when setting multiple adjustment
 properties.
 
 Since: 2.14
@@ -11503,7 +11608,7 @@ Since: 2.14
 Sets the page size of the adjustment.
 
 See gtk_adjustment_set_lower() about how to compress multiple
-emissions of the &quot;changed&quot; signal when setting multiple adjustment
+emissions of the GtkAdjustment::changed signal when setting multiple adjustment
 properties.
 
 Since: 2.14
@@ -11527,7 +11632,7 @@ Since: 2.14
 Sets the step increment of the adjustment.
 
 See gtk_adjustment_set_lower() about how to compress multiple
-emissions of the &quot;changed&quot; signal when setting multiple adjustment
+emissions of the #GtkAdjustment::changed signal when setting multiple adjustment
 properties.
 
 Since: 2.14
@@ -11555,7 +11660,7 @@ Note that values will be restricted by
 property is nonzero.
 
 See gtk_adjustment_set_lower() about how to compress multiple
-emissions of the &quot;changed&quot; signal when setting multiple adjustment
+emissions of the #GtkAdjustment::changed signal when setting multiple adjustment
 properties.
 
 Since: 2.14
@@ -11601,7 +11706,7 @@ range of allowed values goes from #GtkAdjustment:lower to
 <description>
 Emits a #GtkAdjustment::value_changed signal from the #GtkAdjustment.
 This is typically called by the owner of the #GtkAdjustment after it has
-changed the #GtkAdjustment value field.
+changed the #GtkAdjustment:value property.
 
 </description>
 <parameters>
@@ -12485,6 +12590,29 @@ Since: 3.0
 <return></return>
 </function>
 
+<function name="gtk_application_get_active_window">
+<description>
+Gets the &quot;active&quot; window for the application.
+
+The active window is the one that was most recently focused (within
+the application).  This window may not have the focus at the moment
+if another application has it -- this is just the most
+recently-focused window within this application.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GtkApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return> the active window
+
+</return>
+</function>
+
 <function name="gtk_application_get_app_menu">
 <description>
 Returns the menu model that has been set with
@@ -12525,6 +12653,8 @@ Since: 3.4
 
 <function name="gtk_application_get_window_by_id">
 <description>
+Returns the #GtkApplicationWindow with the given ID.
+
 Since: 3.6
 
 </description>
@@ -12538,7 +12668,7 @@ Since: 3.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GtkApplicationWindow with ID @id, or
+<return> the window with ID @id, or
 %NULL if there is no window with this ID
 
 </return>
@@ -12977,8 +13107,8 @@ to 1.0 (right aligned)
 </parameter>
 <parameter name="yalign">
 <parameter_description> Vertical alignment of the child within the allocation of
-the #GtkAspectFrame. This ranges from 0.0 (left aligned)
-to 1.0 (right aligned)
+the #GtkAspectFrame. This ranges from 0.0 (top aligned)
+to 1.0 (bottom aligned)
 </parameter_description>
 </parameter>
 <parameter name="ratio">
@@ -13013,8 +13143,8 @@ to 1.0 (right aligned)
 </parameter>
 <parameter name="yalign">
 <parameter_description> Vertical alignment of the child within the allocation of
-the #GtkAspectFrame. This ranges from 0.0 (left aligned)
-to 1.0 (right aligned)
+the #GtkAspectFrame. This ranges from 0.0 (top aligned)
+to 1.0 (bottom aligned)
 </parameter_description>
 </parameter>
 <parameter name="ratio">
@@ -14509,7 +14639,7 @@ Since: 2.12
 <description>
 Gets the name of the @buildable object. 
 
-#GtkBuilder sets the name based on the the 
+#GtkBuilder sets the name based on the
 &lt;link linkend=&quot;BUILDER-UI&quot;&gt;GtkBuilder UI definition&lt;/link&gt; 
 used to construct the @buildable.
 
@@ -23598,7 +23728,10 @@ potentially do a copy.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the data could be loaded.
+<return> %TRUE. The return value is deprecated and %FALSE will only be
+returned for backwards compatibility reasons if an @error is not 
+%NULL and a loading error occured. To track errors while loading
+CSS, connect to the GtkCssProvider::parsing-error signal.
 </return>
 </function>
 
@@ -23623,7 +23756,10 @@ clear any previously loaded information.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the data could be loaded.
+<return> %TRUE. The return value is deprecated and %FALSE will only be
+returned for backwards compatibility reasons if an @error is not 
+%NULL and a loading error occured. To track errors while loading
+CSS, connect to the GtkCssProvider::parsing-error signal.
 </return>
 </function>
 
@@ -23648,7 +23784,10 @@ any previously loaded information.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the data could be loaded.
+<return> %TRUE. The return value is deprecated and %FALSE will only be
+returned for backwards compatibility reasons if an @error is not 
+%NULL and a loading error occured. To track errors while loading
+CSS, connect to the GtkCssProvider::parsing-error signal.
 </return>
 </function>
 
@@ -24451,34 +24590,6 @@ to @sizes.
 
 <function name="gtk_drag_begin">
 <description>
-Initiates a drag on the source side. The function
-only needs to be used when the application is
-starting drags itself, and is not needed when
-gtk_drag_source_set() is used.
-
-The @event is used to retrieve the timestamp that will be used internally to
-grab the pointer.  If @event is #NULL, then GDK_CURRENT_TIME will be used.
-However, you should try to pass a real event in all cases, since that can be
-used by GTK+ to get information about the start position of the drag, for
-example if the @event is a %GDK_MOTION_NOTIFY.
-
-Generally there are three cases when you want to start a drag by hand by
-calling this function:
-
-1. During a #GtkWidget::button-press-event handler, if you want to start a drag
-immediately when the user presses the mouse button.  Pass the @event
-that you have in your #GtkWidget::button-press-event handler.
-
-2. During a #GtkWidget::motion-notify-event handler, if you want to start a drag
-when the mouse moves past a certain threshold distance after a button-press.
-Pass the @event that you have in your #GtkWidget::motion-notify-event handler.
-
-3. During a timeout handler, if you want to start a drag after the mouse
-button is held down for some time.  Try to save the last event that you got
-from the mouse, using gdk_event_copy(), and pass it to this function
-(remember to free the event with gdk_event_free() when you are done).
-If you can really not pass a real event, pass #NULL instead.
-
 
 </description>
 <parameters>
@@ -24504,16 +24615,11 @@ source can provide the data.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the context for this drag.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_check_threshold">
 <description>
-Checks to see if a mouse drag starting at (@start_x, @start_y) and ending
-at (@current_x, @current_y) has passed the GTK+ drag threshold, and thus
-should trigger the beginning of a drag-and-drop operation.
-
 
 </description>
 <parameters>
@@ -24538,19 +24644,11 @@ should trigger the beginning of a drag-and-drop operation.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the drag threshold has been passed.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_add_image_targets">
 <description>
-Add the image targets supported by #GtkSelection to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_image_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -24564,13 +24662,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_add_text_targets">
 <description>
-Add the text targets supported by #GtkSelection to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_text_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -24584,13 +24675,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_add_uri_targets">
 <description>
-Add the URI targets supported by #GtkSelection to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_uri_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -24604,14 +24688,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_find_target">
 <description>
-Looks for a match between the supported targets of @context and the
-@dest_target_list, returning the first matching target, otherwise
-returning %GDK_NONE. @dest_target_list should usually be the return
-value from gtk_drag_dest_get_target_list(), but some widgets may
-have different valid targets for different parts of the widget; in
-that case, they will have to implement a drag_motion handler that
-passes the correct target list to this function.
-
 
 </description>
 <parameters>
@@ -24629,16 +24705,11 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return> first target that the source offers
-and the dest can accept, or %GDK_NONE
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
 <description>
-Returns the list of targets this widget can accept from
-drag-and-drop.
-
 
 </description>
 <parameters>
@@ -24647,16 +24718,11 @@ drag-and-drop.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GtkTargetList, or %NULL if none
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_get_track_motion">
 <description>
-Returns whether the widget has been configured to always
-emit #GtkWidget::drag-motion signals.
-
-Since: 2.10
 
 </description>
 <parameters>
@@ -24665,53 +24731,11 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the widget always emits
-#GtkWidget::drag-motion events
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_set">
 <description>
-Sets a widget as a potential drop destination, and adds default behaviors.
-
-The default behaviors listed in @flags have an effect similar
-to installing default handlers for the widget's drag-and-drop signals
-(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
-for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
-sufficient to connect to the widget's #GtkWidget::drag-data-received
-signal to get primitive, but consistent drag-and-drop support.
-
-Things become more complicated when you try to preview the dragged data,
-as described in the documentation for #GtkWidget::drag-motion. The default
-behaviors described by @flags make some assumptions, that can conflict
-with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
-invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
-and invokations of gtk_drag_finish() in #GtkWidget::drag-data-received.
-Especially the later is dramatic, when your own #GtkWidget::drag-motion
-handler calls gtk_drag_get_data() to inspect the dragged data.
-
-There's no way to set a default action here, you can use the
-#GtkWidget::drag-motion callback for that. Here's an example which selects
-the action to use depending on whether the control key is pressed or not:
-|[
-static void
-drag_motion (GtkWidget *widget,
-GdkDragContext *context,
-gint x,
-gint y,
-guint time)
-{
-GdkModifierType mask;
-
-gdk_window_get_pointer (gtk_widget_get_window (widget),
-NULL, NULL, &amp;mask);
-if (mask &amp; GDK_CONTROL_MASK)
-gdk_drag_status (context, GDK_ACTION_COPY, time);
-else
-gdk_drag_status (context, GDK_ACTION_MOVE, time);
-}
-]|
 
 </description>
 <parameters>
@@ -24744,7 +24768,6 @@ and gtk_drag_dest_find_target().
 
 <function name="gtk_drag_dest_set_proxy">
 <description>
-Sets this widget as a proxy for drops to another window.
 
 </description>
 <parameters>
@@ -24773,9 +24796,6 @@ subwindow.
 
 <function name="gtk_drag_dest_set_target_list">
 <description>
-Sets the target types that this widget can accept from drag-and-drop.
-The widget must first be made into a drag destination with
-gtk_drag_dest_set().
 
 </description>
 <parameters>
@@ -24793,14 +24813,6 @@ gtk_drag_dest_set().
 
 <function name="gtk_drag_dest_set_track_motion">
 <description>
-Tells the widget to emit #GtkWidget::drag-motion and
-#GtkWidget::drag-leave events regardless of the targets and the
-%GTK_DEST_DEFAULT_MOTION flag.
-
-This may be used when a widget wants to do generic
-actions regardless of the targets that the source offers.
-
-Since: 2.10
 
 </description>
 <parameters>
@@ -24818,9 +24830,6 @@ Since: 2.10
 
 <function name="gtk_drag_dest_unset">
 <description>
-Clears information about a drop destination set with
-gtk_drag_dest_set(). The widget will no longer receive
-notification of drags.
 
 </description>
 <parameters>
@@ -24834,8 +24843,6 @@ notification of drags.
 
 <function name="gtk_drag_finish">
 <description>
-Informs the drag source that the drop is finished, and
-that the data of the drag will no longer be required.
 
 </description>
 <parameters>
@@ -24862,14 +24869,6 @@ original data. (This should be %TRUE for a move)
 
 <function name="gtk_drag_get_data">
 <description>
-Gets the data associated with a drag. When the data
-is received or the retrieval fails, GTK+ will emit a
-#GtkWidget::drag-data-received signal. Failure of the retrieval
-is indicated by the length field of the @selection_data
-signal parameter being negative. However, when gtk_drag_get_data()
-is called implicitely because the %GTK_DEST_DEFAULT_DROP was set,
-then the widget will not receive notification of failed
-drops.
 
 </description>
 <parameters>
@@ -24898,8 +24897,6 @@ or #GtkWidget::drag-drop&quot; signal.
 
 <function name="gtk_drag_get_source_widget">
 <description>
-Determines the source widget for a drag.
-
 
 </description>
 <parameters>
@@ -24908,18 +24905,11 @@ Determines the source widget for a drag.
 </parameter_description>
 </parameter>
 </parameters>
-<return> if the drag is occurring
-within a single application, a pointer to the source widget.
-Otherwise, %NULL.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_highlight">
 <description>
-Draws a highlight around a widget. This will attach
-handlers to #GtkWidget::draw, so the highlight
-will continue to be displayed until gtk_drag_unhighlight()
-is called.
 
 </description>
 <parameters>
@@ -25123,13 +25113,6 @@ signal and destroy it yourself.
 
 <function name="gtk_drag_source_add_image_targets">
 <description>
-Add the writable image targets supported by #GtkSelection to
-the target list of the drag source. The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_image_targets() and
-gtk_drag_source_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -25163,13 +25146,6 @@ Since: 2.6
 
 <function name="gtk_drag_source_add_uri_targets">
 <description>
-Add the URI targets supported by #GtkSelection to
-the target list of the drag source.  The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_uri_targets() and
-gtk_drag_source_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -25183,10 +25159,6 @@ Since: 2.6
 
 <function name="gtk_drag_source_get_target_list">
 <description>
-Gets the list of targets this widget can provide for
-drag-and-drop.
-
-Since: 2.4
 
 </description>
 <parameters>
@@ -25195,15 +25167,11 @@ Since: 2.4
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GtkTargetList, or %NULL if none
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_source_set">
 <description>
-Sets up a widget so that GTK+ will start a drag operation when the user
-clicks and drags on the widget. The widget must have a window.
 
 </description>
 <parameters>
@@ -25276,9 +25244,6 @@ Since: 2.8
 
 <function name="gtk_drag_source_set_icon_pixbuf">
 <description>
-Sets the icon that will be used for drags from a particular widget
-from a #GdkPixbuf. GTK+ retains a reference for @pixbuf and will 
-release it when it is no longer needed.
 
 </description>
 <parameters>
@@ -25315,11 +25280,6 @@ to a stock icon.
 
 <function name="gtk_drag_source_set_target_list">
 <description>
-Changes the target types that this widget offers for drag-and-drop.
-The widget must first be made into a drag source with
-gtk_drag_source_set().
-
-Since: 2.4
 
 </description>
 <parameters>
@@ -25337,7 +25297,6 @@ Since: 2.4
 
 <function name="gtk_drag_source_unset">
 <description>
-Undoes the effects of gtk_drag_source_set().
 
 </description>
 <parameters>
@@ -25351,8 +25310,6 @@ Undoes the effects of gtk_drag_source_set().
 
 <function name="gtk_drag_unhighlight">
 <description>
-Removes a highlight set by gtk_drag_highlight() from
-a widget.
 
 </description>
 <parameters>
@@ -25496,7 +25453,7 @@ This call doesn't do anything if there is no selected text.
 <description>
 Deletes a sequence of characters. The characters that are deleted are 
 those characters at positions from @start_pos up to, but not including 
-@end_pos. If @end_pos is negative, then the the characters deleted
+@end_pos. If @end_pos is negative, then the characters deleted
 are those from @start_pos to the end of the text.
 
 Note that the positions are specified in characters, not bytes.
@@ -25525,7 +25482,7 @@ Virtual: do_delete_text
 <description>
 Retrieves a sequence of characters. The characters that are retrieved 
 are those characters at positions from @start_pos up to, but not 
-including @end_pos. If @end_pos is negative, then the the characters 
+including @end_pos. If @end_pos is negative, then the characters
 retrieved are those characters from @start_pos to the end of the text.
 
 Note that positions are specified in characters, not bytes.
@@ -25667,7 +25624,7 @@ cursor in the editable.
 <description>
 Selects a region of text. The characters that are selected are 
 those characters at positions from @start_pos up to, but not 
-including @end_pos. If @end_pos is negative, then the the 
+including @end_pos. If @end_pos is negative, then the
 characters selected are those characters from @start_pos to 
 the end of the text.
 
@@ -26615,6 +26572,26 @@ Since: 2.4
 </return>
 </function>
 
+<function name="gtk_entry_get_attributes">
+<description>
+Gets the attribute list that was set on the entry using
+gtk_entry_set_attributes(), if any.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return> the attribute list, or %NULL
+if none was set.
+
+</return>
+</function>
+
 <function name="gtk_entry_get_buffer">
 <description>
 Get the #GtkEntryBuffer object which holds the text for
@@ -27012,6 +26989,38 @@ this function is ignored by #GtkEntry.
 <return> the entry's #GtkBorder, or %NULL if none was set.
 
 </return>
+</function>
+
+<function name="gtk_entry_get_input_hints">
+<description>
+Gets the value of the #GtkEntry:input-hints property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_entry_get_input_purpose">
+<description>
+Gets the value of the #GtkEntry:input-purpose property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_entry_get_invisible_char">
@@ -27477,6 +27486,27 @@ Reversed for RTL layouts
 <return></return>
 </function>
 
+<function name="gtk_entry_set_attributes">
+<description>
+Sets a #PangoAttrList; the attributes in the list are applied to the
+entry text.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+<parameter name="attrs">
+<parameter_description> a #PangoAttrList
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_entry_set_buffer">
 <description>
 Set the #GtkEntryBuffer object which holds the text for
@@ -27859,6 +27889,49 @@ this function is ignored by #GtkEntry.
 <return></return>
 </function>
 
+<function name="gtk_entry_set_input_hints">
+<description>
+Sets the #GtkEntry:input-hints property, which
+allows input methods to fine-tune their behaviour.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+<parameter name="hints">
+<parameter_description> the hints
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_entry_set_input_purpose">
+<description>
+Sets the #GtkEntry:input-purpose property which
+can be used by on-screen keyboards and other input
+methods to adjust their behaviour.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+<parameter name="purpose">
+<parameter_description> the purpose
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_entry_set_invisible_char">
 <description>
 Sets the character to use in place of the actual text when
@@ -28025,14 +28098,19 @@ See gtk_entry_buffer_set_text().
 
 <function name="gtk_entry_set_visibility">
 <description>
-Sets whether the contents of the entry are visible or not. 
-When visibility is set to %FALSE, characters are displayed 
-as the invisible char, and will also appear that way when 
+Sets whether the contents of the entry are visible or not.
+When visibility is set to %FALSE, characters are displayed
+as the invisible char, and will also appear that way when
 the text in the entry widget is copied elsewhere.
 
 By default, GTK+ picks the best invisible character available
 in the current font, but it can be changed with
 gtk_entry_set_invisible_char().
+
+Note that you probably want to set #GtkEntry:input-purpose
+to %GTK_INPUT_PURPOSE_PASSWORD or %GTK_INPUT_PURPOSE_PIN to
+inform input methods about the purpose of this entry,
+in addition to setting visibility to %FALSE.
 
 </description>
 <parameters>
@@ -35677,7 +35755,7 @@ To do this, you can use gtk_tree_row_reference_new().
 
 To free the return value, use:
 |[
-g_list_free_full (list, (GDestroyNotify) gtk_tree_patch_free);
+g_list_free_full (list, (GDestroyNotify) gtk_tree_path_free);
 ]|
 
 Since: 2.6
@@ -35803,7 +35881,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="model">
-<parameter_description> a pointer to receive a #GtkTreeModel or %NULL
+<parameter_description> a pointer to receive a
+#GtkTreeModel or %NULL
 </parameter_description>
 </parameter>
 <parameter name="path">
@@ -39559,6 +39638,275 @@ Deprecated: 3.0: Use gtk_scrollable_set_vadjustment()
 <return></return>
 </function>
 
+<function name="gtk_level_bar_add_offset_value">
+<description>
+Adds a new offset marker on @self at the position specified by @value.
+When the bar value is in the interval topped by @value (or between @value
+and #GtkLevelBar:max-value in case the offset is the last one on the bar)
+a style class named &lt;literal&gt;level-&lt;/literal&gt;@name will be applied
+when rendering the level bar fill.
+If another offset marker named @name exists, its value will be
+replaced by @value.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of the new offset
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value for the new offset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_level_bar_get_max_value">
+<description>
+Returns the value of the #GtkLevelBar:max-value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> a positive value
+
+</return>
+</function>
+
+<function name="gtk_level_bar_get_min_value">
+<description>
+Returns the value of the #GtkLevelBar:min-value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> a positive value
+
+</return>
+</function>
+
+<function name="gtk_level_bar_get_mode">
+<description>
+Returns the value of the #GtkLevelBar:mode property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkLevelBarMode
+
+</return>
+</function>
+
+<function name="gtk_level_bar_get_offset_value">
+<description>
+Fetches the value specified for the offset marker @name in @self,
+returning %TRUE in case an offset named @name was found.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of an offset in the bar
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> location where to store the value
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the specified offset is found
+
+</return>
+</function>
+
+<function name="gtk_level_bar_get_value">
+<description>
+Returns the value of the #GtkLevelBar:value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> a value in the interval between
+#GtkLevelBar:min-value and #GtkLevelBar:max-value
+
+</return>
+</function>
+
+<function name="gtk_level_bar_new">
+<description>
+Creates a new #GtkLevelBar.
+
+Since: 3.6
+
+</description>
+<parameters>
+</parameters>
+<return> a #GtkLevelBar.
+
+</return>
+</function>
+
+<function name="gtk_level_bar_new_for_interval">
+<description>
+Utility constructor that creates a new #GtkLevelBar for the specified
+interval.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="min_value">
+<parameter_description> a positive value
+</parameter_description>
+</parameter>
+<parameter name="max_value">
+<parameter_description> a positive value
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkLevelBar
+
+</return>
+</function>
+
+<function name="gtk_level_bar_remove_offset_value">
+<description>
+Removes an offset marker previously added with
+gtk_level_bar_add_offset_value().
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of an offset in the bar
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_level_bar_set_max_value">
+<description>
+Sets the value of the #GtkLevelBar:max-value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a positive value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_level_bar_set_min_value">
+<description>
+Sets the value of the #GtkLevelBar:min-value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a positive value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_level_bar_set_mode">
+<description>
+Sets the value of the #GtkLevelBar:mode property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> a #GtkLevelBarMode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_level_bar_set_value">
+<description>
+Sets the value of the #GtkLevelBar:value property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkLevelBar
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a value in the interval between
+#GtkLevelBar:min-value and #GtkLevelBar:max-value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_link_button_get_uri">
 <description>
 Retrieves the URI set using gtk_link_button_set_uri().
@@ -39721,9 +40069,9 @@ Removes all rows from the list store.
 <function name="gtk_list_store_insert">
 <description>
 Creates a new row at @position.  @iter will be changed to point to this new
-row.  If @position is larger than the number of rows on the list, then the
-new row will be appended to the list. The row will be empty after this
-function is called.  To fill in values, you need to call 
+row.  If @position is -1 or is larger than the number of rows on the list,
+then the new row will be appended to the list. The row will be empty after
+this function is called.  To fill in values, you need to call
 gtk_list_store_set() or gtk_list_store_set_value().
 
 
@@ -39738,7 +40086,7 @@ gtk_list_store_set() or gtk_list_store_set_value().
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 for last
 </parameter_description>
 </parameter>
 </parameters>
@@ -39863,7 +40211,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 for last
 </parameter_description>
 </parameter>
 <parameter name="columns">
@@ -39965,7 +40313,7 @@ Creates a new list store as with @n_columns columns each of the types passed
 in.  Note that only types derived from standard GObject fundamental types
 are supported.
 
-As an example, &lt;literal&gt;gtk_tree_store_new (3, G_TYPE_INT, G_TYPE_STRING,
+As an example, &lt;literal&gt;gtk_list_store_new (3, G_TYPE_INT, G_TYPE_STRING,
 GDK_TYPE_PIXBUF);&lt;/literal&gt; will create a new #GtkListStore with three columns, of type
 int, string and #GdkPixbuf respectively.
 
@@ -40655,24 +41003,6 @@ Since: 3.6
 </return>
 </function>
 
-<function name="gtk_menu_button_get_menu">
-<description>
-Returns the #GtkMenu that pops out of the button.
-
-Since: 3.6
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GtkMenu or %NULL.
-
-</return>
-</function>
-
 <function name="gtk_menu_button_get_menu_model">
 <description>
 Returns the #GMenuModel used to generate the menu.
@@ -40687,6 +41017,24 @@ Since: 3.6
 </parameter>
 </parameters>
 <return> a #GMenuModel or %NULL.
+
+</return>
+</function>
+
+<function name="gtk_menu_button_get_popup">
+<description>
+Returns the #GtkMenu that pops out of the button.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="menu_button">
+<parameter_description> a #GtkMenuButton
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkMenu or %NULL.
 
 </return>
 </function>
@@ -40759,28 +41107,6 @@ Since: 3.6
 <return></return>
 </function>
 
-<function name="gtk_menu_button_set_menu">
-<description>
-Sets the #GtkMenu that will be popped up when the button is clicked,
-or %NULL to disable the button. If #GtkMenuButton:menu-model is set,
-it will be set to %NULL.
-
-Since: 3.6
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_menu_button_set_menu_model">
 <description>
 Sets the #GMenuModel from which the #GtkMenuButton:menu property will be
@@ -40802,6 +41128,28 @@ Since: 3.6
 </parameter>
 <parameter name="menu_model">
 <parameter_description> a #GMenuModel
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_menu_button_set_popup">
+<description>
+Sets the #GtkMenu that will be popped up when the button is clicked,
+or %NULL to disable the button. If #GtkMenuButton:menu-model is set,
+it will be set to %NULL.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="menu_button">
+<parameter_description> a #GtkMenuButton
+</parameter_description>
+</parameter>
+<parameter name="popup">
+<parameter_description> a #GtkMenu
 </parameter_description>
 </parameter>
 </parameters>
@@ -41835,6 +42183,58 @@ item list.
 <return></return>
 </function>
 
+<function name="gtk_menu_shell_bind_model">
+<description>
+Establishes a binding between a #GtkMenuShell and a #GMenuModel.
+
+The contents of @shell are removed and then refilled with menu items
+according to @model.  When @model changes, @shell is updated.
+Calling this function twice on @shell with different @model will
+cause the first binding to be replaced with a binding to the new
+model. If @model is %NULL then any previous binding is undone and
+all children are removed.
+
+@with_separators determines if toplevel items (eg: sections) have
+separators inserted between them.  This is typically desired for
+menus but doesn't make sense for menubars.
+
+If @action_namespace is non-%NULL then the effect is as if all
+actions mentioned in the @model have their names prefixed with the
+namespace, plus a dot.  For example, if the action &quot;quit&quot; is
+mentioned and @action_namespace is &quot;app&quot; then the effective action
+name is &quot;app.quit&quot;.
+
+For most cases you are probably better off using
+gtk_menu_new_from_model() or gtk_menu_bar_new_from_model() or just
+directly passing the #GMenuModel to gtk_application_set_app_menu() or
+gtk_application_set_menu_bar().
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="menu_shell">
+<parameter_description> a #GtkMenuShell
+</parameter_description>
+</parameter>
+<parameter name="model">
+<parameter_description> the #GMenuModel to bind to or %NULL to remove
+binding
+</parameter_description>
+</parameter>
+<parameter name="action_namespace">
+<parameter_description> the namespace for actions in @model
+</parameter_description>
+</parameter>
+<parameter name="with_separators">
+<parameter_description> %TRUE if toplevel items in @shell should have
+separators between them
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_menu_shell_cancel">
 <description>
 Cancels the selection within the menu shell.
@@ -42206,9 +42606,6 @@ Sets the secondary text of the message dialog to be @message_format (with
 printf()-style), which is marked up with the
 &lt;link linkend=&quot;PangoMarkupFormat&quot;&gt;Pango text markup language&lt;/link&gt;.
 
-Note that setting a secondary text makes the primary text become
-bold, unless you have provided explicit markup.
-
 Due to an oversight, this function does not escape special XML characters
 like gtk_message_dialog_new_with_markup() does. Thus, if the arguments
 may contain special XML characters, you should use g_markup_printf_escaped()
@@ -42247,9 +42644,6 @@ Since: 2.6
 <description>
 Sets the secondary text of the message dialog to be @message_format
 (with printf()-style).
-
-Note that setting a secondary text makes the primary text become
-bold, unless you have provided explicit markup.
 
 Since: 2.6
 
@@ -62739,7 +63133,7 @@ the cell containing the largest widget.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A pointer to the the newly created table widget.
+<return> A pointer to the newly created table widget.
 
 </return>
 </function>
@@ -69224,6 +69618,38 @@ The indentation may be negative.
 </return>
 </function>
 
+<function name="gtk_text_view_get_input_hints">
+<description>
+Gets the value of the #GtkTextView:input-hints property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_view_get_input_purpose">
+<description>
+Gets the value of the #GtkTextView:input-purpose property.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_view_get_iter_at_location">
 <description>
 Retrieves the iterator at buffer coordinates @x and @y. Buffer
@@ -70061,6 +70487,49 @@ Tags in the buffer may override the default.
 </parameter>
 <parameter name="indent">
 <parameter_description> indentation in pixels
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_view_set_input_hints">
+<description>
+Sets the #GtkTextView:input-hints property, which
+allows input methods to fine-tune their behaviour.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="hints">
+<parameter_description> the hints
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_view_set_input_purpose">
+<description>
+Sets the #GtkTextView:input-purpose property which
+can be used by on-screen keyboards and other input
+methods to adjust their behaviour.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="purpose">
+<parameter_description> the purpose
 </parameter_description>
 </parameter>
 </parameters>
@@ -71116,7 +71585,8 @@ mnemonic character
 <description>
 Sets the status of the toggle button. Set to %TRUE if you want the
 GtkToggleButton to be 'pressed in', and %FALSE to raise it.
-This action causes the toggled signal to be emitted.
+This action causes the #GtkToggleButton::toggled signal and the
+#GtkButton::clicked signal to be emitted.
 
 </description>
 <parameters>
@@ -76340,10 +76810,10 @@ Removes all rows from @tree_store
 <description>
 Creates a new row at @position.  If parent is non-%NULL, then the row will be
 made a child of @parent.  Otherwise, the row will be created at the toplevel.
-If @position is larger than the number of rows at that level, then the new
-row will be inserted to the end of the list.  @iter will be changed to point
-to this new row.  The row will be empty after this function is called.  To
-fill in values, you need to call gtk_tree_store_set() or
+If @position is -1 or is larger than the number of rows at that level, then
+the new row will be inserted to the end of the list.  @iter will be changed
+to point to this new row.  The row will be empty after this function is
+called.  To fill in values, you need to call gtk_tree_store_set() or
 gtk_tree_store_set_value().
 
 
@@ -76362,7 +76832,7 @@ gtk_tree_store_set_value().
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 for last
 </parameter_description>
 </parameter>
 </parameters>
@@ -76511,7 +76981,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> position to insert the new row
+<parameter_description> position to insert the new row, or -1 for last
 </parameter_description>
 </parameter>
 <parameter name="columns">
@@ -82077,7 +82547,7 @@ it will inherit an #AtkObject implementation from the first ancestor
 class for which such an implementation is defined.
 
 The documentation of the
-&lt;ulink url=&quot;http://library.gnome.org/devel/atk/stable/&quot;&gt;ATK&lt;/ulink&gt;
+&lt;ulink url=&quot;http://developer.gnome.org/atk/stable/&quot;&gt;ATK&lt;/ulink&gt;
 library contains more information about accessible objects and their uses.
 
 
@@ -83850,6 +84320,33 @@ Since: 3.0
 <return></return>
 </function>
 
+<function name="gtk_widget_insert_action_group">
+<description>
+Inserts @group into @widget. Children of @widget that implement
+#GtkActionable can then be associated with actions in @group by
+setting their 'action-name' to
+@prefix.&lt;replaceable&gt;action-name&lt;/replaceable&gt;.
+
+Since: 3.6
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the prefix for actions in @group
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description> a #GActionGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_intersect">
 <description>
 Computes the intersection of a @widget's area and @area, storing
@@ -85592,21 +86089,6 @@ This function works like gtk_widget_queue_resize(),
 except that the widget is not invalidated.
 
 Since: 2.4
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_queue_shallow_draw">
-<description>
-Like gtk_widget_queue_draw(), but only windows owned
-by @widget are invalidated.
 
 </description>
 <parameters>
