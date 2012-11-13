@@ -30,8 +30,10 @@ class Scrollbar;
  *
  * This container accepts a single child widget. It adds scrollbars to the child widget and optionally draws a beveled frame around the child widget.
  * The scrolled window can work in two ways:
- * 1) Some widgets have native scrolling support; these widgets handle certain Gtk::Adjustment signals. Widgets with native scroll support include Gtk::TreeView, Gtk::TextView, and Gtk::Layout.
- * 2) For widgets that lack native scrolling support, such as Gtk::Table, Gtk::Box, and so on, the widget will be placed inside a Gtk::Viewport.
+ * <OL>
+ * <LI>Some widgets have native scrolling support; these widgets handle certain Gtk::Adjustment signals. Widgets with native scroll support include Gtk::TreeView, Gtk::TextView, and Gtk::Layout.</LI>
+ * <LI>For widgets that lack native scrolling support, such as Gtk::Table, Gtk::Box, and so on, the widget will be placed inside a Gtk::Viewport.</LI>
+ * </OL>
  *
  * The position of the scrollbars is controlled by the scroll adjustments. See Gtk::Adjustment for the fields in an adjustment - for Gtk::Scrollbar, used by Gtk::ScrolledWindow,
  * the "value" field represents the position of the scrollbar, which must be between the "lower" field and "upper - page_size."
@@ -73,6 +75,29 @@ public:
   ///Puts the child inside a Gtk::Viewport if it doesn't have native scrolling capability.
   virtual void add(Gtk::Widget& widget);
   _IGNORE(gtk_scrolled_window_add_with_viewport)
+
+  //TODO: When we can break ABI/API, make Bin::remove() virtual and delete remove_with_viewport().
+  //      Add a ScrolledWindow::remove() override, and let it do approximately
+  //      what remove_with_viewport() does. https://bugzilla.gnome.org/show_bug.cgi?id=685739#c2
+  /** Remove the contained object, possibly also a Gtk::Viewport.
+   * Since this can only hold one object it is not necessary to specify which
+   * object to remove, like containers that don't derive from Gtk::Bin.
+   *
+   * This method is useful if you have added a widget without native scrolling
+   * capability, and ScrolledWindow::add() has created a Gtk::Viewport.
+   *
+   * If the child of the ScrolledWindow is a Gtk::Viewport, remove_with_viewport()
+   * removes the Viewport's child from the Viewport, and removes the Viewport from the
+   * ScrolledWindow. The Viewport is destroyed in two cases.
+   * <OL>
+   * <LI>If it was created by ScrolledWindow::add().</LI>
+   * <LI>If it was created as a managed widget
+   *     (<code>Gtk::Viewport* vp = Gtk::manage(new Gtk::Viewport(hadj, vadj));</code>).</LI>
+   * </OL>
+   *
+   * @newin{3,8}
+   */
+  void remove_with_viewport();
 
 #m4 _CONVERSION(`GtkWidget*',`Scrollbar*',`Glib::wrap((GtkScrollbar*)$3)')
 #m4 _CONVERSION(`GtkWidget*',`const Scrollbar*',`Glib::wrap((GtkScrollbar*)$3)')
