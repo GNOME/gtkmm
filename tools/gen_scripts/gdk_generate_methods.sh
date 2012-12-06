@@ -9,9 +9,10 @@ if [ -z "$JHBUILD_SOURCES" ]; then
   exit 1;
 fi
 
-PREFIX="$JHBUILD_SOURCES/gtk+"
+PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
 H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
-$H2DEF_PY "$PREFIX"/gdk/*.h > "$OUT_DIR"/gdk_methods.defs
+$H2DEF_PY "$PREFIX"/gtk+/gdk/*.h > "$OUT_DIR"/gdk_methods.defs
+$H2DEF_PY "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk*.h > "$OUT_DIR"/gdk_pixbuf_methods.defs

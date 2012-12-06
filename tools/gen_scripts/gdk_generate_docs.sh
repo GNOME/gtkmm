@@ -13,7 +13,7 @@ PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
-for dir in "$PREFIX"/gtk+/gdk; do
+for dir in "$PREFIX"/gtk+/gdk "$PREFIX"/gdk-pixbuf/gdk-pixbuf; do
   PARAMS="$PARAMS -s $dir"
 done
 

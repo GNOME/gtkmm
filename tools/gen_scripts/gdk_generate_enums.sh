@@ -9,9 +9,10 @@ if [ -z "$JHBUILD_SOURCES" ]; then
   exit 1;
 fi
 
-PREFIX="$JHBUILD_SOURCES/gtk+"
+PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
 ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
-$ENUM_PL "$PREFIX"/gdk/*.h > "$OUT_DIR"/gdk_enums.defs
+$ENUM_PL "$PREFIX"/gtk+/gdk/*.h > "$OUT_DIR"/gdk_enums.defs
+$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk*.h > "$OUT_DIR"/gdk_pixbuf_enums.defs
