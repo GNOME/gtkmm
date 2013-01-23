@@ -38,7 +38,7 @@
  *
  * @section features Features
  *
- * - GTK+’s mature, capable set of @ref widgets Widgets. See
+ * - GTK+’s mature, capable set of @ref Widgets widgets. See
  *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
  * - Use inheritance to derive custom widgets.
  * - Type-safe signal handlers (slots), in standard C++, using
