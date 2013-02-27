@@ -54,7 +54,8 @@ void Window::set_manage()
 void Window::destroy_()
 {
   //Called from destructors.
-  //overridden so that the correct _destroy_c_instance() ends up being called by the destructor.
+  //overridden so that the correct _release_c_instance() ends up being called by the destructor.
+  //destroy_() is virtual, but _release_c_instance() is not.
 
   //GTKMM_LIFECYCLE
 
@@ -64,10 +65,8 @@ void Window::destroy_()
    g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
 
-  if ( !cpp_destruction_in_progress_ ) //see comment below.
+  if ( !cpp_destruction_in_progress_ )
   {
-    //Prevent destroy_notify_() from running as a possible side-effect of object destruction.
-    //We can't predict whether destroy_notify_() will really be run, so we'll disconnect the C++ instance here.
     cpp_destruction_in_progress_ = true;
 
     //destroy the C instance:
@@ -82,7 +81,7 @@ void Window::_release_c_instance()
   //We override this, (though it's not virtual - we just call it from this class),
   //because top-level windows can only be destroyed with gtk_widget_destroy, according to Owen Taylor. murrayc.
   #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Gtk::Window::_destroy_c_instance() gobject_=%p\n", (void*) gobject_);
+  g_warning("Gtk::Window::_release_c_instance() gobject_=%p\n", (void*) gobject_);
   #endif
 
   cpp_destruction_in_progress_ = true;
@@ -91,10 +90,6 @@ void Window::_release_c_instance()
   GtkWidget* object = GTK_WIDGET(gobj());
   if (object)
   {
-    disconnect_cpp_wrapper();
-    //If we are killing the C++ instance before the C instance, then this might lead to strange behaviour.
-    //If this is a problem, then you'll have to use a managed() object, which will die only upon GTK+'s request.
-
     //We can't do anything with the gobject_ if it's already been disposed.
     //This prevents us from unref-ing it again, or destroying it again after GTK+ has told us that it has been disposed.
     if (!gobject_disposed_)
@@ -103,7 +98,11 @@ void Window::_release_c_instance()
       gtk_widget_destroy(object);
     }
 
-    //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
+    //If the GObject still exists, disconnect the C++ wrapper from it.
+    //The C++ wrapper is being deleted right now.
+    disconnect_cpp_wrapper();
+
+    //Glib::Object::~Object() will not g_object_unref() it too, because gobject_ is now 0.
   }
 }
 

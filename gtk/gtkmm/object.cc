@@ -97,16 +97,6 @@ void Object::_release_c_instance()
   {
     g_assert(G_IS_OBJECT(object));
 
-    disconnect_cpp_wrapper();
-    //Unfortunately this means that our dispose callback will not be called, because the qdata has been removed.
-    //So we'll connect the callback again, just so that gobject_disposed_ gets set for use later in this same method.
-    //See below:
-
-
-    //This probably isn't a problem now:
-    //If we are killing the C++ instance before the C instance, then this might lead to strange behaviour.
-    //If this is a problem, then you'll have to use a managed() object, which will die only upon GTK+'s request.
-
     //We can't do anything with the gobject_ if it's already been disposed.
     //This prevents us from unref-ing it again, or destroying it again after GTK+ has told us that it has been disposed.
     if (!gobject_disposed_)
@@ -118,21 +108,14 @@ void Object::_release_c_instance()
         g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
         #endif
 
-        //TODO: The "destroy" signal had been removed. Use a GWeakRef instead?
-        //Because we called disconnect_cpp_wrapper() our dispose callback will not be called, because the qdata has been removed.
-        //So we'll connect a callback again, just so that gobject_disposed_ gets set for use later in this same method.
-        g_object_weak_ref (object, &Object::callback_weak_notify_, this);
-
         GLIBMM_DEBUG_UNREFERENCE(this, object);
         g_object_unref(object);
 
-        if(!gobject_disposed_) //or if(g_signal_handler_is_connected(object, connection_id_destroy))
-          g_object_weak_unref(object, &Object::callback_weak_notify_, this);
+        //destroy_notify_() should have been called after the final g_object_unref()
+        //or g_object_run_dispose(), so gobject_disposed_ could now be true.
 
-        //destroy_notify() should have been called after the final g_object_unref() or g_object_run_dispose(), so gobject_disposed_ could now be true.
-
-        // Note that this is not an issue for GtkWidgets,
-        // because we use gtk_widget_destroy in Gtk::Widget::_release_c_instance() instead.
+        // Note that this is not an issue for GtkWindows,
+        // because we use gtk_widget_destroy in Gtk::Window::_release_c_instance() instead.
         //
         //If the C instance still isn't dead then insist, by calling g_object_run_dispose().
         //This is necessary because even a manage()d widget is refed when added to a container.
@@ -164,6 +147,10 @@ void Object::_release_c_instance()
       }
     }
 
+    //If the GObject still exists, disconnect the C++ wrapper from it.
+    //The C++ wrapper is being deleted right now.
+    disconnect_cpp_wrapper();
+
     //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
   }
 }
@@ -174,7 +161,7 @@ Object::~Object()
   g_warning("Gtk::Object::~Object() gobject_=%p\n", (void*)gobject_);
   #endif
 
-  //This has probably been called already from Gtk::Object::_destroy(), which is called from derived destructors.
+  //This has probably been called already from Gtk::Object::destroy_(), which is called from derived destructors.
   _release_c_instance();
 }
 
@@ -215,11 +202,18 @@ void Object::destroy_notify_()
     g_warning("  gtypename=%s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
 
+  //TODO: Remove gobject_disposed_ when we can break ABI.
+  //      "if (gobject_disposed_)" can be replaced by "if (gobj())" or "if (gobject_)".
   //Remember that it's been disposed (which only happens once):
   //This also stops us from destroying it again in the destructor when it calls destroy_().
   gobject_disposed_ = true;
 
-  if(!cpp_destruction_in_progress_) //This function might have been called as a side-effect of destroy() when it called g_object_run_dispose().
+  //Actually this function is called when the GObject is finalized, not when it's
+  //disposed. Clear the pointer to the GObject, because otherwise it would
+  //become a dangling pointer, pointing to a non-existant object.
+  gobject_ = 0;
+
+  if(!cpp_destruction_in_progress_) //This function might have been called as a side-effect of destroy_() when it called g_object_run_dispose().
   {
     if (!referenced_) //If it's manage()ed.
     {
@@ -233,7 +227,6 @@ void Object::destroy_notify_()
       #ifdef GLIBMM_DEBUG_REFCOUNTING
       g_warning("Gtk::Object::destroy_notify_: setting gobject_ to 0\n");
       #endif
-      gobject_ = 0;
     }
   }
 
@@ -250,10 +243,8 @@ void Object::destroy_()
    g_warning("  gtypename: %s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
 
-  if ( !cpp_destruction_in_progress_ ) //see comment below.
+  if ( !cpp_destruction_in_progress_ )
   {
-    //Prevent destroy_notify_() from running as a possible side-effect of g_object_run_dispose.
-    //We can't predict whether destroy_notify_() will really be run, so we'll disconnect the C++ instance here.
     cpp_destruction_in_progress_ = true;
 
     //destroy the C instance:
@@ -298,6 +289,7 @@ void Object::set_manage()
   referenced_ = false;
 }
 
+//TODO: This protected function is not used any more. Can it be removed without breaking ABI/API?
 void Object::callback_weak_notify_(void* data, GObject* /* gobject */) //static
 {
   //This is only used for a short time, then disconnected.
