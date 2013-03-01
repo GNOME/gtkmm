@@ -23,11 +23,16 @@ include $(srcdir)/m4/filelist.am
 gmmproc_m4_includedir = $(libdir)/$(GTKMM_MODULE_NAME)/proc/m4
 dist_gmmproc_m4_include_DATA = $(addprefix m4/,$(files_codegen_m4))
 
-noinst_PROGRAMS = extra_defs_gen/generate_extra_defs
+noinst_PROGRAMS = extra_defs_gen/generate_defs_gdk \
+                  extra_defs_gen/generate_defs_gtk
 
-extra_defs_gen_generate_extra_defs_SOURCES = extra_defs_gen/generate_defs_gtk.cc
-extra_defs_gen_generate_extra_defs_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.4
-extra_defs_gen_generate_extra_defs_LDFLAGS = -no-undefined -avoid-version
+extra_defs_gen_generate_defs_gdk_SOURCES = extra_defs_gen/generate_defs_gdk.cc
+extra_defs_gen_generate_defs_gdk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.4
+extra_defs_gen_generate_defs_gdk_LDFLAGS = -no-undefined -avoid-version
+
+extra_defs_gen_generate_defs_gtk_SOURCES = extra_defs_gen/generate_defs_gtk.cc
+extra_defs_gen_generate_defs_gtk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.4
+extra_defs_gen_generate_defs_gtk_LDFLAGS = -no-undefined -avoid-version
 
 AM_CPPFLAGS = -I$(top_builddir) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)

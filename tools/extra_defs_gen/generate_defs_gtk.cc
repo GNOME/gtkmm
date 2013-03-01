@@ -22,10 +22,12 @@
 // We always need to generate the .defs for all types because the code
 // using deprecated API is generated unconditionally and only disabled
 // at compile time.
+#undef GDK_PIXBUF_DISABLE_DEPRECATED
 #undef GDK_DISABLE_DEPRECATED
 #undef GTK_DISABLE_DEPRECATED
 
 #include <glibmm_generate_extra_defs/generate_extra_defs.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
@@ -41,21 +43,7 @@ int main(int argc, char** argv)
 {
   gtk_init(&argc, &argv);
 
-  std::cout << get_defs( GDK_TYPE_APP_LAUNCH_CONTEXT )
-            << get_defs( GDK_TYPE_DRAG_CONTEXT )
-            << get_defs( GDK_TYPE_DISPLAY )
-#if !defined(G_OS_WIN32)
-            << get_defs( GDK_TYPE_DISPLAY_MANAGER )
-#endif /* G_OS_WIN32 */
-            << get_defs( GDK_TYPE_PIXBUF )
-            << get_defs( GDK_TYPE_PIXBUF_ANIMATION )
-            << get_defs( GDK_TYPE_PIXBUF_LOADER )
-            << get_defs( GDK_TYPE_RGBA )
-            << get_defs( GDK_TYPE_SCREEN )
-            << get_defs( GDK_TYPE_VISUAL )
-            << get_defs( GDK_TYPE_WINDOW )
-
-            << get_defs( GTK_TYPE_ABOUT_DIALOG )
+  std::cout << get_defs( GTK_TYPE_ABOUT_DIALOG )
             << get_defs( GTK_TYPE_ACCEL_GROUP )
             << get_defs( GTK_TYPE_ACCEL_LABEL )
             << get_defs( GTK_TYPE_ACTION )
@@ -228,8 +216,7 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_VIEWPORT )
             << get_defs( GTK_TYPE_VOLUME_BUTTON )
             << get_defs( GTK_TYPE_WIDGET )
-            << get_defs( GTK_TYPE_WINDOW );
-
-
+            << get_defs( GTK_TYPE_WINDOW )
+            ;
   return 0;
 }
