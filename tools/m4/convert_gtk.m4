@@ -675,6 +675,8 @@ _CONVERSION(`Align',`float',`_gtkmm_align_float_from_enum($3)')
 #_CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`($3).data())')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
 
+_CONVERSION(`const Glib::RefPtr<Gio::AsyncResult>&',`GAsyncResult*',__CONVERT_REFPTR_TO_P)
+
 _CONVERSION(`const Glib::RefPtr<const Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))
 _CONVERSION(`GIcon*',`Glib::RefPtr<Gio::Icon>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gio::Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Icon))

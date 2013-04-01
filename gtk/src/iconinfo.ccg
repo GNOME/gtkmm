@@ -19,6 +19,7 @@
 
 #include <gtk/gtk.h>
 #include <gtkmm/icontheme.h>
+//TODO: Install and use this? #include <giomm/slot_async.h>
 
 namespace {
 
@@ -28,6 +29,25 @@ static GtkIconInfo* gtk_icon_info_ref(GtkIconInfo* icon_info)
 {
   g_object_ref (G_OBJECT(icon_info));
   return icon_info;
+}
+
+//TODO: Install and use giomm's slot_async.h if we use this more often:
+static void
+SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
+{
+  Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(data);
+
+  try
+  {
+    Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+    (*the_slot)(result);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete the_slot;
 }
 
 }
@@ -97,5 +117,96 @@ Glib::RefPtr<Gdk::Pixbuf> IconInfo::load_symbolic(const Glib::RefPtr<Style>& sty
   return retvalue;
 }
 */
+
+void IconInfo::load_icon_async(const Gio::SlotAsyncReady& slot, const Glib::RefPtr<Gio::Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_icon_async(gobj(),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void IconInfo::load_icon_async(const Gio::SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_icon_async(gobj(),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+
+void IconInfo::load_symbolic_async(const Gdk::RGBA& fg, const Gdk::RGBA& success_color, const Gdk::RGBA& warning_color, const Gdk::RGBA& error_color, const Gio::SlotAsyncReady& slot, const Glib::RefPtr<Gio::Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_symbolic_async(gobj(),
+    fg.gobj(),
+    success_color.gobj(),
+    warning_color.gobj(),
+    error_color.gobj(),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void IconInfo::load_symbolic_async(const Gdk::RGBA& fg, const Gdk::RGBA& success_color, const Gdk::RGBA& warning_color, const Gdk::RGBA& error_color, const Gio::SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_symbolic_async(gobj(),
+    fg.gobj(),
+    success_color.gobj(),
+    warning_color.gobj(),
+    error_color.gobj(),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+
+void IconInfo::load_symbolic_for_context_async(const Glib::RefPtr<StyleContext>& context, const Gio::SlotAsyncReady& slot, const Glib::RefPtr<Gio::Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_symbolic_for_context_async(gobj(),
+    Glib::unwrap(context),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void IconInfo::load_symbolic_for_context_async(const Glib::RefPtr<StyleContext>& context, const Gio::SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  Gio::SlotAsyncReady* slot_copy = new Gio::SlotAsyncReady(slot);
+
+  gtk_icon_info_load_symbolic_for_context_async(gobj(),
+    Glib::unwrap(context),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
 
 } // namespace Gtk
