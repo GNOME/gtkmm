@@ -18,6 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/listhandle.h>
 #include <gdkmm/rgb.h>
 #include <gdk/gdk.h>
 

@@ -18,6 +18,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/value.h>
+#include <glibmm/arrayhandle.h>
+#include <glibmm/listhandle.h>
 #include <gtkmm/accelmap.h>
 #include <gtk/gtk.h>
 

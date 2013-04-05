@@ -19,6 +19,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/listhandle.h>
 #include <gtkmm/selectiondata_private.h>
 
 namespace Gtk
