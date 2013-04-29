@@ -31,6 +31,31 @@
 namespace //anonymous
 {
 
+// This signal callback is custom implemented, so that we can refrain from calling
+// the signal handler if the C++ wrapper is being deleted.
+// https://bugzilla.gnome.org/show_bug.cgi?id=605728#c5
+void Widget_signal_hide_callback(GObject* self, void* data)
+{
+  const Glib::ObjectBase* const obj = Glib::ObjectBase::_get_current_wrapper(self);
+
+  // Do not try to call a signal on a disassociated wrapper.
+  // This function might be invoked recursively if the signal_hide() handler
+  // deletes the object.
+  // Therefore we have to test for cpp_destruction_in_progress_ at this point.
+  if(obj && !obj->_cpp_destruction_is_in_progress())
+  {
+    try
+    {
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+        (*static_cast<sigc::slot<void>*>(slot))();
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+}
+
 //These signal callbacks are custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
 static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext* p0,GtkSelectionData* p1,guint p2,guint p3,void* data)
@@ -84,6 +109,54 @@ static void Widget_signal_selection_get_callback(GtkWidget* self, GtkSelectionDa
 
 namespace Gtk
 {
+
+// This default handler callback is custom implemented, so that we can refrain
+// from calling an on_hide() override, if the C++ wrapper is being deleted.
+void Widget_Class::hide_callback(GtkWidget* self)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  // This function might be invoked recursively if an on_hide() override
+  // deletes the object.
+  // Therefore we test for cpp_destruction_in_progress_ at this point.
+  // (Not sure if it's necessary, but it feels safer. Perhaps the following
+  // dynamic_cast catches all dangerous cases. /Kjell Ahlstedt)
+  if(obj_base && obj_base->is_derived_() && !obj_base->_cpp_destruction_is_in_progress())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        obj->on_hide();
+        return;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+    );
+
+  // Call the original underlying C function:
+  if(base && base->hide)
+    (*base->hide)(self);
+}
 
 //These default handler callbacks are custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
