@@ -1,24 +1,23 @@
 /* Change Display
  *
- * Demonstrates migrating a window between different displays and
- * screens. A display is a mouse and keyboard with some number of
- * associated monitors. A screen is a set of monitors grouped
- * into a single physical work area. The neat thing about having
- * multiple displays is that they can be on a completely separate
+ * Demonstrates migrating a window between different displays.
+ * A display is a mouse and keyboard with some number of
+ * associated monitors. The neat thing about having multiple 
+ * displays is that they can be on a completely separate
  * computers, as long as there is a network connection to the
  * computer where the application is running.
  *
  * Only some of the windowing systems where GTK+ runs have the
- * concept of multiple displays and screens. (The X Window System
- * is the main example.) Other windowing systems can only
- * handle one keyboard and mouse, and combine all monitors into
- * a single screen.
+ * concept of multiple displays. (The X Window System is the
+ * main example.) Other windowing systems can only handle one
+ * keyboard and mouse, and combine all monitors into
+ * a single display.
  *
  * This is a moderately complex example, and demonstrates:
  *
- *  - Tracking the currently open displays and screens
+ *  - Tracking the currently open displays
  *
- *  - Changing the screen for a window
+ *  - Changing the display for a window
  *
  *  - Letting the user choose a window by clicking on it
  *
@@ -33,7 +32,7 @@
 class Popup : public Gtk::Window
 {
 public:
-  Popup(const Glib::RefPtr<Gdk::Screen> screen, const Glib::ustring& prompt);
+  Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
   virtual ~Popup();
 
 protected:
@@ -51,7 +50,6 @@ protected:
   virtual void setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox);
 
   virtual void initialize_displays();
-  virtual void fill_screens();
   virtual void query_change_display();
   virtual Gtk::Widget* find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& display);
   virtual Gtk::Window* query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
@@ -61,7 +59,6 @@ protected:
   virtual void on_button_display_close();
 
   virtual void on_treeview_display_selection_changed();
-  virtual void on_treeview_screen_selection_changed();
 
   virtual void on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display);
 
@@ -80,29 +77,18 @@ protected:
   };
   ModelColumns_Display m_columns_display;
 
-  class ModelColumns_Screen : public Gtk::TreeModelColumnRecord
-  {
-  public:
-    Gtk::TreeModelColumn<int> m_number;
-    Gtk::TreeModelColumn< Glib::RefPtr<Gdk::Screen> > m_screen; //hidden
-
-    ModelColumns_Screen() { add(m_number); add(m_screen); }
-  };
-  ModelColumns_Screen m_columns_screen;
-
   Gtk::Box m_VBox;
-  Gtk::Frame m_Frame_Display, m_Frame_Screen;
-  Gtk::TreeView m_TreeView_Display, m_TreeView_Screen;
-  Glib::RefPtr<Gtk::ListStore> m_refListStore_Display,  m_refListStore_Screen;
-  Gtk::Box m_ButtonBox_Display, m_ButtonBox_Screen;
+  Gtk::Frame m_Frame_Display;
+  Gtk::TreeView m_TreeView_Display;
+  Glib::RefPtr<Gtk::ListStore> m_refListStore_Display;
+  Gtk::Box m_ButtonBox_Display;
 
   Gtk::Button m_Button_Display_Open, m_Button_Display_Close;
 
-  Glib::RefPtr<Gtk::SizeGroup> m_refSizeGroup_Display, m_refSizeGroup_Screen;
+  Glib::RefPtr<Gtk::SizeGroup> m_refSizeGroup_Display;
 
 
   Glib::RefPtr<Gdk::Display> m_refCurrentDisplay;
-  Glib::RefPtr<Gdk::Screen> m_refCurrentScreen;
 
   Popup* m_pPopup;
 
@@ -113,11 +99,10 @@ protected:
 
 
 Example_ChangeDisplay::Example_ChangeDisplay()
-: Gtk::Dialog("Change Screen or display"),
+: Gtk::Dialog("Change Display"),
   m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
   m_Frame_Display("Display"),
-  m_Frame_Screen("Screen"),
-  m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5), m_ButtonBox_Screen(Gtk::ORIENTATION_VERTICAL, 5),
+  m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
   m_pPopup(0),
   m_popup_clicked(false)
@@ -152,25 +137,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
     m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
-  }
-
-  //Screen:
-  {
-    setup_frame(m_Frame_Screen, m_TreeView_Screen, m_ButtonBox_Screen);
-
-    //Setup TreeView:
-    m_refListStore_Screen = Gtk::ListStore::create(m_columns_screen);
-    m_TreeView_Screen.set_model(m_refListStore_Screen);
-    m_TreeView_Screen.append_column("Number", m_columns_screen.m_number);
-
-    //Connect signal:
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = m_TreeView_Screen.get_selection();
-    refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_screen_selection_changed) );
-
-    m_VBox.pack_start(m_Frame_Screen);
-
-    m_refSizeGroup_Screen = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
-    m_refSizeGroup_Screen->add_widget(m_ButtonBox_Screen);
   }
 
   initialize_displays();
@@ -298,46 +264,8 @@ void Example_ChangeDisplay::on_treeview_display_selection_changed()
     m_refCurrentDisplay = (*iter)[m_columns_display.m_display];
   else
     m_refCurrentDisplay.reset();
-
-  fill_screens();
 }
 
-void Example_ChangeDisplay::on_treeview_screen_selection_changed()
-{
-  Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView_Screen.get_selection();
-  Gtk::TreeModel::iterator iter = refSelection->get_selected();
-  if(iter)
-    m_refCurrentScreen = (*iter)[m_columns_screen.m_screen];
-  else
-    m_refCurrentScreen.reset();
-}
-
-/* Fills in the screen list based on the current display
- */
-void Example_ChangeDisplay::fill_screens()
-{
-  m_refListStore_Screen->clear();
-
-  if(m_refCurrentScreen)
-  {
-    int n_screens = m_refCurrentDisplay->get_n_screens();
-
-    for (int i = 0; i < n_screens; i++)
-    {
-      Glib::RefPtr<Gdk::Screen> refScreen = m_refCurrentDisplay->get_screen(i);
-
-      Gtk::TreeModel::Row row = *(m_refListStore_Screen->append());
-      row[m_columns_screen.m_number] = i;
-      row[m_columns_screen.m_screen] = refScreen;
-
-      if (i == 0)
-      {
-        Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView_Screen.get_selection();
-        refSelection->select(row);
-      }
-    }
-  }
-}
 
 /* Prompts the user for a toplevel window to move, and then moves
  * that window to the currently selected display
@@ -350,7 +278,7 @@ void Example_ChangeDisplay::query_change_display()
    "to move to the new screen");
 
   if (pTopLevel)
-    pTopLevel->set_screen(m_refCurrentScreen);
+    pTopLevel->set_screen( m_refCurrentDisplay->get_screen() );
   else
     refScreen->get_display()->beep();
 }
@@ -447,7 +375,7 @@ bool Example_ChangeDisplay::on_popup_button_release_event(GdkEventButton* /* eve
   return true;
 }
 
-Popup::Popup(const Glib::RefPtr<Gdk::Screen> screen, const Glib::ustring& prompt)
+Popup::Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
 : Gtk::Window(Gtk::WINDOW_POPUP),
   m_Label(prompt)
 {
