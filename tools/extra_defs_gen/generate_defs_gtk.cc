@@ -25,7 +25,6 @@
 #undef GDK_PIXBUF_DISABLE_DEPRECATED
 #undef GDK_DISABLE_DEPRECATED
 #undef GTK_DISABLE_DEPRECATED
-#define GDK_DISABLE_DEPRECATION_WARNINGS 1
 
 #include <glibmm_generate_extra_defs/generate_extra_defs.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
