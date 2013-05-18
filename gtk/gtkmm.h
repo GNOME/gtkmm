@@ -95,7 +95,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/accelkey.h>
+#include <gtkmm/accelmap.h>
 #include <gtkmm/accelgroup.h>
+#include <gtkmm/actionable.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/alignment.h>
 #include <gtkmm/appchooserbutton.h>
@@ -152,6 +154,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontbutton.h>
 #include <gtkmm/fontchooser.h>
 #include <gtkmm/fontchooserdialog.h>
+#include <gtkmm/fontchooserwidget.h>
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/grid.h>
@@ -222,6 +225,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/recentinfo.h>
 #include <gtkmm/recentmanager.h>
 #include <gtkmm/scale.h>
+#include <gtkmm/scalebutton.h>
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/searchentry.h>
@@ -268,6 +272,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/uimanager.h>
 #include <gtkmm/viewport.h>
+#include <gtkmm/volumebutton.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
