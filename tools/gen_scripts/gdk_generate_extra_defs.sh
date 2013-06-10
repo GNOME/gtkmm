@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The script assumes that it resides in the tools/gen_scripts directory
-# and the defs files will be placed in gdk/src.
+# and the defs file will be placed in gdk/src.
 
 ROOT_DIR="$(dirname "$0")/../.."
 GEN_DIR="$ROOT_DIR/tools/extra_defs_gen"

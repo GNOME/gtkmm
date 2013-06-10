@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Note that 
-# JHBUILD_SOURCES should be defined to contain the path to the root of the
-# jhbuild sources. The XML files will be placed in gdk/src.
+# Note that JHBUILD_SOURCES should be defined to contain the path to the root
+# of the jhbuild sources. The script assumes that it resides in the
+# tools/gen_scripts/ directory and the XML file will be placed in gdk/src.
 
 if [ -z "$JHBUILD_SOURCES" ]; then
   echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
