@@ -25,6 +25,14 @@
 namespace Gtk
 {
 
+// This is needed in wrap_init.cc, but to get it there in a better way than
+// putting it here requires a change in generate_wrap_init.pl.
+// It's required because some gtk_*_get_type() functions are deprecated, but
+// their .h files have not been moved to the gtk+/gtk/deprecated directory.
+#ifndef GTKMM_DISABLE_DEPRECATED
+#define GDK_DISABLE_DEPRECATION_WARNINGS 1
+#endif
+
 void wrap_init();
 
 } /* namespace Gtk */
