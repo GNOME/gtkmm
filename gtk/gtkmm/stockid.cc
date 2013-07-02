@@ -1,4 +1,7 @@
 // -*- c++ -*-
+
+#ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
+
 /* $Id$ */
 
 /* stockid.cc
@@ -82,3 +85,5 @@ const char* StockID::get_c_str() const
 }
 
 } // namespace Gtk
+
+#endif // GTKMM_DISABLE_DEPRECATED

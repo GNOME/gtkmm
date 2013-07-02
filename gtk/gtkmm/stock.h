@@ -2,6 +2,8 @@
 #ifndef _GTKMM_STOCK_H
 #define _GTKMM_STOCK_H
 
+#ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
+
 /* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
@@ -44,6 +46,7 @@ namespace Gtk
 // const BuiltinStockID DIALOG_INFO = { GTK_STOCK_DIALOG_INFO }
 
 /** See the list of pre-defined stock items, in the Stock namespace.
+ * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
  */
 struct BuiltinStockID
 {
@@ -182,9 +185,9 @@ extern GTKMM_API const Gtk::BuiltinStockID ZOOM_IN;          /*!< @image html gt
 extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html gtk-zoom-out.png            */
 
 /** Add a stock item to the list of registered stock items.
- * @param item StockItem to register.
- * 
- * If an item already exists with the same stock ID the old item gets replaced. 
+ * @param item StockItem to register. If an item already exists with the same
+ *             stock ID the old item gets replaced. 
+ * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
  */
 void add(const Gtk::StockItem& item);
 
@@ -193,6 +196,7 @@ void add(const Gtk::StockItem& item);
   * @param item item to fill in case stockid was found.
   *
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
+  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
 bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
 
@@ -201,6 +205,7 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
   * @param iconset to fill.
   *
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
+  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
 bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
 
@@ -210,12 +215,14 @@ bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
   * @param image: Image to fill.
   *
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise
+  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */  
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image);
 
 /** Retrieves a list of all known stock IDs added to an IconFactory or registered with Stock::add().
   *
   * @return list of all known stock IDs.
+  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
 std::vector<Gtk::StockID> get_ids();
 
@@ -223,6 +230,7 @@ std::vector<Gtk::StockID> get_ids();
 
 } // namespace Gtk
 
+#endif // GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_STOCK_H */
 

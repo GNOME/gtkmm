@@ -1,4 +1,9 @@
 // -*- c++ -*-
+#undef GTK_DISABLE_DEPRECATED
+#define GDK_DISABLE_DEPRECATION_WARNINGS 1
+
+#ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
+
 /* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
@@ -173,3 +178,4 @@ std::vector<Gtk::StockID> get_ids()
 
 } // namespace Gtk
 
+#endif // GTKMM_DISABLE_DEPRECATED
