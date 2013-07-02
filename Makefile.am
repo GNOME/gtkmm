@@ -58,3 +58,6 @@ dist_noinst_DATA = $(text_files) $(msvc_files) $(winstall_files)
 dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files)) win32_installer/lgpl.txt
+
+# Optional: auto-generate the ChangeLog file from the git log on make dist
+include $(top_srcdir)/build/dist-changelog.am
