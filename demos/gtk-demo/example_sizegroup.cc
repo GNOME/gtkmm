@@ -56,7 +56,7 @@ Example_SizeGroup::Example_SizeGroup()
   m_CheckButton("_Enable grouping", true)
 {
   set_resizable(false);
-  add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+  add_button("_Close", Gtk::RESPONSE_CLOSE);
 
   get_content_area()->pack_start(m_VBox);
   m_VBox.set_border_width(5);

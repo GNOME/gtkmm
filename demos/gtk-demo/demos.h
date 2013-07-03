@@ -64,10 +64,10 @@ Demo testgtk_demos[] =
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
   { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
-  { "Stock Item and Icon Browser", "example_stockbrowser.cc", sigc::ptr_fun(&do_stock_browser), 0 },
+//  { "Stock Item and Icon Browser", "example_stockbrowser.cc", sigc::ptr_fun(&do_stock_browser), 0 },
   { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), 0 },
   { "Tree View", "", type_slotDo(), child0 },
-  { "UI Manager", "example_uimanager.cc", sigc::ptr_fun(&do_ui_manager), 0},
+//  { "UI Manager", "example_uimanager.cc", sigc::ptr_fun(&do_ui_manager), 0},
   { 0, 0, type_slotDo(), 0 }
 };
 

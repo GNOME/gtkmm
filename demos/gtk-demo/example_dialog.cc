@@ -135,9 +135,10 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
 : Gtk::Dialog("Interactive Dialog", parent, true),
   m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
-  m_Image(Gtk::Stock::DIALOG_QUESTION, Gtk::ICON_SIZE_DIALOG)
+  m_Image()
 {
-  add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+  m_Image.set_from_icon_name("dialog-question", Gtk::ICON_SIZE_DIALOG);
+  add_button("_OK", Gtk::RESPONSE_OK);
   add_button("_Non-stock Button", Gtk::RESPONSE_CANCEL);
 
   m_HBox.set_border_width(8);

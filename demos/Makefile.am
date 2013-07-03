@@ -39,15 +39,16 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/example_panes.cc			\
 	gtk-demo/example_pixbufs.cc			\
 	gtk-demo/example_sizegroup.cc			\
-	gtk-demo/example_stockbrowser.cc		\
 	gtk-demo/example_textview.cc			\
 	gtk-demo/example_treeview_editable_cells.cc	\
 	gtk-demo/example_treeview_liststore.cc		\
 	gtk-demo/example_treeview_treestore.cc		\
-	gtk-demo/example_uimanager.cc			\
 	gtk-demo/main.cc				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
+
+## gtk-demo/example_stockbrowser.cc		\
+## gtk-demo/example_uimanager.cc			\
 
 dist_noinst_DATA =			\
 	gtk-demo/alphatest.png		\

@@ -62,9 +62,12 @@ Gtk::Window* do_iconview()
 
 Example_IconView::Example_IconView()
 : m_VBox(Gtk::ORIENTATION_VERTICAL),
-  m_ButtonUp(Gtk::Stock::GO_UP),
-  m_ButtonHome(Gtk::Stock::HOME)
+  m_ButtonUp(),
+  m_ButtonHome()
 {
+  m_ButtonUp.set_icon_name("go-up");
+  m_ButtonHome.set_icon_name("go-home");
+
   set_title("Icon View");
   set_default_size(650, 400);
   

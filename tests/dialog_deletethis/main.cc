@@ -13,7 +13,7 @@ class Dlg : public sigc::trackable
       Gtk::Button *btn = manage(new Gtk::Button("ClickMe"));
       btn->signal_clicked().connect(sigc::mem_fun(*this, &Dlg::on_button_clicked));
       dlg_->get_content_area()->pack_start(*btn);
-      dlg_->add_button(Gtk::Stock::OK, 0);
+      dlg_->add_button("_OK", Gtk::RESPONSE_OK);
       dlg_->signal_response().connect(sigc::mem_fun(*this, &Dlg::on_response));
       dlg_->show_all();
     }
@@ -30,7 +30,7 @@ class Dlg : public sigc::trackable
 
     void on_response(int id)
    {
-      if (id == 0)
+      if (id == Gtk::RESPONSE_OK || id == Gtk::RESPONSE_DELETE_EVENT)
         quit();
     }
 
@@ -49,6 +49,7 @@ int main (int argc, char **argv)
 
   new Dlg(); //Not a Gtk::Dialog - it creates one in its constructor.
 
+  app->hold();
   return app->run();
 }
 

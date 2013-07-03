@@ -107,7 +107,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   m_pPopup(0),
   m_popup_clicked(false)
 {
-  add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+  add_button("_Close", Gtk::RESPONSE_CLOSE);
   add_button("Change", Gtk::RESPONSE_OK);
 
   set_default_size(300, 400);
@@ -213,8 +213,8 @@ void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<
 void Example_ChangeDisplay::on_button_display_open()
 {
   Gtk::Dialog dialog("Open Display", true);
-  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+  dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+  dialog.add_button("_OK", Gtk::RESPONSE_OK);
 
   dialog.set_default_response(Gtk::RESPONSE_OK);
 
