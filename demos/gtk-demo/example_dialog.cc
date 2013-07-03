@@ -23,7 +23,7 @@ protected:
   Gtk::Box m_VBox, m_VBox2;
   Gtk::Box m_HBox, m_HBox2;
   Gtk::Button m_Button_Message, m_Button_Interactive;
-  Gtk::Grid m_Table;
+  Gtk::Grid m_Grid;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
 
@@ -42,7 +42,7 @@ public:
 protected:
   //Member widgets:
   Gtk::Box m_HBox;
-  Gtk::Grid m_Table;
+  Gtk::Grid m_Grid;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
   Gtk::Image m_Image;
@@ -88,16 +88,16 @@ Example_Dialog::Example_Dialog()
   m_VBox2.pack_start(m_Button_Interactive, Gtk::PACK_SHRINK);
 
 
-  m_Table.set_row_spacing(4);
-  m_Table.set_column_spacing(4);
-  m_HBox2.pack_start(m_Table, Gtk::PACK_SHRINK);
+  m_Grid.set_row_spacing(4);
+  m_Grid.set_column_spacing(4);
+  m_HBox2.pack_start(m_Grid, Gtk::PACK_SHRINK);
 
-  m_Table.attach(m_Label1, 0, 1, 0, 1);
-  m_Table.attach(m_Entry1, 1, 2, 0, 1);
+  m_Grid.attach(m_Label1, 0, 0, 1, 1);
+  m_Grid.attach(m_Entry1, 1, 0, 1, 1);
   m_Label1.set_mnemonic_widget(m_Entry1);
 
-  m_Table.attach(m_Label2, 0, 1, 1, 2);
-  m_Table.attach(m_Entry2, 1, 2, 1, 2);
+  m_Grid.attach(m_Label2, 0, 1, 1, 1);
+  m_Grid.attach(m_Entry2, 1, 1, 1, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
 
   show_all();
@@ -145,18 +145,18 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);
 
-  m_Table.set_row_spacing(4);
-  m_Table.set_column_spacing(4);
-  m_HBox.pack_start(m_Table);
+  m_Grid.set_row_spacing(4);
+  m_Grid.set_column_spacing(4);
+  m_HBox.pack_start(m_Grid);
 
-  m_Table.attach(m_Label1, 0, 1, 0, 1);
+  m_Grid.attach(m_Label1, 0, 0, 1, 1);
   m_Entry1.set_text(entry1);
-  m_Table.attach(m_Entry1, 1, 2, 0, 1);
+  m_Grid.attach(m_Entry1, 1, 0, 1, 1);
   m_Label1.set_mnemonic_widget(m_Entry1);
 
-  m_Table.attach(m_Label2, 0, 1, 1, 2);
+  m_Grid.attach(m_Label2, 0, 1, 1, 1);
   m_Entry2.set_text(entry2);
-  m_Table.attach(m_Entry2,  1, 2, 1, 2);
+  m_Grid.attach(m_Entry2, 1, 1, 1, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
 
   show_all();

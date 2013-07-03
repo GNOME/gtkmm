@@ -22,8 +22,8 @@ protected:
   Gtk::Menu m_Menubar;
   Gtk::Toolbar m_Toolbar;
   Gtk::ScrolledWindow m_ScrolledWindow;
-  Gtk::TextView m_TextView;
   Gtk::Statusbar m_Statusbar;
+  Gtk::TextView m_TextView;
 };
 
 
@@ -91,28 +91,23 @@ Example_AppWindow::Example_AppWindow()
     list_bar.push_front(MenuElem("_File", *pMenuFile));
 
     //Add the menu bar to the Grid:
-    m_Grid.attach(m_Menubar,
-                    // X direction             Y direction
-                    0, 1,                      0, 1,
-                    Gtk::FILL|Gtk::EXPAND, Gtk::AttachOptions(0)
-                    );
+    //                       left  top  width  height
+    m_Grid.attach(m_Menubar, 0,    0,   1,     1);
   } //menu
 
 */
   //Toolbar:
   {
     m_Toolbar.set_hexpand();
-    m_Grid.attach(m_Toolbar,
-                   /* X direction */       /* Y direction */
-                   0, 1,                   1, 2);
+    //                       left  top  width  height
+    m_Grid.attach(m_Toolbar, 0,    1,   1,     1);
   }
 
 
   m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_IN);
-  m_Grid.attach(m_ScrolledWindow,
-                 /* X direction */       /* Y direction */
-                 0, 1,                   2, 3);
+  //                              left  top  width  height
+  m_Grid.attach(m_ScrolledWindow, 0,    2,   1,     1);
 
   set_default_size(200, 200);
 
@@ -120,11 +115,9 @@ Example_AppWindow::Example_AppWindow()
 
 
   /* Create statusbar */
-   m_Statusbar.set_hexpand();
-  m_Grid.attach(m_Statusbar,
-                 /* X direction */       /* Y direction */
-                 0, 1,                   3, 4);
-
+  m_Statusbar.set_hexpand();
+  //                         left  top  width  height
+  m_Grid.attach(m_Statusbar, 0,    3,   1,     1);
 
   /* Show text widget info in the statusbar */
   Glib::RefPtr<Gtk::TextBuffer> refTextBuffer = m_TextView.get_buffer();

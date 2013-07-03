@@ -98,16 +98,16 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
 {
   set_border_width(4);
 
-  Gtk::Grid *const pTable = new Gtk::Grid();
-  add(*Gtk::manage(pTable));
+  Gtk::Grid *const pGrid = new Gtk::Grid();
+  add(*Gtk::manage(pGrid));
 
-  pTable->attach(*Gtk::manage(new Gtk::Label(label1)), 0, 1, 0, 1);
-  pTable->attach(*Gtk::manage(new Gtk::Label(label2)), 1, 2, 0, 1);
+  pGrid->attach(*Gtk::manage(new Gtk::Label(label1)), 0, 0, 1, 1);
+  pGrid->attach(*Gtk::manage(new Gtk::Label(label2)), 1, 0, 1, 1);
 
-  pTable->attach(m_CheckButton_resize1, 0, 1, 1, 2);
-  pTable->attach(m_CheckButton_shrink1, 0, 1, 2, 3);
-  pTable->attach(m_CheckButton_resize2, 1, 2, 1, 2);
-  pTable->attach(m_CheckButton_shrink2, 1, 2, 2, 3);
+  pGrid->attach(m_CheckButton_resize1, 0, 1, 1, 1);
+  pGrid->attach(m_CheckButton_shrink1, 0, 2, 1, 1);
+  pGrid->attach(m_CheckButton_resize2, 1, 1, 1, 1);
+  pGrid->attach(m_CheckButton_shrink2, 1, 2, 1, 1);
 
   m_CheckButton_resize1.set_active(false);
   m_CheckButton_shrink1.set_active(true);
