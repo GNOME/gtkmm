@@ -23,21 +23,21 @@ Gtk::Window* do_change_display();
 Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
-Gtk::Window* do_images();
+Gtk::Window* do_icontheme();
 Gtk::Window* do_iconview();
-//Gtk::Window* do_item_factory();
+Gtk::Window* do_images();
 Gtk::Window* do_menus();
 Gtk::Window* do_pixbufs();
 Gtk::Window* do_panes();
 Gtk::Window* do_sizegroup();
-Gtk::Window* do_stock_browser();
+//Gtk::Window* do_stock_browser();
 Gtk::Window* do_textview();
 
 Gtk::Window* do_treeview_editable_cells();
 Gtk::Window* do_treeview_liststore();
 Gtk::Window* do_treeview_treestore();
 
-Gtk::Window* do_ui_manager();
+//Gtk::Window* do_ui_manager();
 
 Demo child0[] = {
   { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), 0 },
@@ -55,11 +55,9 @@ Demo testgtk_demos[] =
   { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), 0 },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
+  { "Icon Theme", "example_icontheme.cc", sigc::ptr_fun(&do_icontheme), 0 },  
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
-/*
-  { "Item Factory", "example_item_factory.cc", sigc::ptr_fun(&do_item_factory), 0 },
-*/
   { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },

@@ -33,6 +33,7 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/example_colorsel.cc			\
 	gtk-demo/example_dialog.cc			\
 	gtk-demo/example_drawingarea.cc			\
+	gtk-demo/example_icontheme.cc			\
 	gtk-demo/example_iconview.cc			\
 	gtk-demo/example_images.cc			\
 	gtk-demo/example_menus.cc			\
@@ -47,6 +48,9 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
 
+## These demos use deprecated API.
+## example_icontheme.cc is approximately a replacement for example_stockbrowser.cc.
+## example_uimanager.cc should be replaced by a Gtk::Builder demo.
 ## gtk-demo/example_stockbrowser.cc		\
 ## gtk-demo/example_uimanager.cc			\
 
