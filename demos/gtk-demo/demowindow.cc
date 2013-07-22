@@ -26,6 +26,7 @@
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/box.h>
 #include <glibmm/convert.h>
+#include <glibmm/fileutils.h>
 #include "demowindow.h"
 #include "textwidget.h"
 #include "demos.h"
@@ -268,8 +269,16 @@ void DemoWindow::load_file(const std::string& filename)
     FILE* file = fopen (filename.c_str(), "r");
     if (!file)
     {
-      std::string installed = demo_find_file(filename);
-      file = fopen (installed.c_str(), "r");
+      try
+      {
+        std::string installed = demo_find_file(filename);
+        file = fopen (installed.c_str(), "r");
+      }
+      catch (const Glib::FileError& ex)
+      {
+        g_warning ("%s\n", ex.what().c_str());
+        return;
+      }
     }
 
     if (!file)

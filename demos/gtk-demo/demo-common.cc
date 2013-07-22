@@ -32,13 +32,12 @@ get_democodedir(void)
 /**
  * demo_find_file:
  * @base: base filename
- * @err:  location to store error, or %NULL.
  * 
  * Looks for @base first in the current directory, then in the
- * location GTK+ where it will be installed on make install,
+ * location where gtkmm will be installed on make install,
  * returns the first file found.
  * 
- * Return value: the filename, if found or %NULL
+ * Return value: the filename, if found, else throws a Glib::FileError.
  **/
 std::string demo_find_file(const std::string& base)
 {
