@@ -160,6 +160,7 @@ _CONV_ENUM(Gtk,ApplicationInhibitFlags)
 _CONV_ENUM(Gtk,InputPurpose)
 _CONV_ENUM(Gtk,InputHints)
 _CONV_ENUM(Gtk,LevelBarMode)
+_CONV_ENUM(Gtk,BaselinePosition)
 
 _CONVERSION(`GtkIconSize',`IconSize',`IconSize(static_cast<int>($3))')
 _CONVERSION(`GtkIconSize',`Gtk::IconSize',`Gtk::IconSize(static_cast<int>($3))')
