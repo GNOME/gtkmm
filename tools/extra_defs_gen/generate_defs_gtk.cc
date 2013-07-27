@@ -187,6 +187,8 @@ int main(int argc, char** argv)
 #endif
             << get_defs( GTK_TYPE_SPINNER )
             << get_defs( GTK_TYPE_SPIN_BUTTON )
+            << get_defs( GTK_TYPE_STACK )
+            << get_defs( GTK_TYPE_STACK_SWITCHER )
             << get_defs( GTK_TYPE_STATUSBAR )
             << get_defs( GTK_TYPE_STATUS_ICON )
             << get_defs( GTK_TYPE_STYLE_CONTEXT )
