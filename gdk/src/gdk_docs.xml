@@ -674,7 +674,7 @@ which DND is done.
 </parameter_description>
 </parameter>
 <parameter name="GDK_DRAG_PROTO_MOTIF">
-<parameter_description> The Motif DND protocol.
+<parameter_description> The Motif DND protocol. No longer supported
 </parameter_description>
 </parameter>
 <parameter name="GDK_DRAG_PROTO_XDND">
@@ -1267,8 +1267,8 @@ Defines how device grabs interact with other devices.
 
 <enum name="GdkGrabStatus">
 <description>
-Returned by gdk_pointer_grab() and gdk_keyboard_grab() to indicate
-success or the reason for the failure of the grab attempt.
+Returned by gdk_device_grab(), gdk_pointer_grab() and gdk_keyboard_grab() to
+indicate success or the reason for the failure of the grab attempt.
 
 </description>
 <parameters>
@@ -2653,6 +2653,11 @@ decorations.
 <parameter_description> the window is presented as focused (with active decorations).
 </parameter_description>
 </parameter>
+<parameter name="GDK_WINDOW_TILED">
+<parameter_description> the window is in a tiled state, see
+gdk_window_get_tiled_edges() for more details. Since 3.10
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -3270,6 +3275,31 @@ Since: 2.24
 <return></return>
 </function>
 
+<function name="gdk_cairo_surface_create_from_pixbuf">
+<description>
+Creates an image surface with the same contents as
+the pixbuf.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> a #GdkPixbuf
+</parameter_description>
+</parameter>
+<parameter name="scale">
+<parameter_description> the scale of the new surface, or 0 to use same as @window
+</parameter_description>
+</parameter>
+<parameter name="for_window">
+<parameter_description> The window this will be drawn to, on %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_color_copy">
 <description>
 Makes a copy of a color structure.
@@ -3452,6 +3482,36 @@ Since: 2.8
 </return>
 </function>
 
+<function name="gdk_cursor_get_surface">
+<description>
+Returns a cairo image surface with the image used to display the cursor.
+
+Note that depending on the capabilities of the windowing system and
+on the cursor, GDK may not be able to obtain the image data. In this
+case, %NULL is returned.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="cursor">
+<parameter_description> a #GdkCursor
+</parameter_description>
+</parameter>
+<parameter name="x_hot">
+<parameter_description> Location to store the hotspot x position, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="y_hot">
+<parameter_description> Location to store the hotspot y position, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #cairo_surface_t representing @cursor, or %NULL
+
+</return>
+</function>
+
 <function name="gdk_cursor_new">
 <description>
 Creates a new cursor from the set of builtin cursors for the default display.
@@ -3613,6 +3673,48 @@ Since: 2.4
 </parameter>
 <parameter name="y">
 <parameter_description> the vertical offset of the 'hotspot' of the cursor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GdkCursor.
+
+</return>
+</function>
+
+<function name="gdk_cursor_new_from_surface">
+<description>
+Creates a new cursor from a cairo image surface.
+
+Not all GDK backends support RGBA cursors. If they are not
+supported, a monochrome approximation will be displayed.
+The functions gdk_display_supports_cursor_alpha() and
+gdk_display_supports_cursor_color() can be used to determine
+whether RGBA cursors are supported;
+gdk_display_get_default_cursor_size() and
+gdk_display_get_maximal_cursor_size() give information about
+cursor sizes.
+
+On the X backend, support for RGBA cursors requires a
+sufficently new version of the X Render extension.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the #GdkDisplay for which the cursor will be created
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> the cairo image surface containing the cursor pixel data
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the horizontal offset of the 'hotspot' of the cursor
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the vertical offset of the 'hotspot' of the cursor
 </parameter_description>
 </parameter>
 </parameters>
@@ -4015,6 +4117,38 @@ the @device is on, or %NULL.
 <return></return>
 </function>
 
+<function name="gdk_device_get_position_double">
+<description>
+Gets the current location of @device in double precision. As a slave device's
+coordinates are those of its master pointer, this function
+may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
+unless there is an ongoing grab on them. See gdk_device_grab().
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> pointer device to query status about.
+</parameter_description>
+</parameter>
+<parameter name="screen">
+<parameter_description> location to store the #GdkScreen
+the @device is on, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> location to store root window X coordinate of @device, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> location to store root window Y coordinate of @device, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_device_get_source">
 <description>
 Determines the type of the device.
@@ -4036,9 +4170,9 @@ Since: 2.20
 <function name="gdk_device_get_state">
 <description>
 Gets the current state of a pointer device relative to @window. As a slave
-device coordinates are those of its master pointer, This
+device's coordinates are those of its master pointer, this
 function may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
-unless there is an ongoing grab on them, see gdk_device_grab().
+unless there is an ongoing grab on them. See gdk_device_grab().
 
 </description>
 <parameters>
@@ -4067,6 +4201,40 @@ or %NULL.
 <description>
 Obtains the window underneath @device, returning the location of the device in @win_x and @win_y. Returns
 %NULL if the window tree under @device is not known to GDK (for example, belongs to another application).
+
+As a slave device coordinates are those of its master pointer, This
+function may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
+unless there is an ongoing grab on them, see gdk_device_grab().
+
+Since: 3.0
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> pointer #GdkDevice to query info to.
+</parameter_description>
+</parameter>
+<parameter name="win_x">
+<parameter_description> return location for the X coordinate of the device location,
+relative to the window origin, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="win_y">
+<parameter_description> return location for the Y coordinate of the device location,
+relative to the window origin, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkWindow under the device position, or %NULL.
+
+</return>
+</function>
+
+<function name="gdk_device_get_window_at_position_double">
+<description>
+Obtains the window underneath @device, returning the location of the device in @win_x and @win_y in
+double precision. Returns %NULL if the window tree under @device is not known to GDK (for example,
+belongs to another application).
 
 As a slave device coordinates are those of its master pointer, This
 function may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
@@ -4249,7 +4417,7 @@ Returns the client pointer, that is, the master pointer that acts as the core po
 for this application. In X11, window managers may change this depending on the interaction
 pattern under the presence of several pointers.
 
-You should use this function sheldomly, only in code that isn't triggered by a #GdkEvent
+You should use this function seldomly, only in code that isn't triggered by a #GdkEvent
 and there aren't other means to get a meaningful #GdkDevice to operate on.
 
 Since: 3.0
@@ -4701,6 +4869,8 @@ Gets the number of screen managed by the @display.
 
 Since: 2.2
 
+Deprecated: 3.10: The number of screens is always 1.
+
 </description>
 <parameters>
 <parameter name="display">
@@ -4912,7 +5082,8 @@ Gets the singleton #GdkDisplayManager object.
 When called for the first time, this function consults the
 &lt;envar&gt;GDK_BACKEND&lt;/envar&gt; environment variable to find out which
 of the supported GDK backends to use (in case GDK has been compiled
-with multiple backends).
+with multiple backends). Applications can use gdk_set_allowed_backends()
+to limit what backends can be used.
 
 Since: 2.2
 
@@ -5058,7 +5229,7 @@ if the display could not be opened
 <description>
 Opens the default display specified by command line arguments or
 environment variables, sets it as the default display, and returns
-it.  gdk_parse_args must have been called first. If the default
+it. gdk_parse_args() must have been called first. If the default
 display has previously been set, simply returns that. An internal
 function that should not be used by applications.
 
@@ -6187,6 +6358,24 @@ Since: 3.4
 </return>
 </function>
 
+<function name="gdk_event_get_event_type">
+<description>
+Retrieves the type of the event.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkEventType
+
+</return>
+</function>
+
 <function name="gdk_event_get_keycode">
 <description>
 Extracts the hardware keycode from an event.
@@ -7107,11 +7296,14 @@ Gets the name of the display, which usually comes from the
 &lt;envar&gt;DISPLAY&lt;/envar&gt; environment variable or the
 &lt;option&gt;--display&lt;/option&gt; command line option.
 
+Deprecated: 3.8: Call gdk_display_get_name (gdk_display_get_default ()))
+instead.
 
 </description>
 <parameters>
 </parameters>
 <return> the name of the display.
+
 </return>
 </function>
 
@@ -11758,7 +11950,7 @@ is represented as floating point value in the range 0 to 1.
 These string forms are string forms those supported by
 the CSS3 colors module, and can be parsed by gdk_rgba_parse().
 
-Note that this string representation may loose some
+Note that this string representation may lose some
 precision, since r, g and b are represented as 8-bit
 integers. If this is a concern, you should use a
 different representation.
@@ -12025,6 +12217,33 @@ Since: 2.14
 <return> a newly-allocated string containing the name of the monitor,
 or %NULL if the name cannot be determined
 
+</return>
+</function>
+
+<function name="gdk_screen_get_monitor_scale_factor">
+<description>
+Returns the internal scale factor that maps from monitor coordiantes
+to the actual device pixels. On traditional systems this is 1, but
+on very high density outputs this can be a higher value (often 2).
+
+This can be used if you want to create pixel based data for a
+particula monitor, but most of the time you're drawing to a window
+where it is better to use gdk_window_get_scale_factor() instead.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="screen">
+<parameter_description> screen to get scale factor for
+</parameter_description>
+</parameter>
+<parameter name="monitor_num">
+<parameter_description> number of the monitor, between 0 and gdk_screen_get_n_monitors (screen)
+</parameter_description>
+</parameter>
+</parameters>
+<return> the scale factor
 </return>
 </function>
 
@@ -12784,6 +13003,48 @@ or %GDK_NONE to indicate that the request was rejected
 </parameter>
 <parameter name="time_">
 <parameter_description> timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_set_allowed_backends">
+<description>
+Sets a list of backends that GDK should try to use.
+
+This can be be useful if your application does not
+work with certain GDK backends.
+
+By default, GDK tries all included backends.
+
+For example,
+&lt;programlisting&gt;
+gdk_set_allowed_backends (&quot;wayland,quartz,*&quot;);
+&lt;/programlisting&gt;
+instructs GDK to try the Wayland backend first,
+followed by the Quartz backend, and then all
+others.
+
+If the &lt;envar&gt;GDK_BACKEND&lt;/envar&gt; environment variable
+is set, it determines what backends are tried in what
+order, while still respecting the set of allowed backends
+that are specified by this function.
+
+The possible backend names are x11, win32, quartz,
+broadway, wayland. You can also include a * in the
+list to try all remaining backends.
+
+This call must happen prior to gdk_display_open(),
+gtk_init(), gtk_init_with_args() or gtk_init_check()
+in order to take effect.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="backends">
+<parameter_description> a comma-separated list of backends
 </parameter_description>
 </parameter>
 </parameters>
@@ -13869,6 +14130,60 @@ Since: 3.8
 </return>
 </function>
 
+<function name="gdk_wayland_window_set_use_custom_surface">
+<description>
+Marks a #GdkWindow as a custom Wayland surface. The application is
+expected to register the surface as some type of surface using
+some Wayland interface.
+
+Agood example would be writing a panel or on-screen-keyboard as an
+out-of-process helper - as opposed to having those in the compositor
+process. In this case the underlying surface isn't a wl_shell
+surface and the panel or OSK client need to identify the wl_surface
+as a panel or OSK to the compositor. The assumption is that the
+compositor will expose a private interface to the special client
+that lets the client identify the wl_surface as a panel or such.
+
+This function should be called before a #GdkWindow is shown. This is
+best done by connecting to the #GtkWidget::realized signal:
+
+&lt;informalexample&gt;
+&lt;programlisting&gt;
+static void
+widget_realize_cb (GtkWidget *widget)
+{
+GdkWindow *window;
+struct wl_surface *surface;
+struct input_panel_surface *ip_surface;
+
+window = gtk_widget_get_window (widget);
+gdk_wayland_window_set_custom_surface (window);
+
+surface = gdk_wayland_window_get_wl_surface (window);
+ip_surface = input_panel_get_input_panel_surface (input_panel, surface);
+input_panel_surface_set_panel (ip_surface);
+}
+
+static void
+setup_window (GtkWindow *window)
+{
+g_signal_connect (window, &quot;realize&quot;, G_CALLBACK (widget_realize_cb), NULL);
+}
+&lt;/programlisting&gt;
+&lt;/informalexample&gt;
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_wayland_window_update_size">
 <description>
 Updates the state of the drawable (in particular the drawable's
@@ -14343,6 +14658,50 @@ in parent's coordinate system, or %NULL
 <return></return>
 </function>
 
+<function name="gdk_window_create_similar_image_surface">
+<description>
+Create a new image surface that is efficient to draw on the
+given @window.
+
+Initially the surface contents are all 0 (transparent if contents
+have transparency, black otherwise.)
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> window to make new surface similar to, or %NULL if none
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format for the new surface
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width of the new surface
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height of the new surface
+</parameter_description>
+</parameter>
+<parameter name="scale">
+<parameter_description> the scale of the new surface, or 0 to use same as @window
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the newly allocated surface. The caller
+owns the surface and should call cairo_surface_destroy() when done
+with it.
+
+This function always returns a valid pointer, but it will return a
+pointer to a &quot;nil&quot; surface if @other is already in an error state
+or any other error occurs.
+
+</return>
+</function>
+
 <function name="gdk_window_create_similar_surface">
 <description>
 Create a new surface that is as compatible as possible with the
@@ -14495,9 +14854,7 @@ window in a state which reflects all that has been drawn before.
 Gdk uses multiple kinds of caching to get better performance and
 nicer drawing. For instance, during exposes all paints to a window
 using double buffered rendering are keep on a surface until the last
-window has been exposed. It also delays window moves/scrolls until
-as long as possible until next update to avoid tearing when moving
-windows.
+window has been exposed.
 
 Normally this should be completely invisible to applications, as
 we automatically flush the windows when required, but this might
@@ -14687,6 +15044,36 @@ list of child windows inside @window
 </return>
 </function>
 
+<function name="gdk_window_get_children_with_user_data">
+<description>
+Gets the list of children of @window known to GDK with a particular
+@user_data set on it.
+
+The returned list must be freed, but the elements in the
+list need not be.
+
+The list is returned in (relative) stacking order, i.e. the
+lowest window is first.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> 
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+list of child windows inside @window
+
+</return>
+</function>
+
 <function name="gdk_window_get_clip_region">
 <description>
 Computes the region of a window that potentially can be written
@@ -14829,7 +15216,46 @@ Obtains the current device position and modifier state.
 The position is given in coordinates relative to the upper left
 corner of @window.
 
+Use gdk_window_get_device_position_double() if you need subpixel precision.
+
 Since: 3.0
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow.
+</parameter_description>
+</parameter>
+<parameter name="device">
+<parameter_description> pointer #GdkDevice to query to.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> return location for the X coordinate of @device, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> return location for the Y coordinate of @device, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> return location for the modifier mask, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The window underneath @device (as with
+gdk_device_get_window_at_position()), or %NULL if the window is not known to GDK.
+
+</return>
+</function>
+
+<function name="gdk_window_get_device_position_double">
+<description>
+Obtains the current device position in doubles and modifier state.
+The position is given in coordinates relative to the upper left
+corner of @window.
+
+Since: 3.10
 
 </description>
 <parameters>
@@ -15329,6 +15755,34 @@ window coordinates.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_window_get_scale_factor">
+<description>
+Returns the internal scale factor that maps from window coordiantes
+to the actual device pixels. On traditional systems this is 1, but
+on very high density outputs this can be a higher value (often 2).
+
+A higher value means that drawing is automatically scaled up to
+a higher resolution, so any code doing drawing will automatically look
+nicer. However, if you are supplying pixel-based data the scale
+value can be used to determine whether to use a pixel resource
+with higher resolution data.
+
+The scale of a window may change during runtime, if this happens
+a configure event will be sent to the toplevel window.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> window to get scale factor for
+</parameter_description>
+</parameter>
+</parameters>
+<return> the scale factor
+</return>
 </function>
 
 <function name="gdk_window_get_screen">
@@ -16862,6 +17316,34 @@ gdk_window_set_title() will again update the icon title as well.
 <return></return>
 </function>
 
+<function name="gdk_window_set_invalidate_handler">
+<description>
+Registers an invalidate handler for a specific window. This
+will get called whenever a region in the window or its children
+is invalidated.
+
+This can be used to record the invalidated region, which is
+useful if you are keeping an offscreen copy of some region
+and want to keep it up to date. You can also modify the
+invalidated region in case you're doing some effect where
+e.g. a child widget appears in multiple places.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="handler">
+<parameter_description> a #GdkWindowInvalidateHandlerFunc callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_window_set_keep_above">
 <description>
 Set if @window must be kept above other windows. If the
@@ -17883,6 +18365,32 @@ Since: 3.0
 <return></return>
 </function>
 
+<function name="gdk_x11_display_set_window_scale">
+<description>
+Forces a specific window scale for all windows on this display,
+instead of using the default or user configured scale. This
+is can be used to disable scaling support by setting @scale to
+1, or to programmatically set the window scale.
+
+Once the scale is set by this call it will not change in response
+to later user configuration changes.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the display
+</parameter_description>
+</parameter>
+<parameter name="scale">
+<parameter_description> The new scale value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_x11_display_string_to_compound_text">
 <description>
 Convert a string from the encoding of the current
@@ -18328,6 +18836,27 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="gdk_x11_screen_get_current_desktop">
+<description>
+Returns the current workspace for @screen when running under a
+window manager that supports multiple workspaces, as described
+in the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/wm-spec&quot;&gt;Extended 
+Window Manager Hints&lt;/ulink&gt;.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="screen">
+<parameter_description> a #GdkScreen
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current workspace, or 0 if workspaces are not supported
+
+</return>
+</function>
+
 <function name="gdk_x11_screen_get_monitor_output">
 <description>
 Gets the XID of the specified output/monitor.
@@ -18348,6 +18877,27 @@ Since: 2.14
 </parameter>
 </parameters>
 <return> the XID of the monitor
+
+</return>
+</function>
+
+<function name="gdk_x11_screen_get_number_of_desktops">
+<description>
+Returns the number of workspaces for @screen when running under a
+window manager that supports multiple workspaces, as described
+in the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/wm-spec&quot;&gt;Extended 
+Window Manager Hints&lt;/ulink&gt;.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="screen">
+<parameter_description> a #GdkScreen
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of workspaces, or 0 if workspaces are not supported
 
 </return>
 </function>
@@ -18600,6 +19150,94 @@ Since: 2.8
 <parameters>
 <parameter name="window">
 <parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_x11_window_move_to_desktop">
+<description>
+Moves the window to the given workspace when running unde a
+window manager that supports multiple workspaces, as described
+in the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/wm-spec&quot;&gt;Extended 
+Window Manager Hints&lt;/ulink&gt;.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="desktop">
+<parameter_description> the number of the workspace to move the window to
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_x11_window_set_frame_extents">
+<description>
+Newer GTK+ windows using client-side decorations use extra geometry
+around their frames for effects like shadows and invisible borders.
+Window managers that want to maximize windows or snap to edges need
+to know where the extents of the actual frame lie, so that users
+don't feel like windows are snapping against random invisible edges.
+
+Note that this property is automatically updated by GTK+, so this
+function should only be used by applications which do not use GTK+
+to create toplevel windows.
+
+Since: 3.10
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="left">
+<parameter_description> The left extent
+</parameter_description>
+</parameter>
+<parameter name="right">
+<parameter_description> The right extent
+</parameter_description>
+</parameter>
+<parameter name="top">
+<parameter_description> The top extent
+</parameter_description>
+</parameter>
+<parameter name="bottom">
+<parameter_description> The bottom extent
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_x11_window_set_frame_sync_enabled">
+<description>
+This function can be used to disable frame synchronization for a window.
+Normally frame synchronziation will be enabled or disabled based on whether
+the system has a compositor that supports frame synchronization, but if
+the window is not directly managed by the window manager, then frame
+synchronziation may need to be disabled. This is the case for a window
+embedded via the XEMBED protocol.
+
+Since: 3.8
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a native #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="frame_sync_enabled">
+<parameter_description> whether frame-synchronization should be enabled
 </parameter_description>
 </parameter>
 </parameters>
