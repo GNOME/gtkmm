@@ -324,6 +324,7 @@ _CONVERSION(`const CellRenderer&',`GtkCellRenderer*',__FCR2P)
 _CONVERSION(`ToolItem&',`GtkToolItem*',__FR2P)
 _CONVERSION(`const ToolItem&',`GtkToolItem*',__FCR2P)
 _CONVERSION(`ToolItemGroup&',`GtkToolItemGroup*',__FR2P)
+_CONVERSION(`Gtk::Entry&',`GtkEntry*',__FR2P)
 
 # Glib::ListHandle<> (gtkmm) -> GList (gtk+)
 _CONVERSION(`const Glib::ListHandle<Glib::ustring>&',`GList*',`$3.data()')

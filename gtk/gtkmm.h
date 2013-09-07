@@ -229,6 +229,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/scalebutton.h>
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/scrolledwindow.h>
+#include <gtkmm/searchbar.h>
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/separatormenuitem.h>
