@@ -4313,10 +4313,10 @@ completed within a menu shell.
 <description>
 The ::show-menu signal is emitted before the menu is shown.
 
-It can be used to populate the menu on demand, using 
+It can be used to populate the menu on demand, using
 gtk_menu_tool_button_set_menu().
 
-Note that even if you populate the menu dynamically in this way, 
+Note that even if you populate the menu dynamically in this way,
 you must set an empty menu on the #GtkMenuToolButton beforehand,
 since the arrow is made insensitive if the menu is not set.
 
@@ -28744,6 +28744,10 @@ to @sizes.
 
 <function name="gtk_drag_begin">
 <description>
+This is equivalent to gtk_drag_begin_with_coordinates(), passing -1, -1
+as coordinates.
+
+Deprecated: 3.10: Use gtk_drag_begin_with_coordinates() instead.
 
 </description>
 <parameters>
@@ -28769,7 +28773,9 @@ source can provide the data.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the context for this drag.
+
+</return>
 </function>
 
 <function name="gtk_drag_begin_with_coordinates">
@@ -28843,6 +28849,10 @@ the current pointer position.
 
 <function name="gtk_drag_check_threshold">
 <description>
+Checks to see if a mouse drag starting at (@start_x, @start_y) and ending
+at (@current_x, @current_y) has passed the GTK+ drag threshold, and thus
+should trigger the beginning of a drag-and-drop operation.
+
 
 </description>
 <parameters>
@@ -28867,11 +28877,19 @@ the current pointer position.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the drag threshold has been passed.
+</return>
 </function>
 
 <function name="gtk_drag_dest_add_image_targets">
 <description>
+Add the image targets supported by #GtkSelection to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value, 
+use gtk_target_list_add_image_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -28885,6 +28903,13 @@ the current pointer position.
 
 <function name="gtk_drag_dest_add_text_targets">
 <description>
+Add the text targets supported by #GtkSelection to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value, 
+use gtk_target_list_add_text_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -28898,6 +28923,13 @@ the current pointer position.
 
 <function name="gtk_drag_dest_add_uri_targets">
 <description>
+Add the URI targets supported by #GtkSelection to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value, 
+use gtk_target_list_add_uri_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -28911,6 +28943,14 @@ the current pointer position.
 
 <function name="gtk_drag_dest_find_target">
 <description>
+Looks for a match between the supported targets of @context and the
+@dest_target_list, returning the first matching target, otherwise
+returning %GDK_NONE. @dest_target_list should usually be the return
+value from gtk_drag_dest_get_target_list(), but some widgets may
+have different valid targets for different parts of the widget; in
+that case, they will have to implement a drag_motion handler that
+passes the correct target list to this function.
+
 
 </description>
 <parameters>
@@ -28928,11 +28968,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> first target that the source offers
+and the dest can accept, or %GDK_NONE
+</return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
 <description>
+Returns the list of targets this widget can accept from
+drag-and-drop.
+
 
 </description>
 <parameters>
@@ -28941,11 +28986,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkTargetList, or %NULL if none
+</return>
 </function>
 
 <function name="gtk_drag_dest_get_track_motion">
 <description>
+Returns whether the widget has been configured to always
+emit #GtkWidget::drag-motion signals.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -28954,11 +29004,53 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the widget always emits
+#GtkWidget::drag-motion events
+
+</return>
 </function>
 
 <function name="gtk_drag_dest_set">
 <description>
+Sets a widget as a potential drop destination, and adds default behaviors.
+
+The default behaviors listed in @flags have an effect similar
+to installing default handlers for the widget's drag-and-drop signals
+(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
+for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
+sufficient to connect to the widget's #GtkWidget::drag-data-received
+signal to get primitive, but consistent drag-and-drop support.
+
+Things become more complicated when you try to preview the dragged data,
+as described in the documentation for #GtkWidget::drag-motion. The default
+behaviors described by @flags make some assumptions, that can conflict
+with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
+invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
+and invokations of gtk_drag_finish() in #GtkWidget::drag-data-received.
+Especially the later is dramatic, when your own #GtkWidget::drag-motion
+handler calls gtk_drag_get_data() to inspect the dragged data.
+
+There's no way to set a default action here, you can use the
+#GtkWidget::drag-motion callback for that. Here's an example which selects
+the action to use depending on whether the control key is pressed or not:
+|[
+static void
+drag_motion (GtkWidget *widget,
+GdkDragContext *context,
+gint x,
+gint y,
+guint time)
+{
+GdkModifierType mask;
+
+gdk_window_get_pointer (gtk_widget_get_window (widget),
+NULL, NULL, &amp;mask);
+if (mask &amp; GDK_CONTROL_MASK)
+gdk_drag_status (context, GDK_ACTION_COPY, time);
+else
+gdk_drag_status (context, GDK_ACTION_MOVE, time);
+}
+]|
 
 </description>
 <parameters>
@@ -28991,6 +29083,7 @@ and gtk_drag_dest_find_target().
 
 <function name="gtk_drag_dest_set_proxy">
 <description>
+Sets this widget as a proxy for drops to another window.
 
 </description>
 <parameters>
@@ -29019,6 +29112,9 @@ subwindow.
 
 <function name="gtk_drag_dest_set_target_list">
 <description>
+Sets the target types that this widget can accept from drag-and-drop.
+The widget must first be made into a drag destination with
+gtk_drag_dest_set().
 
 </description>
 <parameters>
@@ -29036,6 +29132,14 @@ subwindow.
 
 <function name="gtk_drag_dest_set_track_motion">
 <description>
+Tells the widget to emit #GtkWidget::drag-motion and
+#GtkWidget::drag-leave events regardless of the targets and the
+%GTK_DEST_DEFAULT_MOTION flag.
+
+This may be used when a widget wants to do generic
+actions regardless of the targets that the source offers.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -29053,6 +29157,9 @@ subwindow.
 
 <function name="gtk_drag_dest_unset">
 <description>
+Clears information about a drop destination set with
+gtk_drag_dest_set(). The widget will no longer receive
+notification of drags.
 
 </description>
 <parameters>
@@ -29066,6 +29173,8 @@ subwindow.
 
 <function name="gtk_drag_finish">
 <description>
+Informs the drag source that the drop is finished, and
+that the data of the drag will no longer be required.
 
 </description>
 <parameters>
@@ -29092,6 +29201,14 @@ original data. (This should be %TRUE for a move)
 
 <function name="gtk_drag_get_data">
 <description>
+Gets the data associated with a drag. When the data
+is received or the retrieval fails, GTK+ will emit a
+#GtkWidget::drag-data-received signal. Failure of the retrieval
+is indicated by the length field of the @selection_data
+signal parameter being negative. However, when gtk_drag_get_data()
+is called implicitely because the %GTK_DEST_DEFAULT_DROP was set,
+then the widget will not receive notification of failed
+drops.
 
 </description>
 <parameters>
@@ -29120,6 +29237,8 @@ or #GtkWidget::drag-drop&quot; signal.
 
 <function name="gtk_drag_get_source_widget">
 <description>
+Determines the source widget for a drag.
+
 
 </description>
 <parameters>
@@ -29128,11 +29247,18 @@ or #GtkWidget::drag-drop&quot; signal.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> if the drag is occurring
+within a single application, a pointer to the source widget.
+Otherwise, %NULL.
+</return>
 </function>
 
 <function name="gtk_drag_highlight">
 <description>
+Draws a highlight around a widget. This will attach
+handlers to #GtkWidget::draw, so the highlight
+will continue to be displayed until gtk_drag_unhighlight()
+is called.
 
 </description>
 <parameters>
@@ -29255,6 +29381,8 @@ with a  context for the source side of a drag)
 <description>
 Sets the icon for a given drag from a stock ID.
 
+Deprecated: 3.10: Use gtk_drag_set_icon_name() instead.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -29336,6 +29464,13 @@ signal and destroy it yourself.
 
 <function name="gtk_drag_source_add_image_targets">
 <description>
+Add the writable image targets supported by #GtkSelection to
+the target list of the drag source. The targets
+are added with @info = 0. If you need another value, 
+use gtk_target_list_add_image_targets() and
+gtk_drag_source_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -29369,6 +29504,13 @@ Since: 2.6
 
 <function name="gtk_drag_source_add_uri_targets">
 <description>
+Add the URI targets supported by #GtkSelection to
+the target list of the drag source.  The targets
+are added with @info = 0. If you need another value, 
+use gtk_target_list_add_uri_targets() and
+gtk_drag_source_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -29382,6 +29524,10 @@ Since: 2.6
 
 <function name="gtk_drag_source_get_target_list">
 <description>
+Gets the list of targets this widget can provide for
+drag-and-drop.
+
+Since: 2.4
 
 </description>
 <parameters>
@@ -29390,11 +29536,15 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkTargetList, or %NULL if none
+
+</return>
 </function>
 
 <function name="gtk_drag_source_set">
 <description>
+Sets up a widget so that GTK+ will start a drag operation when the user
+clicks and drags on the widget. The widget must have a window.
 
 </description>
 <parameters>
@@ -29467,6 +29617,9 @@ Since: 2.8
 
 <function name="gtk_drag_source_set_icon_pixbuf">
 <description>
+Sets the icon that will be used for drags from a particular widget
+from a #GdkPixbuf. GTK+ retains a reference for @pixbuf and will 
+release it when it is no longer needed.
 
 </description>
 <parameters>
@@ -29485,7 +29638,9 @@ Since: 2.8
 <function name="gtk_drag_source_set_icon_stock">
 <description>
 Sets the icon that will be used for drags from a particular source
-to a stock icon. 
+to a stock icon.
+
+Deprecated: 3.10: Use gtk_drag_source_set_icon_name() instead.
 
 </description>
 <parameters>
@@ -29503,6 +29658,11 @@ to a stock icon.
 
 <function name="gtk_drag_source_set_target_list">
 <description>
+Changes the target types that this widget offers for drag-and-drop.
+The widget must first be made into a drag source with
+gtk_drag_source_set().
+
+Since: 2.4
 
 </description>
 <parameters>
@@ -29520,6 +29680,7 @@ to a stock icon.
 
 <function name="gtk_drag_source_unset">
 <description>
+Undoes the effects of gtk_drag_source_set().
 
 </description>
 <parameters>
@@ -29533,6 +29694,8 @@ to a stock icon.
 
 <function name="gtk_drag_unhighlight">
 <description>
+Removes a highlight set by gtk_drag_highlight() from
+a widget.
 
 </description>
 <parameters>
@@ -48731,8 +48894,8 @@ Deprecated: 3.10: Use gtk_menu_tool_button_new() instead.
 <function name="gtk_menu_tool_button_set_arrow_tooltip_markup">
 <description>
 Sets the tooltip markup text to be used as tooltip for the arrow button
-which pops up the menu.  See gtk_tool_item_set_tooltip_text() for setting a
-tooltip on the whole #GtkMenuToolButton.
+which pops up the menu.  See gtk_tool_item_set_tooltip_text() for setting
+a tooltip on the whole #GtkMenuToolButton.
 
 Since: 2.12
 
