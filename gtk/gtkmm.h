@@ -179,6 +179,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/label.h>
 #include <gtkmm/layout.h>
 #include <gtkmm/levelbar.h>
+#include <gtkmm/listbox.h>
+#include <gtkmm/listboxrow.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/listviewtext.h>
 #include <gtkmm/linkbutton.h>

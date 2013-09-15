@@ -572,6 +572,12 @@ _CONVERSION(`const Border&',`const GtkBorder*',__FR2P)
 _CONVERSION(`Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))')
 
+#ListBoxRow
+_CONVERSION(`GtkListBoxRow*',`ListBoxRow*',__RP2P)
+_CONVERSION(`GtkListBoxRow*',`const ListBoxRow*',__RP2P)
+_CONVERSION(`ListBoxRow&',`GtkListBoxRow*',__FR2P)
+_CONVERSION(`ListBoxRow*',`GtkListBoxRow*',__FP2P)
+
 #RecentFilter
 _CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
 _CONVERSION(`const Glib::RefPtr<RecentFilter>&', `GtkRecentFilter*', __CONVERT_REFPTR_TO_P)

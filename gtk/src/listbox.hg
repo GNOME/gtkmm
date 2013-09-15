@@ -1,0 +1,216 @@
+/* Copyright (C) 2013 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/container.h>
+#include <gtkmm/listboxrow.h>
+#include <gtkmm/enums.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/container_p.h)
+
+namespace Gtk
+{
+class Adjustment;
+
+/** A ListBox is a vertical container that contains ListBoxRow
+ * children. These rows can by dynamically sorted and filtered, and
+ * headers can be added dynamically depending on the row content.
+ * It also allows keyboard and mouse navigation and selection like
+ * a typical list.
+ *
+ * Using ListBox is often an alternative to TreeView, especially
+ * when the list contents have a more complicated layout than what is allowed
+ * by a CellRenderer, or when the contents are interactive (e.g. contain a
+ * button).
+ *
+ * Although a ListBox must have only ListBoxRow children you can
+ * add any kind of widget to it via Container::add(), and a ListBoxRow
+ * widget will automatically be inserted between the list and the widget.
+ *
+ * A ListBox looks like this:
+ * @image html listbox1.png
+ *
+ * @ingroup Widgets
+ * @ingroup Containers
+ *
+ * @newin{3,10}
+ */
+class ListBox : public Container
+{
+  _CLASS_GTKOBJECT(ListBox, GtkListBox, GTK_LIST_BOX, Gtk::Container, GtkContainer)
+public:
+  _CTOR_DEFAULT
+
+  /** For instance: bool on_filter(ListBoxRow* row);
+   *
+   * Will be called whenever the row changes or is added and lets you control
+   * if the row should be visible or not.
+   *
+   * @param row The row that may be filtered
+   * @returns <tt>true</tt> if the row should be visible, <tt>false</tt> otherwise
+   *
+   * @newin{3,10}
+   */
+  typedef sigc::slot<bool, ListBoxRow*> SlotFilter;
+
+  /** For instance: int on_sort(ListBoxRow* row1, ListBoxRow* row2);
+   *
+   * Compare two rows to determine which should be first.
+   *
+   * @param row1 The first row
+   * @param row2 The second row
+   * @returns < 0 if @a row1 should be before @a row2, 0 if they are
+   *          equal and > 0 otherwise
+   *
+   * @newin{3,10}
+   */
+  typedef sigc::slot<int, ListBoxRow*, ListBoxRow*> SlotSort;
+
+  /** For instance: void on_update_header(ListBoxRow* row, ListBoxRow* before);
+   *
+   * Whenever @a row changes or which row is before @a row changes this
+   * is called, which lets you update the header on @a row. You may
+   * remove or set a new one via ListBoxRow::set_header() or
+   * just change the state of the current header widget.
+   *
+   * @param row The row to update
+   * @param before The row before @a row, or <tt>0</tt> if it is first
+   *
+   * @newin{3,10}
+   */
+  typedef sigc::slot<void, ListBoxRow*, ListBoxRow*> SlotUpdateHeader;
+
+  _WRAP_METHOD(void prepend(Widget& child), gtk_list_box_prepend)
+  _WRAP_METHOD(void insert(Widget& child, int position), gtk_list_box_insert)
+  _WRAP_METHOD(ListBoxRow* get_selected_row(), gtk_list_box_get_selected_row)
+  _WRAP_METHOD(const ListBoxRow* get_selected_row() const, gtk_list_box_get_selected_row, constversion)
+  _WRAP_METHOD(ListBoxRow* get_row_at_index(int index), gtk_list_box_get_row_at_index)
+  _WRAP_METHOD(const ListBoxRow* get_row_at_index(int index) const, gtk_list_box_get_row_at_index, constversion)
+  _WRAP_METHOD(ListBoxRow* get_row_at_y(int y), gtk_list_box_get_row_at_y)
+  _WRAP_METHOD(const ListBoxRow* get_row_at_y(int y) const, gtk_list_box_get_row_at_y, constversion)
+  _WRAP_METHOD(void select_row(ListBoxRow& row), gtk_list_box_select_row)
+
+  /** Unselects the currently selected row, if any.
+   * 
+   * @newin{3,10}
+   */
+  void unselect_row();
+
+  _WRAP_METHOD(void set_placeholder(Widget& placeholder), gtk_list_box_set_placeholder)
+
+  /** Removes the placeholder widget, if any.
+   * 
+   * @newin{3,10}
+   */
+  void unset_placeholder();
+
+  _WRAP_METHOD(void set_adjustment(const Glib::RefPtr<Adjustment>& adjustment), gtk_list_box_set_adjustment)
+  _WRAP_METHOD(Glib::RefPtr<Adjustment> get_adjustment(), gtk_list_box_get_adjustment, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Adjustment> get_adjustment() const, gtk_list_box_get_adjustment, refreturn, constversion)
+  _WRAP_METHOD(void set_selection_mode(SelectionMode mode), gtk_list_box_set_selection_mode)
+  _WRAP_METHOD(SelectionMode get_selection_mode() const, gtk_list_box_get_selection_mode)
+
+  /** Sets a filter function.
+   *
+   * By setting a filter function on the ListBox one can decide dynamically which
+   * of the rows to show. For instance, to implement a search function on a list that
+   * filters the original list to only show the matching rows.
+   *
+   * The @a slot will be called for each row after the call, and it will
+   * continue to be called each time a row changes (via ListBoxRow::changed()) or
+   * when invalidate_filter() is called.
+   *
+   * @param slot Callback that lets you filter which rows to show
+   * @newin{3,10}
+   */
+  void set_filter_func(const SlotFilter& slot);
+  _IGNORE(gtk_list_box_set_filter_func)
+
+  /** Removes the filter function, if any.
+   * @newin{3,10}
+   */
+  void unset_filter_func();
+
+  /** Sets a sort function.
+   *
+   * By setting a sort function on the ListBox one can dynamically reorder the rows
+   * of the list, based on the contents of the rows.
+   *
+   * The @a slot will be called for each row after the call, and will continue to
+   * be called each time a row changes (via ListBoxRow::changed()) and when
+   * invalidate_sort() is called.
+   *
+   * @param slot The sort function.
+   * @newin{3,10}
+   */
+  void set_sort_func(const SlotSort& slot);
+  _IGNORE(gtk_list_box_set_sort_func)
+
+  /** Removes the sort function, if any.
+   * @newin{3,10}
+   */
+  void unset_sort_func();
+
+  /** Sets a header function.
+   *
+   * By setting a header function on the ListBox one can dynamically add headers
+   * in front of rows, depending on the contents of the row and its position in the list.
+   * For instance, one could use it to add headers in front of the first item of a
+   * new kind, in a list sorted by the kind.
+   *
+   * The @a slot can look at the current header widget using ListBoxRow::get_header()
+   * and either update the state of the widget as needed, or set a new one using
+   * ListBoxRow::set_header(). If no header is needed, use ListBoxRow::unset_header().
+   *
+   * Note that you may get many calls to this @a slot for a particular row when e.g.
+   * changing things that don't affect the header. In this case it is important for performance
+   * to not blindly replace an exisiting header with an identical one.
+   *
+   * The @a slot function will be called for each row after the call, and it will
+   * continue to be called each time a row changes (via ListBoxRow::changed()) and when
+   * the row before changes (either by ListBoxRow::changed() on the previous row, or when
+   * the previous row becomes a different row). It is also called for all rows when
+   * invalidate_headers() is called.
+   *
+   * @param slot Callback that lets you add row headers
+   * @newin{3,10}
+   */
+  void set_header_func(const SlotUpdateHeader& slot);
+  _IGNORE(gtk_list_box_set_header_func)
+
+  /** Removes the header function, if any.
+   * @newin{3,10}
+   */
+  void unset_header_func();
+
+  _WRAP_METHOD(void invalidate_filter(), gtk_list_box_invalidate_filter)
+  _WRAP_METHOD(void invalidate_sort(), gtk_list_box_invalidate_sort)
+  _WRAP_METHOD(void invalidate_headers(), gtk_list_box_invalidate_headers)
+  _WRAP_METHOD(void set_activate_on_single_click(bool single = true), gtk_list_box_set_activate_on_single_click)
+  _WRAP_METHOD(bool get_activate_on_single_click() const, gtk_list_box_get_activate_on_single_click)
+  _WRAP_METHOD(void drag_unhighlight_row(), gtk_list_box_drag_unhighlight_row)
+  _WRAP_METHOD(void drag_highlight_row(ListBoxRow& row), gtk_list_box_drag_highlight_row)
+
+  _WRAP_PROPERTY("selection-mode", SelectionMode)
+  _WRAP_PROPERTY("activate-on-single-click", bool)
+
+  _WRAP_SIGNAL(void row_selected(ListBoxRow* row), row-selected)
+  _WRAP_SIGNAL(void row_activated(ListBoxRow* row), row-activated)
+
+  _IGNORE_SIGNAL(activate-cursor-row, toggle-cursor-row, move-cursor) // Action signals
+};
+
+} // namespace Gtk

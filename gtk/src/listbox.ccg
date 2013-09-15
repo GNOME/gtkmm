@@ -1,0 +1,148 @@
+/* Copyright (C) 2013 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+#include <gtkmm/adjustment.h>
+
+namespace
+{
+
+gboolean SignalProxy_Filter_gtk_callback(GtkListBoxRow* row, void* data)
+{
+  Gtk::ListBox::SlotFilter* the_slot = static_cast<Gtk::ListBox::SlotFilter*>(data);
+
+  try
+  {
+    return (*the_slot)(Glib::wrap(row));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+    return FALSE;
+  }
+}
+
+void SignalProxy_Filter_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::ListBox::SlotFilter*>(data);
+}
+
+gint SignalProxy_Sort_gtk_callback(GtkListBoxRow* row1, GtkListBoxRow* row2, void* data)
+{
+  Gtk::ListBox::SlotSort* the_slot = static_cast<Gtk::ListBox::SlotSort*>(data);
+
+  try
+  {
+    return (*the_slot)(Glib::wrap(row1), Glib::wrap(row2));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+    return 0;
+  }
+}
+
+void SignalProxy_Sort_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::ListBox::SlotSort*>(data);
+}
+
+void SignalProxy_UpdateHeader_gtk_callback(GtkListBoxRow* row, GtkListBoxRow* before, void* data)
+{
+  Gtk::ListBox::SlotUpdateHeader* the_slot = static_cast<Gtk::ListBox::SlotUpdateHeader*>(data);
+
+  try
+  {
+    (*the_slot)(Glib::wrap(row), Glib::wrap(before));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+void SignalProxy_UpdateHeader_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::ListBox::SlotUpdateHeader*>(data);
+}
+
+} // anonymous namespace
+
+namespace Gtk
+{
+
+void ListBox::unselect_row()
+{
+  gtk_list_box_select_row(gobj(), 0);
+}
+
+void ListBox::unset_placeholder()
+{
+  gtk_list_box_set_placeholder(gobj(), 0);
+}
+
+void ListBox::set_filter_func(const SlotFilter& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_Filter_gtk_callback_destroy() is called.
+  SlotFilter* slot_copy = new SlotFilter(slot);
+
+  gtk_list_box_set_filter_func(gobj(),
+    &SignalProxy_Filter_gtk_callback, slot_copy,
+    &SignalProxy_Filter_gtk_callback_destroy);
+}
+
+void ListBox::unset_filter_func()
+{
+  gtk_list_box_set_filter_func(gobj(), 0, 0, 0);
+}
+
+void ListBox::set_sort_func(const SlotSort& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_Sort_gtk_callback_destroy() is called.
+  SlotSort* slot_copy = new SlotSort(slot);
+
+  gtk_list_box_set_sort_func(gobj(),
+    &SignalProxy_Sort_gtk_callback, slot_copy,
+    &SignalProxy_Sort_gtk_callback_destroy);
+}
+
+void ListBox::unset_sort_func()
+{
+  gtk_list_box_set_sort_func(gobj(), 0, 0, 0);
+}
+
+void ListBox::set_header_func(const SlotUpdateHeader& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_Sort_gtk_callback_destroy() is called.
+  SlotUpdateHeader* slot_copy = new SlotUpdateHeader(slot);
+
+  gtk_list_box_set_header_func(gobj(),
+    &SignalProxy_UpdateHeader_gtk_callback, slot_copy,
+    &SignalProxy_UpdateHeader_gtk_callback_destroy);
+}
+
+void ListBox::unset_header_func()
+{
+  gtk_list_box_set_header_func(gobj(), 0, 0, 0);
+}
+
+} //namespace Gtk
