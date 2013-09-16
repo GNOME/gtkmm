@@ -159,6 +159,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/frame.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/handlebox.h>
+#include <gtkmm/headerbar.h>
 #include <gtkmm/hvbox.h>
 #include <gtkmm/hvbuttonbox.h>
 #include <gtkmm/hvpaned.h>
