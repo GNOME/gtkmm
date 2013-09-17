@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2013 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include <vector>
+
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/menu.h>
+#include <giomm/file.h>
+#include <giomm/volume.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/scrolledwindow_p.h)
+
+namespace Gtk
+{
+
+/** Sidebar that displays frequently-used places in the file system.
+ *
+ * Gtk::PlacesSidebar is a widget that displays a list of frequently-used places in the
+ * file system:  the user's home directory, the user's bookmarks, and volumes and drives.
+ * This widget is used as a sidebar in Gtk::FileChooser and may be used by file managers
+ * and similar programs.
+ *
+ * The places sidebar displays drives and volumes, and will automatically mount
+ * or unmount them when the user selects them.
+ *
+ * Applications can hook to various signals in the places sidebar to customize
+ * its behavior.  For example, they can add extra commands to the context menu
+ * of the sidebar.
+ *
+ * While bookmarks are completely in control of the user, the places sidebar also
+ * allows individual applications to provide extra shortcut folders that are unique
+ * to each application.  For example, a Paint program may want to add a shortcut
+ * for a Clipart folder.  You can do this with Gtk::PlacesSidebar::add_shortcut().
+ *
+ * To make use of the places sidebar, an application at least needs to connect
+ * to the Gtk::PlacesSidebar::open-location signal.  This is emitted when the
+ * user selects in the sidebar a location to open.  The application should also
+ * call Gtk::PlacesSidebar::set_location() when it changes the currently-viewed
+ * location.
+ *
+ * @ingroup Widgets
+ * @newin{3,10}
+ */
+
+class PlacesSidebar
+  : public ScrolledWindow
+{
+  _CLASS_GTKOBJECT(PlacesSidebar, GtkPlacesSidebar, GTK_PLACES_SIDEBAR, Gtk::ScrolledWindow, GtkScrolledWindow)
+public:
+
+  /** Creates a new Gtk::PlacesSidebar widget.
+   *
+   * The application should connect to at least the "open-location" signal to be notified when the user makes a selection in the sidebar.
+   *
+   */
+  _CTOR_DEFAULT
+
+
+  _WRAP_METHOD(void set_open_flags(PlacesOpenFlags flags = Gtk::PLACES_OPEN_NORMAL), gtk_places_sidebar_set_open_flags)
+  _WRAP_METHOD(PlacesOpenFlags get_open_flags() const, gtk_places_sidebar_get_open_flags)
+
+  _WRAP_METHOD(void set_location(const Glib::RefPtr<const Gio::File>& location), gtk_places_sidebar_set_location)
+  // transfer full
+  // get_location returns a new Gio::File; modifiying the returned value does not modify the places sidebar
+  _WRAP_METHOD(Glib::RefPtr<Gio::File> get_location() const, gtk_places_sidebar_get_location) 
+
+  _WRAP_METHOD(void set_show_desktop(bool show_desktop = true), gtk_places_sidebar_set_show_desktop)
+  _WRAP_METHOD(bool get_show_desktop() const, gtk_places_sidebar_get_show_desktop)
+
+  _WRAP_METHOD(void add_shortcut(const Glib::RefPtr<Gio::File>& location), gtk_places_sidebar_add_shortcut)
+  _WRAP_METHOD(void remove_shortcut(const Glib::RefPtr<Gio::File>& location), gtk_places_sidebar_remove_shortcut)
+  // transfer full
+  // list_shortcuts returns a copy of the list and its elements; modifiying the returned value does not modify the places sidebar
+#m4 _CONVERSION(`GSList*',`std::vector< Glib::RefPtr<Gio::File> >',`Glib::SListHandler< Glib::RefPtr<Gio::File> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gio::File> > list_shortcuts() const, gtk_places_sidebar_list_shortcuts)
+
+  // transfer full
+  // get_nth_bookmark returns a new Gio::File; modifiying the returned value does not modify the places sidebar
+  _WRAP_METHOD(Glib::RefPtr<Gio::File>  get_nth_bookmark(int n) const, gtk_places_sidebar_get_nth_bookmark)
+
+  _WRAP_METHOD(void set_show_connect_to_server(bool show_connect_to_server = true), gtk_places_sidebar_set_show_connect_to_server)
+  _WRAP_METHOD(bool get_show_connect_to_server() const, gtk_places_sidebar_get_show_connect_to_server)
+
+
+// TODO
+// drag_action_requested and drag_perform_drop does not currently work due to an exec error while wrapping the
+// GList* argument; apparently execution crashes around Glib::wrap_create_new_wrapper_for_interface
+//#m4 _CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
+//#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Gio::File> >',`Glib::ListHandler< Glib::RefPtr<Gio::File> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+//  _WRAP_SIGNAL(int drag_action_requested(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::RefPtr<Gio::File>& dest_file, std::vector< Glib::RefPtr<Gio::File> > source_file_list), "drag_action_requested", no_default_handler)
+//  _WRAP_SIGNAL(void drag_perform_drop(const Glib::RefPtr<Gio::File>& dest_file, std::vector< Glib::RefPtr<Gio::File> > source_file_list, int action), "drag_perform_drop", no_default_handler)
+
+  _WRAP_SIGNAL(int drag_action_ask(int actions), "drag_action_ask", no_default_handler)
+  _WRAP_SIGNAL(void open_location(const Glib::RefPtr<Gio::File>& location, PlacesOpenFlags open_flags), "open_location", no_default_handler)
+#m4 _CONVERSION(`GVolume*',`const Glib::RefPtr<Gio::Volume>&',Glib::wrap($3, true))
+  _WRAP_SIGNAL(void populate_popup(Gtk::Menu* menu, const Glib::RefPtr<Gio::File>& selected_item, const Glib::RefPtr<Gio::Volume>& selected_volume), "populate_popup", no_default_handler)
+  _WRAP_SIGNAL(void show_connect_to_server(), "show_connect_to_server", no_default_handler)
+  _WRAP_SIGNAL(void show_error_message(const Glib::ustring& primary, const Glib::ustring& secondary), "show_error_message", no_default_handler)
+
+
+  _WRAP_PROPERTY("location", Glib::RefPtr<Gio::File>)
+  _WRAP_PROPERTY("open-flags", PlacesOpenFlags)
+  _WRAP_PROPERTY("show-connect-to-server", bool)
+  _WRAP_PROPERTY("show-desktop", bool)
+};
+
+} // namespace Gtk
+
