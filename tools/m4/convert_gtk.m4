@@ -612,6 +612,7 @@ _CONVERSION(`GtkPageOrientation',`PageOrientation',`($2)$3')
 _CONVERSION(`PageSetup&',`GtkPageSetup*',__FR2P)
 _CONVERSION(`const PageSetup&',`GtkPageSetup*',__FCR2P)
 _CONVERSION(`GtkPageSetup*',`Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
+# TODO: What uses this?
 _CONVERSION(`GtkPageSetup*',`const Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PageSetup>',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<PageSetup>&',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
@@ -649,6 +650,7 @@ _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($
 _CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`($2)$3')
 
 #Tooltip
+#TODO: This should not be here:
 _CONVERSION(`GtkTooltip*',`const Glib::RefPtr<Tooltip>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P($3))
 
@@ -698,7 +700,6 @@ _CONVERSION(`const Glib::RefPtr<const Gio::File>&',`GFile*',__CONVERT_CONST_REFP
 _CONVERSION(`const Glib::RefPtr<Gio::File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<Gio::File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
-_CONVERSION(`GFile*',`const Glib::RefPtr<Gio::File>&',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
