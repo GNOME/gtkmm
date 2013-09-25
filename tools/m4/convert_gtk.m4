@@ -612,8 +612,6 @@ _CONVERSION(`GtkPageOrientation',`PageOrientation',`($2)$3')
 _CONVERSION(`PageSetup&',`GtkPageSetup*',__FR2P)
 _CONVERSION(`const PageSetup&',`GtkPageSetup*',__FCR2P)
 _CONVERSION(`GtkPageSetup*',`Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
-# TODO: What uses this?
-_CONVERSION(`GtkPageSetup*',`const Glib::RefPtr<PageSetup>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PageSetup>',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<PageSetup>&',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
 
@@ -651,7 +649,6 @@ _CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`($2)$3')
 
 #Tooltip
 #TODO: This should not be here:
-_CONVERSION(`GtkTooltip*',`const Glib::RefPtr<Tooltip>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P($3))
 
 
@@ -665,25 +662,16 @@ _CONVERSION(`const GtkTextIter*',`const TextIter&',Glib::wrap($3))
 _CONVERSION(`const GtkTextIter*',`const TextBuffer::iterator&',Glib::wrap($3))
 _CONVERSION(`const TextIter&',`GtkTextIter*',__FCR2P)
 _CONVERSION(`const TextBuffer::iterator&',`GtkTextIter*',__FCR2P)
-_CONVERSION(`GtkTextChildAnchor*',`const Glib::RefPtr<ChildAnchor>&',`Glib::wrap($3, true)')
-_CONVERSION(`GtkTextMark*',`const Glib::RefPtr<Mark>&',`Glib::wrap($3, true)')
-_CONVERSION(`GtkTextMark*',`const Glib::RefPtr<TextBuffer::Mark>&',`Glib::wrap($3, true)')
-_CONVERSION(`GtkTextTag*',`const Glib::RefPtr<TextTag>&',`Glib::wrap($3, true)')
-_CONVERSION(`GtkTextTag*',`const Glib::RefPtr<TextBuffer::Tag>&',`Glib::wrap($3, true)')
-_CONVERSION(`GObject*',`const Glib::RefPtr<Glib::Object>&',`Glib::wrap($3, true)')
 _CONVERSION(`GtkTreePath*',`const TreeModel::Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`GtkTreePath*',`const Path&',`Gtk::TreePath($3, true)')
 _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
 
 _CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
-_CONVERSION(`GtkTreeModel*',`const Glib::RefPtr<const TreeModel>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',Glib::wrap($3, true))
-_CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true)')
 _CONVERSION(`CellRenderer*',`GtkCellRenderer*',__FP2P)
 _CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
-_CONVERSION(`GtkAction*',`const Glib::RefPtr<Action>&',`Glib::wrap($3, true)')
 
 _CONVERSION(`Align',`float',`_gtkmm_align_float_from_enum($3)')
 
