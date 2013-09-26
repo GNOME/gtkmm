@@ -49,9 +49,7 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/textwidget.h
 
 ## These demos use deprecated API.
-## example_icontheme.cc is approximately a replacement for example_stockbrowser.cc.
-## example_uimanager.cc should be replaced by a Gtk::Builder demo.
-## gtk-demo/example_stockbrowser.cc		\
+## example_uimanager.cc should be replaced by a Gtk::Builder demo.		\
 ## gtk-demo/example_uimanager.cc			\
 
 dist_noinst_DATA =			\
