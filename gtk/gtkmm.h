@@ -91,6 +91,9 @@ extern const int gtkmm_micro_version;
 
 #include <gdkmm.h>
 
+//Include these first so they can do some undef/re-def magic for StockID.
+#include <gtkmm/toggleaction.h>
+#include <gtkmm/radioaction.h>
 
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>
@@ -215,7 +218,6 @@ extern const int gtkmm_micro_version;
 # include <gtkmm/printunixdialog.h>
 #endif
 #include <gtkmm/progressbar.h>
-#include <gtkmm/radioaction.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
@@ -247,7 +249,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/statusbar.h>
 #include <gtkmm/statusicon.h>
 #include <gtkmm/stock.h>
-#include <gtkmm/stockid.h>
 #include <gtkmm/stockitem.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
@@ -260,7 +261,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/texttag.h>
 #include <gtkmm/texttagtable.h>
 #include <gtkmm/textview.h>
-#include <gtkmm/toggleaction.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/toolitem.h>
@@ -284,5 +284,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
+#include <gtkmm/stockid.h>
 
 #endif /* #ifndef GTKMM_H */
