@@ -66,11 +66,7 @@ protected:
   //      Would that anything useful other than being tidy? murrayc
   void add(RadioButton& item);
   void add(RadioMenuItem& item);
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Use a class that implements interface Gio::Action, such as Gio::SimpleAction, instead of Gtk::RadioAction.
-   */
   void add(const Glib::RefPtr<RadioAction>& item);
-#endif //GTKMM_DISABLE_DEPRECATED
   void add(RadioToolButton& item);
 
   void* operator new(std::size_t); // not implemented
