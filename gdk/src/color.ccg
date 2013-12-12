@@ -61,7 +61,18 @@ void Color::set_rgb_p(double red_, double green_, double blue_)
 
 void Color::set_hsv(double h, double s, double v)
 {
-  //TODO: Comments/Documentation. I have no idea what this code does. murrayc.
+  // The HSV color space is described in a long Wikipedia article,
+  // http://en.wikipedia.org/wiki/HSV_color_space
+  // The following conversion from HSV to RGB is equivalent to the conversion
+  // shown in Wikipedia. The following relations hold between the Wikipedia
+  // equations (uppercase letters) and the equations used here (lowercase letters):
+  //
+  // h = H' (after division of h by 60 degrees)
+  // p = V - C = m (m from Wikipedia), thus v = C + m
+  // When i is odd:  X + m = V - C * abs(H' mod 2 - 1)
+  //                       = v - vs * (h - i) = q
+  // When i is even: X + m = V - C * abs(H' mod 2 - 1)
+  //                       = v - vs * (1 - (h - i)) = t
 
   h /= 60.0;
   int i = (int)h;
@@ -93,7 +104,18 @@ void Color::set_hsv(double h, double s, double v)
 
 void Color::set_hsl(double h, double s, double l)
 {
-  //TODO: Comments/Documentation. I have no idea what this code does. murrayc.
+  // The HSL color space is described in a long Wikipedia article,
+  // http://en.wikipedia.org/wiki/HSV_color_space
+  // The following conversion from HSL to RGB is equivalent to the conversion
+  // shown in Wikipedia. The following relations hold between the Wikipedia
+  // equations (uppercase letters) and the equations used here (lowercase letters):
+  //
+  // 6*h = H' (after division of h by 360 degrees)
+  // t2 = C + m (m from Wikipedia)
+  // t1 = m
+  //
+  // The conversion algorithm used here is shown at
+  // http://www.w3.org/TR/css3-color/#hsl-color
 
   if(s == 0.0)
     set_grey_p(l);
@@ -106,9 +128,12 @@ void Color::set_hsl(double h, double s, double l)
     double tr = h + 1.0/3.0;
     double tg = h;
     double tb = h - 1.0/3.0;
-    if (tb < 0) tb += 1.0;
+    if (tr > 1.0) tr -= 1.0;
+    if (tb < 0.0) tb += 1.0;
 
-    double r = 0.0, g = 0.0, b = 0.0;
+    double r = t1;
+    double g = t1;
+    double b = t1;
 
     if (tr < 1.0/6.0)
       r = t1 +(t2-t1) * 6 * tr;
