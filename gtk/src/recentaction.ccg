@@ -21,11 +21,51 @@
 namespace Gtk
 {
 
-Glib::RefPtr<RecentAction> RecentAction::create(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip)
+_DEPRECATE_IFDEF_START
+RecentAction::RecentAction(const Glib::ustring& name, const StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip)
+:
+  // Mark this class as non-derived to allow C++ vfuncs to be skipped.
+  Glib::ObjectBase(0),
+  Gtk::Action(Glib::ConstructParams(recentaction_class_.init(), "name", name.empty() ? 0 : name.c_str(), "stock_id", (stock_id).get_c_str(), "label", label.empty() ? 0 : label.c_str(), "tooltip", tooltip.empty() ? 0 : tooltip.c_str(), static_cast<char*>(0)))
 {
-  return Glib::RefPtr<RecentAction>( new RecentAction(name, StockID(), label, tooltip) );
 }
 
+RecentAction::RecentAction(const Glib::ustring& name, const StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip, const Glib::RefPtr<RecentManager>& recent_manager)
+:
+  // Mark this class as non-derived to allow C++ vfuncs to be skipped.
+  Glib::ObjectBase(0),
+  Gtk::Action(Glib::ConstructParams(recentaction_class_.init(), "name", name.empty() ? 0 : name.c_str(), "stock_id", (stock_id).get_c_str(), "label", label.empty() ? 0 : label.c_str(), "tooltip", tooltip.empty() ? 0 : tooltip.c_str(), "recent_manager", Glib::unwrap(recent_manager), static_cast<char*>(0)))
+{
+}
+_DEPRECATE_IFDEF_END
+
+Glib::RefPtr<RecentAction> RecentAction::create(const Glib::ustring& name, const Glib::ustring& label, const Glib::ustring& tooltip)
+{
+_DEPRECATE_IFDEF_START
+  return Glib::RefPtr<RecentAction>( new RecentAction(name, StockID(), label, tooltip) );
+#else // GTKMM_DISABLE_DEPRECATED
+  // StockID is deprecated. Can't call the constructor that takes a StockID.
+  Glib::RefPtr<RecentAction> action(new RecentAction());
+  action->set_name(name);
+  if (!label.empty())
+    action->set_label(label);
+  if (!tooltip.empty())
+    action->set_tooltip(tooltip);
+  return action;
+_DEPRECATE_IFDEF_END
+}
+
+_DEPRECATE_IFDEF_START
+Glib::RefPtr<RecentAction> RecentAction::create(const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip)
+{
+  return Glib::RefPtr<RecentAction>( new RecentAction(name, stock_id, label, tooltip) );
+}
+
+Glib::RefPtr<RecentAction> RecentAction::create(const Glib::ustring& name, const Gtk::StockID& stock_id, const Glib::ustring& label, const Glib::ustring& tooltip, const Glib::RefPtr<RecentManager>& recent_manager)
+{
+  return Glib::RefPtr<RecentAction>( new RecentAction(name, stock_id, label, tooltip, recent_manager) );
+}
+_DEPRECATE_IFDEF_END
 
 } // namespace Gtk
 
