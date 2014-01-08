@@ -35,14 +35,20 @@ class SelectionData
   _IGNORE(gtk_selection_data_copy, gtk_selection_data_free)
 public:
 
-  //TODO : document this. It's like the other set(), but it uses this SelectionData's target type.
-  //Why would you ever want to use any other type?
+  /** Assign a memory block of raw data.
+   * Store new data into the Gtk::SelectionData object. Should _only_ be called
+   * from a selection handler callback.  A 0-byte terminates the stored data.
+   * The type of data is determined by get_target().
+   * @param format The data format, i.e. the number of bits in a unit.
+   * @param data Pointer to the data (will be copied).
+   * @param length The length of the data block in bytes.
+   */
   void set(int format, const guint8* data, int length);
 
   /** Assign a memory block of raw data.
-   * Store new data into the Gtk::SelectionData object. Should _only_ by called
+   * Store new data into the Gtk::SelectionData object. Should _only_ be called
    * from a selection handler callback.  A 0-byte terminates the stored data.
-   * @param type The type of the selection.
+   * @param type The type of the selection data.
    * @param format The data format, i.e. the number of bits in a unit.
    * @param data Pointer to the data (will be copied).
    * @param length The length of the data block in bytes.
@@ -50,9 +56,9 @@ public:
   void set(const std::string& type, int format, const guint8* data, int length);
 
   /** Assign a string of raw data.
-   * Store new data into the Gtk::SelectionData object. Should _only_ by called
+   * Store new data into the Gtk::SelectionData object. Should _only_ be called
    * from a selection handler callback.
-   * @param type The type of the selection.
+   * @param type The type of the selection data.
    * @param data A string that contains the data (does not have to be text).
    */
   void set(const std::string& type, const std::string& data);
@@ -80,17 +86,19 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(), gtk_selection_data_get_pixbuf)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Pixbuf> get_pixbuf() const, gtk_selection_data_get_pixbuf, constversion)
 
-#dnl The constness of gtk_selection_data_set_uris() is not quite right:
+dnl The constness of gtk_selection_data_set_uris() is not quite right:
 #m4 _CONVERSION(`const std::vector<Glib::ustring>&',`gchar**',`const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
   _WRAP_METHOD(bool set_uris(const std::vector<Glib::ustring>& uris), gtk_selection_data_set_uris)
 #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector<Glib::ustring> get_uris() const, gtk_selection_data_get_uris)
 
-
   _WRAP_METHOD(const guchar* get_data() const, gtk_selection_data_get_data)
   _WRAP_METHOD(int get_length() const, gtk_selection_data_get_length)
+  _WRAP_METHOD(const guchar* get_data(int& length) const, gtk_selection_data_get_data_with_length)
 
-  //TODO: Documentation
+  /** Retrieves the raw data of the selection as a std::string.
+   * @return The raw data of the selection. Contains 0-bytes, if the selection data does.
+   */
   std::string get_data_as_string() const;
 
 #m4 _CONVERSION(`GdkAtom',`std::string',`Gdk::AtomString::to_cpp_type ($3)')
