@@ -707,15 +707,18 @@ A set of bit-flags to indicate which events a window is to receive.
 Most of these masks map onto one or more of the #GdkEventType event types
 above.
 
-%GDK_POINTER_MOTION_HINT_MASK is a special mask which is used to reduce the
-number of %GDK_MOTION_NOTIFY events received. Normally a %GDK_MOTION_NOTIFY
-event is received each time the mouse moves. However, if the application
-spends a lot of time processing the event (updating the display, for example),
-it can lag behind the position of the mouse. When using
-%GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will be sent,
-some of which are marked as a hint (the is_hint member is %TRUE).
-To receive more motion events after a motion hint event, the application
-needs to asks for more, by calling gdk_event_request_motions().
+%GDK_POINTER_MOTION_HINT_MASK is deprecated. It is a special mask
+to reduce the number of %GDK_MOTION_NOTIFY events received. When using
+%GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will
+be sent, some of which are marked as a hint (the is_hint member is
+%TRUE). To receive more motion events after a motion hint event,
+the application needs to asks for more, by calling
+gdk_event_request_motions().
+
+Since GTK 3.8, motion events are already compressed by default, independent
+of this mechanism. This compression can be disabled with
+gdk_window_set_event_compression(). See the documentation of that function
+for details.
 
 If %GDK_TOUCH_MASK is enabled, the window will receive touch events
 from touch-enabled devices. Those will come as sequences of #GdkEventTouch
@@ -735,7 +738,7 @@ events, so different sequences may be distinguished.
 </parameter_description>
 </parameter>
 <parameter name="GDK_POINTER_MOTION_HINT_MASK">
-<parameter_description> see the explanation above
+<parameter_description> deprecated. see the explanation above
 </parameter_description>
 </parameter>
 <parameter name="GDK_BUTTON_MOTION_MASK">
@@ -3950,6 +3953,10 @@ the device in the given range of time. Some windowing systems
 do not support motion history, in which case, %FALSE will
 be returned. (This is not distinguishable from the case where
 motion history is supported and no events were found.)
+
+Note that there is also gdk_window_set_event_compression() to get
+more motion events delivered directly, independent of the windowing
+system.
 
 
 </description>
@@ -14186,7 +14193,7 @@ Since: 3.8
 </return>
 </function>
 
-<function name="gdk_wayland_display_get_wl_shell">
+<function name="gdk_wayland_display_get_xdg_shell">
 <description>
 Returns the Wayland global singleton shell of a #GdkDisplay
 
@@ -14199,25 +14206,7 @@ Since: 3.8
 </parameter_description>
 </parameter>
 </parameters>
-<return> a Wayland wl_shell
-
-</return>
-</function>
-
-<function name="gdk_wayland_window_get_wl_shell_surface">
-<description>
-Returns the Wayland shell surface of a #GdkWindow
-
-Since: 3.8
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> a Wayland wl_shell_surface
+<return> a Wayland xdg_shell
 
 </return>
 </function>
@@ -14386,7 +14375,7 @@ to begin a drag with a different device.
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description> the button being used to drag
+<parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
 <parameter name="root_x">
@@ -14427,7 +14416,7 @@ Since: 3.4
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description> the button being used to drag
+<parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
 <parameter name="root_x">
@@ -14542,7 +14531,7 @@ to begin a drag with a different device.
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description> the button being used to drag
+<parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
 <parameter name="root_x">
@@ -14586,7 +14575,7 @@ Since: 3.4
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description> the button being used to drag
+<parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
 <parameter name="root_x">
@@ -15464,6 +15453,24 @@ Since: 2.22
 </parameter>
 </parameters>
 <return> the effective toplevel window containing @window
+
+</return>
+</function>
+
+<function name="gdk_window_get_event_compression">
+<description>
+Get the current event compression setting for this window.
+
+Since: 3.12
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if motion events will be compressed
 
 </return>
 </function>
@@ -16911,7 +16918,7 @@ Deprecated: 3.4: Use gdk_window_set_background_rgba() instead.
 Sets the background of @window.
 
 A background of %NULL means that the window will inherit its
-background form its parent window.
+background from its parent window.
 
 The windowing system will normally fill a window with its background
 when the window is obscured then exposed.
@@ -17166,6 +17173,33 @@ Since: 3.0
 </parameter>
 <parameter name="event_mask">
 <parameter_description> event mask for @window
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_window_set_event_compression">
+<description>
+Determines whether or not extra unprocessed motion events in
+the event queue can be discarded. If %TRUE only the most recent
+event will be delivered.
+
+Some types of applications, e.g. paint programs, need to see all
+motion events and will benefit from turning off event compression.
+
+By default, event compression is enabled.
+
+Since: 3.12
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="event_compression">
+<parameter_description> %TRUE if motion events should be compressed
 </parameter_description>
 </parameter>
 </parameters>
@@ -17634,6 +17668,46 @@ non-interchangeable kind of window.
 </parameter>
 <parameter name="role">
 <parameter_description> a string indicating its role
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_window_set_shadow_width">
+<description>
+Newer GTK+ windows using client-side decorations use extra geometry
+around their frames for effects like shadows and invisible borders.
+Window managers that want to maximize windows or snap to edges need
+to know where the extents of the actual frame lie, so that users
+don't feel like windows are snapping against random invisible edges.
+
+Note that this property is automatically updated by GTK+, so this
+function should only be used by applications which do not use GTK+
+to create toplevel windows.
+
+Since: 3.12
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="left">
+<parameter_description> The left extent
+</parameter_description>
+</parameter>
+<parameter name="right">
+<parameter_description> The right extent
+</parameter_description>
+</parameter>
+<parameter name="top">
+<parameter_description> The top extent
+</parameter_description>
+</parameter>
+<parameter name="bottom">
+<parameter_description> The bottom extent
 </parameter_description>
 </parameter>
 </parameters>
@@ -19326,17 +19400,12 @@ Since: 3.10
 
 <function name="gdk_x11_window_set_frame_extents">
 <description>
-Newer GTK+ windows using client-side decorations use extra geometry
-around their frames for effects like shadows and invisible borders.
-Window managers that want to maximize windows or snap to edges need
-to know where the extents of the actual frame lie, so that users
-don't feel like windows are snapping against random invisible edges.
-
-Note that this property is automatically updated by GTK+, so this
-function should only be used by applications which do not use GTK+
-to create toplevel windows.
+This is the same as gdk_window_set_shadow_width() but it only works
+on GdkX11Window.
 
 Since: 3.10
+
+Deprecated: 3.12: Use gdk_window_set_shadow_width() instead.
 
 </description>
 <parameters>
