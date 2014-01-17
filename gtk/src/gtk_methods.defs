@@ -47,18 +47,25 @@
   (gtype-id "GTK_TYPE_APP_CHOOSER")
 )
 
-(define-object AppChooserOnlinePk
-  (in-module "Gtk")
-  (parent "GObject")
-  (c-name "GtkAppChooserOnlinePk")
-  (gtype-id "GTK_TYPE_APP_CHOOSER_ONLINE_PK")
-)
-
 (define-object Application
   (in-module "Gtk")
   (parent "GApplication")
   (c-name "GtkApplication")
   (gtype-id "GTK_TYPE_APPLICATION")
+)
+
+(define-object ApplicationImpl
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkApplicationImpl")
+  (gtype-id "GTK_TYPE_APPLICATION_IMPL")
+)
+
+(define-object ApplicationImplDBus
+  (in-module "Gtk")
+  (parent "GtkApplicationImpl")
+  (c-name "GtkApplicationImplDBus")
+  (gtype-id "GTK_TYPE_APPLICATION_IMPL_DBUS")
 )
 
 (define-object Buildable
@@ -1110,6 +1117,13 @@
   (gtype-id "GTK_TYPE_FIXED")
 )
 
+(define-object ActionBar
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkActionBar")
+  (gtype-id "GTK_TYPE_ACTION_BAR")
+)
+
 (define-object Bin
   (in-module "Gtk")
   (parent "GtkContainer")
@@ -1714,6 +1728,10 @@
     '("bsd" "GTK_LICENSE_BSD")
     '("mit-x11" "GTK_LICENSE_MIT_X11")
     '("artistic" "GTK_LICENSE_ARTISTIC")
+    '("gpl-2-0-only" "GTK_LICENSE_GPL_2_0_ONLY")
+    '("gpl-3-0-only" "GTK_LICENSE_GPL_3_0_ONLY")
+    '("lgpl-2-1-only" "GTK_LICENSE_LGPL_2_1_ONLY")
+    '("lgpl-3-0-only" "GTK_LICENSE_LGPL_3_0_ONLY")
   )
 )
 
@@ -1725,17 +1743,6 @@
     '("visible" "GTK_ACCEL_VISIBLE")
     '("locked" "GTK_ACCEL_LOCKED")
     '("mask" "GTK_ACCEL_MASK")
-  )
-)
-
-(define-enum ActionHelperRole
-  (in-module "Gtk")
-  (c-name "GtkActionHelperRole")
-  (gtype-id "GTK_TYPE_ACTION_HELPER_ROLE")
-  (values
-    '("normal" "GTK_ACTION_HELPER_ROLE_NORMAL")
-    '("toggle" "GTK_ACTION_HELPER_ROLE_TOGGLE")
-    '("radio" "GTK_ACTION_HELPER_ROLE_RADIO")
   )
 )
 
@@ -4163,6 +4170,16 @@
   )
 )
 
+(define-method get_accel
+  (of-object "GtkAccelLabel")
+  (c-name "gtk_accel_label_get_accel")
+  (return-type "none")
+  (parameters
+    '("guint*" "accelerator_key")
+    '("GdkModifierType*" "accelerator_mods")
+  )
+)
+
 
 
 ;; From gtkaccelmap.h
@@ -4378,6 +4395,54 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "detailed_action_name")
+  )
+)
+
+
+
+;; From gtkactionbar.h
+
+(define-function gtk_action_bar_get_type
+  (c-name "gtk_action_bar_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_action_bar_new
+  (c-name "gtk_action_bar_new")
+  (is-constructor-of "GtkActionBar")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_center_widget
+  (of-object "GtkActionBar")
+  (c-name "gtk_action_bar_get_center_widget")
+  (return-type "GtkWidget*")
+)
+
+(define-method set_center_widget
+  (of-object "GtkActionBar")
+  (c-name "gtk_action_bar_set_center_widget")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "center_widget")
+  )
+)
+
+(define-method pack_start
+  (of-object "GtkActionBar")
+  (c-name "gtk_action_bar_pack_start")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "child")
+  )
+)
+
+(define-method pack_end
+  (of-object "GtkActionBar")
+  (c-name "gtk_action_bar_pack_end")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "child")
   )
 )
 
@@ -4943,18 +5008,6 @@
   (c-name "gtk_app_chooser_refresh")
   (return-type "none")
 )
-
-
-
-;; From gtkappchoosermodule.h
-
-
-
-;; From gtkappchooseronline.h
-
-
-
-;; From gtkappchooseronlinepk.h
 
 
 
@@ -13175,6 +13228,21 @@
   (return-type "gboolean")
 )
 
+(define-method set_decoration_layout
+  (of-object "GtkHeaderBar")
+  (c-name "gtk_header_bar_set_decoration_layout")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "layout")
+  )
+)
+
+(define-method get_decoration_layout
+  (of-object "GtkHeaderBar")
+  (c-name "gtk_header_bar_get_decoration_layout")
+  (return-type "const-gchar*")
+)
+
 
 
 ;; From gtkheaderbarprivate.h
@@ -13495,6 +13563,12 @@
   (of-object "GtkIconInfo")
   (c-name "gtk_icon_info_get_builtin_pixbuf")
   (return-type "GdkPixbuf*")
+)
+
+(define-method is_symbolic
+  (of-object "GtkIconInfo")
+  (c-name "gtk_icon_info_is_symbolic")
+  (return-type "gboolean")
 )
 
 (define-method load_icon
@@ -15196,6 +15270,10 @@
   (c-name "gtk_label_get_track_visited_links")
   (return-type "gboolean")
 )
+
+
+
+;; From gtklabelprivate.h
 
 
 
@@ -17243,24 +17321,6 @@
 
 
 ;; From gtkmodelmenuitem.h
-
-
-
-;; From gtkmodelmenu-quartz.h
-
-(define-function gtk_quartz_set_main_menu
-  (c-name "gtk_quartz_set_main_menu")
-  (return-type "none")
-  (parameters
-    '("GMenuModel*" "model")
-    '("GtkApplication*" "application")
-  )
-)
-
-(define-function gtk_quartz_clear_main_menu
-  (c-name "gtk_quartz_clear_main_menu")
-  (return-type "none")
-)
 
 
 
@@ -29663,6 +29723,15 @@
   (varargs #t)
 )
 
+(define-function gtk_tree_path_new_from_indicesv
+  (c-name "gtk_tree_path_new_from_indicesv")
+  (return-type "GtkTreePath*")
+  (parameters
+    '("gint*" "indices")
+    '("gsize" "length")
+  )
+)
+
 (define-method to_string
   (of-object "GtkTreePath")
   (c-name "gtk_tree_path_to_string")
@@ -35750,6 +35819,12 @@
   (parameters
     '("GtkWidget*" "titlebar")
   )
+)
+
+(define-method is_maximized
+  (of-object "GtkWindow")
+  (c-name "gtk_window_is_maximized")
+  (return-type "gboolean")
 )
 
 
