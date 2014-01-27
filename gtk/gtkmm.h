@@ -101,6 +101,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/accelmap.h>
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/actionable.h>
+#include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/alignment.h>
 #include <gtkmm/appchooserbutton.h>
