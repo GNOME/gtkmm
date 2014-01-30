@@ -207,6 +207,7 @@ extern const int gtkmm_micro_version;
 #endif
 #include <gtkmm/papersize.h>
 #include <gtkmm/placessidebar.h>
+#include <gtkmm/popover.h>
 #include <gtkmm/printcontext.h>
 #ifndef G_OS_WIN32
 # include <gtkmm/printer.h>

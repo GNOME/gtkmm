@@ -149,6 +149,7 @@ int main(int argc, char** argv)
 #ifdef GDK_WINDOWING_X11
             << get_defs( GTK_TYPE_PLUG )
 #endif
+            << get_defs( GTK_TYPE_POPOVER )
 #if !defined(G_OS_WIN32) 
             << get_defs( GTK_TYPE_PRINTER )
             << get_defs( GTK_TYPE_PRINT_JOB )
