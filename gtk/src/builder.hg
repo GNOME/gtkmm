@@ -26,6 +26,7 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gtk
 {
+class Application;
 
 /** Exception class for Gdk::Builder errors.
  */
@@ -386,8 +387,20 @@ public:
    */
   _WRAP_METHOD(bool add_from_string(const char* buffer, gsize length), gtk_builder_add_from_string, errthrow)
 
+  _WRAP_METHOD(void expose_object(const Glib::ustring& name, const Glib::RefPtr<Glib::Object>& object), gtk_builder_expose_object)
+#m4 _CONVERSION(`Widget&',`GObject*',`G_OBJECT(($3).gobj())')
+  /** Add @a widget to the builder object pool so it can be referenced just like any
+   * other object built by builder.
+   * 
+   * @newin{3,12}
+   * @param name The name of the widget exposed to the builder.
+   * @param widget The widget to expose.
+   */
+  _WRAP_METHOD(void expose_widget(const Glib::ustring& name, Widget& widget{object}), gtk_builder_expose_object)
+
   //TODO: Custom-implement this and prevent it from being used with GTK_WIDGET-derived types?
-  //TODO: Make this return a Glib::RefPtr<Gtk::Buildable>? Check what the C API really does - and document that if so.
+  // A Builder can contain objects that don't derive from Buildable,
+  // for instance if objects have been added with expose_object().
   /** Gets the object named @a name.
    * 
    * @newin{2,12}
@@ -520,6 +533,10 @@ public:
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), gtk_builder_set_translation_domain)
   _WRAP_METHOD(Glib::ustring get_translation_domain() const, gtk_builder_get_translation_domain)
 
+  _WRAP_METHOD(void set_application(const Glib::RefPtr<Application>& application), gtk_builder_set_application)
+  _WRAP_METHOD(Glib::RefPtr<Application> get_application(), gtk_builder_get_application, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Application> get_application() const, gtk_builder_get_application, refreturn, constversion)
+
   //We ignore gtk_builder_get_type_from_name() because it only seems useful when implementing GtkBuildable for widgets.
   _IGNORE(gtk_builder_get_type_from_name)
 
@@ -536,9 +553,6 @@ dnl
   klass->get_type_from_name = &get_type_from_name_vfunc_callback;
   _POP()
 #m4end
-
-  // TODO: Make sure this is actually invoked even with disabled vfuncs so
-  // that GtkBuilder creates gtkmm's GObjects.
 };
 
 } // namespace Gtk
