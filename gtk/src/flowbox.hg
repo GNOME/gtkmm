@@ -1,0 +1,232 @@
+/* Copyright (C) 2014 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/container.h>
+#include <gtkmm/orientable.h>
+#include <gtkmm/flowboxchild.h>
+#include <vector>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/container_p.h)
+
+namespace Gtk
+{
+
+/** A container that allows reflowing its children.
+ *
+ * A FlowBox positions child widgets in sequence according to its
+ * orientation.
+ *
+ * For instance, with the horizontal orientation, the widgets will be
+ * arranged from left to right, starting a new row under the previous
+ * row when necessary. Reducing the width in this case will require more
+ * rows, so a larger height will be requested.
+ *
+ * Likewise, with the vertical orientation, the widgets will be arranged
+ * from top to bottom, starting a new column to the right when necessary.
+ * Reducing the height will require more columns, so a larger width will
+ * be requested.
+ *
+ * The children of a FlowBox can be dynamically sorted and filtered.
+ *
+ * Although a FlowBox must have only FlowBoxChild children,
+ * you can add any kind of widget to it via Container::add(), and
+ * a FlowBoxChild widget will automatically be inserted between
+ * the box and the widget.
+ *
+ * Also see ListBox.
+ *
+ * @ingroup Widgets
+ * @ingroup Containers
+ *
+ * @newin{3,12}
+ */
+class FlowBox
+  : public Container,
+    public Orientable
+{
+  _CLASS_GTKOBJECT(FlowBox, GtkFlowBox, GTK_FLOW_BOX, Gtk::Container, GtkContainer)
+  _IMPLEMENTS_INTERFACE(Orientable)
+public:
+
+  /** Creates a FlowBox.
+   */
+  _CTOR_DEFAULT
+
+  /** For instance: void foreach_child(FlowBox* box, FlowBoxChild* child);
+   *
+   * A function used by FlowBox::selected_foreach().
+   * It will be called on every selected child of the @a box.
+   *
+   * @param box FlowBox containing the selected children
+   * @param child Each selected FlowBoxChild
+   *
+   * @newin{3,12}
+   */
+  typedef sigc::slot<void, FlowBox*, FlowBoxChild*> SlotSelectedForeach;
+
+  /** For instance: bool on_filter(FlowBoxChild* child);
+   *
+   * Will be called for each child after a call to FlowBox::set_filter_func(),
+   * and it will continue to be called each time a child changes (via
+   * FlowBoxChild::changed()) or when FlowBox::invalidate_filter()
+   * is called.
+   *
+   * @param child A FlowBoxChild that may be filtered
+   * @returns <tt>true</tt> if the child should be visible, <tt>false</tt> otherwise
+   *
+   * @newin{3,12}
+   */
+  typedef sigc::slot<bool, FlowBoxChild*> SlotFilter;
+
+  /** For instance: int on_sort(FlowBoxChild* child1, FlowBoxChild* child2)
+   *
+   * Will be called for each child after a call to FlowBox::set_sort_func(),
+   * and will continue to be called each time a child changes (via
+   * FlowBoxChild::changed()) and when FlowBox::invalidate_sort()
+   * is called.
+   *
+   * @param child1 The first child.
+   * @param child2 The second child.
+   * @returns < 0 if @a child1 should be before @a child2, 0 if
+   * they are equal, and > 0 otherwise
+   *
+   * @newin{3,12}
+   */
+  typedef sigc::slot<int, FlowBoxChild*, FlowBoxChild*> SlotSort;
+
+  _WRAP_METHOD(void set_homogeneous(bool homogeneous = true), gtk_flow_box_set_homogeneous)
+  _WRAP_METHOD(bool get_homogeneous() const, gtk_flow_box_get_homogeneous)
+
+  _WRAP_METHOD(void set_row_spacing(guint spacing), gtk_flow_box_set_row_spacing)
+  _WRAP_METHOD(guint get_row_spacing() const, gtk_flow_box_get_row_spacing)
+
+  _WRAP_METHOD(void set_column_spacing(guint spacing), gtk_flow_box_set_column_spacing)
+  _WRAP_METHOD(guint get_column_spacing() const, gtk_flow_box_get_column_spacing)
+
+  _WRAP_METHOD(void set_min_children_per_line(guint n_children), gtk_flow_box_set_min_children_per_line)
+  _WRAP_METHOD(guint get_min_children_per_line() const, gtk_flow_box_get_min_children_per_line)
+
+  _WRAP_METHOD(void set_max_children_per_line(guint n_children), gtk_flow_box_set_max_children_per_line)
+  _WRAP_METHOD(guint get_max_children_per_line() const, gtk_flow_box_get_max_children_per_line)
+
+  _WRAP_METHOD(void set_activate_on_single_click(bool single = true), gtk_flow_box_set_activate_on_single_click)
+  _WRAP_METHOD(bool get_activate_on_single_click() const, gtk_flow_box_get_activate_on_single_click)
+
+  _WRAP_METHOD(void insert(Widget& widget, int position), gtk_flow_box_insert)
+
+  _WRAP_METHOD(FlowBoxChild* get_child_at_index(int idx), gtk_flow_box_get_child_at_index)
+  _WRAP_METHOD(const FlowBoxChild* get_child_at_index(int idx) const, gtk_flow_box_get_child_at_index, constversion)
+
+  /** Calls a function for each selected child.
+   *
+   * Note that the selection cannot be modified from within
+   * this function.
+   *
+   * @param slot The function to call for each selected child
+   *
+   * @newin{3,12}
+   */
+  void selected_foreach(const SlotSelectedForeach& slot);
+  _IGNORE(gtk_flow_box_selected_foreach)
+
+  // transfer container
+#m4 _CONVERSION(`GList*',`std::vector< Gtk::FlowBoxChild*>',`Glib::ListHandler< Gtk::FlowBoxChild* >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Gtk::FlowBoxChild*> get_selected_children(), gtk_flow_box_get_selected_children)
+#m4 _CONVERSION(`GList*',`std::vector< const Gtk::FlowBoxChild*>',`Glib::ListHandler< const Gtk::FlowBoxChild* >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< const Gtk::FlowBoxChild*> get_selected_children() const, gtk_flow_box_get_selected_children)
+
+  _WRAP_METHOD(void select_child(FlowBoxChild& child), gtk_flow_box_select_child)
+  _WRAP_METHOD(void unselect_child(FlowBoxChild& child), gtk_flow_box_unselect_child)
+
+  _WRAP_METHOD(void select_all(), gtk_flow_box_select_all)
+  _WRAP_METHOD(void unselect_all(), gtk_flow_box_unselect_all)
+
+  _WRAP_METHOD(void set_selection_mode(SelectionMode mode = SELECTION_NONE), gtk_flow_box_set_selection_mode)
+  _WRAP_METHOD(SelectionMode get_selection_mode() const, gtk_flow_box_get_selection_mode)
+
+  _WRAP_METHOD(void set_hadjustment(const Glib::RefPtr<Adjustment>& adjustment), gtk_flow_box_set_hadjustment)
+  _WRAP_METHOD(void set_vadjustment(const Glib::RefPtr<Adjustment>& adjustment), gtk_flow_box_set_vadjustment)
+
+  /** Sets a filter function.
+   *
+   * By setting a filter function on the FlowBox one can decide dynamically
+   * which of the children to show. For instance, to implement a search
+   * function that only shows the children matching the search terms.
+   *
+   * The @a slot will be called for ach child after the call, and
+   * it will continue to be called each time a child changes (via
+   * FlowBoxChild::changed()) or when FlowBox::invalidate_filter()
+   * is called.
+   *
+   * @param slot Callback that lets you filter which children to show
+   *
+   * @newin{3,12}
+   */
+  void set_filter_func(const SlotFilter& slot);
+  _IGNORE(gtk_flow_box_set_filter_func)
+
+  /** Removes the filter function, if any.
+   *
+   * @newin{3,12}
+   */
+  void unset_filter_func();
+
+  _WRAP_METHOD(void invalidate_filter(), gtk_flow_box_invalidate_filter)
+
+  /** Sets a sort function.
+   *
+   * By setting a sort function on the FlowBox, one can dynamically
+   * reorder the children of the box, based on the contents of
+   * the children.
+   *
+   * The @a slot will be called for each child after the call,
+   * and will continue to be called each time a child changes (via
+   * FlowBoxChild::changed()) and when FlowBox::invalidate_sort()
+   * is called.
+   *
+   * @param slot The sort function
+   *
+   * @newin{3,12}
+   */
+  void set_sort_func(const SlotSort& slot);
+  _IGNORE(gtk_flow_box_set_sort_func)
+
+  /** Removes the sort function, if any.
+   *
+   * @newin{3,12}
+   */
+  void unset_sort_func();
+
+  _WRAP_METHOD(void invalidate_sort(), gtk_flow_box_invalidate_sort)
+
+
+  _WRAP_PROPERTY("selection-mode", SelectionMode)
+  _WRAP_PROPERTY("activate-on-single-click", bool)
+  _WRAP_PROPERTY("homogeneous", bool)
+  _WRAP_PROPERTY("min-children-per-line", guint)
+  _WRAP_PROPERTY("max-children-per-line", guint)
+  _WRAP_PROPERTY("row-spacing", guint)
+  _WRAP_PROPERTY("column-spacing", guint)
+
+
+  _WRAP_SIGNAL(void child_activated(FlowBoxChild*), "child-activated")
+  _WRAP_SIGNAL(void selected_children_changed(), "selected-children-changed")
+  _IGNORE("activate-cursor-child", "toggle-cursor-child", "move-cursor", "select-all", "unselect-all") // Action signals
+};
+
+} // namespace Gtk
+

@@ -155,6 +155,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filechooserwidget.h>
 #include <gtkmm/filefilter.h>
 #include <gtkmm/fixed.h>
+#include <gtkmm/flowbox.h>
+#include <gtkmm/flowboxchild.h>
 #include <gtkmm/fontbutton.h>
 #include <gtkmm/fontchooser.h>
 #include <gtkmm/fontchooserdialog.h>

@@ -1,0 +1,125 @@
+/* Copyright (C) 2014 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+#include <gtkmm/adjustment.h>
+
+namespace
+{
+
+static void FuncProxy_Foreach_gtk_callback(GtkFlowBox* box, GtkFlowBoxChild* child, void* data)
+{
+  Gtk::FlowBox::SlotSelectedForeach* the_slot = static_cast<Gtk::FlowBox::SlotSelectedForeach*>(data);
+
+  try
+  {
+    (*the_slot)(Glib::wrap(box), Glib::wrap(child));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static gboolean SignalProxy_Filter_gtk_callback(GtkFlowBoxChild* child, void* data)
+{
+  Gtk::FlowBox::SlotFilter* the_slot = static_cast<Gtk::FlowBox::SlotFilter*>(data);
+
+  try
+  {
+    return (*the_slot)(Glib::wrap(child));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+    return FALSE;
+  }
+}
+
+static void SignalProxy_Filter_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::FlowBox::SlotFilter*>(data);
+}
+
+static gint SignalProxy_Sort_gtk_callback(GtkFlowBoxChild* child1, GtkFlowBoxChild* child2, void* data)
+{
+  Gtk::FlowBox::SlotSort* the_slot = static_cast<Gtk::FlowBox::SlotSort*>(data);
+
+  try
+  {
+    return (*the_slot)(Glib::wrap(child1), Glib::wrap(child2));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+    return 0;
+  }
+}
+
+static void SignalProxy_Sort_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::FlowBox::SlotSort*>(data);
+}
+
+} // anonymous namespace
+
+namespace Gtk
+{
+
+void FlowBox::selected_foreach(const SlotSelectedForeach& slot)
+{
+  SlotSelectedForeach slot_local_copy(slot);
+
+  gtk_flow_box_selected_foreach(gobj(),
+    &FuncProxy_Foreach_gtk_callback, &slot_local_copy);
+}
+
+void FlowBox::set_filter_func(const SlotFilter& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_Filter_gtk_callback_destroy() is called.
+  SlotFilter* slot_copy = new SlotFilter(slot);
+
+  gtk_flow_box_set_filter_func(gobj(),
+    &SignalProxy_Filter_gtk_callback, slot_copy,
+    &SignalProxy_Filter_gtk_callback_destroy);
+}
+
+void FlowBox::unset_filter_func()
+{
+  gtk_flow_box_set_filter_func(gobj(), 0, 0, 0);
+}
+
+void FlowBox::set_sort_func(const SlotSort& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_Sort_gtk_callback_destroy() is called.
+  SlotSort* slot_copy = new SlotSort(slot);
+
+  gtk_flow_box_set_sort_func(gobj(),
+    &SignalProxy_Sort_gtk_callback, slot_copy,
+    &SignalProxy_Sort_gtk_callback_destroy);
+}
+
+void FlowBox::unset_sort_func()
+{
+  gtk_flow_box_set_sort_func(gobj(), 0, 0, 0);
+}
+
+} //namespace Gtk
+

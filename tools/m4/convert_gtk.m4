@@ -572,6 +572,12 @@ _CONVERSION(`const Border&',`const GtkBorder*',__FR2P)
 _CONVERSION(`Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))')
 
+#FlowBoxChild
+_CONVERSION(`GtkFlowBoxChild*',`FlowBoxChild*',__RP2P)
+_CONVERSION(`GtkFlowBoxChild*',`const FlowBoxChild*',__RP2P)
+_CONVERSION(`FlowBoxChild&',`GtkFlowBoxChild*',__FR2P)
+_CONVERSION(`FlowBoxChild*',`GtkFlowBoxChild*',__FP2P)
+
 #ListBoxRow
 _CONVERSION(`GtkListBoxRow*',`ListBoxRow*',__RP2P)
 _CONVERSION(`GtkListBoxRow*',`const ListBoxRow*',__RP2P)
