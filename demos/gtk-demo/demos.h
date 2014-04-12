@@ -24,6 +24,7 @@ Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
 Gtk::Window* do_flowbox();
+Gtk::Window* do_headerbar();
 Gtk::Window* do_icontheme();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
@@ -57,6 +58,7 @@ Demo testgtk_demos[] =
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), 0 },
+  { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), 0 },
   { "Icon Theme", "example_icontheme.cc", sigc::ptr_fun(&do_icontheme), 0 },  
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
