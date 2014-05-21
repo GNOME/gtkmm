@@ -11,6 +11,12 @@
 
 #include "gtkmm.h"
 
+// 2014-05-21: The pan-[up,down,left,right]-symbolic icons are new.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=729565
+// If they are not available in your selected icon theme, perhaps you can
+// use the go-[up,down,previous,next]-symbolic icons.
+#define USE_PAN_ICON_NAMES 0
+
 class Example_HeaderBar : public Gtk::Window
 {
 public:
@@ -22,8 +28,6 @@ protected:
   // Widgets
   Gtk::Image m_send_receive_image;
   Gtk::Button m_send_receive_button;
-  Gtk::Arrow m_left_arrow;
-  Gtk::Arrow m_right_arrow;
   Gtk::Button m_left_arrow_button;
   Gtk::Button m_right_arrow_button;
   Gtk::TextView m_text_view;
@@ -44,9 +48,7 @@ Gtk::Window* do_headerbar()
 }
 
 Example_HeaderBar::Example_HeaderBar()
-: m_left_arrow(Gtk::ARROW_LEFT, Gtk::SHADOW_NONE),
-  m_right_arrow(Gtk::ARROW_RIGHT, Gtk::SHADOW_NONE),
-  m_arrow_buttons_box(Gtk::ORIENTATION_HORIZONTAL)
+: m_arrow_buttons_box(Gtk::ORIENTATION_HORIZONTAL)
 {
   // Window properties
   // Window title is set by header bar
@@ -88,8 +90,13 @@ void Example_HeaderBar::configure_arrow_buttons()
 {
   m_arrow_buttons_box.get_style_context()->add_class("linked");
 
-  m_left_arrow_button.add(m_left_arrow);
-  m_right_arrow_button.add(m_right_arrow);
+#if USE_PAN_ICON_NAMES
+  m_left_arrow_button.set_image_from_icon_name("pan-left-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+  m_right_arrow_button.set_image_from_icon_name("pan-right-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+#else
+  m_left_arrow_button.set_image_from_icon_name("go-previous-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+  m_right_arrow_button.set_image_from_icon_name("go-next-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+#endif
 
   m_arrow_buttons_box.add(m_left_arrow_button);
   m_arrow_buttons_box.add(m_right_arrow_button);
