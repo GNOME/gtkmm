@@ -203,7 +203,8 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
     {
       int x = 0, y = 0;
       Gdk::ModifierType state = Gdk::ModifierType(0);
-      const Glib::RefPtr<const Gdk::Device> device = Glib::wrap(event->device);
+      const Glib::RefPtr<const Gdk::Device> device =
+        Glib::wrap(event->device, true); // true == take_copy
       refWindow->get_device_position(device, x, y, state);
 
       if((state & Gdk::BUTTON1_MASK) != 0)
