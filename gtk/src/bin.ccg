@@ -48,6 +48,7 @@ Bin::remove()
   }
 }
 
+_DEPRECATE_IFDEF_START
 void
 Bin::add_label(const Glib::ustring& str, bool mnemonic /* = false */,
 	             double x_align /* = 0.5 */, double y_align /* = 0.5 */)
@@ -62,16 +63,18 @@ Bin::add_label(const Glib::ustring& str, bool mnemonic /* = false */,
 
   label->show();
 }
+_DEPRECATE_IFDEF_END
 
 void
 Bin::add_label(const Glib::ustring& str, bool mnemonic,
 	       Align x_align, Align y_align /* = ALIGN_CENTER */)
 {
-  add_label(str, mnemonic,
-	    _gtkmm_align_float_from_enum(x_align),
-	    _gtkmm_align_float_from_enum(y_align));
+  Label* label = manage(new Label(str, x_align, y_align, mnemonic));
+  add(*label);
+  label->show();
 }
 
+_DEPRECATE_IFDEF_START
 void
 Bin::add_pixlabel(const std::string& pixfile,
 		  const Glib::ustring& str,
@@ -91,6 +94,25 @@ Bin::add_pixlabel(const std::string& pixfile,
   //And put that Box in this:
   add(*hbox);
 }
+_DEPRECATE_IFDEF_END
 
+void
+Bin::add_pixlabel(const std::string& pixfile,
+      const Glib::ustring& str,
+      Align x_align, Align y_align /* = ALIGN_CENTER */)
+{
+  //Create Image and Label widgets:
+  Image* pmap = manage(new Image(pixfile));
+  Label* label = manage(new Label(str, x_align, y_align));
+
+  //Put them in a Box:
+  Box* hbox = manage(new Box(ORIENTATION_HORIZONTAL, 5));
+  hbox->pack_start(*pmap, PACK_SHRINK);
+  hbox->pack_start(*label);
+  hbox->show_all();
+
+  //And put that Box in this:
+  add(*hbox);
+}
 
 } //namespace Gtk

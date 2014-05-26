@@ -133,8 +133,7 @@ void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
                                 const Glib::ustring& label_text,
                                 const std::list<Glib::ustring>& options)
 {
-  Gtk::Label* pLabel = Gtk::manage(new Gtk::Label(label_text, true));
-  pLabel->set_alignment(Gtk::ALIGN_START, Gtk::ALIGN_END);
+  Gtk::Label* pLabel = Gtk::manage(new Gtk::Label(label_text, Gtk::ALIGN_START, Gtk::ALIGN_END, true));
 
   grid.attach(*pLabel, 0, row, 1, 1);
   pLabel->set_hexpand();

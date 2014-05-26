@@ -386,7 +386,7 @@ Popup::Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& promp
   m_Frame.set_shadow_type(Gtk::SHADOW_OUT);
   add(m_Frame);
 
-  m_Label.set_padding(10, 10);
+  m_Label.property_margin() = 10;
   m_Frame.add(m_Label);
 
   show_all_children();
