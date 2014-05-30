@@ -40,7 +40,6 @@ protected:
   Gtk::ScrolledWindow m_ScrolledWindow;
   Glib::RefPtr<Gtk::TreeModel> m_refTreeModel;
   Gtk::TreeView m_TreeView;
-  Gtk::Alignment m_Alignment;
   Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
 
   Gtk::Image m_Image;
@@ -85,8 +84,7 @@ Example_IconTheme::Example_IconTheme()
   m_IconTheme(Gtk::IconTheme::get_default()),
   m_Frame("Selected Icon"),
   m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
-  m_Alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_START, 0.0, 0.0)
+  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8)
 {
   set_title("Icons in Current Icon Theme");
   set_default_size(1000, 500);
@@ -121,8 +119,9 @@ Example_IconTheme::Example_IconTheme()
   m_TreeView.append_column("Context", m_columns.context);
   //m_TreeView.append_column("Filename", m_columns.filename);
 
-  m_HBox.pack_end(m_Alignment, Gtk::PACK_SHRINK);
-  m_Alignment.add(m_Frame);
+  m_HBox.pack_end(m_Frame, Gtk::PACK_SHRINK);
+  m_Frame.set_halign(Gtk::ALIGN_CENTER);
+  m_Frame.set_valign(Gtk::ALIGN_START);
 
   m_VBox.set_border_width(4);
   m_Frame.add(m_VBox);

@@ -33,7 +33,6 @@ protected:
   Gtk::Box m_VBox;
   Gtk::Label m_Label_Image, m_Label_Animation, m_Label_Progressive;
   Gtk::Frame m_Frame_Image, m_Frame_Animation, m_Frame_Progressive;
-  Gtk::Alignment m_Alignment_Image, m_Alignment_Animation, m_Alignment_Progressive;
   Gtk::Image m_Image_Progressive;
   Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
 
@@ -49,8 +48,6 @@ Gtk::Window* do_images()
 Example_Images::Example_Images()
 :
   m_VBox                (Gtk::ORIENTATION_VERTICAL, 8),
-  m_Alignment_Image     (0.5, 0.5, 0, 0),
-  m_Alignment_Animation (0.5, 0.5, 0, 0),
   m_image_stream        (0)
 {
   set_title("Images");
@@ -66,11 +63,9 @@ Example_Images::Example_Images()
 
   m_Frame_Image.set_shadow_type(Gtk::SHADOW_IN);
 
-  /* The alignment keeps the frame from growing when users resize
-   * the window
-   */
-  m_Alignment_Image.add(m_Frame_Image);
-  m_VBox.pack_start(m_Alignment_Image, Gtk::PACK_SHRINK);
+  m_Frame_Image.set_halign(Gtk::ALIGN_CENTER);
+  m_Frame_Image.set_valign(Gtk::ALIGN_CENTER);
+  m_VBox.pack_start(m_Frame_Image, Gtk::PACK_SHRINK);
 
   Gtk::Image* pImage = Gtk::manage(new Gtk::Image(demo_find_file("gtk-logo-rgb.gif")));
   m_Frame_Image.add(*pImage);
@@ -82,11 +77,9 @@ Example_Images::Example_Images()
 
   m_Frame_Animation.set_shadow_type(Gtk::SHADOW_IN);
 
-  /* The alignment keeps the frame from growing when users resize
-   * the window
-   */
-  m_Alignment_Animation.add(m_Frame_Animation);
-  m_VBox.pack_start(m_Alignment_Animation, Gtk::PACK_SHRINK);
+  m_Frame_Animation.set_halign(Gtk::ALIGN_CENTER);
+  m_Frame_Animation.set_valign(Gtk::ALIGN_CENTER);
+  m_VBox.pack_start(m_Frame_Animation, Gtk::PACK_SHRINK);
 
   pImage = Gtk::manage(new Gtk::Image(demo_find_file("floppybuddy.gif")));
   m_Frame_Animation.add(*pImage);
@@ -98,11 +91,7 @@ Example_Images::Example_Images()
 
   m_Frame_Progressive.set_shadow_type(Gtk::SHADOW_IN);
 
-  /* The alignment keeps the frame from growing when users resize
-  * the window
-  */
-  m_Alignment_Progressive.add(m_Frame_Progressive);
-  m_VBox.pack_start(m_Alignment_Progressive, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Frame_Progressive, Gtk::PACK_SHRINK);
 
   /* Create an empty image for now; the progressive loader
    * will create the pixbuf and fill it in.

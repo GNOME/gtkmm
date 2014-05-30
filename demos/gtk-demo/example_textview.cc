@@ -469,11 +469,11 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
   Gdk::RGBA color("black");
   pEventBox->override_background_color(color);
 
-  Gtk::Alignment* pAlign = Gtk::manage( new Gtk::Alignment(0.5, 0.5, 1.0, 1.0));
-  pAlign->set_border_width(1);
+  pChildView->set_halign(Gtk::ALIGN_CENTER);
+  pChildView->set_valign(Gtk::ALIGN_CENTER);
+  pChildView->set_border_width(1);
 
-  pEventBox->add(*pAlign);
-  pAlign->add(*pChildView);
+  pEventBox->add(*pChildView);
 
   view.add_child_at_anchor(*pEventBox, refAnchor);
   recursive_attach_view (depth + 1, *pChildView, refAnchor);

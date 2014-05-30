@@ -22,7 +22,6 @@ protected:
   Gtk::DrawingArea m_DrawingArea;
   Gtk::Button m_Button;
   Gdk::RGBA m_Color;
-  Gtk::Alignment m_Alignment;
 };
 
 //Called by DemoWindow;
@@ -33,8 +32,7 @@ Gtk::Window* do_colorsel()
 
 Example_ColorSel::Example_ColorSel()
 : m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
-  m_Button("_Change the above color", true),
-  m_Alignment(Gtk::ALIGN_END, Gtk::ALIGN_END, 0.0, 0.0)
+  m_Button("_Change the above color", true)
 {
   set_title("Color Selection");
   set_border_width(8);
@@ -64,9 +62,10 @@ Example_ColorSel::Example_ColorSel()
 
   m_Frame.add(m_DrawingArea);
 
-  m_Alignment.add(m_Button);
+  m_Button.set_halign(Gtk::ALIGN_END);
+  m_Button.set_valign(Gtk::ALIGN_CENTER);
 
-  m_VBox.pack_start(m_Alignment,Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Button, Gtk::PACK_SHRINK);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_ColorSel::on_button_clicked));
 
