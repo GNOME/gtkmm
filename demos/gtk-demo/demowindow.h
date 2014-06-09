@@ -24,6 +24,7 @@
 #include "gtkmm/headerbar.h"
 #include "gtkmm/button.h"
 #include "gtkmm/notebook.h"
+#include "gtkmm/scrolledwindow.h"
 #include "gtkmm/box.h"
 
 #include "gtkmm/treestore.h"
@@ -57,6 +58,7 @@ protected:
   Gtk::HeaderBar m_HeaderBar;
   Gtk::Button m_RunButton;
   Gtk::Notebook m_Notebook;
+  Gtk::ScrolledWindow m_SideBar;
   Gtk::Box m_HBox;
 
   Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;

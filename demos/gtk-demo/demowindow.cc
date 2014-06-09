@@ -99,14 +99,18 @@ DemoWindow::DemoWindow()
 
   fill_tree();
 
-  m_HBox.pack_start(m_TreeView, Gtk::PACK_SHRINK);
+  //SideBar
+  m_SideBar.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+  m_SideBar.get_style_context()->add_class("sidebar");
+  m_SideBar.add(m_TreeView);
+  m_HBox.pack_start(m_SideBar, Gtk::PACK_SHRINK);
 
   //Notebook:
   m_Notebook.append_page(m_TextWidget_Info, "_Info", true);  //true = use mnemonic.
   m_Notebook.append_page(m_TextWidget_Source, "_Source", true);  //true = use mnemonic.
   m_HBox.pack_start(m_Notebook);
 
-  set_default_size (600, 400);
+  set_default_size (800, 600);
 
   load_file (testgtk_demos[0].filename);
   show_all();
