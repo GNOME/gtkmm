@@ -416,6 +416,24 @@ void Widget_Class::get_preferred_width_for_height_vfunc_callback(GtkWidget* self
 Widget::~Widget()
 {}
 
+void Widget::reparent(Widget& new_parent)
+{
+  //TODO: When 'Widget& new_parent' is changed to 'Container& new_parent',
+  // remove the next two statements.
+  Container* new_container = dynamic_cast<Container*>(&new_parent);
+  g_return_if_fail(new_container != 0); // if new_parent is not a Container
+  Container* old_container = get_parent();
+  g_return_if_fail(old_container != 0); // if the widget is not in a Container
+
+  if (old_container != new_container)
+  {
+    reference();
+    old_container->remove(*this);
+    new_container->add(*this);
+    unreference();
+  }
+}
+
 bool Widget::intersect(const Gdk::Rectangle& area) const
 {
   return gtk_widget_intersect(
