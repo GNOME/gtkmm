@@ -18,6 +18,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS =			\
+	builder/test		\
 	child_widget/test		\
 	child_widget2/test		\
 	child_widget_managed/test	\
@@ -33,6 +34,7 @@ check_PROGRAMS =			\
 
 TESTS =	test_validate_docs_xhtml.sh
 
+builder_test_SOURCES               = builder/main.cc
 child_widget_test_SOURCES          = child_widget/main.cc	\
                                      child_widget/testwindow.cc	\
                                      child_widget/testwindow.h
