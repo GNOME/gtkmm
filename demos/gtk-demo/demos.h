@@ -29,6 +29,7 @@ Gtk::Window* do_icontheme();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
 Gtk::Window* do_menus();
+Gtk::Window* do_overlay();
 Gtk::Window* do_pixbufs();
 Gtk::Window* do_panes();
 Gtk::Window* do_sizegroup();
@@ -63,6 +64,7 @@ Demo testgtk_demos[] =
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
   { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
+  { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), 0 },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
   { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
