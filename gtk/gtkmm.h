@@ -202,6 +202,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/numerableicon.h>
 #include <gtkmm/object.h>
 #include <gtkmm/offscreenwindow.h>
+#include <gtkmm/overlay.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
 #ifndef G_OS_WIN32

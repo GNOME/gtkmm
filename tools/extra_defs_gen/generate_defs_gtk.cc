@@ -146,6 +146,7 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_NUMERABLE_ICON )
             << get_defs( GTK_TYPE_OFFSCREEN_WINDOW )
             << get_defs( GTK_TYPE_ORIENTABLE )
+            << get_defs( GTK_TYPE_OVERLAY )
             << get_defs( GTK_TYPE_PANED )
             << get_defs( GTK_TYPE_PLACES_SIDEBAR )
 #ifdef GDK_WINDOWING_X11
