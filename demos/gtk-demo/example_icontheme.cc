@@ -44,7 +44,6 @@ protected:
 
   Gtk::Image m_Image;
   Gtk::Label m_Label_IconName;
-  Gtk::Label m_Label_DisplayName;
   Gtk::Label m_Label_Sizes;
   Gtk::Label m_Label_Context;
   Gtk::Label m_Label_Filename;
@@ -53,7 +52,6 @@ protected:
   {
     Gtk::TreeModelColumn< Glib::RefPtr<Gdk::Pixbuf> > icon;
     Gtk::TreeModelColumn<Glib::ustring>               iconname;
-    Gtk::TreeModelColumn<Glib::ustring>               displayname;
     Gtk::TreeModelColumn<Glib::ustring>               sizes;
     Gtk::TreeModelColumn<Glib::ustring>               context;
     Gtk::TreeModelColumn<Glib::ustring>               filename;
@@ -62,7 +60,6 @@ protected:
     {
       add(icon);
       add(iconname);
-      add(displayname);
       add(sizes);
       add(context);
       add(filename);
@@ -114,7 +111,6 @@ Example_IconTheme::Example_IconTheme()
   m_TreeView.append_column(*pColumn);
 
   //Defaults to CellRendererText for a string model column.
-  m_TreeView.append_column("Display Name", m_columns.displayname);
   m_TreeView.append_column("Sizes", m_columns.sizes);
   m_TreeView.append_column("Context", m_columns.context);
   //m_TreeView.append_column("Filename", m_columns.filename);
@@ -128,7 +124,6 @@ Example_IconTheme::Example_IconTheme()
 
   m_VBox.pack_start(m_Image, Gtk::PACK_SHRINK);
   m_VBox.pack_start(m_Label_IconName, Gtk::PACK_SHRINK);
-  m_VBox.pack_start(m_Label_DisplayName, Gtk::PACK_SHRINK);
   m_VBox.pack_start(m_Label_Sizes, Gtk::PACK_SHRINK);
   m_VBox.pack_start(m_Label_Context, Gtk::PACK_SHRINK);
   m_VBox.pack_start(m_Label_Filename, Gtk::PACK_SHRINK);
@@ -194,10 +189,8 @@ Glib::RefPtr<Gtk::TreeModel> Example_IconTheme::create_model()
         row[m_columns.icon] = icon_info.load_icon();
     }
 
-    // Populate icon name and display name columns.
+    // Populate icon name column.
     row[m_columns.iconname] = *iconiter;
-    if (icon_info)
-      row[m_columns.displayname] = icon_info.get_display_name();
 
     // Populate sizes column.
     std::ostringstream size_names;
@@ -245,13 +238,11 @@ void Example_IconTheme::on_selection_changed()
     // get the data out of the model
     const Glib::RefPtr<Gdk::Pixbuf> icon = row[m_columns.icon];
     const Glib::ustring icon_name = row[m_columns.iconname];
-    const Glib::ustring display_name = row[m_columns.displayname];
     const Glib::ustring sizes = row[m_columns.sizes];
     const Glib::ustring context = row[m_columns.context];
     const Glib::ustring filename = row[m_columns.filename];
 
     m_Label_IconName.set_text(icon_name);
-    m_Label_DisplayName.set_text(display_name);
     m_Label_Sizes.set_text(sizes);
     m_Label_Context.set_text(context);
     m_Label_Filename.set_text(filename);
@@ -275,7 +266,6 @@ void Example_IconTheme::on_selection_changed()
   {
     m_Image.clear();
     m_Label_IconName.set_text("No selected icon");
-    m_Label_DisplayName.set_text("");
     m_Label_Sizes.set_text("");
     m_Label_Context.set_text("");
     m_Label_Filename.set_text("");
