@@ -1,0 +1,184 @@
+/* Copyright (C) 2014 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <vector>
+#include <gtkmm/eventcontroller.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/eventcontroller_p.h)
+
+namespace Gtk
+{
+_WRAP_ENUM(EventSequenceState, GtkEventSequenceState)
+
+/** Abstract base class for gestures.
+ *
+ * This is the base object for gesture recognition. Although this
+ * object is quite generalized to serve as a base for multi-touch gestures,
+ * it is suitable to implement single-touch and pointer-based gestures (using
+ * the special GdkEventSequence value for these).
+ *
+ * The number of touches that a Gesture need to be recognized is controlled
+ * by the n-points property. If a gesture is keeping track of less
+ * or more than that number of sequences, it won't check whether the gesture
+ * is recognized.
+ *
+ * As soon as the gesture has the expected number of touches, the gesture will
+ * run check signal regularly on input events until the gesture
+ * is recognized. The criteria to consider a gesture as "recognized" is left to
+ * Gesture subclasses.
+ *
+ * A recognized gesture will then emit the following signals:
+ * - signal_begin() when the gesture is recognized.
+ * - A number of signal_update(), whenever an input event is processed.
+ * - signal_end() when the gesture is no longer recognized.
+ *
+ * <h2>Event propagation</h2>
+ *
+ * In order to receive events, a gesture needs to either set a propagation phase
+ * through EventController::set_propagation_phase(), or feed those manually
+ * through EventController::handle_event().
+ *
+ * In the capture phase, events are propagated from the toplevel down to the
+ * target widget, and gestures that are attached to containers above the widget
+ * get a chance to interact with the event before it reaches the target.
+ *
+ * After the capture phase, GTK+ emits the traditional Widget::signal_button_press_event(),
+ * Widget::signal_button_release_event(), Widget::signal_touch_event(), etc. Gestures
+ * with the Gtk::PHASE_TARGET phase are fed events from the default
+ * Widget::signal_event() handlers.
+ *
+ * In the bubble phase, events are propagated up from the target widget to the
+ * toplevel, and gestures that are attached to containers above the widget get
+ * a chance to interact with events that have not been handled yet.
+ *
+ * <h2>States of a sequence</h2>
+ *
+ * Whenever input interaction happens, a single event may trigger a cascade of
+ * Gesture%s, both across the parents of the widget receiving the
+ * event and parallelly within an individual widget. It is a responsibility of the
+ * widgets using those gestures to set the state of touch sequences accordingly
+ * in order to enable cooperation of gestures around the GdkEventSequence%s
+ * triggering those.
+ *
+ * Within a widget, gestures can be grouped through group().
+ * Grouped gestures synchronize the state of sequences, so calling
+ * set_sequence_state() on one will effectively propagate
+ * the state throughout the group.
+ *
+ * By default, all sequences start out in the Gtk::EVENT_SEQUENCE_NONE state.
+ * Sequences in this state trigger the gesture event handler, but event
+ * propagation will continue unstopped by gestures.
+ *
+ * If a sequence enters into the Gtk::EVENT_SEQUENCE_DENIED state, the gesture
+ * group will effectively ignore the sequence, letting events go unstopped
+ * through the gesture, but the "slot" will still remain occupied while
+ * the touch is active.
+ *
+ * If a sequence enters in the Gtk::EVENT_SEQUENCE_CLAIMED state, the gesture
+ * group will grab all interaction on the sequence, by:
+ * - Setting the same sequence to Gtk::EVENT_SEQUENCE_DENIED on every other gesture
+ *   group within the widget, and every gesture on parent widgets in the propagation
+ *   chain.
+ * - emitting signal_cancel() on every gesture in widgets underneath in the
+ *   propagation chain.
+ * - Stopping event propagation after the gesture group handles the event.
+ *
+ * @note If a sequence is set early to Gtk::EVENT_SEQUENCE_CLAIMED on
+ * Gdk::TOUCH_BEGIN/Gdk::BUTTON_PRESS (so those events are captured before
+ * reaching the event widget, this implies Gtk::PHASE_CAPTURE), one similar
+ * event will be emulated if the sequence changes to Gtk::EVENT_SEQUENCE_DENIED.
+ * This way event coherence is preserved before event propagation is unstopped
+ * again.
+ *
+ * Sequence states can't be changed freely, see set_sequence_state()
+ * to know about the possible lifetimes of a GdkEventSequence.
+ *
+ * @newin{3,14}
+ */
+class Gesture : public EventController
+{
+  _CLASS_GOBJECT(Gesture, GtkGesture, GTK_GESTURE, EventController, GtkEventController)
+
+protected:
+  /** There is no create() method that corresponds to this constructor,
+   * because only derived classes shall be created.
+   */
+  _CTOR_DEFAULT
+
+public:
+  // No create() because only derived classes shall be instantiated.
+
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Device> get_device(), gtk_gesture_get_device, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Device> get_device() const, gtk_gesture_get_device, refreturn, constversion)
+  _WRAP_METHOD(bool set_state(EventSequenceState state), gtk_gesture_set_state)
+  _WRAP_METHOD(EventSequenceState get_sequence_state(GdkEventSequence* sequence) const, gtk_gesture_get_sequence_state)
+  _WRAP_METHOD(bool set_sequence_state(GdkEventSequence* sequence, EventSequenceState state), gtk_gesture_set_sequence_state)
+
+  /** Returns the list of GdkEventSequence%s currently being interpreted.
+   *
+   * @newin{3,14}
+   *
+   * @return A std::vector of GdkEventSequence pointers.
+   *         The GdkEventSequence%s are owned by GTK+ and must not be freed or modified.
+   */
+  std::vector<const GdkEventSequence*> get_sequences() const;
+  _IGNORE(gtk_gesture_get_sequences)
+
+  _WRAP_METHOD(GdkEventSequence* get_last_updated_sequence(), gtk_gesture_get_last_updated_sequence)
+  _WRAP_METHOD(const GdkEventSequence* get_last_updated_sequence() const, gtk_gesture_get_last_updated_sequence, constversion)
+  _WRAP_METHOD(bool handles_sequence(GdkEventSequence* sequence) const, gtk_gesture_handles_sequence)
+  _WRAP_METHOD(const GdkEvent* get_last_event(GdkEventSequence* sequence) const, gtk_gesture_get_last_event)
+  _WRAP_METHOD(bool get_point(GdkEventSequence* sequence, double& x, double& y) const, gtk_gesture_get_point)
+  _WRAP_METHOD(bool get_bounding_box(Gdk::Rectangle& rect) const, gtk_gesture_get_bounding_box)
+  _WRAP_METHOD(bool get_bounding_box_center(double& x, double& y) const, gtk_gesture_get_bounding_box_center)
+  _WRAP_METHOD(bool is_active() const, gtk_gesture_is_active)
+  _WRAP_METHOD(bool is_recognized() const, gtk_gesture_is_recognized)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_window(), gtk_gesture_get_window, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_window() const, gtk_gesture_get_window, refreturn, constversion)
+  _WRAP_METHOD(void set_window(const Glib::RefPtr<Gdk::Window>& window), gtk_gesture_set_window)
+
+  /** Undoes the effect of previous calls to set_window(),
+   * so the gesture will handle events targeting any Gdk::Window that pertains
+   * to Gtk::EventController::get_widget().
+   *
+   * @newin{3,14}
+   */
+  void unset_window();
+
+#m4 _CONVERSION(`const Glib::RefPtr<Gesture>&',`GtkGesture*',__CONVERT_REFPTR_TO_P($3))
+  _WRAP_METHOD(void group(const Glib::RefPtr<Gesture>& group_gesture), gtk_gesture_group)
+  _WRAP_METHOD(void ungroup(), gtk_gesture_ungroup)
+
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Gesture> >',`Glib::ListHandler< Glib::RefPtr<Gesture> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gesture> > get_group(), gtk_gesture_get_group)
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<const Gesture> >',`Glib::ListHandler< Glib::RefPtr<const Gesture> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const Gesture> > get_group() const, gtk_gesture_get_group)
+
+  _WRAP_METHOD(bool is_grouped_with(const Glib::RefPtr<Gesture>& other) const, gtk_gesture_is_grouped_with)
+
+  // no_default_handler because GtkGestureClass is private.
+  _WRAP_SIGNAL(void begin(GdkEventSequence* sequence), "begin", no_default_handler)
+  _WRAP_SIGNAL(void end(GdkEventSequence* sequence), "end", no_default_handler)
+  _WRAP_SIGNAL(void update(GdkEventSequence* sequence), "update", no_default_handler)
+  _WRAP_SIGNAL(void cancel(GdkEventSequence* sequence), "cancel", no_default_handler)
+  _WRAP_SIGNAL(void sequence_state_changed(GdkEventSequence* sequence, EventSequenceState state), "sequence_state_changed", no_default_handler)
+
+  _WRAP_PROPERTY("n-points", unsigned int)
+  _WRAP_PROPERTY("window", Glib::RefPtr<Gdk::Window>)
+};
+
+} // namespace Gtk

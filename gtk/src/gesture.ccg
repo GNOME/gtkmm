@@ -1,0 +1,41 @@
+/* Copyright (C) 2014 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+// Glib::ListHandler is not well suited for this case, where the contents
+// of the GList shall not be converted to a C++ type.
+std::vector<const GdkEventSequence*> Gesture::get_sequences() const
+{
+  std::vector<const GdkEventSequence*> sequences;
+  GList* list = g_list_first(gtk_gesture_get_sequences(const_cast<GtkGesture*>(gobj())));
+
+  for (GList* node = list; node; node = g_list_next(node))
+    sequences.push_back(static_cast<GdkEventSequence*>(node->data));
+
+  g_list_free(list);
+
+  return sequences;
+}
+
+void Gesture::unset_window()
+{
+  gtk_gesture_set_window(gobj(), 0);
+}
+
+} //namespace Gtk

@@ -149,6 +149,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/eventbox.h>
+#include <gtkmm/eventcontroller.h>
 #include <gtkmm/filechooser.h>
 #include <gtkmm/filechooserbutton.h>
 #include <gtkmm/filechooserdialog.h>
@@ -163,6 +164,15 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontchooserwidget.h>
 #include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/gesture.h>
+#include <gtkmm/gesturedrag.h>
+#include <gtkmm/gesturelongpress.h>
+#include <gtkmm/gesturemultipress.h>
+#include <gtkmm/gesturepan.h>
+#include <gtkmm/gesturerotate.h>
+#include <gtkmm/gesturesingle.h>
+#include <gtkmm/gestureswipe.h>
+#include <gtkmm/gesturezoom.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/headerbar.h>

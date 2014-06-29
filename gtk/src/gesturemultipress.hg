@@ -1,0 +1,81 @@
+/* Copyright (C) 2014 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/gesturesingle.h>
+#include <gdkmm/rectangle.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/gesturesingle_p.h)
+
+namespace Gtk
+{
+/** Multipress gesture.
+ *
+ * This is a Gesture implementation able to recognize
+ * multiple clicks on a nearby zone, which can be listened for through
+ * signal_pressed(). Whenever time or distance between
+ * clicks exceed the GTK+ defaults, signal_stopped() is emitted,
+ * and the click counter is reset.
+ *
+ * Callers may also restrict the area that is considered valid for a >1
+ * touch/button press through set_area(), so any
+ * click happening outside that area is considered to be a first click of
+ * its own.
+ *
+ * @newin{3,14}
+ */
+class GestureMultiPress : public GestureSingle
+{
+  _CLASS_GOBJECT(GestureMultiPress, GtkGestureMultiPress, GTK_GESTURE_MULTI_PRESS, GestureSingle, GtkGestureSingle)
+
+protected:
+  /** There is no create() method that corresponds to this constructor,
+   * because this constructor shall only be used by derived classes.
+   */
+  _CTOR_DEFAULT
+
+  /** Constructs a Gesture that recognizes single and multiple presses.
+   */
+  _WRAP_CTOR(GestureMultiPress(Widget& widget), gtk_gesture_multi_press_new)
+
+public:
+  /** Creates a Gesture that recognizes single and multiple presses.
+   *
+   * @newin{3,14}
+   *
+   * @param widget Widget the gesture relates to.
+   * @return A RefPtr to a new GestureMultiPress.
+   */
+  _WRAP_CREATE(Widget& widget)
+
+  _WRAP_METHOD(bool get_area(Gdk::Rectangle& rect) const, gtk_gesture_multi_press_get_area)
+  _WRAP_METHOD(void set_area(const Gdk::Rectangle& rect), gtk_gesture_multi_press_set_area)
+
+  /** Resets the press area to an unrestricted state.
+   *
+   * @newin{3,14}
+   */
+  void unset_area();
+
+  // no_default_handler because GtkGestureMultiPressClass is private.
+  _WRAP_SIGNAL(void pressed(int n_press, double x, double y), "pressed", no_default_handler)
+  _WRAP_SIGNAL(void released(int n_press, double x, double y), "released", no_default_handler)
+  _WRAP_SIGNAL(void stopped(), "stopped", no_default_handler)
+
+  // GestureMultiPress has no properties
+};
+
+} // namespace Gtk
