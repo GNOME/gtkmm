@@ -40,6 +40,8 @@
 # include <gtk/gtkunixprint.h>
 #endif
 
+std::string get_child_properties(GType gtype);
+
 int main(int argc, char** argv)
 {
   gtk_init(&argc, &argv);
@@ -243,5 +245,64 @@ int main(int argc, char** argv)
             << get_defs( GTK_TYPE_WIDGET )
             << get_defs( GTK_TYPE_WINDOW )
             ;
+
+  std::cout << get_child_properties( GTK_TYPE_BIN )
+            << get_child_properties( GTK_TYPE_BOX )
+            << get_child_properties( GTK_TYPE_FIXED )
+            << get_child_properties( GTK_TYPE_FLOW_BOX )
+            << get_child_properties( GTK_TYPE_GRID )
+            << get_child_properties( GTK_TYPE_HEADER_BAR )
+            << get_child_properties( GTK_TYPE_PANED )
+            << get_child_properties( GTK_TYPE_ICON_VIEW )
+            << get_child_properties( GTK_TYPE_LAYOUT )
+            << get_child_properties( GTK_TYPE_LIST_BOX )
+            << get_child_properties( GTK_TYPE_MENU_SHELL )
+            << get_child_properties( GTK_TYPE_NOTEBOOK )
+#ifdef GDK_WINDOWING_X11
+            << get_child_properties( GTK_TYPE_SOCKET )
+#endif
+            << get_child_properties( GTK_TYPE_STACK )
+            << get_child_properties( GTK_TYPE_TEXT_VIEW )
+            << get_child_properties( GTK_TYPE_TOOLBAR )
+            << get_child_properties( GTK_TYPE_TOOL_ITEM_GROUP )
+            << get_child_properties( GTK_TYPE_TOOL_PALETTE )
+            << get_child_properties( GTK_TYPE_TREE_VIEW )
+            ;
+
   return 0;
+}
+
+std::string get_child_properties(GType gtype)
+{
+  std::string strResult; std::string strObjectName = g_type_name(gtype);
+
+  //Get the list of properties:
+  GParamSpec** ppParamSpec = 0;
+  guint iCount = 0;
+  if(g_type_is_a(gtype, GTK_TYPE_CONTAINER))
+  {
+    GObjectClass* pGClass = G_OBJECT_CLASS(g_type_class_ref(gtype));
+    ppParamSpec = gtk_container_class_list_child_properties (pGClass, &iCount);
+    g_type_class_unref(pGClass);
+
+    if(!ppParamSpec)
+    {
+      strResult += ";; Warning: gtk_container_class_list_child_properties() returned NULL for " + std::string(g_type_name(gtype)) + "\n";
+      iCount = 0;
+    }
+  }
+
+  for(guint i = 0; i < iCount; i++)
+  {
+    GParamSpec* pParamSpec = ppParamSpec[i];
+
+    if(pParamSpec && pParamSpec->owner_type == gtype)
+    {
+      strResult += get_property_with_node_name(pParamSpec, strObjectName, "define-child-property");
+    }
+  }
+
+  g_free(ppParamSpec);
+
+  return strResult;
 }
