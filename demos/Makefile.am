@@ -34,6 +34,7 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/example_dialog.cc			\
 	gtk-demo/example_drawingarea.cc			\
 	gtk-demo/example_flowbox.cc			\
+	gtk-demo/example_gestures.cc			\
 	gtk-demo/example_headerbar.cc			\
 	gtk-demo/example_icontheme.cc			\
 	gtk-demo/example_iconview.cc			\
@@ -50,10 +51,6 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/main.cc				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
-
-## These demos use deprecated API.
-## example_uimanager.cc should be replaced by a Gtk::Builder demo.		\
-## gtk-demo/example_uimanager.cc			\
 
 dist_noinst_DATA =			\
 	gtk-demo/alphatest.png		\

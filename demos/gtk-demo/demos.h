@@ -24,6 +24,7 @@ Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
 Gtk::Window* do_flowbox();
+Gtk::Window* do_gestures();
 Gtk::Window* do_headerbar();
 Gtk::Window* do_icontheme();
 Gtk::Window* do_iconview();
@@ -33,7 +34,6 @@ Gtk::Window* do_overlay();
 Gtk::Window* do_pixbufs();
 Gtk::Window* do_panes();
 Gtk::Window* do_sizegroup();
-//Gtk::Window* do_stock_browser();
 Gtk::Window* do_textview();
 
 Gtk::Window* do_treeview_editable_cells();
@@ -59,6 +59,7 @@ Demo testgtk_demos[] =
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), 0 },
+  { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), 0 },
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), 0 },
   { "Icon Theme", "example_icontheme.cc", sigc::ptr_fun(&do_icontheme), 0 },  
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
@@ -68,10 +69,8 @@ Demo testgtk_demos[] =
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
   { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
-//  { "Stock Item and Icon Browser", "example_stockbrowser.cc", sigc::ptr_fun(&do_stock_browser), 0 },
   { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), 0 },
   { "Tree View", "", type_slotDo(), child0 },
-//  { "UI Manager", "example_uimanager.cc", sigc::ptr_fun(&do_ui_manager), 0},
   { 0, 0, type_slotDo(), 0 }
 };
 
