@@ -34,6 +34,7 @@ Gtk::Window* do_overlay();
 Gtk::Window* do_pixbufs();
 Gtk::Window* do_panes();
 Gtk::Window* do_sizegroup();
+Gtk::Window* do_stack();
 Gtk::Window* do_textview();
 
 Gtk::Window* do_treeview_editable_cells();
@@ -69,6 +70,7 @@ Demo testgtk_demos[] =
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
   { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
+  { "Stack", "example_stack.cc", sigc::ptr_fun(&do_stack), 0 },
   { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), 0 },
   { "Tree View", "", type_slotDo(), child0 },
   { 0, 0, type_slotDo(), 0 }
