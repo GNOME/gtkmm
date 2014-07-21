@@ -718,3 +718,8 @@ _CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
 
 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
 _CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
+
+# Used by LockButton
+_CONVERSION(`Glib::RefPtr<Gio::Permission>&',`GPermission*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Gio::Permission>&',`GPermission*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Permission))
+_CONVERSION(`GPermission*',`Glib::RefPtr<Gio::Permission>',`Glib::wrap($3)')
