@@ -121,7 +121,6 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
 
   /* create tree view */
   m_TreeView.set_model(m_refListStore);
-  m_TreeView.set_rules_hint();
   m_TreeView.set_search_column(m_columns.description.index());
 
   add_columns();

@@ -165,7 +165,6 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
 
   /* create tree view */
   m_TreeView.set_model(m_refTreeStore);
-  m_TreeView.set_rules_hint();
   Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = m_TreeView.get_selection();
   refTreeSelection->set_mode(Gtk::SELECTION_MULTIPLE);
 

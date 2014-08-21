@@ -121,7 +121,6 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
 
   /* create tree view */
   m_TreeView.set_model(m_refListStore);
-  m_TreeView.set_rules_hint();
   Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = m_TreeView.get_selection();
   refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
 
