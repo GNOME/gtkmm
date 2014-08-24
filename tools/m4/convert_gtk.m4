@@ -707,6 +707,9 @@ _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CO
 _CONVERSION(`const Glib::RefPtr<Gio::AppInfo>&',`GAppInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::AppInfo))
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<Gio::AppInfo>',`Glib::wrap($3)')
 
+_CONVERSION(`GMenu*',`Glib::RefPtr<Gio::Menu>',`Glib::wrap($3)')
+_CONVERSION(`GMenu*',`Glib::RefPtr<const Gio::Menu>',`Glib::wrap($3)')
+
 _CONVERSION(`const Glib::RefPtr<Gio::MenuModel>&',`GMenuModel*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Gio::MenuModel>&',`GMenuModel*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GMenuModel*',`Glib::RefPtr<Gio::MenuModel>',`Glib::wrap($3)')
