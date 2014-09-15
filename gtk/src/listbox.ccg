@@ -79,6 +79,23 @@ void SignalProxy_UpdateHeader_gtk_callback_destroy(void* data)
   delete static_cast<Gtk::ListBox::SlotUpdateHeader*>(data);
 }
 
+
+static void proxy_foreach_callback(GtkListBox* /* list_box */, GtkListBoxRow* row, void* data)
+{
+  typedef Gtk::ListBox::SlotForeach SlotType;
+  SlotType& slot = *static_cast<SlotType*>(data);
+
+  try
+  {
+    slot(Glib::wrap(row, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+
 } // anonymous namespace
 
 namespace Gtk
@@ -148,6 +165,13 @@ void ListBox::unset_header_func()
 void ListBox::append(Widget& child)
 {
   insert(child, -1);
+}
+
+void ListBox::selected_foreach(const SlotForeach& slot)
+{
+  SlotForeach slot_copy(slot); //TODO: Is this necessary?
+  gtk_list_box_selected_foreach(gobj(), &proxy_foreach_callback, &slot_copy);
+
 }
 
 } //namespace Gtk
