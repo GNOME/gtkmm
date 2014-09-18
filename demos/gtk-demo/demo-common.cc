@@ -19,7 +19,7 @@ get_democodedir(void)
       if (result == NULL)
 	result = "unknown-location";
 
-      result = g_strconcat (result, "\\share\\gtkmm-2.4\\demo", NULL);
+      result = g_strconcat (result, "\\share\\gtkmm-3.0\\demo", NULL);
     }
 
   return result;
