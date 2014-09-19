@@ -80,7 +80,10 @@ Example_HeaderBar::~Example_HeaderBar()
 
 void Example_HeaderBar::configure_send_receive_button()
 {
-  Glib::RefPtr<Gio::ThemedIcon> icon = Gio::ThemedIcon::create("mail-send-receive-symbolic", false);
+  /* the 'const' is required, to avoid C2668/Ambiguous call errors
+     on some compilers, such as Visual Studio or when compiling without
+     GTKMM_DISABLE_DEPRECATED on g++ */
+  Glib::RefPtr<const Gio::Icon> icon = Gio::ThemedIcon::create("mail-send-receive-symbolic", false);
 
   m_send_receive_image.set(icon, Gtk::ICON_SIZE_BUTTON);
   m_send_receive_button.add(m_send_receive_image);
