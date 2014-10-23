@@ -32,6 +32,18 @@ _CONFIGINCLUDE(gdkmmconfig.h)
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
 
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+// So we can use deprecated functions in our deprecated methods.
+#undef GDK_PIXBUF_DISABLE_DEPRECATED
+// gdk-pixbuf uses G_DEPRECATED. There is no corresponding G_DISABLE_DEPRECATION_WARNINGS.
+// G_DEPRECATED must be cleared after it was defined in glib/glib/gmacros.h,
+// but before any gdk-pixbuf header is included in pixbuf.cc.
+// Because of a complication in glibmm/glib/threads.h, glibmm.h must be given
+// a chance to include glib.h before anyone else.
+#include <glibmm.h>
+#undef G_DEPRECATED
+#define G_DEPRECATED
+#m4 _POP()
 
 namespace Gdk
 {
@@ -297,11 +309,13 @@ public:
    * @param data_length Length in bytes of the @a data argument.
    * @param data Byte data containing a serialized GdkPixdata structure.
    * @param copy_pixels Whether to copy the pixel data, or use direct pointers
-   * to @a data for the resulting pixbuf.
+   *        to @a data for the resulting pixbuf.
    * @throw Gdk::PixbufError
+   *
+   * @deprecated Use Gio::Resource instead.
    */
   _WRAP_METHOD(static Glib::RefPtr<Pixbuf> create_from_inline(int data_length, const guint8* data,
-                                                 bool copy_pixels = false), gdk_pixbuf_new_from_inline, errthrow)
+               bool copy_pixels = false), gdk_pixbuf_new_from_inline, errthrow, deprecated "Use Gio::Resource instead.")
 
   _WRAP_METHOD(static Glib::RefPtr<Pixbuf> create_from_stream(const Glib::RefPtr<Gio::InputStream>& stream, const Glib::RefPtr<Gio::Cancellable>& cancellable), gdk_pixbuf_new_from_stream, errthrow)
   static Glib::RefPtr<Pixbuf> create_from_stream(const Glib::RefPtr<Gio::InputStream>& stream);
