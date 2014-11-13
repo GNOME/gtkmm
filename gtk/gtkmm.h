@@ -266,6 +266,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stock.h>
 #include <gtkmm/stockitem.h>
 #include <gtkmm/stylecontext.h>
+#include <gtkmm/styleproperty.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/table.h>
 #include <gtkmm/tearoffmenuitem.h>
