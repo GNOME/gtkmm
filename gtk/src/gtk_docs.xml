@@ -1005,6 +1005,27 @@ contains.
 </parameters>
 </enum>
 
+<enum name="GtkButtonRole">
+<description>
+The role specifies the desired appearance of a #GtkModelButton.
+
+</description>
+<parameters>
+<parameter name="GTK_BUTTON_ROLE_NORMAL">
+<parameter_description> A plain button
+</parameter_description>
+</parameter>
+<parameter name="GTK_BUTTON_ROLE_CHECK">
+<parameter_description> A check button
+</parameter_description>
+</parameter>
+<parameter name="GTK_BUTTON_ROLE_RADIO">
+<parameter_description> A radio button
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkButtonsType">
 <description>
 Prebuilt sets of buttons for the dialog. If
@@ -1930,7 +1951,7 @@ than when a loading function was called.
 
 <enum name="GtkCssProviderError">
 <description>
-Deprecated.
+Error codes for %GTK_CSS_PROVIDER_ERROR.
 
 </description>
 <parameters>
@@ -3686,6 +3707,88 @@ Space, Shift+Space, Return or Enter.
 </parameter>
 <parameter name="fontname">
 <parameter_description> the font name
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkGLArea::create-context">
+<description>
+The ::create-context signal is emitted when the widget is being
+realized, and allows you to override how the GL context is
+created. This is useful when you want to reuse an existing GL
+context, or if you want to try creating different kinds of GL
+profiles.
+
+If context creation fails then the signal handler can use
+gtk_gl_area_set_error() to register a more detailed error
+of how the construction failed.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> the #GtkGLArea that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store error information on failure
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly created #GdkGLContext;
+the #GtkGLArea widget will take ownership of the returned value.
+
+</return>
+</signal>
+
+<signal name="GtkGLArea::render">
+<description>
+The ::render signal is emitted every time the contents
+of the #GtkGLArea should be redrawn.
+
+The @context is bound to the @area prior to emitting this function,
+and the buffers are painted to the window once the emission terminates.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> the #GtkGLArea that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description> the #GdkGLContext used by @area
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE to stop other handlers from being invoked for the event.
+%FALSE to propagate the event further.
+
+</return>
+</signal>
+
+<signal name="GtkGLArea::resized">
+<description>
+The ::resized signal is emitted once when the widget is realized, and
+then each time the widget is changed while realized. This is useful
+in order to keep GL state up to date with the widget size, like for
+instance camera properties which may depend on the width/height ratio.
+
+The GL context for the area is guaranteed to be current when this signal
+is emitted.
+
+The default handler sets up the GL viewport.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> the #GtkGLArea that emitted the signal
 </parameter_description>
 </parameter>
 </parameters>
@@ -6487,6 +6590,12 @@ For example, when all of a #GtkTreeView can not be seen.
 content determines the size.
 </parameter_description>
 </parameter>
+<parameter name="GTK_POLICY_EXTERNAL">
+<parameter_description> Don't show a scrollbar, but don't force the
+size to follow the content. This can be used e.g. to make multiple
+scrolled windows share a scrollbar. Since: 3.16
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -8166,14 +8275,43 @@ the scrolled window adjustments in a given orientation.
 </parameters>
 </enum>
 
+<signal name="GtkScrolledWindow::edge-overshot">
+<description>
+The ::edge-overshot signal is emitted whenever user initiated scrolling
+makes the scrolledwindow firmly surpass (ie. with some edge resistance)
+the lower or upper limits defined by the adjustment in that orientation.
+
+If a similar behavior without edge resistance is desired, one alternative
+may be to check on #GtkAdjustment::value-changed that the value equals
+either #GtkAdjustment:lower or #GtkAdjustment:upper - #GtkAdjustment:page-size.
+
+Note: The @pos argument is LTR/RTL aware, so callers should be aware too
+if intending to provide behavior on horizontal edges.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="pos">
+<parameter_description> edge side that was hit
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkScrolledWindow::move-focus-out">
 <description>
 The ::move-focus-out signal is a
 [keybinding signal][GtkBindingSignal] which gets
 emitted when focus is moved away from the scrolled window by a
-keybinding.  The #GtkWidget::move-focus signal is emitted with
+keybinding. The #GtkWidget::move-focus signal is emitted with
 @direction_type on this scrolled windows toplevel parent in the
-container hierarchy.  The default bindings for this signal are
+container hierarchy. The default bindings for this signal are
 `Tab + Ctrl` and `Tab + Ctrl + Shift`.
 
 </description>
@@ -10078,7 +10216,8 @@ The default bindings for this signal is Insert.
 
 <enum name="GtkTextViewLayer">
 <description>
-Used to reference the parts of #GtkTextView.
+Used to reference the layers of #GtkTextView for the purpose of customized
+drawing with the ::draw_layer vfunc.
 
 </description>
 <parameters>
@@ -12944,6 +13083,8 @@ widget under the pointer.
 
 The default bindings for this signal are Ctrl-Shift-I
 and Ctrl-Shift-D.
+
+Return: %TRUE if the key binding was handled
 
 </description>
 <parameters>
@@ -20759,15 +20900,15 @@ and merges it with the current contents of @builder.
 
 Most users will probably want to use gtk_builder_new_from_file().
 
-Upon errors 0 will be returned and @error will be assigned a
+If an error occurs, 0 will be returned and @error will be assigned a
 #GError from the #GTK_BUILDER_ERROR, #G_MARKUP_ERROR or #G_FILE_ERROR 
 domain.
 
 It’s not really reasonable to attempt to handle failures of this
-call.  You should not use this function with untrusted files (ie:
-files that are not part of your application).  Broken #GtkBuilder
+call. You should not use this function with untrusted files (ie:
+files that are not part of your application). Broken #GtkBuilder
 files can easily crash your program, and it’s possible that memory
-was leaked leading up to the reported failure.  The only reasonable
+was leaked leading up to the reported failure. The only reasonable
 thing to do when an error is detected is to call g_error().
 
 Since: 2.12
@@ -20799,7 +20940,7 @@ and merges it with the current contents of @builder.
 
 Most users will probably want to use gtk_builder_new_from_resource().
 
-Upon errors 0 will be returned and @error will be assigned a
+If an error occurs, 0 will be returned and @error will be assigned a
 #GError from the #GTK_BUILDER_ERROR, #G_MARKUP_ERROR or #G_RESOURCE_ERROR
 domain.
 
@@ -20837,7 +20978,8 @@ and merges it with the current contents of @builder.
 Most users will probably want to use gtk_builder_new_from_string().
 
 Upon errors 0 will be returned and @error will be assigned a
-#GError from the #GTK_BUILDER_ERROR or #G_MARKUP_ERROR domain.
+#GError from the #GTK_BUILDER_ERROR, #G_MARKUP_ERROR or
+#G_VARIANT_PARSE_ERROR domain.
 
 It’s not really reasonable to attempt to handle failures of this
 call.  The only reasonable thing to do when an error is detected is
@@ -21091,7 +21233,7 @@ The #GtkApplication is used for creating action proxies as requested
 from XML that the builder is loading.
 
 By default, the builder uses the default application: the one from
-g_application_get_default().  If you want to use another application
+g_application_get_default(). If you want to use another application
 for constructing proxies, use gtk_builder_set_application().
 
 Since: 3.10
@@ -21230,9 +21372,9 @@ Since: 3.10
 <description>
 Creates a new empty builder object.
 
-This function is only useful if you intend to make multiple calls to
-gtk_builder_add_from_file(), gtk_builder_add_from_resource() or
-gtk_builder_add_from_string() in order to merge multiple UI
+This function is only useful if you intend to make multiple calls
+to gtk_builder_add_from_file(), gtk_builder_add_from_resource()
+or gtk_builder_add_from_string() in order to merge multiple UI
 descriptions into a single builder.
 
 Most users will probably want to use gtk_builder_new_from_file(),
@@ -21276,8 +21418,8 @@ Since: 3.10
 Builds the [GtkBuilder UI definition][BUILDER-UI]
 at @resource_path.
 
-If there is an error locating the resurce or parsing the description
-then the program will be aborted.
+If there is an error locating the resource or parsing the
+description, then the program will be aborted.
 
 Since: 3.10
 
@@ -21298,11 +21440,11 @@ Since: 3.10
 Builds the user interface described by @string (in the
 [GtkBuilder UI definition][BUILDER-UI] format).
 
-If @string is %NULL-terminated then @length should be -1.  If @length
-is not -1 then it is the length of @string.
+If @string is %NULL-terminated, then @length should be -1.
+If @length is not -1, then it is the length of @string.
 
 If there is an error parsing @string then the program will be
-aborted.  You should not attempt to parse user interface description
+aborted. You should not attempt to parse user interface description
 from untrusted sources.
 
 Since: 3.10
@@ -21328,7 +21470,7 @@ Since: 3.10
 Sets the application associated with @builder.
 
 You only need this function if there is more than one #GApplication
-in your process.  @application cannot be %NULL.
+in your process. @application cannot be %NULL.
 
 Since: 3.10
 
@@ -30104,7 +30246,7 @@ potentially do a copy.
 <return> %TRUE. The return value is deprecated and %FALSE will only be
 returned for backwards compatibility reasons if an @error is not 
 %NULL and a loading error occured. To track errors while loading
-CSS, connect to the GtkCssProvider::parsing-error signal.
+CSS, connect to the #GtkCssProvider::parsing-error signal.
 </return>
 </function>
 
@@ -30132,7 +30274,7 @@ clear any previously loaded information.
 <return> %TRUE. The return value is deprecated and %FALSE will only be
 returned for backwards compatibility reasons if an @error is not 
 %NULL and a loading error occured. To track errors while loading
-CSS, connect to the GtkCssProvider::parsing-error signal.
+CSS, connect to the #GtkCssProvider::parsing-error signal.
 </return>
 </function>
 
@@ -30160,8 +30302,32 @@ any previously loaded information.
 <return> %TRUE. The return value is deprecated and %FALSE will only be
 returned for backwards compatibility reasons if an @error is not 
 %NULL and a loading error occured. To track errors while loading
-CSS, connect to the GtkCssProvider::parsing-error signal.
+CSS, connect to the #GtkCssProvider::parsing-error signal.
 </return>
+</function>
+
+<function name="gtk_css_provider_load_from_resource">
+<description>
+Loads the data contained in the resource at @resource_path into
+the #GtkCssProvider, clearing any previously loaded information.
+
+To track errors while loading CSS, connect to the
+#GtkCssProvider::parsing-error signal.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="css_provider">
+<parameter_description> a #GtkCssProvider
+</parameter_description>
+</parameter>
+<parameter name="resource_path">
+<parameter_description> a #GResource resource path
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_css_provider_new">
@@ -31015,77 +31181,45 @@ source can provide the data.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>
+</return>
 </function>
 
 <function name="gtk_drag_begin_with_coordinates">
 <description>
-Initiates a drag on the source side. The function only needs to be used
-when the application is starting drags itself, and is not needed when
-gtk_drag_source_set() is used.
-
-The @event is used to retrieve the timestamp that will be used internally to
-grab the pointer.  If @event is %NULL, then %GDK_CURRENT_TIME will be used.
-However, you should try to pass a real event in all cases, since that can be
-used to get information about the drag.
-
-Generally there are three cases when you want to start a drag by hand by
-calling this function:
-
-1. During a #GtkWidget::button-press-event handler, if you want to start a drag
-immediately when the user presses the mouse button.  Pass the @event
-that you have in your #GtkWidget::button-press-event handler.
-
-2. During a #GtkWidget::motion-notify-event handler, if you want to start a drag
-when the mouse moves past a certain threshold distance after a button-press.
-Pass the @event that you have in your #GtkWidget::motion-notify-event handler.
-
-3. During a timeout handler, if you want to start a drag after the mouse
-button is held down for some time.  Try to save the last event that you got
-from the mouse, using gdk_event_copy(), and pass it to this function
-(remember to free the event with gdk_event_free() when you are done).
-If you can really not pass a real event, pass #NULL instead.
-
-Since: 3.10
 
 </description>
 <parameters>
 <parameter name="widget">
-<parameter_description> the source widget
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> The targets (data formats) in which the
-source can provide the data
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="actions">
-<parameter_description> A bitmask of the allowed drag actions for this drag
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description> The button the user clicked to start the drag
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="event">
-<parameter_description> The event that triggered the start of the drag
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="x">
-<parameter_description> The initial x coordinate to start dragging from, in the coordinate space
-of @widget. If -1 is passed, the coordinates are retrieved from @event or
-the current pointer position
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="y">
-<parameter_description> The initial y coordinate to start dragging from, in the coordinate space
-of @widget. If -1 is passed, the coordinates are retrieved from @event or
-the current pointer position
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the context for this drag
-
+<return>
 </return>
 </function>
 
@@ -31176,7 +31310,8 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>
+</return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
@@ -31376,7 +31511,8 @@ or #GtkWidget::drag-drop&quot; signal.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>
+</return>
 </function>
 
 <function name="gtk_drag_highlight">
@@ -31638,7 +31774,8 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>
+</return>
 </function>
 
 <function name="gtk_drag_source_set">
@@ -39943,6 +40080,37 @@ of an event sequence is constrained to the next four:
 * None → Claimed
 * None → Claimed → Denied
 
+Note: Due to event handling ordering, it may be unsafe to
+set the state on another gesture within a #GtkGesture::begin
+signal handler, as the callback might be executed before
+the other gesture knows about the sequence. A safe way to
+perform this could be:
+
+|[
+static void
+first_gesture_begin_cb (GtkGesture       *first_gesture,
+GdkEventSequence *sequence,
+gpointer          user_data)
+{
+gtk_gesture_set_sequence_state (first_gesture, sequence, GTK_EVENT_SEQUENCE_ACCEPTED);
+gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
+}
+
+static void
+second_gesture_begin_cb (GtkGesture       *second_gesture,
+GdkEventSequence *sequence,
+gpointer          user_data)
+{
+if (gtk_gesture_get_sequence_state (first_gesture, sequence) == GTK_EVENT_SEQUENCE_ACCEPTED)
+gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
+}
+]|
+
+If both gestures are in the same group, just set the state on
+the gesture emitting the event, the sequence will be already
+be initialized to the group's global state when the second
+gesture processes the event.
+
 Since: 3.14
 
 </description>
@@ -40544,6 +40712,351 @@ when parsing the commandline arguments
 arguments recognized by GTK+
 
 </return>
+</function>
+
+<function name="gtk_gl_area_attach_buffers">
+<description>
+Ensures that the @area framebuffer object is made the current draw
+and read target, and that all the required buffers for the @area
+are created and bound to the frambuffer.
+
+This function is automatically called before emitting the
+#GtkGLArea::render signal, and doesn't normally need to be called
+by application code.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_get_auto_render">
+<description>
+Returns whether the area is in auto render mode or not.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @area is auto rendering, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_context">
+<description>
+Retrieves the #GdkGLContext used by @area.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkGLContext
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_error">
+<description>
+Gets the current error set on the @area.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GError or %NULL
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_has_alpha">
+<description>
+Returns whether the area has an alpha component.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @area has an alpha component, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_has_depth_buffer">
+<description>
+Returns whether the area has a depth buffer.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @area has a depth buffer, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_has_stencil_buffer">
+<description>
+Returns whether the area has a stencil buffer.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @area has a stencil buffer, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="gtk_gl_area_get_profile">
+<description>
+Returns the profile that will be used to create the GL context for the area.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkGLProfile
+
+</return>
+</function>
+
+<function name="gtk_gl_area_make_current">
+<description>
+Ensures that the #GdkGLContext used by @area is associated with
+the #GtkGLArea.
+
+This function is automatically called before emitting the
+#GtkGLArea::render signal, and doesn't normally need to be called
+by application code.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_new">
+<description>
+Creates a new #GtkGLArea widget.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the newly created #GtkGLArea
+
+</return>
+</function>
+
+<function name="gtk_gl_area_queue_render">
+<description>
+Marks the currently rendered data (if any) as invalid, and queues
+a redraw of the widget, ensuring that the #GtkGLArea::render signal
+is emitted during the draw.
+
+This is only needed when the gtk_gl_area_set_auto_render() has
+been called with a %FALSE value. The default behaviour is to
+emit #GtkGLArea::render on each draw.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_auto_render">
+<description>
+If @auto_render is %TRUE the #GtkGLArea::render signal will be
+emitted every time the widget draws. This is the default and is
+useful if drawing the widget is faster.
+
+If @auto_render is %FALSE the data from previous rendering is kept
+around and will be used for drawing the widget the next time,
+unless the window is resized. In order to force a rendering
+gtk_gl_area_queue_render() must be called. This mode is useful when
+the scene changes seldomly, but takes a long time to redraw.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="auto_render">
+<parameter_description> a boolean
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_error">
+<description>
+Sets an error on the area which will be shown instead of the
+GL rendering. This is useful in the #GtkGLArea::create-context
+signal if GL context creation fails.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a new #GError, or %NULL to unset the error
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_has_alpha">
+<description>
+If @has_alpha is %TRUE the buffer allocated by the widget will have
+an alpha channel component, and when rendering to the window the
+result will be composited over whatever is below the widget.
+
+If @has_alpha is %FALSE there will be no alpha channel, and the
+buffer will fully replace anything below the widget.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="has_alpha">
+<parameter_description> %TRUE to add an alpha component
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_has_depth_buffer">
+<description>
+If @has_depth_buffer is %TRUE the widget will allocate and
+enable a depth buffer for the target framebuffer. Otherwise
+there will be none.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="has_depth_buffer">
+<parameter_description> %TRUE to add a depth buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_has_stencil_buffer">
+<description>
+If @has_stencil_buffer is %TRUE the widget will allocate and
+enable a stencil buffer for the target framebuffer. Otherwise
+there will be none.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="has_stencil_buffer">
+<parameter_description> %TRUE to add a stencil buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_profile">
+<description>
+Sets the profile type to be used when creating the context for the widget.
+This must be called before the are has been realized.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="profile">
+<parameter_description> a #GdkGLProfile
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_grab_add">
@@ -48613,6 +49126,42 @@ Since: 2.6
 </return>
 </function>
 
+<function name="gtk_label_get_xalign">
+<description>
+Gets the #GtkLabel:xalign property for @label.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the xalign property
+
+</return>
+</function>
+
+<function name="gtk_label_get_yalign">
+<description>
+Gets the #GtkLabel:yalign property for @label.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the yalign property
+
+</return>
+</function>
+
 <function name="gtk_label_new">
 <description>
 Creates a new label with the given text inside it. You can
@@ -49155,6 +49704,46 @@ Since: 2.6
 </parameter>
 <parameter name="n_chars">
 <parameter_description> the new desired width, in characters.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_label_set_xalign">
+<description>
+Sets the #GtkLabel:xalign property for @label.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+<parameter name="xalign">
+<parameter_description> the new xalign value, between 0 and 1
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_label_set_yalign">
+<description>
+Sets the #GtkLabel:yalign property for @label.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+<parameter name="xalign">
+<parameter_description> the new yalign value, between 0 and 1
 </parameter_description>
 </parameter>
 </parameters>
@@ -53687,6 +54276,20 @@ in pixels.
 <return></return>
 </function>
 
+<function name="gtk_model_button_new">
+<description>
+Creates a new GtkModelButton.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the newly created #GtkModelButton widget
+
+</return>
+</function>
+
 <function name="gtk_mount_operation_get_parent">
 <description>
 Gets the transient parent used by the #GtkMountOperation
@@ -57118,6 +57721,24 @@ Obtains the position of the divider between the two panes.
 </return>
 </function>
 
+<function name="gtk_paned_get_wide_handle">
+<description>
+Gets the #GtkPaned:wide-handle property.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="paned">
+<parameter_description> a #GtkPaned
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the paned should have a wide handle
+
+</return>
+</function>
+
 <function name="gtk_paned_new">
 <description>
 Creates a new #GtkPaned widget.
@@ -57201,6 +57822,26 @@ Sets the position of the divider between the two panes.
 <parameter name="position">
 <parameter_description> pixel position of divider, a negative value means that the position
 is unset.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_paned_set_wide_handle">
+<description>
+Sets the #GtkPaned:wide-handle property.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="paned">
+<parameter_description> a #GtkPaned
+</parameter_description>
+</parameter>
+<parameter name="wide">
+<parameter_description> the new value for the #GtkPaned:wide-handle property
 </parameter_description>
 </parameter>
 </parameters>
@@ -57505,6 +58146,22 @@ represent the same paper size
 </return>
 </function>
 
+<function name="gtk_paper_size_is_ipp">
+<description>
+Returns %TRUE if @size is an IPP standard paper size.
+
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> a #GtkPaperSize object
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @size is not an IPP custom paper size.
+</return>
+</function>
+
 <function name="gtk_paper_size_new">
 <description>
 Creates a new #GtkPaperSize object by parsing a
@@ -57560,6 +58217,38 @@ Since: 2.10
 </parameter>
 </parameters>
 <return> a new #GtkPaperSize object, use gtk_paper_size_free()
+to free it
+
+</return>
+</function>
+
+<function name="gtk_paper_size_new_from_ipp">
+<description>
+Creates a new #GtkPaperSize object by using
+IPP information.
+
+If @ipp_name is not a recognized paper name,
+@width and @height are used to
+construct a custom #GtkPaperSize object.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="ipp_name">
+<parameter_description> an IPP paper name
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the paper width, in points
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the paper height in points
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPaperSize, use gtk_paper_size_free()
 to free it
 
 </return>
@@ -58403,6 +59092,48 @@ Since: 3.12
 <return> a #GtkWidget
 
 </return>
+</function>
+
+<function name="gtk_popover_menu_new">
+<description>
+Creates a new popover menu.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkPopoverMenu
+
+</return>
+</function>
+
+<function name="gtk_popover_menu_open_submenu">
+<description>
+Opens a submenu of the @popover. The @name
+must be one of the names given to the submenus
+of @popover with #GtkPopoverMenu:submenu, or
+&quot;main&quot; to switch back to the main menu.
+
+#GtkModelButton will open submenus automatically
+when the #GtkModelButton:menu-name property is set,
+so this function is only needed when you are using
+other kinds of widgets to initiate menu changes.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="popover">
+<parameter_description> a #GtkPopoverMenu
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of the menu to switch to
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_popover_new">
@@ -62743,11 +63474,17 @@ Since: 2.10
 
 <function name="gtk_printer_option_set_get_groups">
 <description>
+Gets the groups in this set.
+
 
 </description>
 <parameters>
+<parameter name="set">
+<parameter_description> a #GtkPrinterOptionSet
+</parameter_description>
+</parameter>
 </parameters>
-<return>
+<return> a list of group names.
 </return>
 </function>
 
@@ -67071,7 +67808,7 @@ removed by the recently used resources list, and %FALSE otherwise.
 <function name="gtk_render_activity">
 <description>
 Renders an activity indicator (such as in #GtkSpinner).
-The state %GTK_STATE_FLAG_ACTIVE determines whether there is
+The state %GTK_STATE_FLAG_CHECKED determines whether there is
 activity going on.
 
 Since: 3.0
@@ -67191,7 +67928,7 @@ Since: 3.0.
 <description>
 Renders a checkmark (as in a #GtkCheckButton).
 
-The %GTK_STATE_FLAG_ACTIVE state determines whether the check is
+The %GTK_STATE_FLAG_CHECKED state determines whether the check is
 on or off, and %GTK_STATE_FLAG_INCONSISTENT determines whether it
 should be marked as undefined.
 
@@ -67234,7 +67971,7 @@ Since: 3.0
 <function name="gtk_render_expander">
 <description>
 Renders an expander (as used in #GtkTreeView and #GtkExpander) in the area
-defined by @x, @y, @width, @height. The state %GTK_STATE_FLAG_ACTIVE
+defined by @x, @y, @width, @height. The state %GTK_STATE_FLAG_CHECKED
 determines whether the expander is collapsed or expanded.
 
 Typical expander rendering:
@@ -67701,7 +68438,7 @@ Since: 3.0
 
 <function name="gtk_render_option">
 <description>
-Renders an option mark (as in a #GtkRadioButton), the %GTK_STATE_FLAG_ACTIVE
+Renders an option mark (as in a #GtkRadioButton), the %GTK_STATE_FLAG_CHECKED
 state will determine whether the option is on or off, and
 %GTK_STATE_FLAG_INCONSISTENT whether it should be marked as undefined.
 
@@ -68739,7 +69476,7 @@ widgets with native scrolling support should not be used with the
 A widget supports scrolling natively if it implements the
 #GtkScrollable interface.
 
-Deprecated: 3.8: gtk_container_add() will now automatically add
+Deprecated: 3.8: gtk_container_add() will automatically add
 a #GtkViewport if the child doesn’t implement #GtkScrollable.
 
 </description>
@@ -68865,6 +69602,24 @@ Since: 3.0
 </return>
 </function>
 
+<function name="gtk_scrolled_window_get_overlay_scrolling">
+<description>
+Returns whether overlay scrolling is enabled for this scrolled window.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if overlay scrolling is enabled
+
+</return>
+</function>
+
 <function name="gtk_scrolled_window_get_placement">
 <description>
 Gets the placement of the contents with respect to the scrollbars
@@ -68898,12 +69653,12 @@ scrollbars. See gtk_scrolled_window_set_policy().
 </parameter>
 <parameter name="hscrollbar_policy">
 <parameter_description> location to store the policy 
-for the horizontal scrollbar, or %NULL.
+for the horizontal scrollbar, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="vscrollbar_policy">
 <parameter_description> location to store the policy
-for the vertical scrollbar, or %NULL.
+for the vertical scrollbar, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -69101,6 +69856,26 @@ Since: 3.0
 <return></return>
 </function>
 
+<function name="gtk_scrolled_window_set_overlay_scrolling">
+<description>
+Enables or disables overlay scrolling for this scrolled window.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="overlay_scrolling">
+<parameter_description> whether to enable overlay scrolling
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_scrolled_window_set_placement">
 <description>
 Sets the placement of the contents with respect to the scrollbars
@@ -69137,7 +69912,7 @@ from the #GtkPolicyType enumeration. If %GTK_POLICY_ALWAYS, the
 scrollbar is always present; if %GTK_POLICY_NEVER, the scrollbar is
 never present; if %GTK_POLICY_AUTOMATIC, the scrollbar is present only
 if needed (that is, if the slider part of the bar would be smaller
-than the trough - the display is larger than the page size).
+than the trough — the display is larger than the page size).
 
 </description>
 <parameters>
@@ -69161,7 +69936,6 @@ than the trough - the display is larger than the page size).
 <description>
 Changes the type of shadow drawn around the contents of
 @scrolled_window.
-
 
 </description>
 <parameters>
@@ -69199,7 +69973,7 @@ Sets the #GtkAdjustment for the vertical scrollbar.
 <description>
 Unsets the placement of the contents with respect to the scrollbars
 for the scrolled window. If no window placement is set for a scrolled
-window, it defaults to GTK_CORNER_TOP_LEFT.
+window, it defaults to %GTK_CORNER_TOP_LEFT.
 
 See also gtk_scrolled_window_set_placement() and
 gtk_scrolled_window_get_placement().
@@ -70181,8 +70955,23 @@ Since: 2.2
 </return>
 </function>
 
+<function name="gtk_settings_install_property">
+<description>
+Deprecated: 3.16: This function is not useful outside GTK+.
+
+</description>
+<parameters>
+<parameter name="pspec">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_settings_install_property_parser">
 <description>
+Deprecated: 3.16: This function is not useful outside GTK+.
 
 </description>
 <parameters>
@@ -70191,6 +70980,106 @@ Since: 2.2
 </parameter_description>
 </parameter>
 <parameter name="parser">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_settings_set_double_property">
+<description>
+Deprecated: 3.16: Use g_object_set() instead.
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="v_double">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="origin">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_settings_set_long_property">
+<description>
+Deprecated: 3.16: Use g_object_set() instead.
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="v_long">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="origin">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_settings_set_property_value">
+<description>
+Deprecated: 3.16: Use g_object_set() instead.
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="svalue">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_settings_set_string_property">
+<description>
+Deprecated: 3.16: Use g_object_set() instead.
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="v_string">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="origin">
 <parameter_description>
 </parameter_description>
 </parameter>
@@ -70264,6 +71153,63 @@ or %NULL for the default screen
 <return> %TRUE on success, %FALSE on error
 
 </return>
+</function>
+
+<function name="gtk_sidebar_get_stack">
+<description>
+Retrieves the stack.
+See gtk_sidebar_set_stack().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a #GtkSidebar
+</parameter_description>
+</parameter>
+</parameters>
+<return> the associated #GtkStack or
+%NULL if none has been set explicitly
+
+</return>
+</function>
+
+<function name="gtk_sidebar_new">
+<description>
+Creates a new sidebar.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the new #GtkSidebar
+
+</return>
+</function>
+
+<function name="gtk_sidebar_set_stack">
+<description>
+Set the #GtkStack associated with this #GtkSidebar.
+
+The sidebar widget will automatically update according to the order
+(packing) and items within the given #GtkStack.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a #GtkSidebar
+</parameter_description>
+</parameter>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_size_group_add_widget">
@@ -71262,6 +72208,25 @@ Since: 3.12
 </return>
 </function>
 
+<function name="gtk_stack_get_hhomogeneous">
+<description>
+Gets whether @stack is horizontally homogeneous.
+See gtk_stack_set_hhomogeneous().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @stack is horizontally homogeneous.
+
+</return>
+</function>
+
 <function name="gtk_stack_get_homogeneous">
 <description>
 Gets whether @stack is homogeneous.
@@ -71338,6 +72303,25 @@ Since: 3.10
 </return>
 </function>
 
+<function name="gtk_stack_get_vhomogeneous">
+<description>
+Gets whether @stack is vertically homogeneous.
+See gtk_stack_set_vhomogeneous().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @stack is vertically homogeneous.
+
+</return>
+</function>
+
 <function name="gtk_stack_get_visible_child">
 <description>
 Gets the currently visible child of @stack, or %NULL if
@@ -71390,12 +72374,39 @@ Since: 3.10
 </return>
 </function>
 
+<function name="gtk_stack_set_hhomogeneous">
+<description>
+Sets the #GtkStack to be horizontally homogeneous or not.
+If it is homogeneous, the #GtkStack will request the same
+width for all its children. If it isn't, the stack
+may change width when a different child becomes visible.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+<parameter name="hhomogeneous">
+<parameter_description> %TRUE to make @stack horizontally homogeneous
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_stack_set_homogeneous">
 <description>
 Sets the #GtkStack to be homogeneous or not. If it
 is homogeneous, the #GtkStack will request the same
 size for all its children. If it isn't, the stack
 may change size when a different child becomes visible.
+
+Since 3.16, homogeneity can be controlled separately
+for horizontal and vertical size, with the
+#GtkStack:hhomogeneous and #GtkStack:vhomogeneous.
 
 Since: 3.10
 
@@ -71454,6 +72465,29 @@ Since: 3.10
 </parameter>
 <parameter name="transition">
 <parameter_description> the new transition type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_stack_set_vhomogeneous">
+<description>
+Sets the #GtkStack to be vertically homogeneous or not.
+If it is homogeneous, the #GtkStack will request the same
+height for all its children. If it isn't, the stack
+may change height when a different child becomes visible.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+<parameter name="vhomogeneous">
+<parameter_description> %TRUE to make @stack vertically homogeneous
 </parameter_description>
 </parameter>
 </parameters>
@@ -73056,6 +74090,8 @@ Gets the background color for a given state.
 
 Since: 3.0
 
+Deprecated: 3.16: Use gtk_render_background() instead.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -73104,6 +74140,8 @@ Since: 3.0
 Gets the border color for a given state.
 
 Since: 3.0
+
+Deprecated: 3.16: Use gtk_render_border() instead.
 
 </description>
 <parameters>
@@ -74487,6 +75525,8 @@ Deprecated: 3.0: Use #GtkStyleContext
 <description>
 Clears all style information from @props.
 
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
+
 </description>
 <parameters>
 <parameter name="props">
@@ -74503,6 +75543,8 @@ Retrieves several style property values from @props for a
 given state.
 
 Since: 3.0
+
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
@@ -74528,6 +75570,8 @@ Gets a style property from @props for the given state. When done with @value,
 g_value_unset() needs to be called to free any allocated memory.
 
 Since: 3.0
+
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
@@ -74558,6 +75602,8 @@ Since: 3.0
 Retrieves several style property values from @props for a given state.
 
 Since: 3.0
+
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
@@ -74669,6 +75715,8 @@ will prevail.
 
 Since: 3.0
 
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
+
 </description>
 <parameters>
 <parameter name="props">
@@ -74691,11 +75739,13 @@ Since: 3.0
 <description>
 Returns a newly created #GtkStyleProperties
 
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
 </parameters>
 <return> a new #GtkStyleProperties
+
 </return>
 </function>
 
@@ -74730,6 +75780,8 @@ Sets several style properties on @props.
 
 Since: 3.0
 
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
+
 </description>
 <parameters>
 <parameter name="props">
@@ -74753,6 +75805,8 @@ Since: 3.0
 Sets a styling property in @props.
 
 Since: 3.0
+
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
@@ -74782,6 +75836,8 @@ Sets several style properties on @props.
 
 Since: 3.0
 
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
+
 </description>
 <parameters>
 <parameter name="props">
@@ -74805,6 +75861,8 @@ Since: 3.0
 Unsets a style property in @props.
 
 Since: 3.0
+
+Deprecated: 3.16: #GtkStyleProperties are deprecated.
 
 </description>
 <parameters>
@@ -82338,6 +83396,24 @@ convert to window coordinates with gtk_text_view_buffer_to_window_coords().
 <return></return>
 </function>
 
+<function name="gtk_text_view_get_monospace">
+<description>
+Gets the value of the #GtkTextView:monospace property.
+
+Return: %TRUE if monospace fonts are desired
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_view_get_overwrite">
 <description>
 Returns whether the #GtkTextView is in overwrite mode or not.
@@ -83066,6 +84142,28 @@ Tags in the buffer may override the default.
 </parameter>
 <parameter name="left_margin">
 <parameter_description> left margin in pixels
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_view_set_monospace">
+<description>
+Sets the #GtkTextView:monospace property, which
+indicates that the text view should use monospace
+fonts.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="monospace">
+<parameter_description> %TRUE to request monospace styling
 </parameter_description>
 </parameter>
 </parameters>
@@ -98350,6 +99448,8 @@ See gtk_widget_override_color().
 
 Since: 3.0
 
+Deprecated:3.16: Use a custom style provider and style classes instead
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -98400,6 +99500,8 @@ priority.
 
 Since: 3.0
 
+Deprecated:3.16: Use a custom style provider and style classes instead
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -98431,6 +99533,8 @@ so the alpha value in @primary and @secondary will be ignored.
 
 Since: 3.0
 
+Deprecated:3.16: Use a custom style provider and style classes instead
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -98460,6 +99564,8 @@ left untouched. See gtk_widget_override_color().
 
 Since: 3.0
 
+Deprecated:3.16: Use a custom style provider and style classes instead
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -98484,6 +99590,8 @@ See gtk_widget_override_color() for overriding the foreground
 or background color.
 
 Since: 3.0
+
+Deprecated:3.16: Use a custom style provider and style classes instead
 
 </description>
 <parameters>
@@ -99504,6 +100612,9 @@ Widget coordinates are a bit odd; for historical reasons, they are
 defined as @widget-&gt;window coordinates for widgets that are not
 #GTK_NO_WINDOW widgets, and are relative to @widget-&gt;allocation.x,
 @widget-&gt;allocation.y for widgets that are #GTK_NO_WINDOW widgets.
+
+@width or @height may be 0, in this case this function does
+nothing. Negative values for @width and @height are not allowed.
 
 </description>
 <parameters>
@@ -102684,6 +103795,25 @@ Retrieves the title of the window. See gtk_window_set_title().
 <return> the title of the window, or %NULL if none has
 been set explicitly. The returned string is owned by the widget
 and must not be modified or freed.
+</return>
+</function>
+
+<function name="gtk_window_get_titlebar">
+<description>
+Returns the custom titlebar that has been set with
+gtk_window_set_titlebar().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the custom titlebar, or %NULL
+
 </return>
 </function>
 

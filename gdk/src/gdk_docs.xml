@@ -1251,6 +1251,27 @@ Since: 3.8
 </parameters>
 </enum>
 
+<enum name="GdkGLProfile">
+<description>
+...
+
+</description>
+<parameters>
+<parameter name="GDK_GL_PROFILE_DEFAULT">
+<parameter_description> ...
+</parameter_description>
+</parameter>
+<parameter name="GDK_GL_PROFILE_LEGACY">
+<parameter_description> ...
+</parameter_description>
+</parameter>
+<parameter name="GDK_GL_PROFILE_3_2_CORE">
+<parameter_description> ...
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GdkGrabOwnership">
 <description>
 Defines how device grabs interact with other devices.
@@ -1299,6 +1320,10 @@ viewable.
 </parameter>
 <parameter name="GDK_GRAB_FROZEN">
 <parameter_description> the resource is frozen by an active grab of another client.
+</parameter_description>
+</parameter>
+<parameter name="GDK_GRAB_FAILED">
+<parameter_description> the grab failed for some other reason.
 </parameter_description>
 </parameter>
 </parameters>
@@ -1794,6 +1819,19 @@ Specifies why a selection ownership was changed.
 </parameter>
 </parameters>
 </enum>
+
+<signal name="GdkPixbuf::pixel-bytes">
+<description>
+If set, this pixbuf was created from read-only #GBytes.
+Replaces GdkPixbuf::pixels.
+
+Since: 2.32
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
 
 <enum name="GdkPixbufAlphaMode">
 <description>
@@ -2862,6 +2900,9 @@ windows in order to trap or filter the events. You can’t draw on
 Appends gdk option entries to the passed in option group. This is
 not public API and must not be used by applications.
 
+Deprecated: 3.16: This symbol was never meant to be used outside
+of GTK+
+
 </description>
 <parameters>
 <parameter name="group">
@@ -3140,6 +3181,69 @@ Since: 2.8
 cairo_destroy() when you are done drawing.
 
 </return>
+</function>
+
+<function name="gdk_cairo_draw_from_gl">
+<description>
+This is the main way to draw GL content in GTK+. It takes a render buffer ID 
+(@source_type == #GL_RENDERBUFFER) or a texture id (@source_type == #GL_TEXTURE)
+and draws it onto @cr with an OVER operation, respecting the current clip.
+The top left corner of the rectangle specified by @x, @y, @width and @height
+will be drawn at the current (0,0) position of the cairo_t.
+
+This will work for *all* cairo_t, as long as @window is realized, but the
+fallback implementation that reads back the pixels from the buffer may be
+used in the general case. In the case of direct drawing to a window with
+no special effects applied to @cr it will however use a more efficient
+approach.
+
+For #GL_RENDERBUFFER the code will always fall back to software for buffers
+with alpha components, so make sure you use #GL_TEXTURE if using alpha.
+
+Calling this may change the current GL context.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a cairo context
+</parameter_description>
+</parameter>
+<parameter name="window">
+<parameter_description> The window we're rendering for (not necessarily into)
+</parameter_description>
+</parameter>
+<parameter name="source">
+<parameter_description> The GL ID of the source buffer
+</parameter_description>
+</parameter>
+<parameter name="source_type">
+<parameter_description> The type of the @source
+</parameter_description>
+</parameter>
+<parameter name="buffer_scale">
+<parameter_description> The scale-factor that the @source buffer is allocated for
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> The source x position in @source to start copying from in GL coordinates
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> The source y position in @source to start copying from in GL coordinates
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> The width of the region to draw
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> The height of the region to draw
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_cairo_get_clip_rectangle">
@@ -3591,6 +3695,7 @@ See gdk_cursor_new_for_display().
 
 To make the cursor invisible, use %GDK_BLANK_CURSOR.
 
+Deprecated: 3.16: Use gdk_cursor_new_for_display() instead.
 
 </description>
 <parameters>
@@ -3600,6 +3705,7 @@ To make the cursor invisible, use %GDK_BLANK_CURSOR.
 </parameter>
 </parameters>
 <return> a new #GdkCursor
+
 </return>
 </function>
 
@@ -3960,6 +4066,7 @@ by GTK+, and must not be freed or unreffed.
 <function name="gdk_device_get_has_cursor">
 <description>
 Determines whether the pointer follows device motion.
+This is not meaningful for keyboard devices, which don't have a pointer.
 
 Since: 2.20
 
@@ -4057,7 +4164,7 @@ Since: 2.20
 
 <function name="gdk_device_get_last_event_window">
 <description>
-Gets information about which window the given pointer device is in, based on
+Gets information about which window the given pointer device is in, based on events
 that have been received so far from the display server. If another application
 has a pointer grab, or this application has a grab with owner_events = %FALSE,
 %NULL may be returned even if the pointer is physically over one of this
@@ -4337,6 +4444,8 @@ this application until the device is ungrabbed with gdk_device_ungrab(),
 or the window becomes unviewable. This overrides any previous grab on the device
 by this client.
 
+Note that @device and @window need to be on the same display.
+
 Device grabs are used for operations which need complete control over the
 given device events (either pointer or keyboard). For example in GTK+ this
 is used for Drag and Drop operations, popup menus and such.
@@ -4409,6 +4518,8 @@ can be used if the time isn’t known.
 Determines information about the current keyboard grab.
 This is not public API and must not be used by applications.
 
+Deprecated: 3.16: The symbol was never meant to be used outside
+of GTK+
 
 </description>
 <parameters>
@@ -4433,6 +4544,7 @@ gdk_pointer_grab() was %TRUE.
 </parameters>
 <return> %TRUE if this application currently has the
 keyboard grabbed.
+
 </return>
 </function>
 
@@ -5306,12 +5418,15 @@ it. gdk_parse_args() must have been called first. If the default
 display has previously been set, simply returns that. An internal
 function that should not be used by applications.
 
+Deprecated: 3.16: This symbol was never meant to be used outside
+of GTK+
 
 </description>
 <parameters>
 </parameters>
 <return> the default display, if it
 could be opened, otherwise %NULL.
+
 </return>
 </function>
 
@@ -5541,6 +5656,9 @@ Currently this only works on X11 with XComposite and
 XDamage extensions available.
 
 Since: 2.12
+
+Deprecated: 3.16: Compositing is an outdated technology that
+only ever worked on X11.
 
 </description>
 <parameters>
@@ -7443,6 +7561,153 @@ Gets whether event debugging output is enabled.
 </return>
 </function>
 
+<function name="gdk_gl_context_clear_current">
+<description>
+Clears the current #GdkGLContext.
+
+Any OpenGL call after this function returns will be ignored
+until gdk_gl_context_make_current() is called.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gl_context_get_current">
+<description>
+Retrieves the current #GdkGLContext.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the current #GdkGLContext, or %NULL
+
+</return>
+</function>
+
+<function name="gdk_gl_context_get_display">
+<description>
+Retrieves the #GdkDisplay the @context is created for
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDisplay or %NULL
+
+</return>
+</function>
+
+<function name="gdk_gl_context_get_profile">
+<description>
+Retrieves the #GdkGLProfile that @context was created for.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkGLProfile
+
+</return>
+</function>
+
+<function name="gdk_gl_context_get_shared_context">
+<description>
+Retrieves the #GdkGLContext that this @context share data with.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkGLContext or %NULL
+
+</return>
+</function>
+
+<function name="gdk_gl_context_get_window">
+<description>
+Retrieves the #GdkWindow used by the @context.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkWindow or %NULL
+
+</return>
+</function>
+
+<function name="gdk_gl_context_make_current">
+<description>
+Makes the @context the current one.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gl_get_flags">
+<description>
+Returns the currently active GL flags.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the GL flags
+
+</return>
+</function>
+
+<function name="gdk_gl_set_flags">
+<description>
+Sets GL flags.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> #GdkGLFlags to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_init">
 <description>
 Initializes the GDK library and connects to the windowing system.
@@ -8128,6 +8393,24 @@ a list of visuals; the list must be freed, but not its contents
 </return>
 </function>
 
+<function name="gdk_mir_display_get_mir_connection">
+<description>
+Returns the #MirConnection for a #GdkDisplay
+
+Since: 3.14
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #MirConnection
+
+</return>
+</function>
+
 <function name="gdk_notify_startup_complete">
 <description>
 Indicates to the GUI environment that the application has finished
@@ -8610,6 +8893,10 @@ Gets the number of milliseconds the current pixbuf should be displayed,
 or -1 if the current pixbuf should be displayed forever. g_timeout_add()
 conveniently takes a timeout in milliseconds, so you can use a timeout
 to schedule the next update.
+
+Note that some formats, like GIF, might clamp the timeout values in the
+image file to avoid updates that are just too quick. The minimum timeout
+for GIF images is currently 20 milliseconds.
 
 
 </description>
@@ -9187,8 +9474,8 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new #GdkPixbuf, or %NULL if not enough memory could be
-allocated for it.
+<return> the new #GdkPixbuf, or %NULL
+if not enough memory could be allocated for it.
 
 </return>
 </function>
@@ -9412,6 +9699,7 @@ Converts a #GdkPixdata to a #GdkPixbuf. If @copy_pixels is %TRUE or
 if the pixel data is run-length-encoded, the pixel data is copied into
 newly-allocated memory; otherwise it is reused.
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -9496,11 +9784,83 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="width">
+<parameter_description> Return location for the width of the
+image, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> Return location for the height of the
+image, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GdkPixbufFormat describing
+the image format of the file or %NULL if the image format wasn't
+recognized. The return value is owned by #GdkPixbuf and should
+not be freed.
+
+</return>
+</function>
+
+<function name="gdk_pixbuf_get_file_info_async">
+<description>
+Asynchronously parses an image file far enough to determine its
+format and size.
+
+For more details see gdk_pixbuf_get_file_info(), which is the synchronous
+version of this function.
+
+When the operation is finished, @callback will be called in the
+main thread. You can then call gdk_pixbuf_get_file_info_finish() to
+get the result of the operation.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> The name of the file to identify
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_pixbuf_get_file_info_finish">
+<description>
+Finishes an asynchronous pixbuf parsing operation started with
+gdk_pixbuf_get_file_info_async().
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="async_result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="width">
 <parameter_description> Return location for the width of the image, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="height">
 <parameter_description> Return location for the height of the image, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -9685,7 +10045,10 @@ The ICO, XBM, and XPM loaders provide &quot;x_hot&quot; and &quot;y_hot&quot; ho
 options for cursor definitions. The PNG loader provides the tEXt ancillary
 chunk key/value pairs as options. Since 2.12, the TIFF and JPEG loaders
 return an &quot;orientation&quot; option string that corresponds to the embedded 
-TIFF/Exif orientation tag (if present).
+TIFF/Exif orientation tag (if present). Since 2.32, the TIFF loader sets
+the &quot;multipage&quot; option string to &quot;yes&quot; when a multi-page TIFF is loaded.
+Since 2.32 the JPEG and PNG loaders set &quot;x-dpi&quot; and &quot;y-dpi&quot; if the file
+contains image density information in dots per inch.
 
 
 </description>
@@ -9704,6 +10067,28 @@ string that should not be freed or %NULL if @key was not found.
 </return>
 </function>
 
+<function name="gdk_pixbuf_get_options">
+<description>
+Returns a #GHashTable with a list of all the options that may have been
+attached to the @pixbuf when it was loaded, or that may have been
+attached by another function using gdk_pixbuf_set_option().
+
+See gdk_pixbuf_get_option() for more details.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> a #GdkPixbuf
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GHashTable of key/values
+
+</return>
+</function>
+
 <function name="gdk_pixbuf_get_pixels">
 <description>
 Queries a pointer to the pixel data of a pixbuf.
@@ -9719,6 +10104,9 @@ Queries a pointer to the pixel data of a pixbuf.
 <return> A pointer to the pixbuf's pixel data.
 Please see the section on [image data](image-data) for information
 about how the pixel data is stored in memory.
+
+This function will cause an implicit copy of the pixbuf data if the
+pixbuf was created from read-only data.
 </return>
 </function>
 
@@ -9742,6 +10130,9 @@ Since: 2.26
 <return> A pointer to the pixbuf's
 pixel data.  Please see the section on [image data](image-data)
 for information about how the pixel data is stored in memory.
+
+This function will cause an implicit copy of the pixbuf data if the
+pixbuf was created from read-only data.
 
 </return>
 </function>
@@ -9846,8 +10237,9 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GdkPixbufFormat or %NULL. The return
-value is owned by GdkPixbuf and should not be freed.
+<return> A #GdkPixbufFormat or
+%NULL. The return value is owned by GdkPixbuf and should not be
+freed.
 
 </return>
 </function>
@@ -10139,10 +10531,61 @@ you will have to fill it completely yourself.
 </return>
 </function>
 
+<function name="gdk_pixbuf_new_from_bytes">
+<description>
+Creates a new #GdkPixbuf out of in-memory readonly image data.
+Currently only RGB images with 8 bits per sample are supported.
+This is the #GBytes variant of gdk_pixbuf_new_from_data().
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> Image data in 8-bit/sample packed format inside a #GBytes
+</parameter_description>
+</parameter>
+<parameter name="colorspace">
+<parameter_description> Colorspace for the image data
+</parameter_description>
+</parameter>
+<parameter name="has_alpha">
+<parameter_description> Whether the data has an opacity channel
+</parameter_description>
+</parameter>
+<parameter name="bits_per_sample">
+<parameter_description> Number of bits per sample
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> Width of the image in pixels, must be &gt; 0
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> Height of the image in pixels, must be &gt; 0
+</parameter_description>
+</parameter>
+<parameter name="rowstride">
+<parameter_description> Distance in bytes between row starts
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly-created #GdkPixbuf structure with a reference count of 1.
+</return>
+</function>
+
 <function name="gdk_pixbuf_new_from_data">
 <description>
 Creates a new #GdkPixbuf out of in-memory image data.  Currently only RGB
 images with 8 bits per sample are supported.
+
+Since you are providing a pre-allocated pixel buffer, you must also
+specify a way to free that data.  This is done with a function of
+type #GdkPixbufDestroyNotify.  When a pixbuf created with is
+finalized, your destroy notification function will be called, and
+it is its responsibility to free the pixel array.
+
+See also gdk_pixbuf_new_from_bytes().
 
 
 </description>
@@ -10338,6 +10781,7 @@ For non-const inline data, you could get out of memory. For untrusted
 inline data located at runtime, you could have corrupt inline data in 
 addition.
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -10363,6 +10807,7 @@ serialized #GdkPixdata structure
 </parameters>
 <return> A newly-created #GdkPixbuf structure with a reference,
 count of 1, or %NULL if an error occurred.
+
 </return>
 </function>
 
@@ -10525,11 +10970,16 @@ from another thread. If the operation was cancelled, the error
 the #GDK_PIXBUF_ERROR and %G_IO_ERROR domains. 
 
 The image will be scaled to fit in the requested size, optionally 
-preserving the image's aspect ratio. When preserving the aspect ratio, 
-a @width of -1 will cause the image to be scaled to the exact given 
-height, and a @height of -1 will cause the image to be scaled to the 
-exact given width. When not preserving aspect ratio, a @width or 
-@height of -1 means to not scale the image at all in that dimension.
+preserving the image's aspect ratio.
+
+When preserving the aspect ratio, a @width of -1 will cause the image to be
+scaled to the exact given height, and a @height of -1 will cause the image
+to be scaled to the exact given width. If both @width and @height are
+given, this function will behave as if the smaller of the two values
+is passed as -1.
+
+When not preserving aspect ratio, a @width or @height of -1 means to not
+scale the image at all in that dimension.
 
 The stream is not closed.
 
@@ -10659,12 +11109,14 @@ the result of including an XPM file into a program's C source.
 
 <function name="gdk_pixbuf_new_subpixbuf">
 <description>
-Creates a new pixbuf which represents a sub-region of
-@src_pixbuf. The new pixbuf shares its pixels with the
-original pixbuf, so writing to one affects both.
-The new pixbuf holds a reference to @src_pixbuf, so
-@src_pixbuf will not be finalized until the new pixbuf
-is finalized.
+Creates a new pixbuf which represents a sub-region of @src_pixbuf.
+The new pixbuf shares its pixels with the original pixbuf, so
+writing to one affects both.  The new pixbuf holds a reference to
+@src_pixbuf, so @src_pixbuf will not be finalized until the new
+pixbuf is finalized.
+
+Note that if @src_pixbuf is read-only, this function will force it
+to be mutable.
 
 
 </description>
@@ -10692,6 +11144,44 @@ is finalized.
 </parameters>
 <return> a new pixbuf 
 </return>
+</function>
+
+<function name="gdk_pixbuf_read_pixel_bytes">
+<description>
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> A pixbuf
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new reference to a read-only copy of
+the pixel data.  Note that for mutable pixbufs, this function will
+incur a one-time copy of the pixel data for conversion into the
+returned #GBytes.
+
+</return>
+</function>
+
+<function name="gdk_pixbuf_read_pixels">
+<description>
+Returns a read-only pointer to the raw pixel data; must not be
+modified.  This function allows skipping the implicit copy that
+must be made if gdk_pixbuf_get_pixels() is called on a read-only
+pixbuf.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> A pixbuf
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_pixbuf_ref">
@@ -10730,8 +11220,8 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new #GdkPixbuf, or %NULL if not enough memory could be
-allocated for it.
+<return> the new #GdkPixbuf, or %NULL
+if not enough memory could be allocated for it.
 
 </return>
 </function>
@@ -10801,7 +11291,9 @@ gdk_pixbuf_save (pixbuf, handle, &quot;jpeg&quot;, &amp;error, &quot;quality&quo
 ]|
 
 Currently only few parameters exist. JPEG images can be saved with a
-&quot;quality&quot; parameter; its value should be in the range [0,100].
+&quot;quality&quot; parameter; its value should be in the range [0,100]. JPEG
+and PNG density can be set by setting the &quot;x-dpi&quot; and &quot;y-dpi&quot; parameters
+to the appropriate values in dots per inch.
 
 Text chunks can be attached to PNG images by specifying parameters of
 the form &quot;tEXt::key&quot;, where key is an ASCII string of length 1-79.
@@ -10822,9 +11314,13 @@ contents_encode = g_base64_encode ((const guchar *) contents, length);
 gdk_pixbuf_save (pixbuf, handle, &quot;png&quot;, &amp;error, &quot;icc-profile&quot;, contents_encode, NULL);
 ]|
 
-TIFF images recognize a &quot;compression&quot; option which acceps an integer value.
-Among the codecs are 1 None, 2 Huffman, 5 LZW, 7 JPEG and 8 Deflate, see
-the libtiff documentation and tiff.h for all supported codec values.
+TIFF images recognize: (1) a &quot;bits-per-sample&quot; option (integer) which
+can be either 1 for saving bi-level CCITTFAX4 images, or 8 for saving
+8-bits per sample; (2) a &quot;compression&quot; option (integer) which can be
+1 for no compression, 2 for Huffman, 5 for LZW, 7 for JPEG and 8 for
+DEFLATE (see the libtiff documentation and tiff.h for all supported
+codec values); (3) an &quot;icc-profile&quot; option (zero-terminated string)
+containing a base64 encoded ICC color profile.
 
 ICO images can be saved in depth 16, 24, or 32, by using the &quot;depth&quot;
 parameter. When the ICO saver is given &quot;x_hot&quot; and &quot;y_hot&quot; parameters,
@@ -11454,6 +11950,7 @@ The @pixdata contents are reconstructed byte by byte and are checked
 for validity. This function may fail with %GDK_PIXBUF_ERROR_CORRUPT_IMAGE
 or %GDK_PIXBUF_ERROR_UNKNOWN_TYPE.
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -11477,6 +11974,7 @@ serialized #GdkPixdata structure.
 </parameters>
 <return> Upon successful deserialization %TRUE is returned,
 %FALSE otherwise.
+
 </return>
 </function>
 
@@ -11486,6 +11984,7 @@ Converts a #GdkPixbuf to a #GdkPixdata. If @use_rle is %TRUE, the
 pixel data is run-length encoded into newly-allocated memory and a 
 pointer to that memory is returned. 
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -11502,8 +12001,10 @@ pointer to that memory is returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> If @ure_rle is %TRUE, a pointer to the newly-allocated memory 
-for the run-length encoded pixel data, otherwise %NULL.
+<return> If @use_rle is %TRUE, a pointer to the
+newly-allocated memory for the run-length encoded pixel data,
+otherwise %NULL.
+
 </return>
 </function>
 
@@ -11514,6 +12015,7 @@ The byte stream consists of a straightforward writeout of the
 #GdkPixdata fields in network byte order, plus the @pixel_data
 bytes the structure points to.
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -11529,6 +12031,7 @@ bytes the structure points to.
 <return> A
 newly-allocated string containing the serialized #GdkPixdata
 structure.
+
 </return>
 </function>
 
@@ -11541,6 +12044,7 @@ gdk-pixbuf ships with a program called
 [gdk-pixbuf-csource][gdk-pixbuf-csource], which offers a command
 line interface to this function.
 
+Deprecated: 2.32: Use #GResource instead.
 
 </description>
 <parameters>
@@ -11667,6 +12171,20 @@ instead.
 timestamp is available.
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_pre_parse_libgtk_only">
+<description>
+Prepare for parsing command line arguments for GDK. This is not
+public API and should not be used in application code.
+
+Deprecated: 3.16: This symbol was never meant to be used outside
+of GTK+
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </function>
@@ -12376,6 +12894,10 @@ the “work area” on a monitor within the entire screen area.
 The work area should be considered when positioning menus and
 similar popups, to avoid placing them below panels, docks or other
 desktop components.
+
+Note that not all backends may have a concept of workarea. This
+function will return the monitor geometry if a workarea is not
+available, or does not apply.
 
 Monitor numbers start at 0. To obtain the number of monitors of
 @screen, use gdk_screen_get_n_monitors().
@@ -14787,6 +15309,37 @@ in parent’s coordinate system, or %NULL
 <return></return>
 </function>
 
+<function name="gdk_window_create_gl_context">
+<description>
+Creates a new #GdkGLContext matching the
+framebuffer format to the visual of the #GdkWindow. The context
+is disconnected from any particular window or surface.
+
+If the creation of the #GdkGLContext failed, @error will be set.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="profile">
+<parameter_description> the GL profile the context should target
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #GdkGLContext, or
+%NULL on error
+
+</return>
+</function>
+
 <function name="gdk_window_create_similar_image_surface">
 <description>
 Create a new image surface that is efficient to draw on the
@@ -14934,14 +15487,14 @@ Deprecated: 3.8: this function is no longer needed
 
 <function name="gdk_window_end_paint">
 <description>
-Indicates that the backing store created by the most recent call to
-gdk_window_begin_paint_region() should be copied onscreen and
+Indicates that the backing store created by the most recent call
+to gdk_window_begin_paint_region() should be copied onscreen and
 deleted, leaving the next-most-recent backing store or no backing
 store at all as the active paint region. See
-gdk_window_begin_paint_region() for full details. It is an error to
-call this function without a matching
-gdk_window_begin_paint_region() first.
+gdk_window_begin_paint_region() for full details.
 
+It is an error to call this function without a matching
+gdk_window_begin_paint_region() first.
 
 </description>
 <parameters>
@@ -15026,6 +15579,8 @@ an equal number of times to begin processing exposes.
 
 This function is not part of the GDK public API and is only
 for use by GTK+.
+
+Deprecated: 3.16: This symbol was never meant to be used outside of GTK+
 
 </description>
 <parameters>
@@ -15222,6 +15777,9 @@ Determines whether @window is composited.
 See gdk_window_set_composited().
 
 Since: 2.22
+
+Deprecated: 3.16: Compositing is an outdated technology that
+only ever worked on X11.
 
 </description>
 <parameters>
@@ -16474,6 +17032,33 @@ function before gdk_window_show(). (Try gdk_window_show_unraised().)
 <return></return>
 </function>
 
+<function name="gdk_window_mark_paint_from_clip">
+<description>
+If you call this during a paint (e.g. between gdk_window_begin_paint_region()
+and gdk_window_end_paint() then GDK will mark the current clip region of the
+window as being drawn. This is required when mixing GL rendering via
+gdk_cairo_draw_from_gl() and cairo rendering, as otherwise GDK has no way
+of knowing when something paints over the GL-drawn regions.
+
+This is typically called automatically by GTK+ and you don't need
+to care about this.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="cr">
+<parameter_description> a #cairo_t
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_window_maximize">
 <description>
 Maximizes the window. If the window was already maximized, then
@@ -17056,6 +17641,9 @@ attempting to do so.
 
 Since: 2.12
 
+Deprecated: 3.16: Compositing is an outdated technology that
+only ever worked on X11.
+
 </description>
 <parameters>
 <parameter name="window">
@@ -17072,11 +17660,15 @@ Since: 2.12
 
 <function name="gdk_window_set_cursor">
 <description>
-Sets the default mouse pointer for a #GdkWindow. Use gdk_cursor_new_for_display()
-or gdk_cursor_new_from_pixbuf() to create the cursor. To make the cursor
-invisible, use %GDK_BLANK_CURSOR. Passing %NULL for the @cursor argument
-to gdk_window_set_cursor() means that @window will use the cursor of its
-parent window. Most windows should use this default.
+Sets the default mouse pointer for a #GdkWindow.
+
+Note that @cursor must be for the same display as @window.
+
+Use gdk_cursor_new_for_display() or gdk_cursor_new_from_pixbuf() to
+create the cursor. To make the cursor invisible, use %GDK_BLANK_CURSOR.
+Passing %NULL for the @cursor argument to gdk_window_set_cursor() means
+that @window will use the cursor of its parent window. Most windows
+should use this default.
 
 </description>
 <parameters>
@@ -17596,7 +18188,12 @@ of the opacity parameter are clamped to the [0,1] range.)
 
 For toplevel windows this depends on support from the windowing system
 that may not always be there. For instance, On X11, this works only on
-X screens with a compositing manager running.
+X screens with a compositing manager running. On Wayland, there is no
+per-window opacity value that the compositor would apply. Instead, use
+`gdk_window_set_opaque_region (window, NULL)` to tell the compositor
+that the entire window is (potentially) non-opaque, and draw your content
+with alpha, or use gtk_widget_set_opacity() to set an overall opacity
+for your widgets.
 
 For child windows this function only works for non-native windows.
 
@@ -17852,11 +18449,13 @@ Since: 2.12
 
 <function name="gdk_window_set_static_gravities">
 <description>
-Set the bit gravity of the given window to static, and flag it so
-all children get static subwindow gravity. This is used if you are
-implementing scary features that involve deep knowledge of the
-windowing system. Don’t worry about it unless you have to.
+Used to set the bit gravity of the given window to static, and flag
+it so all children get static subwindow gravity. This is used if you
+are implementing scary features that involve deep knowledge of the
+windowing system. Don’t worry about it.
 
+Deprecated: 3.16: static gravities haven't worked on anything but X11
+for a long time.
 
 </description>
 <parameters>
@@ -17869,7 +18468,8 @@ windowing system. Don’t worry about it unless you have to.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the server supports static gravity
+<return> %FALSE
+
 </return>
 </function>
 
@@ -18148,6 +18748,8 @@ gdk_window_freeze_toplevel_updates_libgtk_only().
 
 This function is not part of the GDK public API and is only
 for use by GTK+.
+
+Deprecated: 3.16: This symbol was never meant to be used outside of GTK+
 
 </description>
 <parameters>
@@ -18478,6 +19080,32 @@ Since: 3.0
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_x11_display_get_glx_version">
+<description>
+Retrieves the version of the GLX implementation.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="major">
+<parameter_description> return location for the GLX major version
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> return location for the GLX minor version
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if GLX is available
+
+</return>
 </function>
 
 <function name="gdk_x11_display_get_startup_notification_id">
