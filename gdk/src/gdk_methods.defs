@@ -56,6 +56,13 @@
   (gtype-id "GDK_TYPE_FRAME_CLOCK_IDLE")
 )
 
+(define-object GLContext
+  (in-module "Gdk")
+  (parent "GObject")
+  (c-name "GdkGLContext")
+  (gtype-id "GDK_TYPE_GL_CONTEXT")
+)
+
 (define-object Keymap
   (in-module "Gdk")
   (parent "GObject")
@@ -388,6 +395,7 @@
     '("eventloop" "GDK_DEBUG_EVENTLOOP")
     '("frames" "GDK_DEBUG_FRAMES")
     '("settings" "GDK_DEBUG_SETTINGS")
+    '("opengl" "GDK_DEBUG_OPENGL")
   )
 )
 
@@ -399,6 +407,19 @@
     '("similar" "GDK_RENDERING_MODE_SIMILAR")
     '("image" "GDK_RENDERING_MODE_IMAGE")
     '("recording" "GDK_RENDERING_MODE_RECORDING")
+  )
+)
+
+(define-flags GLFlags
+  (in-module "Gdk")
+  (c-name "GdkGLFlags")
+  (gtype-id "GDK_TYPE_GL_FLAGS")
+  (values
+    '("disable" "GDK_GL_DISABLE")
+    '("always" "GDK_GL_ALWAYS")
+    '("software-draw-gl" "GDK_GL_SOFTWARE_DRAW_GL")
+    '("software-draw-surface" "GDK_GL_SOFTWARE_DRAW_SURFACE")
+    '("texture-rectangle" "GDK_GL_TEXTURE_RECTANGLE")
   )
 )
 
@@ -524,6 +545,7 @@
     '("invalid-time" "GDK_GRAB_INVALID_TIME")
     '("not-viewable" "GDK_GRAB_NOT_VIEWABLE")
     '("frozen" "GDK_GRAB_FROZEN")
+    '("failed" "GDK_GRAB_FAILED")
   )
 )
 
@@ -567,6 +589,28 @@
     '("touch-mask" "GDK_TOUCH_MASK")
     '("smooth-scroll-mask" "GDK_SMOOTH_SCROLL_MASK")
     '("all-events-mask" "GDK_ALL_EVENTS_MASK")
+  )
+)
+
+(define-enum GLProfile
+  (in-module "Gdk")
+  (c-name "GdkGLProfile")
+  (gtype-id "GDK_TYPE_GL_PROFILE")
+  (values
+    '("default" "GDK_GL_PROFILE_DEFAULT")
+    '("legacy" "GDK_GL_PROFILE_LEGACY")
+    '("3-2-core" "GDK_GL_PROFILE_3_2_CORE")
+  )
+)
+
+(define-enum GLError
+  (in-module "Gdk")
+  (c-name "GdkGLError")
+  (gtype-id "GDK_TYPE_GL_ERROR")
+  (values
+    '("not-available" "GDK_GL_ERROR_NOT_AVAILABLE")
+    '("unsupported-format" "GDK_GL_ERROR_UNSUPPORTED_FORMAT")
+    '("unsupported-profile" "GDK_GL_ERROR_UNSUPPORTED_PROFILE")
   )
 )
 
@@ -898,6 +942,22 @@
     '("const-GdkPixbuf*" "pixbuf")
     '("int" "scale")
     '("GdkWindow*" "for_window")
+  )
+)
+
+(define-function gdk_cairo_draw_from_gl
+  (c-name "gdk_cairo_draw_from_gl")
+  (return-type "none")
+  (parameters
+    '("cairo_t*" "cr")
+    '("GdkWindow*" "window")
+    '("int" "source")
+    '("int" "source_type")
+    '("int" "buffer_scale")
+    '("int" "x")
+    '("int" "y")
+    '("int" "width")
+    '("int" "height")
   )
 )
 
@@ -1677,6 +1737,15 @@
 
 ;; From gdkdisplayprivate.h
 
+(define-method make_gl_context_current
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_make_gl_context_current")
+  (return-type "gboolean")
+  (parameters
+    '("GdkGLContext*" "context")
+  )
+)
+
 
 
 ;; From gdkdnd.h
@@ -1990,6 +2059,16 @@
 
 (define-function gdk_event_mask_get_type
   (c-name "gdk_event_mask_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_gl_profile_get_type
+  (c-name "gdk_gl_profile_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_gl_error_get_type
+  (c-name "gdk_gl_error_get_type")
   (return-type "GType")
 )
 
@@ -2490,11 +2569,153 @@
 
 
 
+;; From gdkglcontext.h
+
+(define-function gdk_gl_error_quark
+  (c-name "gdk_gl_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function gdk_gl_context_get_type
+  (c-name "gdk_gl_context_get_type")
+  (return-type "GType")
+)
+
+(define-method get_display
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_get_display")
+  (return-type "GdkDisplay*")
+)
+
+(define-method get_window
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_get_window")
+  (return-type "GdkWindow*")
+)
+
+(define-method get_profile
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_get_profile")
+  (return-type "GdkGLProfile")
+)
+
+(define-method make_current
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_make_current")
+  (return-type "none")
+)
+
+(define-function gdk_gl_context_get_current
+  (c-name "gdk_gl_context_get_current")
+  (return-type "GdkGLContext*")
+)
+
+(define-function gdk_gl_context_clear_current
+  (c-name "gdk_gl_context_clear_current")
+  (return-type "none")
+)
+
+
+
+;; From gdkglcontextprivate.h
+
+(define-method get_paint_data
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_get_paint_data")
+  (return-type "GdkGLContextPaintData*")
+)
+
+(define-method use_texture_rectangle
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_use_texture_rectangle")
+  (return-type "gboolean")
+)
+
+(define-method has_framebuffer_blit
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_has_framebuffer_blit")
+  (return-type "gboolean")
+)
+
+(define-method has_frame_terminator
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_has_frame_terminator")
+  (return-type "gboolean")
+)
+
+(define-method end_frame
+  (of-object "GdkGLContext")
+  (c-name "gdk_gl_context_end_frame")
+  (return-type "none")
+  (parameters
+    '("cairo_region_t*" "painted")
+    '("cairo_region_t*" "damage")
+  )
+)
+
+
+
 ;; From gdk.h
 
 
 
 ;; From gdkinternals.h
+
+(define-function gdk_gl_texture_from_surface
+  (c-name "gdk_gl_texture_from_surface")
+  (return-type "none")
+  (parameters
+    '("cairo_surface_t*" "surface")
+    '("cairo_region_t*" "region")
+  )
+)
+
+(define-function gdk_gl_texture_quads
+  (c-name "gdk_gl_texture_quads")
+  (return-type "none")
+  (parameters
+    '("GdkGLContext*" "paint_context")
+    '("guint" "texture_target")
+    '("int" "n_quads")
+    '("GdkTexturedQuad*" "quads")
+  )
+)
+
+(define-function gdk_cairo_surface_mark_as_direct
+  (c-name "gdk_cairo_surface_mark_as_direct")
+  (return-type "none")
+  (parameters
+    '("cairo_surface_t*" "surface")
+    '("GdkWindow*" "window")
+  )
+)
+
+(define-function gdk_cairo_region_from_clip
+  (c-name "gdk_cairo_region_from_clip")
+  (return-type "cairo_region_t*")
+  (parameters
+    '("cairo_t*" "cr")
+  )
+)
+
+(define-method get_paint_gl_context
+  (of-object "GdkWindow")
+  (c-name "gdk_window_get_paint_gl_context")
+  (return-type "GdkGLContext*")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method get_unscaled_size
+  (of-object "GdkWindow")
+  (c-name "gdk_window_get_unscaled_size")
+  (return-type "none")
+  (parameters
+    '("int*" "unscaled_width")
+    '("int*" "unscaled_height")
+  )
+)
 
 (define-function gdk_offscreen_window_get_type
   (c-name "gdk_offscreen_window_get_type")
@@ -2973,6 +3194,99 @@
     '("gint" "width")
     '("gint" "height")
   )
+)
+
+
+
+;; From gdk-private.h
+
+(define-function gdk_display_open_default
+  (c-name "gdk_display_open_default")
+  (return-type "GdkDisplay*")
+)
+
+(define-function gdk_device_grab_info
+  (c-name "gdk_device_grab_info")
+  (return-type "gboolean")
+  (parameters
+    '("GdkDisplay*" "display")
+    '("GdkDevice*" "device")
+    '("GdkWindow**" "grab_window")
+    '("gboolean*" "owner_events")
+  )
+)
+
+(define-function gdk_add_option_entries
+  (c-name "gdk_add_option_entries")
+  (return-type "none")
+  (parameters
+    '("GOptionGroup*" "group")
+  )
+)
+
+(define-function gdk_pre_parse
+  (c-name "gdk_pre_parse")
+  (return-type "none")
+)
+
+(define-function gdk_gl_get_flags
+  (c-name "gdk_gl_get_flags")
+  (return-type "GdkGLFlags")
+)
+
+(define-function gdk_gl_set_flags
+  (c-name "gdk_gl_set_flags")
+  (return-type "none")
+  (parameters
+    '("GdkGLFlags" "flags")
+  )
+)
+
+(define-method freeze_toplevel_updates
+  (of-object "GdkWindow")
+  (c-name "gdk_window_freeze_toplevel_updates")
+  (return-type "none")
+)
+
+(define-method thaw_toplevel_updates
+  (of-object "GdkWindow")
+  (c-name "gdk_window_thaw_toplevel_updates")
+  (return-type "none")
+)
+
+(define-method get_rendering_mode
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_rendering_mode")
+  (return-type "GdkRenderingMode")
+)
+
+(define-method set_rendering_mode
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_set_rendering_mode")
+  (return-type "none")
+  (parameters
+    '("GdkRenderingMode" "mode")
+  )
+)
+
+(define-method get_debug_updates
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_debug_updates")
+  (return-type "gboolean")
+)
+
+(define-method set_debug_updates
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_set_debug_updates")
+  (return-type "none")
+  (parameters
+    '("gboolean" "debug_updates")
+  )
+)
+
+(define-function gdk__private__
+  (c-name "gdk__private__")
+  (return-type "GdkPrivateVTable*")
 )
 
 
@@ -4215,6 +4529,15 @@
   )
 )
 
+(define-method mark_paint_from_clip
+  (of-object "GdkWindow")
+  (c-name "gdk_window_mark_paint_from_clip")
+  (return-type "none")
+  (parameters
+    '("cairo_t*" "cr")
+  )
+)
+
 (define-method begin_paint_region
   (of-object "GdkWindow")
   (c-name "gdk_window_begin_paint_region")
@@ -5039,6 +5362,16 @@
   (return-type "gboolean")
   (parameters
     '("GdkEvent*" "event")
+  )
+)
+
+(define-method create_gl_context
+  (of-object "GdkWindow")
+  (c-name "gdk_window_create_gl_context")
+  (return-type "GdkGLContext*")
+  (parameters
+    '("GdkGLProfile" "profile")
+    '("GError**" "error")
   )
 )
 
