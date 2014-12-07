@@ -16,6 +16,7 @@
  */
 
 #include <gtkmm/styleprovider.h>
+#include <gtkmm/csssection.h>
 #include <glibmm/object.h>
 #include <giomm/file.h>
 
@@ -25,6 +26,9 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gtk
 {
+/** Exception class for Gtk::CssProvider errors.
+ */
+_WRAP_GERROR(CssProviderError, GtkCssProviderError, GTK_CSS_PROVIDER_ERROR)
 
 /** CSS-like styling for widgets, implementing the StyleProvider base class.
  *
@@ -64,12 +68,23 @@ public:
 
   _WRAP_METHOD(bool load_from_file(const Glib::RefPtr<const Gio::File>& file), gtk_css_provider_load_from_file, errthrow)
   _WRAP_METHOD(bool load_from_path(const std::string& path), gtk_css_provider_load_from_path, errthrow)
+  _WRAP_METHOD(void load_from_resource(const std::string& resource_path), gtk_css_provider_load_from_resource)
 
   _WRAP_METHOD(static Glib::RefPtr<CssProvider> get_default(), gtk_css_provider_get_default, refreturn)
 
   _WRAP_METHOD(static Glib::RefPtr<CssProvider> get_named(const Glib::ustring& name, const Glib::ustring& variant), gtk_css_provider_get_named, refreturn)
 
-  //There are no properties or signals.
+  //TODO: When we can break ABI, remove no_default_handler and
+  // uncomment CssProvider_Class::parsing_error_callback() in the .ccg file.
+#m4 _CONVERSION(`GtkCssSection*',`const Glib::RefPtr<const CssSection>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`const Glib::RefPtr<const CssSection>&',`GtkCssSection*',__CONVERT_CONST_REFPTR_TO_P)
+#m4 _CONVERSION(`const GError*',`const Glib::Error&',`Glib::Error(g_error_copy($3))')
+#m4 _CONVERSION(`const Glib::Error&',`const GError*',__FR2P)
+  /** @param error The parsing error. The referenced object may belong to a subclass of Glib::Error, such as Gtk::CssProviderError.
+   */
+  _WRAP_SIGNAL(void parsing_error(const Glib::RefPtr<const CssSection>& section, const Glib::Error& error), "parsing-error", custom_c_callback, no_default_handler)
+
+  //There are no properties.
 };
 
 } // namespace Gtk
