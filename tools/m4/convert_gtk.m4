@@ -75,6 +75,7 @@ _CONV_ENUM(Gtk,CalendarDisplayOptions)
 _CONV_ENUM(Gtk,CellRendererMode)
 _CONV_ENUM(Gtk,CellRendererState)
 _CONV_ENUM(Gtk,CornerType)
+_CONV_ENUM(Gtk,CssSectionType)
 _CONV_ENUM(Gtk,CurveType)
 _CONV_ENUM(Gtk,DeleteType)
 _CONV_ENUM(Gtk,DestDefaults)
@@ -225,6 +226,7 @@ _CONVERSION(`GtkStyleProvider*',`Glib::RefPtr<StyleProvider>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<StyleProvider>&',`GtkStyleProvider*',__CONVERT_REFPTR_TO_P)
 
 _CONVERSION(`GtkCssProvider*',`Glib::RefPtr<CssProvider>',`Glib::wrap($3)')
+_CONVERSION(`GtkCssSection*',`Glib::RefPtr<CssSection>',`Glib::wrap($3)')
 
 # AccelGroup:
 _CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<AccelGroup>',`Glib::wrap($3)')
