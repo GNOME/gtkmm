@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright 2002      The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -44,7 +42,7 @@ namespace Cairo
 #ifndef GDKMM_DISABLE_DEPRECATED
 
 /** Sets the specified Gdk::Color as the source color of the Cairo context.
- * @param @context The cairo context.
+ * @param context The cairo context.
  * @param color The color to use as the source color.
  *
  * @newin{2,10}
@@ -55,7 +53,7 @@ void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const 
 #endif //GDKMM_DISABLE_DEPRECATED
 
 /** Sets the specified Gdk::RGBA as the source color of the Cairo context.
- * @param @context The cairo context.
+ * @param context The cairo context.
  * @param color The color to use as the source color.
  *
  * @newin{3,0}
@@ -64,7 +62,7 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
 
 
 /** Sets the given pixbuf as the source pattern for the Cairo context. The pattern has an extend mode of CAIRO_EXTEND_NONE and is aligned so that the origin of pixbuf is pixbuf_x, pixbuf_y.
- * @param @context The cairo context.
+ * @param context The cairo context.
  * @param pixbuf A Gdk::Pixbuf
  * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
  * @param pixbuf_y Y coordinate of location to place upper left corner of pixbuf.

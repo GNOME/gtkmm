@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GTKMM_ACCELMAP_H
 #define _GTKMM_ACCELMAP_H
-
-/* $Id$ */
 
 /* accelmap.h
  *
@@ -42,7 +39,7 @@ namespace AccelMap
  * To change the accelerator during runtime programatically, use
  * change_entry().
  * The accelerator path must consist of "<WINDOWTYPE>/Category1/Category2/.../Action",
- * where <WINDOWTYPE> should be a unique application-specific identifier, that
+ * where \<WINDOWTYPE\> should be a unique application-specific identifier, that
  * corresponds to the kind of window the accelerator is being used in, e.g. "Gimp-Image",
  * "Abiword-Document" or "Gnumeric-Settings".
  * The Category1/.../Action portion is most appropriately chosen by the action the
@@ -102,7 +99,7 @@ void save(const std::string& filename);
  * about runtime accelerator changes.
  *
  * Note that locking of individual accelerator paths is independent from
- * locking the #GtkAccelGroup containing them. For runtime accelerator
+ * locking the AccelGroup containing them. For runtime accelerator
  * changes to be possible both the accelerator path and its AccelGroup
  * have to be unlocked.
  *
