@@ -11440,6 +11440,8 @@ Signals that all holders of a reference to the widget should release
 the reference that they hold. May result in finalization of the widget
 if all references are released.
 
+This signal is not suitable for saving widget state.
+
 </description>
 <parameters>
 <parameter name="object">
@@ -30047,7 +30049,7 @@ This function emits the GtkContainer::set_focus_child signal of
 default behaviour by overriding the class closure of this signal.
 
 This is function is mostly meant to be used by widgets. Applications can use
-gtk_widget_grab_focus() to manualy set the focus to a specific widget.
+gtk_widget_grab_focus() to manually set the focus to a specific widget.
 
 </description>
 <parameters>
@@ -33929,6 +33931,28 @@ Gets the value set by gtk_entry_set_width_chars().
 </parameters>
 <return> number of chars to request space for, or negative if unset
 </return>
+</function>
+
+<function name="gtk_entry_grab_focus_without_selecting">
+<description>
+Causes @entry to have keyboard focus.
+
+It behaves like gtk_widget_grab_focus(),
+except that it doesn't select the contents of the entry.
+You only want to call this on some special entries
+which the user usually doesn't want to replace all text in,
+such as search-as-you-type entries.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_entry_im_context_filter_keypress">
@@ -44750,7 +44774,8 @@ icon for @icon_name.
 <function name="gtk_icon_theme_list_contexts">
 <description>
 Gets the list of contexts available within the current
-hierarchy of icon themes
+hierarchy of icon themes.
+See gtk_icon_theme_list_icons() for details about contexts.
 
 Since: 2.12
 
@@ -44775,7 +44800,11 @@ Lists the icons in the current icon theme. Only a subset
 of the icons can be listed by providing a context string.
 The set of values for the context string is system dependent,
 but will typically include such values as “Applications” and
-“MimeTypes”.
+“MimeTypes”. Contexts are explained in the
+[Icon Theme Specification](http://www.freedesktop.org/wiki/Specifications/icon-theme-spec).
+The standard contexts are listed in the
+[Icon Naming Specification](http://www.freedesktop.org/wiki/Specifications/icon-naming-spec).
+Also see gtk_icon_theme_list_contexts().
 
 Since: 2.4
 
@@ -69279,6 +69308,32 @@ Sets the position in which the current value is displayed.
 <return></return>
 </function>
 
+<function name="gtk_scrollable_get_border">
+<description>
+Returns the size of a non-scrolling border around the
+outside of the scrollable. An example for this would
+be treeview headers. GTK+ can use this information to
+display overlayed graphics, like the overshoot indication,
+at the right position.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="scrollable">
+<parameter_description> a #GtkScrollable
+</parameter_description>
+</parameter>
+<parameter name="border">
+<parameter_description> return location for the results
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @border has been set
+
+</return>
+</function>
+
 <function name="gtk_scrollable_get_hadjustment">
 <description>
 Retrieves the #GtkAdjustment used for horizontal scrolling.
@@ -79104,6 +79159,38 @@ result of gtk_text_view_get_editable() is appropriate here.
 </return>
 </function>
 
+<function name="gtk_text_buffer_insert_markup">
+<description>
+Inserts the text in @markup at position @iter. @markup will be inserted
+in its entirety and must be nul-terminated and valid UTF-8. Emits the
+#GtkTextBuffer::insert-text signal, possibly multiple times; insertion
+actually occurs in the default handler for the signal. @iter will point
+to the end of the inserted text on return.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+<parameter name="iter">
+<parameter_description> location to insert the markup
+</parameter_description>
+</parameter>
+<parameter name="markup">
+<parameter_description> a nul-terminated UTF-8 string containing [Pango markup][PangoMarkupFormat]
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> length of @markup in bytes, or -1
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_buffer_insert_pixbuf">
 <description>
 Inserts an image into the text buffer at @iter. The image will be
@@ -79909,7 +79996,7 @@ Since: 3.2
 <description>
 Moves backward by one character offset. Returns %TRUE if movement
 was possible; if @iter was the first in the buffer (character
-offset 0), gtk_text_iter_backward_char () returns %FALSE for convenience when
+offset 0), gtk_text_iter_backward_char() returns %FALSE for convenience when
 writing loops.
 
 
@@ -80148,8 +80235,8 @@ instead of backward.
 <description>
 Moves backward by @count text characters (pixbufs, widgets,
 etc. do not count as characters for this). Equivalent to moving
-through the results of gtk_text_iter_get_text (), rather than
-gtk_text_iter_get_slice ().
+through the results of gtk_text_iter_get_text(), rather than
+gtk_text_iter_get_slice().
 
 
 </description>
@@ -80462,7 +80549,7 @@ function is used by language bindings.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a copy of the @iter, free with gtk_text_iter_free ()
+<return> a copy of the @iter, free with gtk_text_iter_free()
 </return>
 </function>
 
@@ -80471,7 +80558,7 @@ function is used by language bindings.
 Returns whether the character at @iter is within an editable region
 of text.  Non-editable text is “locked” and can’t be changed by the
 user via #GtkTextView. This function is simply a convenience
-wrapper around gtk_text_iter_get_attributes (). If no tags applied
+wrapper around gtk_text_iter_get_attributes(). If no tags applied
 to this text affect editability, @default_setting will be returned.
 
 You don’t want to use this function to decide whether text can be
@@ -80613,10 +80700,10 @@ gtk_text_iter_compare().
 <description>
 Moves @iter forward by one character offset. Note that images
 embedded in the buffer occupy 1 character slot, so
-gtk_text_iter_forward_char () may actually move onto an image instead
+gtk_text_iter_forward_char() may actually move onto an image instead
 of a character, if you have images in your buffer.  If @iter is the
 end iterator or one character before it, @iter will now point at
-the end iterator, and gtk_text_iter_forward_char () returns %FALSE for
+the end iterator, and gtk_text_iter_forward_char() returns %FALSE for
 convenience when writing loops.
 
 
@@ -80868,8 +80955,8 @@ negative, moves backward instead of forward.
 <description>
 Moves forward by @count text characters (pixbufs, widgets,
 etc. do not count as characters for this). Equivalent to moving
-through the results of gtk_text_iter_get_text (), rather than
-gtk_text_iter_get_slice ().
+through the results of gtk_text_iter_get_text(), rather than
+gtk_text_iter_get_slice().
 
 
 </description>
@@ -81151,7 +81238,7 @@ text. The @values parameter should be initialized to the default
 settings you wish to use if no tags are in effect. You’d typically
 obtain the defaults from gtk_text_view_get_default_attributes().
 
-gtk_text_iter_get_attributes () will modify @values, applying the
+gtk_text_iter_get_attributes() will modify @values, applying the
 effects of any tags present at @iter. If any tags affected @values,
 the function returns %TRUE.
 
@@ -81263,10 +81350,10 @@ anchor is returned (with no new reference count added). Otherwise,
 
 <function name="gtk_text_iter_get_language">
 <description>
-A convenience wrapper around gtk_text_iter_get_attributes (),
+A convenience wrapper around gtk_text_iter_get_attributes(),
 which returns the language in effect at @iter. If no tags affecting
 language apply to @iter, the return value is identical to that of
-gtk_get_default_language ().
+gtk_get_default_language().
 
 
 </description>
@@ -81361,7 +81448,7 @@ meaningful order.
 Returns the character offset of an iterator.
 Each character in a #GtkTextBuffer has an offset,
 starting with 0 for the first character in the buffer.
-Use gtk_text_buffer_get_iter_at_offset () to convert an
+Use gtk_text_buffer_get_iter_at_offset() to convert an
 offset back into an iterator.
 
 
@@ -81446,7 +81533,7 @@ Returns text in the given range.  If the range
 contains non-text elements such as images, the character and byte
 offsets in the returned string will not correspond to character and
 byte offsets in the buffer. If you want offsets to correspond, see
-gtk_text_iter_get_slice ().
+gtk_text_iter_get_slice().
 
 
 </description>
@@ -81529,7 +81616,7 @@ toggled on.
 
 <function name="gtk_text_iter_get_visible_slice">
 <description>
-Like gtk_text_iter_get_slice (), but invisible text is not included.
+Like gtk_text_iter_get_slice(), but invisible text is not included.
 Invisible text is usually invisible because a #GtkTextTag with the
 “invisible” attribute turned on has been applied to it.
 
@@ -81551,7 +81638,7 @@ Invisible text is usually invisible because a #GtkTextTag with the
 
 <function name="gtk_text_iter_get_visible_text">
 <description>
-Like gtk_text_iter_get_text (), but invisible text is not included.
+Like gtk_text_iter_get_text(), but invisible text is not included.
 Invisible text is usually invisible because a #GtkTextTag with the
 “invisible” attribute turned on has been applied to it.
 
@@ -81680,7 +81767,7 @@ pango_break() for details on what a cursor position is.
 <function name="gtk_text_iter_is_end">
 <description>
 Returns %TRUE if @iter is the end iterator, i.e. one past the last
-dereferenceable iterator in the buffer. gtk_text_iter_is_end () is
+dereferenceable iterator in the buffer. gtk_text_iter_is_end() is
 the most efficient way to check whether an iterator is the end
 iterator.
 
@@ -81866,9 +81953,9 @@ counted in the offset.
 <function name="gtk_text_iter_starts_line">
 <description>
 Returns %TRUE if @iter begins a paragraph,
-i.e. if gtk_text_iter_get_line_offset () would return 0.
+i.e. if gtk_text_iter_get_line_offset() would return 0.
 However this function is potentially more efficient than
-gtk_text_iter_get_line_offset () because it doesn’t have to compute
+gtk_text_iter_get_line_offset() because it doesn’t have to compute
 the offset, it just has to see whether it’s 0.
 
 
@@ -81923,8 +82010,8 @@ algorithms).
 
 <function name="gtk_text_iter_toggles_tag">
 <description>
-This is equivalent to (gtk_text_iter_begins_tag () ||
-gtk_text_iter_ends_tag ()), i.e. it tells you whether a range with
+This is equivalent to (gtk_text_iter_begins_tag() ||
+gtk_text_iter_ends_tag()), i.e. it tells you whether a range with
 @tag applied to it begins or ends at @iter.
 
 
@@ -83104,7 +83191,7 @@ gtk_text_iter_get_attributes() in order to get the
 attributes in effect at a given text position.
 
 The return value is a copy owned by the caller of this function,
-and should be freed.
+and should be freed with gtk_text_attributes_unref().
 
 
 </description>
@@ -96756,6 +96843,32 @@ library contains more information about accessible objects and their uses.
 </return>
 </function>
 
+<function name="gtk_widget_get_action_group">
+<description>
+Retrieves the #GActionGroup that was registered using @prefix. The resulting
+#GActionGroup may have been registered to @widget or any #GtkWidget in its
+ancestry.
+
+If no action group was found matching @prefix, then %NULL is returned.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> A #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="prefix">
+<parameter_description> The “prefix” of the action group.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GActionGroup or %NULL.
+
+</return>
+</function>
+
 <function name="gtk_widget_get_allocated_baseline">
 <description>
 Returns the baseline that has currently been allocated to @widget.
@@ -99102,6 +99215,25 @@ gtk_accel_group_from_accel_closure().
 </parameters>
 <return>
 a newly allocated #GList of closures
+</return>
+</function>
+
+<function name="gtk_widget_list_action_prefixes">
+<description>
+Retrieves a %NULL-terminated array of strings containing the prefixes of
+#GActionGroup's available to @widget.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> A #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a %NULL-terminated array of strings.
+
 </return>
 </function>
 
