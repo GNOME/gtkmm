@@ -403,6 +403,30 @@ TextBuffer::iterator TextBuffer::insert_with_tags_by_name(const iterator& pos,
   return range_end;
 }
 
+TextBuffer::iterator TextBuffer::insert_markup(const iterator& pos, const Glib::ustring& markup)
+{
+  // gtk_text_buffer_insert_markup() modifies the iterator, but that's not the
+  // STL way so we give it something that we don't mind it modifying.
+  iterator iterCopy (pos);
+  gtk_text_buffer_insert_markup(gobj(), iterCopy.gobj(), markup.data(), markup.bytes());
+
+  // According to the gtk_text_buffer_insert_markup() docs, the "default signal handler
+  // revalidates it to point to the end of the inserted text".
+  return iterCopy;
+}
+
+TextBuffer::iterator TextBuffer::insert_markup(const iterator& pos, const char* markup_begin, const char* markup_end)
+{
+  // gtk_text_buffer_insert_markup() modifies the iterator, but that's not the
+  // STL way so we give it something that we don't mind it modifying.
+  iterator iterCopy (pos);
+  gtk_text_buffer_insert_markup(gobj(), iterCopy.gobj(), markup_begin, markup_end - markup_begin);
+
+  // According to the gtk_text_buffer_insert_markup() docs, the "default signal handler
+  // revalidates it to point to the end of the inserted text".
+  return iterCopy;
+}
+
 TextBuffer::iterator TextBuffer::insert(const iterator& pos,
                                         const iterator& range_begin, const iterator& range_end)
 {
