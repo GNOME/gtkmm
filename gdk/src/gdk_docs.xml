@@ -4320,6 +4320,26 @@ the @device is on, or %NULL.
 <return></return>
 </function>
 
+<function name="gdk_device_get_product_id">
+<description>
+Returns the product ID of this device, or %NULL if this information couldn't
+be obtained. This ID is retrieved from the device, and is thus constant for
+it. See gdk_device_get_vendor_id() for more information.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a slave #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> the product ID, or %NULL
+
+</return>
+</function>
+
 <function name="gdk_device_get_source">
 <description>
 Determines the type of the device.
@@ -4366,6 +4386,49 @@ the axes of @device in, or %NULL.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_device_get_vendor_id">
+<description>
+Returns the vendor ID of this device, or %NULL if this information couldn't
+be obtained. This ID is retrieved from the device, and is thus constant for
+it.
+
+This function, together with gdk_device_get_product_id(), can be used to eg.
+compose #GSettings paths to store settings for this device.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static GSettings *
+get_device_settings (GdkDevice *device)
+{
+const gchar *vendor, *product;
+GSettings *settings;
+GdkDevice *device;
+gchar *path;
+
+vendor = gdk_device_get_vendor_id (device);
+product = gdk_device_get_product_id (device);
+
+path = g_strdup_printf (&quot;/org/example/app/devices/%s:%s/&quot;, vendor, product);
+settings = g_settings_new_with_path (DEVICE_SCHEMA, path);
+g_free (path);
+
+return settings;
+}
+]|
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a slave #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> the vendor ID, or %NULL
+
+</return>
 </function>
 
 <function name="gdk_device_get_window_at_position">
@@ -14850,6 +14913,32 @@ Since: 3.10
 <return></return>
 </function>
 
+<function name="gdk_win32_display_get_wgl_version">
+<description>
+Retrieves the version of the WGL implementation.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="major">
+<parameter_description> return location for the WGL major version
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> return location for the WGL minor version
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if WGL is available
+
+</return>
+</function>
+
 <function name="gdk_window_add_filter">
 <description>
 Adds an event filter to @window, allowing you to intercept events
@@ -16398,7 +16487,7 @@ The position coordinates are relative to the window’s parent window.
 <description>
 Obtains the position of a window position in root
 window coordinates. This is similar to
-gdk_window_get_origin() but allows you go pass
+gdk_window_get_origin() but allows you to pass
 in any position in the window, not just the origin.
 
 Since: 2.18
@@ -17511,10 +17600,12 @@ Since: 2.4
 
 <function name="gdk_window_set_background">
 <description>
-Sets the background color of @window. (However, when using GTK+,
-set the background of a widget with gtk_widget_modify_bg() - if
-you’re an application - or gtk_style_set_background() - if you're
-implementing a custom widget.)
+Sets the background color of @window.
+
+However, when using GTK+, influence the background of a widget
+using a style class or CSS — if you’re an application — or with
+gtk_style_context_set_background() — if you're implementing a
+custom widget.
 
 See also gdk_window_set_background_pattern().
 
