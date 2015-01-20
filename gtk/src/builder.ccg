@@ -23,7 +23,7 @@
 // Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular
 // GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
 static GType
-get_type_from_name_vfunc_callback(GtkBuilder*, const char* type_name)
+get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
 {
   if (!type_name)
     return G_TYPE_INVALID;
@@ -34,10 +34,18 @@ get_type_from_name_vfunc_callback(GtkBuilder*, const char* type_name)
 
   GType gtype = g_type_from_name(classname_prefixed.c_str());
 
-  if(gtype == G_TYPE_INVALID) // if it's not a registered typename
+  if (gtype == G_TYPE_INVALID) // If it's not a registered typename
   {
-    // There's no gtkmm derived type, so just use the normal one.
-    gtype = g_type_from_name(type_name);
+    // Get the parent class of the object class (the original underlying C class).
+    Gtk::Builder_Class::BaseClassType* const base =
+      static_cast<Gtk::Builder_Class::BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
+
+    // Call the original underlying C function.
+    if (base && base->get_type_from_name)
+      gtype = (*base->get_type_from_name)(self, type_name);
+    else // If that's not possible, just use the normal GType.
+      gtype = g_type_from_name(type_name);
   }
 
   return gtype;
