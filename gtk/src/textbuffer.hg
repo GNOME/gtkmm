@@ -485,26 +485,60 @@ public:
   _WRAP_METHOD(Glib::RefPtr<TargetList> get_copy_target_list() const, gtk_text_buffer_get_copy_target_list, refreturn)
   _WRAP_METHOD(Glib::RefPtr<TargetList> get_paste_target_list() const, gtk_text_buffer_get_paste_target_list, refreturn)
 
-//TODO: I have commented these out for now because I don't understand what the register_buffer and content_buffer are. murrayc.
- //TODO: Documentation.
- // typedef sigc::slot<guint8*, const Glib::RefPtr<TextBuffer>& /* content_buffer */, const iterator& /* start */, const iterator& /* end */, gsize& /* length */> SlotSerialize;
+  /** For instance,<br>
+   * guint8* on_serialize(const Glib::RefPtr<TextBuffer>& content_buffer, const iterator& start, const iterator& end, gsize& length);
+   *
+   * @param content_buffer The TextBuffer to serialize. It may be different from
+   *        the TextBuffer where the serialize format is registered.
+   * @param start Start of the block of text to serialize.
+   * @param end End of the block of text to serialize.
+   * @param[out] length The length of the serialized data.
+   * @return A newly-allocated array of guint8 which contains the serialized data, or <tt>0</tt> if an error occurred.
+   */
+ typedef sigc::slot<guint8*, const Glib::RefPtr<TextBuffer>&, const iterator&, const iterator&, gsize&> SlotSerialize;
 
+  /** For instance,<br>
+   * bool on_deserialize(const Glib::RefPtr<TextBuffer>& content_buffer, iterator& iter, const guint8* data, gsize length, bool create_tags);
+   *
+   * @param content_buffer The TextBuffer to deserialize into. It may be different
+   *        from the TextBuffer where the deserialize format is registered.
+   * @param iter Insertion point for the deserialized text.
+   * @param data Data to deserialize.
+   * @param length Length of data.
+   * @param create_tags <tt>true</tt> if deserializing may create tags.
+   * @return <tt>true</tt> on success, <tt>false</tt> otherwise.
+   * @throw Glib::Error If the deserialize slot throws a Glib::Error or an object
+   *        derived from Glib::Error, the exception will be propagated out from
+   *        the calling deserialize() method.
+   */
+  typedef sigc::slot<bool, const Glib::RefPtr<TextBuffer>&, iterator&, const guint8*, gsize, bool> SlotDeserialize;
 
-//TODO: Use ArrayHandle, or just use guint8* to be more efficient?
-// TODO: Or rather - vector utils.
-  // typedef sigc::slot<bool, const Glib::RefPtr<TextBuffer>& /* content_buffer */, iterator& /* iter */, const guint8*  /* data */, gsize /* length */, bool /* create_tags */> SlotDeserialize;
-
-/*
+  /** This function registers a rich text serialization @a slot along with
+   * its @a mime_type with this TextBuffer.
+   *
+   * @newin{3,16}
+   *
+   * @param mime_type The format’s mime-type.
+   * @param slot The serialize slot to register.
+   * @return The newly registered format’s mime-type.
+   */
   Glib::ustring register_serialize_format(const Glib::ustring& mime_type, const SlotSerialize& slot);
   _IGNORE(gtk_text_buffer_register_serialize_format)
-*/
 
   _WRAP_METHOD(Glib::ustring register_serialize_tagset(const Glib::ustring& tagset_name), gtk_text_buffer_register_serialize_tagset)
 
-/*
+  /** This function registers a rich text deserialization @a slot along with
+   * its @a mime_type with this TextBuffer.
+   *
+   * @newin{3,16}
+   *
+   * @param mime_type The format’s mime-type.
+   * @param slot The deserialize slot to register.
+   * @return The newly registered format’s mime-type.
+   */
   Glib::ustring register_deserialize_format(const Glib::ustring& mime_type, const SlotDeserialize& slot);
   _IGNORE(gtk_text_buffer_register_deserialize_format)
-*/
+
   _WRAP_METHOD(Glib::ustring register_deserialize_tagset(const Glib::ustring& tagset_name), gtk_text_buffer_register_deserialize_tagset)
 
   _WRAP_METHOD(void unregister_serialize_format(const Glib::ustring& format), gtk_text_buffer_unregister_serialize_format)
@@ -519,27 +553,16 @@ public:
   std::vector<Glib::ustring> get_deserialize_formats() const;
   _IGNORE(gtk_text_buffer_get_deserialize_formats)
 
-/*
-//TODO: I have commented these out for now because I don't understand what the register_buffer and content_buffer are. murrayc.
-
-//TODO: Use something other than gsize?
-#m4 _CONVERSION(`const iterator&', `GtkTextIter*',`($3).gobj()')
   _WRAP_METHOD(guint8* serialize(const Glib::RefPtr<TextBuffer>& content_buffer,
-                                                       const Glib::ustring& format,
-                                                       const iterator& iterstart,
-                                                       const iterator& iterend,
-                                                       gsize& length), gtk_text_buffer_serialize)
+                                 const Glib::ustring& format,
+                                 const iterator& start,
+                                 const iterator& end,
+                                 gsize& length), gtk_text_buffer_serialize)
 
-//TODO: Is the bool superfluous?
-//TODO: Use an ArrayHandle? Or rather - vector utils.
   _WRAP_METHOD(bool deserialize(const Glib::RefPtr<TextBuffer>& content_buffer,
-                                                       const Glib::ustring& format,
-                                                       const iterator& iter, const guint8* data,
-                                                       gsize length), gtk_text_buffer_deserialize, errthrow)
-*/
-
-
-
+                                const Glib::ustring& format,
+                                iterator& iter, const guint8* data,
+                                gsize length), gtk_text_buffer_deserialize, errthrow)
 
 #m4begin
 dnl // HACK: Override the default conversion to deal correctly
