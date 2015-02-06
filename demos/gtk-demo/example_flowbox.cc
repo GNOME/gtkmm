@@ -15,6 +15,8 @@ public:
   virtual ~Example_FlowBox();
 
 protected:
+  //Signal handlers:
+  bool on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int swatch_i);
 
   // Containers
   Gtk::ScrolledWindow m_scrolled_window;
@@ -69,16 +71,24 @@ Example_FlowBox::~Example_FlowBox()
 
 Gtk::Button* Example_FlowBox::create_color_swatch(int swatch_i)
 {
-  Gdk::RGBA rgba(m_color_names[swatch_i]);
   Gtk::DrawingArea* drawing_area = Gtk::manage(new Gtk::DrawingArea());
   Gtk::Button* color_swatch = Gtk::manage(new Gtk::Button());
 
   drawing_area->set_size_request(24, 24);
-  drawing_area->override_background_color(rgba);
 
   color_swatch->add(*drawing_area);
+  drawing_area->signal_draw().connect(sigc::bind(sigc::mem_fun(*this, &Example_FlowBox::on_drawing_area_draw), swatch_i));
 
   return color_swatch;
+}
+
+bool Example_FlowBox::on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int swatch_i)
+{
+  Gdk::RGBA rgba(m_color_names[swatch_i]);
+  Gdk::Cairo::set_source_rgba(cr, rgba);
+  cr->paint();
+
+  return true;
 }
 
 void Example_FlowBox::fill_color_names()

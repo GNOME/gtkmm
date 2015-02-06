@@ -1,6 +1,6 @@
  /* Color Chooser
  *
- * GtkColorChooserDialog lets the user choose a color.
+ * Gtk::ColorChooserDialog lets the user choose a color.
  *
  */
 
@@ -14,7 +14,8 @@ public:
 
 protected:
   //Signal handlers:
-  virtual void on_button_clicked();
+  void on_button_clicked();
+  bool on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
   //Member widgets:
   Gtk::Box m_VBox;
@@ -34,31 +35,22 @@ Example_ColorSel::Example_ColorSel()
 : m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_Button("_Change the above color", true)
 {
-  set_title("Color Selection");
+  set_title("Color Chooser");
   set_border_width(8);
 
   m_VBox.set_border_width(8);
   add(m_VBox);
 
-  /*
-   * Create the color swatch area
-   */
-
+  // Create the color swatch area
   m_Frame.set_shadow_type(Gtk::SHADOW_IN);
   m_VBox.pack_start(m_Frame);
 
   // set a fixed size
   m_DrawingArea.set_size_request(200, 200);
 
-  /* TODO: Is this still necessary? It is not in the C version now.
-  // Unset the background pixmap (as used by pixmap themes)
-  // because it takes precedence over the background color.
-  m_DrawingArea.modify_bg_pixmap(Gtk::STATE_NORMAL, "<none>");
-  */
-
   // set the color
   m_Color.set_rgba(0, 0, 1, 1);
-  m_DrawingArea.override_background_color(m_Color);
+  m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_ColorSel::on_drawing_area_draw));
 
   m_Frame.add(m_DrawingArea);
 
@@ -87,8 +79,14 @@ void Example_ColorSel::on_button_clicked()
   if(response == Gtk::RESPONSE_OK)
   {
     m_Color = dialog.get_rgba();
-
-    m_DrawingArea.override_background_color(m_Color);
   }
+}
+
+bool Example_ColorSel::on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+  Gdk::Cairo::set_source_rgba(cr, m_Color);
+  cr->paint();
+
+  return true;
 }
 

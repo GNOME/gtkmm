@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* textwidget.cc
  *
  * Copyright (C) 2001-2002 The gtkmm Development Team
@@ -41,13 +39,12 @@ TextWidget::TextWidget(bool is_source)
 
   if (is_source)
   {
-#ifndef G_OS_WIN32
-    Pango::FontDescription fontDesc("Courier 12");
-    m_TextView.override_font(fontDesc);
-#endif /* G_OS_WIN32 */
     m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
 
-    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag  =  m_refTextBuffer->create_tag("comment");
+    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("source");
+    refTag->property_font() = "Courier 12";
+
+    refTag = m_refTextBuffer->create_tag("comment");
     refTag->property_foreground() = "red";
 
     refTag = m_refTextBuffer->create_tag("type");
@@ -79,7 +76,6 @@ TextWidget::TextWidget(bool is_source)
 
     Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("title");
     refTag->property_font() = "Sans 18";
-
   }
 }
 
@@ -335,7 +331,12 @@ void TextWidget::fontify()
 {
   enumStates state = STATE_NORMAL;
 
-  Gtk::TextBuffer::iterator iterStart = m_refTextBuffer->get_iter_at_offset(0);
+  Gtk::TextBuffer::iterator iterStart;
+  Gtk::TextBuffer::iterator iterEnd;
+  m_refTextBuffer->get_bounds(iterStart, iterEnd);
+  m_refTextBuffer->apply_tag_by_name("source", iterStart, iterEnd);
+
+  iterStart = m_refTextBuffer->get_iter_at_offset(0);
 
   Gtk::TextBuffer::iterator iterNext = iterStart;
   while(iterNext.forward_line())
@@ -374,7 +375,3 @@ void TextWidget::fontify()
     iterStart = iterNext;
   }
 }
-
-
-
-

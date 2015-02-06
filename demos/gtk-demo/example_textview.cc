@@ -1,7 +1,7 @@
 /* Text Widget
  *
- * The GtkTextView widget displays a GtkTextBuffer. One GtkTextBuffer
- * can be displayed by multiple GtkTextViews. This demo has two views
+ * The Gtk::TextView widget displays a Gtk::TextBuffer. One Gtk::TextBuffer
+ * can be displayed by multiple Gtk::TextViews. This demo has two views
  * displaying a single buffer, and shows off the widget's text
  * formatting features.
  *
@@ -464,17 +464,11 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
 
   Gtk::TextView* pChildView = Gtk::manage( new Gtk::TextView(view.get_buffer()));
 
-  /* Event box is to add a black border around each child view */
-  Gtk::EventBox* pEventBox = Gtk::manage( new Gtk::EventBox());
-  Gdk::RGBA color("black");
-  pEventBox->override_background_color(color);
+  /* Frame is to add a black border around each child view */
+  Gtk::Frame* pFrame = Gtk::manage( new Gtk::Frame());
 
-  pChildView->set_halign(Gtk::ALIGN_CENTER);
-  pChildView->set_valign(Gtk::ALIGN_CENTER);
-  pChildView->set_border_width(1);
+  pFrame->add(*pChildView);
 
-  pEventBox->add(*pChildView);
-
-  view.add_child_at_anchor(*pEventBox, refAnchor);
+  view.add_child_at_anchor(*pFrame, refAnchor);
   recursive_attach_view (depth + 1, *pChildView, refAnchor);
 }
