@@ -3719,7 +3719,7 @@ The ::create-context signal is emitted when the widget is being
 realized, and allows you to override how the GL context is
 created. This is useful when you want to reuse an existing GL
 context, or if you want to try creating different kinds of GL
-profiles.
+options.
 
 If context creation fails then the signal handler can use
 gtk_gl_area_set_error() to register a more detailed error
@@ -8281,9 +8281,8 @@ The ::edge-overshot signal is emitted whenever user initiated scrolling
 makes the scrolledwindow firmly surpass (ie. with some edge resistance)
 the lower or upper limits defined by the adjustment in that orientation.
 
-If a similar behavior without edge resistance is desired, one alternative
-may be to check on #GtkAdjustment::value-changed that the value equals
-either #GtkAdjustment:lower or #GtkAdjustment:upper - #GtkAdjustment:page-size.
+A similar behavior without edge resistance is provided by the
+#GtkScrolledWindow::edge-reached signal.
 
 Note: The @pos argument is LTR/RTL aware, so callers should be aware too
 if intending to provide behavior on horizontal edges.
@@ -8298,6 +8297,34 @@ Since: 3.16
 </parameter>
 <parameter name="pos">
 <parameter_description> edge side that was hit
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkScrolledWindow::edge-reached">
+<description>
+The ::edge-reached signal is emitted whenever user-initiated scrolling
+makes the scrolledwindow exactly reaches the lower or upper limits
+defined by the adjustment in that orientation.
+
+A similar behavior with edge resistance is provided by the
+#GtkScrolledWindow::edge-overshot signal.
+
+Note: The @pos argument is LTR/RTL aware, so callers should be aware too
+if intending to provide behavior on horizontal edges.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="pos">
+<parameter_description> edge side that was reached
 </parameter_description>
 </parameter>
 </parameters>
@@ -8356,12 +8383,80 @@ horizontally or not
 <return></return>
 </signal>
 
+<signal name="GtkSearchEntry::next-match">
+<description>
+The ::next-match signal is a [keybinding signal][GtkBindingSignal]
+which gets emitted when the user initiates a move to the next match
+for the current search string.
+
+Applications should connect to it, to implement moving between
+matches.
+
+The default bindings for this signal is Ctrl-g.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> the entry on which the signal was emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkSearchEntry::previous-match">
+<description>
+The ::previous-match signal is a [keybinding signal][GtkBindingSignal]
+which gets emitted when the user initiates a move to the previous match
+for the current search string.
+
+Applications should connect to it, to implement moving between
+matches.
+
+The default bindings for this signal is Ctrl-Shift-g.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> the entry on which the signal was emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkSearchEntry::search-changed">
 <description>
 The #GtkSearchEntry::search-changed signal is emitted with a short
 delay of 150 milliseconds after the last change to the entry text.
 
 Since: 3.10
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> the entry on which the signal was emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkSearchEntry::stop-search">
+<description>
+The ::stop-search signal is a [keybinding signal][GtkBindingSignal]
+which gets emitted when the user stops a search via keyboard input.
+
+Applications should connect to it, to implement hiding the search
+entry in this case.
+
+The default bindings for this signal is Escape.
+
+Since: 3.16
 
 </description>
 <parameters>
@@ -26557,6 +26652,25 @@ owned by GTK+, must not be freed or unreffed.
 </return>
 </function>
 
+<function name="gtk_clipboard_get_default">
+<description>
+Returns the default clipboard object for use with cut/copy/paste menu items
+and keyboard shortcuts.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the #GdkDisplay for which the clipboard is to be retrieved.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the default clipboard object.
+
+</return>
+</function>
+
 <function name="gtk_clipboard_get_display">
 <description>
 Gets the #GdkDisplay associated with @clipboard
@@ -31280,6 +31394,33 @@ source can provide the data.
 </parameters>
 <return>
 </return>
+</function>
+
+<function name="gtk_drag_cancel">
+<description>
+Cancels an ongoing drag operation on the source side.
+
+If you want to be able to cancel a drag operation in this way,
+you need to keep a pointer to the drag context, either from an
+explicit call to gtk_drag_begin_with_coordinates(), or by
+connecting to #GtkWidget::drag-begin.
+
+If @context does not refer to an ongoing drag operation, this
+function does nothing.
+
+If a drag is cancelled in this way, the @result argument of
+#GtkWidget::drag-failed is set to @GTK_DRAG_RESULT_ERROR.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext, as e.g. returned by gtk_drag_begin_with_coordinates()
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_drag_check_threshold">
@@ -40925,9 +41066,10 @@ Since: 3.16
 </return>
 </function>
 
-<function name="gtk_gl_area_get_profile">
+<function name="gtk_gl_area_get_required_version">
 <description>
-Returns the profile that will be used to create the GL context for the area.
+Retrieves the required version of OpenGL set
+using gtk_gl_area_set_required_version().
 
 Since: 3.16
 
@@ -40937,10 +41079,16 @@ Since: 3.16
 <parameter_description> a #GtkGLArea
 </parameter_description>
 </parameter>
+<parameter name="major">
+<parameter_description> return location for the required major version
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> return location for the required minor version
+</parameter_description>
+</parameter>
 </parameters>
-<return> a #GdkGLProfile
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_gl_area_make_current">
@@ -41119,10 +41267,12 @@ Since: 3.16
 <return></return>
 </function>
 
-<function name="gtk_gl_area_set_profile">
+<function name="gtk_gl_area_set_required_version">
 <description>
-Sets the profile type to be used when creating the context for the widget.
-This must be called before the are has been realized.
+Sets the required version of OpenGL to be used when creating the context
+for the widget.
+
+This function must be called before the area has been realized.
 
 Since: 3.16
 
@@ -41130,10 +41280,6 @@ Since: 3.16
 <parameters>
 <parameter name="area">
 <parameter_description> a #GtkGLArea
-</parameter_description>
-</parameter>
-<parameter name="profile">
-<parameter_description> a #GdkGLProfile
 </parameter_description>
 </parameter>
 </parameters>
@@ -49347,7 +49493,7 @@ the horizontal, in degrees, measured counterclockwise
 <function name="gtk_label_set_attributes">
 <description>
 Sets a #PangoAttrList; the attributes in the list are applied to the
-label text. 
+label text.
 
 The attributes set with this function will be applied
 and merged with any other attributes previously effected by way
@@ -49363,7 +49509,7 @@ to the label after the markup string is parsed.
 </parameter_description>
 </parameter>
 <parameter name="attrs">
-<parameter_description> a #PangoAttrList
+<parameter_description> a #PangoAttrList, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -50494,6 +50640,49 @@ Since: 2.14
 </parameter>
 <parameter name="visited">
 <parameter_description> the new “visited” state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_list_box_bind_model">
+<description>
+Binds @model to @box.
+
+If @box was already bound to a model, that previous binding is
+destroyed.
+
+The contents of @box are cleared and then filled with widgets that
+represent items from @model. @box is updated whenever @model changes.
+If @model is %NULL, @box is left empty.
+
+It is undefined to add or remove widgets directly (for example, with
+gtk_list_box_insert() or gtk_container_add()) while @box is bound to a
+model.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #GtkListBox
+</parameter_description>
+</parameter>
+<parameter name="model">
+<parameter_description> the #GListModel to be bound to @box
+</parameter_description>
+</parameter>
+<parameter name="create_widget_func">
+<parameter_description> a function that creates widgets for items
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to @create_widget_func
+</parameter_description>
+</parameter>
+<parameter name="user_data_free_func">
+<parameter_description> function for freeing @user_data
 </parameter_description>
 </parameter>
 </parameters>
@@ -54553,6 +54742,31 @@ page in the notebook, or -1 if function fails
 </return>
 </function>
 
+<function name="gtk_notebook_detach_tab">
+<description>
+Removes the child from the notebook.
+
+This function is very similar to gtk_container_remove(),
+but additionally informs the notebook that the removal
+is happening as part of a tab DND operation, which should
+not be cancelled.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="notebook">
+<parameter_description> a #GtkNotebook
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a child
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_notebook_get_action_widget">
 <description>
 Gets one of the action widgets. See gtk_notebook_set_action_widget().
@@ -55364,6 +55578,14 @@ If you want a widget to interact with a notebook through DnD
 destination and accept the target “GTK_NOTEBOOK_TAB”. The notebook
 will fill the selection with a GtkWidget** pointing to the child
 widget that corresponds to the dropped tab.
+
+Note that you should use gtk_notebook_detach_tab() instead
+of gtk_container_remove() if you want to remove the tab from
+the source notebook as part of accepting a drop. Otherwise,
+the source notebook will think that the dragged tab was
+removed from underneath the ongoing drag operation, and
+will initiate a drag cancel animation.
+
 |[&lt;!-- language=&quot;C&quot; --&gt;
 static void
 on_drag_data_received (GtkWidget        *widget,
@@ -55377,14 +55599,12 @@ gpointer          user_data)
 {
 GtkWidget *notebook;
 GtkWidget **child;
-GtkContainer *container;
 
 notebook = gtk_drag_get_source_widget (context);
 child = (void*) gtk_selection_data_get_data (data);
 
 process_widget (*child);
-container = GTK_CONTAINER (notebook);
-gtk_container_remove (container, *child);
+gtk_notebook_detach_tab (GTK_NOTEBOOK (notebook), *child);
 }
 ]|
 
@@ -70276,6 +70496,40 @@ Since: 3.10
 <return></return>
 </function>
 
+<function name="gtk_search_entry_handle_event">
+<description>
+This function should be called when the top-level window
+which contains the search entry received a key event. If
+the entry is part of a #GtkSearchBar, it is preferable
+to call gtk_search_bar_handle_event() instead, which will
+reveal the entry in addition to passing the event to this
+function.
+
+If the key event is handled by the search entry and starts
+or continues a search, %GDK_EVENT_STOP will be returned.
+The caller should ensure that the entry is shown in this
+case, and not propagate the event further.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkSearchEntry
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a key event
+</parameter_description>
+</parameter>
+</parameters>
+<return> %GDK_EVENT_STOP if the key press event resulted
+in a search beginning or continuing, %GDK_EVENT_PROPAGATE
+otherwise.
+
+</return>
+</function>
+
 <function name="gtk_search_entry_new">
 <description>
 Creates a #GtkSearchEntry, with a find icon when the search field is
@@ -71269,63 +71523,6 @@ or %NULL for the default screen
 <return> %TRUE on success, %FALSE on error
 
 </return>
-</function>
-
-<function name="gtk_sidebar_get_stack">
-<description>
-Retrieves the stack.
-See gtk_sidebar_set_stack().
-
-Since: 3.16
-
-</description>
-<parameters>
-<parameter name="sidebar">
-<parameter_description> a #GtkSidebar
-</parameter_description>
-</parameter>
-</parameters>
-<return> the associated #GtkStack or
-%NULL if none has been set explicitly
-
-</return>
-</function>
-
-<function name="gtk_sidebar_new">
-<description>
-Creates a new sidebar.
-
-Since: 3.16
-
-</description>
-<parameters>
-</parameters>
-<return> the new #GtkSidebar
-
-</return>
-</function>
-
-<function name="gtk_sidebar_set_stack">
-<description>
-Set the #GtkStack associated with this #GtkSidebar.
-
-The sidebar widget will automatically update according to the order
-(packing) and items within the given #GtkStack.
-
-Since: 3.16
-
-</description>
-<parameters>
-<parameter name="sidebar">
-<parameter_description> a #GtkSidebar
-</parameter_description>
-</parameter>
-<parameter name="stack">
-<parameter_description> a #GtkStack
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_size_group_add_widget">
@@ -72690,6 +72887,63 @@ Since: 3.10
 </parameter>
 <parameter name="name">
 <parameter_description> the name of the child to make visible
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_stack_sidebar_get_stack">
+<description>
+Retrieves the stack.
+See gtk_stack_sidebar_set_stack().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a #GtkStackSidebar
+</parameter_description>
+</parameter>
+</parameters>
+<return> the associated #GtkStack or
+%NULL if none has been set explicitly
+
+</return>
+</function>
+
+<function name="gtk_stack_sidebar_new">
+<description>
+Creates a new sidebar.
+
+Since: 3.16
+
+</description>
+<parameters>
+</parameters>
+<return> the new #GtkStackSidebar
+
+</return>
+</function>
+
+<function name="gtk_stack_sidebar_set_stack">
+<description>
+Set the #GtkStack associated with this #GtkStackSidebar.
+
+The sidebar widget will automatically update according to the order
+(packing) and items within the given #GtkStack.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a #GtkStackSidebar
+</parameter_description>
+</parameter>
+<parameter name="stack">
+<parameter_description> a #GtkStack
 </parameter_description>
 </parameter>
 </parameters>
