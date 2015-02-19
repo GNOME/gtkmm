@@ -45,6 +45,7 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/example_pixbufs.cc			\
 	gtk-demo/example_sizegroup.cc			\
 	gtk-demo/example_stack.cc			\
+	gtk-demo/example_stacksidebar.cc	\
 	gtk-demo/example_textview.cc			\
 	gtk-demo/example_treeview_editable_cells.cc	\
 	gtk-demo/example_treeview_liststore.cc		\
