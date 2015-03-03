@@ -102,11 +102,11 @@ extern GTKMM_API const Gtk::BuiltinStockID CONVERT;          /*!< @image html gt
 extern GTKMM_API const Gtk::BuiltinStockID CONNECT;          /*!< @image html gtk-connect.png
                                                               * @deprecated No replacement available. */
 extern GTKMM_API const Gtk::BuiltinStockID COPY;             /*!< @image html gtk-copy.png
-                                                              * @deprecated Do not use an icon. Use label "_Copy". */
+                                                              * @deprecated Use the named icon edit-copy or the label "_Copy". */
 extern GTKMM_API const Gtk::BuiltinStockID CUT;              /*!< @image html gtk-cut.png
-                                                              * @deprecated Do not use an icon. Use label "Cu_t". */
+                                                              * @deprecated Use the named icon edit-cut or the label "Cu_t". */
 extern GTKMM_API const Gtk::BuiltinStockID DELETE;           /*!< @image html gtk-delete.png
-                                                              * @deprecated Do not use an icon. Use label "_Delete". */
+                                                              * @deprecated Use the named icon edit-cut or the  label "_Delete". */
 extern GTKMM_API const Gtk::BuiltinStockID DIRECTORY;        /*!< @image html gtk-directory.png
                                                               * @deprecated Use named icon "folder". */
 extern GTKMM_API const Gtk::BuiltinStockID DISCARD;          /*!< @image html gtk-discard.png
