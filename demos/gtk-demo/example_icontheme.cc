@@ -17,6 +17,7 @@
 #include <map>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 class Example_IconTheme: public Gtk::Window
 {
@@ -101,7 +102,7 @@ Example_IconTheme::Example_IconTheme()
   // add columns to the TreeView, mapping model m_columns to TreeView Columns:
 
   //The pixbuf/iconname column:
-  Gtk::TreeView::Column* pColumn = Gtk::manage(new Gtk::TreeView::Column("Icon Name"));
+  Gtk::TreeView::Column* pColumn = Gtk::manage(new Gtk::TreeView::Column("Icon Pixbuf and Icon Name"));
 
   //We specify the renderer(s) after construction.
   // The pixbuf/iconname column uses two CellRenderers: Here we see why Gtk::TreeView is so good.
@@ -183,10 +184,23 @@ Glib::RefPtr<Gtk::TreeModel> Example_IconTheme::create_model()
     // Populate icon column.
     if (icon_info)
     {
-      if (icon_info.get_filename().empty())
-        row[m_columns.icon] = icon_info.get_builtin_pixbuf();
-      else
-        row[m_columns.icon] = icon_info.load_icon();
+      try
+      {
+        if (icon_info.get_filename().empty())
+          row[m_columns.icon] = icon_info.get_builtin_pixbuf();
+        else
+          row[m_columns.icon] = icon_info.load_icon();
+      }
+      catch (const Gdk::PixbufError& err)
+      {
+        std::cout << "Gdk::PixbufError when loading the \"" << *iconiter
+          << "\" icon: " << err.what() << std::endl;
+      }
+      catch (const Glib::Error& err)
+      {
+        std::cout << "Glib::Error when loading the \"" << *iconiter
+          << "\" icon: " << err.what() << std::endl;
+      }
     }
 
     // Populate icon name column.
