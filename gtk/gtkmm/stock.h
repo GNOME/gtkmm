@@ -106,7 +106,7 @@ extern GTKMM_API const Gtk::BuiltinStockID COPY;             /*!< @image html gt
 extern GTKMM_API const Gtk::BuiltinStockID CUT;              /*!< @image html gtk-cut.png
                                                               * @deprecated Use the named icon edit-cut or the label "Cu_t". */
 extern GTKMM_API const Gtk::BuiltinStockID DELETE;           /*!< @image html gtk-delete.png
-                                                              * @deprecated Use the named icon edit-cut or the  label "_Delete". */
+                                                              * @deprecated Use the named icon edit-delete or the  label "_Delete". */
 extern GTKMM_API const Gtk::BuiltinStockID DIRECTORY;        /*!< @image html gtk-directory.png
                                                               * @deprecated Use named icon "folder". */
 extern GTKMM_API const Gtk::BuiltinStockID DISCARD;          /*!< @image html gtk-discard.png
@@ -220,7 +220,7 @@ extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_LANDSCAPE; /*!< @
 extern GTKMM_API const Gtk::BuiltinStockID ORIENTATION_REVERSE_PORTRAIT; /*!< @image html gtk-orientation-reverse-portrait.png
                                                                           * @deprecated No replacement available. */
 extern GTKMM_API const Gtk::BuiltinStockID PASTE;            /*!< @image html gtk-paste.png
-                                                              * @deprecated Do not use an icon. Use label "_Paste". */
+                                                              * @deprecated Use the named icon edit-paste or the label "_Paste". */
 extern GTKMM_API const Gtk::BuiltinStockID PREFERENCES;      /*!< @image html gtk-preferences.png
                                                               * @deprecated Use named icon "preferences-system" or the label "_Preferences". */
 extern GTKMM_API const Gtk::BuiltinStockID PAGE_SETUP;       /*!< @image html gtk-page-setup.png
