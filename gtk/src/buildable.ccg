@@ -16,4 +16,74 @@
  */
 
 #include <gtk/gtk.h>
+#include <gtkmm/builder.h>
+#include <cstring>
 
+namespace Gtk
+{
+
+//static
+gboolean Buildable_Class::custom_tag_start_vfunc_callback(
+  GtkBuildable* buildable,
+  GtkBuilder* builder,
+  GObject* child,
+  const gchar* tagname,
+  GMarkupParser* parser,
+  gpointer* data)
+{
+  // If it's a TreeModel (such as ListStore or TreeStore) and it's the start
+  // of a <columns> element, inform the Builder that the get_type_from_name()
+  // vfunc shall not search for gtkmm-derived types.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=742637
+  if (GTK_IS_TREE_MODEL(buildable) && std::strcmp(tagname, "columns") == 0)
+  {
+    Builder* const cpp_builder = dynamic_cast<Builder*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)builder));
+    if (cpp_builder)
+      cpp_builder->set_no_gtkmm_derived_types(true);
+  }
+
+  BaseClassType* const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+      g_type_interface_peek(G_OBJECT_GET_CLASS(buildable), CppObjectType::get_type()) // Get the interface.
+    )
+  );
+
+  // Call the original underlying C function:
+  if (base && base->custom_tag_start)
+    return (*base->custom_tag_start)(buildable, builder, child, tagname, parser, data);
+  return false;
+}
+
+//static
+void Buildable_Class::custom_tag_end_vfunc_callback(
+  GtkBuildable* buildable,
+  GtkBuilder* builder,
+  GObject* child,
+  const gchar* tagname,
+  gpointer* data)
+{
+  BaseClassType* const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+      g_type_interface_peek(G_OBJECT_GET_CLASS(buildable), CppObjectType::get_type()) // Get the interface.
+    )
+  );
+
+  // Call the original underlying C function:
+  if (base && base->custom_tag_end)
+    (*base->custom_tag_end)(buildable, builder, child, tagname, data);
+
+  // If it's a TreeModel (such as ListStore or TreeStore) and it's the end
+  // of a </columns> element, inform the Builder that the get_type_from_name()
+  // vfunc shall resume search for gtkmm-derived types.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=742637
+  if (GTK_IS_TREE_MODEL(buildable) && std::strcmp(tagname, "columns") == 0)
+  {
+    Builder* const cpp_builder = dynamic_cast<Builder*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)builder));
+    if (cpp_builder)
+      cpp_builder->set_no_gtkmm_derived_types(false);
+  }
+}
+
+} // namespace Gtk

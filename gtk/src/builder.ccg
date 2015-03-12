@@ -20,6 +20,12 @@
 
 #include <gtk/gtk.h>
 
+namespace
+{
+
+//TODO: When we can break ABI, replace this GQuark by member data in Gtk::Builder.
+GQuark quark_no_gtkmm_derived_types = g_quark_from_static_string("gtkmm__Builder::no_gtkmm_derived_types");
+
 // Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular
 // GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
 static GType
@@ -28,11 +34,19 @@ get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
   if (!type_name)
     return G_TYPE_INVALID;
 
-  // See if there is a gtkmm version of the gclass:
-  Glib::ustring classname_prefixed ("gtkmm__"); // gtkmm uses a prefix
-  classname_prefixed += type_name;
+  GType gtype = G_TYPE_INVALID;
 
-  GType gtype = g_type_from_name(classname_prefixed.c_str());
+  // If a TreeModel (such as ListStore or TreeStore) is being built,
+  // Buildable_Class may have requested no search for gtkmm-derived types.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=742637
+  if (!g_object_get_qdata((GObject*)self, quark_no_gtkmm_derived_types))
+  {
+    // See if there is a gtkmm version of the gclass:
+    Glib::ustring classname_prefixed ("gtkmm__"); // gtkmm uses a prefix
+    classname_prefixed += type_name;
+
+    gtype = g_type_from_name(classname_prefixed.c_str());
+  }
 
   if (gtype == G_TYPE_INVALID) // If it's not a registered typename
   {
@@ -51,8 +65,16 @@ get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
   return gtype;
 }
 
+} // anonymous namespace
+
 namespace Gtk
 {
+
+// Called from Buildable
+void Builder::set_no_gtkmm_derived_types(bool status)
+{
+  g_object_set_qdata((GObject*)gobj(), quark_no_gtkmm_derived_types, (gpointer)status);
+}
 
 // static
 Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
