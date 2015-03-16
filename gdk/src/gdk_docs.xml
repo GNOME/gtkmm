@@ -711,6 +711,9 @@ A set of bit-flags to indicate which events a window is to receive.
 Most of these masks map onto one or more of the #GdkEventType event types
 above.
 
+See the [input handling overview][chap-input-handling] for details of
+[event masks][event-masks] and [event propagation][event-propagation].
+
 %GDK_POINTER_MOTION_HINT_MASK is deprecated. It is a special mask
 to reduce the number of %GDK_MOTION_NOTIFY events received. When using
 %GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will
@@ -1251,22 +1254,24 @@ Since: 3.8
 </parameters>
 </enum>
 
-<enum name="GdkGLProfile">
+<enum name="GdkGLError">
 <description>
-...
+Error enumeration for #GdkGLContext.
+
+Since: 3.16
 
 </description>
 <parameters>
-<parameter name="GDK_GL_PROFILE_DEFAULT">
-<parameter_description> ...
+<parameter name="GDK_GL_ERROR_NOT_AVAILABLE">
+<parameter_description> OpenGL support is not available
 </parameter_description>
 </parameter>
-<parameter name="GDK_GL_PROFILE_LEGACY">
-<parameter_description> ...
+<parameter name="GDK_GL_ERROR_UNSUPPORTED_FORMAT">
+<parameter_description> The requested visual format is not supported
 </parameter_description>
 </parameter>
-<parameter name="GDK_GL_PROFILE_3_2_CORE">
-<parameter_description> ...
+<parameter name="GDK_GL_ERROR_UNSUPPORTED_PROFILE">
+<parameter_description> The requested profile is not supported
 </parameter_description>
 </parameter>
 </parameters>
@@ -7653,6 +7658,24 @@ Since: 3.16
 </return>
 </function>
 
+<function name="gdk_gl_context_get_debug_enabled">
+<description>
+Retrieves the value set using gdk_gl_context_set_debug_enabled().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if debugging is enabled
+
+</return>
+</function>
+
 <function name="gdk_gl_context_get_display">
 <description>
 Retrieves the #GdkDisplay the @context is created for
@@ -7671,9 +7694,9 @@ Since: 3.16
 </return>
 </function>
 
-<function name="gdk_gl_context_get_profile">
+<function name="gdk_gl_context_get_forward_compatible">
 <description>
-Retrieves the #GdkGLProfile that @context was created for.
+Retrieves the value set using gdk_gl_context_set_forward_compatible().
 
 Since: 3.16
 
@@ -7684,9 +7707,34 @@ Since: 3.16
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GdkGLProfile
+<return> %TRUE if the context should be forward compatible
 
 </return>
+</function>
+
+<function name="gdk_gl_context_get_required_version">
+<description>
+Retrieves the major and minor version requested by calling
+gdk_gl_context_set_required_version().
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="major">
+<parameter_description> return location for the major version to request
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> return location for the minor version to request
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_gl_context_get_shared_context">
@@ -7705,6 +7753,32 @@ Since: 3.16
 <return> a #GdkGLContext or %NULL
 
 </return>
+</function>
+
+<function name="gdk_gl_context_get_version">
+<description>
+Retrieves the OpenGL version of the @context.
+
+The @context must be realized prior to calling this function.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="major">
+<parameter_description> return location for the major version
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> return location for the minor version
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_gl_context_get_window">
@@ -7735,6 +7809,112 @@ Since: 3.16
 <parameters>
 <parameter name="context">
 <parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gl_context_realize">
+<description>
+Realizes the given #GdkGLContext.
+
+It is safe to call this function on a realized #GdkGLContext.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the context is realized
+
+</return>
+</function>
+
+<function name="gdk_gl_context_set_debug_enabled">
+<description>
+Sets whether the #GdkGLContext should perform extra validations and
+run time checking. This is useful during development, but has
+additional overhead.
+
+The #GdkGLContext must not be realized or made current prior to
+calling this function.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> whether to enable debugging in the context
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gl_context_set_forward_compatible">
+<description>
+Sets whether the #GdkGLContext should be forward compatible.
+
+Forward compatibile contexts must not support OpenGL functionality that
+has been marked as deprecated in the requested version; non-forward
+compatible contexts, on the other hand, must support both deprecated and
+non deprecated functionality.
+
+The #GdkGLContext must not be realized or made current prior to calling
+this function.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="compatible">
+<parameter_description> whether the context should be forward compatible
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_gl_context_set_required_version">
+<description>
+Sets the major and minor version of OpenGL to request.
+
+Setting @major and @minor to zero will use the default values.
+
+The #GdkGLContext must not be realized or made current prior to calling
+this function.
+
+Since: 3.16
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="major">
+<parameter_description> the major version to request
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> the minor version to request
 </parameter_description>
 </parameter>
 </parameters>
@@ -14690,7 +14870,7 @@ Since: 2.22
 
 <function name="gdk_wayland_device_get_wl_keyboard">
 <description>
-Returns the Wayland wl_keyboard of a #GdkDevice
+Returns the Wayland wl_keyboard of a #GdkDevice.
 
 Since: 3.10
 
@@ -14708,7 +14888,7 @@ Since: 3.10
 
 <function name="gdk_wayland_device_get_wl_pointer">
 <description>
-Returns the Wayland wl_pointer of a #GdkDevice
+Returns the Wayland wl_pointer of a #GdkDevice.
 
 Since: 3.10
 
@@ -14726,7 +14906,7 @@ Since: 3.10
 
 <function name="gdk_wayland_device_get_wl_seat">
 <description>
-Returns the Wayland wl_seat of a #GdkDevice
+Returns the Wayland wl_seat of a #GdkDevice.
 
 Since: 3.10
 
@@ -14744,7 +14924,7 @@ Since: 3.10
 
 <function name="gdk_wayland_display_get_wl_compositor">
 <description>
-Returns the Wayland global singleton compositor of a #GdkDisplay
+Returns the Wayland global singleton compositor of a #GdkDisplay.
 
 Since: 3.8
 
@@ -14762,7 +14942,7 @@ Since: 3.8
 
 <function name="gdk_wayland_display_get_wl_display">
 <description>
-Returns the Wayland wl_display of a #GdkDisplay
+Returns the Wayland wl_display of a #GdkDisplay.
 
 Since: 3.8
 
@@ -14780,7 +14960,7 @@ Since: 3.8
 
 <function name="gdk_wayland_display_get_xdg_shell">
 <description>
-Returns the Wayland global singleton shell of a #GdkDisplay
+Returns the Wayland global singleton shell of a #GdkDisplay.
 
 Since: 3.8
 
@@ -14845,7 +15025,7 @@ position of a #GdkWindow in &quot;fake root&quot; coordinates.
 
 <function name="gdk_wayland_window_get_wl_surface">
 <description>
-Returns the Wayland surface of a #GdkWindow
+Returns the Wayland surface of a #GdkWindow.
 
 Since: 3.8
 
@@ -15406,16 +15586,15 @@ is disconnected from any particular window or surface.
 
 If the creation of the #GdkGLContext failed, @error will be set.
 
+Before using the returned #GdkGLContext, you will need to
+call gdk_gl_context_make_current() or gdk_gl_context_realize().
+
 Since: 3.16
 
 </description>
 <parameters>
 <parameter name="window">
 <parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="profile">
-<parameter_description> the GL profile the context should target
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -17877,6 +18056,8 @@ including #GDK_BUTTON_PRESS_MASK means the window should report button
 press events. The event mask is the bitwise OR of values from the
 #GdkEventMask enumeration.
 
+See the [input handling overview][event-masks] for details.
+
 Since: 3.0
 
 </description>
@@ -17931,6 +18112,8 @@ for that window from all master input devices. For example, an event mask
 including #GDK_BUTTON_PRESS_MASK means the window should report button
 press events. The event mask is the bitwise OR of values from the
 #GdkEventMask enumeration.
+
+See the [input handling overview][event-masks] for details.
 
 </description>
 <parameters>
