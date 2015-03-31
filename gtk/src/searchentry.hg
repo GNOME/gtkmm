@@ -41,19 +41,39 @@ namespace Gtk
  * emits the signal_search_changed() signal which can
  * be used instead of the Gtk::Editable::signal_changed() signal.
  *
+ * The signal_previous_match(), signal_next_match()
+ * and signal_stop_search() signals can be uesd to implement
+ * moving between search results and ending the search.
+ *
+ * Often, Gtk::SearchEntry will be fed events by means of being
+ * placed inside a Gtk::SearchBar. If that is not the case,
+ * you can use handle_event() to pass events.
+ *
  * @ingroup Widgets
  * @newin{3,6}
  */
 class SearchEntry
 : public Entry
 {
-  _CLASS_GTKOBJECT(SearchEntry, GtkSearchEntry, GTK_SEARCH_ENTRY, Gtk::Entry,GtkEntry)
+  _CLASS_GTKOBJECT(SearchEntry, GtkSearchEntry, GTK_SEARCH_ENTRY, Gtk::Entry, GtkEntry)
 public:
 
   _CTOR_DEFAULT
 
+  //TODO: Use Gdk::EventKey, if we ever use Gdk::Event elsewhere in the API:
+//We use GdkEventKey* rather than GdkEvent*. See GTK+ bug https://bugzilla.gnome.org/show_bug.cgi?id=709544
+#m4 _CONVERSION(`GdkEventKey*',`GdkEvent*',`(($2)($3))')
+  _WRAP_METHOD(bool handle_event(GdkEventKey* event), gtk_search_entry_handle_event)
+
   //TODO: Remove no_default_handler when we can break ABI:
   _WRAP_SIGNAL(void search_changed(), "search-changed", no_default_handler)
+  // Although next-match, previous-match and stop-search are keybinding signals,
+  // applications shall connect to them.
+  _WRAP_SIGNAL(void next_match(), "next-match", no_default_handler)
+  _WRAP_SIGNAL(void previous_match(), "previous-match", no_default_handler)
+  _WRAP_SIGNAL(void stop_search(), "stop-search", no_default_handler)
+
+  // Gtk::SearchEntry has no properties nor vfuncs as of 3.16.
 };
 
 } /* namespace Gtk */
