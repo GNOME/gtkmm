@@ -209,6 +209,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/menushell.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/misc.h>
+#include <gtkmm/modelbutton.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/numerableicon.h>
 #include <gtkmm/object.h>
@@ -222,6 +223,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/papersize.h>
 #include <gtkmm/placessidebar.h>
 #include <gtkmm/popover.h>
+#include <gtkmm/popovermenu.h>
 #include <gtkmm/printcontext.h>
 #ifndef G_OS_WIN32
 # include <gtkmm/printer.h>
