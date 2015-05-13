@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright (C) 2001 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -45,7 +43,6 @@ protected:
   void fill_tree();
 
   void load_file(const std::string& filename);
-  bool read_line (FILE *stream, GString *str);
 
   //Signal handlers:
   static bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path, bool currently_selected);

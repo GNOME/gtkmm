@@ -51,18 +51,18 @@ enum
 };
 
 const char * const background_name =
-  "gtk-demo/background.jpg";
+  "background.jpg";
 
 const char * const image_names[] =
 {
-  "gtk-demo/apple-red.png",
-  "gtk-demo/gnome-applets.png",
-  "gtk-demo/gnome-calendar.png",
-  "gtk-demo/gnome-foot.png",
-  "gtk-demo/gnome-gmush.png",
-  "gtk-demo/gnome-gimp.png",
-  "gtk-demo/gnome-gsame.png",
-  "gtk-demo/gnu-keys.png"
+  "apple-red.png",
+  "gnome-applets.png",
+  "gnome-calendar.png",
+  "gnome-foot.png",
+  "gnome-gmush.png",
+  "gnome-gimp.png",
+  "gnome-gsame.png",
+  "gnu-keys.png"
 };
 
 class DemoRenderArea : public Gtk::DrawingArea
@@ -85,19 +85,21 @@ private:
 
 Glib::RefPtr<Gdk::Pixbuf> create_pixbuf(const std::string& name)
 {
-  return Gdk::Pixbuf::create_from_file(name);
+  std::string resource_name = std::string("/pixbufs/") + name;
+  return Gdk::Pixbuf::create_from_resource(resource_name);
 }
 
 /*
  * Load all image files, create an empty buffer for storing the current frame,
  * and install a timeout handler that will be called periodically.  The show
- * will start as soon as Gtk::Main::run() is invoked.
+ * will start as soon as Gtk::Application::run() is invoked.
  */
 DemoRenderArea::DemoRenderArea()
 :
   frame_num_ (0)
 {
-  background_ = Gdk::Pixbuf::create_from_file(background_name);
+  std::string resource_name = std::string("/pixbufs/") + background_name;
+  background_ = Gdk::Pixbuf::create_from_resource(resource_name);
   std::transform(
       &image_names[0], &image_names[G_N_ELEMENTS(image_names)],
       std::back_inserter(images_),

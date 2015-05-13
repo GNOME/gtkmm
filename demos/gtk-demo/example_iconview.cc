@@ -8,7 +8,6 @@
 
 #include <gtkmm.h>
 #include <iostream> //For std::cout.
-#include "demo-common.h" //For demo_find_file().
 
 class Example_IconView : public Gtk::Window
 {
@@ -73,12 +72,10 @@ Example_IconView::Example_IconView()
   
   try
   {
-    Glib::ustring filename = demo_find_file("gnome-fs-regular.png");
-    m_refPixbufFile = Gdk::Pixbuf::create_from_file(filename);
-    filename = demo_find_file("gnome-fs-directory.png");
-    m_refPixbufFolder = Gdk::Pixbuf::create_from_file(filename);
+    m_refPixbufFile = Gdk::Pixbuf::create_from_resource("/iconview/gnome-fs-regular.png");
+    m_refPixbufFolder = Gdk::Pixbuf::create_from_resource("/iconview/gnome-fs-directory.png");
   }
-  catch(const Glib::FileError& error)
+  catch(const Glib::Error& error)
   {
     std::cout << error.what() << std::endl;
   }

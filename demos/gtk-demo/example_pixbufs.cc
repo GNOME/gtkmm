@@ -16,7 +16,6 @@
 
 #include <gtkmm.h>
 #include <math.h>
-#include "demo-common.h"
 
 #define FRAME_DELAY 50
 
@@ -82,42 +81,53 @@ Example_Pixbufs::Example_Pixbufs()
   set_title("Pixbufs");
   set_resizable(false);
 
-  load_pixbufs();
+  try
+  {
+    load_pixbufs();
 
-  set_size_request(m_back_width, m_back_height);
-  m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
-  m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
-  add(m_DrawingArea);
+    set_size_request(m_back_width, m_back_height);
+    m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
+    m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
+    add(m_DrawingArea);
 
-  m_TimeoutConnection = Glib::signal_timeout().connect(
-      sigc::mem_fun(*this, &Example_Pixbufs::on_timeout), FRAME_DELAY);
+    m_TimeoutConnection = Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &Example_Pixbufs::on_timeout), FRAME_DELAY);
+  }
+  catch (const Glib::Error& error)
+  {
+    Glib::ustring strMsg = "Failed to load an image: ";
+    strMsg += error.what();
+
+    Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    dialog.run();
+  }
 
   show_all();
 }
 
 Example_Pixbufs::~Example_Pixbufs()
 {
-  m_TimeoutConnection.disconnect(); //Will probably happen anyway, in the destrctor.
+  m_TimeoutConnection.disconnect(); //Will probably happen anyway, in the destructor.
 }
 
-/* Loads the m_images for the demo and returns whether the operation succeeded */
+/* Loads the m_images for the demo and throws and exception if the operation failed */
 void Example_Pixbufs::load_pixbufs()
 {
   if(m_refPixbuf_Background)
     return; /* already loaded earlier */
 
-  std::string filename_background = BACKGROUND_NAME;
+  std::string resource_name_background = std::string("/pixbufs/") + BACKGROUND_NAME;
 
-  m_refPixbuf_Background = Gdk::Pixbuf::create_from_file(demo_find_file(filename_background));
+  m_refPixbuf_Background = Gdk::Pixbuf::create_from_resource(resource_name_background);
 
   m_back_width = m_refPixbuf_Background->get_width();
   m_back_height = m_refPixbuf_Background->get_height();
 
   for(unsigned i = 0; i < N_IMAGES; ++i)
   {
-    std::string filename = image_names[i];
+    std::string resource_name = std::string("/pixbufs/") + image_names[i];
 
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_file(demo_find_file(filename));
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_resource(resource_name);
 
     m_images[i] = pixbuf;
   }
@@ -126,7 +136,7 @@ void Example_Pixbufs::load_pixbufs()
 /* Draw callback for the drawing area */
 bool Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-  Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf_Background);
+  Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf);
   cr->paint();
 
   return true;

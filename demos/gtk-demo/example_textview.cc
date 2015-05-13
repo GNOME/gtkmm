@@ -7,11 +7,9 @@
  *
  */
 
-#include <cstdlib>
 #include <gtkmm.h>
 #include <gtk/gtk.h>
-
-#include "demo-common.h"
+#include <iostream> //For std::cout.
 
 using std::exit;
 
@@ -173,17 +171,17 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = Gdk::Pixbuf::create_from_file(demo_find_file("gtk-logo-rgb.gif"));
-
-  if(!refPixbuf)
+  Glib::RefPtr<Gdk::Pixbuf> refPixbuf;
+  try
   {
-    //TODO: This is not real error handling.
-    g_printerr ("Failed to load image file gtk-logo-rgb.gif\n");
-    exit (1);
+    refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
+    Glib::RefPtr<Gdk::Pixbuf> refScaled = refPixbuf->scale_simple(32, 32, Gdk::INTERP_BILINEAR);
+    refPixbuf = refScaled;
   }
-
-  Glib::RefPtr<Gdk::Pixbuf> refScaled = refPixbuf->scale_simple(32, 32, Gdk::INTERP_BILINEAR);
-  refPixbuf = refScaled;
+  catch (const Glib::Error& error)
+  {
+    std::cout << "Failed to load image gtk-logo-rgb.gif: " << error.what() << std::endl;
+  }
 
   /* get start of buffer; each insertion will revalidate the
    * iterator to point to just after the inserted text.
@@ -243,9 +241,12 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert_with_tag(iter, "Images. ", "heading");
 
   iter = refBuffer->insert(iter, "The buffer can have images in it: ");
-  iter = refBuffer->insert_pixbuf(iter, refPixbuf);
-  iter = refBuffer->insert_pixbuf(iter, refPixbuf);
-  iter = refBuffer->insert_pixbuf(iter, refPixbuf);
+  if (refPixbuf)
+  {
+    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
+    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
+    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
+  }
   iter = refBuffer->insert(iter, " for example.\n\n");
 
   iter = refBuffer->insert_with_tag(iter, "Spacing. ", "heading");
@@ -406,7 +407,9 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 3)
       {
-        pWidget = Gtk::manage( new Gtk::Image(demo_find_file("floppybuddy.gif")) );
+        Gtk::Image* pImage = Gtk::manage( new Gtk::Image() );
+        pImage->set_from_resource("/textview/floppybuddy.gif");
+        pWidget = pImage;
       }
     else if (i == 4)
     {

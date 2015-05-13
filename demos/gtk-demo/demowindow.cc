@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright (C) 2001 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,36 +19,18 @@
 #include "config.h"
 #endif
 
-#include <gtkmm/main.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/treeviewcolumn.h>
-#include <gtkmm/box.h>
+#include <glibmm/bytes.h>
 #include <glibmm/convert.h>
-#include <glibmm/fileutils.h>
+#include <giomm/resource.h>
 #include "demowindow.h"
 #include "textwidget.h"
 #include "demos.h"
-#include <vector>
-#include <cctype>
-#include <cerrno>
-#include <stdio.h>
-
 #include <cstring>
 
 using std::isspace;
 using std::strlen;
-
-#include "demo-common.h"
-
-#ifdef NEED_FLOCKFILE_PROTO
-extern "C" void flockfile (FILE *);
-#endif
-#ifdef NEED_FUNLOCKFILE_PROTO
-extern "C" void funlockfile (FILE *);
-#endif
-#ifdef NEED_GETC_UNLOCKED_PROTO
-extern "C" int getc_unlocked (FILE *);
-#endif
 
 namespace
 {
@@ -236,61 +216,6 @@ void DemoWindow::on_treeselection_changed()
   }
 }
 
-bool DemoWindow::read_line (FILE *stream, GString *str)
-{
-  int n_read = 0;
-
-#ifdef HAVE_FLOCKFILE
-  flockfile (stream);
-#endif
-
-  g_string_truncate (str, 0);
-
-  while (1)
-    {
-      int c;
-
-#ifdef HAVE_GETC_UNLOCKED
-      c = getc_unlocked (stream);
-#else
-      c = getc (stream);
-#endif
-      if (c == EOF)
-	goto done;
-      else
-	n_read++;
-
-      switch (c)
-	{
-	case '\r':
-	case '\n':
-	  {
-#ifdef HAVE_GETC_UNLOCKED
-      int next_c = getc_unlocked (stream);
-#else
-      int next_c = getc (stream);
-#endif
-	    if (!(next_c == EOF ||
-		  (c == '\r' && next_c == '\n') ||
-		  (c == '\n' && next_c == '\r')))
-	      ungetc (next_c, stream);
-	
-	    goto done;
-	  }
-	default:
-	  g_string_append_c (str, c);
-	}
-    }
-
- done:
-
-#ifdef HAVE_FUNLOCKFILE
-  funlockfile (stream);
-#endif
-  return n_read > 0;
-}
-
-
 void DemoWindow::load_file(const std::string& filename)
 {
   if ( m_current_filename == filename )
@@ -307,39 +232,35 @@ void DemoWindow::load_file(const std::string& filename)
     Glib::RefPtr<Gtk::TextBuffer> refBufferInfo = m_TextWidget_Info.get_buffer();
     Glib::RefPtr<Gtk::TextBuffer> refBufferSource = m_TextWidget_Source.get_buffer();
 
-    FILE* file = fopen (filename.c_str(), "r");
-    if (!file)
+    Glib::RefPtr<const Glib::Bytes> bytes;
+    try
     {
-      try
-      {
-        std::string installed = demo_find_file(filename);
-        file = fopen (installed.c_str(), "r");
-      }
-      catch (const Glib::FileError& ex)
-      {
-        g_warning ("%s\n", ex.what().c_str());
-        return;
-      }
+      bytes = Gio::Resource::lookup_data_global("/sources/" + filename);
     }
-
-    if (!file)
+    catch (const Gio::ResourceError& ex)
     {
-      g_warning ("Cannot open %s: %s\n", filename.c_str(), g_strerror (errno));
+      g_warning ("Cannot open source for %s: %s\n", filename.c_str(), ex.what().c_str());
       return;
     }
 
-    GString *buffer = g_string_new (NULL);
+    gsize data_size = 0;
+    gchar** lines = g_strsplit(static_cast<const gchar*>(bytes->get_data(data_size)), "\n", -1);
+    bytes.reset();
+
     int state = 0;
     bool in_para = false;
     Gtk::TextBuffer::iterator start = refBufferInfo->get_iter_at_offset(0);
-    while (read_line (file, buffer))
+    for (int i = 0; lines[i] != NULL; i++)
     {
-      gchar *p = buffer->str;
+      /* Make sure \r is stripped at the end for the poor windows people */
+      lines[i] = g_strchomp(lines[i]);
+
+      gchar *p = lines[i];
       gchar *q = 0;
       gchar *r = 0;
 
       switch (state)
-    	{
+      {
       	case 0:
       	  /* Reading title */
       	  while (*p == '/' || *p == '*' || isspace (*p))
@@ -361,7 +282,7 @@ void DemoWindow::load_file(const std::string& filename)
     	    {
     	      Gtk::TextBuffer::iterator end = start;
 
-              const Glib::ustring strTemp (p, q);
+            const Glib::ustring strTemp (p, q);
     	      end = refBufferInfo->insert(end, strTemp);
     	      start = end;
 
@@ -418,12 +339,12 @@ void DemoWindow::load_file(const std::string& filename)
       	  while (isspace (*p))
       	    p++;
 
-      	  if (*p)
-    	    {
-    	      p = buffer->str;
-    	      state++;
-    	      /* Fall through */
-    	    }
+          if (*p)
+          {
+            p = lines[i];
+            state++;
+            /* Fall through */
+          }
       	  else
       	    break;
         	
@@ -432,8 +353,10 @@ void DemoWindow::load_file(const std::string& filename)
       	  start = refBufferSource->insert(start, p);
       	  start = refBufferSource->insert(start, "\n");
       	  break;
-      	}
-     }
+      } // end switch state
+    } // end for i
+
+    g_strfreev (lines);
 
     m_TextWidget_Source.fontify();
   }

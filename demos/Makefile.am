@@ -19,11 +19,12 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS = pixbuf-demo gtk-demo/gtkmm-demo
 
-pixbuf_demo_SOURCES = pixbuf-demo.cc
+pixbuf_demo_SOURCES = \
+  gtk-demo/demo_resources.c \
+  pixbuf-demo.cc
 
 gtk_demo_gtkmm_demo_SOURCES =				\
-	gtk-demo/demo-common.cc				\
-	gtk-demo/demo-common.h				\
+	gtk-demo/demo_resources.c				\
 	gtk-demo/demos.h				\
 	gtk-demo/demowindow.cc				\
 	gtk-demo/demowindow.h				\
@@ -54,7 +55,11 @@ gtk_demo_gtkmm_demo_SOURCES =				\
 	gtk-demo/textwidget.cc				\
 	gtk-demo/textwidget.h
 
-dist_noinst_DATA =			\
+dist_noinst_DATA = \
+  gtk-demo/demo.gresource.xml \
+  $(GTK_DEMO_RESOURCES)
+
+GTK_DEMO_RESOURCES = \
 	gtk-demo/alphatest.png		\
 	gtk-demo/apple-red.png		\
 	gtk-demo/background.jpg		\
@@ -67,8 +72,14 @@ dist_noinst_DATA =			\
 	gtk-demo/gnome-gimp.png		\
 	gtk-demo/gnome-gmush.png	\
 	gtk-demo/gnome-gsame.png	\
-	gtk-demo/gnu-keys.png		\
+	gtk-demo/gnu-keys.png     \
 	gtk-demo/gtk-logo-rgb.gif
+
+# Delete built sources on make maintainer-clean.
+MAINTAINERCLEANFILES = gtk-demo/demo_resources.c
+
+gtk-demo/demo_resources.c: gtk-demo/demo.gresource.xml $(GTK_DEMO_RESOURCES)
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(dir $<) --generate-source $<
 
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
 gdkmm_ldadd    = $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la

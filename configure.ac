@@ -123,8 +123,13 @@ MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 MM_ARG_WITH_TAGFILE_DOC([atkmm-1.6.tag], [atkmm-1.6])
 
+# glib-compile-resources and C compiler are needed to generate and compile
+# resource files in demo programs.
+AC_SUBST(GLIB_COMPILE_RESOURCES, [`$PKG_CONFIG --variable=glib_compile_resources gio-2.0`])
+AC_PROG_CC
+
 AC_LANG([C++])
-AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
+AC_CHECK_FUNCS([mkfifo])
 
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
