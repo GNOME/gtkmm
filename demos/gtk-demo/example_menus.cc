@@ -1,27 +1,26 @@
 /* Menus
  *
  * There are several widgets involved in displaying menus. The
- * GtkMenuBar widget is a horizontal menu bar, which normally appears
- * at the top of an application. The GtkMenu widget is the actual menu
- * that pops up. Both GtkMenuBar and GtkMenu are subclasses of
- * GtkMenuShell; a GtkMenuShell contains menu items
- * (GtkMenuItem). Each menu item contains text and/or images and can
- * be selected by the user.
+ * Gtk::MenuBar widget is a menu bar, which normally appears horizontally
+ * at the top of an application, but can also be layed out vertically.
+ * The Gtk::Menu widget is the actual menu that pops up. Both Gtk::MenuBar
+ * and Gtk::Menu are subclasses of Gtk::MenuShell; a Gtk::MenuShell contains
+ * menu items (Gtk::MenuItem). Each menu item contains text and/or images
+ * and can be selected by the user.
  *
- * There are several kinds of menu item, including plain GtkMenuItem,
- * GtkCheckMenuItem which can be checked/unchecked, GtkRadioMenuItem
+ * There are several kinds of menu item, including plain Gtk::MenuItem,
+ * Gtk::CheckMenuItem which can be checked/unchecked, Gtk::RadioMenuItem
  * which is a check menu item that's in a mutually exclusive group,
- * GtkSeparatorMenuItem which is a separator bar, and GtkImageMenuItem which
- * can place a GtkImage or other widget next to the menu text.
+ * Gtk::SeparatorMenuItem which is a separator bar, and Gtk::ImageMenuItem which
+ * can place a Gtk::Image or other widget next to the menu text.
  *
- * A GtkMenuItem can have a submenu, which is simply a GtkMenu to pop
+ * A Gtk::MenuItem can have a submenu, which is simply a Gtk::Menu to pop
  * up when the menu item is selected. Typically, all menu items in a menu bar
  * have submenus.
  *
- * GtkUIManager provides a higher-level interface for creating menu bars
+ * Gtk::Builder provides a higher-level interface for creating menu bars
  * and menus; while you can construct menus manually, most people don't
- * do that. There's a separate demo for GtkUIManager.
- *
+ * do that. There's a separate demo for Gtk::Builder.
  */
 
 #include "gtkmm.h"
@@ -68,7 +67,7 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_MenuBar, Gtk::PACK_SHRINK);
 
   {
-    //Note:: It's generally easier to use the Gtk::UIManager API.
+    //Note:: It's generally easier to use the Gtk::Builder API.
     Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
     pMenuItem->set_submenu( *(create_menu(2)) );
     m_MenuBar.append(*pMenuItem);

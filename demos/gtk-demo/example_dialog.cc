@@ -61,7 +61,8 @@ Example_Dialog::Example_Dialog()
   m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
   m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8), m_HBox2(Gtk::ORIENTATION_HORIZONTAL, 8),
   m_Button_Message("_Message Dialog", true), m_Button_Interactive("_Interactive Dialog", true),
-  m_Label1("_Entry 1", true), m_Label2("E_ntry 2")
+  m_Label1("_Entry 1", true),
+  m_Label2("E_ntry 2", true)
 {
   m_count = 0;
 
@@ -115,7 +116,7 @@ void Example_Dialog::on_button_message()
     Glib::ScopedPtr<char> buf (g_strdup_printf("%d", m_count));
     strMessage += buf.get();
   }
-  Gtk::MessageDialog dialog(strMessage, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
+  Gtk::MessageDialog dialog(*this, strMessage, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
   /*int response =*/ dialog.run();
 
   m_count++;
@@ -139,7 +140,7 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
 {
   m_Image.set_from_icon_name("dialog-question", Gtk::ICON_SIZE_DIALOG);
   add_button("_OK", Gtk::RESPONSE_OK);
-  add_button("_Non-stock Button", Gtk::RESPONSE_CANCEL);
+  add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 
   m_HBox.set_border_width(8);
   get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);

@@ -1,10 +1,8 @@
 /* Tree View/List Store
  *
- * The GtkListStore is used to store data in list form, to be used
- * later on by a GtkTreeView to display it. This demo builds a
- * simple GtkListStore and displays it. See the Stock Browser
- * demo for a more advanced example.
- *
+ * The Gtk::ListStore is used to store data in list form, to be used
+ * later on by a Gtk::TreeView to display it. This demo builds a
+ * simple Gtk::ListStore and displays it.
  */
 
 #include <gtkmm.h>

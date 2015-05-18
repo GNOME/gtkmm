@@ -3,15 +3,12 @@
 
 #include "demowindow.h"
 
-//typedef	Gtk::Window* (*GDoDemoFunc) (void);
-
 typedef sigc::slot<Gtk::Window*> type_slotDo;
 
 struct Demo
 {
   const char* title;
   const char* filename;
-  //GDoDemoFunc func;
   type_slotDo slot; //The method to call.
   Demo* children;
 };
@@ -43,15 +40,13 @@ Gtk::Window* do_treeview_editable_cells();
 Gtk::Window* do_treeview_liststore();
 Gtk::Window* do_treeview_treestore();
 
-//Gtk::Window* do_ui_manager();
-
-Demo child0[] = {
+Demo child0[] =
+{
   { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), 0 },
   { "List Store", "example_treeview_liststore.cc", sigc::ptr_fun(&do_treeview_liststore), 0 },
   { "Tree Store", "example_treeview_treestore.cc", sigc::ptr_fun(&do_treeview_treestore), 0 },
   { 0, 0, type_slotDo(), 0 }
 };
-
 
 Demo testgtk_demos[] =
 {
