@@ -19,12 +19,13 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS = pixbuf-demo gtk-demo/gtkmm-demo
 
-pixbuf_demo_SOURCES = \
-  gtk-demo/demo_resources.c \
-  pixbuf-demo.cc
+## Don't distribute demo_resources.c. It's big, and it's built with
+## glib-compile-resources, which is part of glib.
+nodist_pixbuf_demo_SOURCES = gtk-demo/demo_resources.c
+dist_pixbuf_demo_SOURCES = pixbuf-demo.cc
 
-gtk_demo_gtkmm_demo_SOURCES = \
-  gtk-demo/demo_resources.c \
+nodist_gtk_demo_gtkmm_demo_SOURCES = gtk-demo/demo_resources.c
+dist_gtk_demo_gtkmm_demo_SOURCES = \
   gtk-demo/demos.h \
   gtk-demo/demowindow.cc \
   gtk-demo/demowindow.h \
@@ -80,8 +81,7 @@ GTK_DEMO_RESOURCES = \
   gtk-demo/gnu-keys.png \
   gtk-demo/gtk-logo-rgb.gif
 
-# Delete built sources on make maintainer-clean.
-MAINTAINERCLEANFILES = gtk-demo/demo_resources.c
+DISTCLEANFILES = gtk-demo/demo_resources.c
 
 gtk-demo/demo_resources.c: gtk-demo/demo.gresource.xml $(GTK_DEMO_RESOURCES) $(GTK_DEMOS)
 	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(dir $<) --generate-source $<
