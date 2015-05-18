@@ -43,6 +43,8 @@ protected:
   void fill_tree();
 
   void load_file(const std::string& filename);
+  void add_data_tabs(const std::string& filename);
+  void remove_data_tabs();
 
   //Signal handlers:
   static bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path, bool currently_selected);

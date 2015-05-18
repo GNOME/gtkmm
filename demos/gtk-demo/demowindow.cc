@@ -86,6 +86,8 @@ DemoWindow::DemoWindow()
   m_HBox.pack_start(m_SideBar, Gtk::PACK_SHRINK);
 
   //Notebook:
+  m_Notebook.popup_enable();
+  m_Notebook.set_scrollable();
   m_Notebook.append_page(m_TextWidget_Info, "_Info", true);  //true = use mnemonic.
   m_Notebook.append_page(m_TextWidget_Source, "_Source", true);  //true = use mnemonic.
   m_Notebook.child_property_tab_expand(m_TextWidget_Info) = true;
@@ -224,6 +226,10 @@ void DemoWindow::load_file(const std::string& filename)
   }
   else
   {
+    // Show extra data files for this demo, if any.
+    remove_data_tabs();
+    add_data_tabs(filename);
+
     m_current_filename = filename;
 
     m_TextWidget_Info.wipe();
@@ -362,6 +368,77 @@ void DemoWindow::load_file(const std::string& filename)
   }
 }
 
+void DemoWindow::add_data_tabs(const std::string& filename)
+{
+  // We can get the resource_dir from the filename by removing "example_" and ".cc".
+  const std::string resource_dir = "/" + filename.substr(8, filename.size()-11);
+  std::vector<std::string> resources;
+  try
+  {
+    resources = Gio::Resource::enumerate_children_global(resource_dir);
+  }
+  catch (const Gio::ResourceError& ex)
+  {
+    // Ignore this exception. It's no error, if resource_dir does not exist.
+  }
+  for (unsigned int i = 0; i < resources.size(); ++i)
+  {
+    const std::string resource_name = resource_dir + "/" + resources[i];
+    Gtk::Widget* widget = 0;
+    Gtk::Image* image = new Gtk::Image();
+    image->set_from_resource(resource_name);
+    if (image->get_pixbuf() || image->get_animation())
+    {
+      widget = image;
+    }
+    else
+    {
+      // So we've used the best API available to figure out it's
+      // not an image. Let's try something else then.
+      delete image;
+      image = 0;
+
+      Glib::RefPtr<const Glib::Bytes> bytes;
+      try
+      {
+        bytes = Gio::Resource::lookup_data_global(resource_name);
+      }
+      catch (const Gio::ResourceError& ex)
+      {
+        g_warning("Can't get data from resource '%s': %s\n",
+          resource_name.c_str(), ex.what().c_str());
+        continue;
+      }
+      gsize data_size = 0;
+      const char* data = static_cast<const char*>(bytes->get_data(data_size));
+      if (g_utf8_validate(data, data_size, 0))
+      {
+        // Looks like it parses as text. Dump it into a TextWidget then!
+        TextWidget* textwidget = new TextWidget(false);
+        Glib::RefPtr<Gtk::TextBuffer> refBuffer = textwidget->get_buffer();
+        refBuffer->set_text(data, data + data_size);
+        widget = textwidget;
+      }
+      else
+      {
+        g_warning ("Don't know how to display resource '%s'\n", resource_name.c_str());
+        continue;
+      }
+    }
+    widget->show_all();
+    m_Notebook.append_page(*Gtk::manage(widget), resources[i]);
+    m_Notebook.child_property_tab_expand(*widget) = true;
+  }
+}
+
+void DemoWindow::remove_data_tabs()
+{
+  // Remove all tabs except Info and Source.
+  for (int i = m_Notebook.get_n_pages(); i > 1; --i)
+  {
+    m_Notebook.remove_page(i);
+  }
+}
 
 void DemoWindow::on_example_window_hide()
 {
