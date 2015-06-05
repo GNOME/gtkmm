@@ -13,7 +13,8 @@ PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gtk/src"
 
-for dir in "$PREFIX"/gtk+/gtk; do
+PARAMS="--with-properties --no-recursion"
+for dir in "$PREFIX"/gtk+/{gtk,gtk/deprecated}; do
   PARAMS="$PARAMS -s $dir"
 done
 
