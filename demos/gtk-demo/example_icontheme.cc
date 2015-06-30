@@ -179,17 +179,14 @@ Glib::RefPtr<Gtk::TreeModel> Example_IconTheme::create_model()
       }
     }
 
-    Gtk::IconInfo icon_info = m_IconTheme->lookup_icon(*iconiter, minsize, Gtk::ICON_LOOKUP_USE_BUILTIN);
+    Gtk::IconInfo icon_info = m_IconTheme->lookup_icon(*iconiter, minsize);
 
     // Populate icon column.
     if (icon_info)
     {
       try
       {
-        if (icon_info.get_filename().empty())
-          row[m_columns.icon] = icon_info.get_builtin_pixbuf();
-        else
-          row[m_columns.icon] = icon_info.load_icon();
+        row[m_columns.icon] = icon_info.load_icon();
       }
       catch (const Gdk::PixbufError& err)
       {
@@ -269,7 +266,7 @@ void Example_IconTheme::on_selection_changed()
         std::max_element(sizes.begin(), sizes.end());
       const int maxsize = (sizeiter != sizes.end() && *sizeiter > 48) ? *sizeiter : 48;
 
-      m_Image.set(m_IconTheme->load_icon(icon_name, maxsize, Gtk::ICON_LOOKUP_USE_BUILTIN));
+      m_Image.set(m_IconTheme->load_icon(icon_name, maxsize));
     }
     else
     {
