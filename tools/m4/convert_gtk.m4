@@ -732,3 +732,6 @@ _CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidget
 _CONVERSION(`Glib::RefPtr<Gio::Permission>&',`GPermission*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Gio::Permission>&',`GPermission*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Permission))
 _CONVERSION(`GPermission*',`Glib::RefPtr<Gio::Permission>',`Glib::wrap($3)')
+
+_CONVERSION(`const Glib::RefPtr<Pango::FontMap>&',`PangoFontMap*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Pango::FontMap>&',`PangoFontMap*',__CONVERT_CONST_REFPTR_TO_P)
