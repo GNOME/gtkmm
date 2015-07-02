@@ -22,6 +22,7 @@
  */
 
 #include <glibmm/value.h>
+#include <gtk/gtk.h>  /* For GtkBorder */
 
 namespace Gtk
 {
