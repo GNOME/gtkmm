@@ -190,11 +190,7 @@ IconView::get_tooltip_context_path(int& x, int& y,
                                    bool keyboard_tip,
                                    TreeModel::Path& path)
 {
-  //It's cleaner to use a temporary C++ object and get a C pointer to it,
-  //because GtkTreePath is a simple struct, not a GtkObject, so
-  //gtk_tree_path_new() would be necessary. markoa.
-  TreeModel::Path tmp_path;
-  GtkTreePath* cpath = tmp_path.gobj();
+  GtkTreePath* cpath = 0;
 
   gboolean result =
     gtk_icon_view_get_tooltip_context(gobj(),
@@ -204,7 +200,9 @@ IconView::get_tooltip_context_path(int& x, int& y,
                                       &cpath,
                                       0);
 
-  path = Glib::wrap(cpath, false /* take_copy=false */);
+  // If result is false, cpath is not modified, it's still 0.
+  // wrap() can handle that situation.
+  path = Glib::wrap(cpath, /* take_copy= */ false);
 
   return result;
 }
