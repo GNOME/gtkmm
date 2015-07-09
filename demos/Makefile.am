@@ -17,13 +17,10 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-check_PROGRAMS = pixbuf-demo gtk-demo/gtkmm-demo
+check_PROGRAMS = gtk-demo/gtkmm-demo
 
 ## Don't distribute demo_resources.c. It's big, and it's built with
 ## glib-compile-resources, which is part of glib.
-nodist_pixbuf_demo_SOURCES = gtk-demo/demo_resources.c
-dist_pixbuf_demo_SOURCES = pixbuf-demo.cc
-
 nodist_gtk_demo_gtkmm_demo_SOURCES = gtk-demo/demo_resources.c
 dist_gtk_demo_gtkmm_demo_SOURCES = \
   gtk-demo/demos.h \
@@ -99,5 +96,4 @@ local_cppflags = -DDEMOCODEDIR=\""$(democodedir)"\"
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS) $(local_cppflags)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED
 
-pixbuf_demo_LDADD         = $(GTKMM_LIBS) $(local_ldadd)
 gtk_demo_gtkmm_demo_LDADD = $(GTKMM_LIBS) $(local_ldadd)
