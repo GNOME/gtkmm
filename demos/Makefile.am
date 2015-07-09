@@ -49,7 +49,7 @@ GTK_DEMOS = \
   gtk-demo/example_flowbox.cc \
   gtk-demo/example_gestures.cc \
   gtk-demo/example_headerbar.cc \
-  gtk-demo/example_icontheme.cc \
+  gtk-demo/example_iconbrowser.cc \
   gtk-demo/example_iconview.cc \
   gtk-demo/example_images.cc \
   gtk-demo/example_menus.cc \

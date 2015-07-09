@@ -24,13 +24,13 @@ Gtk::Window* do_drawingarea();
 Gtk::Window* do_flowbox();
 Gtk::Window* do_gestures();
 Gtk::Window* do_headerbar();
-Gtk::Window* do_icontheme();
+Gtk::Window* do_iconbrowser();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
 Gtk::Window* do_menus();
 Gtk::Window* do_overlay();
-Gtk::Window* do_pixbufs();
 Gtk::Window* do_panes();
+Gtk::Window* do_pixbufs();
 Gtk::Window* do_sizegroup();
 Gtk::Window* do_stack();
 Gtk::Window* do_stacksidebar();
@@ -60,7 +60,7 @@ Demo testgtk_demos[] =
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), 0 },
   { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), 0 },
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), 0 },
-  { "Icon Theme", "example_icontheme.cc", sigc::ptr_fun(&do_icontheme), 0 },
+  { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), 0 },
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
   { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
@@ -76,4 +76,3 @@ Demo testgtk_demos[] =
 };
 
 #endif //_DEMOS_H
-
