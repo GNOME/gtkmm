@@ -32,12 +32,12 @@
 #include <gdkmm/pixbufloader.h>
 #include <gdkmm/applaunchcontext.h>
 #include <gdkmm/cursor.h>
+#include <gdkmm/glcontext.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/devicemanager.h>
 #include <gdkmm/screen.h>
 #include <gdkmm/general.h>
-#include <gdkmm/gltypes.h>
 
 #endif /* _GDKMM_GDKMM_H_ */
