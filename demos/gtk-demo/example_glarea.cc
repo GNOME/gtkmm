@@ -5,13 +5,9 @@
  */
 
 #include <iostream>
-#include <sstream>
 #include <fstream>
 
-#include <vector>
-
 #include <gtkmm.h>
-
 #include <epoxy/gl.h>
 
 using std::vector;
