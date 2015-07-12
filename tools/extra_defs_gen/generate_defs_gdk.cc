@@ -48,6 +48,7 @@ int main(int argc, char** argv)
             << get_defs( GDK_TYPE_SCREEN )
             << get_defs( GDK_TYPE_VISUAL )
             << get_defs( GDK_TYPE_WINDOW )
+            << get_defs( GDK_TYPE_GL_CONTEXT )
             ;
   return 0;
 }
