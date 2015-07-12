@@ -25,6 +25,7 @@ Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
 Gtk::Window* do_flowbox();
 Gtk::Window* do_gestures();
+Gtk::Window* do_glarea();
 Gtk::Window* do_headerbar();
 Gtk::Window* do_icontheme();
 Gtk::Window* do_iconview();
@@ -62,6 +63,7 @@ Demo testgtk_demos[] =
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), 0 },
   { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), 0 },
+  { "GLArea", "example_glarea.cc",  sigc::ptr_fun(&do_glarea), 0 },
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), 0 },
   { "Icon Theme", "example_icontheme.cc", sigc::ptr_fun(&do_icontheme), 0 },  
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },  
