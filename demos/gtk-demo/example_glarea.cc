@@ -1,6 +1,6 @@
 /* Open GL Area
  *
- * Blah
+ * GLArea is a widget that allows custom drawing using OpenGL calls.
  *
  */
 
@@ -29,6 +29,12 @@ enum {
     N_AXIS
 };
 
+static const GLfloat vertex_data[] = {
+  0.f,   0.5f,   0.f, 1.f,
+  0.5f, -0.366f, 0.f, 1.f,
+ -0.5f, -0.366f, 0.f, 1.f,
+};
+
 class Example_GLArea : public Gtk::Window
 {
 public:
@@ -54,6 +60,8 @@ protected:
     GLuint m_Program;
     GLuint m_Mvp;
 
+    float m_RotationAngles[N_AXIS];
+
     void init_buffers();
     void init_shaders();
 
@@ -66,17 +74,20 @@ Gtk::Window* do_glarea()
 }
 
 Example_GLArea::Example_GLArea() :
-    m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
+    m_VBox(Gtk::ORIENTATION_VERTICAL, false ),
     m_GLArea(),
     m_Controls(Gtk::ORIENTATION_VERTICAL, false ),
     m_Button("Quit")
 {
+    m_RotationAngles[0] = 0.0f;
+    m_RotationAngles[1] = 0.0f;
+    m_RotationAngles[2] = 0.0f;
+
     set_title("GL Area");
     set_default_size( 400, 600 );
-    set_border_width(8);
-    //Connect destroy signal
+    set_border_width(12);
 
-    m_VBox.set_border_width(12);
+    m_VBox.set_spacing( 6 );
     add(m_VBox);
 
     m_GLArea.set_hexpand( true );
@@ -110,50 +121,21 @@ Example_GLArea::~Example_GLArea()
 {
 }
 
-static float rotation_angles[N_AXIS] = { 0.0 };
-
 void Example_GLArea::on_axis_value_change( int axis, Glib::RefPtr<Gtk::Adjustment> adj )
 {
-    rotation_angles[axis] = adj->get_value();
+    m_RotationAngles[axis] = adj->get_value();
 
     m_GLArea.queue_draw();
 }
 
 void Example_GLArea::realize()
 {
-    /*
-    const Glib::RefPtr<const Gdk::GLContext> & context = m_GLArea.get_context();
-    cout << "Context on gl area is - go(" << context->gobj() << ")" << endl;
-
-    const Glib::RefPtr<const Gdk::GLContext> & current = Gdk::GLContext::get_current();
-    if( current )
-    {
-        cout << "Context from get_current is - go(" << current->gobj() << ")" << endl;
-    }
-    else
-    {
-        cout << "Context from get_current is not set" << endl;
-    }
-
-    */
     m_GLArea.make_current();
     if( m_GLArea.get_error() != NULL )
     {
         cout << "Got an error making the context current" << endl;
         return;
     }
-
-    /*
-    const Glib::RefPtr<const Gdk::GLContext> & after_mc = Gdk::GLContext::get_current();
-    if( after_mc )
-    {
-        cout << "Context after make_current - go(" << after_mc->gobj() << ")" << endl;
-    }
-    else
-    {
-        cout << "Context after make_current is not set" << endl;
-    }
-    */
 
     init_buffers();
     init_shaders();
@@ -240,12 +222,6 @@ Gtk::Box * Example_GLArea::create_axis_slider_box( int axis )
 
     return box;
 }
-
-static const GLfloat vertex_data[] = {
-  0.f,   0.5f,   0.f, 1.f,
-  0.5f, -0.366f, 0.f, 1.f,
- -0.5f, -0.366f, 0.f, 1.f,
-};
 
 void Example_GLArea::init_buffers()
 {
@@ -423,9 +399,9 @@ void Example_GLArea::draw_triangle()
     float mvp[16];
 
     compute_mvp( mvp,
-                 rotation_angles[X_AXIS],
-                 rotation_angles[Y_AXIS],
-                 rotation_angles[Z_AXIS] );
+                 m_RotationAngles[X_AXIS],
+                 m_RotationAngles[Y_AXIS],
+                 m_RotationAngles[Z_AXIS] );
 
     glUseProgram( m_Program );
 
