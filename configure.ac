@@ -93,7 +93,7 @@ AS_IF([test "x$enable_static" = xyes],
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 # The extra cairomm-1.0 check is because gdkmm requires a newer cairomm than pangomm requires.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-3.0 requires.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.45.31 pangomm-1.4 >= 2.27.1 gtk+-3.0 >= 3.17.3 cairomm-1.0 >= 1.9.2 gdk-pixbuf-2.0 >= 2.26.0'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.45.31 pangomm-1.4 >= 2.37.1 gtk+-3.0 >= 3.17.3 cairomm-1.0 >= 1.9.2 gdk-pixbuf-2.0 >= 2.26.0'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -104,7 +104,7 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-1.6 >= 2.22.2 $GTKMM_MODULES"])
+      [GTKMM_MODULES="atkmm-1.6 >= 2.23.2 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
