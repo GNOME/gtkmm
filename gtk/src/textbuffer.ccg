@@ -33,7 +33,7 @@ static guint8* SignalProxy_Serialize(GtkTextBuffer* /* register_buffer */,
                                      gsize* length,
                                      gpointer user_data)
 {
-  Gtk::TextBuffer::SlotSerialize* the_slot = static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
+  auto the_slot = static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
 
   try
   {
@@ -58,7 +58,7 @@ static gboolean SignalProxy_Deserialize(GtkTextBuffer* /* register_buffer */,
                                         gpointer user_data,
                                         GError** error)
 {
-  Gtk::TextBuffer::SlotDeserialize* the_slot = static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
+  auto the_slot = static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
 
   try
   {
@@ -523,28 +523,28 @@ int TextBuffer::size() const
 
 Glib::ustring TextBuffer::get_text(bool include_hidden_chars) const
 {
-  TextBuffer* unconst = const_cast<TextBuffer*>(this); //Because begin() and end() are not const.
+  auto unconst = const_cast<TextBuffer*>(this); //Because begin() and end() are not const.
   return get_text(unconst->begin(), unconst->end(), include_hidden_chars);
 }
 
 std::vector<Glib::ustring> TextBuffer::get_serialize_formats() const
 {
   int n_atoms = 0;
-  GdkAtom* atoms = gtk_text_buffer_get_serialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
+  auto atoms = gtk_text_buffer_get_serialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
   return Glib::ArrayHandler<Glib::ustring, Gdk::AtomUstringTraits>::array_to_vector(atoms, n_atoms, Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<Glib::ustring> TextBuffer::get_deserialize_formats() const
 {
   int n_atoms = 0;
-  GdkAtom* atoms = gtk_text_buffer_get_deserialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
+  auto atoms = gtk_text_buffer_get_deserialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
   return Glib::ArrayHandler<Glib::ustring, Gdk::AtomUstringTraits>::array_to_vector(atoms, n_atoms, Glib::OWNERSHIP_SHALLOW);
 }
 
 Glib::ustring TextBuffer::register_serialize_format(const Glib::ustring& mime_type, const SlotSerialize& slot)
 {
   auto slot_copy = new SlotSerialize(slot);
-  GdkAtom atom = gtk_text_buffer_register_serialize_format(gobj(), mime_type.c_str(),
+  auto atom = gtk_text_buffer_register_serialize_format(gobj(), mime_type.c_str(),
                 &SignalProxy_Serialize, slot_copy, &SignalProxy_Serialize_gtk_callback_destroy);
 
   //Convert the atom to a string:
@@ -562,7 +562,7 @@ Glib::ustring TextBuffer::register_serialize_format(const Glib::ustring& mime_ty
 Glib::ustring TextBuffer::register_deserialize_format(const Glib::ustring& mime_type, const SlotDeserialize& slot)
 {
   auto slot_copy = new SlotDeserialize(slot);
-  GdkAtom atom = gtk_text_buffer_register_deserialize_format(gobj(), mime_type.c_str(),
+  auto atom = gtk_text_buffer_register_deserialize_format(gobj(), mime_type.c_str(),
                 &SignalProxy_Deserialize, slot_copy, &SignalProxy_Deserialize_gtk_callback_destroy);
 
   //Convert the atom to a string:
