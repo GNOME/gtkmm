@@ -191,7 +191,7 @@ parse_chars (constpch text,
        bool   start)
 {
   int i = 0;
-  const char* next_token = 0;
+  const char* next_token = nullptr;
 
   /* Handle comments first */
   if(*state == STATE_IN_COMMENT)
@@ -207,8 +207,8 @@ parse_chars (constpch text,
     return;
   }
 
-  *tag = 0;
-  *end_ptr = 0;
+  *tag = nullptr;
+  *end_ptr = nullptr;
 
   /* check for comment */
   if (!strncmp (text, "/*", 2))
@@ -227,7 +227,7 @@ parse_chars (constpch text,
   /* check for preprocessor defines */
   if (*text == '#' && start)
   {
-    *end_ptr = 0;
+    *end_ptr = nullptr;
     *tag = "preprocessor";
     return;
   }
@@ -345,8 +345,8 @@ void TextWidget::fontify()
     const Glib::ustring& str = iterStart.get_text(iterNext);
     const gchar* start_ptr = str.c_str();
 
-    const gchar* end_ptr = 0;
-    const gchar* tag = 0;
+    const gchar* end_ptr = nullptr;
+    const gchar* tag = nullptr;
 
     do
     {

@@ -61,7 +61,7 @@ Example_StackSidebar::Example_StackSidebar()
   fill_page_names();
   for (std::size_t i = 0; i != m_page_names.size(); ++i)
   {
-    Gtk::Widget* widget = 0;
+    Gtk::Widget* widget = nullptr;
     if (i == 0)
     {
       Gtk::Image* image = Gtk::manage(new Gtk::Image());

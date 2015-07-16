@@ -61,7 +61,7 @@ DemoWindow::DemoWindow()
   m_TextWidget_Info(false),
   m_TextWidget_Source(true)
 {
-  m_pWindow_Example = 0;
+  m_pWindow_Example = nullptr;
 
   configure_header_bar();
 
@@ -262,8 +262,8 @@ void DemoWindow::load_file(const std::string& filename)
       lines[i] = g_strchomp(lines[i]);
 
       gchar *p = lines[i];
-      gchar *q = 0;
-      gchar *r = 0;
+      gchar *q = nullptr;
+      gchar *r = nullptr;
 
       switch (state)
       {
@@ -384,7 +384,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
   for (unsigned int i = 0; i < resources.size(); ++i)
   {
     const std::string resource_name = resource_dir + "/" + resources[i];
-    Gtk::Widget* widget = 0;
+    Gtk::Widget* widget = nullptr;
     Gtk::Image* image = new Gtk::Image();
     image->set_from_resource(resource_name);
     if (image->get_pixbuf() || image->get_animation())
@@ -396,7 +396,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       // So we've used the best API available to figure out it's
       // not an image. Let's try something else then.
       delete image;
-      image = 0;
+      image = nullptr;
 
       Glib::RefPtr<const Glib::Bytes> bytes;
       try
@@ -449,7 +449,7 @@ void DemoWindow::on_example_window_hide()
       (*iter)[demo_columns().italic] = false;
 
       delete m_pWindow_Example;
-      m_pWindow_Example = 0;
+      m_pWindow_Example = nullptr;
     }
   }
 }

@@ -204,7 +204,7 @@ void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring
     if(iter)
     {
       //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-      char* pchEnd = 0;
+      char* pchEnd = nullptr;
       int new_value = (int) strtod(new_text.c_str(), &pchEnd);
 
       //Store the user's new text in the model:

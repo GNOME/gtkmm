@@ -44,7 +44,7 @@ void AppWindow::on_button_clicked()
   {
     g_warning("AppWindow::on_button_clicked(): label refcount=%d", G_OBJECT(m_label->gobj())->ref_count);
     delete m_label;
-    m_label = 0;
+    m_label = nullptr;
   }
 }
 

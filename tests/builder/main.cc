@@ -152,10 +152,10 @@ int main(int argc, char* argv[])
 
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_string(gladefile);
 
-  MainWindow* main_win = 0;
+  MainWindow* main_win = nullptr;
   builder->get_widget_derived("main_window", main_win);
 
-  Gtk::Button* orph_button = 0;
+  Gtk::Button* orph_button = nullptr;
   builder->get_widget("orphaned_button", orph_button);
   orph_button->add_destroy_notify_callback(0, on_orphaned_button_deleted);
 

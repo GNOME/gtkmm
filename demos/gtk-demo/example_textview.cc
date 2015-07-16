@@ -381,7 +381,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
   while(find_anchor(iter)) //previously created with create_child_anchor().
   {
     Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = iter.get_child_anchor();
-    Gtk::Widget* pWidget = 0;
+    Gtk::Widget* pWidget = nullptr;
     if (i == 0)
     {
       Gtk::Button* pButton = Gtk::manage( new Gtk::Button("Click Me") );
@@ -417,7 +417,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else
     {
-      pWidget = 0;
+      pWidget = nullptr;
       g_assert_not_reached ();
     }
 

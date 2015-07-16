@@ -38,7 +38,7 @@ Gtk::Window* do_builder()
   }
 
   // Get the GtkBuilder-instantiated window:
-  Example_Builder* pWindow = 0;
+  Example_Builder* pWindow = nullptr;
   builder->get_widget_derived("window1", pWindow);
   if (!pWindow)
   {
@@ -53,7 +53,7 @@ Example_Builder::Example_Builder(
 : Gtk::Window(cobject),
   m_builder(builder)
 {
-  Gtk::Toolbar* pToolbar = 0;
+  Gtk::Toolbar* pToolbar = nullptr;
   builder->get_widget("toolbar1", pToolbar);
   if (pToolbar)
     pToolbar->get_style_context()->add_class("primary-toolbar");
@@ -67,7 +67,7 @@ Example_Builder::Example_Builder(
   Glib::RefPtr<Gtk::AccelGroup> refAccelGroup = Gtk::AccelGroup::create();
   add_accel_group(refAccelGroup);
 
-  Gtk::MenuItem* pMenuItem = 0;
+  Gtk::MenuItem* pMenuItem = nullptr;
   builder->get_widget("new_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
@@ -127,7 +127,7 @@ void Example_Builder::on_file_quit()
 
 void Example_Builder::on_help_about()
 {
-  Gtk::AboutDialog* pDialog = 0;
+  Gtk::AboutDialog* pDialog = nullptr;
   m_builder->get_widget("aboutdialog1", pDialog);
   if (pDialog)
   {

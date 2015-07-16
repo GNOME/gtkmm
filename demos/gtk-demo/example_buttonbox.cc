@@ -71,7 +71,7 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
 {
   Gtk::Frame* pFrame = Gtk::manage(new Gtk::Frame(title));
 
-  Gtk::ButtonBox* pButtonBox = 0;
+  Gtk::ButtonBox* pButtonBox = nullptr;
   if (horizontal)
     pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_HORIZONTAL));
   else

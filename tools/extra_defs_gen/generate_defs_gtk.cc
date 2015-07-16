@@ -282,7 +282,7 @@ std::string get_child_properties(GType gtype)
   std::string strResult; std::string strObjectName = g_type_name(gtype);
 
   //Get the list of properties:
-  GParamSpec** ppParamSpec = 0;
+  GParamSpec** ppParamSpec = nullptr;
   guint iCount = 0;
   if(g_type_is_a(gtype, GTK_TYPE_CONTAINER))
   {

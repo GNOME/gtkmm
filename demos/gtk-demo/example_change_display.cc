@@ -149,7 +149,7 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
   if(m_pPopup)
   {
     delete m_pPopup;
-    m_pPopup = 0;
+    m_pPopup = nullptr;
   }
 }
 
@@ -299,7 +299,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
   if(m_pPopup)
   {
     delete m_pPopup;
-    m_pPopup = 0;
+    m_pPopup = nullptr;
   }
 
   m_pPopup = new Popup(screen, prompt);
@@ -308,7 +308,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   Glib::RefPtr<Gdk::Cursor> cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
 
-  Gtk::Window* toplevel = 0;
+  Gtk::Window* toplevel = nullptr;
 
   //TODO: Find a suitable replacement for this:
   //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
@@ -328,7 +328,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
     toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(screen->get_display()));
     if (toplevel == m_pPopup)
-       toplevel = 0;
+       toplevel = nullptr;
   }
 
   Gdk::flush(); /* Really release the grab */
@@ -348,8 +348,8 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   {
     // The user data field of a GdkWindow is used to store a pointer
     // to the widget that created it.
-    GtkWidget* cWidget = 0;
-    gpointer* user_data = 0;
+    GtkWidget* cWidget = nullptr;
+    gpointer* user_data = nullptr;
     refPointerWindow->get_user_data(user_data);
     cWidget = (GtkWidget*)user_data;
 
