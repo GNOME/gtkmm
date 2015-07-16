@@ -102,7 +102,7 @@ public:
   int index() const { return index_; }
 
 protected:
-  explicit TreeModelColumnBase(GType type);
+  explicit TreeModelColumnBase(GType g_type);
 
 private:
   GType type_;
