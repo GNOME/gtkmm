@@ -179,13 +179,8 @@ void Example_ChangeDisplay::initialize_displays()
 #ifndef G_OS_WIN32
   Glib::RefPtr<Gdk::DisplayManager> refDisplayManager = Gdk::DisplayManager::get();
 
-  typedef std::vector< Glib::RefPtr<Gdk::Display> > type_listDisplays;
-  type_listDisplays listDisplays = refDisplayManager->list_displays();
-
-  for(type_listDisplays::iterator iter = listDisplays.begin(); iter != listDisplays.end(); ++iter)
+  for(auto refDisplay : refDisplayManager->list_displays())
   {
-    Glib::RefPtr<Gdk::Display> refDisplay = *iter;
-
     Gtk::TreeRow row = *(m_refListStore_Display->append());
     row[m_columns_display.m_name] = refDisplay->get_name();;
     row[m_columns_display.m_display] = refDisplay;
@@ -199,13 +194,12 @@ void Example_ChangeDisplay::initialize_displays()
 
 void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<Gdk::Display> display)
 {
-  Gtk::TreeModel::Children children = m_refListStore_Display->children();
-  for(Gtk::TreeModel::iterator iter = children.begin(); iter != children.end(); ++iter)
+  for(auto row : m_refListStore_Display->children())
   {
-    Glib::RefPtr<Gdk::Display> refDisplay = (*iter)[m_columns_display.m_display];
+    Glib::RefPtr<Gdk::Display> refDisplay = row[m_columns_display.m_display];
     if(refDisplay == display)
     {
-      m_refListStore_Display->erase(iter);
+      m_refListStore_Display->erase(row);
     }
   }
 }

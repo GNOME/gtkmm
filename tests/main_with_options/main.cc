@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     
     //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
     std::cout << "  list = ";
-    for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
+    for(auto str : group.m_arg_list)
     {
-      std::cout << *iter << ", ";
+      std::cout << str << ", ";
     }
     std::cout << std::endl;
  

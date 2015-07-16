@@ -151,9 +151,9 @@ Gtk::ComboBoxText* Example_SizeGroup::create_combobox(const std::list<Glib::ustr
 {
   Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
 
-  for(type_listStrings::const_iterator iter = strings.begin(); iter != strings.end(); iter++)
+  for(const auto& str : strings)
   {
-    pCombo->append(*iter);
+    pCombo->append(str);
   }
 
   return pCombo;
