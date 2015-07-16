@@ -181,7 +181,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfig
   return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMotion* event)
+bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMotion* motion_event)
 {
   if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
@@ -190,21 +190,21 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
    * don't call Gdk::Window::get_device_position() you'll only get a single motion
    * event.  The reason is that we specified Gdk::POINTER_MOTION_HINT_MASK to
    * Gtk::Widget::add_events().  If we hadn't specified that, we could just use
-   * event->x, event->y as the pointer location. But we'd also get deluged in
+   * motion_event->x, motion_event->y as the pointer location. But we'd also get deluged in
    * events.  By requesting the next event as we handle the current one, we
    * avoid getting a huge number of events faster than we can cope.
    */
-  if(event && event->window)
+  if(motion_event && motion_event->window)
   {
     const Glib::RefPtr<Gdk::Window> refWindow =
-        Glib::wrap(event->window, true); // true == take_copy
+        Glib::wrap(motion_event->window, true); // true == take_copy
 
     if(refWindow)
     {
       int x = 0, y = 0;
       Gdk::ModifierType state = Gdk::ModifierType(0);
       const Glib::RefPtr<const Gdk::Device> device =
-        Glib::wrap(event->device, true); // true == take_copy
+        Glib::wrap(motion_event->device, true); // true == take_copy
       refWindow->get_device_position(device, x, y, state);
 
       if((state & Gdk::BUTTON1_MASK) != 0)
@@ -216,13 +216,13 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
   return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(GdkEventButton* event)
+bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(GdkEventButton* button_event)
 {
   if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
 
-  if(event->button == 1)
-    scribble_draw_brush(int(event->x), int(event->y));
+  if(button_event->button == 1)
+    scribble_draw_brush(int(button_event->x), int(button_event->y));
 
   // We've handled the event, stop processing.
   return true;

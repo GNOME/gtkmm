@@ -271,9 +271,9 @@ Example_IconBrowser::~Example_IconBrowser()
 {
 }
 
-bool Example_IconBrowser::on_window_key_press_event(GdkEventKey* event)
+bool Example_IconBrowser::on_window_key_press_event(GdkEventKey* key_press_event)
 {
-  return m_search_bar.handle_event(event);
+  return m_search_bar.handle_event(key_press_event);
 }
 
 void Example_IconBrowser::on_symbolic_radio_toggled()
