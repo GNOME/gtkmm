@@ -26,8 +26,10 @@ if [ $# -eq 0 ]
 then
   # Without LC_ALL=C documentation (docs "xxx") may be translated in the .defs file.
   LC_ALL=C "$GEN_DIR"/generate_defs_gtk > "$OUT_DEFS_FILE"
+  # patch version 2.7.5 does not like directory names.
+  cd "$(dirname "$OUT_DEFS_FILE")"
   PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS "$OUT_DEFS_FILE" "$OUT_DEFS_FILE".patch
+  patch $PATCH_OPTIONS "$(basename "$OUT_DEFS_FILE")" "$(basename "$OUT_DEFS_FILE").patch"
 elif [ "$1" = "--make-patch" ]
 then
   diff --unified=10 "$OUT_DEFS_FILE".orig "$OUT_DEFS_FILE" > "$OUT_DEFS_FILE".patch
