@@ -63,6 +63,7 @@ class PlacesSidebar
 {
   _CLASS_GTKOBJECT(PlacesSidebar, GtkPlacesSidebar, GTK_PLACES_SIDEBAR, Gtk::ScrolledWindow, GtkScrolledWindow)
 public:
+  _IGNORE(gtk_places_sidebar_get_location_title)dnl//Private function
 
   /** Creates a new Gtk::PlacesSidebar widget.
    *
@@ -96,14 +97,32 @@ public:
   // get_nth_bookmark returns a new Gio::File; modifiying the returned value does not modify the places sidebar
   _WRAP_METHOD(Glib::RefPtr<Gio::File> get_nth_bookmark(int n) const, gtk_places_sidebar_get_nth_bookmark)
 
-  _WRAP_METHOD(void set_show_connect_to_server(bool show_connect_to_server = true), gtk_places_sidebar_set_show_connect_to_server)
-  _WRAP_METHOD(bool get_show_connect_to_server() const, gtk_places_sidebar_get_show_connect_to_server)
+  _WRAP_METHOD(void set_show_connect_to_server(bool show_connect_to_server = true), gtk_places_sidebar_set_show_connect_to_server,
+               deprecated "Use set_show_other_locations() instead.")
+  _WRAP_METHOD(bool get_show_connect_to_server() const, gtk_places_sidebar_get_show_connect_to_server,
+               deprecated "Use get_show_other_locations() instead.")
 
   _WRAP_METHOD(void set_local_only(bool local_only = true), gtk_places_sidebar_set_local_only)
   _WRAP_METHOD(bool get_local_only() const, gtk_places_sidebar_get_local_only)
 
   _WRAP_METHOD(void set_show_enter_location(bool show_enter_location = true), gtk_places_sidebar_set_show_enter_location)
   _WRAP_METHOD(bool get_show_enter_location() const, gtk_places_sidebar_get_show_enter_location)
+
+  _WRAP_METHOD(void set_show_recent(bool show_recent = true), gtk_places_sidebar_set_show_recent)
+  _WRAP_METHOD(bool get_show_recent() const, gtk_places_sidebar_get_show_recent)
+
+  _WRAP_METHOD(void set_show_trash(bool show_trash = true), gtk_places_sidebar_set_show_trash)
+  _WRAP_METHOD(bool get_show_trash() const, gtk_places_sidebar_get_show_trash)
+
+  _WRAP_METHOD(void set_show_other_locations(bool show_other_locations = true), gtk_places_sidebar_set_show_other_locations)
+  _WRAP_METHOD(bool get_show_other_locations() const, gtk_places_sidebar_get_show_other_locations)
+
+  //TODO: Don't know how to best wrap gtk_places_sidebar_set_drop_targets_visible(). /Kjell
+  //_WRAP_METHOD(void set_drop_targets_visible(bool visible, const Glib::RefPtr<Gdk::DragContext>& context), gtk_places_sidebar_set_drop_targets_visible)
+  // If visible is false, context is not used, but the documentation does not say so (2015-07-19).
+  // If that's properly documented in gtk+, an alternative wrapping would be:
+  //void set_drop_targets_visible(const Glib::RefPtr<Gdk::DragContext>& context);
+  //void unset_drop_targets_visible();
 
 
 // We use no_default_handler with _WRAP_SIGNAL because the C *Class struct is hidden for GtkPlacesSidebar.
@@ -116,20 +135,28 @@ public:
   _WRAP_SIGNAL(int drag_action_ask(int actions), "drag_action_ask", no_default_handler)
   _WRAP_SIGNAL(void open_location(const Glib::RefPtr<Gio::File>& location, PlacesOpenFlags open_flags), "open_location", no_default_handler)
 
+  //TODO: From gtk+ 3.18 the first parameter in populate_popup does not have to be a GtkMenu*.
+  //When be can break ABI, change to Container* container. Also change in gtk_signals.defs.patch.
 #m4 _CONVERSION(`GVolume*',`const Glib::RefPtr<Gio::Volume>&', `Glib::wrap($3, true)')
   _WRAP_SIGNAL(void populate_popup(Menu* menu, const Glib::RefPtr<Gio::File>& selected_item, const Glib::RefPtr<Gio::Volume>& selected_volume), "populate_popup", no_default_handler)
 
-  _WRAP_SIGNAL(void show_connect_to_server(), "show_connect_to_server", no_default_handler)
+  _WRAP_SIGNAL(void show_connect_to_server(), "show_connect_to_server", no_default_handler,
+               deprecated "Use signal_show_other_locations() to connect to network servers.")
   _WRAP_SIGNAL(void show_error_message(const Glib::ustring& primary, const Glib::ustring& secondary), "show_error_message", no_default_handler)
   _WRAP_SIGNAL(void show_enter_location(), "show_enter_location", no_default_handler)
+  _WRAP_SIGNAL(void show_other_locations(), "show_other_locations", no_default_handler)
 
 
   _WRAP_PROPERTY("local-only", bool)
   _WRAP_PROPERTY("location", Glib::RefPtr<Gio::File>)
   _WRAP_PROPERTY("open-flags", PlacesOpenFlags)
-  _WRAP_PROPERTY("show-connect-to-server", bool)
+  _WRAP_PROPERTY("show-connect-to-server", bool, deprecated "Use property_show_other_locations() instead.")
   _WRAP_PROPERTY("show-desktop", bool)
   _WRAP_PROPERTY("show-enter-location", bool)
+  _WRAP_PROPERTY("show-recent", bool)
+  _WRAP_PROPERTY("show-trash", bool)
+  _WRAP_PROPERTY("show-other-locations", bool)
+  _WRAP_PROPERTY("populate-all", bool)
 };
 
 } // namespace Gtk
