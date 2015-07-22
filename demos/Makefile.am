@@ -45,6 +45,7 @@ GTK_DEMOS = \
   gtk-demo/example_drawingarea.cc \
   gtk-demo/example_flowbox.cc \
   gtk-demo/example_gestures.cc \
+  gtk-demo/example_glarea.cc \
   gtk-demo/example_headerbar.cc \
   gtk-demo/example_iconbrowser.cc \
   gtk-demo/example_iconview.cc \
@@ -67,6 +68,8 @@ GTK_DEMO_RESOURCES = \
   gtk-demo/apple-red.png \
   gtk-demo/background.jpg \
   gtk-demo/floppybuddy.gif \
+  gtk-demo/glarea-fragment.glsl \
+  gtk-demo/glarea-vertex.glsl \
   gtk-demo/gnome-applets.png \
   gtk-demo/gnome-calendar.png \
   gtk-demo/gnome-foot.png \
@@ -96,4 +99,5 @@ local_cppflags = -DDEMOCODEDIR=\""$(democodedir)"\"
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS) $(local_cppflags)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED
 
-gtk_demo_gtkmm_demo_LDADD = $(GTKMM_LIBS) $(local_ldadd)
+gtk_demo_gtkmm_demo_CPPFLAGS = $(AM_CPPFLAGS) $(GTKMM_DEMOS_EXTRA_CFLAGS)
+gtk_demo_gtkmm_demo_LDADD = $(GTKMM_LIBS) $(GTKMM_DEMOS_EXTRA_LIBS) $(local_ldadd)

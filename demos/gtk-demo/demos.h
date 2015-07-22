@@ -23,6 +23,7 @@ Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
 Gtk::Window* do_flowbox();
 Gtk::Window* do_gestures();
+Gtk::Window* do_glarea();
 Gtk::Window* do_headerbar();
 Gtk::Window* do_iconbrowser();
 Gtk::Window* do_iconview();
@@ -64,6 +65,7 @@ Demo testgtk_demos[] =
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
   { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
+  { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), 0 },
   { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), 0 },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
