@@ -13,6 +13,8 @@ PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
+shopt -s extglob # Enable extended pattern matching
 ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
-$ENUM_PL "$PREFIX"/gtk+/gdk/*.h > "$OUT_DIR"/gdk_enums.defs
-$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk*.h > "$OUT_DIR"/gdk_pixbuf_enums.defs
+# Process files whose names end with .h, but not with private.h.
+$ENUM_PL "$PREFIX"/gtk+/gdk/!(*private).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h > "$OUT_DIR"/gdk_enums.defs
+$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h > "$OUT_DIR"/gdk_pixbuf_enums.defs
