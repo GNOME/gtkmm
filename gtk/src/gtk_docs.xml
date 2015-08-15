@@ -10736,8 +10736,8 @@ For example, the application may bring up a dialog box asking for
 a URL like &quot;sftp://ftp.example.com&quot;.  It is up to the application to create
 the corresponding mount by using, for example, g_file_mount_enclosing_volume().
 
-Deprecated: 3.18: use #GtkPlacesSidebar::show-other-locations property to
-connect to network servers.
+Deprecated: 3.18: use the #GtkPlacesSidebar::show-other-locations signal
+to connect to network servers.
 
 </description>
 <parameters>
@@ -10801,8 +10801,7 @@ The places sidebar emits this signal when it needs the calling
 application to present a way to show other locations e.g. drives
 and network access points.
 For example, the application may bring up a page showing persistent
-volumes and discovered network addresses. #GtkPlacesView is the
-prime example of how to handle them.
+volumes and discovered network addresses.
 
 Since: 3.18
 
@@ -16060,6 +16059,15 @@ the internals of #PangoFontDescription.
 </description>
 </property>
 
+<property name="GtkTextTag:font-features">
+<description>
+OpenType font features, as a string.
+
+Since: 3.18
+
+</description>
+</property>
+
 <property name="GtkTextTag:foreground-gdk">
 <description>
 Foreground color as a #GdkColor.
@@ -16832,8 +16840,9 @@ or activated with the keyboard.
 <property name="GtkToolButton:icon-name">
 <description>
 The name of the themed icon displayed on the item.
-This property only has an effect if not overridden by &quot;label&quot;, 
-&quot;icon_widget&quot; or &quot;stock_id&quot; properties.
+This property only has an effect if not overridden by
+#GtkToolButton:label-widget, #GtkToolButton:icon-widget or
+#GtkToolButton:stock-id properties.
 
 Since: 2.8 
 
@@ -39972,6 +39981,9 @@ or %NULL if no row matches @key.
 <description>
 Deletes the action at @index_ from @completion’s action list.
 
+Note that @index_ is a relative position and the position of an
+action may have changed since it was inserted.
+
 Since: 2.4
 
 </description>
@@ -40206,6 +40218,9 @@ Since: 2.4
 Inserts an action in @completion’s action item list at position @index_
 with text @text. If you want the action item to have markup, use
 gtk_entry_completion_insert_action_markup().
+
+Note that @index_ is a relative position in the list of actions and
+the position of an action can change when deleting a different action.
 
 Since: 2.4
 
@@ -47002,6 +47017,12 @@ If there are touch sequences being currently handled by @gesture,
 this function returns %TRUE and fills in @rect with the bounding
 box containing all active touches. Otherwise, %FALSE will be
 returned.
+
+Note: This function will yield unexpected results on touchpad
+gestures. Since there is no correlation between physical and
+pixel distances, these will look as if constrained in an
+infinitely small area, @rect width and height will thus be 0
+regardless of the number of touchpoints.
 
 Since: 3.14
 
@@ -54954,7 +54975,7 @@ appropriate path for the menu item, use gtk_stock_lookup() to look up the
 standard accelerator for the stock item, and if one is found, call
 gtk_accel_map_add_entry() to register it.
 
-Deprecated: 3.10: Use gtk_menu_item_new() instead.
+Deprecated: 3.10: Use gtk_menu_item_new_with_mnemonic() instead.
 
 </description>
 <parameters>
@@ -66170,7 +66191,8 @@ Since: 3.10
 <description>
 Returns the value previously set with gtk_places_sidebar_set_show_connect_to_server()
 
-Deprecated: 3.18: use gtk_places_sidebar_get_show_other_locations() instead.
+Deprecated: 3.18: It is recommended to group this functionality with the drives
+and network location under the new 'Other Location' item
 
 </description>
 <parameters>
@@ -66340,15 +66362,15 @@ Since: 3.10
 
 <function name="gtk_places_sidebar_set_drop_targets_visible">
 <description>
-Make the GtkPlacesSidebar show drop targets, so it can show the available drop
-targets and a &quot;new bookmark&quot; row. This improves the drag and drop
-experience of the user and allow applications to show at once the available
-drop targets.
-This needs to be called when the application is aware of a drag and when
-the applications is aware of the end of a drag.
-It's not needed to take care of the drag if it finish in GtkPlacesSidebar, so
-it's not needed to conect to their signals to call gtk_places_sidebar_set_drop_targets_visible
-manually, just call it when the drag ends on some other widget on your application.
+Make the GtkPlacesSidebar show drop targets, so it can show the available
+drop targets and a &quot;new bookmark&quot; row. This improves the Drag-and-Drop
+experience of the user and allows applications to show all available
+drop targets at once.
+
+This needs to be called when the application is aware of an ongoing drag
+that might target the sidebar. The drop-targets-visible state will be unset
+automatically if the drag finishes in the GtkPlacesSidebar. You only need
+to unset the state when the drag ends on some other widget on your application.
 
 Since: 3.18
 
@@ -66451,11 +66473,17 @@ Since: 3.10
 
 <function name="gtk_places_sidebar_set_show_connect_to_server">
 <description>
-Sets whether the @sidebar should show an item for connecting to a network server; this is off by default.
-An application may want to turn this on if it implements a way for the user to connect
-to network servers directly.
+Sets whether the @sidebar should show an item for connecting to a network server;
+this is off by default. An application may want to turn this on if it implements
+a way for the user to connect to network servers directly.
+
+If you enable this, you should connect to the
+#GtkPlacesSidebar::show-connect-to-server signal.
 
 Since: 3.10
+
+Deprecated: 3.18: It is recommended to group this functionality with the drives
+and network location under the new 'Other Location' item
 
 </description>
 <parameters>
@@ -66496,11 +66524,14 @@ Since: 3.10
 
 <function name="gtk_places_sidebar_set_show_enter_location">
 <description>
-Sets whether the @sidebar should show an item for connecting to a network server; this is off by default.
-An application may want to turn this on if it implements a way for the user to connect
-to network servers directly.
+Sets whether the @sidebar should show an item for entering a location;
+this is off by default. An application may want to turn this on if manually
+entering URLs is an expected user action.
 
-Deprecated: 3.18: use gtk_places_sidebar_set_show_other_locations() instead.
+If you enable this, you should connect to the
+#GtkPlacesSidebar::show-enter-location signal.
+
+Since: 3.14
 
 </description>
 <parameters>
@@ -66509,7 +66540,7 @@ Deprecated: 3.18: use gtk_places_sidebar_set_show_other_locations() instead.
 </parameter_description>
 </parameter>
 <parameter name="show_enter_location">
-<parameter_description> whether to show an item for the Connect to Server command
+<parameter_description> whether to show an item to enter a location
 </parameter_description>
 </parameter>
 </parameters>
@@ -66518,12 +66549,14 @@ Deprecated: 3.18: use gtk_places_sidebar_set_show_other_locations() instead.
 
 <function name="gtk_places_sidebar_set_show_other_locations">
 <description>
-Sets whether the @sidebar should show an item for the application to show an Other Locations
-view; this is off by default. When set to %TRUE, persistent devices such as hard drives are
-hidden, otherwise they are shown in the sidebar.
-An application may want to turn this on if it implements a way for the user to see and interact
-with drives and network servers directly. #GtkPlacesView is the reference implementation for
-it.
+Sets whether the @sidebar should show an item for the application to show
+an Other Locations view; this is off by default. When set to %TRUE, persistent
+devices such as hard drives are hidden, otherwise they are shown in the sidebar.
+An application may want to turn this on if it implements a way for the user to
+see and interact with drives and network servers directly.
+
+If you enable this, you should connect to the
+#GtkPlacesSidebar::show-other-locations signal.
 
 Since: 3.18
 
@@ -66623,8 +66656,7 @@ Since: 3.18
 
 <function name="gtk_places_view_get_search_query">
 <description>
-Sets the search query of @view. The search is immediately performed
-once the query is set.
+Retrieves the current search query from @view.
 
 
 </description>
@@ -66633,12 +66665,8 @@ once the query is set.
 <parameter_description> a #GtkPlacesView
 </parameter_description>
 </parameter>
-<parameter name="query_text">
-<parameter_description> the query, or NULL.
-</parameter_description>
-</parameter>
 </parameters>
-<return>
+<return> the current search query.
 </return>
 </function>
 
@@ -66714,6 +66742,27 @@ Since: 3.18
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_places_view_set_search_query">
+<description>
+Sets the search query of @view. The search is immediately performed
+once the query is set.
+
+
+</description>
+<parameters>
+<parameter name="view">
+<parameter_description> a #GtkPlacesView
+</parameter_description>
+</parameter>
+<parameter name="query_text">
+<parameter_description> the query, or NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+</return>
 </function>
 
 <function name="gtk_plug_construct">
@@ -80313,6 +80362,23 @@ Since: 3.10
 </return>
 </function>
 
+<function name="gtk_stack_get_interpolate_size">
+<description>
+Since: 3.18
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> A #GtkStack
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE If the #GtkStack is set up to interpolate between
+visible-child sizes, %FALSE otherwise.
+
+</return>
+</function>
+
 <function name="gtk_stack_get_transition_duration">
 <description>
 Returns the amount of time (in milliseconds) that
@@ -80485,6 +80551,30 @@ Since: 3.10
 </parameter>
 <parameter name="homogeneous">
 <parameter_description> %TRUE to make @stack homogeneous
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_stack_set_interpolate_size">
+<description>
+Sets whether or not @stack will interpolate its size when
+changing the visible child. If the interpolate-size property
+is set to %TRUE, @stack will interpolate its size between
+the current one and the one it'll take after changing the visible-child,
+according to the set transition-duration.
+
+Since: 3.18
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> A #GtkStack
+</parameter_description>
+</parameter>
+<parameter name="interpolate_size">
+<parameter_description> the new value
 </parameter_description>
 </parameter>
 </parameters>
@@ -93697,7 +93787,7 @@ mnemonics on menu items on the overflow menu.
 
 <function name="gtk_tool_button_new">
 <description>
-Creates a new %GtkToolButton using @icon_widget as contents and @label as
+Creates a new #GtkToolButton using @icon_widget as contents and @label as
 label.
 
 Since: 2.4
@@ -93728,7 +93818,8 @@ It is an error if @stock_id is not a name of a stock item.
 
 Since: 2.4
 
-Deprecated: 3.10: Use gtk_tool_button_new() instead.
+Deprecated: 3.10: Use gtk_tool_button_new() together with
+gtk_image_new_from_icon_name() instead.
 
 </description>
 <parameters>
@@ -93746,9 +93837,9 @@ Deprecated: 3.10: Use gtk_tool_button_new() instead.
 <description>
 Sets the icon for the tool button from a named themed icon.
 See the docs for #GtkIconTheme for more details.
-The “icon_name” property only has an effect if not
-overridden by non-%NULL “label”, “icon_widget” and “stock_id”
-properties.
+The #GtkToolButton:icon-name property only has an effect if not
+overridden by non-%NULL #GtkToolButton:label-widget, 
+#GtkToolButton:icon-widget and #GtkToolButton:stock-id properties.
 
 Since: 2.8
 
@@ -93769,8 +93860,8 @@ Since: 2.8
 <function name="gtk_tool_button_set_icon_widget">
 <description>
 Sets @icon as the widget used as icon on @button. If @icon_widget is
-%NULL the icon is determined by the “stock_id” property. If the
-“stock_id” property is also %NULL, @button will not have an icon.
+%NULL the icon is determined by the #GtkToolButton:stock-id property. If the
+#GtkToolButton:stock-id property is also %NULL, @button will not have an icon.
 
 Since: 2.4
 
@@ -93790,11 +93881,12 @@ Since: 2.4
 
 <function name="gtk_tool_button_set_label">
 <description>
-Sets @label as the label used for the tool button. The “label” property
-only has an effect if not overridden by a non-%NULL “label_widget” property.
-If both the “label_widget” and “label” properties are %NULL, the label
-is determined by the “stock_id” property. If the “stock_id” property is also
-%NULL, @button will not have a label.
+Sets @label as the label used for the tool button. The #GtkToolButton:label
+property only has an effect if not overridden by a non-%NULL 
+#GtkToolButton:label-widget property. If both the #GtkToolButton:label-widget
+and #GtkToolButton:label properties are %NULL, the label is determined by the
+#GtkToolButton:stock-id property. If the #GtkToolButton:stock-id property is
+also %NULL, @button will not have a label.
 
 Since: 2.4
 
@@ -93815,10 +93907,10 @@ Since: 2.4
 <function name="gtk_tool_button_set_label_widget">
 <description>
 Sets @label_widget as the widget that will be used as the label
-for @button. If @label_widget is %NULL the “label” property is used
-as label. If “label” is also %NULL, the label in the stock item
-determined by the “stock_id” property is used as label. If
-“stock_id” is also %NULL, @button does not have a label.
+for @button. If @label_widget is %NULL the #GtkToolButton:label property is used
+as label. If #GtkToolButton:label is also %NULL, the label in the stock item
+determined by the #GtkToolButton:stock-id property is used as label. If
+#GtkToolButton:stock-id is also %NULL, @button does not have a label.
 
 Since: 2.4
 
@@ -93839,8 +93931,8 @@ Since: 2.4
 <function name="gtk_tool_button_set_stock_id">
 <description>
 Sets the name of the stock item. See gtk_tool_button_new_from_stock().
-The stock_id property only has an effect if not
-overridden by non-%NULL “label” and “icon_widget” properties.
+The stock_id property only has an effect if not overridden by non-%NULL 
+#GtkToolButton:label-widget and #GtkToolButton:icon-widget properties.
 
 Since: 2.4
 
@@ -104646,8 +104738,8 @@ the widget may expand if some of its children do.
 <function name="gtk_widget_create_pango_context">
 <description>
 Creates a new #PangoContext with the appropriate font map,
-font description, and base direction for drawing text for
-this widget. See also gtk_widget_get_pango_context().
+font options, font description, and base direction for drawing
+text for this widget. See also gtk_widget_get_pango_context().
 
 
 </description>
@@ -105417,6 +105509,24 @@ widget.
 </parameter>
 </parameters>
 <return> event mask for @widget
+</return>
+</function>
+
+<function name="gtk_widget_get_font_map">
+<description>
+Gets the font map that has been set with gtk_widget_set_font_map().
+
+Since: 3.18
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #PangoFontMap, or %NULL
+
 </return>
 </function>
 
@@ -109737,6 +109847,28 @@ box.
 <return></return>
 </function>
 
+<function name="gtk_widget_set_font_map">
+<description>
+Sets the font map to use for Pango rendering. When not set, the widget
+will inherit the font map from its parent.
+
+Since: 3.18
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="font_map">
+<parameter_description> a #PangoFontMap, or %NULL to unset any previously
+set font map
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_set_font_options">
 <description>
 Sets the #cairo_font_options_t used for Pango rendering in this widget.
@@ -111346,6 +111478,34 @@ Since: 2.2
 <return></return>
 </function>
 
+<function name="gtk_window_fullscreen_on_monitor">
+<description>
+Asks to place @window in the fullscreen state. Note that you shouldn't assume
+the window is definitely full screen afterward.
+
+You can track the fullscreen state via the &quot;window-state-event&quot; signal
+on #GtkWidget.
+
+Since: 3.18
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+<parameter name="screen">
+<parameter_description> a #GdkScreen to draw to
+</parameter_description>
+</parameter>
+<parameter name="monitor">
+<parameter_description> which monitor to go fullscreen on
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_window_get_accept_focus">
 <description>
 Gets the value set by gtk_window_set_accept_focus().
@@ -112310,7 +112470,6 @@ onscreen.
 You can track iconification via the “window-state-event” signal
 on #GtkWidget.
 
-
 </description>
 <parameters>
 <parameter name="window">
@@ -112403,7 +112562,6 @@ initially.
 You can track maximization via the “window-state-event” signal
 on #GtkWidget, or by listening to notifications on the
 #GtkWindow:is-maximized property.
-
 
 </description>
 <parameters>
@@ -114054,7 +114212,6 @@ It’s permitted to call this function before showing a window.
 You can track stickiness via the “window-state-event” signal
 on #GtkWidget.
 
-
 </description>
 <parameters>
 <parameter name="window">
@@ -114102,7 +114259,6 @@ end up unmaximized. Just don’t write code that crashes if not.
 You can track maximization via the “window-state-event” signal
 on #GtkWidget.
 
-
 </description>
 <parameters>
 <parameter name="window">
@@ -114124,7 +114280,6 @@ end up stuck. Just don’t write code that crashes if not.
 
 You can track stickiness via the “window-state-event” signal
 on #GtkWidget.
-
 
 </description>
 <parameters>
