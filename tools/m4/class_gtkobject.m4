@@ -160,6 +160,19 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 }
 
 ')dnl
+
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src)
+: __CPPPARENT__`'(std::move(src))
+_IMPORT(SECTION_CC_MOVE_CONSTRUCTOR_INTERFACES)
+{}
+
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
+{
+  __CPPPARENT__::operator=`'(std::move(src));
+_IMPORT(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)
+  return *this;
+}
+
 ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
 ',`dnl
 __CPPNAME__::~__CPPNAME__`'()
@@ -188,6 +201,9 @@ public:
   typedef __CNAME__ BaseObjectType;
   typedef __REAL_CNAME__`'Class BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+  __CPPNAME__`'(__CPPNAME__&& src);
+  __CPPNAME__& operator=(__CPPNAME__&& src);
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'();
