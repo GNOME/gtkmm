@@ -63,6 +63,9 @@ class GTKMM_API Object : public Glib::Object
   typedef GObjectClass BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+  Object(Object&& src) noexcept;
+  Object& operator=(Object&& src) noexcept;
+
   virtual ~Object();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

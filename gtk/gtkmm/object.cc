@@ -155,6 +155,21 @@ void Object::_release_c_instance()
   }
 }
 
+Object::Object(Object&& src) noexcept
+: Glib::Object(std::move(src)),
+  referenced_(std::move(src.referenced_)),
+  gobject_disposed_(std::move(src.gobject_disposed_))
+{}
+
+Object& Object::operator=(Object&& src) noexcept
+{
+  Glib::Object::operator=(std::move(src));
+  referenced_ = std::move(src.referenced_);
+  gobject_disposed_ = std::move(src.gobject_disposed_);
+  return *this;
+}
+
+
 Object::~Object()
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
