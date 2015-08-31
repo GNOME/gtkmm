@@ -54,7 +54,7 @@ TargetEntry::TargetEntry(const TargetEntry& src)
   set_flags(src.get_flags());
 }
 
-TargetEntry::~TargetEntry()
+TargetEntry::~TargetEntry() noexcept
 {
   //See https://bugzilla.gnome.org/show_bug.cgi?id=565665#c10 about the 
   //const_cast<>.

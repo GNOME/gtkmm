@@ -29,7 +29,7 @@ SelectionData_WithoutOwnership::SelectionData_WithoutOwnership(GtkSelectionData*
 {
 }
 
-SelectionData_WithoutOwnership::~SelectionData_WithoutOwnership()
+SelectionData_WithoutOwnership::~SelectionData_WithoutOwnership() noexcept
 {
   //Prevent the base class's destructor from free-ing the underlying gobject:
   gobject_ = 0;

@@ -43,7 +43,7 @@ class ListViewText : public Gtk::TreeView
 public:
 
   ListViewText(guint columns_count, bool editable = false, Gtk::SelectionMode mode = Gtk::SELECTION_SINGLE);
-  virtual ~ListViewText();
+  virtual ~ListViewText() noexcept;
 
   /** Adds a title to column @a column.
    * @param column the column number.
@@ -116,7 +116,7 @@ protected:
   {
   public:
     TextModelColumns(guint columns_count);
-    ~TextModelColumns();
+    ~TextModelColumns() noexcept;
 
     guint get_num_columns() const;
 

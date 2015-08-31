@@ -49,7 +49,7 @@ protected:
    * initialization of the first instance of a widget.
    */
   StylePropertyBase(Gtk::Widget& widget, GType value_type);
-  ~StylePropertyBase();
+  ~StylePropertyBase() noexcept;
 
   /** Checks if the style property has already been installed.
    */

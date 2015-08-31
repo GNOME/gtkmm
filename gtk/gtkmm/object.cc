@@ -170,7 +170,7 @@ Object& Object::operator=(Object&& src) noexcept
 }
 
 
-Object::~Object()
+Object::~Object() noexcept
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Gtk::Object::~Object() gobject_=%p\n", (void*)gobject_);

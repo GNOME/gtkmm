@@ -38,7 +38,7 @@ class SelectionData_WithoutOwnership : public SelectionData
 {
 public:
   explicit SelectionData_WithoutOwnership(GtkSelectionData* gobject);
-  ~SelectionData_WithoutOwnership();
+  ~SelectionData_WithoutOwnership() noexcept;
 };
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

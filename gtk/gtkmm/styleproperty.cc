@@ -31,7 +31,7 @@ StylePropertyBase::StylePropertyBase(Gtk::Widget& widget, GType value_type)
 {
 }
 
-StylePropertyBase::~StylePropertyBase()
+StylePropertyBase::~StylePropertyBase() noexcept
 {
   if (param_spec_)
     g_param_spec_unref(param_spec_);

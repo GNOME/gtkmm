@@ -34,7 +34,7 @@ ListViewText::TextModelColumns::TextModelColumns(guint columns_count)
   }
 }
 
-ListViewText::TextModelColumns::~TextModelColumns()
+ListViewText::TextModelColumns::~TextModelColumns() noexcept
 {
   if(m_columns)
     delete[] m_columns;
@@ -70,7 +70,7 @@ ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMod
   get_selection()->set_mode(mode);
 }
 
-ListViewText::~ListViewText()
+ListViewText::~ListViewText() noexcept
 {
 }
 

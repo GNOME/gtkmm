@@ -45,7 +45,7 @@ public:
   explicit TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags = Gtk::TargetFlags(0), guint info = 0);
   explicit TargetEntry(const GtkTargetEntry& gobject);
   TargetEntry(const TargetEntry& src);
-  virtual ~TargetEntry();
+  virtual ~TargetEntry() noexcept;
 
   TargetEntry& operator=(const TargetEntry& src);
 

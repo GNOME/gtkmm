@@ -71,7 +71,7 @@ class TreeModelColumnRecord
 {
 public:
   TreeModelColumnRecord();
-  virtual ~TreeModelColumnRecord();
+  virtual ~TreeModelColumnRecord() noexcept;
 
   /** Adds a TreeModelColumn to this record.
    * add() not only registers the @a column, but also assigns a column

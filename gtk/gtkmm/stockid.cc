@@ -48,7 +48,7 @@ StockID::StockID(const char* id)
   id_ ((id) ? id : "")
 {}
 
-StockID::~StockID()
+StockID::~StockID() noexcept
 {}
 
 StockID::StockID(const StockID& other)

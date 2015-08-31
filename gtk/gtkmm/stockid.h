@@ -60,7 +60,7 @@ public:
    * If id is 0 an empty StockID will be created.
    */  
   explicit StockID(const char* id);
-  ~StockID();
+  ~StockID() noexcept;
 
   /** Create a StockID as copy from another.
    * @param other: StockID to copy.

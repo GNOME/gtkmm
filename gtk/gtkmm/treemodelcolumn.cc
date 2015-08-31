@@ -30,7 +30,7 @@ TreeModelColumnRecord::TreeModelColumnRecord()
   column_types_ ()
 {}
 
-TreeModelColumnRecord::~TreeModelColumnRecord()
+TreeModelColumnRecord::~TreeModelColumnRecord() noexcept
 {}
 
 void TreeModelColumnRecord::add(TreeModelColumnBase& column)
