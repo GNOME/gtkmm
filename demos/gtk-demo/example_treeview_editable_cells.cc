@@ -9,8 +9,6 @@
 #include <cstdlib>
 #include <gtkmm.h>
 
-using std::strtod;
-
 class CellItem_Product
 {
 public:
@@ -204,8 +202,7 @@ void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring
     if(iter)
     {
       //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-      char* pchEnd = nullptr;
-      int new_value = (int) strtod(new_text.c_str(), &pchEnd);
+      auto new_value = std::stoi(new_text);
 
       //Store the user's new text in the model:
       Gtk::TreeRow row = *iter;
