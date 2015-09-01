@@ -27,6 +27,7 @@
 #include "demowindow.h"
 #include "textwidget.h"
 #include "demos.h"
+#include <iostream>
 #include <cstring>
 
 using std::isspace;
@@ -245,7 +246,7 @@ void DemoWindow::load_file(const std::string& filename)
     }
     catch (const Gio::ResourceError& ex)
     {
-      g_warning ("Cannot open source for %s: %s\n", filename.c_str(), ex.what().c_str());
+      std::cerr << "Cannot open source for " << filename << ": " << ex.what() << std::endl;
       return;
     }
 
@@ -405,8 +406,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       }
       catch (const Gio::ResourceError& ex)
       {
-        g_warning("Can't get data from resource '%s': %s\n",
-          resource_name.c_str(), ex.what().c_str());
+        std::cerr << "Can't get data from resource '" << resource_name << "': " << ex.what() << std::endl;
         continue;
       }
       gsize data_size = 0;
@@ -421,7 +421,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       }
       else
       {
-        g_warning ("Don't know how to display resource '%s'\n", resource_name.c_str());
+        std::cerr << "Don't know how to display resource '" << resource_name << "'" << std::endl;
         continue;
       }
     }
