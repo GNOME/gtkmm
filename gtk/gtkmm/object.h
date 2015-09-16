@@ -63,6 +63,14 @@ class GTKMM_API Object : public Glib::Object
   typedef GObjectClass BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+#ifdef GTKMM_DISABLE_DEPRECATED
+  /** This prevents use of Gtk::Object-derived classes with RefPtr.
+   * RefPtr should only be used with classes that have create() methods
+   * that return RefPtr.
+   */
+  typedef int dont_allow_use_in_glib_refptr_;
+#endif
+
   Object(Object&& src) noexcept;
   Object& operator=(Object&& src) noexcept;
 
