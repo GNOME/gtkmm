@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <gtkmm.h>
 #include <giomm/resource.h>
@@ -46,7 +47,7 @@ protected:
   GLuint m_Program {0};
   GLuint m_Mvp {0};
 
-  float m_RotationAngles[N_AXIS] {0.0f, 0.0f, 0.0f};
+  std::vector<float> m_RotationAngles;
 
   void on_axis_value_change(int axis, const Glib::RefPtr<Gtk::Adjustment>& adj);
 
@@ -65,7 +66,7 @@ Gtk::Window* do_glarea()
   return new Example_GLArea();
 }
 
-Example_GLArea::Example_GLArea()
+Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
 {
   set_title("GL Area");
   set_default_size(400, 600);
