@@ -205,6 +205,10 @@ public:
   __CPPNAME__`'(__CPPNAME__&& src) noexcept;
   __CPPNAME__& operator=(__CPPNAME__&& src) noexcept;
 
+  // noncopyable
+  __CPPNAME__`'(const __CPPNAME__&) = delete;
+  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
+
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'() noexcept;
 
@@ -216,10 +220,6 @@ private:')dnl endif
 
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
-
-  // noncopyable
-  __CPPNAME__`'(const __CPPNAME__&);
-  __CPPNAME__& operator=(const __CPPNAME__&);
 
 protected:
   explicit __CPPNAME__`'(const Glib::ConstructParams& construct_params);
