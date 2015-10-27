@@ -110,7 +110,7 @@ public:
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /** Used by Gtk::manage(). You should not need to use this directly.
    */
-  virtual void set_manage();
+  void set_manage() override;
   #endif //DOXYGEN_SHOULD_SKIP_THIS
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -129,7 +129,7 @@ protected:
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   void _init_unmanage(bool is_toplevel = false);
-  virtual void destroy_notify_(); //override.
+  void destroy_notify_() override;
   void disconnect_cpp_wrapper();
   void _release_c_instance();
   static void callback_weak_notify_(void* data, GObject* gobject); //only connected for a short time.
