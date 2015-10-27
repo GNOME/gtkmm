@@ -26,9 +26,9 @@ class ExampleOptionGroup : public Glib::OptionGroup
 public:
   ExampleOptionGroup();
 
-  virtual bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
-  virtual bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
-  virtual void on_error(Glib::OptionContext& context, Glib::OptionGroup& group);
+  bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  void on_error(Glib::OptionContext& context, Glib::OptionGroup& group) override;
   
   //These int instances should live as long as the OptionGroup to which they are added, 
   //and as long as the OptionContext to which those OptionGroups are added.

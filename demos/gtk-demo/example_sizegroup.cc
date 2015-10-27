@@ -30,7 +30,7 @@ protected:
   virtual void add_row(Gtk::Grid& grid, int row, const Glib::RefPtr<Gtk::SizeGroup>& size_group, const Glib::ustring& label_text, const std::list<Glib::ustring>& options);
   virtual Gtk::ComboBoxText* create_combobox(const std::list<Glib::ustring>& strings);
 
-  virtual void on_response(int response_id);
+  void on_response(int response_id) override;
 
   //Member widgets:
   Gtk::Frame m_Frame_Color, m_Frame_Line;

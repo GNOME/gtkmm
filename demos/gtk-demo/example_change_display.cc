@@ -64,7 +64,7 @@ protected:
 
   virtual bool on_popup_button_release_event(GdkEventButton* event);
 
-  virtual void on_response(int response_id);
+  void on_response(int response_id) override;
 
 
   class ModelColumns_Display : public Gtk::TreeModelColumnRecord

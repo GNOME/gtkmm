@@ -38,7 +38,7 @@ public:
 
 protected:
   //vfunc overrides:
-  virtual void on_realize();
+  void on_realize() override;
 
   virtual void create_model();
   virtual void add_columns();

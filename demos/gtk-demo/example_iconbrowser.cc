@@ -73,8 +73,8 @@ protected:
   IconInfoStore();
 
   // Overridden virtual function:
-  virtual bool drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
-    Gtk::SelectionData& selection_data) const;
+  bool drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
+    Gtk::SelectionData& selection_data) const override;
 
 private:
   Gtk::TreeModelColumn<Glib::ustring> m_text_column;
