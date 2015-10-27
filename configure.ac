@@ -139,7 +139,7 @@ AC_CHECK_FUNCS([mkfifo])
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra -Wformat-security -Wshadow -Wno-long-long -DGSEAL_ENABLE],
+                       [-pedantic -Wall -Wextra -Wformat-security -Wshadow -Wsuggest-override -Wno-long-long -DGSEAL_ENABLE],
                        [G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM SIGCXX])
 
 AC_CONFIG_FILES([Makefile
