@@ -3,13 +3,11 @@
 #include <iostream>
 #include <stdlib.h>
 
-class Derived : public Glib::Object
+class Derived : public Gtk::Object
 {
 public:
-  //A real application would never make the constructor public.
-  //It would instead have a protectd constructor and a public create() method.
   Derived(GObject* gobject, int i)
-  : Glib::Object(gobject),
+  : Gtk::Object(gobject),
     i_(i)
   {
   }
@@ -18,13 +16,13 @@ public:
   Derived& operator=(const Derived& src) = delete;
 
   Derived(Derived&& src) noexcept
-  : Glib::Object(std::move(src)),
+  : Gtk::Object(std::move(src)),
     i_(std::move(src.i_))
   {}
 
   Derived& operator=(Derived&& src) noexcept
   {
-    Glib::Object::operator=(std::move(src));
+    Gtk::Object::operator=(std::move(src));
     i_ = std::move(src.i_);
 
     return *this;
@@ -36,14 +34,33 @@ public:
 static
 void test_object_move_constructor()
 {
-  GObject *button = G_OBJECT(gtk_button_new());
+  GObject* button = G_OBJECT(gtk_button_new());
   Derived derived(button, 5);
   std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == button);
-  Derived derived2 = std::move(derived);
+
+  Derived derived2(std::move(derived));
   g_assert_cmpint(derived2.i_, ==, 5);
   std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == button);
+  g_assert(derived.gobj() == nullptr);
+}
+
+static
+void test_object_move_assignment_operator()
+{
+  GObject* button = G_OBJECT(gtk_button_new());
+  Derived derived(button, 5);
+  //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
+  g_assert(derived.gobj() == button);
+
+  GObject* button2 = G_OBJECT(gtk_button_new());
+  Derived derived2(button2, 6);
+  derived2 = std::move(derived);
+  g_assert_cmpint(derived2.i_, ==, 5);
+  //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
+  g_assert(derived2.gobj() == button);
+  g_assert(derived.gobj() == nullptr);
 }
 
 int main(int argc, char** argv)
@@ -52,6 +69,7 @@ int main(int argc, char** argv)
   Gtk::Main::init_gtkmm_internals();
 
   test_object_move_constructor();
+  test_object_move_assignment_operator();
 
   return EXIT_SUCCESS;
 }

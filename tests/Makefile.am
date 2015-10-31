@@ -33,7 +33,8 @@ check_PROGRAMS =			\
 	scrolledwindow/test		\
 	wrap_existing/test
 
-TESTS =	test_validate_docs_xhtml.sh
+TESTS =	object_move/test \
+  test_validate_docs_xhtml.sh
 
 builder_test_SOURCES               = builder/main.cc
 child_widget_test_SOURCES          = child_widget/main.cc	\
