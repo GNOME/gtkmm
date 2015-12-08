@@ -127,6 +127,7 @@ public:
   _WRAP_METHOD(void queue_draw_area(int x, int y, int width, int height), gtk_widget_queue_draw_area)
   _WRAP_METHOD(void queue_draw_region(const ::Cairo::RefPtr<const ::Cairo::Region>& region), gtk_widget_queue_draw_region)
   _WRAP_METHOD(void queue_resize(), gtk_widget_queue_resize)
+  _WRAP_METHOD(void queue_allocate(), gtk_widget_queue_allocate)
 
   _WRAP_METHOD(void size_allocate(const Allocation& allocation), gtk_widget_size_allocate)
 
@@ -194,6 +195,8 @@ public:
   _WRAP_METHOD(bool is_focus() const, gtk_widget_is_focus)
   _WRAP_METHOD(bool has_visible_focus() const, gtk_widget_has_visible_focus)
   _WRAP_METHOD(void grab_focus(), gtk_widget_grab_focus)
+  _WRAP_METHOD(void set_focus_on_click(bool focus_on_click = true), gtk_widget_set_focus_on_click)
+  _WRAP_METHOD(bool get_focus_on_click() const, gtk_widget_get_focus_on_click)
   _WRAP_METHOD(void set_can_default(bool can_default = true), gtk_widget_set_can_default)
   _WRAP_METHOD(bool get_can_default() const, gtk_widget_get_can_default)
   _WRAP_METHOD(bool has_default() const, gtk_widget_has_default)
@@ -265,6 +268,7 @@ public:
   _WRAP_METHOD(int get_allocated_width() const, gtk_widget_get_allocated_width)
   _WRAP_METHOD(int get_allocated_height() const, gtk_widget_get_allocated_height)
   _WRAP_METHOD(int get_allocated_baseline() const, gtk_widget_get_allocated_baseline)
+  _WRAP_METHOD(void get_allocated_size(Allocation& allocation, int& baseline) const, gtk_widget_get_allocated_size)
 
   /** Retrieves the widget's location.
    * Note, when implementing a Container: a widget's allocation will be its "adjusted" allocation,
@@ -485,6 +489,17 @@ _DEPRECATE_IFDEF_END
 
   _WRAP_METHOD(Glib::RefPtr<Pango::Context> create_pango_context(), gtk_widget_create_pango_context)
   _WRAP_METHOD(Glib::RefPtr<Pango::Context> get_pango_context(), gtk_widget_get_pango_context, refreturn)
+
+  _WRAP_METHOD(void set_font_options(const ::Cairo::FontOptions& options), gtk_widget_set_font_options)
+  /** Undoes the effect of previous calls to set_font_options().
+   *
+   * @newin{3,20}
+   */
+  void unset_font_options();
+  // This returns a const, so we assume that we must copy it:
+  #m4 _CONVERSION(`const cairo_font_options_t*', `::Cairo::FontOptions', `::Cairo::FontOptions(const_cast<cairo_font_options_t*>($3), false /* take_ownership */)')
+  _WRAP_METHOD(::Cairo::FontOptions get_font_options() const, gtk_widget_get_font_options)
+
   _WRAP_METHOD(Glib::RefPtr<Pango::Layout> create_pango_layout(const Glib::ustring& text), gtk_widget_create_pango_layout)
 
   _IGNORE(gtk_widget_render_icon) //deprecated.
@@ -638,6 +653,9 @@ _DEPRECATE_IFDEF_END
 #m4 _CONVERSION(`const gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(std::vector<Glib::ustring> list_action_prefixes() const, gtk_widget_list_action_prefixes)
 
+  _WRAP_METHOD(void set_font_map(const Glib::RefPtr<Pango::FontMap>& font_map), gtk_widget_set_font_map)
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontMap> get_font_map(), gtk_widget_get_font_map, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Pango::FontMap> get_font_map() const, gtk_widget_get_font_map, refreturn, constversion)
 
   _WRAP_SIGNAL(void show(),"show")
   _WRAP_SIGNAL(void hide(),"hide", custom_c_callback)
@@ -809,6 +827,7 @@ _CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true
   _WRAP_PROPERTY("can_focus", bool)
   _WRAP_PROPERTY("has_focus", bool)
   _WRAP_PROPERTY("is_focus", bool)
+  _WRAP_PROPERTY("focus_on_click", bool)
   _WRAP_PROPERTY("can_default", bool)
   _WRAP_PROPERTY("has_default", bool)
   _WRAP_PROPERTY("receives_default", bool)
