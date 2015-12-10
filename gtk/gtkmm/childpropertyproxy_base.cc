@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /* childpropertyproxy_base.cc
  *
  * Copyright 2014 The gtkmm Development Team
@@ -77,7 +75,7 @@ void ChildPropertyProxy_Base::reset_property_()
   const GParamSpec *const pParamSpec =
       gtk_container_class_find_child_property(G_OBJECT_GET_CLASS(parent_->gobj()), property_name_);
 
-  g_return_if_fail(pParamSpec != 0);
+  g_return_if_fail(pParamSpec != nullptr);
 
   Glib::ValueBase value;
   value.init(G_PARAM_SPEC_VALUE_TYPE(pParamSpec));

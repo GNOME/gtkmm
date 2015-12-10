@@ -1,10 +1,7 @@
-// -*- c++ -*-
 #undef GTK_DISABLE_DEPRECATED
 #define GDK_DISABLE_DEPRECATION_WARNINGS 1
 
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -159,13 +156,13 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item)
 bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<IconSet>& iconset)
 {
   iconset = IconSet::lookup_default(stock_id);
-  return (iconset && (iconset->gobj() != 0));
+  return (iconset && (iconset->gobj() != nullptr));
 }
 
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image)
 {
   image.set(stock_id, size);
-  return (image.gobj() != 0);
+  return (image.gobj() != nullptr);
 }
 
 std::vector<Gtk::StockID> get_ids()

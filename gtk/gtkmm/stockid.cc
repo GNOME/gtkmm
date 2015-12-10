@@ -1,8 +1,4 @@
-// -*- c++ -*-
-
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
-
-/* $Id$ */
 
 /* stockid.cc
  *
@@ -64,7 +60,7 @@ StockID& StockID::operator=(const StockID& other)
 
 StockID::operator const void*() const
 {
-  return !(id_.empty()) ? GINT_TO_POINTER(1) : 0 ;
+  return !(id_.empty()) ? GINT_TO_POINTER(1) : nullptr ;
 }
 
 bool StockID::equal(const StockID& rhs) const

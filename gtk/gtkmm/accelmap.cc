@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -79,7 +76,7 @@ bool lookup_entry(const Glib::ustring& accel_path, Gtk::AccelKey& key)
 
 bool lookup_entry(const Glib::ustring& accel_path)
 {
-  return gtk_accel_map_lookup_entry(accel_path.c_str(), 0 /* "optional", according to the C docs. */);
+  return gtk_accel_map_lookup_entry(accel_path.c_str(), nullptr /* "optional", according to the C docs. */);
 }
 
 } // namespace AccelMap
