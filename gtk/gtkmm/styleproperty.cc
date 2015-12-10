@@ -27,7 +27,7 @@ StylePropertyBase::StylePropertyBase(Gtk::Widget& widget, GType value_type)
 :
   widget_     (&widget),
   value_type_ (value_type),
-  param_spec_ (0)
+  param_spec_ (nullptr)
 {
 }
 
@@ -39,7 +39,7 @@ StylePropertyBase::~StylePropertyBase() noexcept
 
 bool StylePropertyBase::lookup_style_property(const Glib::ustring& name)
 {
-  g_assert(param_spec_ == 0);
+  g_assert(param_spec_ == nullptr);
 
   param_spec_ = gtk_widget_class_find_style_property(GTK_WIDGET_GET_CLASS(widget_->gobj()), name.c_str());
 
@@ -49,12 +49,12 @@ bool StylePropertyBase::lookup_style_property(const Glib::ustring& name)
     g_param_spec_ref(param_spec_);
   }
 
-  return param_spec_ != 0;
+  return param_spec_ != nullptr;
 }
 
 void StylePropertyBase::install_style_property(GParamSpec* param_spec)
 {
-  g_return_if_fail(param_spec != 0);
+  g_return_if_fail(param_spec != nullptr);
 
   gtk_widget_class_install_style_property(GTK_WIDGET_GET_CLASS(widget_->gobj()), param_spec);
 
@@ -65,7 +65,7 @@ void StylePropertyBase::install_style_property(GParamSpec* param_spec)
 const char* StylePropertyBase::get_name_internal() const
 {
   const char* const name = g_param_spec_get_name(param_spec_);
-  g_return_val_if_fail(name != 0, "");
+  g_return_val_if_fail(name != nullptr, "");
   return name;
 }
 

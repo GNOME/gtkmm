@@ -131,7 +131,7 @@ int TreeView::insert_column_with_data_func(int position, const Glib::ustring& ti
 
 void TreeView::set_cursor(const TreeModel::Path& path)
 {
-  gtk_tree_view_set_cursor(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, false);
+  gtk_tree_view_set_cursor(gobj(), const_cast<GtkTreePath*>(path.gobj()), nullptr, false);
 }
 
 void TreeView::get_cursor(TreeModel::Path& path, TreeViewColumn*& focus_column)
@@ -190,7 +190,7 @@ bool TreeView::get_path_at_pos(int x, int y, TreeModel::Path& path, TreeViewColu
 bool TreeView::get_path_at_pos(int x, int y, TreeModel::Path& path) const
 {
   GtkTreePath* pTreePath = nullptr;
-  const bool result = gtk_tree_view_get_path_at_pos(const_cast<GtkTreeView*>(gobj()), x, y, &pTreePath, 0, 0, 0);
+  const bool result = gtk_tree_view_get_path_at_pos(const_cast<GtkTreeView*>(gobj()), x, y, &pTreePath, nullptr, nullptr, nullptr);
 
   path = TreeModel::Path(pTreePath, false /* don't take a copy, because the gtk_tree_view_get_path_at_pos() docs say that we must free the path */ );
   return result;
@@ -255,7 +255,7 @@ void TreeView::set_column_drag_function(const SlotColumnDrop& slot)
 void TreeView::unset_column_drag_function()
 {
   gtk_tree_view_set_column_drag_function(gobj(),
-      0, 0, 0); /* See GTK+ docs about the 0s. */
+      nullptr, nullptr, nullptr); /* See GTK+ docs about the nullptrs. */
 }
 
 void TreeView::scroll_to_cell(const TreeModel::Path& path, TreeViewColumn& column, float row_align, float col_align)
@@ -270,22 +270,22 @@ void TreeView::scroll_to_cell(const TreeModel::Path& path, TreeViewColumn& colum
 
 void TreeView::scroll_to_row(const TreeModel::Path& path, float row_align)
 {
-  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, TRUE, row_align, 0.0);
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), nullptr, TRUE, row_align, 0.0);
 }
 
 void TreeView::scroll_to_row(const TreeModel::Path& path)
 {
-  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), 0, FALSE, 0.0, 0.0);
+  gtk_tree_view_scroll_to_cell(gobj(), const_cast<GtkTreePath*>(path.gobj()), nullptr, FALSE, 0.0, 0.0);
 }
 
 void TreeView::scroll_to_column(TreeViewColumn& column, float col_align)
 {
-  gtk_tree_view_scroll_to_cell(gobj(), 0, column.gobj(), TRUE, 0.0, col_align);
+  gtk_tree_view_scroll_to_cell(gobj(), nullptr, column.gobj(), TRUE, 0.0, col_align);
 }
 
 void TreeView::scroll_to_column(TreeViewColumn& column)
 {
-  gtk_tree_view_scroll_to_cell(gobj(), 0, column.gobj(), FALSE, 0.0, 0.0);
+  gtk_tree_view_scroll_to_cell(gobj(), nullptr, column.gobj(), FALSE, 0.0, 0.0);
 }
 
 void TreeView::remove_all_columns()
@@ -315,7 +315,7 @@ CellRenderer* TreeView::get_column_cell_renderer(int n)
   if(pColumn)
     return pColumn->get_first_cell();
   else
-    return 0;
+    return nullptr;
 }
 
 
@@ -328,7 +328,7 @@ const CellRenderer* TreeView::get_column_cell_renderer(int n) const
 
 void TreeView::reset_expander_column()
 {
-  gtk_tree_view_set_expander_column(gobj(), 0 /* see C docs */);
+  gtk_tree_view_set_expander_column(gobj(), nullptr /* see C docs */);
 }
 
 void TreeView::_auto_store_on_cellrenderer_toggle_edited(const Glib::ustring& path_string,
@@ -366,7 +366,7 @@ void TreeView::_auto_store_on_cellrenderer_toggle_edited_with_model(const Glib::
 
 void TreeView::move_column_to_start(TreeViewColumn& column)
 {
-  gtk_tree_view_move_column_after(gobj(), (column).gobj(), 0 /* See C docs */);
+  gtk_tree_view_move_column_after(gobj(), (column).gobj(), nullptr /* See C docs */);
 }
 
 void TreeView::set_row_separator_func(const SlotRowSeparator& slot)
@@ -404,7 +404,7 @@ bool TreeView::get_visible_range(TreeModel::Path& start_path, TreeModel::Path& e
 
 void TreeView::unset_model()
 {
-  gtk_tree_view_set_model(gobj(), 0);
+  gtk_tree_view_set_model(gobj(), nullptr);
 }
 
 bool
@@ -422,9 +422,9 @@ TreeView::get_tooltip_context_path(int& x, int& y,
     gtk_tree_view_get_tooltip_context(gobj(),
                                       &x, &y,
                                       keyboard_tip,
-                                      0,
+                                      nullptr,
                                       &cpath,
-                                      0);
+                                      nullptr);
 
   path = Glib::wrap(cpath, false /* take_copy=false */);
 
@@ -442,8 +442,8 @@ TreeView::get_tooltip_context_iter(int& x, int& y,
     gtk_tree_view_get_tooltip_context(gobj(),
                                       &x, &y,
                                       keyboard_tip,
-                                      0,
-                                      0,
+                                      nullptr,
+                                      nullptr,
                                       &src_iter);
 
   iter = TreeIter(gtk_tree_view_get_model(this->gobj()), &src_iter);
@@ -464,18 +464,18 @@ bool TreeView::is_blank_at_pos(int x, int y, TreePath& path, TreeViewColumn*& co
 
 bool TreeView::is_blank_at_pos(int x, int y) const
 {
-  return gtk_tree_view_is_blank_at_pos(const_cast<GtkTreeView*>(gobj()), x, y, 0, 0, 0, 0);
+  return gtk_tree_view_is_blank_at_pos(const_cast<GtkTreeView*>(gobj()), x, y, nullptr, nullptr, nullptr, nullptr);
 }
 
 void TreeView::unset_drag_dest_row()
 {
   // The C docs specify that a 0 path means unset.
-  gtk_tree_view_set_drag_dest_row(gobj(), 0, GTK_TREE_VIEW_DROP_BEFORE /* Arbitrary. Ignored anyway. */);
+  gtk_tree_view_set_drag_dest_row(gobj(), nullptr, GTK_TREE_VIEW_DROP_BEFORE /* Arbitrary. Ignored anyway. */);
 }
 
 void TreeView::unset_row_separator_func()
 {
-  gtk_tree_view_set_row_separator_func(gobj(), 0, 0, 0);
+  gtk_tree_view_set_row_separator_func(gobj(), nullptr, nullptr, nullptr);
 }
 
 } // namespace Gtk

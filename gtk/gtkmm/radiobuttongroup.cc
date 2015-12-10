@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright(C) 2003 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -32,7 +30,7 @@ namespace Gtk
 {
 
 RadioButtonGroup::RadioButtonGroup()
-: group_(0)
+: group_(nullptr)
 {}
 
 RadioButtonGroup::RadioButtonGroup(GSList* group)
