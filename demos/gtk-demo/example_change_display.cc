@@ -104,7 +104,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   m_Frame_Display("Display"),
   m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
-  m_pPopup(0),
+  m_pPopup(nullptr),
   m_popup_clicked(false)
 {
   add_button("_Close", Gtk::RESPONSE_CLOSE);
@@ -359,7 +359,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   }
   */
 
-  return 0;
+  return nullptr;
 }
 
 

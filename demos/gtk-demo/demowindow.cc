@@ -161,7 +161,7 @@ DemoWindow::~DemoWindow()
 
 void DemoWindow::on_run_button_clicked()
 {
-  if(m_pWindow_Example == 0) //Don't open a second window.
+  if(m_pWindow_Example == nullptr) //Don't open a second window.
   {
     if(const Gtk::TreeModel::iterator iter = m_refTreeSelection->get_selected())
     {
@@ -176,7 +176,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
 {
   m_TreePath = path;
 
-  if(m_pWindow_Example == 0) //Don't open a second window.
+  if(m_pWindow_Example == nullptr) //Don't open a second window.
   {
     if(const Gtk::TreeModel::iterator iter = m_TreeView.get_model()->get_iter(m_TreePath))
     {
@@ -411,7 +411,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       }
       gsize data_size = 0;
       const char* data = static_cast<const char*>(bytes->get_data(data_size));
-      if (g_utf8_validate(data, data_size, 0))
+      if (g_utf8_validate(data, data_size, nullptr))
       {
         // Looks like it parses as text. Dump it into a TextWidget then!
         TextWidget* textwidget = new TextWidget(false);

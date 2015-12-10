@@ -134,7 +134,7 @@ Example_Menus::~Example_Menus()
 Gtk::Menu* Example_Menus::create_menu(gint depth)
 {
   if (depth < 1)
-    return 0;
+    return nullptr;
 
   Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
 

@@ -116,7 +116,7 @@ static const char* tokens[] =
 {
   "/*",
   "\"",
-  NULL
+  nullptr
 };
 
 static const char* types[] =
@@ -164,7 +164,7 @@ static const char* types[] =
   "GdkPixbuf ",
   "GError",
   "size_t",
-  0
+  nullptr
 };
 
 static const char* control[] =
@@ -178,7 +178,7 @@ static const char* control[] =
   ":",
   "return ",
   "goto ",
-  0
+  nullptr
 };
 
 typedef const char* constpch;
@@ -244,7 +244,7 @@ parse_chars (constpch text,
   }
   
   /* check for types */
-  for (i = 0; types[i] != 0; i++)
+  for (i = 0; types[i] != nullptr; i++)
     if (!strncmp (text, types[i], strlen (types[i])))
     {
       *end_ptr = text + strlen (types[i]);
@@ -253,7 +253,7 @@ parse_chars (constpch text,
     }
 
   /* check for control */
-  for (i = 0; control[i] != 0; i++)
+  for (i = 0; control[i] != nullptr; i++)
     if (!strncmp (text, control[i], strlen (control[i])))
     {
       *end_ptr = text + strlen (control[i]);
@@ -287,7 +287,7 @@ parse_chars (constpch text,
   }
 
   /* not at the start of a tag.  Find the next one. */
-  for (i = 0; tokens[i] != 0; i++)
+  for (i = 0; tokens[i] != nullptr; i++)
   {
     next_token = strstr (text, tokens[i]);
     if (next_token)
@@ -299,7 +299,7 @@ parse_chars (constpch text,
     }
   }
 
-  for (i = 0; types[i] != 0; i++)
+  for (i = 0; types[i] != nullptr; i++)
   {
     next_token = strstr (text, types[i]);
     if (next_token)
@@ -311,7 +311,7 @@ parse_chars (constpch text,
     }
   }
 
-  for (i = 0; control[i] != 0; i++)
+  for (i = 0; control[i] != nullptr; i++)
   {
     next_token = strstr (text, control[i]);
     if (next_token)

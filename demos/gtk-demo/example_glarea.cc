@@ -382,7 +382,7 @@ void Example_GLArea::draw_triangle()
 
   glBindBuffer(GL_ARRAY_BUFFER, m_Vao);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
