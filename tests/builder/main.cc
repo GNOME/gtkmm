@@ -79,13 +79,13 @@ const char gladefile[] =
 void* on_managed_button_deleted(void* /* data */)
 {
   std::cout << "Gtk::Button in window deleted" << std::endl;
-  return 0;
+  return nullptr;
 }
 
 void* on_orphaned_button_deleted(void* /* data */)
 {
   std::cout << "Orphaned Gtk::Button deleted" << std::endl;
-  return 0;
+  return nullptr;
 }
 
 class DerivedButton : public Gtk::Button
@@ -107,7 +107,7 @@ class MainWindow : public Gtk::Window
 {
 public:
   MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refBuilder)
-  : Gtk::Window(cobject), m_pDerivedButton(0), m_pStandardButton(0)
+  : Gtk::Window(cobject), m_pDerivedButton(nullptr), m_pStandardButton(nullptr)
   {
     std::cout << "MainWindow::ctor" << std::endl;
 
@@ -117,7 +117,7 @@ public:
     refBuilder->get_widget("standard_button", m_pStandardButton);
     refBuilder->get_widget("standard_button", m_pStandardButton);
 
-    m_pStandardButton->add_destroy_notify_callback(0, on_managed_button_deleted);
+    m_pStandardButton->add_destroy_notify_callback(nullptr, on_managed_button_deleted);
   }
 
   virtual ~MainWindow()
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
   Gtk::Button* orph_button = nullptr;
   builder->get_widget("orphaned_button", orph_button);
-  orph_button->add_destroy_notify_callback(0, on_orphaned_button_deleted);
+  orph_button->add_destroy_notify_callback(nullptr, on_orphaned_button_deleted);
 
   const GObject* const window = (GObject*)main_win->gobj();
   const GObject* const orphaned_button = (GObject*)orph_button->gobj();

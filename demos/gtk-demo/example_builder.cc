@@ -34,7 +34,7 @@ Gtk::Window* do_builder()
   catch (const Glib::Error& error)
   {
     std::cout << "Error loading example_builder.ui: " << error.what() << std::endl;
-    return 0;
+    return nullptr;
   }
 
   // Get the GtkBuilder-instantiated window:
@@ -43,7 +43,7 @@ Gtk::Window* do_builder()
   if (!pWindow)
   {
     std::cout << "Could not get 'window1' from the builder." << std::endl;
-    return 0;
+    return nullptr;
   }
   return pWindow;
 }

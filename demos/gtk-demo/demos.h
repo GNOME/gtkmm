@@ -43,38 +43,38 @@ Gtk::Window* do_treeview_treestore();
 
 Demo child0[] =
 {
-  { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), 0 },
-  { "List Store", "example_treeview_liststore.cc", sigc::ptr_fun(&do_treeview_liststore), 0 },
-  { "Tree Store", "example_treeview_treestore.cc", sigc::ptr_fun(&do_treeview_treestore), 0 },
-  { 0, 0, type_slotDo(), 0 }
+  { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), nullptr },
+  { "List Store", "example_treeview_liststore.cc", sigc::ptr_fun(&do_treeview_liststore), nullptr },
+  { "Tree Store", "example_treeview_treestore.cc", sigc::ptr_fun(&do_treeview_treestore), nullptr },
+  { nullptr, nullptr, type_slotDo(), nullptr }
 };
 
 Demo testgtk_demos[] =
 {
-  { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), 0 },
-  { "Builder", "example_builder.cc", sigc::ptr_fun(&do_builder), 0 },
-  { "Button Boxes", "example_buttonbox.cc",  sigc::ptr_fun(&do_buttonbox), 0 },
-  { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), 0 },
-  { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), 0 },
-  { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), 0 },
-  { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), 0 },
-  { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), 0 },
-  { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), 0 },
-  { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), 0 },
-  { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), 0 },
-  { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), 0 },
-  { "Images", "example_images.cc", sigc::ptr_fun(&do_images), 0 },
-  { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), 0 },
-  { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), 0 },
-  { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), 0 },
-  { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), 0 },
-  { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), 0 },
-  { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), 0 },
-  { "Stack", "example_stack.cc", sigc::ptr_fun(&do_stack), 0 },
-  { "Stack Sidebar", "example_stacksidebar.cc", sigc::ptr_fun(&do_stacksidebar), 0 },
-  { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), 0 },
+  { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), nullptr },
+  { "Builder", "example_builder.cc", sigc::ptr_fun(&do_builder), nullptr },
+  { "Button Boxes", "example_buttonbox.cc",  sigc::ptr_fun(&do_buttonbox), nullptr },
+  { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), nullptr },
+  { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
+  { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), nullptr },
+  { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), nullptr },
+  { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), nullptr },
+  { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), nullptr },
+  { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), nullptr },
+  { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), nullptr },
+  { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), nullptr },
+  { "Images", "example_images.cc", sigc::ptr_fun(&do_images), nullptr },
+  { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), nullptr },
+  { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), nullptr },
+  { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), nullptr },
+  { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), nullptr },
+  { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), nullptr },
+  { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), nullptr },
+  { "Stack", "example_stack.cc", sigc::ptr_fun(&do_stack), nullptr },
+  { "Stack Sidebar", "example_stacksidebar.cc", sigc::ptr_fun(&do_stacksidebar), nullptr },
+  { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), nullptr },
   { "Tree View", "", type_slotDo(), child0 },
-  { 0, 0, type_slotDo(), 0 }
+  { nullptr, nullptr, type_slotDo(), nullptr }
 };
 
 #endif //_DEMOS_H

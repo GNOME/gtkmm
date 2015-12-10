@@ -17,7 +17,7 @@ private:
 };
 
 AppWindow::AppWindow()
-    : m_label (0)
+    : m_label (nullptr)
 {
     Gtk::Box* vbox = Gtk::manage(new Gtk::Box (Gtk::ORIENTATION_VERTICAL, 5));
     add(*vbox);
