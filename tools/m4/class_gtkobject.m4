@@ -210,7 +210,7 @@ public:
   __CPPNAME__& operator=(const __CPPNAME__&) = delete;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  virtual ~__CPPNAME__`'() noexcept;
+  ~__CPPNAME__`'() noexcept override;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
