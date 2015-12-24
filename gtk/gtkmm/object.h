@@ -74,7 +74,7 @@ class GTKMM_API Object : public Glib::Object
   Object(Object&& src) noexcept;
   Object& operator=(Object&& src) noexcept;
 
-  virtual ~Object() noexcept;
+  ~Object() noexcept override;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
