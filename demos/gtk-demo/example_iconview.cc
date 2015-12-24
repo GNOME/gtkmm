@@ -13,7 +13,7 @@ class Example_IconView : public Gtk::Window
 {
 public:
   Example_IconView();
-  virtual ~Example_IconView();
+  ~Example_IconView() override;
 
 protected:
 

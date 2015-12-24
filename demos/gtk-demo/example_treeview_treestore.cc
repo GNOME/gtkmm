@@ -34,7 +34,7 @@ class Example_TreeView_TreeStore : public Gtk::Window
 {
 public:
   Example_TreeView_TreeStore();
-  virtual ~Example_TreeView_TreeStore();
+  ~Example_TreeView_TreeStore() override;
 
 protected:
   //vfunc overrides:

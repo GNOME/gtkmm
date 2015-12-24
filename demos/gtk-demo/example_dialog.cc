@@ -11,7 +11,7 @@ class Example_Dialog : public Gtk::Window
 {
 public:
   Example_Dialog();
-  virtual ~Example_Dialog();
+  ~Example_Dialog() override;
 
 protected:
   //Signal handlers:
@@ -34,7 +34,7 @@ class Dialog_Interactive : public Gtk::Dialog
 {
 public:
   Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2);
-  virtual ~Dialog_Interactive();
+  ~Dialog_Interactive() override;
 
   Glib::ustring get_entry1() const;
   Glib::ustring get_entry2() const;

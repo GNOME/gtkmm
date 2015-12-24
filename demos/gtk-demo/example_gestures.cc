@@ -11,7 +11,7 @@ class Example_Gestures : public Gtk::Window
 {
 public:
   Example_Gestures();
-  virtual ~Example_Gestures();
+  ~Example_Gestures() override;
 
 protected:
 

@@ -20,7 +20,7 @@ class Example_Panes : public Gtk::Window
 {
 public:
   Example_Panes();
-  virtual ~Example_Panes();
+  ~Example_Panes() override;
 };
 
 class PaneOptions : public Gtk::Frame
@@ -28,7 +28,7 @@ class PaneOptions : public Gtk::Frame
 public:
   PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
               const Glib::ustring& label1, const Glib::ustring& label2);
-  virtual ~PaneOptions();
+  ~PaneOptions() override;
 
 private:
   // member widgets:

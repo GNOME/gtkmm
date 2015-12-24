@@ -20,7 +20,7 @@ class Example_SizeGroup : public Gtk::Dialog
 {
 public:
   Example_SizeGroup();
-  virtual ~Example_SizeGroup();
+  ~Example_SizeGroup() override;
 
 protected:
   //Signal handlers:

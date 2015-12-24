@@ -9,7 +9,7 @@ class Example_Overlay : public Gtk::Window
 {
 public:
   Example_Overlay();
-  virtual ~Example_Overlay();
+  ~Example_Overlay() override;
 
 protected:
 

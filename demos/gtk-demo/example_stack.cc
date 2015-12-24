@@ -12,7 +12,7 @@ class Example_Stack : public Gtk::Window
 {
 public:
   Example_Stack();
-  virtual ~Example_Stack();
+  ~Example_Stack() override;
 
 protected:
 

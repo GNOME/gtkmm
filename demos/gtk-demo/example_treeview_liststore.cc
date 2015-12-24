@@ -26,7 +26,7 @@ class Example_TreeView_ListStore : public Gtk::Window
 {
 public:
   Example_TreeView_ListStore();
-  virtual ~Example_TreeView_ListStore();
+  ~Example_TreeView_ListStore() override;
 
 protected:
   virtual void create_model();

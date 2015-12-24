@@ -30,7 +30,7 @@ class Example_Menus : public Gtk::Window
 {
 public:
   Example_Menus();
-  virtual ~Example_Menus();
+  ~Example_Menus() override;
 
 protected:
   //signal handlers:

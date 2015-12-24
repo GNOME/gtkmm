@@ -19,7 +19,7 @@ class Example_DrawingArea : public Gtk::Window
 {
 public:
   Example_DrawingArea();
-  virtual ~Example_DrawingArea();
+  ~Example_DrawingArea() override;
 
 protected:
   //signal handlers:

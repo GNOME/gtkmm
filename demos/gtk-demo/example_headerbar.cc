@@ -21,7 +21,7 @@ class Example_HeaderBar : public Gtk::Window
 {
 public:
   Example_HeaderBar();
-  virtual ~Example_HeaderBar();
+  ~Example_HeaderBar() override;
 
 protected:
 

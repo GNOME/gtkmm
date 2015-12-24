@@ -17,14 +17,14 @@ class DerivedLabel : public Gtk::Label
 {
 public:
   DerivedLabel() {}
-  virtual ~DerivedLabel() { printf("~DerivedLabel\n");}
+  ~DerivedLabel() override { printf("~DerivedLabel\n");}
 };
 
 class DerivedScrolledWindow : public Gtk::ScrolledWindow
 {
 public:
   DerivedScrolledWindow() {}
-  virtual ~DerivedScrolledWindow() { printf("~DerivedScrolledWindow\n");}
+  ~DerivedScrolledWindow() override { printf("~DerivedScrolledWindow\n");}
 };
 
 class Instance

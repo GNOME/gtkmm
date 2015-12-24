@@ -34,7 +34,7 @@ class Example_GLArea : public Gtk::Window
 {
 public:
   Example_GLArea();
-  virtual ~Example_GLArea();
+  ~Example_GLArea() override;
 
 protected:
   Gtk::Box m_VBox {Gtk::ORIENTATION_VERTICAL, false};

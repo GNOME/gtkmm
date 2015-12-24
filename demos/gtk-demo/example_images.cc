@@ -18,7 +18,7 @@ class Example_Images : public Gtk::Window
 {
 public:
   Example_Images();
-  virtual ~Example_Images();
+  ~Example_Images() override;
 
 protected:
   virtual void start_progressive_loading();

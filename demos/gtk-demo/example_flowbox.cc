@@ -12,7 +12,7 @@ class Example_FlowBox : public Gtk::Window
 {
 public:
   Example_FlowBox();
-  virtual ~Example_FlowBox();
+  ~Example_FlowBox() override;
 
 protected:
   //Signal handlers:

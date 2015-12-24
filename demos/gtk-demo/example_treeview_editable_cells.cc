@@ -25,7 +25,7 @@ class Example_TreeView_EditableCells : public Gtk::Window
 {
 public:
   Example_TreeView_EditableCells();
-  virtual ~Example_TreeView_EditableCells();
+  ~Example_TreeView_EditableCells() override;
 
 protected:
   //signal handlers:

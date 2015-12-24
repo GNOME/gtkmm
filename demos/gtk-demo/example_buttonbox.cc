@@ -10,7 +10,7 @@ class Example_ButtonBox : public Gtk::Window
 {
 public:
   Example_ButtonBox();
-  virtual ~Example_ButtonBox();
+  ~Example_ButtonBox() override;
 
 protected:
   Gtk::Frame* create_button_box(bool horizontal, const Glib::ustring& title,

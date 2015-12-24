@@ -17,7 +17,7 @@ class Window_EasterEgg : public Gtk::Window
 {
 public:
   Window_EasterEgg();
-  virtual ~Window_EasterEgg();
+  ~Window_EasterEgg() override;
 
 protected:
   virtual void recursive_attach_view(int depth, Gtk::TextView& view, Glib::RefPtr<Gtk::TextChildAnchor> refAnchor);
@@ -31,7 +31,7 @@ class Example_TextView : public Gtk::Window
 {
 public:
   Example_TextView();
-  virtual ~Example_TextView();
+  ~Example_TextView() override;
 
 protected:
   virtual void create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer);

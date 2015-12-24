@@ -12,7 +12,7 @@ class Example_Builder : public Gtk::Window
 public:
   Example_Builder(BaseObjectType* cobject,
                   const Glib::RefPtr<Gtk::Builder>& builder);
-  virtual ~Example_Builder();
+  ~Example_Builder() override;
 
 protected:
   void on_file_quit();

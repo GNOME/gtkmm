@@ -10,7 +10,7 @@ class Example_ColorSel : public Gtk::Window
 {
 public:
   Example_ColorSel();
-  virtual ~Example_ColorSel();
+  ~Example_ColorSel() override;
 
 protected:
   //Signal handlers:

@@ -34,7 +34,7 @@ class DemoWindow : public Gtk::Window
 {
 public:
   DemoWindow();
-  virtual ~DemoWindow();
+  ~DemoWindow() override;
 
 protected:
   void run_example(const Gtk::TreeModel::Row& row);

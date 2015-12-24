@@ -33,7 +33,7 @@ class Popup : public Gtk::Window
 {
 public:
   Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
-  virtual ~Popup();
+  ~Popup() override;
 
 protected:
   Gtk::Frame m_Frame;
@@ -44,7 +44,7 @@ class Example_ChangeDisplay : public Gtk::Dialog
 {
 public:
   Example_ChangeDisplay();
-  virtual ~Example_ChangeDisplay();
+  ~Example_ChangeDisplay() override;
 
 protected:
   virtual void setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox);

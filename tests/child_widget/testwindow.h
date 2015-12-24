@@ -26,7 +26,7 @@ class TestWindow : public Gtk::Window
 {
 public:
   TestWindow();
-  virtual ~TestWindow();
+  ~TestWindow() override;
 
 protected:
 

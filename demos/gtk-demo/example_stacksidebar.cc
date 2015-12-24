@@ -13,7 +13,7 @@ class Example_StackSidebar : public Gtk::Window
 {
 public:
   Example_StackSidebar();
-  virtual ~Example_StackSidebar();
+  ~Example_StackSidebar() override;
 
 protected:
   // Container:

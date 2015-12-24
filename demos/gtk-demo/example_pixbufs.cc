@@ -46,7 +46,7 @@ class Example_Pixbufs : public Gtk::Window
 {
 public:
   Example_Pixbufs();
-  virtual ~Example_Pixbufs();
+  ~Example_Pixbufs() override;
 
 protected:
   virtual void load_pixbufs();

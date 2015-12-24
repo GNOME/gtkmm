@@ -9,7 +9,7 @@ class Example_AppWindow : public Gtk::Window
 {
 public:
   Example_AppWindow();
-  virtual ~Example_AppWindow();
+  ~Example_AppWindow() override;
 
 protected:
   //Signal handlers:

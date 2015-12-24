@@ -43,7 +43,7 @@ class IconInfoStore : public Gtk::ListStore
 {
 public:
   static Glib::RefPtr<IconInfoStore> create();
-  virtual ~IconInfoStore();
+  ~IconInfoStore() override;
 
   void set_text_column(bool symbolic)
   { m_text_column = symbolic ? m_columns.symbolic_name : m_columns.name; }
@@ -86,7 +86,7 @@ class DetailDialog : public Gtk::Dialog
 {
 public:
   DetailDialog(Gtk::Window& parent);
-  virtual ~DetailDialog();
+  ~DetailDialog() override;
 
   void set_image(const Glib::ustring& icon_name, const Glib::ustring& description);
 
@@ -116,7 +116,7 @@ class Example_IconBrowser : public Gtk::Window
 {
 public:
   Example_IconBrowser();
-  virtual ~Example_IconBrowser();
+  ~Example_IconBrowser() override;
 
 protected:
   // Signal handlers:
