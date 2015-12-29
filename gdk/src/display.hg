@@ -31,6 +31,7 @@ _CC_INCLUDE(gdk/gdk.h)
 
 class Device;
 class DeviceManager;
+class Seat;
 
  /** Gdk::Display object's purpose is two fold:
  *   To grab/ungrab keyboard focus and mouse pointer
@@ -145,19 +146,32 @@ public:
                deprecated "Compositing is an outdated technology that only ever worked on X11.")
   _WRAP_METHOD(void notify_startup_complete(const Glib::ustring& startup_id), gdk_display_notify_startup_complete)
 
-  _WRAP_METHOD(Glib::RefPtr<DeviceManager> get_device_manager(), gdk_display_get_device_manager, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const DeviceManager> get_device_manager() const, gdk_display_get_device_manager, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<DeviceManager> get_device_manager(), gdk_display_get_device_manager, refreturn,
+    deprecated "Use get_default_seat() and Gdk::Seat operations.")
+  _WRAP_METHOD(Glib::RefPtr<const DeviceManager> get_device_manager() const, gdk_display_get_device_manager, refreturn, constversion,
+    deprecated "Use get_default_seat() and Gdk::Seat operations.")
 
 #m4 _CONVERSION(`GdkAppLaunchContext*',`Glib::RefPtr<AppLaunchContext>', `Glib::wrap($3)')
 #m4 _CONVERSION(`GdkAppLaunchContext*',`Glib::RefPtr<const AppLaunchContext>', `Glib::wrap($3)')
   _WRAP_METHOD(Glib::RefPtr<AppLaunchContext> get_app_launch_context(), gdk_display_get_app_launch_context, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const AppLaunchContext> get_app_launch_context() const, gdk_display_get_app_launch_context, refreturn, constversion)
 
+  _WRAP_METHOD(Glib::RefPtr<Seat> get_default_seat(), gdk_display_get_default_seat, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Seat> get_default_seat() const, gdk_display_get_default_seat, refreturn, constversion)
+
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Seat>>',`Glib::ListHandler<Glib::RefPtr<Seat>>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Seat>> list_seats(), gdk_display_list_seats)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Seat>>',`Glib::ListHandler<Glib::RefPtr<const Seat>>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Seat>> list_seats() const, gdk_display_list_seats)
 
   //We use no_default_handler because GdkDisplayClass is private.
 
   _WRAP_SIGNAL(void closed(bool is_error), closed, no_default_handler)
   _WRAP_SIGNAL(void opened(), opened, no_default_handler)
+
+#m4 _CONVERSION(`GdkSeat*',`const Glib::RefPtr<Seat>&', Glib::wrap($3, true))
+  _WRAP_SIGNAL(void seat_added(const Glib::RefPtr<Seat>& seat), "seat-added", no_default_handler)
+  _WRAP_SIGNAL(void seat_removed(const Glib::RefPtr<Seat>& seat), "seat-removed", no_default_handler)
 
   // There are no properties.
   // We don't wrap the vfuncs because GdkDisplayClass is private.
