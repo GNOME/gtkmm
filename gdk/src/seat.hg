@@ -1,0 +1,90 @@
+/* Copyright (C) 2015 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <vector>
+#include <glibmm/object.h>
+#include <gdkmm/cursor.h>
+#include <gdkmm/device.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gdk
+{
+_WRAP_ENUM(SeatCapabilities, GdkSeatCapabilities)
+
+class Display;
+class Window;
+
+/** A Gdk::Seat object represents a collection of input devices that belong to a user.
+ *
+ * @newin{3,20}
+ */
+class Seat : public Glib::Object
+{
+  _CLASS_GOBJECT(Seat, GdkSeat, GDK_SEAT, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  /** For instance,<br>
+   *   void on_grab_prepare(const Glib::RefPtr<Gdk::Window>& window);
+   *
+   * Type of the callback used to set up @a window so it can be
+   * grabbed. A typical action would be ensuring the window is
+   * visible, although there's room for other initialization actions.
+   *
+   * @param window The Gdk::Window being grabbed.
+   *
+   * @newin{3,20}
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<Window>&> SlotGrabPrepare;
+
+  _WRAP_METHOD(GrabStatus grab(const Glib::RefPtr<Window>& window,
+               SeatCapabilities capabilities,
+               bool owner_events,
+               const Glib::RefPtr<Cursor>& cursor = Glib::RefPtr<Cursor>(),
+               const GdkEvent* event = nullptr,
+               const SlotGrabPrepare& slot = SlotGrabPrepare()),
+               gdk_seat_grab, slot_name slot, slot_callback Seat_grab_callback, no_slot_copy)
+
+  _WRAP_METHOD(void ungrab(), gdk_seat_ungrab)
+  _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_seat_get_display, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_seat_get_display, refreturn, constversion)
+  _WRAP_METHOD(SeatCapabilities get_capabilities() const, gdk_seat_get_capabilities)
+
+//TODO: Wrap gdk_seat_get_slaves() when we can be sure that it's intended to return
+// a list of GdkDevice's. https://bugzilla.gnome.org/show_bug.cgi?id=759785
+//#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Device>>',`Glib::ListHandler<Glib::RefPtr<Device>>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+//  _WRAP_METHOD(std::vector<Glib::RefPtr<Device>> get_slaves(SeatCapabilities capabilities), gdk_seat_get_slaves)
+//#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Device>>',`Glib::ListHandler<Glib::RefPtr<const Device>>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+//  _WRAP_METHOD(std::vector<Glib::RefPtr<const Device>> get_slaves(SeatCapabilities capabilities) const, gdk_seat_get_slaves)
+
+  _WRAP_METHOD(Glib::RefPtr<Device> get_pointer(), gdk_seat_get_pointer, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Device> get_pointer() const, gdk_seat_get_pointer, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Device> get_keyboard(), gdk_seat_get_keyboard, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Device> get_keyboard() const, gdk_seat_get_keyboard, refreturn, constversion)
+
+  // We use no_default_handler because GdkSeatClass is private.
+#m4 _CONVERSION(`GdkDevice*',`const Glib::RefPtr<Device>&', Glib::wrap($3, true))
+  _WRAP_SIGNAL(void device_added(const Glib::RefPtr<Device>& device), "device-added", no_default_handler)
+  _WRAP_SIGNAL(void device_removed(const Glib::RefPtr<Device>& device), "device-removed", no_default_handler)
+
+  _WRAP_PROPERTY("display", Glib::RefPtr<Display>)
+};
+
+} // namespace Gdk
