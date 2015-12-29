@@ -557,6 +557,15 @@ Since: 3.16
 </description>
 </property>
 
+<property name="GdkDevice:seat">
+<description>
+#GdkSeat of this device.
+
+Since: 3.20
+
+</description>
+</property>
+
 <property name="GdkDevice:type">
 <description>
 Device role in the device manager.
@@ -696,6 +705,48 @@ system for @display is opened.
 <parameters>
 <parameter name="display">
 <parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDisplay::seat-added">
+<description>
+The ::seat-added signal is emitted whenever a new seat is made
+known to the windowing system.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="seat">
+<parameter_description> the seat that was just added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDisplay::seat-removed">
+<description>
+The ::seat-removed signal is emitted whenever a seat is removed
+by the windowing system.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="seat">
+<parameter_description> the seat that was just added
 </parameter_description>
 </parameter>
 </parameters>
@@ -924,6 +975,7 @@ child windows
 </parameter>
 <parameter name="GDK_SMOOTH_SCROLL_MASK">
 <parameter_description> receive smooth scrolling events. Since 3.4
+   @GDK_TOUCHPAD_GESTURE_MASK: receive touchpad gesture events. Since 3.18
 </parameter_description>
 </parameter>
 <parameter name="GDK_ALL_EVENTS_MASK">
@@ -2070,6 +2122,10 @@ given operation on the type of image at hand.
 <parameter_description> Generic failure code, something went wrong.
 </parameter_description>
 </parameter>
+<parameter name="GDK_PIXBUF_ERROR_INCOMPLETE_ANIMATION">
+<parameter_description> Only part of the animation was loaded.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -2449,6 +2505,96 @@ Specifies the direction for #GdkEventScroll.
 <parameter name="GDK_SCROLL_SMOOTH">
 <parameter_description> the scrolling is determined by the delta values
 in #GdkEventScroll. See gdk_event_get_scroll_deltas(). Since: 3.4
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<signal name="GdkSeat::device-added">
+<description>
+The ::device-added signal is emitted either when a new input
+device is related to this seat.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="device">
+<parameter_description> the newly added #GdkDevice.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkSeat::device-removed">
+<description>
+The ::device-removed signal is emitted either when an
+input device is removed (e.g. unplugged).
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="device">
+<parameter_description> the just removed #GdkDevice.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GdkSeat:display">
+<description>
+#GdkDisplay of this seat.
+
+Since: 3.20
+
+</description>
+</property>
+
+<enum name="GdkSeatCapabilities">
+<description>
+Flags describing the seat capabilities.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="GDK_SEAT_CAPABILITY_NONE">
+<parameter_description> No input capabilities
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_POINTER">
+<parameter_description> The seat has a pointer (e.g. mouse)
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_TOUCH">
+<parameter_description> The seat has touchscreen(s) attached
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_TABLET_STYLUS">
+<parameter_description> The seat has drawing tablet(s) attached
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_KEYBOARD">
+<parameter_description> The seat has keyboard(s) attached
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_ALL_POINTING">
+<parameter_description> The union of all pointing capabilities
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_ALL">
+<parameter_description> The union of all capabilities
 </parameter_description>
 </parameter>
 </parameters>
@@ -4599,6 +4745,25 @@ Since: 3.16
 </return>
 </function>
 
+<function name="gdk_device_get_seat">
+<description>
+Returns the #GdkSeat the device belongs to.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> A #GdkDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GdkSeat. This memory is owned by GTK+ and
+must not be freed.
+
+</return>
+</function>
+
 <function name="gdk_device_get_source">
 <description>
 Determines the type of the device.
@@ -4785,6 +4950,8 @@ events that are emitted when the grab ends unvoluntarily.
 
 Since: 3.0
 
+Deprecated: 3.20. Use gdk_seat_grab() instead.
+
 </description>
 <parameters>
 <parameter name="device">
@@ -4922,6 +5089,8 @@ and there aren’t other means to get a meaningful #GdkDevice to operate on.
 
 Since: 3.0
 
+Deprecated: 3.20.
+
 </description>
 <parameters>
 <parameter name="device_manager">
@@ -4961,6 +5130,9 @@ Returns the list of devices of type @type currently attached to
 @device_manager.
 
 Since: 3.0
+
+Deprecated: 3.20, use gdk_seat_get_pointer(), gdk_seat_get_keyboard()
+and gdk_seat_list_slaves() instead.
 
 </description>
 <parameters>
@@ -5061,6 +5233,8 @@ by the input mode.
 Release any grab on @device.
 
 Since: 3.0
+
+Deprecated: 3.20. Use gdk_seat_ungrab() instead.
 
 </description>
 <parameters>
@@ -5304,11 +5478,31 @@ Since: 2.2
 </return>
 </function>
 
+<function name="gdk_display_get_default_seat">
+<description>
+Returns the default #GdkSeat for this display.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return> the default seat.
+
+</return>
+</function>
+
 <function name="gdk_display_get_device_manager">
 <description>
 Returns the #GdkDeviceManager associated to @display.
 
 Since: 3.0
+
+Deprecated: 3.20. Use gdk_display_get_default_seat() and #GdkSeat operations.
 
 </description>
 <parameters>
@@ -5449,6 +5643,7 @@ cursor is on, or %NULL.
 Returns a screen object for one of the screens of the display.
 
 Since: 2.2
+Deprecated: 3.20: There is only one screen; use gdk_display_get_default_screen() to get it.
 
 </description>
 <parameters>
@@ -5578,6 +5773,25 @@ Deprecated: 3.0: Use gdk_device_manager_list_devices() instead.
 </parameters>
 <return>
 a list of #GdkDevice
+
+</return>
+</function>
+
+<function name="gdk_display_list_seats">
+<description>
+Returns the list of seats known to @display.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return> the
+list of seats known to the #GdkDisplay
 
 </return>
 </function>
@@ -6229,6 +6443,43 @@ as list of #GdkAtoms
 </return>
 </function>
 
+<function name="gdk_drag_begin_from_point">
+<description>
+Starts a drag and creates a new drag context for it.
+
+This function is called by the drag source.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the source window for this drag
+</parameter_description>
+</parameter>
+<parameter name="device">
+<parameter_description> the device that controls this drag
+</parameter_description>
+</parameter>
+<parameter name="targets">
+<parameter_description> the offered targets,
+as list of #GdkAtoms
+</parameter_description>
+</parameter>
+<parameter name="x_root">
+<parameter_description> the x coordinate where the drag nominally started
+</parameter_description>
+</parameter>
+<parameter name="y_root">
+<parameter_description> the y coordinate where the drag nominally started
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly created #GdkDragContext
+
+</return>
+</function>
+
 <function name="gdk_drag_context_get_actions">
 <description>
 Determines the bitmask of actions proposed by the source if
@@ -6279,6 +6530,29 @@ Returns the #GdkDevice associated to the drag context.
 </parameter>
 </parameters>
 <return> The #GdkDevice associated to @context.
+</return>
+</function>
+
+<function name="gdk_drag_context_get_drag_window">
+<description>
+Returns the window on which the drag icon should be rendered
+during the drag operation. Note that the window may not be
+available until the drag operation has begun. GDK will move
+the window in accordance with the ongoing drag operation.
+The window is owned by @context and will be destroyed when
+the drag operation is over.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the drag window, or %NULL
+
 </return>
 </function>
 
@@ -6391,6 +6665,32 @@ for @context are emitted as if they came from this device.
 <return></return>
 </function>
 
+<function name="gdk_drag_context_set_hotspot">
+<description>
+Sets the position of the drag window that will be kept
+under the cursor hotspot. Initially, the hotspot is at the
+top left corner of the drag window.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+<parameter name="hot_x">
+<parameter_description> x coordinate of the drag window hotspot
+</parameter_description>
+</parameter>
+<parameter name="hot_y">
+<parameter_description> y coordinate of the drag window hotspot
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_drag_drop">
 <description>
 Drops on the current destination.
@@ -6405,6 +6705,31 @@ This function is called by the drag source.
 </parameter>
 <parameter name="time_">
 <parameter_description> the timestamp for this operation
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_drag_drop_done">
+<description>
+Inform GDK if the drop ended successfully. Passing %FALSE
+for @success may trigger a drag cancellation animation.
+
+This function is called by the drag source, and should
+be the last call before dropping the reference to the
+@context.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+<parameter name="success">
+<parameter_description> whether the drag was ultimatively successful
 </parameter_description>
 </parameter>
 </parameters>
@@ -7026,6 +7351,24 @@ Since: 3.2
 </parameter>
 </parameters>
 <return> %TRUE if the event delivered a scroll direction
+
+</return>
+</function>
+
+<function name="gdk_event_get_seat">
+<description>
+Returns the #GdkSeat this event was generated for.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GdkSeat of this event
 
 </return>
 </function>
@@ -8049,6 +8392,39 @@ Since: 3.16
 </parameter>
 </parameters>
 <return> a #GdkWindow or %NULL
+
+</return>
+</function>
+
+<function name="gdk_gl_context_is_legacy">
+<description>
+Whether the #GdkGLContext is in legacy mode or not.
+
+The #GdkGLContext must be realized before calling this function.
+
+When realizing a GL context, GDK will try to use the OpenGL 3.2 core
+profile; this profile removes all the OpenGL API that was deprecated
+prior to the 3.2 version of the specification. If the realization is
+successful, this function will return %FALSE.
+
+If the underlying OpenGL implementation does not support core profiles,
+GDK will fall back to a pre-3.2 compatibility profile, and this function
+will return %TRUE.
+
+You can use the value returned by this function to decide which kind
+of OpenGL API to use, or whether to do extension discovery, or what
+kind of shader programs to load.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the GL context is in legacy mode
 
 </return>
 </function>
@@ -9240,14 +9616,14 @@ Queries the height of the bounding box of a pixbuf animation.
 <function name="gdk_pixbuf_animation_get_iter">
 <description>
 Get an iterator for displaying an animation. The iterator provides
-the frames that should be displayed at a given time.
-It should be freed after use with g_object_unref().
+the frames that should be displayed at a given time. It should be
+freed after use with g_object_unref().
 
-@start_time would normally come from g_get_current_time(), and
-marks the beginning of animation playback. After creating an
-iterator, you should immediately display the pixbuf returned by
-gdk_pixbuf_animation_iter_get_pixbuf(). Then, you should install a
-timeout (with g_timeout_add()) or by some other mechanism ensure
+@start_time would normally come from g_get_current_time(), and marks
+the beginning of animation playback. After creating an iterator, you
+should immediately display the pixbuf returned by
+gdk_pixbuf_animation_iter_get_pixbuf(). Then, you should install
+a timeout (with g_timeout_add()) or by some other mechanism ensure
 that you'll update the image after
 gdk_pixbuf_animation_iter_get_delay_time() milliseconds. Each time
 the image is updated, you should reinstall the timeout with the new,
@@ -9328,9 +9704,9 @@ Queries the width of the bounding box of a pixbuf animation.
 
 <function name="gdk_pixbuf_animation_is_static_image">
 <description>
-If you load a file with gdk_pixbuf_animation_new_from_file() and it turns
-out to be a plain, unanimated image, then this function will return
-%TRUE. Use gdk_pixbuf_animation_get_static_image() to retrieve
+If you load a file with gdk_pixbuf_animation_new_from_file() and it
+turns out to be a plain, unanimated image, then this function will
+return %TRUE. Use gdk_pixbuf_animation_get_static_image() to retrieve
 the image.
 
 
@@ -9380,7 +9756,6 @@ and update the display with the new pixbuf.
 </parameter>
 </parameters>
 <return> %TRUE if the image may need updating
-
 </return>
 </function>
 
@@ -9411,9 +9786,9 @@ for GIF images is currently 20 milliseconds.
 <description>
 Gets the current pixbuf which should be displayed; the pixbuf might not
 be the same size as the animation itself
-(gdk_pixbuf_animation_get_width(), gdk_pixbuf_animation_get_height()). 
-This pixbuf should be displayed for 
-gdk_pixbuf_animation_iter_get_delay_time() milliseconds.  The caller
+(gdk_pixbuf_animation_get_width(), gdk_pixbuf_animation_get_height()).
+This pixbuf should be displayed for
+gdk_pixbuf_animation_iter_get_delay_time() milliseconds. The caller
 of this function does not own a reference to the returned pixbuf;
 the returned pixbuf will become invalid when the iterator advances
 to the next frame, which may happen anytime you call
@@ -9455,8 +9830,8 @@ the updated area.
 
 <function name="gdk_pixbuf_animation_new_from_file">
 <description>
-Creates a new animation by loading it from a file.  The file format is
-detected automatically.  If the file's format does not support multi-frame
+Creates a new animation by loading it from a file. The file format is
+detected automatically. If the file's format does not support multi-frame
 images, then an animation with a single frame will be created. Possible errors
 are in the #GDK_PIXBUF_ERROR and #G_FILE_ERROR domains.
 
@@ -9511,11 +9886,11 @@ the stream contained invalid data, or the operation was cancelled.
 <description>
 Creates a new animation by loading it from an input stream.
 
-The file format is detected automatically. If %NULL is returned, then 
+The file format is detected automatically. If %NULL is returned, then
 @error will be set. The @cancellable can be used to abort the operation
-from another thread. If the operation was cancelled, the error 
-%G_IO_ERROR_CANCELLED will be returned. Other possible errors are in 
-the #GDK_PIXBUF_ERROR and %G_IO_ERROR domains. 
+from another thread. If the operation was cancelled, the error
+%G_IO_ERROR_CANCELLED will be returned. Other possible errors are in
+the #GDK_PIXBUF_ERROR and %G_IO_ERROR domains.
 
 The stream is not closed.
 
@@ -9536,9 +9911,9 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-created pixbuf, or %NULL if any of several error 
-conditions occurred: the file could not be opened, the image format is 
-not supported, there was not enough memory to allocate the image buffer, 
+<return> A newly-created pixbuf, or %NULL if any of several error
+conditions occurred: the file could not be opened, the image format is
+not supported, there was not enough memory to allocate the image buffer,
 the stream contained invalid data, or the operation was cancelled.
 
 </return>
@@ -9661,6 +10036,218 @@ Since: 2.12
 input pixbuf (with an increased reference count).
 
 </return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_clear">
+<description>
+Resets @queue into to initial state. All buffers it contains will be 
+released and the offset will be reset to 0.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_flush">
+<description>
+Removes the first @n_bytes bytes from the queue.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+<parameter name="n_bytes">
+<parameter_description> amount of bytes to flush from the queue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_get_offset">
+<description>
+Queries the amount of bytes that has already been pulled out of
+@queue using functions like gdk_pixbuf_buffer_queue_pull().
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return> Number of bytes that were already pulled from this queue.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_get_size">
+<description>
+Returns the number of bytes currently in @queue.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return> amount of bytes in @queue.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_new">
+<description>
+Creates a new empty buffer queue.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new buffer queue. Use gdk_pixbuf_buffer_queue_unref () to free it.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_peek">
+<description>
+Creates a new buffer with the first @length bytes from @queue, but unlike 
+gdk_pixbuf_buffer_queue_pull(), does not remove them from @queue.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue to read from
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> amount of bytes to peek
+</parameter_description>
+</parameter>
+</parameters>
+<return> NULL if the requested amount of data wasn't available or a new 
+#GBytes. Use g_bytes_unref() after use.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_peek_buffer">
+<description>
+Gets the first buffer out of @queue and returns it. This function is 
+equivalent to calling gdk_pixbuf_buffer_queue_peek() with the size of the
+first buffer in it.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return> The first buffer in @queue or %NULL if @queue is empty. Use 
+g_bytes_unref() after use.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_pull">
+<description>
+If enough data is still available in @queue, the first @length bytes are 
+put into a new buffer and that buffer is returned. The @length bytes are
+removed from the head of the queue. If not enough data is available, %NULL
+is returned.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> amount of bytes to pull
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GBytes or %NULL
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_pull_buffer">
+<description>
+Pulls the first buffer out of @queue and returns it. This function is 
+equivalent to calling gdk_pixbuf_buffer_queue_pull() with the size of the
+first buffer in it.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return> The first buffer in @queue or %NULL if @queue is empty.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_push">
+<description>
+Appends the given @bytes to the buffers already in @queue. This function
+will take ownership of the given @buffer. Use g_bytes_ref () before
+calling this function to keep a reference.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> #GBytes to append to @queue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_ref">
+<description>
+increases the reference count of @queue by one.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return> The passed in @queue.
+</return>
+</function>
+
+<function name="gdk_pixbuf_buffer_queue_unref">
+<description>
+Decreases the reference count of @queue by one. If no reference 
+to this buffer exists anymore, the buffer and the memory 
+it manages are freed.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GdkPixbufBufferQueue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_pixbuf_composite">
@@ -10434,8 +11021,9 @@ image data from a server-side drawable to a client-side RGB(A) buffer.
 This allows you to efficiently read individual pixels on the client side.
 
 This function will create an RGB pixbuf with 8 bits per channel with
-the same size specified by the @width and @height arguments. The pixbuf
-will contain an alpha channel if the @window contains one.
+the size specified by the @width and @height arguments scaled by the
+scale factor of @window. The pixbuf will contain an alpha channel if
+the @window contains one.
 
 If the window is off the screen, then there is no image data in the
 obscured/offscreen regions to be placed in the pixbuf. The contents of
@@ -10716,7 +11304,7 @@ return %NULL.
 </parameter>
 </parameters>
 <return> The #GdkPixbufAnimation that the loader is loading, or %NULL if
- not enough data has been read to determine the information.
+not enough data has been read to determine the information.
 </return>
 </function>
 
@@ -12881,6 +13469,28 @@ location for the available visual types
 <return></return>
 </function>
 
+<function name="gdk_rectangle_equal">
+<description>
+Checks if the two given rectangles are equal.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="rect1">
+<parameter_description> a #GdkRectangle
+</parameter_description>
+</parameter>
+<parameter name="rect2">
+<parameter_description> a #GdkRectangle
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the rectangles are equal.
+
+</return>
+</function>
+
 <function name="gdk_rectangle_intersect">
 <description>
 Calculates the intersection of two rectangles. It is allowed for
@@ -13344,7 +13954,7 @@ to the actual device pixels. On traditional systems this is 1, but
 on very high density outputs this can be a higher value (often 2).
 
 This can be used if you want to create pixel based data for a
-particula monitor, but most of the time you’re drawing to a window
+particular monitor, but most of the time you’re drawing to a window
 where it is better to use gdk_window_get_scale_factor() instead.
 
 Since: 3.10
@@ -13869,6 +14479,200 @@ Note that on many X servers this value will not be correct.
 <return> the width of the default screen in millimeters,
 though it is not always correct.
 </return>
+</function>
+
+<function name="gdk_seat_get_capabilities">
+<description>
+Returns the capabilities this #GdkSeat currently has.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return> the seat capabilities
+
+</return>
+</function>
+
+<function name="gdk_seat_get_display">
+<description>
+Returns the #GdkDisplay this seat belongs to.
+
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDisplay. This memory is owned by GTK+ and
+must not be freed.
+</return>
+</function>
+
+<function name="gdk_seat_get_keyboard">
+<description>
+Returns the master device that routes keyboard events.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return> a master #GdkDevice with keyboard
+capabilities. This object is owned by GTK+ and must not be
+freed.
+
+</return>
+</function>
+
+<function name="gdk_seat_get_pointer">
+<description>
+Returns the master device that routes pointer events.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return> a master #GdkDevice with pointer
+capabilities. This object is owned by GTK+ and must not be
+freed.
+
+</return>
+</function>
+
+<function name="gdk_seat_get_slaves">
+<description>
+Returns the slave devices that match the given capabilities.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+<parameter name="capabilities">
+<parameter_description> capabilities to get devices for
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list of #GdkDevices. The list
+must be freed with g_list_free(), the elements are owned
+by GDK and must not be freed.
+
+</return>
+</function>
+
+<function name="gdk_seat_grab">
+<description>
+Grabs the seat so that all events corresponding to the given @capabilities
+are passed to this application until the seat is ungrabbed with gdk_seat_ungrab(),
+or the window becomes hidden. This overrides any previous grab on the
+seat by this client.
+
+As a rule of thumb, if a grab is desired over %GDK_SEAT_CAPABILITY_POINTER,
+all other &quot;pointing&quot; capabilities (eg. %GDK_SEAT_CAPABILITY_TOUCH) should
+be grabbed too, so the user is able to interact with all of those while
+the grab holds, you should thus use %GDK_SEAT_CAPABILITY_ALL_POINTING most
+commonly.
+
+Grabs are used for operations which need complete control over the
+events corresponding to the given capabilities. For example in GTK+ this
+is used for Drag and Drop operations, popup menus and such.
+
+Note that if the event mask of a #GdkWindow has selected both button press
+and button release events, or touch begin and touch end, then a press event
+will cause an automatic grab until the button is released, equivalent to a
+grab on the window with @owner_events set to %TRUE. This performed as most
+applications expect to receive presses and releases in pairs.
+
+If you set up anything at the time you take the grab that needs to be
+cleaned up when the grab ends, you should handle the #GdkEventGrabBroken
+events that are emitted when the grab ends unvoluntarily.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+<parameter name="window">
+<parameter_description> the #GdkWindow which will own the grab
+</parameter_description>
+</parameter>
+<parameter name="capabilities">
+<parameter_description> capabilities that will be grabbed
+</parameter_description>
+</parameter>
+<parameter name="owner_events">
+<parameter_description> if %FALSE then all device events are reported with respect to
+@window and are only reported if selected by @event_mask. If
+%TRUE then pointer events for this application are reported
+as normal, but pointer events outside this application are
+reported with respect to @window and only if selected by
+@event_mask. In either mode, unreported events are discarded.
+</parameter_description>
+</parameter>
+<parameter name="cursor">
+<parameter_description> the cursor to display while the grab is active. If
+this is %NULL then the normal cursors are used for
+@window and its descendants, and the cursor for @window is used
+elsewhere.
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> the event that is triggering the grab, or %NULL if none
+is available.
+</parameter_description>
+</parameter>
+<parameter name="prepare_func">
+<parameter_description> function to prepare the window to be
+grabbed, it can be %NULL if @window is visible before this call.
+</parameter_description>
+</parameter>
+<parameter name="prepare_func_data">
+<parameter_description> user data to pass to @prepare_func
+</parameter_description>
+</parameter>
+</parameters>
+<return> %GDK_GRAB_SUCCESS if the grab was successful.
+
+</return>
+</function>
+
+<function name="gdk_seat_ungrab">
+<description>
+Releases a grab added through gdk_seat_grab().
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_selection_convert">
