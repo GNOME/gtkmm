@@ -91,10 +91,17 @@ void* on_orphaned_button_deleted(void* /* data */)
 class DerivedButton : public Gtk::Button
 {
 public:
-  DerivedButton(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& /* refBuilder */)
+  DerivedButton(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& /* refBuilder */,
+    const Glib::ustring icon_name = Glib::ustring())
   : Gtk::Button(cobject)
   {
     std::cout << "DerivedButton::ctor" << std::endl;
+
+    if (!icon_name.empty())
+    {
+      set_image_from_icon_name(icon_name);
+      property_always_show_image() = true;
+    }
   }
 
   virtual ~DerivedButton()
@@ -112,7 +119,7 @@ public:
     std::cout << "MainWindow::ctor" << std::endl;
 
     // Called twice just to see if two calls affect the ref count.
-    refBuilder->get_widget_derived("derived_button", m_pDerivedButton);
+    refBuilder->get_widget_derived("derived_button", m_pDerivedButton, "face-smile");
     refBuilder->get_widget_derived("derived_button", m_pDerivedButton);
     refBuilder->get_widget("standard_button", m_pStandardButton);
     refBuilder->get_widget("standard_button", m_pStandardButton);
@@ -171,7 +178,7 @@ int main(int argc, char* argv[])
     << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
 
   const int result = app->run(*main_win);
- 
+
   std::cout << "After app->run(*main_win)" << std::endl
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
