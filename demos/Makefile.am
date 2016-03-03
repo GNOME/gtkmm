@@ -54,6 +54,7 @@ GTK_DEMOS = \
   gtk-demo/example_overlay.cc \
   gtk-demo/example_panes.cc \
   gtk-demo/example_pixbufs.cc \
+  gtk-demo/example_shortcuts.cc \
   gtk-demo/example_sizegroup.cc \
   gtk-demo/example_stack.cc \
   gtk-demo/example_stacksidebar.cc \
@@ -64,6 +65,11 @@ GTK_DEMOS = \
 
 GTK_DEMO_RESOURCES = \
   gtk-demo/example_builder.ui \
+  gtk-demo/example_shortcuts.ui \
+  gtk-demo/example_shortcuts_boxes.ui \
+  gtk-demo/example_shortcuts_builder.ui \
+  gtk-demo/example_shortcuts_clocks.ui \
+  gtk-demo/example_shortcuts_gedit.ui \
   gtk-demo/alphatest.png \
   gtk-demo/apple-red.png \
   gtk-demo/background.jpg \

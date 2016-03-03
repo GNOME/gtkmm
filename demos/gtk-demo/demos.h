@@ -32,6 +32,7 @@ Gtk::Window* do_menus();
 Gtk::Window* do_overlay();
 Gtk::Window* do_panes();
 Gtk::Window* do_pixbufs();
+Gtk::Window* do_shortcuts();
 Gtk::Window* do_sizegroup();
 Gtk::Window* do_stack();
 Gtk::Window* do_stacksidebar();
@@ -69,6 +70,7 @@ Demo testgtk_demos[] =
   { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), nullptr },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), nullptr },
   { "Pixbufs", "example_pixbufs.cc", sigc::ptr_fun(&do_pixbufs), nullptr },
+  { "Shortcuts Window", "example_shortcuts.cc", sigc::ptr_fun(&do_shortcuts), nullptr },
   { "Size Groups", "example_sizegroup.cc", sigc::ptr_fun(&do_sizegroup), nullptr },
   { "Stack", "example_stack.cc", sigc::ptr_fun(&do_stack), nullptr },
   { "Stack Sidebar", "example_stacksidebar.cc", sigc::ptr_fun(&do_stacksidebar), nullptr },
