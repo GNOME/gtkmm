@@ -109,6 +109,7 @@ _CONV_ENUM(Gtk,RevealerTransitionType)
 _CONV_ENUM(Gtk,ScrollType)
 _CONV_ENUM(Gtk,SelectionMode)
 _CONV_ENUM(Gtk,ShadowType)
+_CONV_ENUM(Gtk,ShortcutType)
 _CONV_ENUM(Gtk,SizeGroupMode)
 _CONV_ENUM(Gtk,SortType)
 _CONV_ENUM(Gtk,SpinButtonUpdatePolicy)
@@ -582,6 +583,10 @@ _CONVERSION(`GtkBorder*',`Gtk::Border&',`Glib::wrap($3)')
 _CONVERSION(`const Border&',`const GtkBorder*',__FR2P)
 _CONVERSION(`Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`const GtkBorder*',`Border',`Glib::wrap(const_cast<GtkBorder*>($3))')
+
+_CONVERSION(`GtkShortcutsWindow*',`ShortcutsWindow*',__RP2P)
+_CONVERSION(`GtkShortcutsWindow*',`const ShortcutsWindow*',__RP2P)
+_CONVERSION(`ShortcutsWindow&',`GtkShortcutsWindow*',__FR2P)
 
 #FlowBoxChild
 _CONVERSION(`GtkFlowBoxChild*',`FlowBoxChild*',__RP2P)
