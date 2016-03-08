@@ -39,7 +39,7 @@ namespace
  * be handled by a single class.  Special handling is needed for signals that
  * don't support destroy notification; see the comment on connection_list_.
  */
-class GtkMainConnectionNode
+class GtkMainConnectionNode : public sigc::notifiable
 {
 public:
   // A function taking a connection id, e.g. gtk_timeout_remove().
@@ -47,8 +47,8 @@ public:
 
   explicit GtkMainConnectionNode(const sigc::slot_base& slot);
 
-  static void* notify(void* data);
-  static void destroy_notify_handler(void* data);
+  static void notify(sigc::notifiable* data);
+  static void destroy_notify_handler(sigc::notifiable* data);
 
   // Call this after installing the GTK+ callback.
   void install(guint conn_id, RemoveFunc remove_func, bool has_destroy_notify);
@@ -93,7 +93,7 @@ GtkMainConnectionNode::GtkMainConnectionNode(const sigc::slot_base& slot)
 }
 
 //static:
-void* GtkMainConnectionNode::notify(void* data)
+void GtkMainConnectionNode::notify(sigc::notifiable* data)
 {
   // notification from the sigc++ side ...
 
@@ -116,12 +116,10 @@ void* GtkMainConnectionNode::notify(void* data)
     // destruction of slot_ notifies all objects referring to it.
     delete self;
   }
-
-  return nullptr;
 }
 
 // static
-void GtkMainConnectionNode::destroy_notify_handler(void* data)
+void GtkMainConnectionNode::destroy_notify_handler(sigc::notifiable* data)
 {
   // notification from the gtk+ side ...
 
