@@ -7,5 +7,6 @@ ROOT_DIR="$(dirname "$0")/../.."
 GEN_DIR="$ROOT_DIR/tools/extra_defs_gen"
 OUT_DIR="$ROOT_DIR/gdk/src"
 
-"$GEN_DIR"/generate_defs_gdk > "$OUT_DIR"/gdk_signals.defs
+# Without LC_ALL=C documentation (docs "xxx") may be translated in the .defs file.
+LC_ALL=C "$GEN_DIR"/generate_defs_gdk > "$OUT_DIR"/gdk_signals.defs
 
