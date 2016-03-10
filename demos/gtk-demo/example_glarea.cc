@@ -81,11 +81,11 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_VBox.add(m_GLArea);
 
   // Connect gl area signals
-  m_GLArea.signal_realize().connect(sigc::mem_fun(this, &Example_GLArea::realize));
+  m_GLArea.signal_realize().connect(sigc::mem_fun(*this, &Example_GLArea::realize));
   // Important that the unrealize signal calls our handler to clean up
   // GL resources _before_ the default unrealize handler is called (the "false")
-  m_GLArea.signal_unrealize().connect(sigc::mem_fun(this, &Example_GLArea::unrealize), false);
-  m_GLArea.signal_render().connect(sigc::mem_fun(this, &Example_GLArea::render));
+  m_GLArea.signal_unrealize().connect(sigc::mem_fun(*this, &Example_GLArea::unrealize), false);
+  m_GLArea.signal_render().connect(sigc::mem_fun(*this, &Example_GLArea::render));
 
   m_VBox.add(m_Controls);
   m_Controls.set_hexpand(true);
@@ -99,7 +99,7 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_Button.set_hexpand(true);
   m_VBox.add(m_Button);
   // Connect clicked to close of window
-  m_Button.signal_clicked().connect(sigc::mem_fun(this, &Gtk::Window::close));
+  m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Gtk::Window::close));
 
   show_all();
 }
@@ -206,7 +206,7 @@ Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
   auto adj = Gtk::Adjustment::create(0.0, 0.0, 360.0, 1.0, 12.0, 0.0);
 
   adj->signal_value_changed().connect(
-    sigc::bind(sigc::mem_fun(this, &Example_GLArea::on_axis_value_change), axis, adj)
+    sigc::bind(sigc::mem_fun(*this, &Example_GLArea::on_axis_value_change), axis, adj)
                                       );
   auto slider = Gtk::manage(new Gtk::Scale{adj, Gtk::ORIENTATION_HORIZONTAL});
   box->add(*slider);
