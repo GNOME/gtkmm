@@ -548,6 +548,17 @@ Since: 3.0
 </description>
 </property>
 
+<property name="GdkDevice:num-touches">
+<description>
+The maximal number of concurrent touches on a touch device.
+Will be 0 if the device is not a touch device or if the number
+of touches is unknown.
+
+Since: 3.20
+
+</description>
+</property>
+
 <property name="GdkDevice:product-id">
 <description>
 Product ID of this device, see gdk_device_get_product_id().
@@ -746,7 +757,7 @@ Since: 3.20
 </parameter_description>
 </parameter>
 <parameter name="seat">
-<parameter_description> the seat that was just added
+<parameter_description> the seat that was just removed
 </parameter_description>
 </parameter>
 </parameters>
@@ -809,6 +820,119 @@ destination will do something that the source doesn’t understand.
 </parameter>
 </parameters>
 </enum>
+
+<enum name="GdkDragCancelReason">
+<description>
+Used in #GdkDragContext to the reason of a cancelled DND operation.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="GDK_DRAG_CANCEL_NO_TARGET">
+<parameter_description> There is no suitable drop target.
+</parameter_description>
+</parameter>
+<parameter name="GDK_DRAG_CANCEL_USER_CANCELLED">
+<parameter_description> Drag cancelled by the user
+</parameter_description>
+</parameter>
+<parameter name="GDK_DRAG_CANCEL_ERROR">
+<parameter_description> Unspecified error.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<signal name="GdkDragContext::action-changed">
+<description>
+A new action is being chosen for the drag and drop operation.
+
+This signal will only be emitted if the #GdkDragContext manages
+the drag and drop operation. See gdk_drag_context_manage_dnd()
+for more information.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="action">
+<parameter_description> The action currently chosen
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDragContext::cancel">
+<description>
+The drag and drop operation was cancelled.
+
+This signal will only be emitted if the #GdkDragContext manages
+the drag and drop operation. See gdk_drag_context_manage_dnd()
+for more information.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The object on which the signal is emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDragContext::dnd-finished">
+<description>
+The drag and drop operation was finished, the drag destination
+finished reading all data. The drag source can now free all
+miscellaneous data.
+
+This signal will only be emitted if the #GdkDragContext manages
+the drag and drop operation. See gdk_drag_context_manage_dnd()
+for more information.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The object on which the signal is emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDragContext::drop-performed">
+<description>
+The drag and drop operation was performed on an accepting client.
+
+This signal will only be emitted if the #GdkDragContext manages
+the drag and drop operation. See gdk_drag_context_manage_dnd()
+for more information.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="time">
+<parameter_description> the time at which the drop happened.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
 
 <enum name="GdkDragProtocol">
 <description>
@@ -2512,7 +2636,7 @@ in #GdkEventScroll. See gdk_event_get_scroll_deltas(). Since: 3.4
 
 <signal name="GdkSeat::device-added">
 <description>
-The ::device-added signal is emitted either when a new input
+The ::device-added signal is emitted when a new input
 device is related to this seat.
 
 Since: 3.20
@@ -2533,7 +2657,7 @@ Since: 3.20
 
 <signal name="GdkSeat::device-removed">
 <description>
-The ::device-removed signal is emitted either when an
+The ::device-removed signal is emitted when an
 input device is removed (e.g. unplugged).
 
 Since: 3.20
@@ -4128,6 +4252,7 @@ platforms can be found in the CSS specification:
 - ![](default_cursor.png) &quot;default&quot;
 - ![](help_cursor.png) &quot;help&quot;
 - ![](pointer_cursor.png) &quot;pointer&quot;
+- ![](pointer_cursor.png) &quot;context-menu&quot;
 - ![](progress_cursor.png) &quot;progress&quot;
 - ![](wait_cursor.png) &quot;wait&quot;
 - ![](cell_cursor.png) &quot;cell&quot;
@@ -5089,7 +5214,7 @@ and there aren’t other means to get a meaningful #GdkDevice to operate on.
 
 Since: 3.0
 
-Deprecated: 3.20.
+Deprecated: 3.20: Use gdk_seat_get_pointer() instead.
 
 </description>
 <parameters>
@@ -5132,7 +5257,7 @@ Returns the list of devices of type @type currently attached to
 Since: 3.0
 
 Deprecated: 3.20, use gdk_seat_get_pointer(), gdk_seat_get_keyboard()
-and gdk_seat_list_slaves() instead.
+and gdk_seat_get_slaves() instead.
 
 </description>
 <parameters>
@@ -6376,6 +6501,9 @@ Aborts a drag without dropping.
 
 This function is called by the drag source.
 
+This function does not need to be called in managed drag and drop
+operations. See gdk_drag_context_manage_dnd() for more information.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -6646,6 +6774,47 @@ Since: 2.22
 </return>
 </function>
 
+<function name="gdk_drag_context_manage_dnd">
+<description>
+Requests the drag and drop operation to be managed by @context.
+When a drag and drop operation becomes managed, the #GdkDragContext
+will internally handle all input and source-side #GdkEventDND events
+as required by the windowing system.
+
+Once the drag and drop operation is managed, the drag context will
+emit the following signals:
+- The #GdkDragContext::action-changed signal whenever the final action
+to be performed by the drag and drop operation changes.
+- The #GdkDragContext::drop-performed signal after the user performs
+the drag and drop gesture (typically by releasing the mouse button).
+- The #GdkDragContext::dnd-finished signal after the drag and drop
+operation concludes (after all #GdkSelection transfers happen).
+- The #GdkDragContext::cancel signal if the drag and drop operation is
+finished but doesn't happen over an accepting destination, or is
+cancelled through other means.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+<parameter name="ipc_window">
+<parameter_description> Window to use for IPC messaging/events
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the actions supported by the drag source
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if the drag and drop operation is managed.
+
+</return>
+</function>
+
 <function name="gdk_drag_context_set_device">
 <description>
 Associates a #GdkDevice to @context, so all Drag and Drop events
@@ -6697,6 +6866,9 @@ Drops on the current destination.
 
 This function is called by the drag source.
 
+This function does not need to be called in managed drag and drop
+operations. See gdk_drag_context_manage_dnd() for more information.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -6719,6 +6891,10 @@ for @success may trigger a drag cancellation animation.
 This function is called by the drag source, and should
 be the last call before dropping the reference to the
 @context.
+
+The #GdkDragContext will only take the first gdk_drag_drop_done()
+call as effective, if this function is called multiple times,
+all subsequent calls will be ignored.
 
 Since: 3.20
 
@@ -6824,6 +7000,9 @@ Updates the drag context when the pointer moves or the
 set of actions changes.
 
 This function is called by the drag source.
+
+This function does not need to be called in managed drag and drop
+operations. See gdk_drag_context_manage_dnd() for more information.
 
 
 </description>
@@ -7483,6 +7662,30 @@ gdk_event_handler_set() is called with another event handler.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_event_is_scroll_stop_event">
+<description>
+Check whether a scroll event is a stop scroll event. Scroll sequences
+with smooth scroll information may provide a stop scroll event once the
+interaction with the device finishes, e.g. by lifting a finger. This
+stop scroll event is the signal that a widget may trigger kinetic
+scrolling based on the current velocity.
+
+Stop scroll events always have a a delta of 0/0.
+
+Since: 3.20
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event is a scroll stop event
+
+</return>
 </function>
 
 <function name="gdk_event_new">
@@ -13528,6 +13731,9 @@ The union of rectangles @src1 and @src2 is the smallest rectangle which
 includes both @src1 and @src2 within it.
 It is allowed for @dest to be the same as either @src1 or @src2.
 
+Note that this function does not ignore 'empty' rectangles (ie. with
+zero width or height).
+
 </description>
 <parameters>
 <parameter name="src1">
@@ -13778,7 +13984,9 @@ default font options have been set.
 
 <function name="gdk_screen_get_height">
 <description>
-Gets the height of @screen in pixels
+Gets the height of @screen in pixels. The returned size is in
+”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 Since: 2.2
 
@@ -13871,7 +14079,9 @@ close to @window.
 <function name="gdk_screen_get_monitor_geometry">
 <description>
 Retrieves the #GdkRectangle representing the size and position of
-the individual monitor within the entire screen area.
+the individual monitor within the entire screen area. The returned
+geometry is in ”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 Monitor numbers start at 0. To obtain the number of monitors of
 @screen, use gdk_screen_get_n_monitors().
@@ -13949,7 +14159,7 @@ of the monitor, or %NULL if the name cannot be determined
 
 <function name="gdk_screen_get_monitor_scale_factor">
 <description>
-Returns the internal scale factor that maps from monitor coordiantes
+Returns the internal scale factor that maps from monitor coordinates
 to the actual device pixels. On traditional systems this is 1, but
 on very high density outputs this can be a higher value (often 2).
 
@@ -13999,7 +14209,9 @@ Since: 2.14
 <function name="gdk_screen_get_monitor_workarea">
 <description>
 Retrieves the #GdkRectangle representing the size and position of
-the “work area” on a monitor within the entire screen area.
+the “work area” on a monitor within the entire screen area. The returned
+geometry is in ”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 The work area should be considered when positioning menus and
 similar popups, to avoid placing them below panels, docks or other
@@ -14242,7 +14454,9 @@ list of toplevel windows, free with g_list_free()
 
 <function name="gdk_screen_get_width">
 <description>
-Gets the width of @screen in pixels
+Gets the width of @screen in pixels. The returned size is in
+”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 Since: 2.2
 
@@ -14315,7 +14529,9 @@ list of #GdkWindows for the current window stack, or %NULL.
 
 <function name="gdk_screen_height">
 <description>
-Returns the height of the default screen in pixels.
+Gets the height of the default screen in pixels. The returned
+size is in ”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 
 </description>
@@ -14457,7 +14673,9 @@ involved; the terminology is conventional.)
 
 <function name="gdk_screen_width">
 <description>
-Returns the width of the default screen in pixels.
+Gets the width of the default screen in pixels. The returned
+size is in ”application pixels”, not in ”device pixels” (see
+gdk_screen_get_monitor_scale_factor()).
 
 
 </description>
@@ -14511,8 +14729,8 @@ Returns the #GdkDisplay this seat belongs to.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GdkDisplay. This memory is owned by GTK+ and
-must not be freed.
+<return> a #GdkDisplay. This object is owned by GTK+
+and must not be freed.
 </return>
 </function>
 
@@ -14530,8 +14748,7 @@ Since: 3.20
 </parameter>
 </parameters>
 <return> a master #GdkDevice with keyboard
-capabilities. This object is owned by GTK+ and must not be
-freed.
+capabilities. This object is owned by GTK+ and must not be freed.
 
 </return>
 </function>
@@ -14550,8 +14767,7 @@ Since: 3.20
 </parameter>
 </parameters>
 <return> a master #GdkDevice with pointer
-capabilities. This object is owned by GTK+ and must not be
-freed.
+capabilities. This object is owned by GTK+ and must not be freed.
 
 </return>
 </function>
@@ -14573,8 +14789,8 @@ Since: 3.20
 </parameter_description>
 </parameter>
 </parameters>
-<return> A list of #GdkDevices. The list
-must be freed with g_list_free(), the elements are owned
+<return> A list of #GdkDevices.
+The list must be freed with g_list_free(), the elements are owned
 by GDK and must not be freed.
 
 </return>
@@ -14600,8 +14816,8 @@ is used for Drag and Drop operations, popup menus and such.
 Note that if the event mask of a #GdkWindow has selected both button press
 and button release events, or touch begin and touch end, then a press event
 will cause an automatic grab until the button is released, equivalent to a
-grab on the window with @owner_events set to %TRUE. This performed as most
-applications expect to receive presses and releases in pairs.
+grab on the window with @owner_events set to %TRUE. This is done because most
+applications expect to receive paired press and release events.
 
 If you set up anything at the time you take the grab that needs to be
 cleaned up when the grab ends, you should handle the #GdkEventGrabBroken
@@ -14645,8 +14861,9 @@ is available.
 </parameter_description>
 </parameter>
 <parameter name="prepare_func">
-<parameter_description> function to prepare the window to be
-grabbed, it can be %NULL if @window is visible before this call.
+<parameter_description> function to
+prepare the window to be grabbed, it can be %NULL if @window is
+visible before this call.
 </parameter_description>
 </parameter>
 <parameter name="prepare_func_data">
@@ -15721,7 +15938,12 @@ should not be freed. %NULL may be returned if no visual has type
 <description>
 Returns the number of significant bits per red, green and blue value.
 
+Not all GDK backend provide a meaningful value for this function.
+
 Since: 2.22
+
+Deprecated: 3.22. Use gdk_visual_get_red_pixel_details() and its variants to
+learn about the pixel layout of TrueColor and DirectColor visuals
 
 </description>
 <parameters>
@@ -15771,7 +15993,13 @@ Since: 2.22
 <description>
 Returns the byte order of this visual.
 
+The information returned by this function is only relevant
+when working with XImages, and not all backends return
+meaningful information for this.
+
 Since: 2.22
+
+Deprecated: 3.22: This information is not useful
 
 </description>
 <parameters>
@@ -15789,7 +16017,12 @@ Since: 2.22
 <description>
 Returns the size of a colormap for this visual.
 
+You have to use platform-specific APIs to manipulate colormaps.
+
 Since: 2.22
+
+Deprecated: 3.22: This information is not useful, since GDK does not
+provide APIs to operate on colormaps.
 
 </description>
 <parameters>
