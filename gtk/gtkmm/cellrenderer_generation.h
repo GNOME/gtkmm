@@ -36,12 +36,12 @@ namespace CellRenderer_Generation
 template<class T_ModelColumnType> //e.g. bool or Glib::ustring.
 CellRenderer* generate_cellrenderer(bool editable = false)
 {
-  CellRendererText* pCellRenderer = new CellRendererText(); //the default - template specializations will use other renderers.
+  auto cell_renderer = new CellRendererText(); //the default - template specializations will use other renderers.
   //CellRendererText can render both strings and numerical values.
 
-  pCellRenderer->property_editable() = editable;
+  cell_renderer->property_editable() = editable;
 
-  return pCellRenderer;
+  return cell_renderer;
 }
 
 #if !defined(__GNUC__) || __GNUC__ > 2
