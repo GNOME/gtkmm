@@ -3,7 +3,7 @@
  * Demonstrates migrating a window between different displays.
  * A display is a mouse and keyboard with some number of
  * associated monitors. The neat thing about having multiple 
- * displays is that they can be on a completely separate
+ * displays is that they can be on completely separate
  * computers, as long as there is a network connection to the
  * computer where the application is running.
  *
@@ -272,7 +272,7 @@ void Example_ChangeDisplay::query_change_display()
    "to move to the new screen");
 
   if (pTopLevel)
-    pTopLevel->set_screen( m_refCurrentDisplay->get_screen() );
+    pTopLevel->set_screen( m_refCurrentDisplay->get_default_screen() );
   else
     refScreen->get_display()->beep();
 }
