@@ -83,10 +83,10 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
   pButtonBox->set_layout(layout);
   pButtonBox->set_spacing(spacing);
 
-  Gtk::Button* pButton = Gtk::manage(new Gtk::Button("_OK"));
+  Gtk::Button* pButton = Gtk::manage(new Gtk::Button("_OK", true));
   pButtonBox->add(*pButton);
 
-  pButton = Gtk::manage(new Gtk::Button("_Cancel"));
+  pButton = Gtk::manage(new Gtk::Button("_Cancel", true));
   pButtonBox->add(*pButton);
 
   pButton = Gtk::manage(new Gtk::Button());
