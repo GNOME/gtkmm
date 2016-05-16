@@ -160,7 +160,7 @@ protected:
 
   // Dialog box, showing icon details:
   DetailDialog m_details;
-  
+
   Glib::RefPtr<Glib::Binding> m_binding_search_button_search_entry;
   Glib::ustring m_current_context_id;
   Glib::RefPtr<Gtk::TreeModelFilter> m_filter_model;

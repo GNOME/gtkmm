@@ -11,7 +11,7 @@ void on_destroyed_menuderived(GtkWidget*, gpointer)
   std::cout << "on_destroyed_menuderived" << std::endl;
 }
 
-//Previously, this derived from a Gtk::ComboBox, 
+//Previously, this derived from a Gtk::ComboBox,
 //and that might have been necessary to trigger the bug at the time,
 //but ComboBox is now deprecated.
 class ComboBoxTextDerived : public Gtk::ComboBoxText
@@ -22,7 +22,7 @@ public:
     g_signal_connect (gobj(), "destroy",
 				G_CALLBACK (on_destroyed_ComboBoxderived), NULL);
   }
-  
+
   ~ComboBoxTextDerived()
   {
     //remove_menu();
@@ -38,11 +38,11 @@ public:
   g_signal_connect (gobj(), "destroy",
 				G_CALLBACK (on_destroyed_menuderived), NULL);
   }
-  
+
   ~MenuDerived()
   {
     std::cout << "~MenuDerived() 1" << std::endl;
- 
+
     std::cout << "~MenuDerived() 2" << std::endl;
 
   }
@@ -57,7 +57,7 @@ public:
     std::cout << "~test_window()1" << std::endl;
 
    }
-  
+
 protected:
 
   //Gtk::MenuItem m_MenuItem;

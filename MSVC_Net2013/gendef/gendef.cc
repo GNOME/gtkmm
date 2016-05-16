@@ -22,7 +22,7 @@
 
 /* Modified by Cedric Gustin <cedric.gustin@gmail.com> on 2006/01/13 :
  * Redirect the output of dumpbin to dumpbin.out instead of reading the
- * output stream of popen, as it fails with Visual Studio 2005 in 
+ * output stream of popen, as it fails with Visual Studio 2005 in
  * pre-link build events.
  */
 
@@ -48,8 +48,8 @@ int main(int argc,char** argv)
 	  dumpbin += argv[i++];
   }
 
-  FILE * dump; 
-  
+  FILE * dump;
+
   if( (dump = _popen(dumpbin.c_str(),"r")) == NULL ) {
 	  cerr << "could not popen dumpbin" << endl;
 	  return 3;
@@ -66,8 +66,8 @@ int main(int argc,char** argv)
 
   i=0;
   while( !feof(dump)) {
-	  char buf [65000]; 
-	  
+	  char buf [65000];
+
 	  if( fgets( buf, 64999, dump ) != NULL ) {
 		  if(!strstr(buf," UNDEF ") && strstr(buf," External ")) {
 			  char *s = strchr(buf,'|') + 1;
@@ -75,9 +75,9 @@ int main(int argc,char** argv)
 			  char *e=s;
 			  while(*e != ' ' && *e != '\t' && *e != '\0' && *e!= '\n') e++;
 			  *e = '\0';
-			
+
 			if(strchr(s,'?')==0 && s[0]=='_' && strchr(s,'@') == 0 )//this is a C export type: _fct -> fct
-				  def_file << "    " << (s+1) << endl;			
+				  def_file << "    " << (s+1) << endl;
 			else
 			if(strchr(s,'?')!=0 && strncmp(s,"??_G",4)!=0 && strncmp(s,"??_E",4)!=0) {
 				  def_file << "    " << s << endl;

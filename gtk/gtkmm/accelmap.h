@@ -53,8 +53,8 @@ namespace AccelMap
  * @param accel_mods the accelerator modifiers
  *
  */
-void add_entry(const std::string& accel_path, 
-               guint accel_key, 
+void add_entry(const std::string& accel_path,
+               guint accel_key,
                Gdk::ModifierType accel_mods);
 
 /** Changes the accel_key and accel_mods currently associated with accel_path.
@@ -69,9 +69,9 @@ void add_entry(const std::string& accel_path,
  * @param accel_mods  the new accelerator modifiers
  * @param replace     true if other accelerators may be deleted upon conflicts
  * @result     true if the accelerator could be changed, false otherwise
- */               
-bool change_entry(const std::string& accel_path, 
-                  guint accel_key, 
+ */
+bool change_entry(const std::string& accel_path,
+                  guint accel_key,
                   Gdk::ModifierType accel_mods,
                   bool replace);
 
@@ -79,7 +79,7 @@ bool change_entry(const std::string& accel_path,
  * accelerator specifications, and propagates them accordingly.
  *
  * @param filename a file containing accelerator specifications
- */                  
+ */
 void load(const std::string& filename);
 
 /** Saves current accelerator specifications (accelerator path, key

@@ -22,15 +22,15 @@
 
 
 class ExampleOptionGroup : public Glib::OptionGroup
-{ 
+{
 public:
   ExampleOptionGroup();
 
   bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
   bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
   void on_error(Glib::OptionContext& context, Glib::OptionGroup& group) override;
-  
-  //These int instances should live as long as the OptionGroup to which they are added, 
+
+  //These int instances should live as long as the OptionGroup to which they are added,
   //and as long as the OptionContext to which those OptionGroups are added.
   int m_arg_foo;
   std::string m_arg_filename;
@@ -48,24 +48,24 @@ ExampleOptionGroup::ExampleOptionGroup()
   entry1.set_short_name('f');
   entry1.set_description("The Foo");
   add_entry(entry1, m_arg_foo);
-      
+
   Glib::OptionEntry entry2;
   entry2.set_long_name("file");
   entry2.set_short_name('F');
   entry2.set_description("The Filename");
   add_entry_filename(entry2, m_arg_filename);
- 
+
   Glib::OptionEntry entry3;
   entry3.set_long_name("goo");
   entry3.set_short_name('g');
   entry3.set_description("The Goo");
   add_entry(entry3, m_arg_goo);
-  
+
   Glib::OptionEntry entry4;
   entry4.set_long_name("activate_something");
   entry4.set_description("Activate something");
   add_entry(entry4, m_arg_boolean);
-  
+
   Glib::OptionEntry entry5;
   entry5.set_long_name("list");
   entry5.set_short_name('l');
@@ -95,25 +95,25 @@ int main(int argc, char *argv[])
   //This example should be executed like so:
   //./example --foo=1 --bar=2 --goo=abc
   //./example --help
-   
+
   Glib::OptionContext context;
-  
+
   ExampleOptionGroup group;
   context.set_main_group(group);
-  
+
   try
   {
     Glib::RefPtr<Gtk::Application> app =
       Gtk::Application::create(argc, argv);
-  
+
     //Here we can see the parsed values of our custom command-line arguments:
 
     std::cout << "parsed values: " << std::endl <<
-      "  foo = " << group.m_arg_foo << std::endl << 
+      "  foo = " << group.m_arg_foo << std::endl <<
       "  filename = " << group.m_arg_filename << std::endl <<
       "  activate_something = " << (group.m_arg_boolean ? "enabled" : "disabled") << std::endl <<
       "  goo = " << group.m_arg_goo << std::endl;
-    
+
     //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
     std::cout << "  list = ";
     for(auto str : group.m_arg_list)
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
       std::cout << str << ", ";
     }
     std::cout << std::endl;
- 
+
 
     //Any standard GTK+ command-line arguments will have an effect on this window:
     //Try --name="bobble" to change the window's title to "bobble", for instance.

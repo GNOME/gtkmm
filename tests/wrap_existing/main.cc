@@ -29,7 +29,7 @@ int main(int argc, char**argv)
   //Set a quark and a callback:
   initialize_quark();
   int a = 0; // (This doesn't work unless we have a non-null value for the 3rd parameter.)
-  g_object_set_qdata_full((GObject*)pBox->gobj(), quark_test, &a, &on_object_qdata_destroyed); 
+  g_object_set_qdata_full((GObject*)pBox->gobj(), quark_test, &a, &on_object_qdata_destroyed);
 
   g_warning("vbox refcount=%d", G_OBJECT(pBox->gobj())->ref_count);
 

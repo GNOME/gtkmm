@@ -33,7 +33,7 @@ ExampleWindow::ExampleWindow()
 
     m_button = manage(new MyButton);
     add(*m_button);
-	
+
     show_all_children();
 }
 

@@ -49,16 +49,16 @@ ListViewText::ListViewText(guint columns_count, bool editable, Gtk::SelectionMod
 : m_model_columns(columns_count)
 {
   char column_title[20];
-  
+
   // Create model
-  m_model = Gtk::ListStore::create(m_model_columns);	
+  m_model = Gtk::ListStore::create(m_model_columns);
   set_model(m_model);
 
   // Append columns
   for(guint i = 0; i < columns_count; ++i)
   {
     //Get text for the number:
-    sprintf(column_title, "%d", i);		
+    sprintf(column_title, "%d", i);
 
     if(editable)
       append_column_editable(column_title, m_model_columns.m_columns[i]);
@@ -128,7 +128,7 @@ Glib::ustring ListViewText::get_text(guint row, guint column) const
 
   g_return_val_if_fail( row < size(), result );
 
-  Gtk::TreeModel::iterator iter = m_model->children()[row];	 
+  Gtk::TreeModel::iterator iter = m_model->children()[row];
   iter->get_value(column, result);
 
   return result;

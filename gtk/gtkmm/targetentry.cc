@@ -56,7 +56,7 @@ TargetEntry::TargetEntry(const TargetEntry& src)
 
 TargetEntry::~TargetEntry() noexcept
 {
-  //See https://bugzilla.gnome.org/show_bug.cgi?id=565665#c10 about the 
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=565665#c10 about the
   //const_cast<>.
   g_free(const_cast<char*>(gobject_.target));
 }

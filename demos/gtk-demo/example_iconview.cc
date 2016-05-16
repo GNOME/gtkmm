@@ -23,9 +23,9 @@ protected:
   virtual void on_button_up();
   virtual void on_button_home();
   virtual void on_iconview_item_activated(const Gtk::TreeModel::Path& path);
-  
+
   virtual int on_model_sort(const Gtk::TreeModel::iterator& a, const Gtk::TreeModel::iterator& b);
-  
+
   class ModelColumns : public Gtk::TreeModelColumnRecord
   {
   public:
@@ -39,10 +39,10 @@ protected:
   };
 
   const ModelColumns m_columns;
-  
+
   Glib::RefPtr<Gtk::ListStore> m_model;
   Glib::RefPtr<Gdk::Pixbuf> m_refPixbufFile, m_refPixbufFolder;
-  
+
   std::string m_parent;
 
   //Member widgets:
@@ -69,7 +69,7 @@ Example_IconView::Example_IconView()
 
   set_title("Icon View");
   set_default_size(650, 400);
-  
+
   try
   {
     m_refPixbufFile = Gdk::Pixbuf::create_from_resource("/iconview/gnome-fs-regular.png");
@@ -79,9 +79,9 @@ Example_IconView::Example_IconView()
   {
     std::cout << error.what() << std::endl;
   }
-  
+
   m_VBox.pack_start(m_Toolbar, Gtk::PACK_SHRINK);
-  
+
   m_ButtonUp.set_is_important();
   m_ButtonUp.set_sensitive();
   m_Toolbar.append(m_ButtonUp);
@@ -89,40 +89,40 @@ Example_IconView::Example_IconView()
   m_ButtonHome.set_is_important();
   m_ButtonHome.set_sensitive();
   m_Toolbar.append(m_ButtonHome);
-    
+
   m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-  
+
   m_VBox.pack_start(m_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
- 
+
   //Create the data model:
   m_model = Gtk::ListStore::create(m_columns);
   m_model->set_default_sort_func( sigc::mem_fun(*this, &Example_IconView::on_model_sort) );
   m_model->set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
-  
+
   /* and fill it with the contents of '/' */
   m_parent = "/";
   fill_store();
-  
+
   m_IconView.set_model(m_model);
   m_IconView.set_selection_mode(Gtk::SELECTION_MULTIPLE);
-  
+
   //Connect signals:
   m_ButtonUp.signal_clicked().connect( sigc::mem_fun(*this, &Example_IconView::on_button_up) );
   m_ButtonHome.signal_clicked().connect( sigc::mem_fun(*this, &Example_IconView::on_button_home) );
-  
+
   /* We now set which model columns that correspont to the text
    * and pixbuf of each item
    */
   m_IconView.set_text_column(m_columns.display_name);
   m_IconView.set_pixbuf_column(m_columns.pixbuf);
-   
+
   m_IconView.signal_item_activated().connect( sigc::mem_fun(*this, &Example_IconView::on_iconview_item_activated) );
 
   m_ScrolledWindow.add(m_IconView);
-   
+
   m_IconView.grab_focus();
-  
+
   add(m_VBox);
 
   show_all();
@@ -136,10 +136,10 @@ int Example_IconView::on_model_sort(const Gtk::TreeModel::iterator& a, const Gtk
 
   Gtk::TreeModel::Row row_a = *a;
   Gtk::TreeModel::Row row_b = *b;
-  
+
   const bool a_is_dir = row_a[m_columns.is_directory];
   const bool b_is_dir = row_b[m_columns.is_directory];
-    
+
   if(!a_is_dir && b_is_dir)
     return 1;
   else if (a_is_dir && !b_is_dir)
@@ -151,7 +151,7 @@ int Example_IconView::on_model_sort(const Gtk::TreeModel::iterator& a, const Gtk
   }
 }
 
-   
+
 Example_IconView::~Example_IconView()
 {
 }
@@ -185,7 +185,7 @@ void Example_IconView::fill_store()
   try
   {
     Glib::Dir dir(m_parent); //throws an exception if it fails.
-  
+
     std::string name = dir.read_name();
     while(!name.empty())
     {
@@ -204,7 +204,7 @@ void Example_IconView::fill_store()
         row[m_columns.is_directory] = is_dir;
         row[m_columns.pixbuf] = (is_dir ? m_refPixbufFolder : m_refPixbufFile);
       }
-    
+
       name = dir.read_name();
     }
   }
@@ -227,7 +227,7 @@ void Example_IconView::on_iconview_item_activated(const Gtk::TreeModel::Path& pa
     {
       m_parent = filepath;
       fill_store();
-     
+
        /* Sensitize the up button */
       m_ButtonUp.set_sensitive();
     }

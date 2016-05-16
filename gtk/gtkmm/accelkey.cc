@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /* $Id$ */
 
-/* 
+/*
  *
  * Copyright 1998-2002 The gtkmm Development Team
  *

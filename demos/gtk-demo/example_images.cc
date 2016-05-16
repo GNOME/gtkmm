@@ -140,7 +140,7 @@ bool Example_Images::on_timeout()
     }
     catch(const Glib::Error& error)
     {
-     
+
       Glib::ustring strMsg = "Failure reading image 'alphatest.png': ";
       strMsg += error.what();
 

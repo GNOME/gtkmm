@@ -3,7 +3,7 @@
 #define _GTKMM_ACCELKEY_H
 
 /* menu_elems.h
- * 
+ *
  * Copyright (C) 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ namespace Gtk
  *
  * By defining accelerator paths you can allow the user of your application
  * to change accelerators himself. An example of an accelerator might be
- * "<MainWindow>/File/Open". Modified accelerators may be saved 
+ * "<MainWindow>/File/Open". Modified accelerators may be saved
  * @see Gtk::AccelMap
  * @ingroup Menus
  */
@@ -48,16 +48,16 @@ public:
   * @param accel_mods For instance, Gdk::CONTROL_MASK
   * @param accel_path For instance, "<MainWindow>/File/Open"
   */
-  AccelKey(guint accel_key, Gdk::ModifierType accel_mods, 
+  AccelKey(guint accel_key, Gdk::ModifierType accel_mods,
            const Glib::ustring& accel_path = "");
-  
+
   /** AccelKey constructor.
-   * @param accelerator For instance, &quot;&lt;control&gt;q&quot; - Use 
-   *     &lt;control&gt;, &lt;shift&gt;, &lt;alt&gt; and &lt;release&gt;. 
+   * @param accelerator For instance, &quot;&lt;control&gt;q&quot; - Use
+   *     &lt;control&gt;, &lt;shift&gt;, &lt;alt&gt; and &lt;release&gt;.
    *     Use F1, F2, etc, for function keys.
    * @param accel_path For instance, "<MainWindow>/File/Open"
    */
-  AccelKey(const Glib::ustring& accelerator, 
+  AccelKey(const Glib::ustring& accelerator,
            const Glib::ustring& accel_path = Glib::ustring());
 
   AccelKey(const AccelKey& src);

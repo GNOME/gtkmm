@@ -38,9 +38,9 @@ public:
     g_signal_connect (G_OBJECT(m_ScrolledWindow.get_child()->gobj()), "destroy", G_CALLBACK(on_viewport_destroyed), NULL);
 
    g_signal_connect (G_OBJECT(m_pLabel.gobj()), "destroy", G_CALLBACK(on_gtklabel_destroyed), NULL);
-    
+
   }
- 
+
   virtual ~Instance()
   {
     printf("~Instance() 1\n");
@@ -56,7 +56,7 @@ protected:
 };
 
 int main ( int argc, char *argv[] ) {
-  
+
   Glib::RefPtr<Gtk::Application> app =
     Gtk::Application::create(argc, argv);
 

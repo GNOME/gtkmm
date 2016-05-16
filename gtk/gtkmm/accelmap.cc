@@ -24,16 +24,16 @@ namespace Gtk
 namespace AccelMap
 {
 
-void add_entry(const std::string& accel_path, 
-               guint accel_key, 
+void add_entry(const std::string& accel_path,
+               guint accel_key,
                Gdk::ModifierType accel_mods)
 {
     gtk_accel_map_add_entry(accel_path.c_str(), accel_key,
                             (GdkModifierType)accel_mods);
 }
 
-bool change_entry(const std::string& accel_path, 
-                  guint accel_key, 
+bool change_entry(const std::string& accel_path,
+                  guint accel_key,
                   Gdk::ModifierType accel_mods,
                   bool replace)
 {

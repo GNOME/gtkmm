@@ -73,7 +73,7 @@ protected:
 
   GSList* group_;
 };
-  
+
 } // namespace Gtk
 
 

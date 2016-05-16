@@ -29,7 +29,7 @@ namespace Gtk
 /** A simple listbox which presents some lines of information in columns and lets the user select some of them.
  *
  * This is a convenience class, based on Gtk::TreeView, which allows only text values and does not allow child items.
- * In most cases you will actually need the functionality offered by a real Gtk::TreeView with your own type-safe 
+ * In most cases you will actually need the functionality offered by a real Gtk::TreeView with your own type-safe
  * Gtk::TreeModel::ColumnRecord.
  *
  * @ingroup Widgets
@@ -86,7 +86,7 @@ public:
 
   /** Change an existing value of cell of the list.
    * @param row the number of the row in the list.
-   * @param column the number of the column in the row.	 
+   * @param column the number of the column in the row.
    * @param value the new contents of that row and column.
    */
   void set_text(guint row, guint column, const Glib::ustring& value);

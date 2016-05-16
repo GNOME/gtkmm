@@ -58,7 +58,7 @@ public:
    * @param id string representation of the stock id. Usually something like "gtk-about".
    *
    * If id is 0 an empty StockID will be created.
-   */  
+   */
   explicit StockID(const char* id);
   ~StockID() noexcept;
 
@@ -72,9 +72,9 @@ public:
    */
   StockID& operator=(const StockID& other);
 
-  /** This typedef is just to make it more obvious that 
+  /** This typedef is just to make it more obvious that
    * our operator const void* should be used like operator bool().
-   */ 
+   */
   typedef const void* BoolExpr;
 
   /** Tests whether the StockID is not empty.

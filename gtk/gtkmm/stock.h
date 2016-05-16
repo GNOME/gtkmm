@@ -290,7 +290,7 @@ extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html gt
 
 /** Add a stock item to the list of registered stock items.
  * @param item StockItem to register. If an item already exists with the same
- *             stock ID the old item gets replaced. 
+ *             stock ID the old item gets replaced.
  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
  */
 void add(const Gtk::StockItem& item);
@@ -320,7 +320,7 @@ bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
   *
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise
   * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
-  */  
+  */
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image);
 
 /** Retrieves a list of all known stock IDs added to an IconFactory or registered with Stock::add().

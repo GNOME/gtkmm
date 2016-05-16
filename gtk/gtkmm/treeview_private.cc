@@ -40,7 +40,7 @@ void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell
     if(!cppiter->get_model_gobject())
     {
       g_warning("SignalProxy_CellData_gtk_callback() The cppiter has no model\n");
-      return; 
+      return;
     }
 
     (*the_slot)(Glib::wrap(cell, false), cppiter);

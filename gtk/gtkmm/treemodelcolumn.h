@@ -79,7 +79,7 @@ public:
    * you're free to pass it around by value.
    */
   void add(TreeModelColumnBase& column);
-  
+
   unsigned int size()  const;
   const GType* types() const;
 

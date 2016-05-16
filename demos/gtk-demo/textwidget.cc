@@ -20,7 +20,7 @@
 #include <cstring>
 #include "textwidget.h"
 #include "pangomm/fontdescription.h"
-  
+
 using std::strstr;
 using std::strncmp;
 using std::strlen;
@@ -203,7 +203,7 @@ parse_chars (constpch text,
       *state = STATE_NORMAL;
       *tag = "comment";
     }
-    
+
     return;
   }
 
@@ -242,7 +242,7 @@ parse_chars (constpch text,
       return;
     }
   }
-  
+
   /* check for types */
   for (i = 0; types[i] != nullptr; i++)
     if (!strncmp (text, types[i], strlen (types[i])))
@@ -268,7 +268,7 @@ parse_chars (constpch text,
 
     *end_ptr = text + 1;
     *tag = "string";
-      
+
     while (**end_ptr != '\000')
     {
       if (**end_ptr == '\"' && !maybe_escape)
@@ -276,7 +276,7 @@ parse_chars (constpch text,
         *end_ptr += 1;
         return;
       }
-      
+
       if (**end_ptr == '\\')
         maybe_escape = true;
       else

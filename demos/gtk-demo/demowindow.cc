@@ -297,11 +297,11 @@ void DemoWindow::load_file(const std::string& filename)
     	      refBufferInfo->apply_tag_by_name("title", start, end);
 
     	      start = end;
-      	
+
     	      state++;
     	    }
     	    break;
-  	
+
       	case 1:
       	  /* Reading body of info section */
       	  while (isspace (*p))
@@ -315,14 +315,14 @@ void DemoWindow::load_file(const std::string& filename)
       	  else
     	    {
     	      int len;
-        	
+
     	      while (*p == '*' || isspace (*p))
     		      p++;
 
     	      len = strlen (p);
     	      while (isspace (*(p + len - 1)))
     		     len--;
-        	
+
     	      if (len > 0)
                 {
                   if (in_para)
@@ -354,7 +354,7 @@ void DemoWindow::load_file(const std::string& filename)
           }
       	  else
       	    break;
-        	
+
       	case 3:
       	  /* Reading program body */
       	  start = refBufferSource->insert(start, p);

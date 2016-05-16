@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 #endif
             << get_defs( GTK_TYPE_POPOVER )
             << get_defs( GTK_TYPE_POPOVER_MENU )
-#if !defined(G_OS_WIN32) 
+#if !defined(G_OS_WIN32)
             << get_defs( GTK_TYPE_PRINTER )
             << get_defs( GTK_TYPE_PRINT_JOB )
 #endif /* G_OS_WIN32 */
