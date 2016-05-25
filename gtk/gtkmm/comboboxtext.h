@@ -35,6 +35,14 @@ namespace Gtk
  *
  * You should not call set_model() or attempt to pack more cells into this combo box via its CellLayout base class.
  *
+ * You can't use this class with Gtk::Builder::get_widget() or
+ * Gtk::Builder::get_widget_derived() to get a GtkComboBoxText object from a
+ * Glade file. Gtk::ComboBoxText does not wrap GtkComboBoxText, because
+ * Gtk::ComboBoxText was made before GtkComboBoxText, and we don't want to
+ * break the ABI.
+ * This has been fixed in gtkmm 3.x, which is not ABI-compatible with
+ * gtkmm 2.x, and which you are recommended to use.
+ *
  * Note that you cannot use this class with Gnome::Glade::Xml::get_widget_derived() to wrap a GtkComboBox added 
  * in the Glade user interface designer, because Glade adds its own TreeModel instead of using the TreeModel from 
  * this class. You could use a normal Gtk::ComboBox instead, though you can not use Glade to add rows to a TreeModel 
