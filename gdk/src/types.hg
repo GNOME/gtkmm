@@ -127,6 +127,30 @@ struct AtomStringTraits
 // we don't want it to look like we're calling a template trait, but
 // a utility function. -Bryan
 typedef AtomStringTraits AtomString;
+
+// Glib::ScopedPtr has been deprecated in glibmm 2.47.6.
+// We don't want to use the replacement, Glib::make_unique_ptr_gfree(),
+// in gtkmm-2, because it requires C++11. Instead, add this identical Gdk::ScopedPtr,
+// intended only for internal use in gtkmm.
+
+/** Helper to deal with memory allocated
+ * by GLib functions in an exception-safe manner.
+ */
+template <typename T>
+class ScopedPtr
+{
+private:
+  T* ptr_;
+  ScopedPtr(const ScopedPtr<T>&);
+  ScopedPtr<T>& operator=(const ScopedPtr<T>&);
+
+public:
+  ScopedPtr() : ptr_(nullptr) {}
+  explicit ScopedPtr(T* ptr) : ptr_(ptr) {}
+  ~ScopedPtr() noexcept { g_free(ptr_); }
+  T* get() const { return ptr_; }
+  T** addr() { return &ptr_; }
+};
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 typedef Glib::ArrayHandle<std::string,AtomStringTraits> ArrayHandle_AtomString;

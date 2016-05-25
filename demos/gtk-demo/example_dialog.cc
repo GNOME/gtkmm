@@ -113,7 +113,7 @@ void Example_Dialog::on_button_message()
   Glib::ustring strMessage = "This message box has been popped up the following\n"
                              "number of times:\n\n";
   {
-    Glib::ScopedPtr<char> buf (g_strdup_printf("%d", m_count));
+    Gdk::ScopedPtr<char> buf (g_strdup_printf("%d", m_count));
     strMessage += buf.get();
   }
   Gtk::MessageDialog dialog(strMessage, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
