@@ -37,6 +37,7 @@
 #include <gdkmm/devicemanager.h>
 #include <gdkmm/screen.h>
 #include <gdkmm/seat.h>
+#include <gdkmm/monitor.h>
 #include <gdkmm/general.h>
 
 #endif /* _GDKMM_GDKMM_H_ */
