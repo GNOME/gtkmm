@@ -25,6 +25,7 @@ _EQUAL(guchar*,guint8*)
 _EQUAL(gfloat,float)
 
 # Enums
+_CONV_ENUM(Gdk,AxisFlags)
 _CONV_ENUM(Gdk,AxisUse)
 _CONV_ENUM(Gdk,ByteOrder)
 _CONV_ENUM(Gdk,CapStyle)
