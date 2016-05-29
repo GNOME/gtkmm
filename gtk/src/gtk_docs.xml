@@ -6844,6 +6844,18 @@ Since: 3.16
 </description>
 </property>
 
+<property name="GtkGLArea:use-es">
+<description>
+If set to %TRUE the widget will try to create a #GdkGLContext using
+OpenGL ES instead of OpenGL.
+
+See also: gdk_gl_context_set_use_es()
+
+Since: 3.22
+
+</description>
+</property>
+
 <signal name="GtkGesture::begin">
 <description>
 This signal is emitted when the gesture is recognized. This means the
@@ -15167,6 +15179,19 @@ in .ui files.
 </description>
 </property>
 
+<property name="GtkShortcutsShortcut:action-name">
+<description>
+A detailed action name. If this is set for a shortcut
+of type %GTK_SHORTCUT_ACCELERATOR, then GTK+ will use
+the accelerators that are associated with the action
+via gtk_application_set_accels_for_action(), and setting
+#GtkShortcutsShortcut::accelerator is not necessary.
+
+Since: 3.22
+
+</description>
+</property>
+
 <property name="GtkShortcutsShortcut:direction">
 <description>
 The text direction for which this shortcut is active. If the shortcut
@@ -19752,7 +19777,7 @@ Since: 3.0
 </parameter>
 </parameters>
 <return> %TRUE to stop other handlers from being invoked for the event.
-   % %FALSE to propagate the event further.
+%FALSE to propagate the event further.
 
 </return>
 </signal>
@@ -20379,7 +20404,7 @@ been emitted, relative to @widget's top
 </parameter_description>
 </parameter>
 <parameter name="keyboard_mode">
-<parameter_description> %TRUE if the tooltip was trigged using the keyboard
+<parameter_description> %TRUE if the tooltip was triggered using the keyboard
 </parameter_description>
 </parameter>
 <parameter name="tooltip">
@@ -21140,6 +21165,15 @@ elements to size separators; the value of this style property is ignored.
 </description>
 </property>
 
+<property name="GtkWidget:style">
+<description>
+The style of the widget, which contains information about how it will look (colors, etc).
+
+Deprecated: Use #GtkStyleContext instead
+
+</description>
+</property>
+
 <property name="GtkWidget:tooltip-markup">
 <description>
 Sets the text of tooltip to be the given string, which is marked up
@@ -21351,7 +21385,7 @@ for a way to keep it alive without windows).
 
 Normally, the connection between the application and the window
 will remain until the window is destroyed, but you can explicitly
-remove it by setting the ::application property to %NULL.
+remove it by setting the :application property to %NULL.
 
 Since: 3.0
 
@@ -26929,6 +26963,7 @@ Since: 3.4
 </parameter>
 </parameters>
 <return> the application menu of @application
+or %NULL if no application menu has been set.
 
 </return>
 </function>
@@ -26980,6 +27015,9 @@ Since: 3.4
 <function name="gtk_application_get_window_by_id">
 <description>
 Returns the #GtkApplicationWindow with the given ID.
+
+The ID of a #GtkApplicationWindow can be retrieved with
+gtk_application_window_get_id().
 
 Since: 3.6
 
@@ -27037,7 +27075,7 @@ that should not be interrupted, such as creating a CD or DVD. The
 types of actions that may be blocked are specified by the @flags
 parameter. When the application completes the operation it should
 call gtk_application_uninhibit() to remove the inhibitor. Note that
-an application can have multiple inhibitors, and all of the must
+an application can have multiple inhibitors, and all of them must
 be individually removed. Inhibitors are also cleared when the
 application exits.
 
@@ -27282,6 +27320,9 @@ accelerator, which may be displayed in the UI.
 
 To remove all accelerators for an action, use an empty, zero-terminated
 array for @accels.
+
+For the @detailed_action_name, see g_action_parse_detailed_name() and
+g_action_print_detailed_name().
 
 Since: 3.12
 
@@ -40405,6 +40446,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_image_targets">
 <description>
+Add the image targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_image_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40418,6 +40466,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_text_targets">
 <description>
+Add the text targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_text_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40431,6 +40486,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_uri_targets">
 <description>
+Add the URI targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_uri_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40444,6 +40506,14 @@ source can provide the data.
 
 <function name="gtk_drag_dest_find_target">
 <description>
+Looks for a match between the supported targets of @context and the
+@dest_target_list, returning the first matching target, otherwise
+returning %GDK_NONE. @dest_target_list should usually be the return
+value from gtk_drag_dest_get_target_list(), but some widgets may
+have different valid targets for different parts of the widget; in
+that case, they will have to implement a drag_motion handler that
+passes the correct target list to this function.
+
 
 </description>
 <parameters>
@@ -40461,12 +40531,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> first target that the source offers
+and the dest can accept, or %GDK_NONE
 </return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
 <description>
+Returns the list of targets this widget can accept from
+drag-and-drop.
+
 
 </description>
 <parameters>
@@ -40475,11 +40549,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkTargetList, or %NULL if none
+</return>
 </function>
 
 <function name="gtk_drag_dest_get_track_motion">
 <description>
+Returns whether the widget has been configured to always
+emit #GtkWidget::drag-motion signals.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -40488,11 +40567,53 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the widget always emits
+#GtkWidget::drag-motion events
+
+</return>
 </function>
 
 <function name="gtk_drag_dest_set">
 <description>
+Sets a widget as a potential drop destination, and adds default behaviors.
+
+The default behaviors listed in @flags have an effect similar
+to installing default handlers for the widget’s drag-and-drop signals
+(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
+for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
+sufficient to connect to the widget’s #GtkWidget::drag-data-received
+signal to get primitive, but consistent drag-and-drop support.
+
+Things become more complicated when you try to preview the dragged data,
+as described in the documentation for #GtkWidget::drag-motion. The default
+behaviors described by @flags make some assumptions, that can conflict
+with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
+invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
+and invokations of gtk_drag_finish() in #GtkWidget::drag-data-received.
+Especially the later is dramatic, when your own #GtkWidget::drag-motion
+handler calls gtk_drag_get_data() to inspect the dragged data.
+
+There’s no way to set a default action here, you can use the
+#GtkWidget::drag-motion callback for that. Here’s an example which selects
+the action to use depending on whether the control key is pressed or not:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+drag_motion (GtkWidget *widget,
+GdkDragContext *context,
+gint x,
+gint y,
+guint time)
+{
+GdkModifierType mask;
+
+gdk_window_get_pointer (gtk_widget_get_window (widget),
+NULL, NULL, &amp;mask);
+if (mask &amp; GDK_CONTROL_MASK)
+gdk_drag_status (context, GDK_ACTION_COPY, time);
+else
+gdk_drag_status (context, GDK_ACTION_MOVE, time);
+}
+]|
 
 </description>
 <parameters>
@@ -40505,10 +40626,10 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> a pointer to an array of #GtkTargetEntrys
-indicating the drop types that this @widget will accept, or %NULL.
-Later you can access the list with gtk_drag_dest_get_target_list()
-and gtk_drag_dest_find_target().
+<parameter_description> a pointer to an array of
+#GtkTargetEntrys indicating the drop types that this @widget will
+accept, or %NULL. Later you can access the list with
+gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
@@ -40525,6 +40646,7 @@ and gtk_drag_dest_find_target().
 
 <function name="gtk_drag_dest_set_proxy">
 <description>
+Sets this widget as a proxy for drops to another window.
 
 </description>
 <parameters>
@@ -40553,6 +40675,9 @@ subwindow.
 
 <function name="gtk_drag_dest_set_target_list">
 <description>
+Sets the target types that this widget can accept from drag-and-drop.
+The widget must first be made into a drag destination with
+gtk_drag_dest_set().
 
 </description>
 <parameters>
@@ -40570,6 +40695,14 @@ subwindow.
 
 <function name="gtk_drag_dest_set_track_motion">
 <description>
+Tells the widget to emit #GtkWidget::drag-motion and
+#GtkWidget::drag-leave events regardless of the targets and the
+%GTK_DEST_DEFAULT_MOTION flag.
+
+This may be used when a widget wants to do generic
+actions regardless of the targets that the source offers.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -40587,6 +40720,9 @@ subwindow.
 
 <function name="gtk_drag_dest_unset">
 <description>
+Clears information about a drop destination set with
+gtk_drag_dest_set(). The widget will no longer receive
+notification of drags.
 
 </description>
 <parameters>
@@ -49092,6 +49228,10 @@ of #GtkGestures, free with g_list_free()
 <description>
 Returns the last event that was processed for @sequence.
 
+Note that the returned pointer is only valid as long as the @sequence
+is still interpreted by the @gesture. If in doubt, you should make
+a copy of the event.
+
 
 </description>
 <parameters>
@@ -50331,6 +50471,25 @@ Since: 3.16
 <return></return>
 </function>
 
+<function name="gtk_gl_area_get_use_es">
+<description>
+Retrieves the value set by gtk_gl_area_set_use_es().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the #GtkGLArea should create an OpenGL ES context
+and %FALSE otherwise
+
+</return>
+</function>
+
 <function name="gtk_gl_area_make_current">
 <description>
 Ensures that the #GdkGLContext used by @area is associated with
@@ -50528,6 +50687,29 @@ Since: 3.16
 </parameter>
 <parameter name="minor">
 <parameter_description> the minor version
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_gl_area_set_use_es">
+<description>
+Sets whether the @area should create an OpenGL or an OpenGL ES context.
+
+You should check the capabilities of the #GdkGLContext before drawing
+with either API.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="area">
+<parameter_description> a #GtkGLArea
+</parameter_description>
+</parameter>
+<parameter name="use_es">
+<parameter_description> whether to use OpenGL or OpenGL ES
 </parameter_description>
 </parameter>
 </parameters>
@@ -57832,8 +58014,8 @@ Since: 2.18
 <function name="gtk_info_bar_set_message_type">
 <description>
 Sets the message type of the message area.
-GTK+ uses this type to determine what color to use
-when drawing the message area.
+
+GTK+ uses this type to determine how the message is displayed.
 
 Since: 2.18
 
@@ -62872,7 +63054,7 @@ from 0 to n-1
 <function name="gtk_menu_set_monitor">
 <description>
 Informs GTK+ on which monitor a menu should be popped up.
-See gdk_screen_get_monitor_geometry().
+See gdk_monitor_get_geometry().
 
 This function should be called from a #GtkMenuPositionFunc
 if the menu should not appear on the same monitor as the pointer.
@@ -74156,6 +74338,202 @@ be styled and sized suitably for containing text, as long as
 </parameter>
 <parameter name="text">
 <parameter_description> a UTF-8 string, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_progress_tracker_advance_frame">
+<description>
+Increments the progress of the animation forward a frame. If no animation has
+been started, does nothing.
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+<parameter name="frame_time">
+<parameter_description> The current frame time, usually from the frame clock.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_progress_tracker_finish">
+<description>
+Stops running the current animation.
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_progress_tracker_get_ease_out_cubic">
+<description>
+Applies a simple ease out cubic function to the result of
+gtk_progress_tracker_get_progress().
+
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+<parameter name="reversed">
+<parameter_description> If progress should be reversed before applying the ease function.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The eased progress value.
+</return>
+</function>
+
+<function name="gtk_progress_tracker_get_iteration">
+<description>
+Returns the fractional number of cycles the animation has completed. For
+example, it you started an animation with iteration-count of 2 and are half
+way through the second animation, this returns 1.5.
+
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current iteration.
+</return>
+</function>
+
+<function name="gtk_progress_tracker_get_iteration_cycle">
+<description>
+Returns an integer index of the current iteration cycle tracker is
+progressing through. Handles edge cases, such as an iteration value of 2.0
+which could be considered the end of the second iteration of the beginning of
+the third, in the same way as gtk_progress_tracker_get_progress().
+
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+</parameters>
+<return> The integer count of the current animation cycle.
+</return>
+</function>
+
+<function name="gtk_progress_tracker_get_progress">
+<description>
+Gets the progress through the current animation iteration, from [0, 1]. Use
+to interpolate between animation targets. If reverse is true each iteration
+will begin at 1 and end at 0.
+
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+<parameter name="reversed">
+<parameter_description> If progress should be reversed.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The progress value.
+</return>
+</function>
+
+<function name="gtk_progress_tracker_get_state">
+<description>
+Returns whether the tracker is before, during or after the currently started
+animation. The tracker will only ever be in the before state if the animation
+was started with a delay. If no animation has been started, returns
+%GTK_PROGRESS_STATE_AFTER.
+
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+</parameters>
+<return> A GtkProgressState
+</return>
+</function>
+
+<function name="gtk_progress_tracker_init_copy">
+<description>
+Copy all progress tracker state from the source tracker to dest tracker.
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> The source progress tracker
+</parameter_description>
+</parameter>
+<parameter name="dest">
+<parameter_description> The destination progress tracker
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_progress_tracker_skip_frame">
+<description>
+Does not update the progress of the animation forward, but records the frame
+to calculate future deltas. Calling this each frame will effectively pause
+the animation.
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+<parameter name="frame_time">
+<parameter_description> The current frame time, usually from the frame clock.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_progress_tracker_start">
+<description>
+Begins tracking progress for a new animation. Clears all previous state.
+
+</description>
+<parameters>
+<parameter name="tracker">
+<parameter_description> The progress tracker
+</parameter_description>
+</parameter>
+<parameter name="duration">
+<parameter_description> Animation duration in us
+</parameter_description>
+</parameter>
+<parameter name="delay">
+<parameter_description> Animation delay in us
+</parameter_description>
+</parameter>
+<parameter name="iteration_count">
+<parameter_description> Number of iterations to run the animation, must be &gt;= 0
 </parameter_description>
 </parameter>
 </parameters>
@@ -94280,6 +94658,8 @@ Since: 2.4
 <function name="gtk_text_view_get_pixels_above_lines">
 <description>
 Gets the default number of pixels to put above paragraphs.
+Adding this function with gtk_text_view_get_pixels_below_lines()
+is equal to the line space between each paragraph.
 
 
 </description>
@@ -94296,6 +94676,9 @@ Gets the default number of pixels to put above paragraphs.
 <function name="gtk_text_view_get_pixels_below_lines">
 <description>
 Gets the value set by gtk_text_view_set_pixels_below_lines().
+
+The line space is the sum of the value returned by this function and the
+value returned by gtk_text_view_get_pixels_above_lines().
 
 
 </description>
@@ -99763,6 +100146,9 @@ If @child is at the toplevel, and doesn’t have a parent, then
 @iter is set to an invalid iterator and %FALSE is returned.
 @child will remain a valid node after this function has been
 called.
+
+@iter will be initialized before the lookup is performed, so @child
+and @iter cannot point to the same memory location.
 
 
 </description>
@@ -111759,6 +112145,8 @@ reposition its contents.
 
 An example user of this function is gtk_widget_set_halign().
 
+Since: 3.20
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -115631,7 +116019,7 @@ fill_with_content (vbox);
 gtk_widget_show_all (vbox);
 
 gtk_window_set_geometry_hints (GTK_WINDOW (window),
-window,
+NULL,
 &amp;size_hints,
 GDK_HINT_MIN_SIZE |
 GDK_HINT_BASE_SIZE |
@@ -116358,7 +116746,7 @@ character); aspect ratios; and more. See the #GdkGeometry struct.
 </parameter>
 <parameter name="geometry_widget">
 <parameter_description> widget the geometry hints used to be applied to
-or %NULL. Since 3.18 this argument is ignored and GTK behaves as if %NULL was
+or %NULL. Since 3.20 this argument is ignored and GTK behaves as if %NULL was
 set.
 </parameter_description>
 </parameter>
