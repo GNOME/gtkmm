@@ -48,6 +48,7 @@ _WRAP_ENUM(FullscreenMode, GdkFullscreenMode)
 class Cursor;
 class Pixbuf;
 class GLContext;
+class DrawingContext;
 
 /** A Gdk::Window is a rectangular region on the screen. It's a low-level object, used to implement high-level objects such
  * as Gtk::Widget and Gtk::Window on the GTK+ level. A Gtk::Window is a toplevel window, the thing a user might think of as
@@ -59,7 +60,6 @@ class Window : public Glib::Object
   _CLASS_GOBJECT(Window, GdkWindow, GDK_WINDOW, Glib::Object, GObject)
   _STRUCT_NOT_HIDDEN
   _IGNORE(gdk_window_destroy, gdk_window_new, gdk_window_is_destroyed)
-  _IGNORE(gdk_window_get_unscaled_size)
 
 protected:
   Window(const Glib::RefPtr<Window>& parent, GdkWindowAttr* attributes, int attributes_mask);
@@ -144,9 +144,11 @@ public:
   _WRAP_METHOD(bool get_modal_hint() const, gdk_window_get_modal_hint)
   _WRAP_METHOD(void set_modal_hint(bool modal = true), gdk_window_set_modal_hint)
   _WRAP_METHOD(void set_geometry_hints(const Geometry& geometry, WindowHints geom_mask), gdk_window_set_geometry_hints)
-  _WRAP_METHOD(void begin_paint_rect(const Rectangle& rectangle), gdk_window_begin_paint_rect)
-  _WRAP_METHOD(void begin_paint_region(const ::Cairo::RefPtr< ::Cairo::Region>& region), gdk_window_begin_paint_region)
-  _WRAP_METHOD(void end_paint(), gdk_window_end_paint)
+  _WRAP_METHOD(void begin_paint_rect(const Rectangle& rectangle), gdk_window_begin_paint_rect,
+    deprecated "Use begin_draw_frame() instead.")
+  _WRAP_METHOD(void begin_paint_region(const ::Cairo::RefPtr< ::Cairo::Region>& region), gdk_window_begin_paint_region,
+    deprecated "Use begin_draw_frame() instead.")
+  _WRAP_METHOD(void end_paint(), gdk_window_end_paint, deprecated "Use end_draw_frame() instead.")
   _WRAP_METHOD(void flush(), gdk_window_flush, deprecated "This method does nothing.")
   _WRAP_METHOD(void set_title(const Glib::ustring& title), gdk_window_set_title)
   _WRAP_METHOD(void set_role(const Glib::ustring& role), gdk_window_set_role)
@@ -381,7 +383,8 @@ public:
   _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Region> get_visible_region() const, gdk_window_get_visible_region)
 
 #m4 _CONVERSION(`cairo_t*',`::Cairo::RefPtr< ::Cairo::Context>',`::Cairo::RefPtr< ::Cairo::Context>(new ::Cairo::Context($3, true /* has_reference */))')
-  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Context> create_cairo_context(), gdk_cairo_create)
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Context> create_cairo_context(), gdk_cairo_create,
+    deprecated "Use begin_draw_frame() and Gdk::DrawingContext::get_cairo_context() instead.")
 
   //TODO: Wrap these? Find out when they are emitted and if they are useful outside of GTK+, and improve the C docs.
   //_WRAP_SIGNAL(Glib::RefPtr<Gdk::Window> pick_embedded_child(double x, double y), pick-embedded-child, no_default_handler)
@@ -413,6 +416,9 @@ public:
    * @throws GLError On missing GL implementation or extension required for context creation.
    */
   _WRAP_METHOD(Glib::RefPtr<Gdk::GLContext> create_gl_context(), gdk_window_create_gl_context, errthrow)
+
+  _WRAP_METHOD(Glib::RefPtr<DrawingContext> begin_draw_frame(const ::Cairo::RefPtr<const ::Cairo::Region>& region), gdk_window_begin_draw_frame, refreturn)
+  _WRAP_METHOD(void end_draw_frame(const Glib::RefPtr<DrawingContext>& context), gdk_window_end_draw_frame)
 
   _WRAP_PROPERTY("cursor", Glib::RefPtr<Cursor>)
 };
