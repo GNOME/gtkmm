@@ -1,0 +1,73 @@
+/* Copyright (C) 2016 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <cairomm/context.h>
+#include <cairomm/region.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gdk
+{
+class Window;
+
+/** Drawing context for GDK windows.
+ *
+ * Gdk::DrawingContext is an object that represents the current drawing
+ * state of a Gdk::Window.
+ *
+ * It's possible to use a Gdk::DrawingContext to draw on a Gdk::Window
+ * via rendering API like Cairo or OpenGL.
+ *
+ * A Gdk::DrawingContext can only be created by calling Gdk::Window::begin_draw_frame()
+ * and will be valid until a call to Gdk::Window::end_draw_frame().
+ *
+ * @newin{3,22}
+ */
+class DrawingContext : public Glib::Object
+{
+  _CLASS_GOBJECT(DrawingContext, GdkDrawingContext, GDK_DRAWING_CONTEXT, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(Glib::RefPtr<Window> get_window(), gdk_drawing_context_get_window, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Window> get_window() const, gdk_drawing_context_get_window, refreturn, constversion)
+
+#m4 _CONVERSION(`cairo_region_t*',`::Cairo::RefPtr< ::Cairo::Region>',`::Cairo::RefPtr< ::Cairo::Region>(new ::Cairo::Region($3, true /* do not take ref */))')
+  // This is const because it returns a copy.
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Region> get_clip() const, gdk_drawing_context_get_clip)
+
+  _WRAP_METHOD(bool is_valid() const, gdk_drawing_context_is_valid)
+
+#m4 _CONVERSION(`cairo_t*',`::Cairo::RefPtr< ::Cairo::Context>',`::Cairo::RefPtr< ::Cairo::Context>(new ::Cairo::Context($3, false /* take reference */))')
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Context> get_cairo_context(), gdk_drawing_context_get_cairo_context)
+  _WRAP_METHOD(::Cairo::RefPtr<const ::Cairo::Context> get_cairo_context() const, gdk_drawing_context_get_cairo_context, constversion)
+
+#m4 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Context>&',`cairo_t*',`($3)->cobj()')
+  _WRAP_METHOD(static Glib::RefPtr<DrawingContext> get_drawing_context_from_cairo_context(const ::Cairo::RefPtr< ::Cairo::Context>& cr), gdk_cairo_get_drawing_context, refreturn)
+
+  _WRAP_PROPERTY("window", Glib::RefPtr<Window>)
+  // A wrapped property_clip() would require a template specialization
+  // Glib::Value<Cairo::RefPtr<T>>.
+  //_WRAP_PROPERTY("clip", ::Cairo::RefPtr< ::Cairo::Region>)
+
+  // There are no signals or vfuncs.
+};
+
+} // namespace Gdk
