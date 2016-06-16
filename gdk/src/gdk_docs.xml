@@ -1160,6 +1160,24 @@ unclaimed root window drops.
 </parameters>
 </enum>
 
+<property name="GdkDrawingContext:clip">
+<description>
+The clip region applied to the drawing context.
+
+Since: 3.22
+
+</description>
+</property>
+
+<property name="GdkDrawingContext:window">
+<description>
+The #GdkWindow that created the drawing context.
+
+Since: 3.22
+
+</description>
+</property>
+
 <enum name="GdkEventMask">
 <description>
 A set of bit-flags to indicate which events a window is to receive.
@@ -1821,7 +1839,7 @@ viewable.
 </parameter_description>
 </parameter>
 <parameter name="GDK_GRAB_FAILED">
-<parameter_description> the grab failed for some other reason.
+<parameter_description> the grab failed for some other reason. Since 3.16
 </parameter_description>
 </parameter>
 </parameters>
@@ -1942,6 +1960,11 @@ as a touchscreen or tablet. This device type has been added in 3.4.
 <parameter name="GDK_SOURCE_TOUCHPAD">
 <parameter_description> the device is an indirect touch device, such
 as a touchpad. This device type has been added in 3.4.
+</parameter_description>
+</parameter>
+<parameter name="GDK_SOURCE_TRACKPOINT">
+<parameter_description> the device is a trackpoint. This device type has been
+added in 3.22
 </parameter_description>
 </parameter>
 </parameters>
@@ -3943,7 +3966,18 @@ Creates a Cairo context for drawing to @window.
 Note that calling cairo_reset_clip() on the resulting #cairo_t will
 produce undefined results, so avoid it at all costs.
 
+Typically, this function is used to draw on a #GdkWindow out of the paint
+cycle of the toolkit; this should be avoided, as it breaks various assumptions
+and optimizations.
+
+If you are drawing on a native #GdkWindow in response to a %GDK_EXPOSE event
+you should use gdk_window_begin_draw_frame() and gdk_drawing_context_get_cairo_context()
+instead. GTK will automatically do this for you when drawing a widget.
+
 Since: 2.8
+
+Deprecated: 3.22: Use gdk_window_begin_draw_frame() and
+gdk_drawing_context_get_cairo_context() instead
 
 </description>
 <parameters>
@@ -4041,6 +4075,25 @@ a boolean indicating if a clip area exists.
 </parameters>
 <return> %TRUE if a clip rectangle exists, %FALSE if all of @cr is
 clipped and all drawing can be skipped
+</return>
+</function>
+
+<function name="gdk_cairo_get_drawing_context">
+<description>
+Retrieves the #GdkDrawingContext that created the Cairo
+context @cr.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> a Cairo context
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDrawingContext, if any is set
+
 </return>
 </function>
 
@@ -7502,6 +7555,85 @@ or 0 to indicate that a drop will not be accepted
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_drawing_context_get_cairo_context">
+<description>
+Retrieves a Cairo context to be used to draw on the #GdkWindow
+that created the #GdkDrawingContext.
+
+The returned context is guaranteed to be valid as long as the
+#GdkDrawingContext is valid, that is between a call to
+gdk_window_begin_draw_frame() and gdk_window_end_draw_frame().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> a Cairo context to be used to draw
+the contents of the #GdkWindow. The context is owned by the
+#GdkDrawingContext and should not be destroyed
+
+</return>
+</function>
+
+<function name="gdk_drawing_context_get_clip">
+<description>
+Retrieves a copy of the clip region used when creating the @context.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawingContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a Cairo region
+
+</return>
+</function>
+
+<function name="gdk_drawing_context_get_window">
+<description>
+Retrieves the window that created the drawing @context.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawingContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkWindow
+
+</return>
+</function>
+
+<function name="gdk_drawing_context_is_valid">
+<description>
+Checks whether the given #GdkDrawingContext is valid.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawingContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the context is valid
+
+</return>
 </function>
 
 <function name="gdk_drop_finish">
@@ -17149,6 +17281,56 @@ Since: 2.12
 <return></return>
 </function>
 
+<function name="gdk_window_begin_draw_frame">
+<description>
+Indicates that you are beginning the process of redrawing @region
+on @window, and provides you with a #GdkDrawingContext.
+
+If @window is a top level #GdkWindow, backed by a native window
+implementation, a backing store (offscreen buffer) large enough to
+contain @region will be created. The backing store will be initialized
+with the background color or background surface for @window. Then, all
+drawing operations performed on @window will be diverted to the
+backing store. When you call gdk_window_end_frame(), the contents of
+the backing store will be copied to @window, making it visible
+on screen. Only the part of @window contained in @region will be
+modified; that is, drawing operations are clipped to @region.
+
+The net result of all this is to remove flicker, because the user
+sees the finished product appear all at once when you call
+gdk_window_end_draw_frame(). If you draw to @window directly without
+calling gdk_window_begin_draw_frame(), the user may see flicker
+as individual drawing operations are performed in sequence.
+
+When using GTK+, the widget system automatically places calls to
+gdk_window_begin_draw_frame() and gdk_window_end_draw_frame() around
+emissions of the `GtkWidget::draw` signal. That is, if you’re
+drawing the contents of the widget yourself, you can assume that the
+widget has a cleared background, is already set as the clip region,
+and already has a backing store. Therefore in most cases, application
+code in GTK does not need to call gdk_window_begin_draw_frame()
+explicitly.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="region">
+<parameter_description> a Cairo region
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDrawingContext context that should be
+used to draw the contents of the window; the returned context is owned
+by GDK.
+
+</return>
+</function>
+
 <function name="gdk_window_begin_move_drag">
 <description>
 Begins a window move operation (for a toplevel window).
@@ -17229,6 +17411,7 @@ A convenience wrapper around gdk_window_begin_paint_region() which
 creates a rectangular region for you. See
 gdk_window_begin_paint_region() for details.
 
+Deprecated: 3.22: Use gdk_window_begin_draw_frame() instead
 
 </description>
 <parameters>
@@ -17285,6 +17468,7 @@ the topmost backing store in the stack. One matching call to
 gdk_window_end_paint() is required for each call to
 gdk_window_begin_paint_region().
 
+Deprecated: 3.22: Use gdk_window_begin_draw_frame() instead
 
 </description>
 <parameters>
@@ -17700,6 +17884,32 @@ Deprecated: 3.8: this function is no longer needed
 <parameters>
 <parameter name="window">
 <parameter_description> a toplevel #GdkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_window_end_draw_frame">
+<description>
+Indicates that the drawing of the contents of @window started with
+gdk_window_begin_frame() has been completed.
+
+This function will take care of destroying the #GdkDrawingContext.
+
+It is an error to call this function without a matching
+gdk_window_begin_frame() first.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description> the #GdkDrawingContext created by gdk_window_begin_draw_frame()
 </parameter_description>
 </parameter>
 </parameters>
