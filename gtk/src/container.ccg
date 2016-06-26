@@ -18,11 +18,18 @@
 #include <glibmm/vectorutils.h>
 
 #include <gtkmm/adjustment.h>
+#include <gtkmm/scrolledwindow.h>
 #include <gtk/gtk.h>
 
 
 namespace
 {
+
+// Marks a widget that has been automatically created and added by gtk_container_add().
+// The only reason we must use this GQuark or a similar trick, is that we want
+// to restore the state of a managed removed object.
+// gtk_container_remove() does not do that.
+GQuark quark_auto_added_widget = g_quark_from_static_string("gtkmm_Container::auto_added_widget");
 
 static void container_foreach_callback(GtkWidget* widget_gobj, void* data)
 {
@@ -172,9 +179,31 @@ void Container::forall(const Container::ForeachSlot& slot)
   gtk_container_forall(gobj(), &container_foreach_callback, &slot_copy);
 }
 
-void  Container::add(Widget& widget)
+// Why not let both add() and remove() be virtual, and override them in ScrolledWindow?
+// Because a virtual add() has an unwanted side-effect in Gtk::Stack.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=724732
+// And a virtual remove() can be problematic because ScrolledWindow and other
+// subclasses of Bin have a remove() overload with no parameter.
+
+void Container::add(Widget& widget)
 {
-  gtk_container_add(gobj(), widget.gobj());
+  auto scrolled_window = dynamic_cast<ScrolledWindow*>(this);
+  if (scrolled_window)
+  {
+    auto old_child = gtk_bin_get_child(scrolled_window->Bin::gobj()); // Normally nullptr
+    gtk_container_add(gobj(), widget.gobj());
+    auto child = gtk_bin_get_child(scrolled_window->Bin::gobj());
+    if (child && child != old_child)
+    {
+      // If the child is not the inserted widget, gtk_scrolled_window_add() has
+      // created and inserted a GtkViewport. Mark this GtkViewport as automatically
+      // added. Container::remove() needs this information.
+      const gpointer qdata_value = (child != widget.gobj()) ? child : nullptr;
+      g_object_set_qdata(G_OBJECT(child), quark_auto_added_widget, qdata_value);
+    }
+  }
+  else
+    gtk_container_add(gobj(), widget.gobj());
 }
 
 bool Container::has_focus_chain() const
@@ -214,16 +243,34 @@ void Container::show_all_children(bool recursive)
 
 void Container::remove(Widget& widget)
 {
-  //If this is a managed widget, then do an extra ref so that it will not be
-  //destroyed when it is removed, and restore the floating state of the ref.
-  //This should leave it in the same state as when it was instantiated,
-  //before being added to the first container.
-  if(widget.is_managed_())
+  auto child_to_float = &widget;
+  if (g_object_get_qdata(widget.Glib::Object::gobj(), quark_auto_added_widget))
   {
-    widget.reference();
-    g_object_force_floating(static_cast<Glib::Object&>(widget).gobj());
+    // If widget was created by gtk_scrolled_window_add(),
+    // don't restore the floating state of that widget. Instead, restore the
+    // state of that widget's child, which was added by add().
+    auto scrolled_window = dynamic_cast<ScrolledWindow*>(this);
+    if (scrolled_window)
+    {
+      auto bin = dynamic_cast<Bin*>(&widget);
+      if (bin)
+        child_to_float = bin->get_child();
+    }
   }
 
+  // If this is a managed widget, then do an extra ref so that it will not be
+  // destroyed when it is removed, and restore the floating state of the ref.
+  // This should leave it in the same state as when it was instantiated,
+  // before being added to the container.
+  if (child_to_float && child_to_float->is_managed_())
+  {
+    child_to_float->reference();
+    g_object_force_floating(child_to_float->Glib::Object::gobj());
+  }
+
+  // gtk_container_remove() removes what gtk_container_add() added, even if
+  // gtk_container_add() added an extra GtkViewport in a GtkScrolledWindow.
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=710471
   gtk_container_remove(gobj(), widget.gobj());
 }
 

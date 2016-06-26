@@ -17,10 +17,8 @@
  */
 
 #include <gtkmm/scrollbar.h>
-#include <gtkmm/viewport.h>
 #include <gtkmm/adjustment.h>
 #include <gtk/gtk.h>
-
 
 namespace Gtk
 {
@@ -33,44 +31,13 @@ void ScrolledWindow::add(Gtk::Widget& widget)
   Bin::add(widget);
 }
 
+_DEPRECATE_IFDEF_START
 void ScrolledWindow::remove_with_viewport()
 {
-  auto child = gtk_bin_get_child(Bin::gobj());
-  if (child)
-  {
-    if (GTK_IS_VIEWPORT(child))
-    {
-      // Remove the Viewport's child, if any, from the Viewport.
-      auto grandchild = gtk_bin_get_child(GTK_BIN(child)); // A GtkViewport is a GtkBin
-      if (grandchild)
-      {
-        auto cppGrandchild = Glib::wrap(grandchild);
-
-        //If the grandchild is a managed widget, then do an extra ref so that it will not be
-        //destroyed when it is removed, and restore the floating state of the ref.
-        //This should leave it in the same state as when it was instantiated,
-        //before being added to the first container.
-        if (cppGrandchild->is_managed_())
-        {
-          cppGrandchild->reference();
-          g_object_force_floating(static_cast<Glib::Object*>(cppGrandchild)->gobj());
-        }
-
-        gtk_container_remove(GTK_CONTAINER(child), grandchild);
-      }
-
-      // Remove the Viewport.
-      // Don't do an extra ref on the child (the Viewport). If it's added
-      // by ScrolledWindow::add() or created as a managed widget,
-      // let it be deleted, when it's removed and the ref count reaches 0.
-      gtk_container_remove(Container::gobj(), child);
-    }
-    else
-    {
-      // The child is not a Viewport. Just remove it.
-      Bin::remove();
-    }
-  }
+  //We used to do what GTK+ now does for us:
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=710471
+  remove();
 }
+_DEPRECATE_IFDEF_END
 
 } //namespace Gtk
