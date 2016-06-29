@@ -73,16 +73,27 @@ class ApplicationWindow
   public Gio::ActionGroup,
   public Gio::ActionMap
 {
-  _CLASS_GOBJECT(ApplicationWindow, GtkApplicationWindow, GTK_APPLICATION_WINDOW, Gtk::Window, GtkWindow)
+  //TODO: At the next ABI-break, remove _NO_WRAP_FUNCTION, and the hand-coded gobj_copy() and wrap().
+  // https://bugzilla.gnome.org/show_bug.cgi?id=767951
+  _CLASS_GTKOBJECT(ApplicationWindow, GtkApplicationWindow, GTK_APPLICATION_WINDOW, Gtk::Window, GtkWindow)
   _IMPLEMENTS_INTERFACE(Gio::ActionGroup)
   _IMPLEMENTS_INTERFACE(Gio::ActionMap)
-
+  _UNMANAGEABLE
+  _NO_WRAP_FUNCTION
 public:
   _CTOR_DEFAULT
   explicit ApplicationWindow(const Glib::RefPtr<Application>& application);
 dnl // Don't ignore gtk_application_window_new(). h2def.py erroneously classifies
 dnl // it as a GtkApplication method, because its first parameter is a GtkApplication*.
 dnl //_IGNORE(gtk_application_window_new)
+
+_DEPRECATE_IFDEF_START
+  /** Provides access to the underlying C instance.
+   * The caller is responsible for unrefing it. Use when directly setting fields in structs.
+   * @deprecated This method should never have been created.
+   */
+  GtkApplicationWindow* gobj_copy();
+_DEPRECATE_IFDEF_END
 
   _WRAP_METHOD(void set_show_menubar(bool show_menubar = true), gtk_application_window_set_show_menubar)
   _WRAP_METHOD(bool get_show_menubar() const, gtk_application_window_get_show_menubar)
@@ -101,3 +112,29 @@ dnl //_IGNORE(gtk_application_window_new)
 };
 
 } // namespace Gtk
+
+_DEPRECATE_IFDEF_START
+namespace Glib
+{
+  /** A Glib::wrap() method for this object.
+   *
+   * @note
+   * This wrap() function is broken. It will be fixed at the next ABI-break.
+   * It should return a Gtk::ApplicationWindow*. A workaround:
+   * @code
+   * GtkApplicationWindow* gtkappwin = some_func();
+   * Gtk::ApplicationWindow* appwinmm =
+   *   dynamic_cast<Gtk::ApplicationWindow*>(Glib::wrap((GtkWindow*)gtkappwin, take_copy));
+   * @endcode
+   *
+   * @deprecated Use the workaround instead.
+   *
+   * @param object The C instance.
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   *
+   * @relates Gtk::ApplicationWindow
+   */
+  Glib::RefPtr<Gtk::ApplicationWindow> wrap(GtkApplicationWindow* object, bool take_copy = false);
+}
+_DEPRECATE_IFDEF_END
