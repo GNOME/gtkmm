@@ -71,6 +71,25 @@ define(`__BOOL_PROTECTED_GCLASS__',`1')
 _POP()
 ')
 
+dnl In case a class needs to write its own declaration and implementation of
+dnl its Glib::wrap() function, or it does not need a wrap() function.
+define(`_NO_WRAP_FUNCTION',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_NO_WRAP_FUNCTION__',`$1')
+_POP()
+')
+
+dnl In case a class needs to write its own implementation of its Glib::wrap()
+dnl function. The function will be declared in the header, but the body is not
+dnl generated.
+define(`_CUSTOM_WRAP_FUNCTION',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_WRAP_FUNCTION__',`$1')
+_POP()
+')
+
 
 dnl
 dnl _END_CLASS_GTKOBJECT()
@@ -79,6 +98,9 @@ dnl
 define(`_END_CLASS_GTKOBJECT',`
 
 _SECTION(SECTION_HEADER1)
+dnl _END_CLASS_GOBJECT does not call _STRUCT_PROTOTYPE(), if __BOOL_NO_WRAP_FUNCTION__
+dnl is defined. That may not always be appropriate, and if necessary
+dnl _STRUCT_PROTOTYPE() can be disabled with _STRUCT_NOT_HIDDEN.
 _STRUCT_PROTOTYPE()
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -87,6 +109,8 @@ __NAMESPACE_BEGIN__ class __CPPNAME__`'_Class; __NAMESPACE_END__
 
 _SECTION(SECTION_HEADER3)
 
+ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
+',`dnl
 namespace Glib
 {
   /** A Glib::wrap() method for this object.
@@ -99,6 +123,7 @@ namespace Glib
    */
   __NAMESPACE__::__CPPNAME__`'* wrap(__CNAME__`'* object, bool take_copy = false);
 } //namespace Glib
+')dnl endif __BOOL_NO_WRAP_FUNCTION__
 
 dnl
 dnl
@@ -114,6 +139,10 @@ __NAMESPACE_END__
 
 _SECTION(SECTION_SRC_GENERATED)
 
+ifdef(`__BOOL_CUSTOM_WRAP_FUNCTION__',`dnl
+',`dnl else
+ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
+',`dnl else
 namespace Glib
 {
 
@@ -123,6 +152,8 @@ __NAMESPACE__::__CPPNAME__`'* wrap(__CNAME__`'* object, bool take_copy)
 }
 
 } /* namespace Glib */
+')dnl endif __BOOL_NO_WRAP_FUNCTION__
+')dnl endif __BOOL_CUSTOM_WRAP_FUNCTION__
 
 __NAMESPACE_BEGIN__
 
