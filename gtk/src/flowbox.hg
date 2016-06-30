@@ -17,7 +17,9 @@
 #include <gtkmm/container.h>
 #include <gtkmm/orientable.h>
 #include <gtkmm/flowboxchild.h>
+#include <giomm/liststore.h>
 #include <vector>
+#include <utility> // std::forward
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/container_p.h)
@@ -213,6 +215,79 @@ public:
 
   _WRAP_METHOD(void invalidate_sort(), gtk_flow_box_invalidate_sort)
 
+  /** For instance:
+   * Gtk::Widget* on_create_widget(const Glib::RefPtr<T_item>& item);
+   *
+   * Called for flow boxes that are bound to a Gio::ListModel with bind_model()
+   * or bind_list_store() for each item that gets added to the model.
+   *
+   * @newin{3,22}
+   *
+   * @tparam T_item Base class of the items in the Gio::ListModel. All items must
+   *                be of type T_item or a type derived from T_item.
+   *                T_item must be Glib::Object or a type derived from Glib::Object.
+   * @param item The item from the model for which to create a widget.
+   * @eturn A Gtk::Widget that represents @a item.
+   */
+  template <typename T_item>
+  using SlotCreateWidget = sigc::slot<Gtk::Widget*, const Glib::RefPtr<T_item>&>;
+
+  /** Binds a Gio::ListModel.
+   *
+   * If this FlowBox was already bound to a model, that previous binding is
+   * destroyed.
+   *
+   * The contents of the FlowBox are cleared and then filled with widgets that
+   * represent items from @a model. The FlowBox is updated whenever @a model changes.
+   * If @a model is an empty Glib::RefPtr, the FlowBox is left empty.
+   *
+   * It is undefined to add or remove widgets directly (for example, with
+   * insert() or Gtk::Container::add()) while the FlowBox is bound to a model.
+   *
+   * Note that using a model is incompatible with the filtering and sorting
+   * functionality in FlowBox. When using a model, filtering and sorting
+   * should be implemented by the model.
+   *
+   * @newin{3,22}
+   *
+   * @param model The Gio::ListModel to be bound.
+   * @param slot_create_widget A slot that creates widgets for items.
+   *
+   * @see bind_list_store()
+   */
+  void bind_model(const Glib::RefPtr<Gio::ListModel>& model,
+    const SlotCreateWidget<Glib::Object>& slot_create_widget);
+  _IGNORE(gtk_flow_box_bind_model)
+
+  /** Binds a Gio::ListStore<>.
+   *
+   * If this FlowBox was already bound to a Gio::ListModel, that previous binding is
+   * destroyed. (Gio::ListStore is a Gio::ListModel.)
+   *
+   * The contents of the FlowBox are cleared and then filled with widgets that
+   * represent items from @a store. The FlowBox is updated whenever @a store changes.
+   * If @a store is an empty Glib::RefPtr, the FlowBox is left empty.
+   *
+   * It is undefined to add or remove widgets directly (for example, with
+   * insert() or Gtk::Container::add()) while the FlowBox is bound to a model.
+   *
+   * Note that using a model is incompatible with the filtering and sorting
+   * functionality in FlowBox. When using a model, filtering and sorting
+   * should be implemented by the model.
+   *
+   * @newin{3,22}
+   *
+   * @tparam T_item Base class of the items in the Gio::ListStore. All items must
+   *                be of type T_item or a type derived from T_item.
+   *                T_item must be Glib::Object or a type derived from Glib::Object.
+   * @tparam T_slot SlotCreateWidget<T_item> or a type that can be converted
+   *                to SlotCreateWidget<T_item>.
+   * @param store The Gio::ListStore<> to be bound.
+   * @param slot_create_widget A slot that creates widgets for items.
+   */
+  template <typename T_item, typename T_slot>
+  void bind_list_store(const Glib::RefPtr<Gio::ListStore<T_item>>& store,
+    T_slot&& slot_create_widget);
 
   _WRAP_PROPERTY("selection-mode", SelectionMode)
   _WRAP_PROPERTY("activate-on-single-click", bool)
@@ -226,7 +301,51 @@ public:
   _WRAP_SIGNAL(void child_activated(FlowBoxChild* child), "child-activated")
   _WRAP_SIGNAL(void selected_children_changed(), "selected-children-changed")
   _IGNORE_SIGNAL(activate-cursor-child, toggle-cursor-child, move-cursor, select-all, unselect-all) // Action signals
+
+private:
+  template <typename T_item>
+  static GtkWidget* proxy_bind_list_store_create_widget_callback(void* item, void* data);
 };
 
-} // namespace Gtk
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+template <typename T_item, typename T_slot>
+void FlowBox::bind_list_store(const Glib::RefPtr<Gio::ListStore<T_item>>& store,
+  T_slot&& slot_create_widget)
+{
+  // Create a copy of the slot.
+  // It will be deleted by Glib::destroy_notify_delete<SlotCreateWidget>.
+  auto slot_copy = new SlotCreateWidget<T_item>(std::forward<T_slot>(slot_create_widget));
+
+  gtk_flow_box_bind_model(gobj(),
+    Glib::unwrap(Glib::RefPtr<Gio::ListModel>::cast_static(store)),
+    &proxy_bind_list_store_create_widget_callback<T_item>,
+    slot_copy, &Glib::destroy_notify_delete<SlotCreateWidget<T_item>>);
+}
+
+template <typename T_item>
+GtkWidget* FlowBox::proxy_bind_list_store_create_widget_callback(void* item, void* data)
+{
+  auto& slot = *static_cast<SlotCreateWidget<T_item>*>(data);
+  auto cobject = static_cast<typename T_item::BaseObjectType*>(item);
+
+  try
+  {
+    // cast_dynamic is necessary if T_item is a user-defined type, such as
+    // class MyObject : public Glib::Object
+    // take_copy is true here, because wrap() returns a Glib::RefPtr<>.
+    // cobject will be unreferenced when the RefPtr is deleted.
+    Gtk::Widget* widget = slot(Glib::RefPtr<T_item>::cast_dynamic(Glib::wrap(cobject, true)));
+    if (widget)
+      return widget->gobj();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return nullptr;
+}
+
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+
+} // namespace Gtk

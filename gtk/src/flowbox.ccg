@@ -74,6 +74,26 @@ static void SignalProxy_Sort_gtk_callback_destroy(void* data)
   delete static_cast<Gtk::FlowBox::SlotSort*>(data);
 }
 
+static GtkWidget* proxy_bind_model_create_widget_callback(void* item, void* data)
+{
+  auto& slot = *static_cast<Gtk::FlowBox::SlotCreateWidget<Glib::Object>*>(data);
+  auto cobject = static_cast<GObject*>(item);
+
+  try
+  {
+    // take_copy is true here, because wrap() returns a Glib::RefPtr<Glib::Object>.
+    // cobject will be unreferenced when the RefPtr is deleted.
+    Gtk::Widget* widget = slot(Glib::wrap(cobject, true));
+    if (widget)
+      return widget->gobj();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return nullptr;
+}
+
 } // anonymous namespace
 
 namespace Gtk
@@ -119,6 +139,17 @@ void FlowBox::set_sort_func(const SlotSort& slot)
 void FlowBox::unset_sort_func()
 {
   gtk_flow_box_set_sort_func(gobj(), nullptr, nullptr, nullptr);
+}
+
+void FlowBox::bind_model(const Glib::RefPtr<Gio::ListModel>& model,
+  const SlotCreateWidget<Glib::Object>& slot_create_widget)
+{
+  // Create a copy of the slot.
+  // It will be deleted by Glib::destroy_notify_delete<SlotCreateWidget>.
+  auto slot_copy = new SlotCreateWidget<Glib::Object>(slot_create_widget);
+
+  gtk_flow_box_bind_model(gobj(), Glib::unwrap(model), &proxy_bind_model_create_widget_callback,
+    slot_copy, &Glib::destroy_notify_delete<SlotCreateWidget<Glib::Object>>);
 }
 
 } //namespace Gtk
