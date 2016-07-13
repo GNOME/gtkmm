@@ -1,7 +1,5 @@
 #ifndef _GTKMM_RADIOBUTTONGROUP_H
 #define _GTKMM_RADIOBUTTONGROUP_H
-/* $Id$ */
-
 /* radiobuttongroup.h
  *
  * Copyright(C) 2001-2002 The gtkmm Development Team
@@ -21,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmmconfig.h> // Can define GTKMM_DISABLE_DEPRECATED
+
 #include <glibmm/object.h> //For Glib::RefPtr<> and std::size_t
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -35,10 +35,10 @@ namespace Gtk
 
 class RadioButton;
 class RadioMenuItem;
-class RadioAction;
+class RadioAction; //deprecated
 class RadioToolButton;
 
-/** RadioButtonGroup identifier for RadioButtons
+/** RadioButtonGroup, identifier for RadioButtons.
  * To set up this RadioButtonGroup, construct a RadioButtonGroup and then pass it
  * to the constructor of all radio items.  You do not need
  * to keep the RadioButtonGroup beyond the initial construction.
@@ -57,7 +57,7 @@ protected:
 
   friend class Gtk::RadioButton;
   friend class Gtk::RadioMenuItem;
-  friend class Gtk::RadioAction;
+  friend class Gtk::RadioAction; //deprecated
   friend class Gtk::RadioToolButton;
 
 
@@ -66,7 +66,11 @@ protected:
   //      Would that anything useful other than being tidy? murrayc
   void add(RadioButton& item);
   void add(RadioMenuItem& item);
+#ifndef GTKMM_DISABLE_DEPRECATED
+  /** @deprecated Because Gtk::RadioAction is deprecated.
+   */
   void add(const Glib::RefPtr<RadioAction>& item);
+#endif // GTKMM_DISABLE_DEPRECATED
   void add(RadioToolButton& item);
 
   void* operator new(std::size_t); // not implemented
