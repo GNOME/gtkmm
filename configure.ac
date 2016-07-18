@@ -26,7 +26,9 @@ AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
 
 AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news no-dist-gzip dist-xz tar-ustar no-define nostdinc])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+# Support silent build rules.
+# Disable by either passing --disable-silent-rules to configure or passing V=1 to make.
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
