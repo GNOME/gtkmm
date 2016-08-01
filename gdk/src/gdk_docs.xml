@@ -1,4 +1,66 @@
 <root>
+<enum name="GdkAnchorHints">
+<description>
+Positioning hints for aligning a window relative to a rectangle.
+
+These hints determine how the window should be positioned in the case that
+the window would fall off-screen if placed in its ideal position.
+
+For example, %GDK_ANCHOR_FLIP_X will replace %GDK_GRAVITY_NORTH_WEST with
+%GDK_GRAVITY_NORTH_EAST and vice versa if the window extends beyond the left
+or right edges of the monitor.
+
+If %GDK_ANCHOR_SLIDE_X is set, the window can be shifted horizontally to fit
+on-screen. If %GDK_ANCHOR_RESIZE_X is set, the window can be shrunken
+horizontally to fit.
+
+In general, when multiple flags are set, flipping should take precedence over
+sliding, which should take precedence over resizing.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+<parameters>
+<parameter name="GDK_ANCHOR_FLIP_X">
+<parameter_description> allow flipping anchors horizontally
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_FLIP_Y">
+<parameter_description> allow flipping anchors vertically
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_SLIDE_X">
+<parameter_description> allow sliding window horizontally
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_SLIDE_Y">
+<parameter_description> allow sliding window vertically
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_RESIZE_X">
+<parameter_description> allow resizing window horizontally
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_RESIZE_Y">
+<parameter_description> allow resizing window vertically
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_FLIP">
+<parameter_description> allow flipping anchors on both axes
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_SLIDE">
+<parameter_description> allow sliding window on both axes
+</parameter_description>
+</parameter>
+<parameter name="GDK_ANCHOR_RESIZE">
+<parameter_description> allow resizing window on both axes
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GdkAxisFlags">
 <description>
 Flags describing the current capabilities of a device/tool.
@@ -3286,6 +3348,51 @@ coordinate in the offscreen window
 <parameter name="offscreen_y">
 <parameter_description> return location for the y
 coordinate in the offscreen window
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkWindow::moved-to-rect">
+<description>
+Emitted when the position of @window is finalized after being moved to a
+destination rectangle.
+
+@window might be flipped over the destination rectangle in order to keep
+it on-screen, in which case @flipped_x and @flipped_y will be set to %TRUE
+accordingly.
+
+@flipped_rect is the ideal position of @window after any possible
+flipping, but before any possible sliding. @final_rect is @flipped_rect,
+but possibly translated in the case that flipping is still ineffective in
+keeping @window on-screen.
+
+Since: 3.22
+Stability: Private
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the #GdkWindow that moved
+</parameter_description>
+</parameter>
+<parameter name="flipped_rect">
+<parameter_description> the position of @window after any possible
+flipping or %NULL if the backend can't obtain it
+</parameter_description>
+</parameter>
+<parameter name="final_rect">
+<parameter_description> the final position of @window or %NULL if the
+backend can't obtain it
+</parameter_description>
+</parameter>
+<parameter name="flipped_x">
+<parameter_description> %TRUE if the anchors were flipped horizontally
+</parameter_description>
+</parameter>
+<parameter name="flipped_y">
+<parameter_description> %TRUE if the anchors were flipped vertically
 </parameter_description>
 </parameter>
 </parameters>
@@ -17753,6 +17860,25 @@ given @window.
 Initially the surface contents are all 0 (transparent if contents
 have transparency, black otherwise.)
 
+The @width and @height of the new surface are not affected by
+the scaling factor of the @window, or by the @scale argument; they
+are the size of the surface in device pixels. If you wish to create
+an image surface capable of holding the contents of @window you can
+use:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+int scale = gdk_window_get_scale_factor (window);
+int width = gdk_window_get_width (window) * scale;
+int height = gdk_window_get_height (window) * scale;
+
+// format is set elsewhere
+cairo_surface_t *surface =
+gdk_window_create_similar_image_surface (window,
+format,
+width, height,
+scale);
+]|
+
 Since: 3.10
 
 </description>
@@ -19688,6 +19814,62 @@ move, then resize, if you don’t use gdk_window_move_resize().)
 </parameter>
 <parameter name="height">
 <parameter_description> new height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_window_move_to_rect">
+<description>
+Moves @window to @rect, aligning their anchor points.
+
+@rect is relative to the top-left corner of the window that @window is
+transient for. @rect_anchor and @window_anchor determine anchor points on
+@rect and @window to pin together. @rect's anchor point can optionally be
+offset by @rect_anchor_dx and @rect_anchor_dy, which is equivalent to
+offsetting the position of @window.
+
+@anchor_hints determines how @window will be moved if the anchor points cause
+it to move off-screen. For example, %GDK_ANCHOR_FLIP_X will replace
+%GDK_GRAVITY_NORTH_WEST with %GDK_GRAVITY_NORTH_EAST and vice versa if
+@window extends beyond the left or right edges of the monitor.
+
+Connect to the #GdkWindow::moved-to-rect signal to find out how it was
+actually positioned.
+
+Since: 3.22
+Stability: Private
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the #GdkWindow to move
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> the destination #GdkRectangle to align @window with
+</parameter_description>
+</parameter>
+<parameter name="rect_anchor">
+<parameter_description> the point on @rect to align with @window's anchor point
+</parameter_description>
+</parameter>
+<parameter name="window_anchor">
+<parameter_description> the point on @window to align with @rect's anchor point
+</parameter_description>
+</parameter>
+<parameter name="anchor_hints">
+<parameter_description> positioning hints to use when limited on space
+</parameter_description>
+</parameter>
+<parameter name="rect_anchor_dx">
+<parameter_description> horizontal offset to shift @window, i.e. @rect's anchor
+point
+</parameter_description>
+</parameter>
+<parameter name="rect_anchor_dy">
+<parameter_description> vertical offset to shift @window, i.e. @rect's anchor point
 </parameter_description>
 </parameter>
 </parameters>
