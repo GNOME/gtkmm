@@ -18,6 +18,7 @@
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/menushell_p.h)
 
+#include <gdkmm/window.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/menuitem.h>
 
@@ -96,6 +97,10 @@ public:
    */
   void popup(guint button, guint32 activate_time, const Glib::RefPtr<Gdk::Device>& device = Glib::RefPtr<Gdk::Device>());
 
+  _WRAP_METHOD(void popup_at_rect(const Glib::RefPtr<Gdk::Window>& rect_window, const Gdk::Rectangle& rect, Gdk::Gravity rect_anchor, Gdk::Gravity menu_anchor, const GdkEvent* trigger_event), gtk_menu_popup_at_rect)
+  _WRAP_METHOD(void popup_at_widget(Widget* widget, Gdk::Gravity widget_anchor, Gdk::Gravity menu_anchor, const GdkEvent* trigger_event), gtk_menu_popup_at_widget)
+  _WRAP_METHOD(void popup_at_pointer(const GdkEvent* trigger_event), gtk_menu_popup_at_pointer)
+
   _WRAP_METHOD(void reposition(), gtk_menu_reposition)
 
   _WRAP_METHOD(void popdown(), gtk_menu_popdown)
@@ -132,6 +137,7 @@ _DEPRECATE_IFDEF_END
 
   _WRAP_METHOD(void set_monitor(int monitor_num), gtk_menu_set_monitor)
   _WRAP_METHOD(int get_monitor() const, gtk_menu_get_monitor)
+  //TODO: Wrap or ignore gtk_menu_place_on_monitor(). It's not documented. Does it mean it's private?
 
   void reorder_child(const MenuItem& child, int position);
   _IGNORE(gtk_menu_reorder_child)
@@ -149,8 +155,10 @@ _DEPRECATE_IFDEF_END
    */
   void attach_to_widget(Widget& attach_widget);
 
-  _IGNORE_SIGNAL("move_scroll")
-
+  _IGNORE_SIGNAL("move_scroll")dnl// action signal
+  // no_default_handler because the wrapped C signal has no default handler.
+#m4 _CONVERSION(`gpointer',`const Gdk::Rectangle*',`&Glib::wrap((GdkRectangle*)$3)')
+  _WRAP_SIGNAL(void popped_up(const Gdk::Rectangle* flipped_rect, const Gdk::Rectangle* final_rect, bool flipped_x, bool flipped_y), "popped-up", no_default_handler)
 
   _WRAP_PROPERTY("active", int)
   _WRAP_PROPERTY("accel-group", Glib::RefPtr<AccelGroup>)
@@ -160,6 +168,10 @@ _DEPRECATE_IFDEF_END
   _WRAP_PROPERTY("tearoff-state", bool, deprecated "No replacement available.")
   _WRAP_PROPERTY("monitor", int)
   _WRAP_PROPERTY("reserve-toggle-size", bool)
+  _WRAP_PROPERTY("anchor-hints", Gdk::AnchorHints)
+  _WRAP_PROPERTY("rect-anchor-dx", int)
+  _WRAP_PROPERTY("rect-anchor-dy", int)
+  _WRAP_PROPERTY("menu-type-hint", Gdk::WindowTypeHint)
 
 protected:
 
