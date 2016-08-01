@@ -8705,7 +8705,7 @@ to this signal and append your menuitems to the @menu.
 The angle that the baseline of the label makes with the horizontal,
 in degrees, measured counterclockwise. An angle of 90 reads from
 from bottom to top, an angle of 270, from top to bottom. Ignored
-if the label is selectable, wrapped, or ellipsized.
+if the label is selectable.
 
 Since: 2.6
 
@@ -9224,6 +9224,62 @@ Since: 3.14
 <return></return>
 </signal>
 
+<signal name="GtkMenu::popped-up">
+<description>
+Emitted when the position of @menu is finalized after being popped up
+using gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (), or
+gtk_menu_popup_at_pointer ().
+
+@menu might be flipped over the anchor rectangle in order to keep it
+on-screen, in which case @flipped_x and @flipped_y will be set to %TRUE
+accordingly.
+
+@flipped_rect is the ideal position of @menu after any possible flipping,
+but before any possible sliding. @final_rect is @flipped_rect, but possibly
+translated in the case that flipping is still ineffective in keeping @menu
+on-screen.
+
+![](popup-slide.png)
+
+The blue menu is @menu's ideal position, the green menu is @flipped_rect,
+and the red menu is @final_rect.
+
+See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
+gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
+#GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and
+#GtkMenu:menu-type-hint.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> the #GtkMenu that popped up
+</parameter_description>
+</parameter>
+<parameter name="flipped_rect">
+<parameter_description> the position of @menu after any possible
+flipping or %NULL if the backend can't obtain it
+</parameter_description>
+</parameter>
+<parameter name="final_rect">
+<parameter_description> the final position of @menu or %NULL if the
+backend can't obtain it
+</parameter_description>
+</parameter>
+<parameter name="flipped_x">
+<parameter_description> %TRUE if the anchors were flipped horizontally
+</parameter_description>
+</parameter>
+<parameter name="flipped_y">
+<parameter_description> %TRUE if the anchors were flipped vertically
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <property name="GtkMenu:accel-group">
 <description>
 The accel group holding accelerators for the menu.
@@ -9248,6 +9304,29 @@ The index of the currently selected menu item, or -1 if no
 menu item is selected.
 
 Since: 2.14
+
+</description>
+</property>
+
+<property name="GtkMenu:anchor-hints">
+<description>
+Positioning hints for aligning the menu relative to a rectangle.
+
+These hints determine how the menu should be positioned in the case that
+the menu would fall off-screen if placed in its ideal position.
+
+![](popup-flip.png)
+
+For example, %GDK_ANCHOR_FLIP_Y will replace %GDK_GRAVITY_NORTH_WEST with
+%GDK_GRAVITY_SOUTH_WEST and vice versa if the menu extends beyond the
+bottom edge of the monitor.
+
+See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
+gtk_menu_popup_at_pointer (), #GtkMenu:rect-anchor-dx,
+#GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
+
+Since: 3.22
+Stability: Unstable
 
 </description>
 </property>
@@ -9306,11 +9385,54 @@ property is ignored.
 </description>
 </property>
 
+<property name="GtkMenu:menu-type-hint">
+<description>
+The #GdkWindowTypeHint to use for the menu's #GdkWindow.
+
+See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
+gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
+#GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and #GtkMenu::popped-up.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+</property>
+
 <property name="GtkMenu:monitor">
 <description>
 The monitor the menu will be popped up on.
 
 Since: 2.14
+
+</description>
+</property>
+
+<property name="GtkMenu:rect-anchor-dx">
+<description>
+Horizontal offset to apply to the menu, i.e. the rectangle or widget
+anchor.
+
+See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
+gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
+#GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+</property>
+
+<property name="GtkMenu:rect-anchor-dy">
+<description>
+Vertical offset to apply to the menu, i.e. the rectangle or widget anchor.
+
+See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
+gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
+#GtkMenu:rect-anchor-dx, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
+
+Since: 3.22
+Stability: Unstable
 
 </description>
 </property>
@@ -14061,6 +14183,24 @@ Since: 3.4
 </description>
 </property>
 
+<property name="GtkScrolledWindow:max-content-height">
+<description>
+The maximum content height of @scrolled_window, or -1 if not set.
+
+Since: 3.22
+
+</description>
+</property>
+
+<property name="GtkScrolledWindow:max-content-width">
+<description>
+The maximum content width of @scrolled_window, or -1 if not set.
+
+Since: 3.22
+
+</description>
+</property>
+
 <property name="GtkScrolledWindow:min-content-height">
 <description>
 The minimum content height of @scrolled_window, or -1 if not set.
@@ -15004,6 +15144,25 @@ or there is (any other value).
 </parameters>
 </enum>
 
+<property name="GtkShortcutLabel:accelerator">
+<description>
+The accelerator that @self displays. See #GtkShortcutsShortcut:accelerator
+for the accepted syntax.
+
+Since: 3.22
+
+</description>
+</property>
+
+<property name="GtkShortcutLabel:disabled-text">
+<description>
+The text that is displayed when no accelerator is set.
+
+Since: 3.22
+
+</description>
+</property>
+
 <enum name="GtkShortcutType">
 <description>
 GtkShortcutType specifies the kind of shortcut that is being described.
@@ -15312,10 +15471,17 @@ Set this to %NULL to show all groups.
 
 <property name="GtkSizeGroup:ignore-hidden">
 <description>
-If %TRUE, unmapped widgets are ignored when determining 
+If %TRUE, unmapped widgets are ignored when determining
 the size of the group.
 
 Since: 2.8
+
+Deprecated: 3.22: Measuring the size of hidden widgets has not worked
+reliably for a long time. In most cases, they will report a size
+of 0 nowadays, and thus, their size will not affect the other
+size group members. In effect, size groups will always operate
+as if this property was %TRUE. Use a #GtkStack instead to hide
+widgets while still having their size taken into account.
 
 </description>
 </property>
@@ -16282,6 +16448,24 @@ Since: 2.4
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkStyleContext::changed">
+<description>
+The ::changed signal is emitted when there is a change in the
+#GtkStyleContext.
+
+For a #GtkStyleContext returned by gtk_widget_get_style_context(), the
+#GtkWidget::style-updated signal/vfunc might be more convenient to use.
+
+This signal is useful when using the theming layer standalone.
+
+Since: 3.0
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </signal>
@@ -17411,8 +17595,8 @@ There are too many key combinations to list them all here.
 
 <signal name="GtkTextView::move-viewport">
 <description>
-The ::move-viewport signal is a 
-[keybinding signal][GtkBindingSignal] 
+The ::move-viewport signal is a
+[keybinding signal][GtkBindingSignal]
 which can be bound to key combinations to allow the user
 to move the viewport, i.e. change what part of the text view
 is visible in a containing scrolled window.
@@ -17426,7 +17610,7 @@ There are no default bindings for this signal.
 </parameter_description>
 </parameter>
 <parameter name="step">
-<parameter_description> the granularity of the move, as a #GtkMovementStep
+<parameter_description> the granularity of the movement, as a #GtkScrollStep
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -20716,9 +20900,12 @@ just got its initial style
 
 <signal name="GtkWidget::style-updated">
 <description>
-The ::style-updated signal is emitted when the #GtkStyleContext
-of a widget is changed. Note that style-modifying functions like
-gtk_widget_override_color() also cause this signal to be emitted.
+The ::style-updated signal is a convenience signal that is emitted when the
+#GtkStyleContext::changed signal is emitted on the @widget's associated
+#GtkStyleContext as returned by gtk_widget_get_style_context().
+
+Note that style-modifying functions like gtk_widget_override_color() also
+cause this signal to be emitted.
 
 Since: 3.0
 
@@ -25248,7 +25435,7 @@ Since: 3.4
 
 <function name="gtk_actionable_get_action_target_value">
 <description>
-Gets the current target value of @actionabe.
+Gets the current target value of @actionable.
 
 See gtk_actionable_set_action_target_value() for more information.
 
@@ -30457,6 +30644,8 @@ See gtk_button_set_focus_on_click().
 
 Since: 2.4
 
+Deprecated: 3.20: Use gtk_widget_get_focus_on_click() instead
+
 </description>
 <parameters>
 <parameter name="button">
@@ -30799,6 +30988,8 @@ you don’t want the keyboard focus removed from the main area of the
 application.
 
 Since: 2.4
+
+Deprecated: 3.20: Use gtk_widget_set_focus_on_click() instead
 
 </description>
 <parameters>
@@ -36979,6 +37170,8 @@ with the mouse. See gtk_combo_box_set_focus_on_click().
 
 Since: 2.6
 
+Deprecated: 3.20: Use gtk_widget_get_focus_on_click() instead
+
 </description>
 <parameters>
 <parameter name="combo">
@@ -37498,6 +37691,8 @@ like toolbars where you don’t want the keyboard focus removed from
 the main area of the application.
 
 Since: 2.6
+
+Deprecated: 3.20: Use gtk_widget_set_focus_on_click() instead
 
 </description>
 <parameters>
@@ -44884,6 +45079,44 @@ but always returns %FALSE.
 </return>
 </function>
 
+<function name="gtk_file_chooser_add_choice">
+<description>
+Adds a 'choice' to the file chooser. This is typically implemented
+as a combobox or, for boolean choices, as a checkbutton. You can select
+a value using gtk_file_chooser_set_choice() before the dialog is shown,
+and you can obtain the user-selected value in the ::response signal handler
+using gtk_file_chooser_get_choice().
+
+Compare gtk_file_chooser_set_extra_widget().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkFileChooser
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> id for the added choice
+</parameter_description>
+</parameter>
+<parameter name="label">
+<parameter_description> user-visible label for the added choice
+</parameter_description>
+</parameter>
+<parameter name="options">
+<parameter_description> ids for the options of the choice, or %NULL for a boolean choice
+</parameter_description>
+</parameter>
+<parameter name="option_labels">
+<parameter_description> user-visible labels for the options, must be the same length as @options
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_file_chooser_add_filter">
 <description>
 Adds @filter to the list of filters that the user can select between.
@@ -44975,6 +45208,8 @@ Returns whether the button grabs focus when it is clicked with the mouse.
 See gtk_file_chooser_button_set_focus_on_click().
 
 Since: 2.10
+
+Deprecated: 3.20: Use gtk_widget_get_focus_on_click() instead
 
 </description>
 <parameters>
@@ -45083,6 +45318,8 @@ you don’t want the keyboard focus removed from the main area of the
 application.
 
 Since: 2.10
+
+Deprecated: 3.20: Use gtk_widget_set_focus_on_click() instead
 
 </description>
 <parameters>
@@ -45203,6 +45440,27 @@ Since: 2.4
 </parameters>
 <return> the action that the file selector is performing
 
+</return>
+</function>
+
+<function name="gtk_file_chooser_get_choice">
+<description>
+Gets the currently selected option in the 'choice' with the given ID.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkFileChooser
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the ID of the choice to get
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID of the currenly selected option
 </return>
 </function>
 
@@ -45899,6 +46157,26 @@ Since: 3.20
 <return></return>
 </function>
 
+<function name="gtk_file_chooser_remove_choice">
+<description>
+Removes a 'choice' that has been added with gtk_file_chooser_add_choice().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkFileChooser
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the ID of the choice to remove
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_file_chooser_remove_filter">
 <description>
 Removes @filter from the list of filters that the user can select between.
@@ -46088,6 +46366,32 @@ Since: 2.4
 </parameter>
 <parameter name="action">
 <parameter_description> the action that the file selector is performing
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_file_chooser_set_choice">
+<description>
+Selects an option in a 'choice' that has been added with
+gtk_file_chooser_add_choice(). For a boolean choice, the
+possible options are &quot;true&quot; and &quot;false&quot;.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="chooser">
+<parameter_description> a #GtkFileChooser
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the ID of the choice to set
+</parameter_description>
+</parameter>
+<parameter name="option">
+<parameter_description> the ID of the option to select
 </parameter_description>
 </parameter>
 </parameters>
@@ -46916,6 +47220,25 @@ Since: 2.4
 </return>
 </function>
 
+<function name="gtk_file_filter_new_from_gvariant">
+<description>
+Deserialize a file filter from an a{sv} variant in
+the format produced by gtk_file_filter_to_gvariant().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="variant">
+<parameter_description> an a{sv} #GVariant
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkFileFilter object
+
+</return>
+</function>
+
 <function name="gtk_file_filter_set_name">
 <description>
 Sets the human-readable name of the filter; this is the string
@@ -46937,6 +47260,24 @@ to remove any existing name.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_file_filter_to_gvariant">
+<description>
+Serialize a file filter to an a{sv} variant.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="filter">
+<parameter_description> a #GtkFileFilter
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new, floating, #GVariant
+
+</return>
 </function>
 
 <function name="gtk_fixed_move">
@@ -62863,6 +63204,147 @@ the menu, or %NULL
 <return></return>
 </function>
 
+<function name="gtk_menu_popup_at_pointer">
+<description>
+Displays @menu and makes it available for selection.
+
+See gtk_menu_popup_at_widget () to pop up a menu at a widget.
+gtk_menu_popup_at_rect () also allows you to position a menu at an arbitrary
+rectangle.
+
+@menu will be positioned at the pointer associated with @trigger_event.
+
+Properties that influence the behaviour of this function are
+#GtkMenu:anchor-hints, #GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and
+#GtkMenu:menu-type-hint. Connect to the #GtkMenu::popped-up signal to find
+out how it was actually positioned.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> the #GtkMenu to pop up
+</parameter_description>
+</parameter>
+<parameter name="trigger_event">
+<parameter_description> the #GdkEvent that initiated this request or
+%NULL if it's the current event
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_menu_popup_at_rect">
+<description>
+Displays @menu and makes it available for selection.
+
+See gtk_menu_popup_at_widget () and gtk_menu_popup_at_pointer (), which
+handle more common cases for popping up menus.
+
+@menu will be positioned at @rect, aligning their anchor points. @rect is
+relative to the top-left corner of @rect_window. @rect_anchor and
+@menu_anchor determine anchor points on @rect and @menu to pin together.
+@menu can optionally be offset by #GtkMenu:rect-anchor-dx and
+#GtkMenu:rect-anchor-dy.
+
+Anchors should be specified under the assumption that the text direction is
+left-to-right; they will be flipped horizontally automatically if the text
+direction is right-to-left.
+
+Other properties that influence the behaviour of this function are
+#GtkMenu:anchor-hints and #GtkMenu:menu-type-hint. Connect to the
+#GtkMenu::popped-up signal to find out how it was actually positioned.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> the #GtkMenu to pop up
+</parameter_description>
+</parameter>
+<parameter name="rect_window">
+<parameter_description> the #GdkWindow @rect is relative to
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> the #GdkRectangle to align @menu with
+</parameter_description>
+</parameter>
+<parameter name="rect_anchor">
+<parameter_description> the point on @rect to align with @menu's anchor point
+</parameter_description>
+</parameter>
+<parameter name="menu_anchor">
+<parameter_description> the point on @menu to align with @rect's anchor point
+</parameter_description>
+</parameter>
+<parameter name="trigger_event">
+<parameter_description> the #GdkEvent that initiated this request or
+%NULL if it's the current event
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_menu_popup_at_widget">
+<description>
+Displays @menu and makes it available for selection.
+
+See gtk_menu_popup_at_pointer () to pop up a menu at the master pointer.
+gtk_menu_popup_at_rect () also allows you to position a menu at an arbitrary
+rectangle.
+
+![](popup-anchors.png)
+
+@menu will be positioned at @widget, aligning their anchor points.
+@widget_anchor and @menu_anchor determine anchor points on @widget and @menu
+to pin together. @menu can optionally be offset by #GtkMenu:rect-anchor-dx
+and #GtkMenu:rect-anchor-dy.
+
+Anchors should be specified under the assumption that the text direction is
+left-to-right; they will be flipped horizontally automatically if the text
+direction is right-to-left.
+
+Other properties that influence the behaviour of this function are
+#GtkMenu:anchor-hints and #GtkMenu:menu-type-hint. Connect to the
+#GtkMenu::popped-up signal to find out how it was actually positioned.
+
+Since: 3.22
+Stability: Unstable
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> the #GtkMenu to pop up
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the #GtkWidget to align @menu with
+</parameter_description>
+</parameter>
+<parameter name="widget_anchor">
+<parameter_description> the point on @widget to align with @menu's anchor point
+</parameter_description>
+</parameter>
+<parameter name="menu_anchor">
+<parameter_description> the point on @menu to align with @widget's anchor point
+</parameter_description>
+</parameter>
+<parameter name="trigger_event">
+<parameter_description> the #GdkEvent that initiated this request or
+%NULL if it's the current event
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_menu_popup_for_device">
 <description>
 Displays a menu and makes it available for selection.
@@ -63672,6 +64154,47 @@ the tracker will emit add/remove automatically when this changes.
 </return>
 </function>
 
+<function name="gtk_menu_update_scroll_offset">
+<description>
+Updates the scroll offset of @menu based on the amount of sliding done while
+positioning @menu. Connect this to the #GtkMenu::popped-up signal to keep the
+contents of the menu vertically aligned with their ideal position, for combo
+boxes for example.
+
+Since: 3.22
+Stability: Private
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> the #GtkMenu that popped up
+</parameter_description>
+</parameter>
+<parameter name="flipped_rect">
+<parameter_description> the position of @menu after any possible flipping
+or %NULL if unknown
+</parameter_description>
+</parameter>
+<parameter name="final_rect">
+<parameter_description> the final position of @menu or %NULL if unknown
+</parameter_description>
+</parameter>
+<parameter name="flipped_x">
+<parameter_description> %TRUE if the anchors were flipped horizontally
+</parameter_description>
+</parameter>
+<parameter name="flipped_y">
+<parameter_description> %TRUE if the anchors were flipped vertically
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_message_dialog_format_secondary_markup">
 <description>
 Sets the secondary text of the message dialog to be @message_format (with
@@ -63774,7 +64297,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GtkVBox corresponding to the
+<return> A #GtkBox corresponding to the
 “message area” in the @message_dialog.
 
 </return>
@@ -66307,6 +66830,25 @@ Since: 2.12
 </return>
 </function>
 
+<function name="gtk_page_setup_new_from_gvariant">
+<description>
+Desrialize a page setup from an a{sv} variant in
+the format produced by gtk_page_setup_to_gvariant().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="variant">
+<parameter_description> an a{sv} #GVariant
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPageSetup object
+
+</return>
+</function>
+
 <function name="gtk_page_setup_new_from_key_file">
 <description>
 Reads the page setup from the group @group_name in the key file
@@ -66519,6 +67061,24 @@ Since: 2.12
 <return> %TRUE on success
 
 </return>
+</function>
+
+<function name="gtk_page_setup_to_gvariant">
+<description>
+Serialize page setup to an a{sv} variant.
+
+Return: (transfer none): a new, floating, #GVariant
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="setup">
+<parameter_description> a #GtkPageSetup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_page_setup_to_key_file">
@@ -68337,6 +68897,25 @@ to free it
 </return>
 </function>
 
+<function name="gtk_paper_size_new_from_gvariant">
+<description>
+Deserialize a paper size from an a{sv} variant in
+the format produced by gtk_paper_size_to_gvariant().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="variant">
+<parameter_description> an a{sv} #GVariant
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPaperSize object
+
+</return>
+</function>
+
 <function name="gtk_paper_size_new_from_ipp">
 <description>
 Creates a new #GtkPaperSize object by using
@@ -68460,6 +69039,24 @@ Since: 2.10
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_paper_size_to_gvariant">
+<description>
+Serialize a paper size to an a{sv} variant.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="paper_size">
+<parameter_description> a #GtkPaperSize
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new, floating, #GVariant
+
+</return>
 </function>
 
 <function name="gtk_paper_size_to_key_file">
@@ -70717,6 +71314,40 @@ Since: 3.0
 <return></return>
 </function>
 
+<function name="gtk_print_job_set_source_fd">
+<description>
+Make the #GtkPrintJob send an existing document to the
+printing system. The file can be in any format understood
+by the platforms printing system (typically PostScript,
+but on many platforms PDF may work too). See
+gtk_printer_accepts_pdf() and gtk_printer_accepts_ps().
+
+This is similar to gtk_print_job_set_source_file(),
+but takes expects an open file descriptor for the file,
+instead of a filename.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="job">
+<parameter_description> a #GtkPrintJob
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for errors
+</parameter_description>
+</parameter>
+</parameters>
+<return> %FALSE if an error occurred
+
+</return>
+</function>
+
 <function name="gtk_print_job_set_source_file">
 <description>
 Make the #GtkPrintJob send an existing document to the 
@@ -72503,6 +73134,25 @@ Since: 2.12
 </return>
 </function>
 
+<function name="gtk_print_settings_new_from_gvariant">
+<description>
+Deserialize print settings from an a{sv} variant in
+the format produced by gtk_print_settings_to_gvariant().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="variant">
+<parameter_description> an a{sv} #GVariant
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPrintSettings object
+
+</return>
+</function>
+
 <function name="gtk_print_settings_new_from_key_file">
 <description>
 Reads the print settings from the group @group_name in @key_file.  Returns a
@@ -73206,6 +73856,24 @@ Since: 2.12
 </parameter>
 </parameters>
 <return> %TRUE on success
+
+</return>
+</function>
+
+<function name="gtk_print_settings_to_gvariant">
+<description>
+Serialize print settings to an a{sv} variant.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description> a #GtkPrintSettings
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new, floating, #GVariant
 
 </return>
 </function>
@@ -80458,6 +81126,42 @@ Since: 3.4
 </return>
 </function>
 
+<function name="gtk_scrolled_window_get_max_content_height">
+<description>
+Returns the maximum content height set.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the maximum content height, or -1
+
+</return>
+</function>
+
+<function name="gtk_scrolled_window_get_max_content_width">
+<description>
+Returns the maximum content width set.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> the maximum content width, or -1
+
+</return>
+</function>
+
 <function name="gtk_scrolled_window_get_min_content_height">
 <description>
 Gets the minimal content height of @scrolled_window, or -1 if not set.
@@ -80704,11 +81408,64 @@ Since: 3.4
 <return></return>
 </function>
 
+<function name="gtk_scrolled_window_set_max_content_height">
+<description>
+Sets the maximum height that @scrolled_window should keep visible. The
+@scrolled_window will grow up to this width before it starts scrolling
+the content.
+
+It is a programming error to set the maximum content height to a value
+smaller than #GtkScrolledWindow:min-content-height.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the maximum content height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scrolled_window_set_max_content_width">
+<description>
+Sets the maximum width that @scrolled_window should keep visible. The
+@scrolled_window will grow up to this width before it starts scrolling
+the content.
+
+It is a programming error to set the maximum content width to a value
+smaller than #GtkScrolledWindow:min-content-width.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the maximum content width
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_scrolled_window_set_min_content_height">
 <description>
 Sets the minimum height that @scrolled_window should keep visible.
 Note that this can and (usually will) be smaller than the minimum
 size of the content.
+
+It is a programming error to set the minimum content height to a
+value smaller than #GtkScrolledWindow:max-content-height.
 
 Since: 3.0
 
@@ -80731,6 +81488,9 @@ Since: 3.0
 Sets the minimum width that @scrolled_window should keep visible.
 Note that this can and (usually will) be smaller than the minimum
 size of the content.
+
+It is a programming error to set the minimum content width to a
+value smaller than #GtkScrolledWindow:max-content-width.
 
 Since: 3.0
 
@@ -82036,6 +82796,101 @@ Deprecated: 3.16: Use g_object_set() instead.
 <return></return>
 </function>
 
+<function name="gtk_shortcut_label_get_accelerator">
+<description>
+Retrieves the current accelerator of @self.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkShortcutLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current accelerator.
+
+</return>
+</function>
+
+<function name="gtk_shortcut_label_get_disabled_text">
+<description>
+Retrieves the text that is displayed when no accelerator is set.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkShortcutLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current text displayed when no
+accelerator is set.
+
+</return>
+</function>
+
+<function name="gtk_shortcut_label_new">
+<description>
+Creates a new #GtkShortcutLabel with @accelerator set.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="accelerator">
+<parameter_description> the initial accelerator
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated #GtkShortcutLabel
+
+</return>
+</function>
+
+<function name="gtk_shortcut_label_set_accelerator">
+<description>
+Sets the accelerator to be displayed by @self.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkShortcutLabel
+</parameter_description>
+</parameter>
+<parameter name="accelerator">
+<parameter_description> the new accelerator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_shortcut_label_set_disabled_text">
+<description>
+Sets the text to be displayed by @self when no accelerator is set.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkShortcutLabel
+</parameter_description>
+</parameter>
+<parameter name="disabled_text">
+<parameter_description> the text to be displayed when no accelerator is set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_show_about_dialog">
 <description>
 This is a convenience function for showing an application’s about box.
@@ -82104,6 +82959,38 @@ or %NULL for the default screen
 </return>
 </function>
 
+<function name="gtk_show_uri_on_window">
+<description>
+A convenience function for launching the default application
+to show the uri. Like gtk_show_uri(), but takes a window
+as transient parent instead of a screen.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="parent">
+<parameter_description> parent window
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> the uri to show
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> a timestamp to prevent focus stealing
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError that is returned in case of errors
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on error
+
+</return>
+</function>
+
 <function name="gtk_size_group_add_widget">
 <description>
 Adds a widget to a #GtkSizeGroup. In the future, the requisition
@@ -82134,6 +83021,13 @@ be removed from the size group.
 Returns if invisible widgets are ignored when calculating the size.
 
 Since: 2.8
+
+Deprecated: 3.22: Measuring the size of hidden widgets has not worked
+reliably for a long time. In most cases, they will report a size
+of 0 nowadays, and thus, their size will not affect the other
+size group members. In effect, size groups will always operate
+as if this property was %TRUE. Use a #GtkStack instead to hide
+widgets while still having their size taken into account.
 
 </description>
 <parameters>
@@ -82221,7 +83115,14 @@ Removes a widget from a #GtkSizeGroup.
 Sets whether unmapped widgets should be ignored when
 calculating the size.
 
-Since: 2.8 
+Since: 2.8
+
+Deprecated: 3.22: Measuring the size of hidden widgets has not worked
+reliably for a long time. In most cases, they will report a size
+of 0 nowadays, and thus, their size will not affect the other
+size group members. In effect, size groups will always operate
+as if this property was %TRUE. Use a #GtkStack instead to hide
+widgets while still having their size taken into account.
 
 </description>
 <parameters>
@@ -107892,19 +108793,35 @@ on the widget.
 <description>
 Destroys a widget.
 
-When a widget is
-destroyed, it will break any references it holds to other objects.
-If the widget is inside a container, the widget will be removed
-from the container. If the widget is a toplevel (derived from
-#GtkWindow), it will be removed from the list of toplevels, and the
-reference GTK+ holds to it will be removed. Removing a
-widget from its container or the list of toplevels results in the
-widget being finalized, unless you’ve added additional references
-to the widget with g_object_ref().
+When a widget is destroyed all references it holds on other objects
+will be released:
 
-In most cases, only toplevel widgets (windows) require explicit
-destruction, because when you destroy a toplevel its children will
-be destroyed as well.
+- if the widget is inside a container, it will be removed from its
+parent
+- if the widget is a container, all its children will be destroyed,
+recursively
+- if the widget is a top level, it will be removed from the list
+of top level widgets that GTK+ maintains internally
+
+It's expected that all references held on the widget will also
+be released; you should connect to the #GtkWidget::destroy signal
+if you hold a reference to @widget and you wish to remove it when
+this function is called. It is not necessary to do so if you are
+implementing a #GtkContainer, as you'll be able to use the
+#GtkContainerClass.remove() virtual function for that.
+
+It's important to notice that gtk_widget_destroy() will only cause
+the @widget to be finalized if no additional references, acquired
+using g_object_ref(), are held on it. In case additional references
+are in place, the @widget will be in an &quot;inert&quot; state after calling
+this function; @widget will still point to valid memory, allowing you
+to release the references you hold, but you may not query the widget's
+own state.
+
+You should typically call this function on top level widgets, and
+rarely on child widgets.
+
+See also: gtk_container_remove()
 
 </description>
 <parameters>
@@ -109726,7 +110643,8 @@ Deprecated:3.0: Use #GtkStyleContext instead
 
 <function name="gtk_widget_get_style_context">
 <description>
-Returns the style context associated to @widget.
+Returns the style context associated to @widget. The returned object is
+guaranteed to be the same for the lifetime of @widget.
 
 
 </description>
@@ -112629,6 +113547,10 @@ use gdk_window_invalidate_rect() or gdk_window_invalidate_region().
 To cause the redraw to be done immediately, follow that call
 with a call to gdk_window_process_updates().
 
+Deprecated: 3.22: Application and widget code should not handle
+expose events directly; invalidation should use the #GtkWidget
+API, and drawing should only happen inside #GtkWidget::draw
+implementations
 
 </description>
 <parameters>
@@ -112643,6 +113565,7 @@ with a call to gdk_window_process_updates().
 </parameters>
 <return> return from the event signal emission (%TRUE if
 the event was handled)
+
 </return>
 </function>
 
@@ -113029,10 +113952,10 @@ set by gtk_widget_set_default_direction() will be used.
 <description>
 Widgets are double buffered by default; you can use this function
 to turn off the buffering. “Double buffered” simply means that
-gdk_window_begin_paint_region() and gdk_window_end_paint() are called
+gdk_window_begin_draw_frame() and gdk_window_end_draw_frame() are called
 automatically around expose events sent to the
-widget. gdk_window_begin_paint_region() diverts all drawing to a widget's
-window to an offscreen buffer, and gdk_window_end_paint() draws the
+widget. gdk_window_begin_draw_frame() diverts all drawing to a widget's
+window to an offscreen buffer, and gdk_window_end_draw_frame() draws the
 buffer to the screen. The result is that users see the window
 update in one smooth step, and don’t see individual graphics
 primitives being rendered.
@@ -113044,7 +113967,7 @@ if you had special needs and really knew what you were doing.
 Note: if you turn off double-buffering, you have to handle
 expose events, since even the clearing to the background color or
 pixmap will not happen automatically (as it is done in
-gdk_window_begin_paint_region()).
+gdk_window_begin_draw_frame()).
 
 In 3.10 GTK and GDK have been restructured for translucent drawing. Since
 then expose events for double-buffered widgets are culled into a single
