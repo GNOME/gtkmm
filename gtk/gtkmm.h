@@ -260,6 +260,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/separatormenuitem.h>
 #include <gtkmm/separatortoolitem.h>
 #include <gtkmm/settings.h>
+#include <gtkmm/shortcutlabel.h>
 #include <gtkmm/shortcutsgroup.h>
 #include <gtkmm/shortcutssection.h>
 #include <gtkmm/shortcutsshortcut.h>
