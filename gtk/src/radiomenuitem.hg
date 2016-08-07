@@ -35,36 +35,42 @@ class RadioMenuItem : public CheckMenuItem
 {
   _CLASS_GTKOBJECT(RadioMenuItem, GtkRadioMenuItem, GTK_RADIO_MENU_ITEM, Gtk::CheckMenuItem, GtkCheckMenuItem)
 public:
+  using Group = RadioButtonGroup;
 
-  typedef RadioButtonGroup Group;
+  /** @newin{3,22}
+   */
+  _CTOR_DEFAULT()
+
+  /** @newin{3,22}
+   */
+  explicit RadioMenuItem(const Glib::ustring& label, bool mnemonic = false);
 
   RadioMenuItem(Group& groupx);
   _IGNORE(gtk_radio_menu_item_new)
   RadioMenuItem(Group& groupx, const Glib::ustring& label, bool mnemonic = false);
   _IGNORE(gtk_radio_menu_item_new_with_label, gtk_radio_menu_item_new_with_mnemonic)
 
-  //We ignore the _new_*_from_widget() functions because they are just the same as calling get_group() and set_group() ourselves.
+  //We ignore the _new_*_from_widget() functions because they are just the same as calling join_group() ourselves.
   _IGNORE(gtk_radio_menu_item_new_from_widget, gtk_radio_menu_item_new_with_mnemonic_from_widget, gtk_radio_menu_item_new_with_label_from_widget)
 
   _WRAP_METHOD(Group get_group(), gtk_radio_menu_item_get_group)
   _IGNORE(gtk_radio_menu_item_set_group)
   void set_group(Group& group);
+
+  /** Removes the radio menu item from the group.
+   */
   void reset_group();
 
-  /** Emitted when the group of radio menu items that a radio menu item belongs
-   * to changes. This is emitted when a radio menu item switches from
-   * being alone to being part of a group of 2 or more menu items, or
-   * vice-versa, and when a buttton is moved from one group of 2 or
-   * more menu items to a different one, but not when the composition
-   * of the group that a menu item belongs to changes.
-   */
+#m4 _CONVERSION(`RadioMenuItem&',`GtkRadioMenuItem*',`($3).gobj()')
+  _WRAP_METHOD(void join_group(RadioMenuItem& group_source), gtk_radio_menu_item_join_group, newin "3,22")
+
   _WRAP_SIGNAL(void group_changed(), "group_changed")
 
-  //Probably wouldn't work: _WRAP_PROPERTY("group", Group)
+  /// Note that %property_group() corresponds to join_group(), rather than to get_group() and set_group().
+  _WRAP_PROPERTY("group", RadioMenuItem*, newin "3,22")
 
 protected:
   void constructor(const Group& group);
 };
 
 } /* namspace Gtk */
-
