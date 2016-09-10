@@ -611,7 +611,7 @@ axes and keys.
 <signal name="GdkDevice::tool-changed">
 <description>
 The ::tool-changed signal is emitted on pen/eraser
-#GdkDevice&lt;!-- --&gt;s whenever tools enter or leave proximity.
+#GdkDevices whenever tools enter or leave proximity.
 
 Since: 3.22
 
@@ -816,6 +816,27 @@ is unplugged.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GdkDevicePadFeature">
+<description>
+A pad feature.
+
+</description>
+<parameters>
+<parameter name="GDK_DEVICE_PAD_FEATURE_BUTTON">
+<parameter_description> a button
+</parameter_description>
+</parameter>
+<parameter name="GDK_DEVICE_PAD_FEATURE_RING">
+<parameter_description> a ring-shaped interactive area
+</parameter_description>
+</parameter>
+<parameter name="GDK_DEVICE_PAD_FEATURE_STRIP">
+<parameter_description> a straight interactive area
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GdkDeviceToolType">
 <description>
@@ -1365,6 +1386,10 @@ child windows
    @GDK_TOUCHPAD_GESTURE_MASK: receive touchpad gesture events. Since 3.18
 </parameter_description>
 </parameter>
+<parameter name="GDK_TABLET_PAD_MASK">
+<parameter_description> receive tablet pad events. Since 3.22
+</parameter_description>
+</parameter>
 <parameter name="GDK_ALL_EVENTS_MASK">
 <parameter_description> the combination of all the above event masks.
 </parameter_description>
@@ -1588,6 +1613,31 @@ is determined by its phase field. This event type was added in 3.18.
 <parameter name="GDK_TOUCHPAD_PINCH">
 <parameter_description> A touchpad pinch gesture event, the current state
 is determined by its phase field. This event type was added in 3.18.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_BUTTON_PRESS">
+<parameter_description> A tablet pad button press event. This event type
+was added in 3.22.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_BUTTON_RELEASE">
+<parameter_description> A tablet pad button release event. This event type
+was added in 3.22.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_RING">
+<parameter_description> A tablet pad axis event from a &quot;ring&quot;. This event type was
+added in 3.22.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_STRIP">
+<parameter_description> A tablet pad axis event from a &quot;strip&quot;. This event type was
+added in 3.22.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_GROUP_MODE">
+<parameter_description> A tablet pad group mode change. This event type was
+added in 3.22.
 </parameter_description>
 </parameter>
 <parameter name="GDK_EVENT_LAST">
@@ -2027,6 +2077,12 @@ as a touchpad. This device type has been added in 3.4.
 <parameter name="GDK_SOURCE_TRACKPOINT">
 <parameter_description> the device is a trackpoint. This device type has been
 added in 3.22
+</parameter_description>
+</parameter>
+<parameter name="GDK_SOURCE_TABLET_PAD">
+<parameter_description> the device is a &quot;pad&quot;, a collection of buttons,
+rings and strips found in drawing tablets. This device type has been
+added in 3.22.
 </parameter_description>
 </parameter>
 </parameters>
@@ -5719,6 +5775,98 @@ GTK+ and must not be freed or unreffed.
 </return>
 </function>
 
+<function name="gdk_device_pad_get_feature_group">
+<description>
+Returns the group the given @feature and @idx belong to,
+or -1 if feature/index do not exist in @pad.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GdkDevicePad
+</parameter_description>
+</parameter>
+<parameter name="feature">
+<parameter_description> the feature type to get the group from
+</parameter_description>
+</parameter>
+<parameter name="feature_idx">
+<parameter_description> the index of the feature to get the group from
+</parameter_description>
+</parameter>
+</parameters>
+<return> The group number of the queried pad feature.
+
+</return>
+</function>
+
+<function name="gdk_device_pad_get_group_n_modes">
+<description>
+Returns the number of modes that @group may have.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GdkDevicePad
+</parameter_description>
+</parameter>
+<parameter name="group_idx">
+<parameter_description> group to get the number of available modes from
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of modes available in @group.
+
+</return>
+</function>
+
+<function name="gdk_device_pad_get_n_features">
+<description>
+Returns the number of features a tablet pad has.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GdkDevicePad
+</parameter_description>
+</parameter>
+<parameter name="feature">
+<parameter_description> a pad feature
+</parameter_description>
+</parameter>
+</parameters>
+<return> The amount of elements of type @feature that this pad has.
+
+</return>
+</function>
+
+<function name="gdk_device_pad_get_n_groups">
+<description>
+Returns the number of groups this pad device has. Pads have
+at least one group. A pad group is a subcollection of
+buttons/strip/rings that is affected collectively by a same
+current mode.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GdkDevicePad
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of button/ring/strip groups in the pad.
+
+</return>
+</function>
+
 <function name="gdk_device_set_axis_use">
 <description>
 Specifies how an axis of a device is used.
@@ -5791,6 +5939,32 @@ by the input mode.
 </parameter>
 </parameters>
 <return> %TRUE if the mode was successfully changed.
+</return>
+</function>
+
+<function name="gdk_device_tool_get_hardware_id">
+<description>
+Gets the hardware ID of this tool, or 0 if it's not known. When
+non-zero, the identificator is unique for the given tool model,
+meaning that two identical tools will share the same @hardware_id,
+but will have different serial numbers (see gdk_device_tool_get_serial()).
+
+This is a more concrete (and device specific) method to identify
+a #GdkDeviceTool than gdk_device_tool_get_tool_type(), as a tablet
+may support multiple devices with the same #GdkDeviceToolType,
+but having different hardware identificators.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="tool">
+<parameter_description> a #GdkDeviceTool
+</parameter_description>
+</parameter>
+</parameters>
+<return> The hardware identificator of this tool.
+
 </return>
 </function>
 
@@ -11706,7 +11880,8 @@ allocated for it.
 <function name="gdk_pixbuf_copy">
 <description>
 Creates a new #GdkPixbuf with a copy of the information in the specified
-@pixbuf.
+@pixbuf. Note that this does not copy the options set on the original #GdkPixbuf,
+use gdk_pixbuf_copy_options() for this.
 
 
 </description>
@@ -11766,6 +11941,31 @@ Therefore, you can not use this function to scroll a pixbuf.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_pixbuf_copy_options">
+<description>
+Copy the key/value pair options attached to a #GdkPixbuf to another.
+This is useful to keep original metadata after having manipulated
+a file. However be careful to remove metadata which you've already
+applied, such as the &quot;orientation&quot; option after rotating the image.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="src_pixbuf">
+<parameter_description> a #GdkPixbuf to copy options from
+</parameter_description>
+</parameter>
+<parameter name="dest_pixbuf">
+<parameter_description> the #GdkPixbuf to copy options to
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success.
+
+</return>
 </function>
 
 <function name="gdk_pixbuf_fill">
@@ -11961,6 +12161,30 @@ Since: 2.6
 </parameter>
 </parameters>
 <return> whether this image format is disabled.
+
+</return>
+</function>
+
+<function name="gdk_pixbuf_format_is_save_option_supported">
+<description>
+Returns %TRUE if the save option specified by @option_key is supported when
+saving a pixbuf using the module implementing @format.
+See gdk_pixbuf_save() for more information about option keys.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a #GdkPixbufFormat
+</parameter_description>
+</parameter>
+<parameter name="option_key">
+<parameter_description> the name of an option
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the specified option is supported
 
 </return>
 </function>
@@ -13533,6 +13757,28 @@ Deprecated: 2.0: Use g_object_ref().
 </parameter>
 </parameters>
 <return> The same as the @pixbuf argument.
+
+</return>
+</function>
+
+<function name="gdk_pixbuf_remove_option">
+<description>
+Remove the key/value pair option attached to a #GdkPixbuf.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> a #GdkPixbuf
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a nul-terminated string representing the key to remove.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if an option was removed, %FALSE if not.
 
 </return>
 </function>
@@ -20689,6 +20935,7 @@ can scale the icon  but setting several size icons can give better
 image quality since the window manager may only need to scale the
 icon by a small amount or not at all.
 
+Note that some platforms don't support window icons.
 
 </description>
 <parameters>
@@ -20717,6 +20964,8 @@ will not update the icon title.
 
 Using %NULL for @name unsets the icon title; further calls to
 gdk_window_set_title() will again update the icon title as well.
+
+Note that some platforms don't support window icons.
 
 </description>
 <parameters>

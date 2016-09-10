@@ -10672,6 +10672,27 @@ Represents the packing location #GtkBox children. (See: #GtkVBox,
 </parameters>
 </enum>
 
+<enum name="GtkPadActionType">
+<description>
+The type of a pad action.
+
+</description>
+<parameters>
+<parameter name="GTK_PAD_ACTION_BUTTON">
+<parameter_description> Action is triggered by a pad button
+</parameter_description>
+</parameter>
+<parameter name="GTK_PAD_ACTION_RING">
+<parameter_description> Action is triggered by a pad ring
+</parameter_description>
+</parameter>
+<parameter name="GTK_PAD_ACTION_STRIP">
+<parameter_description> Action is triggered by a pad strip
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkPageOrientation">
 <description>
 See also gtk_print_settings_set_orientation().
@@ -14227,6 +14248,32 @@ is present. Otherwise, they are overlayed on top of the content,
 as narrow indicators.
 
 Since: 3.16
+
+</description>
+</property>
+
+<property name="GtkScrolledWindow:propagate-natural-height">
+<description>
+Whether the natural height of the child should be calculated and propagated
+through the scrolled windows requested natural height.
+
+This is useful in cases where an attempt should be made to allocate exactly
+enough space for the natural size of the child.
+
+Since: 3.22
+
+</description>
+</property>
+
+<property name="GtkScrolledWindow:propagate-natural-width">
+<description>
+Whether the natural width of the child should be calculated and propagated
+through the scrolled windows requested natural width.
+
+This is useful in cases where an attempt should be made to allocate exactly
+enough space for the natural size of the child.
+
+Since: 3.22
 
 </description>
 </property>
@@ -28552,6 +28599,20 @@ Override or install a new key binding for @keyval with @modifiers on
 emitted on the target widget, with @n_args @Varargs used as
 arguments.
 
+Each argument to the signal must be passed as a pair of varargs: the
+#GType of the argument, followed by the argument value (which must
+be of the given type). There must be @n_args pairs in total.
+
+## Adding a Key Binding
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+gtk_binding_entry_add_signal (binding_set, keyval, modmask,
+&quot;move-cursor&quot;, 3,
+G_TYPE_ENUM, step,
+G_TYPE_INT, count,
+G_TYPE_BOOLEAN, FALSE);
+]|
+
 </description>
 <parameters>
 <parameter name="binding_set">
@@ -38710,7 +38771,7 @@ Since: 2.14
 </parameter>
 </parameters>
 <return> The child widget which will receive the
-focus inside @container when the @conatiner is focussed,
+focus inside @container when the @container is focused,
 or %NULL if none is set.
 
 </return>
@@ -40641,13 +40702,6 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_image_targets">
 <description>
-Add the image targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_image_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -40661,13 +40715,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_add_text_targets">
 <description>
-Add the text targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_text_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -40681,13 +40728,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_add_uri_targets">
 <description>
-Add the URI targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_uri_targets() and
-gtk_drag_dest_set_target_list().
-
-Since: 2.6
 
 </description>
 <parameters>
@@ -40701,14 +40741,6 @@ Since: 2.6
 
 <function name="gtk_drag_dest_find_target">
 <description>
-Looks for a match between the supported targets of @context and the
-@dest_target_list, returning the first matching target, otherwise
-returning %GDK_NONE. @dest_target_list should usually be the return
-value from gtk_drag_dest_get_target_list(), but some widgets may
-have different valid targets for different parts of the widget; in
-that case, they will have to implement a drag_motion handler that
-passes the correct target list to this function.
-
 
 </description>
 <parameters>
@@ -40726,16 +40758,12 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return> first target that the source offers
-and the dest can accept, or %GDK_NONE
+<return>
 </return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
 <description>
-Returns the list of targets this widget can accept from
-drag-and-drop.
-
 
 </description>
 <parameters>
@@ -40744,16 +40772,11 @@ drag-and-drop.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GtkTargetList, or %NULL if none
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_get_track_motion">
 <description>
-Returns whether the widget has been configured to always
-emit #GtkWidget::drag-motion signals.
-
-Since: 2.10
 
 </description>
 <parameters>
@@ -40762,53 +40785,11 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the widget always emits
-#GtkWidget::drag-motion events
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_drag_dest_set">
 <description>
-Sets a widget as a potential drop destination, and adds default behaviors.
-
-The default behaviors listed in @flags have an effect similar
-to installing default handlers for the widget’s drag-and-drop signals
-(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
-for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
-sufficient to connect to the widget’s #GtkWidget::drag-data-received
-signal to get primitive, but consistent drag-and-drop support.
-
-Things become more complicated when you try to preview the dragged data,
-as described in the documentation for #GtkWidget::drag-motion. The default
-behaviors described by @flags make some assumptions, that can conflict
-with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
-invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
-and invokations of gtk_drag_finish() in #GtkWidget::drag-data-received.
-Especially the later is dramatic, when your own #GtkWidget::drag-motion
-handler calls gtk_drag_get_data() to inspect the dragged data.
-
-There’s no way to set a default action here, you can use the
-#GtkWidget::drag-motion callback for that. Here’s an example which selects
-the action to use depending on whether the control key is pressed or not:
-|[&lt;!-- language=&quot;C&quot; --&gt;
-static void
-drag_motion (GtkWidget *widget,
-GdkDragContext *context,
-gint x,
-gint y,
-guint time)
-{
-GdkModifierType mask;
-
-gdk_window_get_pointer (gtk_widget_get_window (widget),
-NULL, NULL, &amp;mask);
-if (mask &amp; GDK_CONTROL_MASK)
-gdk_drag_status (context, GDK_ACTION_COPY, time);
-else
-gdk_drag_status (context, GDK_ACTION_MOVE, time);
-}
-]|
 
 </description>
 <parameters>
@@ -40821,10 +40802,10 @@ gdk_drag_status (context, GDK_ACTION_MOVE, time);
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> a pointer to an array of
-#GtkTargetEntrys indicating the drop types that this @widget will
-accept, or %NULL. Later you can access the list with
-gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
+<parameter_description> a pointer to an array of #GtkTargetEntrys
+indicating the drop types that this @widget will accept, or %NULL.
+Later you can access the list with gtk_drag_dest_get_target_list()
+and gtk_drag_dest_find_target().
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
@@ -40841,7 +40822,6 @@ gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
 
 <function name="gtk_drag_dest_set_proxy">
 <description>
-Sets this widget as a proxy for drops to another window.
 
 </description>
 <parameters>
@@ -40870,9 +40850,6 @@ subwindow.
 
 <function name="gtk_drag_dest_set_target_list">
 <description>
-Sets the target types that this widget can accept from drag-and-drop.
-The widget must first be made into a drag destination with
-gtk_drag_dest_set().
 
 </description>
 <parameters>
@@ -40890,14 +40867,6 @@ gtk_drag_dest_set().
 
 <function name="gtk_drag_dest_set_track_motion">
 <description>
-Tells the widget to emit #GtkWidget::drag-motion and
-#GtkWidget::drag-leave events regardless of the targets and the
-%GTK_DEST_DEFAULT_MOTION flag.
-
-This may be used when a widget wants to do generic
-actions regardless of the targets that the source offers.
-
-Since: 2.10
 
 </description>
 <parameters>
@@ -40915,9 +40884,6 @@ Since: 2.10
 
 <function name="gtk_drag_dest_unset">
 <description>
-Clears information about a drop destination set with
-gtk_drag_dest_set(). The widget will no longer receive
-notification of drags.
 
 </description>
 <parameters>
@@ -66487,6 +66453,109 @@ Since: 3.18
 <return></return>
 </function>
 
+<function name="gtk_pad_controller_new">
+<description>
+Creates a new #GtkPadController that will associate events from @pad to
+actions. A %NULL pad may be provided so the controller manages all pad devices
+generically, it is discouraged to mix #GtkPadController objects with %NULL
+and non-%NULL @pad argument on the same @window, as execution order is not
+guaranteed.
+
+The #GtkPadController is created with no mapped actions. In order to map pad
+events to actions, use gtk_pad_controller_set_action_entries() or
+gtk_pad_controller_set_action().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description> #GActionGroup to trigger actions from
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> A %GDK_SOURCE_TABLET_PAD device, or %NULL to handle all pads
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly created #GtkPadController
+
+</return>
+</function>
+
+<function name="gtk_pad_controller_set_action">
+<description>
+Adds an individual action to @controller. This action will only be activated
+if the given button/ring/strip number in @index is interacted while
+the current mode is @mode. -1 may be used for simple cases, so the action
+is triggered on all modes.
+
+The given @label should be considered user-visible, so internationalization
+rules apply. Some windowing systems may be able to use those for user
+feedback.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkPadController
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the type of pad feature that will trigger this action
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> the 0-indexed button/ring/strip number that will trigger this action
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the mode that will trigger this action, or -1 for all modes.
+</parameter_description>
+</parameter>
+<parameter name="label">
+<parameter_description> Human readable description of this action, this string should
+be deemed user-visible.
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> action name that will be activated in the #GActionGroup
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_pad_controller_set_action_entries">
+<description>
+This is a convenience function to add a group of action entries on
+@controller. See #GtkPadActionEntry and gtk_pad_controller_set_action().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkPadController
+</parameter_description>
+</parameter>
+<parameter name="entries">
+<parameter_description> the action entries to set on @controller
+</parameter_description>
+</parameter>
+<parameter name="n_entries">
+<parameter_description> the number of elements in @entries
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_page_setup_copy">
 <description>
 Copies a #GtkPageSetup.
@@ -70182,6 +70251,10 @@ Returns whether show/hide transitions are enabled on this popover.
 
 Since: 3.16
 
+Deprecated: 3.22: You can show or hide the popover without transitions
+using gtk_widget_show() and gtk_widget_hide() while gtk_popover_popup()
+and gtk_popover_popdown() will use transitions.
+
 </description>
 <parameters>
 <parameter name="popover">
@@ -70284,6 +70357,42 @@ Since: 3.12
 <return> the new #GtkPopover
 
 </return>
+</function>
+
+<function name="gtk_popover_popdown">
+<description>
+Pops @popover down.This is different than a gtk_widget_hide() call
+in that it shows the popover with a transition. If you want to hide
+the popover without a transition, use gtk_widget_hide().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="popover">
+<parameter_description> a #GtkPopover
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_popover_popup">
+<description>
+Pops @popover up. This is different than a gtk_widget_show() call
+in that it shows the popover with a transition. If you want to show
+the popover without a transition, use gtk_widget_show().
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="popover">
+<parameter_description> a #GtkPopover
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_popover_set_constrain_to">
@@ -70433,6 +70542,10 @@ Since: 3.12
 Sets whether show/hide transitions are enabled on this popover
 
 Since: 3.16
+
+Deprecated: 3.22: You can show or hide the popover without transitions
+using gtk_widget_show() and gtk_widget_hide() while gtk_popover_popup()
+and gtk_popover_popdown() will use transitions.
 
 </description>
 <parameters>
@@ -80738,6 +80851,11 @@ Sets the number of decimal places that are displayed in the value.
 Also causes the value of the adjustment to be rounded off to this
 number of digits, so the retrieved value matches the value the user saw.
 
+Note that rounding to a small number of digits can interfere with
+the smooth autoscrolling that is built into #GtkScale. As an alternative,
+you can use the #GtkScale::format-value signal to format the displayed
+value yourself.
+
 </description>
 <parameters>
 <parameter name="scale">
@@ -81261,6 +81379,44 @@ for the vertical scrollbar, or %NULL
 <return></return>
 </function>
 
+<function name="gtk_scrolled_window_get_propagate_natural_height">
+<description>
+Reports whether the natural height of the child will be calculated and propagated
+through the scrolled windows requested natural height.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether natural height propagation is enabled.
+
+</return>
+</function>
+
+<function name="gtk_scrolled_window_get_propagate_natural_width">
+<description>
+Reports whether the natural width of the child will be calculated and propagated
+through the scrolled windows requested natural width.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether natural width propagation is enabled.
+
+</return>
+</function>
+
 <function name="gtk_scrolled_window_get_shadow_type">
 <description>
 Gets the shadow type of the scrolled window. See 
@@ -81578,6 +81734,48 @@ than the trough — the display is larger than the page size).
 </parameter>
 <parameter name="vscrollbar_policy">
 <parameter_description> policy for vertical bar
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scrolled_window_set_propagate_natural_height">
+<description>
+Sets whether the natural height of the child should be calculated and propagated
+through the scrolled windows requested natural height.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="propagate">
+<parameter_description> whether to propagate natural height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scrolled_window_set_propagate_natural_width">
+<description>
+Sets whether the natural width of the child should be calculated and propagated
+through the scrolled windows requested natural width.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="scrolled_window">
+<parameter_description> a #GtkScrolledWindow
+</parameter_description>
+</parameter>
+<parameter name="propagate">
+<parameter_description> whether to propagate natural width
 </parameter_description>
 </parameter>
 </parameters>
@@ -116164,23 +116362,21 @@ gtk_window_move() to keep @window in its current position.
 This means that the meaning of the returned value varies with
 window gravity. See gtk_window_move() for more details.
 
+The reliability of this function depends on the windowing system
+currently in use. Some windowing systems, such as Wayland, do not
+support a global coordinate system, and thus the position of the
+window will always be (0, 0). Others, like X11, do not have a reliable
+way to obtain the geometry of the decorations of a window if they are
+provided by the window manager. Additionally, on X11, window manager
+have been known to mismanage window gravity, which result in windows
+moving even if you use the coordinates of the current position as
+returned by this function.
+
 If you haven’t changed the window gravity, its gravity will be
 #GDK_GRAVITY_NORTH_WEST. This means that gtk_window_get_position()
 gets the position of the top-left corner of the window manager
 frame for the window. gtk_window_move() sets the position of this
 same top-left corner.
-
-gtk_window_get_position() is not 100% reliable because the X Window System
-does not specify a way to obtain the geometry of the
-decorations placed on a window by the window manager.
-Thus GTK+ is using a “best guess” that works with most
-window managers.
-
-Moreover, nearly all window managers are historically broken with
-respect to their handling of window gravity. So moving a window to
-its current position as returned by gtk_window_get_position() tends
-to result in moving the window slightly. Window managers are
-slowly getting better over time.
 
 If a window has gravity #GDK_GRAVITY_STATIC the window manager
 frame is not relevant, and thus gtk_window_get_position() will
@@ -116188,14 +116384,15 @@ always produce accurate results. However you can’t use static
 gravity to do things like place a window in a corner of the screen,
 because static gravity ignores the window manager decorations.
 
-If you are saving and restoring your application’s window
-positions, you should know that it’s impossible for applications to
-do this without getting it somewhat wrong because applications do
-not have sufficient knowledge of window manager state. The Correct
-Mechanism is to support the session management protocol (see the
-“GnomeClient” object in the GNOME libraries for example) and allow
-the window manager to save your window sizes and positions.
+Ideally, this function should return appropriate values if the
+window has client side decorations, assuming that the windowing
+system supports global coordinates.
 
+In practice, saving the window position should not be left to
+applications, as they lack enough knowledge of the windowing
+system and the window manager state to effectively do so. The
+appropriate way to implement saving the window position is to
+use a platform-specific protocol, wherever that is available.
 
 </description>
 <parameters>
@@ -117796,7 +117993,8 @@ Since: 3.4
 Sets up the icon representing a #GtkWindow. This icon is used when
 the window is minimized (also known as iconified).  Some window
 managers or desktop environments may also place it in the window
-frame, or display it in other contexts.
+frame, or display it in other contexts. On others, the icon is not
+used at all, so your mileage may vary.
 
 The icon should be provided in whatever size it was naturally
 drawn; that is, don’t scale the image before passing it to
@@ -117828,7 +118026,7 @@ for all windows in your application in one go.
 
 <function name="gtk_window_set_icon_from_file">
 <description>
-Sets the icon for @window.  
+Sets the icon for @window.
 Warns on failure if @err is %NULL.
 
 This function is equivalent to calling gtk_window_set_icon()
@@ -117861,7 +118059,8 @@ Since: 2.2
 Sets up the icon representing a #GtkWindow. The icon is used when
 the window is minimized (also known as iconified).  Some window
 managers or desktop environments may also place it in the window
-frame, or display it in other contexts.
+frame, or display it in other contexts. On others, the icon is not
+used at all, so your mileage may vary.
 
 gtk_window_set_icon_list() allows you to pass in the same icon in
 several hand-drawn sizes. The list should contain the natural sizes
@@ -117899,8 +118098,9 @@ set the icon on transient windows.
 
 <function name="gtk_window_set_icon_name">
 <description>
-Sets the icon for the window from a named themed icon. See
-the docs for #GtkIconTheme for more details.
+Sets the icon for the window from a named themed icon.
+See the docs for #GtkIconTheme for more details.
+On some platforms, the window icon is not used at all.
 
 Note that this has nothing to do with the WM_ICON_NAME 
 property which is mentioned in the ICCCM.
