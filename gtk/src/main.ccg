@@ -38,6 +38,11 @@ namespace
  * the gtk_*_remove() functions have the same signature, all main signals can
  * be handled by a single class.  Special handling is needed for signals that
  * don't support destroy notification; see the comment on connection_list_.
+ *
+ * This class is now used only by the deprecated key snooper API. The class
+ * contains some code and data which is now unnecessary, after other code has
+ * been removed. Both the key snooper API and the GtkMainConnectionNode class
+ * can be removed in gtk+-4/gtkmm-4.
  */
 class GtkMainConnectionNode
 {
@@ -48,7 +53,6 @@ public:
   explicit GtkMainConnectionNode(const sigc::slot_base& slot);
 
   static void* notify(void* data);
-  static void destroy_notify_handler(void* data);
 
   // Call this after installing the GTK+ callback.
   void install(guint conn_id, RemoveFunc remove_func, bool has_destroy_notify);
@@ -118,30 +122,6 @@ void* GtkMainConnectionNode::notify(void* data)
   }
 
   return nullptr;
-}
-
-// static
-void GtkMainConnectionNode::destroy_notify_handler(void* data)
-{
-  // notification from the gtk+ side ...
-
-  const auto self = static_cast<GtkMainConnectionNode*>(data);
-
-  // this call might be triggered from notify().
-  if(!self->destroyed_)
-  {
-    self->destroyed_ = true;
-
-    // The GTK+ side is disconnected now, thus the ID is no longer valid.
-    self->conn_id_ = 0;
-
-    // remove self from global list.
-    if (!self->has_destroy_notify_)
-      list_remove(self);
-
-    // destruction of slot_ notifies all objects referring to it.
-    delete self;
-  }
 }
 
 void GtkMainConnectionNode::install(
