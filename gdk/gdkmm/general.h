@@ -28,29 +28,10 @@
 namespace Gdk
 {
 
-int screen_width();
-int screen_height();
-
-int screen_width_mm();
-int screen_height_mm();
-
 void flush();
 
 namespace Cairo
 {
-
-#ifndef GDKMM_DISABLE_DEPRECATED
-
-/** Sets the specified Gdk::Color as the source color of the Cairo context.
- * @param context The cairo context.
- * @param color The color to use as the source color.
- *
- * @newin{2,10}
- * @deprecated Use set_source_rgba() instead.
- */
-void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
-
-#endif //GDKMM_DISABLE_DEPRECATED
 
 /** Sets the specified Gdk::RGBA as the source color of the Cairo context.
  * @param context The cairo context.

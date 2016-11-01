@@ -28,27 +28,6 @@
 namespace Gdk
 {
 
-int screen_width()
-{
-  return gdk_screen_width();
-}
-
-int screen_height()
-{
-  return gdk_screen_height();
-}
-
-int screen_width_mm()
-{
-  return gdk_screen_width_mm();
-}
-
-int screen_height_mm()
-{
-  return gdk_screen_height_mm();
-}
-
-
 void flush()
 {
   gdk_flush();
@@ -56,15 +35,6 @@ void flush()
 
 namespace Cairo
 {
-
-#ifndef GDKMM_DISABLE_DEPRECATED
-
-void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color)
-{
-  gdk_cairo_set_source_color(context->cobj(), const_cast<GdkColor*>(color.gobj()));
-}
-
-#endif //GDKMM_DISABLE_DEPRECATED
 
 void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color)
 {
