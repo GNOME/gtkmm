@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [3.22.0],
+AC_INIT([gtkmm], [3.89.0],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -33,8 +33,8 @@ AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 MM_PREREQ([0.9.10])
-MM_INIT_MODULE([gdkmm-3.0])
-MM_INIT_MODULE([gtkmm-3.0])
+MM_INIT_MODULE([gdkmm-4.0])
+MM_INIT_MODULE([gtkmm-4.0])
 
 # Copy the mm-common .pl scripts into docs/,
 # and use them from there,
@@ -42,7 +42,7 @@ MM_INIT_MODULE([gtkmm-3.0])
 MM_CONFIG_DOCTOOL_DIR([docs])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-AC_SUBST([LIBGTKMM_SO_VERSION], [2:0:1])
+AC_SUBST([LIBGTKMM_SO_VERSION], [0:0:0])
 
 AC_PROG_CXX
 MM_AX_CXX_COMPILE_STDCXX([11], [noext],[mandatory])
@@ -50,13 +50,13 @@ MM_AX_CXX_COMPILE_STDCXX([11], [noext],[mandatory])
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
 
-PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+PKG_CHECK_MODULES([GTK], [gtk+-4.0])
 gdk_target_win32=no
 gdk_target_quartz=no
 gdk_target_x11=no
 gdk_target_wayland=no
 gdk_target_broadway=no
-backends=`$PKG_CONFIG --variable=targets gtk+-3.0`
+backends=`$PKG_CONFIG --variable=targets gtk+-4.0`
 m4_foreach([mytarget], [[win32], [quartz], [x11], [wayland], [broadway]], [
     AC_ARG_ENABLE(mytarget-backend,
                   AS_HELP_STRING([--enable-mytarget-backend@<:@=yes|no|check@:>@], [enable mytarget gdk target @<:@default=check@:>@]),
@@ -94,12 +94,12 @@ AS_IF([test "x$enable_static" = xyes],
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 # The extra cairomm-1.0 check is because gdkmm requires a newer cairomm than pangomm requires.
-# The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-3.0 requires.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.49.1 pangomm-1.4 >= 2.38.2 gtk+-3.0 >= 3.22.0 cairomm-1.0 >= 1.12.0 gdk-pixbuf-2.0 >= 2.35.5'])
+# The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-4.0 requires.
+AC_SUBST([GDKMM_MODULES], ['giomm-2.4 >= 2.49.1 pangomm-1.4 >= 2.38.2 gtk+-4.0 >= 3.89.0 cairomm-1.0 >= 1.12.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
-      [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-3.0"])
+      [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-4.0"])
 
 # Offer the ability to omit some API from the library, to reduce the code size.
 # Note that there are other options in glibmm, which affect gtkmm.
