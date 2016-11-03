@@ -71,7 +71,6 @@ class Window;
 class Container;
 class Settings;
 class Tooltip;
-class StockID; //deprecated.
 
 // Gtk::Allocation is a typedef of Gdk::Rectangle because GtkAllocation is
 // a typedef of GdkRectangle.
@@ -95,8 +94,7 @@ typedef Gdk::Rectangle Allocation;
  * first be set with ().
  *
  * Only widgets with a Gdk::Window on the server side are allowed to
- * capture events.  Widgets in the Gtk::Misc group for example lack
- * a Gdk::Window.
+ * capture events.
  */
 class Widget
 : public Object,
@@ -108,7 +106,7 @@ class Widget
   _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Object,GObject)
   _IMPLEMENTS_INTERFACE(Buildable)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
-  _IGNORE(gtk_widget_set_visual, gtk_widget_destroy, gtk_widget_destroyed, gtk_widget_hide_on_delete,
+  _IGNORE(gtk_widget_destroy, gtk_widget_destroyed, gtk_widget_hide_on_delete,
           gtk_widget_style_get_valist, gtk_widget_list_accel_closures, gtk_widget_style_get)
 public:
   friend class Main;
@@ -132,8 +130,6 @@ public:
   _WRAP_METHOD(void size_allocate(const Allocation& allocation), gtk_widget_size_allocate)
 
   _WRAP_METHOD(void size_allocate(const Allocation& allocation, int baseline), gtk_widget_size_allocate_with_baseline)
-
-  _IGNORE(gtk_widget_size_request) //deprecated
 
   _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_widget_get_request_mode)
   _WRAP_METHOD(void get_preferred_width(int& minimum_width, int& natural_width) const, gtk_widget_get_preferred_width)
@@ -162,8 +158,6 @@ public:
 
   //TODO: Use C++ type
   _WRAP_METHOD(bool event(GdkEvent* gdk_event), gtk_widget_event)
-  _WRAP_METHOD(int send_expose(GdkEvent* gdk_event), gtk_widget_send_expose,
-    deprecated "%Application and widget code should not handle expose events directly; invalidation should use the Gtk::Widget API, and drawing should only happen inside signal_draw() implementations.")
   _WRAP_METHOD(bool send_focus_change(GdkEvent* gdk_event), gtk_widget_send_focus_change)
   _WRAP_METHOD(bool activate(), gtk_widget_activate)
 
@@ -175,15 +169,9 @@ public:
    * @param new_parent A Gtk::Container to move the widget into.
    */
   void reparent(Widget& new_parent);
-  _IGNORE(gtk_widget_reparent)
 
   bool intersect(const Gdk::Rectangle& area) const;
   _WRAP_METHOD(bool intersect(const Gdk::Rectangle& area, Gdk::Rectangle& intersection) const, gtk_widget_intersect)
-
-#m4 _CONVERSION(`cairo_region_t*',`::Cairo::RefPtr< ::Cairo::Region>',`::Cairo::RefPtr< ::Cairo::Region>(new ::Cairo::Region($3, true /* do not take ref */))')
-
-  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Region> region_intersect(const ::Cairo::RefPtr< ::Cairo::Region>& region) const, gtk_widget_region_intersect,
-               deprecated "Use get_allocation() and Cairo::Region::intersect(const Cairo::RectangleInt&) to get the same behavior.")
 
   _WRAP_METHOD(void freeze_child_notify(), gtk_widget_freeze_child_notify)
   _WRAP_METHOD(void child_notify(const Glib::ustring& child_property), gtk_widget_child_notify)
@@ -229,9 +217,6 @@ public:
   void unset_name();
   _WRAP_METHOD(Glib::ustring get_name() const, gtk_widget_get_name)
 
-  _WRAP_METHOD(void set_state(StateType state), gtk_widget_set_state, deprecated "Use set_state_flags() instead.")
-  _WRAP_METHOD(StateType get_state() const, gtk_widget_get_state, deprecated "Use get_state_flags() instead.")
-
   _WRAP_METHOD(void set_state_flags(StateFlags flags, bool clear = true), gtk_widget_set_state_flags)
   _WRAP_METHOD(void unset_state_flags(StateFlags flags), gtk_widget_unset_state_flags)
   _WRAP_METHOD(StateFlags get_state_flags() const, gtk_widget_get_state_flags)
@@ -249,10 +234,6 @@ public:
   _WRAP_METHOD(bool get_mapped() const, gtk_widget_get_mapped)
   _WRAP_METHOD(void set_app_paintable(bool app_paintable = true), gtk_widget_set_app_paintable)
   _WRAP_METHOD(bool get_app_paintable() const, gtk_widget_get_app_paintable)
-  _WRAP_METHOD(void set_double_buffered(bool double_buffered = true), gtk_widget_set_double_buffered,
-    deprecated "This does not work under non-X11 backends, and it should not be used in newly written code.")
-  _WRAP_METHOD(bool get_double_buffered() const, gtk_widget_get_double_buffered,
-    deprecated "This should not be used in newly written code.")
 
   _WRAP_METHOD(void set_redraw_on_allocate(bool redraw_on_allocate = true),
                gtk_widget_set_redraw_on_allocate)
@@ -340,9 +321,6 @@ public:
   _WRAP_METHOD(Widget* get_ancestor(GType widget_type), gtk_widget_get_ancestor)
   _WRAP_METHOD(const Widget* get_ancestor(GType widget_type) const, gtk_widget_get_ancestor, constversion)
 
-
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Visual> get_visual(), gtk_widget_get_visual, refreturn)
-
   _WRAP_METHOD(Glib::RefPtr<Gdk::Screen> get_screen(), gtk_widget_get_screen, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Screen> get_screen() const, gtk_widget_get_screen, refreturn, constversion)
 
@@ -352,9 +330,6 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Display> get_display(), gtk_widget_get_display, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Display> get_display() const, gtk_widget_get_display, refreturn, constversion)
-
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_root_window(), gtk_widget_get_root_window, refreturn, deprecated "Use Gdk::Screen::get_root_window() instead.")
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_root_window() const, gtk_widget_get_root_window, refreturn, constversion, deprecated "Use Gdk::Screen::get_root_window() instead.")
 
   _WRAP_METHOD(Glib::RefPtr<Settings> get_settings(), gtk_widget_get_settings, refreturn)
 
@@ -383,10 +358,6 @@ public:
   _WRAP_METHOD(Align get_valign() const, gtk_widget_get_valign)
   _WRAP_METHOD(Align get_valign_with_baseline() const, gtk_widget_get_valign_with_baseline)
   _WRAP_METHOD(void set_valign(Align align), gtk_widget_set_valign)
-  _WRAP_METHOD(int get_margin_left() const, gtk_widget_get_margin_left, deprecated "Use get_margin_start() instead.")
-  _WRAP_METHOD(void set_margin_left(int margin), gtk_widget_set_margin_left, deprecated "Use set_margin_start() instead.")
-  _WRAP_METHOD(int get_margin_right() const, gtk_widget_get_margin_right, deprecated "Use get_margin_end() instead.")
-  _WRAP_METHOD(void set_margin_right(int margin), gtk_widget_set_margin_right, deprecated "Use set_margin_end() instead.")
   _WRAP_METHOD(int get_margin_start() const, gtk_widget_get_margin_start)
   _WRAP_METHOD(void set_margin_start(int margin), gtk_widget_set_margin_start)
   _WRAP_METHOD(int get_margin_end() const, gtk_widget_get_margin_end)
@@ -398,85 +369,11 @@ public:
 
   _WRAP_METHOD(Gdk::EventMask get_events() const, gtk_widget_get_events)
   _WRAP_METHOD(Gdk::EventMask get_device_events(const Glib::RefPtr<const Gdk::Device>& device) const, gtk_widget_get_device_events)
-  _WRAP_METHOD(void get_pointer(int &x, int &y) const, gtk_widget_get_pointer, deprecated "Use Gdk::Window::get_device_position instead.")
   _WRAP_METHOD(bool is_ancestor(Widget &ancestor) const, gtk_widget_is_ancestor)
 
   _WRAP_METHOD(bool translate_coordinates(Widget& dest_widget,
 					       int src_x, int src_y,
 					       int& dest_x, int& dest_y), gtk_widget_translate_coordinates)
-
-  _IGNORE(gtk_widget_set_style, gtk_widget_get_style, gtk_widget_has_rc_style, gtk_widget_ensure_style,
-    gtk_widget_modify_style, gtk_widget_get_modifier_style,
-    gtk_widget_reset_rc_styles) //deprecated broadly in favour of StyleContext.;
-
-  _WRAP_METHOD(void override_color(const Gdk::RGBA& color{.}, StateFlags state{.} = STATE_FLAG_NORMAL), gtk_widget_override_color,
-               deprecated "Use a custom style provider and style classes instead.")
-
-_DEPRECATE_IFDEF_START
-  /** Undoes the effect of previous calls to override_color().
-   *
-   * @newin{3,0}
-   * @deprecated Use a custom style provider and style classes instead.
-   *
-   * @param state The state for which to use the color of the user's theme.
-   */
-  void unset_color(StateFlags state = STATE_FLAG_NORMAL);
-_DEPRECATE_IFDEF_END
-
-  _WRAP_METHOD(void override_background_color(const Gdk::RGBA& color{.}, StateFlags state{.} = STATE_FLAG_NORMAL), gtk_widget_override_background_color,
-               deprecated "Use a custom style provider and style classes instead.")
-
-_DEPRECATE_IFDEF_START
-  /** Undoes the effect of previous calls to override_background_color().
-   *
-   * @newin{3,0}
-   * @deprecated Use a custom style provider and style classes instead.
-   *
-   * @param state The state for which to use the background color of the user's theme.
-   */
-  void unset_background_color(StateFlags state = STATE_FLAG_NORMAL);
-_DEPRECATE_IFDEF_END
-
-  _WRAP_METHOD(void override_font(const Pango::FontDescription& font_desc), gtk_widget_override_font,
-               deprecated "Use a custom style provider and style classes instead.")
-
-_DEPRECATE_IFDEF_START
-  /** Undoes the effect of previous calls to override_font().
-   *
-   * @newin{3,0}
-   * @deprecated Use a custom style provider and style classes instead.
-   */
-  void unset_font();
-_DEPRECATE_IFDEF_END
-
-  _WRAP_METHOD(void override_symbolic_color(const Glib::ustring& name, const Gdk::RGBA& color), gtk_widget_override_symbolic_color,
-               deprecated "Use a custom style provider and style classes instead.")
-
-_DEPRECATE_IFDEF_START
-  /** Undoes the effect of previous calls to override_symbolic_color().
-   *
-   * @newin{3,0}
-   * @deprecated Use a custom style provider and style classes instead.
-   *
-   * @param name The name of the symbolic color to fetch from the user's theme.
-   */
-  void unset_symbolic_color(const Glib::ustring& name);
-_DEPRECATE_IFDEF_END
-
-  _WRAP_METHOD(void override_cursor(const Gdk::RGBA& cursor, const Gdk::RGBA& secondary_cursor), gtk_widget_override_cursor,
-               deprecated "Use a custom style provider and style classes instead.")
-
-_DEPRECATE_IFDEF_START
-  /** Undoes the effect of previous calls to override_cursor().
-   *
-   * @newin{3,0}
-   * @deprecated Use a custom style provider and style classes instead.
-   */
-  void unset_cursor();
-_DEPRECATE_IFDEF_END
-
-  _IGNORE(gtk_widget_modify_fg, gtk_widget_modify_bg, gtk_widget_modify_font, gtk_widget_modify_text,
-     gtk_widget_modify_base, gtk_widget_modify_cursor) //deprecated
 
   _WRAP_METHOD(void reset_style(), gtk_widget_reset_style)
 
@@ -503,20 +400,6 @@ _DEPRECATE_IFDEF_END
 
   _WRAP_METHOD(Glib::RefPtr<Pango::Layout> create_pango_layout(const Glib::ustring& text), gtk_widget_create_pango_layout)
 
-  _IGNORE(gtk_widget_render_icon) //deprecated.
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> render_icon_pixbuf(const StockID& stock_id, IconSize size), gtk_widget_render_icon_pixbuf, deprecated "Use IconTheme::load_icon() instead.")
-
-  _WRAP_METHOD(void set_composite_name(const Glib::ustring& name), gtk_widget_set_composite_name, deprecated "Use gtk_widget_class_set_template(), or don't use this API at all.")
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Use gtk_widget_class_set_template(), or don't use this API at all.
-   */
-  void unset_composite_name();
-#endif // GTKMM_DISABLE_DEPRECATED
-  _WRAP_METHOD(Glib::ustring get_composite_name() const, gtk_widget_get_composite_name, deprecated "Use gtk_widget_class_set_template(), or don't use this API at all.")
-
-  _WRAP_METHOD(static void push_composite_child(), gtk_widget_push_composite_child, deprecated "This API never really worked well and was mostly unused, now we have a more complete mechanism for composite children, see gtk_widget_class_set_template().")
-  _WRAP_METHOD(static void pop_composite_child(), gtk_widget_pop_composite_child, deprecated "Use gtk_widget_class_set_template(), or don't use this API at all.")
-
 /* Directionality of Text */
 
   _WRAP_METHOD(void set_direction(TextDirection dir), gtk_widget_set_direction)
@@ -529,7 +412,6 @@ _DEPRECATE_IFDEF_END
   _WRAP_METHOD(void input_shape_combine_region(const ::Cairo::RefPtr<const ::Cairo::Region>& region), gtk_widget_input_shape_combine_region)
 
   _WRAP_METHOD(WidgetPath get_path() const, gtk_widget_get_path)
-  _IGNORE(gtk_widget_path, gtk_widget_class_path) //deprecated
 
 #m4 _CONVERSION(`GList*',`std::vector<Widget*>',`Glib::ListHandler<Widget*>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
  _WRAP_METHOD(std::vector<Widget*> list_mnemonic_labels(), gtk_widget_list_mnemonic_labels)
@@ -549,7 +431,6 @@ _DEPRECATE_IFDEF_END
   void drag_dest_set(const std::vector<TargetEntry>& targets, DestDefaults flags = DEST_DEFAULT_ALL, Gdk::DragAction actions = Gdk::ACTION_COPY);
   _IGNORE(gtk_drag_dest_set)
 
-  _WRAP_METHOD(void drag_dest_set_proxy(const Glib::RefPtr<Gdk::Window>& proxy_window, Gdk::DragProtocol protocol, bool use_coordinates), gtk_drag_dest_set_proxy)
   _WRAP_METHOD(void drag_dest_unset(), gtk_drag_dest_unset)
   _WRAP_METHOD(Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::RefPtr<TargetList>& target_list) const, gtk_drag_dest_find_target)
   Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context) const;
@@ -568,15 +449,12 @@ _DEPRECATE_IFDEF_END
   _WRAP_METHOD(void drag_source_unset(), gtk_drag_source_unset)
 
   _WRAP_METHOD(void drag_source_set_icon(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_drag_source_set_icon_pixbuf)
-  _WRAP_METHOD(void drag_source_set_icon(const StockID& stock_id), gtk_drag_source_set_icon_stock, deprecated "Use the drag_source_set_icon() that takes a Glib::ustring instead.")
   _WRAP_METHOD(void drag_source_set_icon(const Glib::ustring& icon_name), gtk_drag_source_set_icon_name)
 
   _WRAP_METHOD(void drag_source_add_text_targets(), gtk_drag_source_add_text_targets)
   _WRAP_METHOD(void drag_source_add_uri_targets(), gtk_drag_source_add_uri_targets)
   _WRAP_METHOD(void drag_source_add_image_targets(), gtk_drag_source_add_image_targets)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(const Glib::RefPtr<TargetList>& targets, Gdk::DragAction actions, int button, GdkEvent* gdk_event), gtk_drag_begin, refreturn,
-               deprecated "Use the drag_begin() that takes x,y coordinates.")
   _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(const Glib::RefPtr<TargetList>& targets, Gdk::DragAction actions, int button, GdkEvent* gdk_event, int x, int y), gtk_drag_begin_with_coordinates, refreturn)
   _WRAP_METHOD(bool drag_check_threshold(int start_x, int start_y, int current_x, int current_y), gtk_drag_check_threshold)
 
@@ -597,17 +475,6 @@ _DEPRECATE_IFDEF_END
   //Most containers that derive from GtkContainer do not need to, but GtkNotebook does.
   _WRAP_METHOD(void map(), gtk_widget_map)
   _WRAP_METHOD(void unmap(), gtk_widget_unmap)
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** Draws a text caret on @a cr at @a location.
-   * This is not a style function but merely a convenience function for drawing
-   * the standard cursor shape.
-   *
-   * @deprecated Use StyleContext::render_insertion_cursor() instead.
-   */
-  void draw_insertion_cursor(const ::Cairo::RefPtr< ::Cairo::Context>& cr, const Gdk::Rectangle& location, bool is_primary, TextDirection direction, bool draw_arrow = true);
-#endif // GTKMM_DISABLE_DEPRECATED
-  _IGNORE(gtk_draw_insertion_cursor)
 
   // Gtk+ 2.12 tooltip API
   _WRAP_METHOD(void set_tooltip_window(Window& custom_window), gtk_widget_set_tooltip_window)
@@ -688,8 +555,6 @@ _DEPRECATE_IFDEF_END
 //  and      style_set  => style_changed
 //  to avoid confusion with set_parent and set_style.
 
-  _WRAP_SIGNAL(void state_changed(Gtk::StateType previous_state), "state_changed", deprecated "Use signal_state_flags_changed() instead.")
-
   //TODO: Remove no_default_handler when we can break ABI:
   _WRAP_SIGNAL(void state_flags_changed(Gtk::StateFlags previous_state_flags), "state-flags-changed", no_default_handler)
 
@@ -700,7 +565,6 @@ _DEPRECATE_IFDEF_END
 
   _WRAP_SIGNAL(void hierarchy_changed(Widget* previous_toplevel), "hierarchy_changed")
 
-  _IGNORE_SIGNAL("style_set") //uses deprecated GtkStyle.
   _WRAP_SIGNAL(void style_updated(), "style_updated")
 
   _WRAP_SIGNAL(void direction_changed(TextDirection direction), "direction_changed")
@@ -767,8 +631,6 @@ dnl
   _WRAP_SIGNAL(bool selection_notify_event(GdkEventSelection* selection_event), "selection_notify_event")
   _WRAP_SIGNAL(bool proximity_in_event(GdkEventProximity* proximity_event), "proximity_in_event")
   _WRAP_SIGNAL(bool proximity_out_event(GdkEventProximity* proximity_event), "proximity_out_event")
-  _WRAP_SIGNAL(bool visibility_notify_event(GdkEventVisibility* visibility_event), "visibility_notify_event",
-    deprecated "Modern composited windowing systems with pervasive transparency make it impossible to track the visibility of a window reliably, so this signal can not be guaranteed to provide useful information.")
   _WRAP_SIGNAL(bool window_state_event(GdkEventWindowState* window_state_event), "window_state_event")
 
   //We use the optional custom_c_callback parameter with _WRAP_SIGNAL() for some of these,
@@ -832,20 +694,15 @@ _CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true
   _WRAP_PROPERTY("can_default", bool)
   _WRAP_PROPERTY("has_default", bool)
   _WRAP_PROPERTY("receives_default", bool)
-  _WRAP_PROPERTY("composite_child", bool)
-  _WRAP_PROPERTY("style", Glib::RefPtr<Style>, deprecated "Don't use this API. There is no Style class in gtkmm 3.")
   _WRAP_PROPERTY("events", Gdk::EventMask)
   _WRAP_PROPERTY("has_tooltip", bool)
   _WRAP_PROPERTY("tooltip_markup", Glib::ustring)
   _WRAP_PROPERTY("tooltip_text", Glib::ustring)
   _WRAP_PROPERTY("window", Glib::RefPtr<Gdk::Window>)
   _WRAP_PROPERTY("no-show-all", bool)
-  _WRAP_PROPERTY("double-buffered", bool, deprecated "Widgets should not use this property.")
 
   _WRAP_PROPERTY("halign", Align)
   _WRAP_PROPERTY("valign", Align)
-  _WRAP_PROPERTY("margin-left", int, deprecated "Use property_margin_start() instead.")
-  _WRAP_PROPERTY("margin-right", int, deprecated "Use property_margin_end() instead.")
   _WRAP_PROPERTY("margin-start", int)
   _WRAP_PROPERTY("margin-end", int)
   _WRAP_PROPERTY("margin-top", int)
@@ -868,10 +725,6 @@ protected:
   _WRAP_VFUNC(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", refreturn, ifdef GTKMM_ATKMM_ENABLED)
 
   _WRAP_VFUNC(SizeRequestMode get_request_mode() const, get_request_mode)
-  _WRAP_VFUNC(void get_preferred_width(int& minimum_width, int& natural_width) const, get_preferred_width, custom_vfunc_callback)
-  _WRAP_VFUNC(void get_preferred_height_for_width(int width, int& minimum_height, int& natural_height) const, get_preferred_height_for_width, custom_vfunc_callback)
-  _WRAP_VFUNC(void get_preferred_height(int& minimum_height, int& natural_height) const, get_preferred_height, custom_vfunc_callback)
-  _WRAP_VFUNC(void get_preferred_width_for_height(int height, int& minimum_width, int& natural_width) const, get_preferred_width_for_height, custom_vfunc_callback)
   //TODO: Wrap all the new vfuncs when we can break ABI.
 
 protected:
@@ -926,28 +779,6 @@ protected:
   */
   void transform_cairo_context_to_window(const ::Cairo::RefPtr< ::Cairo::Context>& cr, const Glib::RefPtr<const Gdk::Window>& window);
   _IGNORE(gtk_cairo_transform_to_window)
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /**  Retrieves the widget's requisition.
-   *
-   * This method should only be used by widget implementations in
-   * order to discover whether the widget's requisition has actually
-   * changed after some internal state change (so that they can call
-   * queue_resize() instead of queue_draw()).
-   *
-   * Normally, size_request() should be used.
-   *
-   * @result The widget's requisition.
-   *
-   * @newin{2,20}
-   * @deprecated Use get_preferred_size() instead.
-   */
-  Requisition get_requisition() const;
-  _IGNORE(gtk_widget_get_requisition)
-#endif // GTKMM_DISABLE_DEPRECATED
-
-  _IGNORE(gtk_widget_style_attach) //deprecated
-  _IGNORE(gtk_widget_get_child_requisition) //deprecated.
 
   //The parameter name is "the_property_name" to avoid a warning because there is a method with the "property_name" name.
   /** Gets the value of a style property of @a widget.

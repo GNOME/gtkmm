@@ -16,13 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmm/misc.h>
-#include <gtkmm/iconset.h>
+#include <gtkmm/widget.h>
 #include <gdkmm/pixbufanimation.h>
 #include <giomm/icon.h>
 
 _DEFS(gtkmm,gtk)
-_PINCLUDE(gtkmm/private/misc_p.h)
+_PINCLUDE(gtkmm/private/widget_p.h)
 
 namespace Gtk
 {
@@ -37,9 +36,6 @@ _WRAP_ENUM(ImageType, GtkImageType)
  * displayed as an image; most typically, you would load a Gdk::Pixbuf ("pixel
  * buffer") from a file, and then display that.
  *
- * Gtk::Image is a subclass of Gtk::Misc, which implies that you can align it
- * (center, left, right) and add padding to it, using Gtk::Misc methods.
- *
  * Gtk::Image is a "no window" widget (has no Gdk::Window of its own), so by
  * default does not receive events. If you want to receive events on the
  * image, such as button clicks, place the image inside a Gtk::EventBox, then
@@ -50,10 +46,9 @@ _WRAP_ENUM(ImageType, GtkImageType)
  *
  * @ingroup Widgets
  */
-class Image : public Misc
+class Image : public Widget
 {
-  _CLASS_GTKOBJECT(Image,GtkImage,GTK_IMAGE,Gtk::Misc,GtkMisc)
-  _IGNORE(gtk_image_get_stock, gtk_image_get_icon_set)
+  _CLASS_GTKOBJECT(Image,GtkImage,GTK_IMAGE,Gtk::Widget,GtkWidget)
 public:
 
   _CTOR_DEFAULT
@@ -75,37 +70,16 @@ public:
    * Should you want that, you should use the default constructor and set_from_icon_name().
    */
   _WRAP_CTOR(Image(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_image_new_from_pixbuf)
-  _IGNORE(gtk_image_new_from_icon_set) // deprecated since 3.10
 
   //We don't wrap gtk_image_new_from_icon_name() to avoid a clash with the from-filename constructor.
   //But we do wrap gtk_image_set_from_icon_name()
   _IGNORE(gtk_image_new_from_icon_name)
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** Creates am Image displaying a stock icon.
-   * Sample stock icon identifiers are Gtk::Stock::OPEN, Gtk::Stock::EXIT. Sample stock sizes are Gtk::ICON_SIZE_MENU, Gtk::ICON_SIZE_SMALL_TOOLBAR.
-   * If the stock icon name isn't known, a "broken image" icon will be displayed instead.
-   * You can register your own stock icon names - see Gtk::IconFactory::add().
-   * @param stock_id A stock icon.
-   * @param size A stock icon size.
-   * @deprecated Use the default constructor and set_from_icon_name() instead.
-   */
-  Image(const Gtk::StockID& stock_id, IconSize size);
-#endif //GTKMM_DISABLE_DEPRECATED
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Use the default constructor and set_from_icon_name() instead.
-   */
-  Image(const Glib::RefPtr<IconSet>& icon_set, IconSize size);
-#endif //GTKMM_DISABLE_DEPRECATED
 
   explicit Image(const Glib::RefPtr<Gdk::PixbufAnimation>& animation);
 
   _WRAP_METHOD(void set(const std::string& filename), gtk_image_set_from_file)
   _WRAP_METHOD(void set_from_resource(const std::string& resource_path), gtk_image_set_from_resource)
   _WRAP_METHOD(void set(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_image_set_from_pixbuf)
-  _WRAP_METHOD(void set(const Gtk::StockID& stock_id, IconSize size), gtk_image_set_from_stock, deprecated "Use set_from_icon_name() instead.")
-  _WRAP_METHOD(void set(const Glib::RefPtr<IconSet>& icon_set, IconSize size), gtk_image_set_from_icon_set, deprecated "Use set_from_icon_name() instead.")
   _WRAP_METHOD(void set(const Glib::RefPtr<Gdk::PixbufAnimation>& animation), gtk_image_set_from_animation)
   _WRAP_METHOD(void set(const Glib::RefPtr<const Gio::Icon>& icon, IconSize size), gtk_image_set_from_gicon)
 
@@ -121,18 +95,6 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(), gtk_image_get_pixbuf, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Pixbuf> get_pixbuf() const, gtk_image_get_pixbuf, refreturn, constversion)
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Use get_icon_name() instead.
-   */
-  void get_stock(Gtk::StockID& stock_id, IconSize& size) const;
-#endif //GTKMM_DISABLE_DEPRECATED
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Use get_icon_name() instead.
-   */
-  void get_icon_set(Glib::RefPtr<IconSet>& icon_set, IconSize& size) const;
-#endif //GTKMM_DISABLE_DEPRECATED
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::PixbufAnimation> get_animation(), gtk_image_get_animation, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::PixbufAnimation> get_animation() const, gtk_image_get_animation, refreturn, constversion)
@@ -167,8 +129,6 @@ public:
 
   _WRAP_PROPERTY("pixbuf", Glib::RefPtr<Gdk::Pixbuf>)
   _WRAP_PROPERTY("file", Glib::ustring)
-  _WRAP_PROPERTY("stock", Glib::ustring, deprecated "Use property_icon_name() instead.")
-  _WRAP_PROPERTY("icon-set", Glib::RefPtr<IconSet>, deprecated "Use property_icon_name() instead.")
   _WRAP_PROPERTY("icon-size", int)
   _WRAP_PROPERTY("pixel-size", int)
   _WRAP_PROPERTY("pixbuf-animation", Glib::RefPtr<Gdk::PixbufAnimation>)

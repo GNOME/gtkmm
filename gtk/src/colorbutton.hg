@@ -17,7 +17,7 @@
  */
 
 #include <gtkmm/button.h>
-#include <gdkmm/color.h>
+#include <gtkmm/colorchooser.h>
 #include <gdkmm/rgba.h>
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/button_p.h)
@@ -30,8 +30,6 @@ _PINCLUDE(gtkmm/private/button_p.h)
 namespace Gtk
 {
 
-//TODO: Derive from (and implement) ColorChooser when we can break ABI.
-
 /** A button to launch a color selection dialog.
  *
  * The GtkColorButton is a button which displays the currently selected color an allows to
@@ -43,11 +41,12 @@ namespace Gtk
  *
  * @ingroup Widgets
  */
-class ColorButton : public Button
-  //TODO: When we can break ABI: public ColorChooser
+class ColorButton
+: public Button,
+  public ColorChooser
 {
   _CLASS_GTKOBJECT(ColorButton, GtkColorButton, GTK_COLOR_BUTTON, Gtk::Button, GtkButton)
-  //TODO: When we can break ABI: _IMPLEMENTS_INTERFACE(ColorChooser)
+  _IMPLEMENTS_INTERFACE(ColorChooser)
 public:
 
   /** Creates a new color button.
@@ -62,28 +61,10 @@ public:
   _CTOR_DEFAULT()
   _IGNORE(gtk_color_button_new)
 
-  // _WRAP_CTOR does not take a 'deprecated' parameter.
-  // _WRAP_CTOR(ColorButton(const Gdk::Color& color), gtk_color_button_new_with_color)
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** Creates a new color button with a predefined color.
-   *
-   * Same as Gtk::ColorButton::ColorButton(). Additionally takes a Gdk::Color and
-   * initializes the button with this color. Equivalent to calling set_color(@a color)
-   * after the default constructor.
-   *
-   * @param color A Gdk::Color to set the current color with.
-   *
-   * @newin{2,4}
-   * @deprecated "Use the constructor that takes a Gdk::RGBA instead."
-   */
-   explicit ColorButton(const Gdk::Color& color);
-   _IGNORE(gtk_color_button_new_with_color)
-#endif //GTKMM_DISABLE_DEPRECATED
-
   /** Creates a new color button with a predefined color.
    *
    * Same as Gtk::ColorButton::ColorButton(). Additionally takes a Gdk::RGBA and
-   * initializes the button with this color. Equivalent to calling set_rgba(@a color)
+   * initializes the button with this color. Equivalent to calling ColorChooser::set_rgba(@a rgba)
    * after the default constructor.
    *
    * @param rgba A Gdk::RGBA to set the current color with.
@@ -92,56 +73,12 @@ public:
    */
   _WRAP_CTOR(ColorButton(const Gdk::RGBA& rgba), gtk_color_button_new_with_rgba)
 
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::set_rgba() instead."
-  _WRAP_METHOD(void set_color(const Gdk::Color& color), gtk_color_button_set_color, deprecated "Use set_rgba() instead.")
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::set_rgba() instead."
-  _WRAP_METHOD(void set_alpha(guint16 alpha), gtk_color_button_set_alpha, deprecated "Use set_rgba() instead.")
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::set_rgba() instead."
-  _WRAP_METHOD(void set_rgba(const Gdk::RGBA& rgba), gtk_color_button_set_rgba)
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-
-  //TODO: When we can implement interface ColorChooser: deprecated Use Gtk::ColorChooser::get_rgba() instead.
-  /** Returns a copy of the the current color.
-   *
-   * Changes to the return value will have no effect on the Gtk::ColorButton.
-   *
-   * @return A Gdk::Color representing the current internal color of the Gtk::ColorButton.
-   *
-   * @newin{2,4}
-   * @deprecated Use get_rgba() instead.
-   */
-  Gdk::Color get_color() const;
-  _IGNORE(gtk_color_button_get_color)
-
-#endif //GTKMM_DISABLE_DEPRECATED
-
-  //TODO: When we can implement interface ColorChooser: deprecated Use Gtk::ColorChooser::get_rgba() instead.
-  /** Returns a copy of the the current color.
-   *
-   * Changes to the return value will have no effect on the Gtk::ColorButton.
-   *
-   * @return A Gdk::RGBA representing the current internal color of the Gtk::ColorButton.
-   *
-   * @newin{3,0}
-   */
-  Gdk::RGBA get_rgba() const;
-  _IGNORE(gtk_color_button_get_rgba)
-
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::get_rgba() instead."
-  _WRAP_METHOD(guint16 get_alpha() const, gtk_color_button_get_alpha, deprecated "Use get_rgba() instead.")
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::set_use_alpha() instead."
-  _WRAP_METHOD(void set_use_alpha(bool use_alpha = true), gtk_color_button_set_use_alpha)
-  //TODO: When we can implement interface ColorChooser: deprecated "Use Gtk::ColorChooser::get_use_alpha() instead."
-  _WRAP_METHOD(bool get_use_alpha() const, gtk_color_button_get_use_alpha)
   _WRAP_METHOD(void set_title(const Glib::ustring& title), gtk_color_button_set_title)
   _WRAP_METHOD(Glib::ustring get_title() const, gtk_color_button_get_title)
 
   _WRAP_PROPERTY("use-alpha", bool)
   _WRAP_PROPERTY("title", Glib::ustring)
-  _WRAP_PROPERTY("color", Gdk::Color, deprecated "Use property_rgba() instead.")
   _WRAP_PROPERTY("rgba", Gdk::RGBA)
-  _WRAP_PROPERTY("alpha", guint16) //Todo: Remove this when we remove the "color" property too.
   _WRAP_PROPERTY("show-editor", bool)
 
   _WRAP_SIGNAL(void color_set(), "color-set")

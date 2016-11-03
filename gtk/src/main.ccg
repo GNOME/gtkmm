@@ -29,219 +29,12 @@
 #include <gdkmm/wrap_init.h>
 #include <gtkmm/wrap_init.h>
 
-_DEPRECATE_IFDEF_START
-
-namespace
-{
-
-/* This class tells sigc++ how to break GTK+ main signal connections.  Since
- * the gtk_*_remove() functions have the same signature, all main signals can
- * be handled by a single class.  Special handling is needed for signals that
- * don't support destroy notification; see the comment on connection_list_.
- */
-class GtkMainConnectionNode
-{
-public:
-  // A function taking a connection id, e.g. gtk_timeout_remove().
-  typedef void (*RemoveFunc) (guint);
-
-  explicit GtkMainConnectionNode(const sigc::slot_base& slot);
-
-  static void* notify(void* data);
-  static void destroy_notify_handler(void* data);
-
-  // Call this after installing the GTK+ callback.
-  void install(guint conn_id, RemoveFunc remove_func, bool has_destroy_notify);
-
-  inline sigc::slot_base* get_slot();
-
-  static bool list_remove(GtkMainConnectionNode* conn_node);
-  static void list_notify_all();
-
-private:
-  sigc::slot_base slot_;
-  static GSList*  connection_list_;
-
-  guint           conn_id_;
-  RemoveFunc      remove_func_;
-  bool            has_destroy_notify_;
-  bool            destroyed_;
-};
-
-
-/* The global connection_list_ is needed to deal with GTK+ main signals
- * that don't support destroy notification.  This applies only to
- * gtk_key_snooper_install() and gtk_init_add().
- *
- * The list is static and not a member of Gtk::Main, in order to support
- * connection to Gtk::Main::signal_run() before Gtk::Main is instantiated.
- * Thus, it's possible to install initialization hooks in global constructors,
- * for instance.
- */
-// static
-GSList* GtkMainConnectionNode::connection_list_ = nullptr;
-
-GtkMainConnectionNode::GtkMainConnectionNode(const sigc::slot_base& slot)
-:
-  slot_(slot),
-  conn_id_             (0),
-  remove_func_         (nullptr),
-  has_destroy_notify_  (false),
-  destroyed_           (false)
-{
-  slot_.set_parent(this, &GtkMainConnectionNode::notify);
-}
-
-//static:
-void* GtkMainConnectionNode::notify(void* data)
-{
-  // notification from the sigc++ side ...
-
-  const auto self = static_cast<GtkMainConnectionNode*>(data);
-
-  // this call might be triggered from destroy_notify_handler().
-  if(!self->destroyed_)
-  {
-    // during (*remove_func_)() destroy_notify_handler() might get called.
-    // This must not lead to the destruction of the object!
-    self->destroyed_ = true;
-
-    // disconnect from the gtk+ side.
-    (*(self->remove_func_))(self->conn_id_);
-
-    // remove self from global list.
-    if (!self->has_destroy_notify_)
-      list_remove(self);
-
-    // destruction of slot_ notifies all objects referring to it.
-    delete self;
-  }
-
-  return nullptr;
-}
-
-// static
-void GtkMainConnectionNode::destroy_notify_handler(void* data)
-{
-  // notification from the gtk+ side ...
-
-  const auto self = static_cast<GtkMainConnectionNode*>(data);
-
-  // this call might be triggered from notify().
-  if(!self->destroyed_)
-  {
-    self->destroyed_ = true;
-
-    // The GTK+ side is disconnected now, thus the ID is no longer valid.
-    self->conn_id_ = 0;
-
-    // remove self from global list.
-    if (!self->has_destroy_notify_)
-      list_remove(self);
-
-    // destruction of slot_ notifies all objects referring to it.
-    delete self;
-  }
-}
-
-void GtkMainConnectionNode::install(
-    guint conn_id, GtkMainConnectionNode::RemoveFunc remove_func, bool has_destroy_notify)
-{
-  conn_id_     = conn_id;
-  remove_func_ = remove_func;
-  has_destroy_notify_  = has_destroy_notify;
-
-  if (!has_destroy_notify_)
-    connection_list_ = g_slist_prepend(connection_list_, this);
-}
-
-inline
-sigc::slot_base* GtkMainConnectionNode::get_slot()
-{
-  return &slot_;
-}
-
-// static
-bool GtkMainConnectionNode::list_remove(GtkMainConnectionNode* conn_node)
-{
-  // The conn_node pointer is only valid if we still hold
-  // a reference of the ConnectionNode in our global list.
-  //
-  if(GSList *const link = g_slist_find(connection_list_, conn_node))
-  {
-    connection_list_ = g_slist_delete_link(connection_list_, link);
-    return true;
-  }
-
-  return false;
-}
-
-/* Cleanup function to be called by the Gtk::Main destructor.  The elements
- * are removed prior to notification, in order to avoid invalid elements in
- * the container.
- */
-// static
-void GtkMainConnectionNode::list_notify_all()
-{
-  while(connection_list_ != nullptr)
-  {
-    GtkMainConnectionNode *const conn_node =
-        static_cast<GtkMainConnectionNode*>(connection_list_->data);
-
-    connection_list_ = g_slist_delete_link(connection_list_, connection_list_);
-
-    // no need to search the list in notify().
-    conn_node->has_destroy_notify_ = true;
-
-    // conn_node gets destroyed from notify().
-    notify(conn_node);
-  }
-}
-
-} // anonymous namespace
-
-_DEPRECATE_IFDEF_END
-
-
 namespace Gtk
 {
 
 _DEPRECATE_IFDEF_START
 
-/**** Gtk::KeySnooperSig ***************************************************/
-
-sigc::connection KeySnooperSig::connect(const KeySnooperSig::SlotType& slot)
-{
-  const auto conn_node = new GtkMainConnectionNode(slot);
-  const sigc::connection connection(*conn_node->get_slot());
-
-  const guint conn_id = gtk_key_snooper_install(&KeySnooperSig::gtk_callback, conn_node);
-
-  conn_node->install(conn_id, &gtk_key_snooper_remove, false);
-  return connection;
-}
-
-// static
-gint KeySnooperSig::gtk_callback(GtkWidget* widget, GdkEventKey* event, gpointer data)
-{
-  try
-  {
-    // Recreate the specific SlotType from the generic slot node.
-    auto conn_node = static_cast<GtkMainConnectionNode*>(data);
-    auto pSlot = static_cast<SlotType*>(conn_node->get_slot());
-    return (*pSlot)(Glib::wrap(widget), event);
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-
-  return 0;
-}
-
 /**** Gtk::Main -- static data *********************************************/
-
-KeySnooperSig Main::signal_key_snooper_;
 
 Main*         Main::instance_ = nullptr;
 
@@ -274,7 +67,6 @@ Main::~Main()
   if(instance_ == this)
   {
     instance_ = nullptr;
-    GtkMainConnectionNode::list_notify_all();
 
     // Release the gtkmm type registration tables,
     // allowing Main to be instantiated again:
@@ -405,14 +197,6 @@ bool Main::events_pending()
 }
 
 _DEPRECATE_IFDEF_START
-
-/**** Gtk::Main -- static signal accessors *********************************/
-
-KeySnooperSig& Main::signal_key_snooper()
-{
-  return signal_key_snooper_;
-}
-
 
 /**** Gtk::Main -- protected virtuals **************************************/
 

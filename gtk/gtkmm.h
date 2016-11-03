@@ -64,12 +64,12 @@
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-3.0`
+ * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-4.0`
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
+ * PKG_CHECK_MODULES([GTKMM], [gtkmm-4.0])
  * @endcode
  * Then use the generated @c GTKMM_CFLAGS and @c GTKMM_LIBS variables in the
  * project @c Makefile.am files. For example:
@@ -91,10 +91,6 @@ extern const int gtkmm_micro_version;
 
 #include <gdkmm.h>
 
-//Include these first so they can do some undef/re-def magic for StockID.
-#include <gtkmm/toggleaction.h>
-#include <gtkmm/radioaction.h>
-
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/accelkey.h>
@@ -103,13 +99,11 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/actionable.h>
 #include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>
-#include <gtkmm/alignment.h>
 #include <gtkmm/appchooserbutton.h>
 #include <gtkmm/appchooserdialog.h>
 #include <gtkmm/appchooserwidget.h>
 #include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
-#include <gtkmm/arrow.h>
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
 #include <gtkmm/base.h>
@@ -137,7 +131,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorbutton.h>
 #include <gtkmm/colorchooser.h>
 #include <gtkmm/colorchooserdialog.h>
-#include <gtkmm/colorselection.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/container.h>
@@ -163,7 +156,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontchooser.h>
 #include <gtkmm/fontchooserdialog.h>
 #include <gtkmm/fontchooserwidget.h>
-#include <gtkmm/fontselection.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/gesture.h>
 #include <gtkmm/gesturedrag.h>
@@ -176,21 +168,10 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gesturezoom.h>
 #include <gtkmm/glarea.h>
 #include <gtkmm/grid.h>
-#include <gtkmm/handlebox.h>
 #include <gtkmm/headerbar.h>
-#include <gtkmm/hvbox.h>
-#include <gtkmm/hvbuttonbox.h>
-#include <gtkmm/hvpaned.h>
-#include <gtkmm/hvscale.h>
-#include <gtkmm/hvscrollbar.h>
-#include <gtkmm/hvseparator.h>
-#include <gtkmm/iconset.h>
-#include <gtkmm/iconfactory.h>
-#include <gtkmm/iconsource.h>
 #include <gtkmm/icontheme.h>
 #include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
-#include <gtkmm/imagemenuitem.h>
 #include <gtkmm/infobar.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/invisible.h>
@@ -209,12 +190,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/menuitem.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/messagedialog.h>
-#include <gtkmm/misc.h>
 #include <gtkmm/modelbutton.h>
 #include <gtkmm/notebook.h>
-#include <gtkmm/numerableicon.h>
 #include <gtkmm/object.h>
-#include <gtkmm/offscreenwindow.h>
 #include <gtkmm/overlay.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
@@ -241,7 +219,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
-#include <gtkmm/recentaction.h>
 #include <gtkmm/recentchooser.h>
 #include <gtkmm/recentchooserdialog.h>
 #include <gtkmm/recentchoosermenu.h>
@@ -272,14 +249,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stacksidebar.h>
 #include <gtkmm/stackswitcher.h>
 #include <gtkmm/statusbar.h>
-#include <gtkmm/statusicon.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/stockitem.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/styleproperty.h>
 #include <gtkmm/switch.h>
-#include <gtkmm/table.h>
-#include <gtkmm/tearoffmenuitem.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textiter.h>
@@ -304,12 +276,10 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeviewcolumn.h>
-#include <gtkmm/uimanager.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/volumebutton.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
-#include <gtkmm/stockid.h>
 
 #endif /* #ifndef GTKMM_H */

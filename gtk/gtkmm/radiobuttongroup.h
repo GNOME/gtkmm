@@ -57,7 +57,6 @@ protected:
 
   friend class Gtk::RadioButton;
   friend class Gtk::RadioMenuItem;
-  friend class Gtk::RadioAction; //deprecated
   friend class Gtk::RadioToolButton;
 
 
@@ -66,11 +65,6 @@ protected:
   //      Would that anything useful other than being tidy? murrayc
   void add(RadioButton& item);
   void add(RadioMenuItem& item);
-#ifndef GTKMM_DISABLE_DEPRECATED
-  /** @deprecated Because Gtk::RadioAction is deprecated.
-   */
-  void add(const Glib::RefPtr<RadioAction>& item);
-#endif // GTKMM_DISABLE_DEPRECATED
   void add(RadioToolButton& item);
 
   void* operator new(std::size_t); // not implemented

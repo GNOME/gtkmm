@@ -22,7 +22,6 @@
 
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/radiomenuitem.h>
-#include <gtkmm/radioaction.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtk/gtk.h>
 
@@ -64,16 +63,6 @@ void RadioButtonGroup::add(RadioMenuItem& item)
   //probably not necessary:
   group_ = gtk_radio_menu_item_get_group(item.gobj());
 }
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-void RadioButtonGroup::add(const Glib::RefPtr<RadioAction>& item)
-{
-  item->set_group(*this);
-
-  //probably not necessary:
-  group_ = gtk_radio_action_get_group(item->gobj());
-}
-#endif // GTKMM_DISABLE_DEPRECATED
 
 void RadioButtonGroup::add(RadioToolButton& item)
 {
