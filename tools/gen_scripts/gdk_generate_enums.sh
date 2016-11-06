@@ -14,6 +14,7 @@ ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
 shopt -s extglob # Enable extended pattern matching
+shopt -s nullglob # Skip a filename pattern that matches no file
 ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
 # Process files whose names end with .h, but not with private.h.
 # Exclude gtk+/gdk/gdkinternals.h.

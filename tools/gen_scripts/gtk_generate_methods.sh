@@ -14,6 +14,7 @@ ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gtk/src"
 
 shopt -s extglob # Enable extended pattern matching
+shopt -s nullglob # Skip a filename pattern that matches no file
 H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
 # Process files whose names end with .h, but not with private.h.
 $H2DEF_PY "$PREFIX"/gtk/!(*private).h "$PREFIX"/gtk/deprecated/!(*private).h > "$OUT_DIR"/gtk_methods.defs
