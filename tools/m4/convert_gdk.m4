@@ -89,21 +89,12 @@ _CONVERSION(`GdkRgbCmap&',`GdkRgbCmap*',`&$3',`*$3')
 _CONVERSION(`GdkKeymap*',`const GdkKeymap*',`$3')
 
 
-
-
-# for GtkStyle public struct members
-_CONVERSION(`Gdk::Color',`GdkColor', `(*($3).gobj())')
-_CONVERSION(`GdkColor',`Gdk::Color', `Gdk::Color(const_cast<GdkColor*>(&($3)), true)')
-
 # Ref (gdkmm) -> Ptr (gtk+)
-_CONVERSION(`Color&',`GdkColor*',($3).gobj())
-_CONVERSION(`const Gdk::Color&',`const GdkColor*',`($3).gobj()')
 _CONVERSION(`const RGBA&',`const GdkRGBA*',`($3).gobj()')
 _CONVERSION(`RGBA&',`GdkRGBA*',`($3).gobj()')
 _CONVERSION(`Gdk::RGBA&',`GdkRGBA*',`($3).gobj()')
 _CONVERSION(`const RGBA&',`GdkRGBA*',`const_cast<RGBA&>($3).gobj()')
 _CONVERSION(`const Gdk::RGBA&',`const GdkRGBA*',`($3).gobj()')
-_CONVERSION(`const Color&',`const GdkColor*',`($3).gobj()')
 _CONVERSION(`Rectangle&',`GdkRectangle*',($3).gobj())
 _CONVERSION(`Gdk::Rectangle&',`GdkRectangle*',($3).gobj())
 _CONVERSION(`const Rectangle&',`const GdkRectangle*',($3).gobj())
@@ -151,8 +142,6 @@ _CONVERSION(`const Glib::RefPtr<const Gdk::Screen>&',`GdkScreen*',__CONVERT_CONS
 
 define(`__CFR2P',`const_cast<$`'2>($`'3.gobj())')
 _CONVERSION(const Font&,GdkFont*,__CFR2P)
-_CONVERSION(const Gdk::Color&,GdkColor*,__CFR2P)
-_CONVERSION(const Color&,GdkColor*,__CFR2P)
 _CONVERSION(const Gdk::Rectangle&,GdkRectangle*,__CFR2P)
 _CONVERSION(const Rectangle&,GdkRectangle*,__CFR2P)
 _CONVERSION(const Geometry&,const GdkGeometry*,&($3))

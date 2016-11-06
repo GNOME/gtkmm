@@ -19,7 +19,6 @@
 #define _GDKMM_GENERAL_H
 
 #include <gdkmm/pixbuf.h>
-#include <gdkmm/color.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/rgba.h>
 #include <cairomm/context.h>

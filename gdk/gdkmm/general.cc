@@ -15,13 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-//Allow use of deprecated API,
-//in the API that we also deprecate, but cannot remove yet:
-#undef GDK_DISABLE_DEPRECATED
-#define GDK_DISABLE_DEPRECATION_WARNINGS 1
-
 #include <gdkmm/general.h>
-#include <gdkmm/color.h>
 #include <gdk/gdk.h>
 
 
