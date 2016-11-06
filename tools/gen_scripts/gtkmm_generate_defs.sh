@@ -18,9 +18,17 @@ MMGIRGEN_PATH=mmgirgenerator
 
 ############## Gdk ###############
 # Gdk enums
-$MMGIRGEN_PATH Gdk-3.0 \
-    --namespace=Gdk \
-    --print-enum > $GTKMM_DIR/gdk/src/gdk_enums.defs
+$MMGIRGEN_PATH Gdk-3.0 GdkPixbuf-2.0 \
+	       --namespace=Gdk \
+	       --namespace-mapping=GdkPixbuf:Gdk \
+	       --print-enum > $GTKMM_DIR/gdk/src/gdk_enums.defs
+
+#Gdk signals & properties
+$MMGIRGEN_PATH Gdk-3.0 GdkPixbuf-2.0 \
+	       --namespace=Gdk \
+	       --namespace-mapping=GdkPixbuf:Gdk \
+	       --print-signal\
+	       --print-property > $GTKMM_DIR/gdk/src/gdk_signals.defs
 
 patch_directory $GTKMM_DIR/gdk/src
 
@@ -30,5 +38,11 @@ patch_directory $GTKMM_DIR/gdk/src
 $MMGIRGEN_PATH Gtk-3.0 \
     --namespace=Gtk \
     --print-enum > $GTKMM_DIR/gtk/src/gtk_enums.defs
+
+#Gtk signals & properties
+$MMGIRGEN_PATH Gtk-3.0 \
+    --namespace=Gtk \
+    --print-signal\
+    --print-property > $GTKMM_DIR/gtk/src/gtk_signals.defs
 
 patch_directory $GTKMM_DIR/gtk/src
