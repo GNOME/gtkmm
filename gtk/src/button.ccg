@@ -27,5 +27,22 @@ Button::Button(const Glib::ustring& label, bool mnemonic)
   _CONSTRUCT("label", label.c_str(), "use_underline", gboolean(mnemonic))
 {}
 
-} // namespace Gtk
+void Button::set_image_from_icon_name(const Glib::ustring& icon_name, IconSize size, bool use_fallback)
+{
+  // It would be possible to create a Gtk::Image and add it with Container::add()
+  // instead of calling set_icon_name(), but only set_icon_name() sets style classes
+  // appropriately for a button with an icon.
 
+  set_icon_name(icon_name);
+  if (size == ICON_SIZE_BUTTON && !use_fallback)
+    return;
+
+  auto image = dynamic_cast<Image*>(get_child());
+  if (image)
+  {
+    image->set_from_icon_name(icon_name, size);
+    image->property_use_fallback() = use_fallback;
+  }
+}
+
+} // namespace Gtk
