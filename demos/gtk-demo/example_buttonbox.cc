@@ -36,13 +36,15 @@ Example_ButtonBox::Example_ButtonBox()
   m_HBox(Gtk::ORIENTATION_HORIZONTAL)
 {
   set_title("Button Boxes");
-  set_border_width(10);
 
+  m_VBox_Main.property_margin() = 10;
   add(m_VBox_Main);
 
+  m_Frame_Horizontal.set_margin_top(10);
+  m_Frame_Horizontal.set_margin_bottom(10);
   m_VBox_Main.pack_start(m_Frame_Horizontal, Gtk::PACK_EXPAND_WIDGET, 10);
 
-  m_VBox.set_border_width(10);
+  m_VBox.property_margin() = 10;
   m_Frame_Horizontal.add(m_VBox);
 
   m_VBox.pack_start( *(create_button_box(true, "Spread", 40, Gtk::BUTTONBOX_SPREAD)) );
@@ -52,7 +54,7 @@ Example_ButtonBox::Example_ButtonBox()
 
   m_VBox_Main.pack_start(m_Frame_Vertical, Gtk::PACK_EXPAND_WIDGET, 10);
 
-  m_VBox.set_border_width(10);
+  m_HBox.property_margin() = 10;
   m_Frame_Vertical.add(m_HBox);
 
   m_HBox.pack_start( *(create_button_box(false, "Spread", 30, Gtk::BUTTONBOX_SPREAD)) );
@@ -75,9 +77,13 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
   if (horizontal)
     pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_HORIZONTAL));
   else
+  {
     pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_VERTICAL));
+    pFrame->set_margin_start(5);
+    pFrame->set_margin_end(5);
+  }
 
-  pButtonBox->set_border_width(5);
+  pButtonBox->property_margin() = 5;
   pFrame->add(*pButtonBox);
 
   pButtonBox->set_layout(layout);
@@ -90,9 +96,7 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
   pButtonBox->add(*pButton);
 
   pButton = Gtk::manage(new Gtk::Button());
-  Gtk::Image* pImage = Gtk::manage(new Gtk::Image());
-  pImage->set_from_icon_name("help-browser", Gtk::ICON_SIZE_BUTTON);
-  pButton->add(*pImage);
+  pButton->set_icon_name("help-browser");
   pButtonBox->add(*pButton);
 
   return pFrame;

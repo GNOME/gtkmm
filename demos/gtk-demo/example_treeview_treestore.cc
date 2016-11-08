@@ -150,9 +150,9 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   m_Label("Jonathan's Holiday Card Planning Sheet")
 {
   set_title("Card planning sheet");
-  set_border_width(8);
   set_default_size(650, 400);
 
+  m_VBox.property_margin() = 8;
   add(m_VBox);
   m_VBox.pack_start(m_Label, Gtk::PACK_SHRINK);
 

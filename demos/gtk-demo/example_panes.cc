@@ -1,14 +1,14 @@
 /* Paned Widgets
  *
- * The GtkHPaned and GtkVPaned Widgets divide their content
- * area into two panes with a divider in between that the
- * user can adjust. A separate child is placed into each
- * pane.
+ * The Gtk::Paned Widget divides its content area into two panes
+ * with a divider in between that the user can adjust. A separate
+ * child is placed into each pane. Gtk::Paned widgets can be split
+ * horizontally or vertially.
  *
  * There are a number of options that can be set for each pane.
- * This test contains both a horizontal (HPaned) and a vertical
- * (VPaned) widget, and allows you to adjust the options for
- * each side of each widget.
+ * This test contains both a horizontal and a vertical Gtk::Paned
+ * widget, and allows you to adjust the options for each side of
+ * each widget.
  */
 
 #include <gtkmm.h>
@@ -47,14 +47,13 @@ private:
 Example_Panes::Example_Panes()
 {
   set_title("Panes");
-  set_border_width(0);
 
   Gtk::Box *const pVBox = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
   add(*Gtk::manage(pVBox));
 
   Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::ORIENTATION_VERTICAL);
   pVBox->pack_start(*Gtk::manage(pVPaned));
-  pVPaned->set_border_width(5);
+  pVPaned->property_margin() = 5;
 
   Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::ORIENTATION_HORIZONTAL);
   pVPaned->add1(*Gtk::manage(pHPaned));
@@ -96,9 +95,8 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
   m_CheckButton_resize2 ("_Resize", true),
   m_CheckButton_shrink2 ("_Shrink", true)
 {
-  set_border_width(4);
-
   Gtk::Grid *const pGrid = new Gtk::Grid();
+  pGrid->property_margin() = 4;
   add(*Gtk::manage(pGrid));
 
   pGrid->attach(*Gtk::manage(new Gtk::Label(label1)), 0, 0, 1, 1);
@@ -131,28 +129,18 @@ PaneOptions::~PaneOptions()
 
 void PaneOptions::on_checkbutton1()
 {
-  Gtk::AttachOptions options = Gtk::AttachOptions(0);
-
-  if(m_CheckButton_resize1.get_active()) options = (options | Gtk::EXPAND);
-  if(m_CheckButton_shrink1.get_active()) options = (options | Gtk::SHRINK);
-
   Gtk::Widget *const pChild = m_pPaned->get_child1();
 
   m_pPaned->remove(*pChild);
-  m_pPaned->pack1(*pChild, options);
+  m_pPaned->pack1(*pChild, m_CheckButton_resize1.get_active(), m_CheckButton_shrink1.get_active());
 }
 
 void PaneOptions::on_checkbutton2()
 {
-  Gtk::AttachOptions options = Gtk::AttachOptions(0);
-
-  if(m_CheckButton_resize2.get_active()) options = (options | Gtk::EXPAND);
-  if(m_CheckButton_shrink2.get_active()) options = (options | Gtk::SHRINK);
-
   Gtk::Widget *const pChild = m_pPaned->get_child2();
 
   m_pPaned->remove(*pChild);
-  m_pPaned->pack2(*pChild, options);
+  m_pPaned->pack2(*pChild, m_CheckButton_resize2.get_active(), m_CheckButton_shrink2.get_active());
 }
 
 } // anonymous namespace

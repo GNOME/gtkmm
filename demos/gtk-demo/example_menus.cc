@@ -60,7 +60,6 @@ Example_Menus::Example_Menus()
   m_Button("close")
 {
   set_title("menus");
-  set_border_width(0);
 
   add(m_VBox1);
 
@@ -85,7 +84,7 @@ Example_Menus::Example_Menus()
   }
 
 
-  m_VBox_Sub1.set_border_width(10);
+  m_VBox_Sub1.property_margin() = 10;
   m_VBox1.pack_start(m_VBox_Sub1);
 
   {
@@ -115,7 +114,7 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_Separator, Gtk::PACK_SHRINK);
 
 
-  m_VBox_Sub2.set_border_width(10);
+  m_VBox_Sub2.property_margin() = 10;
   m_VBox1.pack_start(m_VBox_Sub2, Gtk::PACK_SHRINK);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));

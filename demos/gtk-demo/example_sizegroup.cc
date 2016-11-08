@@ -59,7 +59,7 @@ Example_SizeGroup::Example_SizeGroup()
   add_button("_Close", Gtk::RESPONSE_CLOSE);
 
   get_content_area()->pack_start(m_VBox);
-  m_VBox.set_border_width(5);
+  m_VBox.property_margin() = 5;
 
   m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL),
 
@@ -67,7 +67,7 @@ Example_SizeGroup::Example_SizeGroup()
    */
   m_VBox.pack_start(m_Frame_Color);
 
-  m_Grid_Color.set_border_width(5);
+  m_Grid_Color.property_margin() = 5;
   m_Grid_Color.set_row_spacing(5);
   m_Grid_Color.set_column_spacing(10);
   m_Frame_Color.add(m_Grid_Color);
@@ -84,7 +84,7 @@ Example_SizeGroup::Example_SizeGroup()
    */
   m_VBox.pack_start(m_Frame_Line, Gtk::PACK_SHRINK);
 
-  m_Grid_Line.set_border_width(5);
+  m_Grid_Line.property_margin() = 5;
   m_Grid_Line.set_row_spacing(5);
   m_Grid_Line.set_column_spacing(10);
   m_Frame_Line.add(m_Grid_Line);

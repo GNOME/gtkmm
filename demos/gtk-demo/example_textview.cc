@@ -66,9 +66,8 @@ Example_TextView::Example_TextView()
 {
   set_default_size(450, 450);
   set_title("Text View");
-  set_border_width(0);
 
-  m_VPaned.set_border_width(5);
+  m_VPaned.property_margin() = 5;
   add(m_VPaned);
 
   /* For convenience, we just use the autocreated buffer from

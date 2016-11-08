@@ -37,7 +37,6 @@ Example_Overlay::Example_Overlay()
   // Window properties
   set_default_size(450, 450);
   set_title("Overlay");
-  set_border_width(0);
 
   // Main text view
   m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);

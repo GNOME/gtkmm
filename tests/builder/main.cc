@@ -98,10 +98,7 @@ public:
     std::cout << "DerivedButton::ctor" << std::endl;
 
     if (!icon_name.empty())
-    {
-      set_image_from_icon_name(icon_name);
-      property_always_show_image() = true;
-    }
+      set_icon_name(icon_name);
   }
 
   virtual ~DerivedButton()

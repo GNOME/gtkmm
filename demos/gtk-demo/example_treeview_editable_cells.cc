@@ -105,9 +105,9 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   m_Button_Remove("Remove item")
 {
   set_title("Shopping List");
-  set_border_width(5);
   set_default_size(320, 200);
 
+  m_VBox.property_margin() = 5;
   add(m_VBox);
   m_VBox.pack_start(m_Label, Gtk::PACK_SHRINK);
 

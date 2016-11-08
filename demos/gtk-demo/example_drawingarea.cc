@@ -51,9 +51,8 @@ Example_DrawingArea::Example_DrawingArea()
   m_VBox(Gtk::ORIENTATION_VERTICAL, 8)
 {
   set_title("Drawing Area");
-  set_border_width(8);
 
-  m_VBox.set_border_width(8);
+  m_VBox.property_margin() = 16;
   add(m_VBox);
 
   /*

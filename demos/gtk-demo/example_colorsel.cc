@@ -36,9 +36,8 @@ Example_ColorSel::Example_ColorSel()
   m_Button("_Change the above color", true)
 {
   set_title("Color Chooser");
-  set_border_width(8);
 
-  m_VBox.set_border_width(8);
+  m_VBox.property_margin() = 12;
   add(m_VBox);
 
   // Create the color swatch area

@@ -50,9 +50,8 @@ Example_Images::Example_Images()
   m_image_stream        ()
 {
   set_title("Images");
-  set_border_width(8);
 
-  m_VBox.set_border_width(8);
+  m_VBox.property_margin() = 16;
   add(m_VBox);
 
   /* Image */

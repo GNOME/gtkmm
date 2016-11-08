@@ -112,7 +112,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
   set_default_size(300, 400);
 
-  m_VBox.set_border_width(8);
+  m_VBox.property_margin() = 8;
   get_content_area()->pack_start(m_VBox);
 
 
@@ -156,7 +156,7 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
 {
   Gtk::Box* pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
-  pHBox->set_border_width(8);
+  pHBox->property_margin() = 8;
   frame.add(*pHBox);
 
   Gtk::ScrolledWindow* pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );

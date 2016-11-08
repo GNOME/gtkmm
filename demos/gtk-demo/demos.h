@@ -56,7 +56,7 @@ Demo testgtk_demos[] =
   { "Builder", "example_builder.cc", sigc::ptr_fun(&do_builder), nullptr },
   { "Button Boxes", "example_buttonbox.cc",  sigc::ptr_fun(&do_buttonbox), nullptr },
   { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), nullptr },
-  { "Color Selector", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
+  { "Color Chooser", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), nullptr },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), nullptr },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), nullptr },

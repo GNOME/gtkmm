@@ -67,11 +67,11 @@ Example_Dialog::Example_Dialog()
   m_count = 0;
 
   set_title("Dialogs");
-  set_border_width(8);
 
+  m_Frame.property_margin() = 8;
   add(m_Frame);
 
-  m_VBox.set_border_width(8);
+  m_VBox.property_margin() = 8;
   m_Frame.add(m_VBox);
 
 
@@ -142,7 +142,6 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   add_button("_OK", Gtk::RESPONSE_OK);
   add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 
-  m_HBox.set_border_width(8);
   get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);
 
