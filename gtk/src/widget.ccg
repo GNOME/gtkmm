@@ -225,6 +225,55 @@ void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, G
   }
 }
 
+// This vfunc callback is custom implemented because we want the output
+// arguments of the C++ vfunc to be int& (not int*), and the vfunc_callback
+// function may be called from gtk+ with NULL pointers.
+void Widget_Class::measure_vfunc_callback(GtkWidget* self, GtkOrientation orientation, int for_size,
+  int* minimum, int* natural, int* minimum_baseline, int* natural_baseline)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+        int no_minimum = 0;
+        int no_natural = 0;
+        int no_minimum_baseline = 0;
+        int no_natural_baseline = 0;
+        obj->measure_vfunc((Orientation)orientation, for_size,
+          (minimum ? *minimum : no_minimum),
+          (natural ? *natural : no_natural),
+          (minimum_baseline ? *minimum_baseline : no_minimum_baseline),
+          (natural_baseline ? *natural_baseline : no_natural_baseline));
+        return;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->measure)
+    (*base->measure)(self, orientation, for_size, minimum, natural, minimum_baseline, natural_baseline);
+}
+
 Widget::~Widget() noexcept
 {}
 
