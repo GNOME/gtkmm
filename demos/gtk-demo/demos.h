@@ -3,7 +3,7 @@
 
 #include "demowindow.h"
 
-typedef sigc::slot<Gtk::Window*> type_slotDo;
+typedef sigc::slot<Gtk::Window*()> type_slotDo;
 
 struct Demo
 {
