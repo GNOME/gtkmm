@@ -106,7 +106,7 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-1.6 >= 2.24.2 $GTKMM_MODULES"])
+      [GTKMM_MODULES="atkmm-2.26 >= 2.24.2 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 AC_SUBST([GTKMM_DEMOS_EXTRA_MODULES], ['epoxy >= 1.2'])
@@ -118,7 +118,7 @@ PKG_CHECK_MODULES([GTKMM_DEMOS_EXTRA], [$GTKMM_DEMOS_EXTRA_MODULES])
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.52])
-MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.42 atkmm-1.6])
+MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.42 atkmm-2.26])
 
 MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
 
@@ -128,7 +128,7 @@ MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.52.tag], [glibmm-2.52])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-2.42.tag], [pangomm-2.42])
-MM_ARG_WITH_TAGFILE_DOC([atkmm-1.6.tag], [atkmm-1.6])
+MM_ARG_WITH_TAGFILE_DOC([atkmm-2.26.tag], [atkmm-2.26])
 
 # glib-compile-resources and C compiler are needed to generate and compile
 # resource files in demo programs.
