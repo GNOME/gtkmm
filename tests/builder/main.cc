@@ -76,16 +76,14 @@ const char gladefile[] =
   "</object>"
 "</interface>";
 
-void* on_managed_button_deleted(void* /* data */)
+void on_managed_button_deleted(sigc::notifiable* /* data */)
 {
   std::cout << "Gtk::Button in window deleted" << std::endl;
-  return nullptr;
 }
 
-void* on_orphaned_button_deleted(void* /* data */)
+void on_orphaned_button_deleted(sigc::notifiable* /* data */)
 {
   std::cout << "Orphaned Gtk::Button deleted" << std::endl;
-  return nullptr;
 }
 
 class DerivedButton : public Gtk::Button
