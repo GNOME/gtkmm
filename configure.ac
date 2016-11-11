@@ -93,9 +93,8 @@ AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-# The extra cairomm-1.0 check is because gdkmm requires a newer cairomm than pangomm requires.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-4.0 requires.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.52 >= 2.49.1 pangomm-2.42 >= 2.38.2 gtk+-4.0 >= 3.89.0 cairomm-1.0 >= 1.12.0 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.52 >= 2.49.1 pangomm-2.42 >= 2.38.2 gtk+-4.0 >= 3.89.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -126,7 +125,7 @@ MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.52.tag], [glibmm-2.52])
-MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
+MM_ARG_WITH_TAGFILE_DOC([cairomm-1.14.tag], [cairomm-1.14])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-2.42.tag], [pangomm-2.42])
 MM_ARG_WITH_TAGFILE_DOC([atkmm-2.26.tag], [atkmm-2.26])
 
