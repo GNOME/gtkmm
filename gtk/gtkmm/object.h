@@ -95,16 +95,8 @@ protected:
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static GType get_type()      G_GNUC_CONST;
-
-
   static GType get_base_type() G_GNUC_CONST;
 #endif
-
-  ///Provides access to the underlying C GtkObject.
-  GObject*       gobj()       { return reinterpret_cast<GObject*>(gobject_); }
-
-  ///Provides access to the underlying C GtkObject.
-  const GObject* gobj() const { return reinterpret_cast<GObject*>(gobject_); }
 
 public:
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -128,15 +120,13 @@ protected:
   #endif //DOXYGEN_SHOULD_SKIP_THIS
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  void _init_unmanage(bool is_toplevel = false);
+  void _init_unmanage();
   void destroy_notify_() override;
   void disconnect_cpp_wrapper();
   void _release_c_instance();
-  static void callback_weak_notify_(void* data, GObject* gobject); //only connected for a short time.
 
   // set if flags used by derived classes.
   bool referenced_; // = not managed.
-  bool gobject_disposed_;
   #endif //DOXYGEN_SHOULD_SKIP_THIS
 };
 

@@ -27,20 +27,16 @@ namespace Gtk
 Object::Object(const Glib::ConstructParams& construct_params)
 : Glib::Object(construct_params)
 {
-   gobject_disposed_ = false;
-
   _init_unmanage(); //We don't like the GTK+ default memory management - we want to be in control._)
 }
 
 Object::Object(GObject* castitem)
 : Glib::Object(castitem)
 {
-  gobject_disposed_ = false;
-
    _init_unmanage(); //We don't like the GTK+ default memory management - we want to be in control.
 }
 
-void Object::_init_unmanage(bool /* is_toplevel = false */)
+void Object::_init_unmanage()
 {
   //GTKMM_LIFECYCLE
 
@@ -62,20 +58,20 @@ void Object::_init_unmanage(bool /* is_toplevel = false */)
       g_warning("    c instance gtype: %s\n", G_OBJECT_TYPE_NAME(gobject_));
       #endif
 
-     referenced_ = true; //Not managed.
+      referenced_ = true; //Not managed.
     }
     else
     {
-       //This widget is already not floating. It's probably already been added to a GTK+ container, and has just had Glib::wrap() called on it.
-       //It's not floating because containers call g_object_sink() on child widgets to take control of them.
-       //We just ref() it so that we can unref it later.
-       //GLIBMM_DEBUG_REFERENCE(this, gobject_);
-       //g_object_ref(gobject_);
+      //This widget is already not floating. It's probably already been added to a GTK+ container, and has just had Glib::wrap() called on it.
+      //It's not floating because containers call g_object_sink() on child widgets to take control of them.
+      //We just ref() it so that we can unref it later.
+      //GLIBMM_DEBUG_REFERENCE(this, gobject_);
+      //g_object_ref(gobject_);
 
-       //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
-       //We do an extra unref() in Window::_release_c_instance() to take care of that.
+      //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
+      //We do an extra unref() in Window::_release_c_instance() to take care of that.
 
-       referenced_ = false; //Managed. We should not try to unfloat GObjects that we did not instantiate.
+      referenced_ = false; //Managed. We should not try to unfloat GObjects that we did not instantiate.
     }
   }
 }
@@ -97,54 +93,46 @@ void Object::_release_c_instance()
   {
     g_assert(G_IS_OBJECT(object));
 
-    //We can't do anything with the gobject_ if it's already been disposed.
-    //This prevents us from unref-ing it again, or destroying it again after GTK+ has told us that it has been disposed.
-    if (!gobject_disposed_)
+    if(referenced_)
     {
-      if(referenced_)
+      //It's not manage()ed so we just unref to destroy it
+      #ifdef GLIBMM_DEBUG_REFCOUNTING
+      g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
+      #endif
+
+      GLIBMM_DEBUG_UNREFERENCE(this, object);
+      g_object_unref(object);
+
+      //destroy_notify_() should have been called after the final g_object_unref()
+      //or g_object_run_dispose(), so gobject_ could now be nullptr.
+
+      // Note that this is not an issue for GtkWindows,
+      // because we use gtk_widget_destroy in Gtk::Window::_release_c_instance() instead.
+      //
+      //If the C instance still isn't dead then insist, by calling g_object_run_dispose().
+      //This is necessary because even a manage()d widget is refed when added to a container.
+      // <danielk> That's simply not true.  But references might be taken elsewhere,
+      // and g_object_run_dispose() just tells everyone "drop your refs, please!".
+      if (gobject_)
       {
-        //It's not manage()ed so we just unref to destroy it
         #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
+        g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p, gtypename=%s\n", (void*)object, G_OBJECT_TYPE_NAME(object));
         #endif
 
-        GLIBMM_DEBUG_UNREFERENCE(this, object);
-        g_object_unref(object);
-
-        //destroy_notify_() should have been called after the final g_object_unref()
-        //or g_object_run_dispose(), so gobject_disposed_ could now be true.
-
-        // Note that this is not an issue for GtkWindows,
-        // because we use gtk_widget_destroy in Gtk::Window::_release_c_instance() instead.
-        //
-        //If the C instance still isn't dead then insist, by calling g_object_run_dispose().
-        //This is necessary because even a manage()d widget is refed when added to a container.
-        // <danielk> That's simply not true.  But references might be taken elsewhere,
-        // and g_object_run_dispose() just tells everyone "drop your refs, please!".
-        if (!gobject_disposed_)
-        {
-          #ifdef GLIBMM_DEBUG_REFCOUNTING
-          g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p, gtypename=%s\n", (void*)object, G_OBJECT_TYPE_NAME(object));
-          #endif
-
-          g_assert(G_IS_OBJECT(object));
-          g_object_run_dispose(object); //Container widgets can respond to this.
-        }
+        g_assert(G_IS_OBJECT(object));
+        g_object_run_dispose(object); //Container widgets can respond to this.
       }
-      else
-      {
-        //It's manag()ed, but the coder decided to delete it before deleting its parent.
-        //That should be OK because the Container can respond to that.
-        #ifdef GLIBMM_DEBUG_REFCOUNTING
-        g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p\n", (void*)gobject_);
-        #endif
+    }
+    else
+    {
+      //It's manag()ed, but the coder decided to delete it before deleting its parent.
+      //That should be OK because the Container can respond to that.
+      #ifdef GLIBMM_DEBUG_REFCOUNTING
+      g_warning("Gtk::Object::_release_c_instance(): Calling g_object_run_dispose(): gobject_=%p\n", (void*)gobject_);
+      #endif
 
-        if (!gobject_disposed_)
-        {
-          g_assert(G_IS_OBJECT(object));
-          g_object_run_dispose(object);
-        }
-      }
+      g_assert(G_IS_OBJECT(object));
+      g_object_run_dispose(object);
     }
 
     //If the GObject still exists, disconnect the C++ wrapper from it.
@@ -157,15 +145,13 @@ void Object::_release_c_instance()
 
 Object::Object(Object&& src) noexcept
 : Glib::Object(std::move(src)),
-  referenced_(std::move(src.referenced_)),
-  gobject_disposed_(std::move(src.gobject_disposed_))
+  referenced_(std::move(src.referenced_))
 {}
 
 Object& Object::operator=(Object&& src) noexcept
 {
   Glib::Object::operator=(std::move(src));
   referenced_ = std::move(src.referenced_);
-  gobject_disposed_ = std::move(src.gobject_disposed_);
   return *this;
 }
 
@@ -217,15 +203,9 @@ void Object::destroy_notify_()
     g_warning("  gtypename=%s\n", G_OBJECT_TYPE_NAME(gobject_));
   #endif
 
-  //TODO: Remove gobject_disposed_ when we can break ABI.
-  //      "if (gobject_disposed_)" can be replaced by "if (gobj())" or "if (gobject_)".
-  //Remember that it's been disposed (which only happens once):
-  //This also stops us from destroying it again in the destructor when it calls destroy_().
-  gobject_disposed_ = true;
-
   //Actually this function is called when the GObject is finalized, not when it's
   //disposed. Clear the pointer to the GObject, because otherwise it would
-  //become a dangling pointer, pointing to a non-existant object.
+  //become a dangling pointer, pointing to a non-existent object.
   gobject_ = nullptr;
 
   if(!cpp_destruction_in_progress_) //This function might have been called as a side-effect of destroy_() when it called g_object_run_dispose().
@@ -244,7 +224,6 @@ void Object::destroy_notify_()
       #endif
     }
   }
-
 }
 
 void Object::destroy_()
@@ -287,7 +266,7 @@ void Object::set_manage()
       g_warning("Object::set_manage(): setting GTK_FLOATING: gobject_ = %p", (void*) gobj());
       g_warning("  gtypename=%s\n", G_OBJECT_TYPE_NAME(gobj()));
     #endif
-    //deprecated: GTK_OBJECT_SET_FLAGS(gobj(), GTK_FLOATING);
+
     g_object_force_floating(gobject_);
   }
   else
@@ -304,20 +283,6 @@ void Object::set_manage()
   referenced_ = false;
 }
 
-//TODO: This protected function is not used any more. Can it be removed without breaking ABI/API?
-void Object::callback_weak_notify_(void* data, GObject* /* gobject */) //static
-{
-  //This is only used for a short time, then disconnected.
-
-  Object* cppObject = static_cast<Object*>(data);
-  if(cppObject) //This will be 0 if the C++ destructor has already run.
-  {
-    cppObject->gobject_disposed_ = true;
-  }
-
-  //TODO: Do we need to do this?: g_object_weak_unref(gobject, &Object::callback_weak_notify_, data);
-}
-
 bool Object::is_managed_() const
 {
   return !referenced_;
@@ -325,13 +290,8 @@ bool Object::is_managed_() const
 
 } // namespace Gtk
 
-namespace
-{
-} // anonymous namespace
-
 namespace Gtk
 {
-
 
 /* The *_Class implementation: */
 
