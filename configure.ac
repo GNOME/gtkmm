@@ -125,7 +125,7 @@ MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.52.tag], [glibmm-2.52])
-MM_ARG_WITH_TAGFILE_DOC([cairomm-1.14.tag], [cairomm-1.14])
+MM_ARG_WITH_TAGFILE_DOC([cairomm-1.16.tag], [cairomm-1.16])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-2.42.tag], [pangomm-2.42])
 MM_ARG_WITH_TAGFILE_DOC([atkmm-2.26.tag], [atkmm-2.26])
 
