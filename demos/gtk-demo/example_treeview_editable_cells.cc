@@ -52,8 +52,7 @@ protected:
   Gtk::Box m_HBox;
   Gtk::Button m_Button_Add, m_Button_Remove;
 
-  typedef std::vector<CellItem_Product> type_vecItems;
-  type_vecItems m_vecItems;
+  std::vector<CellItem_Product> m_vecItems;
 
   struct ModelColumns : public Gtk::TreeModelColumnRecord
   {

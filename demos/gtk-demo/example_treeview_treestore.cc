@@ -52,8 +52,7 @@ protected:
   Gtk::TreeView m_TreeView;
   Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
 
-  typedef std::vector<CellItem_Holiday> type_vecItems;
-  type_vecItems m_vecItems;
+  std::vector<CellItem_Holiday> m_vecItems;
 
   struct ModelColumns : public Gtk::TreeModelColumnRecord
   {
