@@ -26,16 +26,136 @@ namespace Gtk
 
 /** A widget for custom user interface elements.
  *
+ * The %DrawingArea widget is used for creating custom user interface
+ * elements. It’s essentially a blank widget; you can draw on it. After
+ * creating a drawing area, the application may want to connect to:
+ *
+ * - Mouse and button press signals to respond to input from
+ *   the user. (Use Gtk::Widget::add_events() to enable events
+ *   you wish to receive.)
+ *
+ * - Gtk::Widget::signal_realize() to take any necessary actions
+ *   when the widget is instantiated on a particular display.
+ *   (Create GDK resources in response to this signal.)
+ *
+ * - Gtk::Widget::signal_size_allocate() to take any necessary
+ *   actions when the widget changes size.
+ *
+ * - Call set_draw_func() to handle redrawing the contents of the widget.
+ *
+ * The following code portion demonstrates using a drawing
+ * area to display a circle in the normal widget foreground color.
+ *
+ * Note that GDK automatically clears the exposed area before causing a
+ * redraw, and that drawing is implicitly clipped to the exposed
+ * area. If you want to have a theme-provided background, you need
+ * to call Gtk::StyleContext::render_background() in your draw function.
+ *
+ * Simple %DrawingArea usage:
+ * @code
+ * class MyDrawingArea : public Gtk::DrawingArea
+ * {
+ * public:
+ *   MyDrawingArea()
+ *   {
+ *     set_draw_func(sigc::mem_fun(*this, &MyDrawingArea::on_draw));
+ *   }
+ *
+ *   void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
+ *   {
+ *     auto style_context = get_style_context();
+ *
+ *     style_context->render_background(cr, 0, 0, width, height);
+ *
+ *     cr->arc(width / 2.0, height / 2.0, std::min(width, height) / 2.0, 0, 2 * M_PI);
+ *
+ *     auto color = style_context->get_color();
+ *     Gdk::Cairo::set_source_rgba(cr, color);
+ *
+ *     cr->fill();
+ *   }
+ * //...
+ * }; // end MyDrawingArea
+ *
+ * //...
+ * auto area = Gtk::manage(new MyDrawingArea)
+ * area->set_content_width(100);
+ * area->set_content_height(100);
+ * @endcode
+ *
+ * The draw function is normally called when a drawing area first comes
+ * onscreen, or when it’s covered by another window and then uncovered.
+ * You can also force a redraw by adding to the “damage region” of the
+ * drawing area’s window using Gtk::Widget::queue_draw_region(),
+ * Gtk::Widget::queue_draw_area() or Gtk::Widget::queue_draw().
+ * This will cause the drawing area to call the draw function again.
+ *
+ * To receive mouse events on a drawing area, you will need to enable
+ * them with Gtk::Widget::add_events(). To receive keyboard events, you
+ * will need to set the “can-focus” property on the drawing area, and you
+ * should probably draw some user-visible indication that the drawing
+ * area is focused. Use Gtk::Widget::has_focus() in your draw function
+ * to decide whether to draw the focus indicator. See
+ * Gtk::StyleContext::render_focus() for one way to draw focus.
+ *
  * @ingroup Widgets
  */
 class DrawingArea : public Widget
 {
   _CLASS_GTKOBJECT(DrawingArea,GtkDrawingArea,GTK_DRAWING_AREA,Gtk::Widget,GtkWidget)
-public:
 
+public:
   _CTOR_DEFAULT
 
+/** Whenever the drawing area needs to redraw, this slot will be called.
+ *
+ * For instance:
+ * @code
+ * void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
+ * @endcode
+ *
+ * This slot should exclusively redraw the contents of the drawing area
+ * and must not call any widget functions that cause changes.
+ *
+ * @param cr The context to draw to.
+ * @param width The actual width of the contents. This value will be at least
+ *   as wide as property_content_width().
+ * @param height The actual height of the contents. This value will be at least
+ *   as high as property_content_height().
+ *
+ * @newin{3,90}
+ */
+  using SlotDraw = sigc::slot<void(const ::Cairo::RefPtr< ::Cairo::Context>&, int, int)>;
+
+  _WRAP_METHOD(void set_content_width(int width), gtk_drawing_area_set_content_width)
+  _WRAP_METHOD(int get_content_width() const, gtk_drawing_area_get_content_width)
+  _WRAP_METHOD(void set_content_height(int width), gtk_drawing_area_set_content_height)
+  _WRAP_METHOD(int get_content_height() const, gtk_drawing_area_get_content_height)
+
+  /** Sets a draw function.
+   *
+   * Setting a draw function is the main thing you want to do when using a drawing
+   * area. It is called whenever GTK needs to draw the contents of the drawing area
+   * to the screen.
+   *
+   * The draw function will be called during the drawing stage of GTK. In the
+   * drawing stage it is not allowed to change properties of any GTK widgets or call
+   * any functions that would cause any properties to be changed.
+   * You should restrict yourself exclusively to drawing your contents in the draw
+   * function.
+   *
+   * If what you are drawing does change, call Gtk::Widget::queue_draw() on the
+   * drawing area. This will call a redraw and will call @a slot again.
+   *
+   * @newin{3,90}
+   *
+   * @param slot Callback that lets you draw the drawing area's contents.
+   */
+  void set_draw_func(const SlotDraw& slot);
+  _IGNORE(gtk_drawing_area_set_draw_func)
+
+  _WRAP_PROPERTY("content-width", int)
+  _WRAP_PROPERTY("content-height", int)
 };
 
 } //namespace Gtk
-

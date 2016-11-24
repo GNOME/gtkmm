@@ -18,3 +18,39 @@
 
 #include <gtk/gtk.h>
 
+namespace
+{
+
+void SignalProxy_Draw_gtk_callback(GtkDrawingArea* /* drawing_area */, cairo_t* cr,
+  int width, int height, void* user_data)
+{
+  auto the_slot = static_cast<Gtk::DrawingArea::SlotDraw*>(user_data);
+  auto cr2 = ::Cairo::RefPtr< ::Cairo::Context>(new ::Cairo::Context(cr, false /* has_reference */));
+
+  try
+  {
+    (*the_slot)(cr2, width, height);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+} // anonymous namespace
+
+namespace Gtk
+{
+void DrawingArea::set_draw_func(const SlotDraw& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when Glib::destroy_notify_delete<SlotDraw> is called.
+  auto slot_copy = new SlotDraw(slot);
+
+  gtk_drawing_area_set_draw_func(gobj(),
+    &SignalProxy_Draw_gtk_callback, slot_copy,
+    &Glib::destroy_notify_delete<SlotDraw>);
+}
+
+} //namespace Gtk
