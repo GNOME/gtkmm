@@ -1,18 +1,15 @@
 /* Pixbufs
  *
- * A GdkPixbuf represents an image, normally in RGB or RGBA format.
+ * A Gdk::Pixbuf represents an image, normally in RGB or RGBA format.
  * Pixbufs are normally used to load files from disk and perform
  * image scaling.
  *
  * This demo is not all that educational, but looks cool. It was written
  * by Extreme Pixbuf Hacker Federico Mena Quintero. It also shows
- * off how to use GtkDrawingArea to do a simple animation.
+ * off how to use Gtk::DrawingArea to do a simple animation.
  *
  * Look at the Image demo for additional pixbuf usage examples.
- *
  */
-
-//#include <config.h>
 
 #include <gtkmm.h>
 #include <math.h>
@@ -50,9 +47,9 @@ public:
 
 protected:
   virtual void load_pixbufs();
+  void on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
-  //signal handlers:
-  virtual bool on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+  //signal handler:
   virtual bool on_timeout();
 
   //Member widgets:
@@ -87,7 +84,7 @@ Example_Pixbufs::Example_Pixbufs()
 
     set_size_request(m_back_width, m_back_height);
     m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
-    m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
+    m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
     add(m_DrawingArea);
 
     m_TimeoutConnection = Glib::signal_timeout().connect(
@@ -134,12 +131,10 @@ void Example_Pixbufs::load_pixbufs()
 }
 
 /* Draw callback for the drawing area */
-bool Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr, int, int)
 {
   Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf);
   cr->paint();
-
-  return true;
 }
 
 #define CYCLE_LEN 60

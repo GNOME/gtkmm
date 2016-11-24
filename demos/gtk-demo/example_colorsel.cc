@@ -13,9 +13,11 @@ public:
   ~Example_ColorSel() override;
 
 protected:
-  //Signal handlers:
+  //Signal handler:
   void on_button_clicked();
-  bool on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+
+  //Drawing function:
+  void on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
   //Member widgets:
   Gtk::Box m_VBox;
@@ -45,11 +47,12 @@ Example_ColorSel::Example_ColorSel()
   m_VBox.pack_start(m_Frame);
 
   // set a fixed size
-  m_DrawingArea.set_size_request(200, 200);
+  m_DrawingArea.set_content_width(200);
+  m_DrawingArea.set_content_height(200);
 
   // set the color
   m_Color.set_rgba(0, 0, 1, 1);
-  m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_ColorSel::on_drawing_area_draw));
+  m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_ColorSel::on_drawing_area_draw));
 
   m_Frame.add(m_DrawingArea);
 
@@ -81,11 +84,8 @@ void Example_ColorSel::on_button_clicked()
   }
 }
 
-bool Example_ColorSel::on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void Example_ColorSel::on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int, int)
 {
   Gdk::Cairo::set_source_rgba(cr, m_Color);
   cr->paint();
-
-  return true;
 }
-

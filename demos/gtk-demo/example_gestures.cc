@@ -14,9 +14,9 @@ public:
   ~Example_Gestures() override;
 
 protected:
+  void on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr, int width, int height);
 
   // Signal handlers:
-  bool on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr);
   void on_gesture_swipe_swipe(double velocity_x, double velocity_y);
   void on_gesture_long_press_pressed(double x, double y);
   void on_gesture_long_press_end(GdkEventSequence* sequence);
@@ -54,7 +54,7 @@ Example_Gestures::Example_Gestures()
   add(m_DrawingArea);
   m_DrawingArea.add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |
                            Gdk::POINTER_MOTION_MASK | Gdk::TOUCH_MASK);
-  m_DrawingArea.signal_draw().connect(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
+  m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.
   m_GestureSwipe = Gtk::GestureSwipe::create(m_DrawingArea);
@@ -83,13 +83,12 @@ Example_Gestures::~Example_Gestures()
 {
 }
 
-bool Example_Gestures::on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr)
+void Example_Gestures::on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr,
+  int width, int height)
 {
-  Gtk::Allocation allocation = m_DrawingArea.get_allocation();
-
   // Coordinates for the center of the window
-  const int xc = allocation.get_width() / 2;
-  const int yc = allocation.get_height() / 2;
+  const int xc = width / 2;
+  const int yc = height / 2;
 
   if (m_GestureRotate->is_recognized() || m_GestureZoom->is_recognized())
   {
@@ -132,8 +131,6 @@ bool Example_Gestures::on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Cont
     cr->stroke();
     cr->restore();
   }
-
-  return true;
 }
 
 void Example_Gestures::on_gesture_swipe_swipe(double velocity_x, double velocity_y)

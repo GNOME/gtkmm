@@ -1,11 +1,11 @@
 /* Drawing Area
  *
- * GtkDrawingArea is a blank area where you can draw custom displays
+ * Gtk::DrawingArea is a blank area where you can draw custom displays
  * of various kinds.
  *
  * This demo has two drawing areas. The checkerboard area shows
  * how you can just draw something; all you have to do is write
- * a signal handler for draw, as shown here.
+ * a draw function, as shown here.
  *
  * The "scribble" area is a bit more advanced, and shows how to handle
  * events such as button presses and mouse motion. Click the mouse
@@ -22,9 +22,11 @@ public:
   ~Example_DrawingArea() override;
 
 protected:
+  //draw functions:
+  void on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
+  void on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
+
   //signal handlers:
-  bool on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-  bool on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr);
   bool on_drawingarea_scribble_configure_event(GdkEventConfigure* event);
   bool on_drawingarea_scribble_motion_notify_event(GdkEventMotion* event);
   bool on_drawingarea_scribble_button_press_event(GdkEventButton* event);
@@ -65,10 +67,11 @@ Example_DrawingArea::Example_DrawingArea()
   m_VBox.pack_start(m_Frame_Checkerboard);
 
   /* set a minimum size */
-  m_DrawingArea_Checkerboard.set_size_request(100, 100);
+  m_DrawingArea_Checkerboard.set_content_width(100);
+  m_DrawingArea_Checkerboard.set_content_height(100);
   m_Frame_Checkerboard.add(m_DrawingArea_Checkerboard);
 
-  m_DrawingArea_Checkerboard.signal_draw().connect(
+  m_DrawingArea_Checkerboard.set_draw_func(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_checkerboard_draw));
 
   /*
@@ -81,12 +84,14 @@ Example_DrawingArea::Example_DrawingArea()
   m_VBox.pack_start(m_Frame_Scribble);
 
   /* set a minimum size */
-  m_DrawingArea_Scribble.set_size_request(100, 100);
+  m_DrawingArea_Scribble.set_content_width(100);
+  m_DrawingArea_Scribble.set_content_height(100);
   m_Frame_Scribble.add(m_DrawingArea_Scribble);
 
-  /* Signals used to handle backing pixmap */
-  m_DrawingArea_Scribble.signal_draw().connect(
+  m_DrawingArea_Scribble.set_draw_func(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_draw));
+
+  /* Signal used to handle backing surface */
   m_DrawingArea_Scribble.signal_configure_event().connect(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event));
 
@@ -102,7 +107,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_DrawingArea_Scribble.add_events(Gdk::LEAVE_NOTIFY_MASK |
                                     Gdk::BUTTON_PRESS_MASK |
                                     Gdk::POINTER_MOTION_MASK |
-                                    Gdk::POINTER_MOTION_HINT_MASK);
+                                    Gdk::STRUCTURE_MASK);
   show_all();
 }
 
@@ -110,7 +115,8 @@ Example_DrawingArea::~Example_DrawingArea()
 {
 }
 
-bool Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<Cairo::Context>& cr,
+  int width, int height)
 {
   enum { CHECK_SIZE = 10, SPACING = 2 };
 
@@ -123,8 +129,6 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<C
 
   int xcount = 0;
 
-  const int width = m_DrawingArea_Checkerboard.get_allocated_width();
-  const int height = m_DrawingArea_Checkerboard.get_allocated_height();
   int i = SPACING;
   while (i < width)
   {
@@ -151,19 +155,16 @@ bool Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<C
     i += CHECK_SIZE + SPACING;
     ++xcount;
   }
-
-  /* return true because we've handled this event, so no
-   * further processing is required.
-   */
-  return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+void Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr,
+  int, int)
 {
-  cr->set_source(m_surface, 0, 0); //TODO: Add =0 default parameters to cairomm.
-  cr->paint();
+  if (!m_surface)
+    return; // paranoia check, in case we haven't gotten a configure event
 
-  return false;
+  cr->set_source(m_surface, 0, 0);
+  cr->paint();
 }
 
 bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfigure*)
