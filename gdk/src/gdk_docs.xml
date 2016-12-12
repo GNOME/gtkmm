@@ -1263,11 +1263,38 @@ unclaimed root window drops.
 </parameters>
 </enum>
 
+<property name="GdkDrawContext:display">
+<description>
+The #GdkDisplay used to create the #GdkDrawContext.
+
+Since: 3.90
+
+</description>
+</property>
+
+<property name="GdkDrawContext:window">
+<description>
+The #GdkWindow the gl context is bound to.
+
+Since: 3.90
+
+</description>
+</property>
+
 <property name="GdkDrawingContext:clip">
 <description>
 The clip region applied to the drawing context.
 
 Since: 3.22
+
+</description>
+</property>
+
+<property name="GdkDrawingContext:paint-context">
+<description>
+The #GdkDrawContext used to draw or %NULL if Cairo is used.
+
+Since: 3.90
 
 </description>
 </property>
@@ -1870,27 +1897,9 @@ Since: 3.8
 </parameters>
 </enum>
 
-<property name="GdkGLContext:display">
-<description>
-The #GdkDisplay used to create the #GdkGLContext.
-
-Since: 3.16
-
-</description>
-</property>
-
 <property name="GdkGLContext:shared-context">
 <description>
 The #GdkGLContext that this context is sharing data with, or #NULL
-
-Since: 3.16
-
-</description>
-</property>
-
-<property name="GdkGLContext:window">
-<description>
-The #GdkWindow the gl context is bound to.
 
 Since: 3.16
 
@@ -3258,6 +3267,42 @@ being converted directly.
 </parameters>
 </enum>
 
+<signal name="GdkVulkanContext::images-updated">
+<description>
+This signal is emitted when the images managed by this context have
+changed. Usually this means that the swapchain had to be recreated,
+for example in response to a change of the window size.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<enum name="GdkVulkanError">
+<description>
+Error enumeration for #GdkVulkanContext.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="GDK_VULKAN_ERROR_UNSUPPORTED">
+<parameter_description> Vulkan is not supported on this backend or has not been
+compiled in.
+</parameter_description>
+</parameter>
+<parameter name="GDK_VULKAN_ERROR_NOT_AVAILABLE">
+<parameter_description> Vulkan support is not available on this Window
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GdkWMDecoration">
 <description>
 These are hints originally defined by the Motif toolkit.
@@ -3881,39 +3926,6 @@ Emits a short beep on the default display.
 <return></return>
 </function>
 
-<function name="gdk_cairo_create">
-<description>
-Creates a Cairo context for drawing to @window.
-
-Note that calling cairo_reset_clip() on the resulting #cairo_t will
-produce undefined results, so avoid it at all costs.
-
-Typically, this function is used to draw on a #GdkWindow out of the paint
-cycle of the toolkit; this should be avoided, as it breaks various assumptions
-and optimizations.
-
-If you are drawing on a native #GdkWindow in response to a %GDK_EXPOSE event
-you should use gdk_window_begin_draw_frame() and gdk_drawing_context_get_cairo_context()
-instead. GTK will automatically do this for you when drawing a widget.
-
-Since: 2.8
-
-Deprecated: 3.22: Use gdk_window_begin_draw_frame() and
-gdk_drawing_context_get_cairo_context() instead
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> A newly created Cairo context. Free with
-cairo_destroy() when you are done drawing.
-
-</return>
-</function>
-
 <function name="gdk_cairo_draw_from_gl">
 <description>
 This is the main way to draw GL content in GTK+. It takes a render buffer ID 
@@ -4124,41 +4136,6 @@ Since: 3.0
 </parameter>
 <parameter name="rgba">
 <parameter_description> a #GdkRGBA
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_cairo_set_source_window">
-<description>
-Sets the given window as the source pattern for @cr.
-
-The pattern has an extend mode of %CAIRO_EXTEND_NONE and is aligned
-so that the origin of @window is @x, @y. The window contains all its
-subwindows when rendering.
-
-Note that the contents of @window are undefined outside of the
-visible part of @window, so use this function with care.
-
-Since: 2.24
-
-</description>
-<parameters>
-<parameter name="cr">
-<parameter_description> a cairo context
-</parameter_description>
-</parameter>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X coordinate of location to place upper left corner of @window
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y coordinate of location to place upper left corner of @window
 </parameter_description>
 </parameter>
 </parameters>
@@ -7137,10 +7114,49 @@ or 0 to indicate that a drop will not be accepted
 <return></return>
 </function>
 
+<function name="gdk_draw_context_get_display">
+<description>
+Retrieves the #GdkDisplay the @context is created for
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDisplay or %NULL
+
+</return>
+</function>
+
+<function name="gdk_draw_context_get_window">
+<description>
+Retrieves the #GdkWindow used by the @context.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkWindow or %NULL
+
+</return>
+</function>
+
 <function name="gdk_drawing_context_get_cairo_context">
 <description>
 Retrieves a Cairo context to be used to draw on the #GdkWindow
-that created the #GdkDrawingContext.
+that created the #GdkDrawingContext. The @context must have been
+created without a #GdkDrawContext for this function to work. If
+gdk_drawing_context_get_paint_context() does not return %NULL,
+then this function will.
 
 The returned context is guaranteed to be valid as long as the
 #GdkDrawingContext is valid, that is between a call to
@@ -7151,13 +7167,14 @@ Since: 3.22
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description>
+<parameter_description> a #GdkDrawingContext created with a %NULL paint context
 </parameter_description>
 </parameter>
 </parameters>
 <return> a Cairo context to be used to draw
 the contents of the #GdkWindow. The context is owned by the
-#GdkDrawingContext and should not be destroyed
+#GdkDrawingContext and should not be destroyed. %NULL is
+returned when a paint context is in used.
 
 </return>
 </function>
@@ -7176,6 +7193,24 @@ Since: 3.22
 </parameter>
 </parameters>
 <return> a Cairo region
+
+</return>
+</function>
+
+<function name="gdk_drawing_context_get_paint_context">
+<description>
+Retrieves the paint context used to draw with.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawingContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDrawContext or %NULL
 
 </return>
 </function>
@@ -8666,6 +8701,24 @@ Since: 3.16
 </parameters>
 <return> the current #GdkGLContext, or %NULL
 
+</return>
+</function>
+
+<function name="gdk_gl_context_get_damage">
+<description>
+Returns the part of the backbuffer that is known to be damaged and would
+need to be redrawn. This is the area that needs to be respected in addition
+to areas invalidated by GTK or the windowing system itself.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> The damage to the backbuffer
 </return>
 </function>
 
@@ -11623,8 +11676,7 @@ owned by #GdkPixbuf and should not be freed.
 <description>
 Transfers image data from a #cairo_surface_t and converts it to an RGB(A)
 representation inside a #GdkPixbuf. This allows you to efficiently read
-individual pixels from cairo surfaces. For #GdkWindows, use
-gdk_pixbuf_get_from_window() instead.
+individual pixels from cairo surfaces.
 
 This function will create an RGB pixbuf with 8 bits per channel.
 The pixbuf will contain an alpha channel if the @surface contains one.
@@ -11642,64 +11694,6 @@ The pixbuf will contain an alpha channel if the @surface contains one.
 </parameter>
 <parameter name="src_y">
 <parameter_description> Source Y coordinate within @surface
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> Width in pixels of region to get
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> Height in pixels of region to get
-</parameter_description>
-</parameter>
-</parameters>
-<return> A newly-created pixbuf with a
-reference count of 1, or %NULL on error
-</return>
-</function>
-
-<function name="gdk_pixbuf_get_from_window">
-<description>
-Transfers image data from a #GdkWindow and converts it to an RGB(A)
-representation inside a #GdkPixbuf. In other words, copies
-image data from a server-side drawable to a client-side RGB(A) buffer.
-This allows you to efficiently read individual pixels on the client side.
-
-This function will create an RGB pixbuf with 8 bits per channel with
-the size specified by the @width and @height arguments scaled by the
-scale factor of @window. The pixbuf will contain an alpha channel if
-the @window contains one.
-
-If the window is off the screen, then there is no image data in the
-obscured/offscreen regions to be placed in the pixbuf. The contents of
-portions of the pixbuf corresponding to the offscreen region are undefined.
-
-If the window you’re obtaining data from is partially obscured by
-other windows, then the contents of the pixbuf areas corresponding
-to the obscured regions are undefined.
-
-If the window is not mapped (typically because it’s iconified/minimized
-or not on the current workspace), then %NULL will be returned.
-
-If memory can’t be allocated for the return value, %NULL will be returned
-instead.
-
-(In short, there are several ways this function can fail, and if it fails
-it returns %NULL; so check the return value.)
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> Source window
-</parameter_description>
-</parameter>
-<parameter name="src_x">
-<parameter_description> Source X coordinate within @window
-</parameter_description>
-</parameter>
-<parameter name="src_y">
-<parameter_description> Source Y coordinate within @window
 </parameter_description>
 </parameter>
 <parameter name="width">
@@ -15897,6 +15891,10 @@ Since: 3.22
 <parameter_description> a #GdkWindow
 </parameter_description>
 </parameter>
+<parameter name="context">
+<parameter_description> the context used to draw the frame
+</parameter_description>
+</parameter>
 <parameter name="region">
 <parameter_description> a Cairo region
 </parameter_description>
@@ -16311,6 +16309,31 @@ with it.
 This function always returns a valid pointer, but it will return a
 pointer to a “nil” surface if @other is already in an error state
 or any other error occurs.
+
+</return>
+</function>
+
+<function name="gdk_window_create_vulkan_context">
+<description>
+Creates a new #GdkVulkanContext for rendering on @window.
+
+If the creation of the #GdkVulkanContext failed, @error will be set.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GdkWindow
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #GdkVulkanContext, or
+%NULL on error
 
 </return>
 </function>
@@ -17515,15 +17538,10 @@ Since: 2.10
 <function name="gdk_window_invalidate_maybe_recurse">
 <description>
 Adds @region to the update area for @window. The update area is the
-region that needs to be redrawn, or “dirty region.” The call
-gdk_window_process_updates() sends one or more expose events to the
-window, which together cover the entire update area. An
-application would normally redraw the contents of @window in
-response to those expose events.
+region that needs to be redrawn, or “dirty region.”
 
-GDK will call gdk_window_process_all_updates() on your behalf
-whenever your program returns to the main loop and becomes idle, so
-normally there’s no need to do that manually, you just need to
+GDK will process all updates whenever the frame clock schedules a redraw,
+so there’s no need to do forces redraws manually, you just need to
 invalidate regions that you know should be redrawn.
 
 The @child_func parameter controls whether the region of
@@ -17582,15 +17600,10 @@ window
 <function name="gdk_window_invalidate_region">
 <description>
 Adds @region to the update area for @window. The update area is the
-region that needs to be redrawn, or “dirty region.” The call
-gdk_window_process_updates() sends one or more expose events to the
-window, which together cover the entire update area. An
-application would normally redraw the contents of @window in
-response to those expose events.
+region that needs to be redrawn, or “dirty region.”
 
-GDK will call gdk_window_process_all_updates() on your behalf
-whenever your program returns to the main loop and becomes idle, so
-normally there’s no need to do that manually, you just need to
+GDK will process all updates whenever the frame clock schedules a redraw,
+so there’s no need to do forces redraws manually, you just need to
 invalidate regions that you know should be redrawn.
 
 The @invalidate_children parameter controls whether the region of
@@ -17724,33 +17737,6 @@ function before gdk_window_show(). (Try gdk_window_show_unraised().)
 <parameters>
 <parameter name="window">
 <parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_window_mark_paint_from_clip">
-<description>
-If you call this during a paint (e.g. between gdk_window_begin_paint_region()
-and gdk_window_end_paint() then GDK will mark the current clip region of the
-window as being drawn. This is required when mixing GL rendering via
-gdk_cairo_draw_from_gl() and cairo rendering, as otherwise GDK has no way
-of knowing when something paints over the GL-drawn regions.
-
-This is typically called automatically by GTK+ and you don't need
-to care about this.
-
-Since: 3.16
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="cr">
-<parameter_description> a #cairo_t
 </parameter_description>
 </parameter>
 </parameters>
@@ -18123,44 +18109,6 @@ children, so the list does not need to be freed.
 <return>
 a reference to the list of child windows in @window
 </return>
-</function>
-
-<function name="gdk_window_process_all_updates">
-<description>
-Calls gdk_window_process_updates() for all windows (see #GdkWindow)
-in the application.
-
-
-</description>
-<parameters>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_window_process_updates">
-<description>
-Sends one or more expose events to @window. The areas in each
-expose event will cover the entire update area for the window (see
-gdk_window_invalidate_region() for details). Normally GDK calls
-gdk_window_process_all_updates() on your behalf, so there’s no
-need to call this function unless you want to force expose events
-to be delivered immediately and synchronously (vs. the usual
-case, where GDK delivers them in an idle handler). Occasionally
-this is useful to produce nicer scrolling behavior, for example.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="update_children">
-<parameter_description> whether to also process updates for child windows
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_window_raise">
