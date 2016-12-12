@@ -29,7 +29,7 @@
 class TextWidget : public Gtk::ScrolledWindow
 {
 public:
-  TextWidget(bool is_source);
+  explicit TextWidget(bool is_source);
   ~TextWidget() override;
 
   Glib::RefPtr<Gtk::TextBuffer> get_buffer();

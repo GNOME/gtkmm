@@ -85,7 +85,7 @@ private:
 class DetailDialog : public Gtk::Dialog
 {
 public:
-  DetailDialog(Gtk::Window& parent);
+  explicit DetailDialog(Gtk::Window& parent);
   ~DetailDialog() override;
 
   void set_image(const Glib::ustring& icon_name, const Glib::ustring& description);
