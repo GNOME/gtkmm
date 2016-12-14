@@ -27,6 +27,9 @@
 #endif //GTKMM_ATKMM_ENABLED
 #include <gdkmm/wrap_init.h>
 #include <gtkmm/wrap_init.h>
+#include <locale>
+#include <clocale>
+#include <stdexcept>
 
 namespace
 {
@@ -48,7 +51,29 @@ static void init_gtkmm_internals()
     Gdk::wrap_init();
     Gtk::wrap_init();
 
+    // Shall gtk_init() set the global C locale to the user's preferred locale?
+    if (!Glib::get_init_to_users_preferred_locale())
+      gtk_disable_setlocale();
+
     init_done = true;
+  }
+}
+
+// Make sure the C++ locale is the same as the C locale.
+// The first call to Glib::init() fixes this. We repeat it here just to be sure.
+// The application program may have changed the locale settings after
+// the first call to Glib::init(). Unlikely, but possible.
+static void set_cxx_locale_to_c_locale()
+{
+  try
+  {
+    // Make the C++ locale equal to the C locale.
+    std::locale::global(std::locale(std::setlocale(LC_ALL, nullptr)));
+  }
+  catch (const std::runtime_error& ex)
+  {
+    g_warning("Can't make the global C++ locale equal to the C locale.\n"
+      "   %s\n   C locale = %s\n", ex.what(), std::setlocale(LC_ALL, nullptr));
   }
 }
 
@@ -73,6 +98,7 @@ Application::Application(const Glib::ustring& application_id, Gio::ApplicationFl
   m_argv(nullptr)
 {
   gtk_init(nullptr, nullptr);
+  set_cxx_locale_to_c_locale();
 }
 
 Application::Application(int& argc, char**& argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags)
@@ -85,6 +111,7 @@ Application::Application(int& argc, char**& argv, const Glib::ustring& applicati
   m_argv(argv)
 {
   gtk_init(&argc, &argv);
+  set_cxx_locale_to_c_locale();
 }
 
 Glib::RefPtr<Application> Application::create(const Glib::ustring& application_id, Gio::ApplicationFlags flags)
