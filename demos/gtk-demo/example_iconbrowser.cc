@@ -972,7 +972,7 @@ Glib::RefPtr<Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
   try
   {
     bool is_symbolic = false;
-    pixbuf = info.load_symbolic(context, is_symbolic);
+    pixbuf = info.load_symbolic_for_context(context, is_symbolic);
   }
   catch (const Glib::Error& err)
   {
