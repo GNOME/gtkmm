@@ -35,7 +35,6 @@ namespace Gtk
 
 class RadioButton;
 class RadioMenuItem;
-class RadioAction; //deprecated
 class RadioToolButton;
 
 /** RadioButtonGroup, identifier for RadioButtons.
