@@ -167,6 +167,62 @@ void Container_Class::remove_callback(GtkContainer* self, GtkWidget* p0)
   }
 }
 
+// Custom hand-coded callback:
+void Container_Class::forall_vfunc_callback(GtkContainer* self,
+  gboolean include_internals, GtkCallback callback, gpointer callback_data)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        if (callback == &container_foreach_callback)
+        {
+          // This call comes from Container::forall() or Container::foreach(),
+          // or is a recursive call. Don't create another slot layer.
+          // callback_data is a pointer to a Container::ForeachSlot.
+          const auto slot = static_cast<Container::ForeachSlot*>(callback_data);
+
+          // Call the virtual member method, which derived classes might override.
+          obj->forall_vfunc(include_internals, *slot);
+        }
+        else
+        {
+          // A slot that, when called, will call the callback function with the callback_data.
+          Container::ForeachSlot slot = [callback, callback_data](Widget& widget)
+                                        { callback(widget.gobj(), callback_data); };
+
+          // Call the virtual member method, which derived classes might override.
+          obj->forall_vfunc(include_internals, slot);
+        }
+        return;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->forall)
+    (*base->forall)(self, include_internals, callback, callback_data);
+}
+
 void Container::foreach(const Container::ForeachSlot& slot)
 {
   ForeachSlot slot_copy (slot);

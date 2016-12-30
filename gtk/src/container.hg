@@ -27,11 +27,6 @@ _PINCLUDE(gtkmm/private/widget_p.h)
  * These widgets can be used to group other widgets together.
  */
 
-/* we'll include gtkfeatures because we dont want to include the whole
-   gtk/gtk.h - this file is used by almost ALL our widgets, so dependencies
-   in minimum - adding things here will increase compile times ALOT */
-
-
 namespace Gtk
 {
 
@@ -81,10 +76,10 @@ public:
   /// Request that contained widgets check their size
   _WRAP_METHOD(void check_resize(), gtk_container_check_resize)
 
-  /** For instance,
-   * void on_foreach(Gtk::Widget* widget);
+  /** For instance,<br>
+   * void on_foreach(Gtk::Widget& widget);
    */
-  typedef sigc::slot<void(Widget&)> ForeachSlot;
+  using ForeachSlot = sigc::slot<void(Widget&)>;
 
   /** Operate on contained items.
    *
@@ -156,6 +151,8 @@ public:
 
   _WRAP_METHOD(GType child_type() const, gtk_container_child_type)
 
+  // gtk_container_get_path_for_child() returns a newly created GtkWidgetPath.
+#m4 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, false)')
   _WRAP_METHOD(WidgetPath get_path_for_child(const Widget& child) const, gtk_container_get_path_for_child)
 
   // Ignore functions such as gtk_container_class_install_child_property(),  which I think are for themes, like the GtkWidget style properties.
@@ -193,10 +190,10 @@ protected:
    * Most applications should use foreach(), rather than forall().
    *
    * @param include_internals
-   * @param callback A callback.
-   * @param callback_data Callback user data
+   * @param slot A slot to call for each child.
    */
-  _WRAP_VFUNC(void forall(gboolean include_internals, GtkCallback callback, gpointer callback_data), forall)
+  _WRAP_VFUNC(void forall(bool include_internals, const ForeachSlot& slot{callback}), forall,
+    custom_vfunc_callback, slot_name slot, slot_callback container_foreach_callback, no_slot_copy)
 
   /** Sets a child property for this container and its child.
    *
@@ -205,13 +202,15 @@ protected:
    * examples of child properties are the position or pack-type of a widget
    * which is contained in a Gtk::Box.
    *
-   * @param child The child property.
+   * @param child The child widget.
    * @param property_id The ID of the child property to set.
    * @param value The new value for the child property.
-   * @param pspec
+   * @param pspec The GParamSpec of the child property to set.
    */
-  _WRAP_VFUNC(void set_child_property(GtkWidget* child, guint property_id, const GValue* value, GParamSpec* pspec), set_child_property)
+  _WRAP_VFUNC(void set_child_property(Widget* child, guint property_id,
+    const Glib::ValueBase& value, GParamSpec* pspec), set_child_property)
 
+#m4 _CONVERSION(`const Widget*', `GtkWidget*', `const_cast<$2>(Glib::unwrap($3))')
   /** Returns a child property for this container and its child.
    *
    * Child  properties are object properties that are not specific to either the
@@ -219,12 +218,22 @@ protected:
    * examples of child properties are the position or pack-type of a widget
    * which is contained in a Gtk::Box.
    *
-   * @param child The child property.
+   * @param child The child widget.
    * @param property_id The ID of the child property to get.
-   * @param value A GValue to fill with the child property's value.
-   * @param pspec
+   * @param value A Glib::Value to fill with the child property's value.
+   * @param pspec The GParamSpec of the child property to get.
    */
-  _WRAP_VFUNC(void get_child_property(GtkWidget* child, guint property_id, GValue* value, GParamSpec* pspec) const, get_child_property)
+  _WRAP_VFUNC(void get_child_property(const Widget* child, guint property_id,
+    Glib::ValueBase& value, GParamSpec* pspec) const, get_child_property)
+
+#m4 _CONVERSION(`WidgetPath', `GtkWidgetPath*', __FR2P)
+  /** Returns a widget path representing all the widget hierarchy
+   * from the toplevel down to and including @a child.
+   *
+   * @param child The child widget.
+   * @return The WidgetPath of @a child.
+   */
+  _WRAP_VFUNC(WidgetPath get_path_for_child(const Widget* child) const, get_path_for_child, refreturn_ctype)
 
 #m4begin
 dnl// Hook in special code to catch explicit uses of gtk_object_destroy() by
