@@ -24,7 +24,7 @@ protected:
   virtual void on_button_home();
   virtual void on_iconview_item_activated(const Gtk::TreeModel::Path& path);
 
-  virtual int on_model_sort(const Gtk::TreeModel::iterator& a, const Gtk::TreeModel::iterator& b);
+  virtual int on_model_sort(const Gtk::TreeModel::const_iterator& a, const Gtk::TreeModel::const_iterator& b);
 
   class ModelColumns : public Gtk::TreeModelColumnRecord
   {
@@ -128,14 +128,14 @@ Example_IconView::Example_IconView()
   show_all();
 }
 
-int Example_IconView::on_model_sort(const Gtk::TreeModel::iterator& a, const Gtk::TreeModel::iterator& b)
+int Example_IconView::on_model_sort(const Gtk::TreeModel::const_iterator& a, const Gtk::TreeModel::const_iterator& b)
 {
   /* We need this function because we want to sort
    * folders before files.
    */
 
-  Gtk::TreeModel::Row row_a = *a;
-  Gtk::TreeModel::Row row_b = *b;
+  const Gtk::TreeModel::Row row_a = *a;
+  const Gtk::TreeModel::Row row_b = *b;
 
   const bool a_is_dir = row_a[m_columns.is_directory];
   const bool b_is_dir = row_b[m_columns.is_directory];

@@ -108,7 +108,7 @@ void ListViewText::insert(guint row, const Glib::ustring& column_one_value)
 {
   g_return_if_fail( row < size() );
 
-  Gtk::ListStore::const_iterator iter = m_model->children()[row];
+  Gtk::ListStore::iterator iter = m_model->children()[row].get_iter();
   Gtk::TreeModel::Row newRow = *(m_model->insert(iter));
 
   if(!column_one_value.empty())
@@ -128,8 +128,8 @@ Glib::ustring ListViewText::get_text(guint row, guint column) const
 
   g_return_val_if_fail( row < size(), result );
 
-  Gtk::TreeModel::iterator iter = m_model->children()[row];
-  iter->get_value(column, result);
+  const Gtk::TreeModel::Row childrow = m_model->children()[row];
+  childrow.get_value(column, result);
 
   return result;
 }
@@ -138,16 +138,16 @@ void ListViewText::set_text(guint row, guint column, const Glib::ustring& value)
 {
   g_return_if_fail( row < size() );
 
-  Gtk::TreeModel::iterator iter = m_model->children()[row];
-  (*iter)->set_value(column, value);
+  Gtk::TreeModel::Row childrow = m_model->children()[row];
+  childrow.set_value(column, value);
 }
 
 void ListViewText::set_text(guint row, const Glib::ustring& value)
 {
   g_return_if_fail( row < size() );
 
-  Gtk::TreeModel::iterator iter = m_model->children()[ row ];
-  (*iter)->set_value(0, value);
+  Gtk::TreeModel::Row childrow = m_model->children()[row];
+  childrow.set_value(0, value);
 }
 
 guint ListViewText::size() const

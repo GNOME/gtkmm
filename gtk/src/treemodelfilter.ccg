@@ -53,7 +53,7 @@ static void SignalProxy_Modify_gtk_callback(GtkTreeModel* model, GtkTreeIter* it
     auto column_type = gtk_tree_model_get_column_type(model, column);
     cppValue.init(column_type);
 
-    (*the_slot)( Gtk::TreeModel::const_iterator(model, iter), cppValue, column );
+    (*the_slot)( Gtk::TreeModel::iterator(model, iter), cppValue, column );
 
     //GTK+ has already done this for us: g_value_init(value, column_type);
 
@@ -105,7 +105,7 @@ void TreeModelFilter::set_visible_func(const SlotVisible& slot)
 
 TreeModel::iterator TreeModelFilter::convert_child_iter_to_iter(const iterator& child_iter) const
 {
-  TreeIter filter_iter (const_cast<TreeModelFilter*>(this));
+  iterator filter_iter(const_cast<TreeModelFilter*>(this));
 
   gtk_tree_model_filter_convert_child_iter_to_iter(
       const_cast<GtkTreeModelFilter*>(gobj()), filter_iter.gobj(),
@@ -118,7 +118,7 @@ TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& 
 {
   const auto child_model = gtk_tree_model_filter_get_model(const_cast<GtkTreeModelFilter*>(gobj()));
 
-  TreeIter child_iter (dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) child_model, false)));
+  iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*)child_model, false)));
 
   gtk_tree_model_filter_convert_iter_to_child_iter(
       const_cast<GtkTreeModelFilter*>(gobj()), child_iter.gobj(),
@@ -148,7 +148,7 @@ void TreeModelFilter::set_value_impl(const iterator& row, int column, const Glib
   const auto child_model = dynamic_cast<TreeModel*>(
       Glib::wrap_auto((GObject*) gtk_tree_model_filter_get_model(gobj()), false));
 
-  TreeIter child_iter (child_model);
+  iterator child_iter(child_model);
 
   gtk_tree_model_filter_convert_iter_to_child_iter(
       gobj(), child_iter.gobj(), const_cast<GtkTreeIter*>(row.gobj()));

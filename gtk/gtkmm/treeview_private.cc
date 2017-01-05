@@ -36,8 +36,8 @@ void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell
   try
   {
     // use Slot::operator()
-    Gtk::TreeModel::iterator cppiter = TreeIter(model, iter);
-    if(!cppiter->get_model_gobject())
+    Gtk::TreeModel::iterator cppiter = Gtk::TreeModel::iterator(model, iter);
+    if(!cppiter.get_model_gobject())
     {
       g_warning("SignalProxy_CellData_gtk_callback() The cppiter has no model\n");
       return;
@@ -63,7 +63,7 @@ gboolean SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter*
 
   try
   {
-    return (*the_slot)(Glib::wrap(model, true), Gtk::TreeIter(model, iter));
+    return (*the_slot)(Glib::wrap(model, true), Gtk::TreeModel::iterator(model, iter));
   }
   catch(...)
   {

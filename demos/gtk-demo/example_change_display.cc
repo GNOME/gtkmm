@@ -194,12 +194,13 @@ void Example_ChangeDisplay::initialize_displays()
 
 void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<Gdk::Display> display)
 {
-  for(auto row : m_refListStore_Display->children())
+  auto children = m_refListStore_Display->children();
+  for (auto iter = children.begin(); iter != children.end(); ++iter)
   {
-    Glib::RefPtr<Gdk::Display> refDisplay = row[m_columns_display.m_display];
-    if(refDisplay == display)
+    Glib::RefPtr<Gdk::Display> refDisplay = (*iter)[m_columns_display.m_display];
+    if (refDisplay == display)
     {
-      m_refListStore_Display->erase(row);
+      m_refListStore_Display->erase(iter);
     }
   }
 }

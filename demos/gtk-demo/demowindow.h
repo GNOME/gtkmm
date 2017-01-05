@@ -37,7 +37,7 @@ public:
   ~DemoWindow() override;
 
 protected:
-  void run_example(const Gtk::TreeModel::Row& row);
+  void run_example(Gtk::TreeModel::Row& row);
   void configure_header_bar();
 
   void fill_tree();

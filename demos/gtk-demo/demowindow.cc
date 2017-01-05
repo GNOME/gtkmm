@@ -185,7 +185,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
   }
 }
 
-void DemoWindow::run_example(const Gtk::TreeModel::Row& row)
+void DemoWindow::run_example(Gtk::TreeModel::Row& row)
 {
   const DemoColumns& columns = demo_columns();
 

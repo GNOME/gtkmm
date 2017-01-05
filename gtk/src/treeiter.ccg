@@ -22,30 +22,47 @@
 namespace Gtk
 {
 
-/**** Gtk::TreeIter ********************************************************/
+/**** Gtk::TreeIterBase2 ***************************************************/
 
-TreeIter::TreeIter()
+TreeIterBase2::TreeIterBase2()
 :
   TreeIterBase(),
   model_      (nullptr),
   is_end_     (false)
 {}
 
-TreeIter::TreeIter(TreeModel* model)
+TreeIterBase2::TreeIterBase2(TreeModel* model)
 :
   TreeIterBase(),
   model_      (model),
   is_end_     (false)
 {}
 
-TreeIter::TreeIter(GtkTreeModel* model, const GtkTreeIter* iter)
+TreeIterBase2::TreeIterBase2(GtkTreeModel* model, const GtkTreeIter* iter)
 :
   TreeIterBase(iter),
-  model_      (dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) model))),
+  model_      (dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*)model))),
   is_end_     (iter == nullptr)
 {}
 
-TreeIter& TreeIter::operator++()
+/**** Gtk::TreeIterBase3 ***************************************************/
+
+TreeIterBase3::TreeIterBase3()
+:
+  TreeIterBase2()
+{}
+
+TreeIterBase3::TreeIterBase3(TreeModel* model)
+:
+  TreeIterBase2(model)
+{}
+
+TreeIterBase3::TreeIterBase3(GtkTreeModel* model, const GtkTreeIter* iter)
+:
+  TreeIterBase2(model, iter)
+{}
+
+void TreeIterBase3::plus_plus()
 {
   g_assert(!is_end_);
 
@@ -56,26 +73,9 @@ TreeIter& TreeIter::operator++()
     is_end_ = true;
     gtk_tree_model_iter_parent(Glib::unwrap(model_), &gobject_, &previous);
   }
-
-  return *this;
 }
 
-const TreeIter TreeIter::operator++(int)
-{
-  g_assert(!is_end_);
-
-  TreeIter previous (*this);
-
-  if(!gtk_tree_model_iter_next(model_->gobj(), &gobject_))
-  {
-    is_end_ = true;
-    gtk_tree_model_iter_parent(Glib::unwrap(model_), &gobject_, &previous.gobject_);
-  }
-
-  return previous;
-}
-
-TreeIter& TreeIter::operator--()
+void TreeIterBase3::minus_minus()
 {
   if(!is_end_)
   {
@@ -91,34 +91,11 @@ TreeIter& TreeIter::operator--()
 
     g_assert(!is_end_);
   }
-
-  return *this;
-}
-
-const TreeIter TreeIter::operator--(int)
-{
-  TreeIter next (*this);
-
-  if(!is_end_)
-  {
-    gtk_tree_model_iter_previous(Glib::unwrap(model_), &gobject_);
-  }
-  else // --end yields last
-  {
-    const auto parent = (next.gobject_.stamp != 0) ? &next.gobject_ : nullptr;
-
-    const int index = gtk_tree_model_iter_n_children(model_->gobj(), parent) - 1;
-    is_end_ = !gtk_tree_model_iter_nth_child(model_->gobj(), &gobject_, parent, index);
-
-    g_assert(!is_end_);
-  }
-
-  return next;
 }
 
 /* There is no public gtk_tree_iter_equal(), so we must write our own.
  */
-bool TreeIter::equal(const TreeIter& other) const
+bool TreeIterBase3::equal(const TreeIterBase3& other) const
 {
   g_assert(model_ == other.model_);
 
@@ -134,15 +111,7 @@ bool TreeIter::equal(const TreeIter& other) const
          (gobject_.user_data3 == other.gobject_.user_data3);
 }
 
-TreeIter::operator bool() const
-{
-  // Test whether the GtkTreeIter is valid and not an end iterator.  This check
-  // is almost the same as the private VALID_ITER() macro in gtkliststore.c and
-  // gtktreestore.c.
-  return !is_end_ && gobject_.stamp;
-}
-
-void TreeIter::setup_end_iterator(const TreeIter& last_valid)
+void TreeIterBase3::setup_end_iterator(const TreeIterBase3& last_valid)
 {
   g_assert(model_ == last_valid.model_);
 
@@ -154,28 +123,32 @@ void TreeIter::setup_end_iterator(const TreeIter& last_valid)
   is_end_ = true;
 }
 
-void TreeIter::set_model_refptr(const Glib::RefPtr<TreeModel>& model)
+void TreeIterBase3::set_model_refptr(const Glib::RefPtr<TreeModel>& model)
 {
   model_ = model.operator->();
 }
 
-void TreeIter::set_model_gobject(GtkTreeModel* model)
+void TreeIterBase3::set_model_gobject(GtkTreeModel* model)
 {
   model_ = dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) model));
 }
 
-GtkTreeModel* TreeIter::get_model_gobject() const
+GtkTreeModel* TreeIterBase3::get_model_gobject()
 {
   return (model_) ? model_->gobj() : nullptr;
 }
 
+const GtkTreeModel* TreeIterBase3::get_model_gobject() const
+{
+  return (model_) ? model_->gobj() : nullptr;
+}
 
-int TreeIter::get_stamp() const
+int TreeIterBase3::get_stamp() const
 {
   return gobj()->stamp;
 }
 
-void TreeIter::set_stamp(int stamp)
+void TreeIterBase3::set_stamp(int stamp)
 {
   gobj()->stamp = stamp;
 }
@@ -183,16 +156,33 @@ void TreeIter::set_stamp(int stamp)
 
 /**** Gtk::TreeRow *********************************************************/
 
-const TreeNodeChildren& TreeRow::children() const
+TreeNodeChildren& TreeRow::children()
 {
   g_assert(!is_end_);
 
-  return static_cast<const TreeNodeChildren&>(static_cast<const TreeIter&>(*this));
+  return static_cast<TreeNodeChildren&>(static_cast<TreeIterBase2&>(*this));
 }
 
-TreeIter TreeRow::parent() const
+const TreeNodeChildren& TreeRow::children() const
 {
-  TreeIter iter (model_);
+  return const_cast<TreeRow*>(this)->children();
+}
+
+TreeIter<TreeRow> TreeRow::parent()
+{
+  TreeIter<TreeRow> iter(model_);
+
+  if(is_end_)
+    iter.gobject_ = gobject_;
+  else
+    gtk_tree_model_iter_parent(model_->gobj(), iter.gobj(), &gobject_);
+
+  return iter;
+}
+
+TreeIter<const TreeRow> TreeRow::parent() const
+{
+  TreeIter<const TreeRow> iter(model_);
 
   if(is_end_)
     iter.gobject_ = gobject_;
@@ -202,26 +192,39 @@ TreeIter TreeRow::parent() const
   return iter;
 }
 
-void TreeRow::set_value_impl(int column, const Glib::ValueBase& value) const
+TreeIter<TreeRow> TreeRow::get_iter()
 {
-  model_->set_value_impl(*this, column, value);
+  return static_cast<TreeIter<TreeRow>&>(static_cast<TreeIterBase2&>(*this));
+}
+
+TreeIter<const TreeRow> TreeRow::get_iter() const
+{
+  return static_cast<const TreeIter<const TreeRow>&>(static_cast<const TreeIterBase2&>(*this));
+}
+
+void TreeRow::set_value_impl(int column, const Glib::ValueBase& value)
+{
+  model_->set_value_impl(static_cast<TreeIter<TreeRow>&>(static_cast<TreeIterBase2&>(*this)), column, value);
 }
 
 void TreeRow::get_value_impl(int column, Glib::ValueBase& value) const
 {
-  model_->get_value_impl(*this, column, value);
+  model_->get_value_impl(static_cast<const TreeIter<const TreeRow>&>(static_cast<const TreeIterBase2&>(*this)), column, value);
 }
 
 TreeRow::operator bool() const
 {
-  return TreeIter::operator bool();
-
+  // Test whether the GtkTreeIter is valid and not an end iterator. This check
+  // is almost the same as the private VALID_ITER() macro in gtkliststore.c and
+  // gtktreestore.c.
+  return !is_end_ && gobject_.stamp;
 }
+
 /**** Gtk::TreeNodeChildren ************************************************/
 
 TreeNodeChildren::iterator TreeNodeChildren::begin()
 {
-  iterator iter (model_);
+  iterator iter(model_);
 
   // If the iterator is invalid (stamp == 0), assume a 'virtual' toplevel
   // node.  This behaviour is needed to implement Gtk::TreeModel::children().
@@ -251,7 +254,7 @@ TreeNodeChildren::const_iterator TreeNodeChildren::begin() const
 {
   //TODO: Reduce the copy/paste from the non-const begin()?
 
-  const_iterator iter (model_);
+  const_iterator iter(model_);
 
   // If the iterator is invalid (stamp == 0), assume a 'virtual' toplevel
   // node.  This behaviour is needed to implement Gtk::TreeModel::children().
@@ -280,7 +283,8 @@ TreeNodeChildren::const_iterator TreeNodeChildren::begin() const
 TreeNodeChildren::iterator TreeNodeChildren::end()
 {
   // Just copy the parent, and turn it into an end iterator.
-  iterator iter (*this);
+  iterator iter(model_);
+  iter.gobject_ = gobject_;
   iter.is_end_ = true;
   return iter;
 }
@@ -288,14 +292,31 @@ TreeNodeChildren::iterator TreeNodeChildren::end()
 TreeNodeChildren::const_iterator TreeNodeChildren::end() const
 {
   // Just copy the parent, and turn it into an end iterator.
-  const_iterator iter (*this);
+  const_iterator iter(model_);
+  iter.gobject_ = gobject_;
   iter.is_end_ = true;
   return iter;
 }
 
-TreeNodeChildren::value_type TreeNodeChildren::operator[](TreeNodeChildren::size_type index) const
+TreeNodeChildren::value_type TreeNodeChildren::operator[](TreeNodeChildren::size_type index)
 {
-  iterator iter (model_);
+  iterator iter(model_);
+
+  const auto parent = const_cast<GtkTreeIter*>(get_parent_gobject());
+
+  if (!gtk_tree_model_iter_nth_child(model_->gobj(), iter.gobj(), parent, index))
+  {
+    // Assign the already known parent, in order to create an end iterator.
+    iter.gobject_ = gobject_;
+    iter.is_end_ = true;
+  }
+
+  return *iter;
+}
+
+const TreeNodeChildren::value_type TreeNodeChildren::operator[](TreeNodeChildren::size_type index) const
+{
+  const_iterator iter(model_);
 
   const auto parent = const_cast<GtkTreeIter*>(get_parent_gobject());
 
@@ -331,4 +352,3 @@ bool TreeNodeChildren::empty() const
 }
 
 } // namespace Gtk
-
