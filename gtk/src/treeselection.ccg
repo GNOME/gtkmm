@@ -20,6 +20,8 @@
 #include <gtkmm/treeview.h>
 #include <gtk/gtk.h>
 
+namespace
+{
 
 static void proxy_foreach_selection_iter_callback(GtkTreeModel* model, GtkTreePath*, GtkTreeIter* iter, void* data)
 {
@@ -28,7 +30,7 @@ static void proxy_foreach_selection_iter_callback(GtkTreeModel* model, GtkTreePa
 
   try
   {
-    slot(Gtk::TreeModel::iterator(model, iter));
+    slot(Gtk::TreeModel::const_iterator(model, iter));
   }
   catch(...)
   {
@@ -59,7 +61,7 @@ static void proxy_foreach_selection_path_and_iter_callback(GtkTreeModel* model, 
 
   try
   {
-    slot(Gtk::TreeModel::Path(path, true), Gtk::TreeModel::iterator(model, iter));
+    slot(Gtk::TreeModel::Path(path, true), Gtk::TreeModel::const_iterator(model, iter));
   }
   catch(...)
   {
@@ -86,6 +88,8 @@ static gboolean SignalProxy_Select_gtk_callback(GtkTreeSelection*, GtkTreeModel*
 
   return 0;
 }
+
+} // anonymous namespace
 
 static void SignalProxy_Select_gtk_callback_destroy(void* data)
 {
@@ -125,10 +129,16 @@ TreeModel::iterator TreeSelection::get_selected()
   TreeModel::iterator iter;
   GtkTreeModel* model_gobject = nullptr;
 
+  // If no row is selected, *iter.gobj() is set to an invalid iterator.
   gtk_tree_selection_get_selected(gobj(), &model_gobject, iter.gobj());
 
   iter.set_model_gobject(model_gobject);
   return iter;
+}
+
+TreeModel::const_iterator TreeSelection::get_selected() const
+{
+  return const_cast<TreeSelection*>(this)->get_selected();
 }
 
 TreeModel::iterator TreeSelection::get_selected(Glib::RefPtr<TreeModel>& model)
@@ -136,12 +146,18 @@ TreeModel::iterator TreeSelection::get_selected(Glib::RefPtr<TreeModel>& model)
   TreeModel::iterator iter;
   GtkTreeModel* model_gobject = nullptr;
 
+  // If no row is selected, *iter.gobj() is set to an invalid iterator.
   gtk_tree_selection_get_selected(gobj(), &model_gobject, iter.gobj());
 
   model = Glib::wrap(model_gobject, true);
 
   iter.set_model_refptr(model);
   return iter;
+}
+
+TreeModel::const_iterator TreeSelection::get_selected(Glib::RefPtr<const TreeModel>& model) const
+{
+  return const_cast<TreeSelection*>(this)->get_selected(model);
 }
 
 void TreeSelection::selected_foreach_iter(const SlotForeachIter& slot) const

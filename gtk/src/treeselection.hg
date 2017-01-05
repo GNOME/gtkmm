@@ -29,8 +29,6 @@ namespace Gtk
 {
 
 class TreeView;
-class TreeModel;
-class TreePath;
 
 /** Typedefed as Gtk::TreeView::Selection.
  * This is a helper object to manage the selection for a Gtk::TreeView widget.
@@ -58,21 +56,19 @@ class TreePath;
  */
 class TreeSelection : public Glib::Object
 {
-   _CLASS_GOBJECT(TreeSelection, GtkTreeSelection, GTK_TREE_SELECTION, Glib::Object, GObject)
-   _IGNORE(gtk_tree_selection_get_selected,
-           gtk_tree_selection_get_selected_rows, gtk_tree_selection_count_selected_rows)
-protected:
-
+  _CLASS_GOBJECT(TreeSelection, GtkTreeSelection, GTK_TREE_SELECTION, Glib::Object, GObject)
 
 public:
   _WRAP_METHOD(void set_mode(SelectionMode type), gtk_tree_selection_set_mode)
   _WRAP_METHOD(SelectionMode get_mode() const, gtk_tree_selection_get_mode)
 
-  /** For instance, bool on_select_function(const Glib::RefPtr<TreeModel>& model, const TreeModel::Path& path, bool path_currently_selected)
+  /** For instance,
+   * bool on_select_function(const Glib::RefPtr<TreeModel>& model, const TreeModel::Path& path, bool path_currently_selected);
+   *
    * The select function should return true if the state of the node may be toggled,
    * and false if the state of the node should be left unchanged.
    */
-  typedef sigc::slot<bool(const Glib::RefPtr<TreeModel>&, const TreeModel::Path&, bool)> SlotSelect;
+  using SlotSelect = sigc::slot<bool(const Glib::RefPtr<TreeModel>&, const TreeModel::Path&, bool)>;
 
   /** Sets the selection callback slot. If set, this function is called before any node is selected or unselected,
    * giving some control over which nodes are selected.
@@ -84,7 +80,6 @@ public:
    */
   void set_select_function(const SlotSelect& slot);
   _IGNORE(gtk_tree_selection_set_select_function, gtk_tree_selection_get_select_function)
-
   _IGNORE(gtk_tree_selection_get_user_data) // This would be our SignalProxy_Select* data.
 
   _WRAP_METHOD(TreeView* get_tree_view(), gtk_tree_selection_get_tree_view)
@@ -96,10 +91,8 @@ public:
   Glib::RefPtr<TreeModel> get_model(); // convenience function, not in GTK+
   Glib::RefPtr<const TreeModel> get_model() const; // convenience function, not in GTK+
 
-  //TODO: Add TreeModel::const_iterator get_selected() const, when we have a real const_iterator.
-
   /** Get the currently selected row.
-   * @return The currently selected row.
+   * @return The currently selected row. Or an invalid iterator, if no row is selected.
    * @note
    * This method won't work if the selection mode is <tt>Gtk::SELECTION_MULTIPLE</tt>.
    * Use get_selected_rows() for multiple selections.
@@ -107,43 +100,62 @@ public:
   TreeModel::iterator get_selected();
 
   /** Get the currently selected row.
-   * @return The currently selected row. Or end() if no rows were selected.
-   * @retval model The current TreeModel.
+   * @return The currently selected row. Or an invalid iterator, if no row is selected.
+   * @note
+   * This method won't work if the selection mode is <tt>Gtk::SELECTION_MULTIPLE</tt>.
+   * Use get_selected_rows() for multiple selections.
+   *
+   * @newin{3,90}
+   */
+  TreeModel::const_iterator get_selected() const;
+
+  /** Get the currently selected row.
+   * @param[out] model The current TreeModel.
+   * @return The currently selected row. Or an invalid iterator, if no row is selected.
    * @note
    * This method won't work if the selection mode is <tt>Gtk::SELECTION_MULTIPLE</tt>.
    * Use get_selected_rows() for multiple selections.
    */
   TreeModel::iterator get_selected(Glib::RefPtr<TreeModel>& model);
 
-  /** Creates a list of paths of all selected rows.
+  /** Get the currently selected row.
+   * @param[out] model The current TreeModel.
+   * @return The currently selected row. Or an invalid iterator, if no row is selected.
+   * @note
+   * This method won't work if the selection mode is <tt>Gtk::SELECTION_MULTIPLE</tt>.
+   * Use get_selected_rows() for multiple selections.
+   *
+   * @newin{3,90}
+   */
+  TreeModel::const_iterator get_selected(Glib::RefPtr<const TreeModel>& model) const;
+
+  /** Creates a vector of paths of all selected rows.
    * Additionally, if you are planning on modifying the model after calling this function,
    * you may want to convert the returned list into a list of GtkTreeRowReferences.
    *
-   * @returns a standard container containing a Gtk::Model::Path for each selected row.
+   * @returns A vector containing a Gtk::TreeModel::Path for each selected row.
    */
   std::vector<TreeModel::Path> get_selected_rows() const;
+  _IGNORE(gtk_tree_selection_get_selected, gtk_tree_selection_get_selected_rows)
 
   /** Creates a list of paths of all selected rows.
    * Additionally, if you are planning on modifying the model after calling this function,
    * you may want to convert the returned list into a list of GtkTreeRowReferences.
    *
-   * @retval model The current TreeModel.
-   * @returns a standard container containing a Gtk::Model::Path for each selected row.
+   * @param[out] model The current TreeModel.
+   * @returns A vector containing a Gtk::TreeModel::Path for each selected row.
    */
   std::vector<TreeModel::Path> get_selected_rows(Glib::RefPtr<TreeModel>& model);
 
   _WRAP_METHOD(int count_selected_rows() const, gtk_tree_selection_count_selected_rows)
 
-  //TODO: Consider deprecating these selected_foreach() methods, because get_selected_rows() should be enough.
-
-  //TODO: SlotForEachIter should take a const_iterator, when we have a real const iterator.
   /** For example,
-   * void on_foreach(const Gtk::TreeModel::iterator& iter);
+   * void on_foreach(const Gtk::TreeModel::const_iterator& iter);
    *
    * Note that you cannot modify the tree or selection from within the callback function.
    * As a result, get_selected_rows() might be more useful.
    */
-  typedef sigc::slot<void(const TreeModel::iterator&)> SlotForeachIter;
+  using SlotForeachIter = sigc::slot<void(const TreeModel::const_iterator&)>;
 
   /** Calls a callback slot for each selected node.
    * Note that you cannot modify the tree or selection from within the callback function.
@@ -159,7 +171,7 @@ public:
    * Note that you cannot modify the tree or selection from within the callback function.
    * As a result, get_selected_rows() might be more useful.
    */
-  typedef sigc::slot<void(const TreeModel::Path&)> SlotForeachPath;
+  using SlotForeachPath = sigc::slot<void(const TreeModel::Path&)>;
 
   /** Calls a callback slot for each selected node.
    * Note that you cannot modify the tree or selection from within the callback function.
@@ -171,12 +183,12 @@ public:
   _IGNORE(gtk_tree_selection_selected_foreach)
 
   /** For example,
-   * void on_foreach(const Gtk::TreeModel::Path& path, const Gtk::TreeModel::iterator& iter);
+   * void on_foreach(const Gtk::TreeModel::Path& path, const Gtk::TreeModel::const_iterator& iter);
    *
    * Note that you cannot modify the tree or selection from within the callback function.
    * As a result, get_selected_rows() might be more useful.
    */
-  typedef sigc::slot<void(const TreeModel::Path&, const TreeModel::iterator&)> SlotForeachPathAndIter;
+  using SlotForeachPathAndIter = sigc::slot<void(const TreeModel::Path&, const TreeModel::const_iterator&)>;
 
   /** Calls a callback slot for each selected node.
    * Note that you cannot modify the tree or selection from within the callback function.
@@ -187,16 +199,15 @@ public:
   void selected_foreach(const SlotForeachPathAndIter& slot) const;
 
   _WRAP_METHOD(void select(const TreeModel::Path& path), gtk_tree_selection_select_path)
-  _WRAP_METHOD(void select(const TreeModel::iterator& iter), gtk_tree_selection_select_iter)
-  _WRAP_METHOD(void select(const TreeModel::Row& row), gtk_tree_selection_select_iter)
   _WRAP_METHOD(void select(const TreeModel::Path& start_path, const TreeModel::Path& end_path), gtk_tree_selection_select_range)
+  _WRAP_METHOD(void select(const TreeModel::iterator& iter), gtk_tree_selection_select_iter)
 
   _WRAP_METHOD(void unselect(const TreeModel::Path& path), gtk_tree_selection_unselect_path)
   _WRAP_METHOD(void unselect(const TreeModel::Path& start_path, const TreeModel::Path& end_path), gtk_tree_selection_unselect_range)
   _WRAP_METHOD(void unselect(const TreeModel::iterator& iter), gtk_tree_selection_unselect_iter)
 
   _WRAP_METHOD(bool is_selected(const TreeModel::Path& path) const, gtk_tree_selection_path_is_selected)
-  _WRAP_METHOD(bool is_selected(const TreeModel::iterator& iter) const, gtk_tree_selection_iter_is_selected)
+  _WRAP_METHOD(bool is_selected(const TreeModel::const_iterator& iter) const, gtk_tree_selection_iter_is_selected)
 
   _WRAP_METHOD(void select_all(), gtk_tree_selection_select_all)
   _WRAP_METHOD(void unselect_all(), gtk_tree_selection_unselect_all)
@@ -207,4 +218,3 @@ public:
 };
 
 } // namespace Gtk
-
