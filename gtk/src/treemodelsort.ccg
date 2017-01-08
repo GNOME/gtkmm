@@ -18,14 +18,24 @@
 
 #include <gtk/gtk.h>
 
-typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
+using Path = Gtk::TreeModel::Path; //So that the generated method implementations can use this as a return type.
 
 namespace Gtk
 {
 
-TreeModel::iterator TreeModelSort::convert_child_iter_to_iter(const iterator& child_iter) const
+TreeModel::iterator TreeModelSort::convert_child_iter_to_iter(const iterator& child_iter)
 {
-  iterator sorted_iter(const_cast<TreeModelSort*>(this));
+  iterator sorted_iter(this);
+
+  gtk_tree_model_sort_convert_child_iter_to_iter(gobj(), sorted_iter.gobj(),
+      const_cast<GtkTreeIter*>(child_iter.gobj()));
+
+  return sorted_iter;
+}
+
+TreeModel::const_iterator TreeModelSort::convert_child_iter_to_iter(const const_iterator& child_iter) const
+{
+  const_iterator sorted_iter(const_cast<TreeModelSort*>(this));
 
   gtk_tree_model_sort_convert_child_iter_to_iter(
       const_cast<GtkTreeModelSort*>(gobj()), sorted_iter.gobj(),
@@ -34,11 +44,23 @@ TreeModel::iterator TreeModelSort::convert_child_iter_to_iter(const iterator& ch
   return sorted_iter;
 }
 
-TreeModel::iterator TreeModelSort::convert_iter_to_child_iter(const iterator& sorted_iter) const
+TreeModel::iterator TreeModelSort::convert_iter_to_child_iter(const iterator& sorted_iter)
+{
+  const auto child_model = gtk_tree_model_sort_get_model(gobj());
+
+  iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) child_model, false)));
+
+  gtk_tree_model_sort_convert_iter_to_child_iter(gobj(), child_iter.gobj(),
+      const_cast<GtkTreeIter*>(sorted_iter.gobj()));
+
+  return child_iter;
+}
+
+TreeModel::const_iterator TreeModelSort::convert_iter_to_child_iter(const const_iterator& sorted_iter) const
 {
   const auto child_model = gtk_tree_model_sort_get_model(const_cast<GtkTreeModelSort*>(gobj()));
 
-  iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) child_model, false)));
+  const_iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*) child_model, false)));
 
   gtk_tree_model_sort_convert_iter_to_child_iter(
       const_cast<GtkTreeModelSort*>(gobj()), child_iter.gobj(),

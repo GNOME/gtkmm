@@ -73,7 +73,7 @@ static void SignalProxy_Modify_gtk_callback_destroy(void* data)
 }
 
 
-typedef Gtk::TreeModel::Path Path; //So that the generated method implemenations can use this a return type.
+using Path = Gtk::TreeModel::Path; //So that the generated method implementations can use this as a return type.
 
 namespace Gtk
 {
@@ -103,9 +103,19 @@ void TreeModelFilter::set_visible_func(const SlotVisible& slot)
 }
 
 
-TreeModel::iterator TreeModelFilter::convert_child_iter_to_iter(const iterator& child_iter) const
+TreeModel::iterator TreeModelFilter::convert_child_iter_to_iter(const iterator& child_iter)
 {
-  iterator filter_iter(const_cast<TreeModelFilter*>(this));
+  iterator filter_iter(this);
+
+  gtk_tree_model_filter_convert_child_iter_to_iter(gobj(), filter_iter.gobj(),
+      const_cast<GtkTreeIter*>(child_iter.gobj()));
+
+  return filter_iter;
+}
+
+TreeModel::const_iterator TreeModelFilter::convert_child_iter_to_iter(const const_iterator& child_iter) const
+{
+  const_iterator filter_iter(const_cast<TreeModelFilter*>(this));
 
   gtk_tree_model_filter_convert_child_iter_to_iter(
       const_cast<GtkTreeModelFilter*>(gobj()), filter_iter.gobj(),
@@ -114,11 +124,23 @@ TreeModel::iterator TreeModelFilter::convert_child_iter_to_iter(const iterator& 
   return filter_iter;
 }
 
-TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& filter_iter) const
+TreeModel::iterator TreeModelFilter::convert_iter_to_child_iter(const iterator& filter_iter)
+{
+  const auto child_model = gtk_tree_model_filter_get_model(gobj());
+
+  iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*)child_model, false)));
+
+  gtk_tree_model_filter_convert_iter_to_child_iter(gobj(), child_iter.gobj(),
+      const_cast<GtkTreeIter*>(filter_iter.gobj()));
+
+  return child_iter;
+}
+
+TreeModel::const_iterator TreeModelFilter::convert_iter_to_child_iter(const const_iterator& filter_iter) const
 {
   const auto child_model = gtk_tree_model_filter_get_model(const_cast<GtkTreeModelFilter*>(gobj()));
 
-  iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*)child_model, false)));
+  const_iterator child_iter(dynamic_cast<TreeModel*>(Glib::wrap_auto((GObject*)child_model, false)));
 
   gtk_tree_model_filter_convert_iter_to_child_iter(
       const_cast<GtkTreeModelFilter*>(gobj()), child_iter.gobj(),
