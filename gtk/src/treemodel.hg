@@ -97,9 +97,11 @@ public:
   typedef TreeModelColumnRecord ColumnRecord;
 
   typedef TreeNodeChildren Children;
+  typedef TreeNodeConstChildren ConstChildren;
   typedef Children::iterator iterator;
-  typedef Children::const_iterator const_iterator;
+  typedef ConstChildren::const_iterator const_iterator;
 
+  typedef TreeConstRow ConstRow;
   typedef TreeRow Row;
   typedef TreePath Path;
   typedef TreeRowReference RowReference;
@@ -113,8 +115,13 @@ public:
    * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
    */
   iterator get_iter(const Path& path);
-  //TODO: Add const_iterator get_iter(const Path& path) const;
-  //Implement a const_iterator?
+
+  /** Returns a valid iterator pointing to @a path.
+   *
+   * @param path The @link Gtk::TreePath Gtk::TreeModel::Path@endlink.
+   * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
+   */
+  const_iterator get_iter(const Path& path) const;
 
   /** Returns a valid iterator pointing to @a path_string.
    *
@@ -122,26 +129,31 @@ public:
    * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
    */
   iterator get_iter(const Glib::ustring& path_string);
-  //TODO: Implement a const_iterator? const_iterator get_iter(const Glib::ustring& path_string) const;
+
+  /** Returns a valid iterator pointing to @a path_string.
+   *
+   * @param path_string The path, as a string representation.
+   * @result A valid iterator pointing to the path, or an invalid iterator if that is not possible.
+   */
+  const_iterator get_iter(const Glib::ustring& path_string) const;
 
   ///This returns an STL-like container API, for iterating over the rows.
   Children children();
 
-  //TODO: Return a real TreeNodeChildren (a container of const_iterators), when we have a real const_iterator.
   ///This returns an STL-like container API, for iterating over the rows.
-  Children children() const;
+  const ConstChildren children() const;
 
   _IGNORE(gtk_tree_model_foreach)
 
   /** For example,
    * void on_foreach(const Gtk::TreeModel::iterator& iter);
    *
-   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach_iter() returns.
    */
   typedef sigc::slot<bool(const TreeModel::iterator&)> SlotForeachIter;
 
   /** Calls a callback slot on each node in the model in a depth-first fashion.
-   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach_iter() returns.
    *
    * @param slot The function to call for each selected node.
    */
@@ -150,12 +162,12 @@ public:
   /** For example,
    * void on_foreach(const Gtk::TreeModel::Path& path);
    *
-   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach_path() returns.
    */
   typedef sigc::slot<bool(const TreeModel::Path&)> SlotForeachPath;
 
   /** Calls a callback slot on each node in the model in a depth-first fashion.
-   * If the callback function returns true, then the tree ceases to be walked, and foreach() returns.
+   * If the callback function returns true, then the tree ceases to be walked, and foreach_path() returns.
    *
    * @param slot The function to call for each selected node.
    */
@@ -180,7 +192,7 @@ public:
   _WRAP_METHOD(GType get_column_type(int index) const, gtk_tree_model_get_column_type)
   //TODO: A C++-type version of get_column_type()?
 
-  _WRAP_METHOD(TreeModel::Path get_path(const iterator& iter) const, gtk_tree_model_get_path)
+  _WRAP_METHOD(TreeModel::Path get_path(const const_iterator& iter) const, gtk_tree_model_get_path)
 
   _WRAP_METHOD(void row_changed(const Path& path, const iterator& iter), gtk_tree_model_row_changed)
   _WRAP_METHOD(void row_inserted(const Path& path, const iterator& iter), gtk_tree_model_row_inserted)
@@ -403,6 +415,7 @@ dnl
 
   friend class Gtk::TreeModelFilter;
   friend class Gtk::TreeModelSort;
+  friend class Gtk::TreeConstRow;
   friend class Gtk::TreeRow;
 };
 

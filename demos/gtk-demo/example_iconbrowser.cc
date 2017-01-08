@@ -865,7 +865,7 @@ void Example_IconBrowser::add_icon(const Glib::ustring& name,
 
 bool Example_IconBrowser::is_icon_visible(const Gtk::TreeModel::const_iterator& iter) const
 {
-  const Gtk::TreeModel::Row row = *iter;
+  const auto row = *iter;
   const Glib::ustring name = row[m_store->get_text_column()];
   if (name.empty())
     return false;
@@ -1005,12 +1005,11 @@ Glib::RefPtr<IconInfoStore> IconInfoStore::create()
 bool IconInfoStore::drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
   Gtk::SelectionData& selection_data) const
 {
-  // There is no const version of Gtk::TreeModel::get_iter().
-  Gtk::TreeModel::const_iterator iter = const_cast<IconInfoStore*>(this)->get_iter(path);
+  const auto iter = get_iter(path);
   if (!iter)
     return false;
 
-  const Gtk::TreeModel::Row row = *iter;
+  const auto row = *iter;
   const Glib::ustring name = row[m_text_column];
   selection_data.set_text(name);
   return true;

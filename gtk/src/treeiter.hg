@@ -22,9 +22,6 @@ _DEFS(gtkmm,gtk)
 #include <iterator>
 #include <type_traits>
 #include <gtk/gtk.h> /* for GtkTreeIter */
-#ifdef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
-#include <cstddef> /* for std::ptrdiff_t */
-#endif
 
 namespace Gtk
 {
@@ -32,7 +29,9 @@ namespace Gtk
 class TreeModel;
 template <typename T>
 class TreeIter;
+class TreeConstRow;
 class TreeRow;
+class TreeNodeConstChildren;
 class TreeNodeChildren;
 
 // Why all the base classes?
@@ -85,8 +84,11 @@ protected:
   bool       is_end_;
 
   // For the conversion and assignment from iterator to const_iterator
-  friend class Gtk::TreeIter<const Gtk::TreeRow>;
+  friend class Gtk::TreeIter<Gtk::TreeConstRow>;
+
+  friend class Gtk::TreeConstRow;
   friend class Gtk::TreeRow;
+  friend class Gtk::TreeNodeConstChildren;
   friend class Gtk::TreeNodeChildren;
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
@@ -94,7 +96,7 @@ protected:
 
 /** Base of TreeIter.
  *
- * Contains the common parts of TreeIter<TreeRow> and TreeIter<const&nbsp;TreeRow>.
+ * Contains the common parts of TreeIter<TreeRow> and TreeIter<TreeConstRow>.
  *
  * @ingroup TreeView
  */
@@ -165,9 +167,9 @@ protected:
 // carefully implemented by hand.
 //TODO: document implementation details.
 
-/** A Gtk::TreeModel::iterator is a reference to a specific node on a specific
- * model.
+/** Typedefed as TreeModel::iterator and TreeModel::const_iterator.
  *
+ * A Gtk::TreeModel::iterator is a reference to a specific node on a specific model.
  * It is a generic structure with an integer and three generic pointers.
  * These are filled in by the model in a model-specific way.
  *
@@ -190,21 +192,19 @@ protected:
  * the Gtk::TREE_MODEL_ITERS_PERSIST flag was added to indicate this behaviour -
  * see Gtk::TreeModel::get_flags().
  *
- * Typedefed as Gtk::TreeModel::iterator and Gtk::TreeModel::const_iterator.
- *
- * @tparam T <TreeRow> for an iterator, or <const&nbsp;TreeRow> for a const_iterator.
+ * @tparam T TreeRow for an iterator, TreeConstRow for a const_iterator.
  *
  * @ingroup TreeView
  */
 template <typename T>
 class TreeIter : public TreeIterBase3
 {
-  static_assert(std::is_same<T, TreeRow>::value || std::is_same<T, const TreeRow>::value,
-                "TreeIter can only iterate over TreeRow or const TreeRow");
+  static_assert(std::is_same<T, TreeRow>::value || std::is_same<T, TreeConstRow>::value,
+                "TreeIter can only iterate over TreeRow or TreeConstRow");
 
 public:
   using iterator_category = std::bidirectional_iterator_tag;
-  using value_type        = TreeRow;
+  using value_type        = T;
   using difference_type   = int;
   using reference         = T&;
   using pointer           = T*;
@@ -212,13 +212,13 @@ public:
   TreeIter();
 
   /// iterator to const_iterator conversion.
-  template <typename T2, typename = typename std::enable_if<!std::is_same<T, T2>::value &&
-    std::is_same<T, const T2>::value, T2>::type>
+  template <typename T2, typename = typename std::enable_if<
+    std::is_same<T, TreeConstRow>::value && std::is_same<T2, TreeRow>::value, T2>::type>
   TreeIter(const TreeIter<T2>& src);
 
   /// iterator to const_iterator assignment.
-  template <typename T2, typename = typename std::enable_if<!std::is_same<T, T2>::value &&
-    std::is_same<T, const T2>::value, T2>::type>
+  template <typename T2, typename = typename std::enable_if<
+    std::is_same<T, TreeConstRow>::value && std::is_same<T2, TreeRow>::value, T2>::type>
   TreeIter& operator=(const TreeIter<T2>& src);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -263,25 +263,99 @@ template <typename T>
 inline bool operator!=(const TreeIter<T>& lhs, const TreeIter<T>& rhs)
 { return !lhs.equal(rhs); }
 
-template <class ColumnType>
+template <typename RowType, typename ColumnType>
 class TreeValueProxy
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  inline TreeValueProxy(const TreeRow& row, const TreeModelColumn<ColumnType>& column);
+  inline TreeValueProxy(const RowType& row, const TreeModelColumn<ColumnType>& column);
 #endif
 
-  inline TreeValueProxy<ColumnType>& operator=(const ColumnType& data);
+  inline TreeValueProxy& operator=(const ColumnType& data);
   inline operator ColumnType() const;
 
 private:
-  TreeRow& row_;
+  RowType& row_;
   const TreeModelColumn<ColumnType>& column_;
 
   // no copy assignment
-  TreeValueProxy<ColumnType>& operator=(const TreeValueProxy<ColumnType>&) = delete;
+  TreeValueProxy& operator=(const TreeValueProxy&) = delete;
 };
 
+
+/** Typedefed as TreeModel::ConstRow.
+ *
+ * %TreeConstRow is a const version of %TreeRow. %TreeConstRow does not contain
+ * methods for modifying the underlying TreeModel.
+ *
+ * @see TreeRow
+ * @ingroup TreeView
+ */
+class TreeConstRow : public TreeIterBase2
+{
+public:
+
+  /** Use this to get the value of this @a column of this row.
+   * This is a templated method, so the compiler will not allow you to provide an inappropriate type
+   * of data for the model column.
+   *
+   * This is just a more convenient syntax that does the same thing as get_value().
+   *
+   * @param column The model column.
+   */
+  template <typename ColumnType> inline
+  const TreeValueProxy<TreeConstRow, ColumnType> operator[](const TreeModelColumn<ColumnType>& column) const;
+
+  /** Gets the value of this @a column of this row.
+   *
+   * See also operator[]().
+   *
+   * @param column The model column.
+   * @result The value of this column of this row.
+   */
+  template <typename ColumnType>
+  ColumnType get_value(const TreeModelColumn<ColumnType>& column) const;
+
+  /** Use get_value(const TreeModelColumn<>& column) unless
+   * you do not know the column type at compile-time.
+   * If the @a data output argument is of an inappropriate C++ type then this might fail at runtime.
+   * @param column The number of the column whose value you want to query.
+   * @param[out] data An output argument which will contain the value of this column of this row.
+   */
+  template <typename ColumnType>
+  void get_value(int column, ColumnType& data) const;
+
+  /** This returns an STL-like container API, for iterating over the rows.
+   * See also Gtk::TreeModel::children() for the top-level children.
+   */
+  const TreeNodeConstChildren& children() const;
+
+  /** Gets a const_iterator to the parent row of this row.
+   * @result A const_iterator to the parent row.
+   */
+  TreeIter<TreeConstRow> parent() const;
+
+  /** Gets a const_iterator to this row.
+   * @result A const_iterator to this row.
+   */
+  TreeIter<TreeConstRow> get_iter() const;
+
+  /** Discover whether this is a valid row.
+   * For instance,
+   * @code
+   * if (treerow)
+   *   do_something();
+   * @endcode
+   *
+   * @newin{3,22}
+   */
+  explicit operator bool() const;
+
+private:
+  // Forwarders to Gtk::TreeModel virtual methods.
+  void get_value_impl(int column, Glib::ValueBase& value) const;
+
+}; // class TreeConstRow
 
 /** Typedefed as TreeModel::Row.
  *
@@ -297,9 +371,15 @@ private:
  *
  * @ingroup TreeView
  */
-class TreeRow : public TreeIterBase2
+class TreeRow : public TreeConstRow
 {
 public:
+
+  // Inherit the const versions
+  using TreeConstRow::operator[];
+  using TreeConstRow::children;
+  using TreeConstRow::parent;
+  using TreeConstRow::get_iter;
 
   /** Use this to set and get the value of this @a column of this row.
    * This is a templated method, so the compiler will not allow you to provide an inappropriate type
@@ -309,22 +389,19 @@ public:
    *
    * @param column The model column.
    */
-  template <class ColumnType> inline
-  TreeValueProxy<ColumnType> operator[](const TreeModelColumn<ColumnType>& column);
-
-  template <class ColumnType> inline
-  const TreeValueProxy<ColumnType> operator[](const TreeModelColumn<ColumnType>& column) const;
+  template <typename ColumnType> inline
+  TreeValueProxy<TreeRow, ColumnType> operator[](const TreeModelColumn<ColumnType>& column);
 
   /** Sets the value of this @a column of this row.
    * This is a templated method, so the compiler will not allow you to provide an inappropriate type
    * of @a data for the model column.
    *
-   * See also operator[].
+   * See also operator[]().
    *
    * @param column The model column.
    * @param data The new value to use for this column of this row.
    */
-  template <class ColumnType>
+  template <typename ColumnType>
   void set_value(const TreeModelColumn<ColumnType>& column, const ColumnType& data);
 
   /** Use set_value(const TreeModelColumn<>& column, const ColumnType& data) unless
@@ -333,76 +410,23 @@ public:
    * @param column The number of the column whose value you want to change.
    * @param data The new value to use for this column of this row.
    */
-  template <class ColumnType>
+  template <typename ColumnType>
   void set_value(int column, const ColumnType& data);
-
-  /** Gets the value of this @a column of this row.
-   * This is a templated method, so the compiler will not allow you to provide an inappropriate type
-   * of data for the model column.
-   *
-   * See also operator[].
-   *
-   * @param column The model column.
-   * @result The value of this column of this row
-   */
-  template <class ColumnType>
-  ColumnType get_value(const TreeModelColumn<ColumnType>& column) const;
-
-  /** Use get_value(const TreeModelColumn<>& column) unless
-   * you do not know the column type at compile-time.
-   * If the @a data output argument is of an inappropriate C++ type then this might fail at runtime.
-   * @param column The number of the column whose value you want to query.
-   * @param[out] data An output argument which will contain the value of this column of this row.
-   */
-  template <class ColumnType>
-  void get_value(int column, ColumnType& data) const;
 
   /** This returns an STL-like container API, for iterating over the rows.
    * See also Gtk::TreeModel::children() for the top-level children.
    */
   TreeNodeChildren& children();
 
-  /** This returns an STL-like container API, for iterating over the rows.
-   * See also Gtk::TreeModel::children() for the top-level children.
-   */
-  const TreeNodeChildren& children() const;
-
   /** Gets an iterator to the parent row of this row.
    * @result An iterator to the parent row.
    */
   TreeIter<TreeRow> parent();
 
-  /** Gets a const_iterator to the parent row of this row.
-   * @result A const_iterator to the parent row.
-   */
-  TreeIter<const TreeRow> parent() const;
-
   /** Gets an iterator to this row.
    * @result An iterator to this row.
    */
   TreeIter<TreeRow> get_iter();
-
-  /** Gets a const_iterator to this row.
-   * @result A const_iterator to this row.
-   */
-  TreeIter<const TreeRow> get_iter() const;
-
-  /** Discover whether this is a valid row.
-   * For instance,
-   * @code
-   * if (treerow)
-   *   do_something();
-   * @endcode
-   *
-   * @newin{3,22}
-   */
-  explicit operator bool() const;
-
-  /// Provides access to the underlying C GObject.
-  GtkTreeIter*       gobj()       { return TreeIterBase::gobj(); }
-
-  /// Provides access to the underlying C GObject.
-  const GtkTreeIter* gobj() const { return TreeIterBase::gobj(); }
 
 private:
   // Forwarders to Gtk::TreeModel virtual methods.
@@ -414,33 +438,33 @@ private:
 
 //TODO: Document begin(), end(), size(), etc, in an STL-style way. murrayc.
 
-/** Virtual container of TreeModel::Row items.
+/** Typedefed as TreeModel::ConstChildren.
  *
- * typedefed as TreeModel::Children.
+ * Virtual container of TreeModel::ConstRow items.
  *
+ * %TreeNodeConstChildren is a const version of %TreeNodeChildren.
+ * %TreeNodeConstChildren does not contain methods for modifying the underlying TreeModel.
+ *
+ * @see TreeNodeChildren
  * @ingroup TreeView
  */
-class TreeNodeChildren : public TreeIterBase2
+class TreeNodeConstChildren : public TreeIterBase2
 {
 public:
-  using value_type      = Gtk::TreeRow;
+  using value_type      = Gtk::TreeConstRow;
   using size_type       = unsigned int;
   using difference_type = int;
-  using iterator        = Gtk::TreeIter<Gtk::TreeRow>;
-  using const_iterator  = Gtk::TreeIter<const Gtk::TreeRow>;
+  using const_iterator  = Gtk::TreeIter<Gtk::TreeConstRow>;
 
-  iterator begin();
   const_iterator begin() const;
-  iterator end();
   const_iterator end()   const;
 
-  value_type operator[](size_type index);
   const value_type operator[](size_type index) const;
 
   size_type size() const;
   bool empty() const;
 
-  /** Discover whether this is a valid TreeNodeChildren.
+  /** Discover whether this is a valid container.
    * For instance,
    * @code
    * if (children)
@@ -456,11 +480,42 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  explicit TreeNodeChildren(TreeModel* model)
-    : TreeIterBase2(model) {}
+  explicit TreeNodeConstChildren(const TreeModel* model)
+    : TreeIterBase2(const_cast<TreeModel*>(model)) {}
 
   const GtkTreeIter* get_parent_gobject() const
-    { return (gobject_.stamp != 0) ? &gobject_ : nullptr; }
+  { return (gobject_.stamp != 0) ? &gobject_ : nullptr; }
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+}; // class TreeNodeConstChildren
+
+/** Typedefed as TreeModel::Children.
+ *
+ * Virtual container of TreeModel::Row items.
+ *
+ * @ingroup TreeView
+ */
+class TreeNodeChildren : public TreeNodeConstChildren
+{
+public:
+  using value_type      = Gtk::TreeRow;
+  using iterator        = Gtk::TreeIter<Gtk::TreeRow>;
+
+  // Inherit the const versions
+  using TreeNodeConstChildren::begin;
+  using TreeNodeConstChildren::end;
+  using TreeNodeConstChildren::operator[];
+
+  iterator begin();
+  iterator end();
+
+  value_type operator[](size_type index);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+  explicit TreeNodeChildren(TreeModel* model)
+    : TreeNodeConstChildren(model) {}
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -562,42 +617,45 @@ TreeIter<T>::operator bool() const
 
 /**** Gtk::TreeValueProxy<> ************************************************/
 
-template <class ColumnType> inline
-TreeValueProxy<ColumnType>::TreeValueProxy(const TreeRow& row, const TreeModelColumn<ColumnType>& column)
+template <typename RowType, typename ColumnType> inline
+TreeValueProxy<RowType, ColumnType>::TreeValueProxy(const RowType& row, const TreeModelColumn<ColumnType>& column)
 :
-  row_    (const_cast<TreeRow&>(row)),
+  row_    (const_cast<RowType&>(row)),
   column_ (column)
 {}
 
-template <class ColumnType> inline
-TreeValueProxy<ColumnType>& TreeValueProxy<ColumnType>::operator=(const ColumnType& data)
+template <typename RowType, typename ColumnType> inline
+TreeValueProxy<RowType, ColumnType>& TreeValueProxy<RowType, ColumnType>::operator=(const ColumnType& data)
 {
+  // If row_ is a TreeConstRow and TreeValueProxy::operator=() is actually used,
+  // this will fail at compile time. TreeConstRow has no set_value() method.
+  // This failure is deliberate.
   row_.set_value(column_, data);
   return *this;
 }
 
-template <class ColumnType> inline
-TreeValueProxy<ColumnType>::operator ColumnType() const
+template <typename RowType, typename ColumnType> inline
+TreeValueProxy<RowType, ColumnType>::operator ColumnType() const
 {
   return row_.get_value(column_);
 }
 
 
-/**** Gtk::TreeRow *********************************************************/
+/**** Gtk::TreeConstRow and Gtk::TreeRow **************************************/
 
-template <class ColumnType> inline
-const TreeValueProxy<ColumnType> TreeRow::operator[](const TreeModelColumn<ColumnType>& column) const
+template <typename ColumnType> inline
+const TreeValueProxy<TreeConstRow, ColumnType> TreeConstRow::operator[](const TreeModelColumn<ColumnType>& column) const
 {
-  return TreeValueProxy<ColumnType>(*this, column);
+  return TreeValueProxy<TreeConstRow, ColumnType>(*this, column);
 }
 
-template <class ColumnType> inline
-TreeValueProxy<ColumnType> TreeRow::operator[](const TreeModelColumn<ColumnType>& column)
+template <typename ColumnType> inline
+TreeValueProxy<TreeRow, ColumnType> TreeRow::operator[](const TreeModelColumn<ColumnType>& column)
 {
-  return TreeValueProxy<ColumnType>(*this, column);
+  return TreeValueProxy<TreeRow, ColumnType>(*this, column);
 }
 
-template <class ColumnType>
+template <typename ColumnType>
 void TreeRow::set_value(const TreeModelColumn<ColumnType>& column, const ColumnType& data)
 {
   using ValueType = typename Gtk::TreeModelColumn<ColumnType>::ValueType;
@@ -609,7 +667,7 @@ void TreeRow::set_value(const TreeModelColumn<ColumnType>& column, const ColumnT
   this->set_value_impl(column.index(), value);
 }
 
-template <class ColumnType>
+template <typename ColumnType>
 void TreeRow::set_value(int column, const ColumnType& data)
 {
   // This could fail at run-time, because the wrong ColumnType might be used.
@@ -624,8 +682,8 @@ void TreeRow::set_value(int column, const ColumnType& data)
   this->set_value_impl(column, value);
 }
 
-template <class ColumnType>
-ColumnType TreeRow::get_value(const TreeModelColumn<ColumnType>& column) const
+template <typename ColumnType>
+ColumnType TreeConstRow::get_value(const TreeModelColumn<ColumnType>& column) const
 {
   using ValueType = typename Gtk::TreeModelColumn<ColumnType>::ValueType;
 
@@ -635,8 +693,8 @@ ColumnType TreeRow::get_value(const TreeModelColumn<ColumnType>& column) const
   return value.get();
 }
 
-template <class ColumnType>
-void TreeRow::get_value(int column, ColumnType& data) const
+template <typename ColumnType>
+void TreeConstRow::get_value(int column, ColumnType& data) const
 {
   // This could fail at run-time, because the wrong ColumnType might be used.
   // It's only for dynamically generated model columns.

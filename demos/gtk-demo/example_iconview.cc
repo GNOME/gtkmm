@@ -134,8 +134,8 @@ int Example_IconView::on_model_sort(const Gtk::TreeModel::const_iterator& a, con
    * folders before files.
    */
 
-  const Gtk::TreeModel::Row row_a = *a;
-  const Gtk::TreeModel::Row row_b = *b;
+  const auto row_a = *a;
+  const auto row_b = *b;
 
   const bool a_is_dir = row_a[m_columns.is_directory];
   const bool b_is_dir = row_b[m_columns.is_directory];
