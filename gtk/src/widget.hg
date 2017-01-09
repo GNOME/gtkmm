@@ -62,8 +62,6 @@ _CC_INCLUDE(gtk/gtk.h)
 _WRAP_ENUM(DestDefaults, GtkDestDefaults)
 _WRAP_ENUM(DragResult, GtkDragResult)
 
-class Action;
-class Style;
 class AccelGroup;
 class Adjustment;
 class Window;
@@ -382,7 +380,7 @@ public:
   //The parameter name is "the_property_name" to avoid a warning because there is a method with the "property_name" name.
   /** Gets the value of a style property of @a widget.
    * @param the_property_name The name of a style property.
-   * @param value Location to return the property value.
+   * @param[out] value Location to return the property value.
    */
   template <class PropertyType>
   void get_style_property(const Glib::ustring& the_property_name, PropertyType& value) const;
@@ -778,19 +776,6 @@ protected:
   void transform_cairo_context_to_window(const ::Cairo::RefPtr< ::Cairo::Context>& cr, const Glib::RefPtr<const Gdk::Window>& window);
   _IGNORE(gtk_cairo_transform_to_window)
 
-  //The parameter name is "the_property_name" to avoid a warning because there is a method with the "property_name" name.
-  /** Gets the value of a style property of @a widget.
-   *
-   * It is usually easier to use get_style_property(), to avoid the use of
-   * Glib::Value.
-   *
-   * @param the_property_name The name of a style property.
-   * @param value Location to return the property value.
-   */
-  _WRAP_METHOD(void get_style_property_value(
-                   const Glib::ustring& the_property_name, Glib::ValueBase& value) const,
-               gtk_widget_style_get_property)
-
   void realize_if_needed();
 
 #m4begin
@@ -823,12 +808,7 @@ dnl
 template <class PropertyType>
 void Widget::get_style_property(const Glib::ustring& the_property_name, PropertyType& value) const
 {
-  Glib::Value<PropertyType> property_value;
-  property_value.init(Glib::Value<PropertyType>::value_type());
-
-  this->get_style_property_value(the_property_name, property_value);
-
-  value = property_value.get();
+  gtk_widget_style_get(const_cast<GtkWidget*>(gobj()), the_property_name.c_str(), &value, nullptr);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
