@@ -353,7 +353,11 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refAnchor = refBuffer->create_child_anchor(iter);
   iter = refBuffer->insert(refBuffer->end(), ".\n");
 
-  refBuffer->insert(iter, "\n\nThis demo doesn't demonstrate all the GtkTextBuffer features; it leaves out, for example: invisible/hidden text (doesn't work in GTK 2, but planned), tab stops, application-drawn areas on the sides of the widget for displaying breakpoints and such...");
+  refBuffer->insert(iter,
+    "\n\nThis demo doesn't demonstrate all the Gtk::TextBuffer features; "
+    "it leaves out, for example: invisible/hidden text, tab stops, "
+    "application-drawn areas on the sides of the widget for displaying "
+    "breakpoints and such...");
 
   // Apply word_wrap tag to whole buffer
   Gtk::TextBuffer::iterator start, end;
