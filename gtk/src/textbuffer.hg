@@ -36,9 +36,6 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gtk
 {
 
-class TextMark;
-class TextIter;
-
 /** Multi-line attributed text that can be displayed by one or more Gtk::TextView widgets.
  *
  * Text in a buffer can be marked with tags. A @link Gtk::TextTag Gtk::TextBuffer::Tag@endlink is an attribute that can be applied to some range of text. For example, a tag
@@ -51,7 +48,8 @@ class TextIter;
  * table associated with it; only tags from that tag table can be used with the buffer. A single tag table can be shared between
  * multiple buffers, however.
  *
- * Most text manipulation is accomplished with iterators, represented by an @link Gtk::TextIter iterator@endlink. The iterator can
+ * Most text manipulation is accomplished with iterators, represented by an @link Gtk::TextIter iterator@endlink
+ * or a @link Gtk::ConstTextIter const_iterator@endlink. The iterator can
  * be used to navigate over characters, words, lines, and sentences.
  *
  * But iterators can't be used to preserve positions across buffer modifications. To preserve a position, the
@@ -80,6 +78,7 @@ class TextBuffer : public Glib::Object
            gtk_text_buffer_get_iter_at_child_anchor, gtk_text_buffer_insert_markup)
 public:
   typedef TextIter iterator;
+  typedef TextConstIter const_iterator;
   typedef TextTag Tag;
   typedef TextTagTable TagTable;
   typedef TextMark Mark;
@@ -141,7 +140,6 @@ public:
    * Emits the "insert_text" signal; insertion actually occurs in the default handler for the signal.
    *
    * @param text The text to be inserted in the buffer.
-   * @result An iterator that points to the end of the inserted text.
    */
   void insert_at_cursor(const Glib::ustring& text);
 
@@ -150,7 +148,6 @@ public:
    *
    * @param text_begin The start of a UTF8 character array.
    * @param text_end The end of the UTF8 character array.
-   * @result An iterator that points to the end of the inserted text.
    */
   void insert_at_cursor(const char* text_begin, const char* text_end);
 
@@ -218,7 +215,7 @@ public:
    * @param range_end Another position in the same buffer as @a range_begin.
    * @result Whether text was actually inserted
    */
-  iterator insert(const iterator& pos, const iterator& range_begin, const iterator& range_end);
+  iterator insert(const iterator& pos, const const_iterator& range_begin, const const_iterator& range_end);
   _IGNORE(gtk_text_buffer_insert_range)
 
   /** Same as insert_range(), but does nothing if the insertion point isn't editable.
@@ -232,7 +229,7 @@ public:
    * @param default_editable Default editability of buffer.
    * @result Whether text was actually inserted
    */
-  std::pair<iterator,bool> insert_interactive(const iterator& pos, const iterator& range_begin, const iterator& range_end, bool default_editable = true);
+  std::pair<iterator,bool> insert_interactive(const iterator& pos, const const_iterator& range_begin, const const_iterator& range_end, bool default_editable = true);
   _IGNORE(gtk_text_buffer_insert_range_interactive)
 
   iterator insert_with_tag(const iterator& pos, const Glib::ustring& text, const Glib::RefPtr<Tag>& tag);
@@ -355,7 +352,7 @@ public:
   iterator backspace(const iterator& iter, bool interactive = true, bool default_editable = true);
   _IGNORE(gtk_text_buffer_backspace)
 
-  _WRAP_METHOD(Glib::ustring get_text(const iterator& range_start, const iterator& range_end, bool include_hidden_chars = true) const, gtk_text_buffer_get_text)
+  _WRAP_METHOD(Glib::ustring get_text(const const_iterator& range_start, const const_iterator& range_end, bool include_hidden_chars = true) const, gtk_text_buffer_get_text)
 
   /** Returns all the text in the buffer. Excludes undisplayed
    * text (text marked with tags that set the invisibility attribute) if
@@ -370,7 +367,7 @@ public:
    */
   Glib::ustring get_text(bool include_hidden_chars = true) const;
 
-  _WRAP_METHOD(Glib::ustring get_slice(const iterator& range_start, const iterator& range_end, bool include_hidden_chars = true) const, gtk_text_buffer_get_slice)
+  _WRAP_METHOD(Glib::ustring get_slice(const const_iterator& range_start, const const_iterator& range_end, bool include_hidden_chars = true) const, gtk_text_buffer_get_slice)
 
   iterator insert_pixbuf(const iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
   _IGNORE(gtk_text_buffer_insert_pixbuf)
@@ -441,12 +438,19 @@ public:
   Glib::RefPtr<Tag> create_tag();
 
   iterator get_iter_at_line_offset(int line_number, int char_offset);
+  const_iterator get_iter_at_line_offset(int line_number, int char_offset) const;
   iterator get_iter_at_line_index(int line_number, int byte_index);
+  const_iterator get_iter_at_line_index(int line_number, int byte_index) const;
   iterator get_iter_at_offset(int char_offset);
+  const_iterator get_iter_at_offset(int char_offset) const;
   iterator get_iter_at_line(int line_number);
+  const_iterator get_iter_at_line(int line_number) const;
   iterator begin();
+  const_iterator begin() const;
   iterator end();
+  const_iterator end() const;
   void get_bounds(iterator& range_begin, iterator& range_end);
+  void get_bounds(const_iterator& range_begin, const_iterator& range_end) const;
 
   /** Get the current position of a mark.
    * @param mark The @link Gtk::TextMark Gtk::TextBuffer::Mark@endlink
@@ -454,11 +458,23 @@ public:
    */
   iterator get_iter_at_mark(const Glib::RefPtr<Mark>& mark);
 
+  /** Get the current position of a mark.
+   * @param mark The @link Gtk::TextMark Gtk::TextBuffer::Mark@endlink
+   * @result An iterator that points to the position of the @a mark.
+   */
+  const_iterator get_iter_at_mark(const Glib::RefPtr<Mark>& mark) const;
+
   /** Get the current position of an anchor.
    * @param anchor A @link Gtk::TextChildAnchor Gtk::TextBuffer::Anchor@endlink that appears in the buffer.
    * @result An iterator that points to the position of the @a anchor.
    */
   iterator get_iter_at_child_anchor(const Glib::RefPtr<ChildAnchor>& anchor);
+
+  /** Get the current position of an anchor.
+   * @param anchor A @link Gtk::TextChildAnchor Gtk::TextBuffer::Anchor@endlink that appears in the buffer.
+   * @result An iterator that points to the position of the @a anchor.
+   */
+  const_iterator get_iter_at_child_anchor(const Glib::RefPtr<ChildAnchor>& anchor) const;
 
   _WRAP_METHOD(bool get_modified() const, gtk_text_buffer_get_modified)
   _WRAP_METHOD(void set_modified(bool setting = true), gtk_text_buffer_set_modified)
@@ -473,7 +489,8 @@ public:
   void paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable = true);
   _IGNORE(gtk_text_buffer_paste_clipboard)
 
-  _WRAP_METHOD(bool get_selection_bounds(iterator& range_start, iterator& range_end) const, gtk_text_buffer_get_selection_bounds)
+  _WRAP_METHOD(bool get_selection_bounds(iterator& range_start, iterator& range_end), gtk_text_buffer_get_selection_bounds)
+  _WRAP_METHOD(bool get_selection_bounds(const_iterator& range_start, const_iterator& range_end) const, gtk_text_buffer_get_selection_bounds, constversion)
   _WRAP_METHOD(bool erase_selection(bool interactive = true, bool default_editable = true), gtk_text_buffer_delete_selection)
 
   _WRAP_METHOD(void select_range(const iterator& ins, const iterator& bound), gtk_text_buffer_select_range)
@@ -482,20 +499,22 @@ public:
   _WRAP_METHOD(void begin_user_action(), gtk_text_buffer_begin_user_action)
   _WRAP_METHOD(void end_user_action(), gtk_text_buffer_end_user_action)
 
-  _WRAP_METHOD(Glib::RefPtr<TargetList> get_copy_target_list() const, gtk_text_buffer_get_copy_target_list, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<TargetList> get_paste_target_list() const, gtk_text_buffer_get_paste_target_list, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<TargetList> get_copy_target_list(), gtk_text_buffer_get_copy_target_list, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const TargetList> get_copy_target_list() const, gtk_text_buffer_get_copy_target_list, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<TargetList> get_paste_target_list(), gtk_text_buffer_get_paste_target_list, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const TargetList> get_paste_target_list() const, gtk_text_buffer_get_paste_target_list, refreturn, constversion)
 
   /** For instance,<br>
-   * guint8* on_serialize(const Glib::RefPtr<TextBuffer>& content_buffer, const iterator& start, const iterator& end, gsize& length);
+   * guint8* on_serialize(const Glib::RefPtr<TextBuffer>& content_buffer, const const_iterator& range_start, const const_iterator& range_end, gsize& length);
    *
    * @param content_buffer The TextBuffer to serialize. It may be different from
    *        the TextBuffer where the serialize format is registered.
-   * @param start Start of the block of text to serialize.
-   * @param end End of the block of text to serialize.
+   * @param range_start Start of the block of text to serialize.
+   * @param range_end End of the block of text to serialize.
    * @param[out] length The length of the serialized data.
-   * @return A newly-allocated array of guint8 which contains the serialized data, or <tt>0</tt> if an error occurred.
+   * @return A newly-allocated array of guint8 which contains the serialized data, or <tt>nullptr</tt> if an error occurred.
    */
- typedef sigc::slot<guint8*(const Glib::RefPtr<TextBuffer>&, const iterator&, const iterator&, gsize&)> SlotSerialize;
+ typedef sigc::slot<guint8*(const Glib::RefPtr<TextBuffer>&, const const_iterator&, const const_iterator&, gsize&)> SlotSerialize;
 
   /** For instance,<br>
    * bool on_deserialize(const Glib::RefPtr<TextBuffer>& content_buffer, iterator& iter, const guint8* data, gsize length, bool create_tags);
@@ -555,9 +574,9 @@ public:
 
   _WRAP_METHOD(guint8* serialize(const Glib::RefPtr<TextBuffer>& content_buffer,
                                  const Glib::ustring& format,
-                                 const iterator& range_start,
-                                 const iterator& range_end,
-                                 gsize& length), gtk_text_buffer_serialize)
+                                 const const_iterator& range_start,
+                                 const const_iterator& range_end,
+                                 gsize& length) const, gtk_text_buffer_serialize)
 
   _WRAP_METHOD(bool deserialize(const Glib::RefPtr<TextBuffer>& content_buffer,
                                 const Glib::ustring& format,
@@ -568,20 +587,22 @@ public:
 dnl // HACK: Override the default conversion to deal correctly
 dnl // with non-0-terminated strings in insert_text_callback().
 _CONVERSION(`const char*',`const Glib::ustring&',`Glib::ustring(p1, p1 + p2)')
+_CONVERSION(`GtkTextIter*',`TextBuffer::iterator&',Glib::wrap_iter($3))
 #m4end
-  _WRAP_SIGNAL(void insert(const TextBuffer::iterator& pos, const Glib::ustring& text, int bytes), "insert_text")
+  _WRAP_SIGNAL(void insert(TextBuffer::iterator& pos, const Glib::ustring& text, int bytes), "insert_text")
 
 #m4 _CONVERSION(`GdkPixbuf*',`const Glib::RefPtr<Gdk::Pixbuf>&', Glib::wrap($3, true))
-  _WRAP_SIGNAL(void insert_pixbuf(const TextBuffer::iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), "insert_pixbuf")
+  _WRAP_SIGNAL(void insert_pixbuf(TextBuffer::iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), "insert_pixbuf")
 
 #m4 _CONVERSION(`GtkTextChildAnchor*',`const Glib::RefPtr<ChildAnchor>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(void insert_child_anchor(const TextBuffer::iterator& pos, const Glib::RefPtr<ChildAnchor>& anchor), "insert_child_anchor")
+  _WRAP_SIGNAL(void insert_child_anchor(TextBuffer::iterator& pos, const Glib::RefPtr<ChildAnchor>& anchor), "insert_child_anchor")
 
-  _WRAP_SIGNAL(void erase(const TextBuffer::iterator& range_start, const TextBuffer::iterator& range_end), "delete_range")
+  _WRAP_SIGNAL(void erase(TextBuffer::iterator& range_start, TextBuffer::iterator& range_end), "delete_range")
   _WRAP_SIGNAL(void changed(), "changed")
   _WRAP_SIGNAL(void modified_changed(), "modified_changed")
 
 #m4 _CONVERSION(`GtkTextMark*',`const Glib::RefPtr<TextBuffer::Mark>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`const GtkTextIter*',`const TextBuffer::iterator&',Glib::wrap_iter($3))
   _WRAP_SIGNAL(void mark_set(const TextBuffer::iterator& location, const Glib::RefPtr<TextBuffer::Mark>& mark), "mark_set")
 
 #m4 _CONVERSION(`GtkTextTag*',`const Glib::RefPtr<TextBuffer::Tag>&',`Glib::wrap($3, true)')

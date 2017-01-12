@@ -37,7 +37,8 @@ static guint8* SignalProxy_Serialize(GtkTextBuffer* /* register_buffer */,
 
   try
   {
-    return (*the_slot)(Glib::wrap(content_buffer, true), Glib::wrap(start), Glib::wrap(end), *length);
+    return (*the_slot)(Glib::wrap(content_buffer, true),
+      Glib::wrap_const_iter(start), Glib::wrap_const_iter(end), *length);
   }
   catch (...)
   {
@@ -62,7 +63,8 @@ static gboolean SignalProxy_Deserialize(GtkTextBuffer* /* register_buffer */,
 
   try
   {
-    return (*the_slot)(Glib::wrap(content_buffer, true), Glib::wrap(iter), data, length, create_tags);
+    return (*the_slot)(Glib::wrap(content_buffer, true),
+      Glib::wrap_iter(iter), data, length, create_tags);
   }
   catch (Glib::Error& err)
   {
@@ -124,11 +126,21 @@ TextBuffer::iterator TextBuffer::get_iter_at_line_offset(int line_number, int ch
   return iter;
 }
 
+TextBuffer::const_iterator TextBuffer::get_iter_at_line_offset(int line_number, int char_offset) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_line_offset(line_number, char_offset);
+}
+
 TextBuffer::iterator TextBuffer::get_iter_at_line_index(int line_number, int byte_index)
 {
   iterator iter;
   gtk_text_buffer_get_iter_at_line_index(gobj(), iter.gobj(), line_number, byte_index);
   return iter;
+}
+
+TextBuffer::const_iterator TextBuffer::get_iter_at_line_index(int line_number, int byte_index) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_line_index(line_number, byte_index);
 }
 
 TextBuffer::iterator TextBuffer::get_iter_at_offset(int char_offset)
@@ -138,11 +150,21 @@ TextBuffer::iterator TextBuffer::get_iter_at_offset(int char_offset)
   return iter;
 }
 
+TextBuffer::const_iterator TextBuffer::get_iter_at_offset(int char_offset) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_offset(char_offset);
+}
+
 TextBuffer::iterator TextBuffer::get_iter_at_line(int line_number)
 {
   iterator iter;
   gtk_text_buffer_get_iter_at_line(gobj(), iter.gobj(), line_number);
   return iter;
+}
+
+TextBuffer::const_iterator TextBuffer::get_iter_at_line(int line_number) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_line(line_number);
 }
 
 TextBuffer::iterator TextBuffer::begin()
@@ -152,6 +174,11 @@ TextBuffer::iterator TextBuffer::begin()
   return iter;
 }
 
+TextBuffer::const_iterator TextBuffer::begin() const
+{
+  return const_cast<TextBuffer*>(this)->begin();
+}
+
 TextBuffer::iterator TextBuffer::end()
 {
   iterator iter;
@@ -159,9 +186,19 @@ TextBuffer::iterator TextBuffer::end()
   return iter;
 }
 
+TextBuffer::const_iterator TextBuffer::end() const
+{
+  return const_cast<TextBuffer*>(this)->end();
+}
+
 void TextBuffer::get_bounds(iterator& range_begin, iterator& range_end)
 {
   gtk_text_buffer_get_bounds(gobj(), range_begin.gobj(), range_end.gobj());
+}
+
+void TextBuffer::get_bounds(const_iterator& range_begin, const_iterator& range_end) const
+{
+  gtk_text_buffer_get_bounds(const_cast<GtkTextBuffer*>(gobj()), range_begin.gobj(), range_end.gobj());
 }
 
 TextBuffer::iterator TextBuffer::get_iter_at_mark(const Glib::RefPtr<Mark>& mark)
@@ -169,6 +206,11 @@ TextBuffer::iterator TextBuffer::get_iter_at_mark(const Glib::RefPtr<Mark>& mark
   iterator iter;
   gtk_text_buffer_get_iter_at_mark(gobj(), iter.gobj(), mark->gobj());
   return iter;
+}
+
+TextBuffer::const_iterator TextBuffer::get_iter_at_mark(const Glib::RefPtr<Mark>& mark) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_mark(mark);
 }
 
 void TextBuffer::set_text(const Glib::ustring& text)
@@ -435,7 +477,7 @@ TextBuffer::iterator TextBuffer::insert_markup(const iterator& pos, const char* 
 }
 
 TextBuffer::iterator TextBuffer::insert(const iterator& pos,
-                                        const iterator& range_begin, const iterator& range_end)
+                                        const const_iterator& range_begin, const const_iterator& range_end)
 {
   iterator iterCopy (pos);
   gtk_text_buffer_insert_range(gobj(), iterCopy.gobj(), range_begin.gobj(), range_end.gobj());
@@ -443,8 +485,8 @@ TextBuffer::iterator TextBuffer::insert(const iterator& pos,
 }
 
 std::pair<TextBuffer::iterator,bool>
-TextBuffer::insert_interactive(const iterator& pos, const iterator& range_begin,
-                               const iterator& range_end, bool default_editable)
+TextBuffer::insert_interactive(const iterator& pos, const const_iterator& range_begin,
+                               const const_iterator& range_end, bool default_editable)
 {
   // Since we have to copy the iterator anyway we can as well create the
   // std::pair now.  That saves another copy later (mind you, TextIter is
@@ -514,6 +556,11 @@ TextBuffer::iterator TextBuffer::get_iter_at_child_anchor(const Glib::RefPtr<Chi
   iterator iter;
   gtk_text_buffer_get_iter_at_child_anchor(gobj(), iter.gobj(), anchor->gobj());
   return iter;
+}
+
+TextBuffer::const_iterator TextBuffer::get_iter_at_child_anchor(const Glib::RefPtr<ChildAnchor>& anchor) const
+{
+  return const_cast<TextBuffer*>(this)->get_iter_at_child_anchor(anchor);
 }
 
 int TextBuffer::size() const
