@@ -21,12 +21,63 @@
 #include <gtkmm/textmark.h>
 #include <gtkmm/textchildanchor.h>
 
-namespace Gtk
-{
-
 /**** Gtk::TextIterBase *******************************************************/
 
+namespace
+{
+gboolean TextIterBase_find_char_callback(gunichar ch, void* user_data)
+{
+  try
+  {
+    auto slot = static_cast<Gtk::TextIterBase::SlotFindChar*>(user_data);
+    return (*slot)(ch);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+    return false;
+  }
+}
+
+} // anonymous namespace
+
+namespace Gtk
+{
+bool TextIterBase::forward_find_char(const SlotFindChar& slot, const TextIterBase& limit)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotFindChar*>(&slot);
+
+  return gtk_text_iter_forward_find_char(gobj(), &TextIterBase_find_char_callback, slot_copy, limit.gobj());
+}
+
+bool TextIterBase::forward_find_char(const SlotFindChar& slot)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotFindChar*>(&slot);
+
+  return gtk_text_iter_forward_find_char(gobj(), &TextIterBase_find_char_callback, slot_copy, nullptr);
+}
+
+bool TextIterBase::backward_find_char(const SlotFindChar& slot, const TextIterBase& limit)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotFindChar*>(&slot);
+
+  return gtk_text_iter_backward_find_char(gobj(), &TextIterBase_find_char_callback, slot_copy, limit.gobj());
+}
+
+bool TextIterBase::backward_find_char(const SlotFindChar& slot)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotFindChar*>(&slot);
+
+  return gtk_text_iter_backward_find_char(gobj(), &TextIterBase_find_char_callback, slot_copy, nullptr);
+}
+
 } // namespace Gtk
+
+/**** Gtk::TextIter and Gtk::TextConstIter ************************************/
 
 namespace Glib
 {

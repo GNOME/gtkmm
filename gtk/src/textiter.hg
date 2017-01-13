@@ -17,7 +17,6 @@
 
 #include <vector>
 #include <pangomm/language.h>
-#include <glibmm/exceptionhandler.h>
 #include <gtkmm/texttag.h>
 #include <gtk/gtk.h> /* we need the definition of GtkTextIter */
 
@@ -52,6 +51,7 @@ class TextIterBase
   _CLASS_BOXEDTYPE_STATIC(TextIterBase, GtkTextIter)
   _IGNORE(gtk_text_iter_copy, gtk_text_iter_free, gtk_text_iter_equal)
   _IGNORE(gtk_text_iter_assign)
+
 public:
   using iterator_category = std::bidirectional_iterator_tag;
   using value_type        = gunichar;
@@ -72,29 +72,6 @@ public:
     * @newin{3,22}
     */
    explicit operator bool() const;
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-protected:
-  template <typename Predicate>
-  struct PredicateAdapter
-  {
-    Predicate predicate_;
-    inline explicit PredicateAdapter(const Predicate& predicate);
-    static gboolean gtk_callback(gunichar uc, void* user_data);
-  };
-
-  _WRAP_METHOD(bool forward_find_char_impl(GtkTextCharPredicate predicate,
-                                           void* user_data,
-                                           const GtkTextIter* limit), gtk_text_iter_forward_find_char)
-
-  _WRAP_METHOD(bool backward_find_char_impl(GtkTextCharPredicate predicate,
-                                            void* user_data,
-                                            const GtkTextIter* limit), gtk_text_iter_backward_find_char)
-
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-public:
 
   _WRAP_METHOD(int get_offset() const, gtk_text_iter_get_offset)
   _WRAP_METHOD(int get_line() const, gtk_text_iter_get_line)
@@ -191,14 +168,65 @@ public:
   _WRAP_METHOD(bool forward_to_tag_toggle(const Glib::RefPtr<const TextTag>& tag = Glib::RefPtr<const TextTag>()), gtk_text_iter_forward_to_tag_toggle)
   _WRAP_METHOD(bool backward_to_tag_toggle(const Glib::RefPtr<const TextTag>& tag = Glib::RefPtr<const TextTag>()), gtk_text_iter_backward_to_tag_toggle)
 
-  template <typename Predicate>
-  bool forward_find_char(const Predicate& predicate, const TextIterBase& limit);
-  template <typename Predicate>
-  bool forward_find_char(const Predicate& predicate);
-  template <typename Predicate>
-  bool backward_find_char(const Predicate& predicate, const TextIterBase& limit);
-  template <typename Predicate>
-  bool backward_find_char(const Predicate& predicate);
+  /** A slot that will be called on each consecutive character.
+   * forward_find_char() and backward_find_char() advance the iterator one
+   * character at a time until the slot returns <tt>true</tt>.
+   *
+   * For instance,
+   * @code
+   * bool on_find_char(gunichar ch);
+   * @endcode
+   *
+   * @newin{3,90}
+   */
+  using SlotFindChar = sigc::slot<bool(gunichar)>;
+
+  // _WRAP_METHOD can't be used here, because user_data is not the last parameter
+  // in the gtk+ functions.
+  //_WRAP_METHOD(bool forward_find_char(const SlotFindChar& slot{pred}, const TextIterBase& limit{.?}),
+  //  gtk_text_iter_forward_find_char, slot_name slot, slot_callback TextIterBase_find_char_callback, no_slot_copy)
+  //_WRAP_METHOD(bool backward_find_char(const SlotFindChar& slot{pred}, const TextIterBase& limit{.?}),
+  //  gtk_text_iter_backward_find_char, slot_name slot, slot_callback TextIterBase_find_char_callback, no_slot_copy)
+  _IGNORE(gtk_text_iter_forward_find_char, gtk_text_iter_backward_find_char)
+
+  /** Advances this iterator, calling @a slot on each character.
+   *
+   * If @a slot returns <tt>true</tt>, %forward_find_char() returns <tt>true</tt>
+   * and stops scanning.
+   * If @a slot never returns <tt>true</tt>, this iterator is set to @a limit.
+   *
+   * @param slot A function to be called on each character.
+   * @param limit Search limit.
+   * @return Whether a match was found.
+   */
+  bool forward_find_char(const SlotFindChar& slot, const TextIterBase& limit);
+
+  /** Advances this iterator, calling @a slot on each character.
+   *
+   * If @a slot returns <tt>true</tt>, %forward_find_char() returns <tt>true</tt>
+   * and stops scanning.
+   * If @a slot never returns <tt>true</tt>, this iterator is set to the end iterator.
+   *
+   * @param slot A function to be called on each character.
+   * @return Whether a match was found.
+   */
+  bool forward_find_char(const SlotFindChar& slot);
+
+  /** Same as forward_find_char(const SlotFindChar& slot, const TextIterBase& limit),
+   * but goes backward.
+   *
+   * @param slot Function to be called on each character.
+   * @param limit Search limit.
+   * @return Whether a match was found.
+   */
+  bool backward_find_char(const SlotFindChar& slot, const TextIterBase& limit);
+
+  /** Same as forward_find_char(const SlotFindChar& slot), but goes backward.
+   *
+   * @param slot Function to be called on each character.
+   * @return Whether a match was found.
+   */
+  bool backward_find_char(const SlotFindChar& slot);
 
   _WRAP_METHOD(int compare(const TextIterBase& rhs) const, gtk_text_iter_compare)
   _WRAP_METHOD(bool in_range(const TextIterBase& start, const TextIterBase& end) const, gtk_text_iter_in_range)
@@ -327,30 +355,6 @@ public:
 
 /**** Gtk::TextIterBase *******************************************************/
 
-template <typename Predicate> inline
-TextIterBase::PredicateAdapter<Predicate>::PredicateAdapter(const Predicate& predicate)
-:
-  predicate_(predicate)
-{}
-
-// static
-template <typename Predicate>
-gboolean TextIterBase::PredicateAdapter<Predicate>::gtk_callback(gunichar uc, void* user_data)
-{
-  try
-  {
-    // This will either use Predicate::operator(), or call a function pointer.
-    // The explicit conditional expression avoids relying on an implicit
-    // conversion of the return type to int, which might be not available.
-    return (static_cast<TextIterBase::PredicateAdapter<Predicate>*>(user_data)->predicate_(uc)) ? 1 : 0;
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-    return 0;
-  }
-}
-
 inline
 TextIterBase::value_type TextIterBase::operator*() const
 {
@@ -361,38 +365,6 @@ inline
 TextIterBase::operator bool() const
 {
   return !is_end();
-}
-
-template <typename Predicate>
-bool TextIterBase::forward_find_char(const Predicate& predicate, const TextIterBase& limit)
-{
-  typedef TextIterBase::PredicateAdapter<Predicate> PredAdapter;
-  PredAdapter adapter(predicate);
-  return this->forward_find_char_impl(&PredAdapter::gtk_callback, &adapter, limit.gobj());
-}
-
-template <typename Predicate>
-bool TextIterBase::forward_find_char(const Predicate& predicate)
-{
-  typedef TextIterBase::PredicateAdapter<Predicate> PredAdapter;
-  PredAdapter adapter(predicate);
-  return this->forward_find_char_impl(&PredAdapter::gtk_callback, &adapter, nullptr);
-}
-
-template <typename Predicate>
-bool TextIterBase::backward_find_char(const Predicate& predicate, const TextIterBase& limit)
-{
-  typedef TextIterBase::PredicateAdapter<Predicate> PredAdapter;
-  PredAdapter adapter(predicate);
-  return this->backward_find_char_impl(&PredAdapter::gtk_callback, &adapter, limit.gobj());
-}
-
-template <typename Predicate>
-bool TextIterBase::backward_find_char(const Predicate& predicate)
-{
-  typedef TextIterBase::PredicateAdapter<Predicate> PredAdapter;
-  PredAdapter adapter(predicate);
-  return this->backward_find_char_impl(&PredAdapter::gtk_callback, &adapter, nullptr);
 }
 
 /**** Gtk::TextIter ***********************************************************/
