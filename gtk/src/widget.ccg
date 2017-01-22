@@ -274,6 +274,68 @@ void Widget_Class::measure_vfunc_callback(GtkWidget* self, GtkOrientation orient
     (*base->measure)(self, orientation, for_size, minimum, natural, minimum_baseline, natural_baseline);
 }
 
+// This vfunc callback and the corresponding vfunc are custom implemented because we want
+// the output arguments of the C++ vfunc to be bool& (not gboolean* or gboolean&).
+void Widget_Class::compute_expand_vfunc_callback(GtkWidget* self, gboolean* hexpand_p, gboolean* vexpand_p)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+        bool hexpand_pcxx = hexpand_p ? *hexpand_p : false;
+        bool vexpand_pcxx = vexpand_p ? *vexpand_p : false;
+        obj->compute_expand_vfunc(hexpand_pcxx, vexpand_pcxx);
+        if (hexpand_p)
+          *hexpand_p = hexpand_pcxx;
+        if (vexpand_p)
+          *vexpand_p = vexpand_pcxx;
+        return;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->compute_expand)
+    (*base->compute_expand)(self, hexpand_p, vexpand_p);
+}
+
+void Gtk::Widget::compute_expand_vfunc(bool& hexpand_p, bool& vexpand_p)
+{
+  const auto base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->compute_expand)
+  {
+    gboolean hexpand_pc = hexpand_p;
+    gboolean vexpand_pc = vexpand_p;
+    (*base->compute_expand)(gobj(), &hexpand_pc, &vexpand_pc);
+    hexpand_p = hexpand_pc;
+    vexpand_p = vexpand_pc;
+  }
+}
+
+
 Widget::~Widget() noexcept
 {}
 

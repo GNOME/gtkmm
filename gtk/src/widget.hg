@@ -598,15 +598,14 @@ dnl
   _POP()
 #m4end
 
-#m4 _CONVERSION(`cairo_t*',`const ::Cairo::RefPtr< ::Cairo::Context>&',`::Cairo::make_refptr_for_instance< ::Cairo::Context>(new ::Cairo::Context($3, false /* has_reference */))')
-  //TODO: no_default_handler is a temporary fix (rather workaround) for the
-  // problem with get_render_mode() in gtk+.
-  // Most widgets will be correctly drawn, even Gtk::DrawingArea since it now
-  // uses a draw function instead of signal_draw().
-  // Custom widgets won't be drawn correctly with this workaround.
+  // The draw signal must not be wrapped here. It would interfere with the way
+  // gtk+ selects either the snapshot vfunc or the draw signal for rendering widgets.
+  // Custom widgets that need the draw signal must use a custom rendering widget
+  // that wraps the draw signal.
   // https://bugzilla.gnome.org/show_bug.cgi?id=774778
-  _WRAP_SIGNAL(bool draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr), "draw", no_default_handler)
+//#m4 _CONVERSION(`cairo_t*',`const ::Cairo::RefPtr< ::Cairo::Context>&',`::Cairo::make_refptr_for_instance< ::Cairo::Context>(new ::Cairo::Context($3, false /* has_reference */))')
   //_WRAP_SIGNAL(bool draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr), "draw")
+  _IGNORE_SIGNAL(draw)
 
   /// Event triggered by a key press will widget has focus.
   _WRAP_SIGNAL(bool key_press_event(GdkEventKey* key_event), "key_press_event")
@@ -713,12 +712,26 @@ protected:
   //comment in GTK+ header: "seldomly overidden"
   _WRAP_VFUNC(void dispatch_child_properties_changed(guint, GParamSpec**), "dispatch_child_properties_changed")
 
-  _WRAP_VFUNC(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", refreturn, ifdef GTKMM_ATKMM_ENABLED)
-
   _WRAP_VFUNC(SizeRequestMode get_request_mode() const, get_request_mode)
   _WRAP_VFUNC(void measure(Orientation orientation, int for_size, int& minimum, int& natural,
     int& minimum_baseline, int& natural_baseline) const, measure, custom_vfunc_callback)
-  //TODO: Wrap all the new vfuncs when we can break ABI.
+  _WRAP_VFUNC(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", refreturn, ifdef GTKMM_ATKMM_ENABLED)
+
+  _WRAP_VFUNC(void compute_expand(bool& hexpand_p, bool& vexpand_p), compute_expand,
+    custom_vfunc_callback, custom_vfunc)
+
+#m4 _CONVERSION(`const cairo_region_t*',`const ::Cairo::RefPtr<const ::Cairo::Region>&',`::Cairo::make_refptr_for_instance<const ::Cairo::Region>(new ::Cairo::Region(const_cast<cairo_region_t*>($3), false /* has_reference */))')
+  _WRAP_VFUNC(void queue_draw_region(const ::Cairo::RefPtr<const ::Cairo::Region>& region), queue_draw_region)
+  _WRAP_VFUNC(void queue_draw_child(Widget& child, const ::Cairo::RefPtr<const ::Cairo::Region>& region), queue_draw_child)
+
+  // The snapshot vfunc must not be wrapped here. It would interfere with the way
+  // gtk+ selects either the snapshot vfunc or the draw signal for rendering widgets.
+  // Custom widgets that need the snapshot vfunc must use a custom rendering widget
+  // that wraps the snapshot vfunc.
+  // https://bugzilla.gnome.org/show_bug.cgi?id=774778
+//#m4 _CONVERSION(`Snapshot&',`GtkSnapshot*',`($3).gobj()')
+//#m4 _CONVERSION(`GtkSnapshot*',`Snapshot&',`*Glib::wrap($3)')
+  //_WRAP_VFUNC(void snapshot(Snapshot& snapshot), snapshot)
 
 protected:
   _CTOR_DEFAULT()
@@ -784,7 +797,7 @@ dnl
 #m4end
 
 #m4begin
-dnl// Hook in custom hierarchy_changed callback.
+dnl// Hook in custom parent_set callback.
 dnl// It will use the generated callback.
 dnl
   _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
