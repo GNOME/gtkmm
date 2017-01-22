@@ -38,9 +38,9 @@
 
 std::string get_child_properties(GType gtype);
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
-  gtk_init(&argc, &argv);
+  gtk_init();
 
   std::cout << get_defs( GTK_TYPE_ABOUT_DIALOG )
             << get_defs( GTK_TYPE_ACCEL_GROUP )

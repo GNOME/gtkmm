@@ -31,9 +31,9 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
-  gtk_init(&argc, &argv);
+  gtk_init();
 
   std::cout << get_defs( GDK_TYPE_APP_LAUNCH_CONTEXT )
             << get_defs( GDK_TYPE_DRAG_CONTEXT )

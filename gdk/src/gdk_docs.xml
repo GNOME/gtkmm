@@ -2549,7 +2549,7 @@ be at least as large as the width of the pixbuf.
 <enum name="GdkPixbufAlphaMode">
 <description>
 These values can be passed to
-gdk_pixbuf_render_to_drawable_alpha() to control how the alpha
+gdk_pixbuf_xlib_render_to_drawable_alpha() to control how the alpha
 channel of an image should be handled.  This function can create a
 bilevel clipping mask (black and white) and use it while painting
 the image.  In the future, when the X Window System gets an alpha
@@ -9098,59 +9098,6 @@ Since: 3.16
 <return></return>
 </function>
 
-<function name="gdk_init">
-<description>
-Initializes the GDK library and connects to the windowing system.
-If initialization fails, a warning message is output and the application
-terminates with a call to `exit(1)`.
-
-Any arguments used by GDK are removed from the array and @argc and @argv
-are updated accordingly.
-
-GTK+ initializes GDK in gtk_init() and so this function is not usually
-needed by GTK+ applications.
-
-</description>
-<parameters>
-<parameter name="argc">
-<parameter_description> the number of command line arguments.
-</parameter_description>
-</parameter>
-<parameter name="argv">
-<parameter_description> the array of command line arguments.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_init_check">
-<description>
-Initializes the GDK library and connects to the windowing system,
-returning %TRUE on success.
-
-Any arguments used by GDK are removed from the array and @argc and @argv
-are updated accordingly.
-
-GTK+ initializes GDK in gtk_init() and so this function is not usually
-needed by GTK+ applications.
-
-
-</description>
-<parameters>
-<parameter name="argc">
-<parameter_description> the number of command line arguments.
-</parameter_description>
-</parameter>
-<parameter name="argv">
-<parameter_description> the array of command line arguments.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if initialization succeeded.
-</return>
-</function>
-
 <function name="gdk_keymap_add_virtual_modifiers">
 <description>
 Maps the non-virtual modifiers (i.e Mod2, Mod3, ...) which are set
@@ -10155,33 +10102,6 @@ are end indexes
 </return>
 </function>
 
-<function name="gdk_parse_args">
-<description>
-Parse command line arguments, and store for future
-use by calls to gdk_display_open().
-
-Any arguments used by GDK are removed from the array and @argc and @argv are
-updated accordingly.
-
-You shouldn’t call this function explicitly if you are using
-gtk_init(), gtk_init_check(), gdk_init(), or gdk_init_check().
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="argc">
-<parameter_description> the number of command line arguments.
-</parameter_description>
-</parameter>
-<parameter name="argv">
-<parameter_description> the array of command line arguments.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_pixbuf_add_alpha">
 <description>
 Takes an existing pixbuf and adds an alpha channel to it.
@@ -10591,7 +10511,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the pixbuf is loaded
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -10680,7 +10600,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-created pixbuf, or a reference to the
+<return> A newly-created pixbuf, %NULL if
+not enough memory could be allocated for it, or a reference to the
 input pixbuf (with an increased reference count).
 
 </return>
@@ -10904,7 +10825,7 @@ Creates a transformation of the source image @src by scaling by
 @scale_x and @scale_y then translating by @offset_x and @offset_y.
 This gives an image in the coordinates of the destination pixbuf.
 The rectangle (@dest_x, @dest_y, @dest_width, @dest_height)
-is then composited onto the corresponding rectangle of the
+is then alpha blended onto the corresponding rectangle of the
 original destination image.
 
 When the destination rectangle contains parts not in the source 
@@ -10971,10 +10892,13 @@ to infinity.
 <description>
 Creates a transformation of the source image @src by scaling by
 @scale_x and @scale_y then translating by @offset_x and @offset_y,
-then composites the rectangle (@dest_x ,@dest_y, @dest_width,
+then alpha blends the rectangle (@dest_x ,@dest_y, @dest_width,
 @dest_height) of the resulting image with a checkboard of the
 colors @color1 and @color2 and renders it onto the destination
 image.
+
+If the source image has no alpha channel, and @overall_alpha is 255, a fast
+path is used which omits the alpha blending and just performs the scaling.
 
 See gdk_pixbuf_composite_color_simple() for a simpler variant of this
 function suitable for many tasks.
@@ -11057,7 +10981,7 @@ function suitable for many tasks.
 <function name="gdk_pixbuf_composite_color_simple">
 <description>
 Creates a new #GdkPixbuf by scaling @src to @dest_width x
-@dest_height and compositing the result with a checkboard of colors
+@dest_height and alpha blending the result with a checkboard of colors
 @color1 and @color2.
 
 
@@ -11609,7 +11533,7 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the file info is available
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -12766,7 +12690,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the pixbuf is loaded
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -12873,7 +12797,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the pixbuf is loaded
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -13046,6 +12970,8 @@ Since: 2.36
 <description>
 Rotates a pixbuf by a multiple of 90 degrees, and returns the
 result in a new pixbuf.
+
+If @angle is 0, a copy of @src is returned, avoiding any rotation.
 
 Since: 2.6
 
@@ -13457,7 +13383,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the pixbuf is saved
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -13580,7 +13506,7 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the the pixbuf is loaded
+<parameter_description> a #GAsyncReadyCallback to call when the pixbuf is saved
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -13743,7 +13669,10 @@ reasonable quality and speed.
 You can scale a sub-portion of @src by creating a sub-pixbuf
 pointing into @src; see gdk_pixbuf_new_subpixbuf().
 
-For more complicated scaling/compositing see gdk_pixbuf_scale()
+If @dest_width and @dest_height are equal to the @src width and height, a
+copy of @src is returned, avoiding any scaling.
+
+For more complicated scaling/alpha blending see gdk_pixbuf_scale()
 and gdk_pixbuf_composite().
 
 
@@ -14339,6 +14268,44 @@ Since: 3.0
 </parameter>
 </parameters>
 <return> The hash value for @p
+
+</return>
+</function>
+
+<function name="gdk_rgba_is_clear">
+<description>
+Checks if an @rgba value is transparent. That is, drawing with the value
+would not produce any change.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="rgba">
+<parameter_description> a #GdkRGBA
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @rgab is clear
+
+</return>
+</function>
+
+<function name="gdk_rgba_is_opaque">
+<description>
+Checks if an @rgba value is opaque. That is, drawing with the value
+will not retain any results from previous contents.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="rgba">
+<parameter_description> a #GdkRGBA
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @rgab is opaque
 
 </return>
 </function>
@@ -15131,130 +15098,6 @@ for the default screen. See gdk_screen_get_setting().
 </parameters>
 <return> %TRUE if the setting existed and a value was stored
 in @value, %FALSE otherwise.
-</return>
-</function>
-
-<function name="gdk_test_render_sync">
-<description>
-Retrieves a pixel from @window to force the windowing
-system to carry out any pending rendering commands.
-
-This function is intended to be used to synchronize with rendering
-pipelines, to benchmark windowing system rendering operations.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a mapped #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_test_simulate_button">
-<description>
-This function is intended to be used in GTK+ test programs.
-It will warp the mouse pointer to the given (@x,@y) coordinates
-within @window and simulate a button press or release event.
-Because the mouse pointer needs to be warped to the target
-location, use of this function outside of test programs that
-run in their own virtual windowing system (e.g. Xvfb) is not
-recommended.
-
-Also, gdk_test_simulate_button() is a fairly low level function,
-for most testing purposes, gtk_test_widget_click() is the right
-function to call which will generate a button press event followed
-by its accompanying button release event.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow to simulate a button event for
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description>      x coordinate within @window for the button event
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description>      y coordinate within @window for the button event
-</parameter_description>
-</parameter>
-<parameter name="button">
-<parameter_description> Number of the pointer button for the event, usually 1, 2 or 3
-</parameter_description>
-</parameter>
-<parameter name="modifiers">
-<parameter_description> Keyboard modifiers the event is setup with
-</parameter_description>
-</parameter>
-<parameter name="button_pressrelease">
-<parameter_description> either %GDK_BUTTON_PRESS or %GDK_BUTTON_RELEASE
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether all actions necessary for a button event simulation
-were carried out successfully
-
-</return>
-</function>
-
-<function name="gdk_test_simulate_key">
-<description>
-This function is intended to be used in GTK+ test programs.
-If (@x,@y) are &gt; (-1,-1), it will warp the mouse pointer to
-the given (@x,@y) coordinates within @window and simulate a
-key press or release event.
-
-When the mouse pointer is warped to the target location, use
-of this function outside of test programs that run in their
-own virtual windowing system (e.g. Xvfb) is not recommended.
-If (@x,@y) are passed as (-1,-1), the mouse pointer will not
-be warped and @window origin will be used as mouse pointer
-location for the event.
-
-Also, gdk_test_simulate_key() is a fairly low level function,
-for most testing purposes, gtk_test_widget_send_key() is the
-right function to call which will generate a key press event
-followed by its accompanying key release event.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow to simulate a key event for
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description>      x coordinate within @window for the key event
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description>      y coordinate within @window for the key event
-</parameter_description>
-</parameter>
-<parameter name="keyval">
-<parameter_description> A GDK keyboard value
-</parameter_description>
-</parameter>
-<parameter name="modifiers">
-<parameter_description> Keyboard modifiers the event is setup with
-</parameter_description>
-</parameter>
-<parameter name="key_pressrelease">
-<parameter_description> either %GDK_KEY_PRESS or %GDK_KEY_RELEASE
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether all actions necessary for a key event simulation
-were carried out successfully
-
 </return>
 </function>
 
@@ -16232,6 +16075,10 @@ width, height,
 scale);
 ]|
 
+Note that unlike cairo_surface_create_similar_image(), the new
+surface's device scale is set to @scale, or to the scale factor of
+@window if @scale is 0.
+
 Since: 3.10
 
 </description>
@@ -16401,27 +16248,6 @@ Since: 3.22
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_window_ensure_native">
-<description>
-Tries to ensure that there is a window-system native window for this
-GdkWindow. This may fail in some situations, returning %FALSE.
-
-Some backends may not support native child windows.
-
-Since: 2.18
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the window has a native window, %FALSE otherwise
-
-</return>
 </function>
 
 <function name="gdk_window_focus">
@@ -17439,8 +17265,7 @@ Gets the type of the window. See #GdkWindowType.
 
 <function name="gdk_window_has_native">
 <description>
-Checks whether the window has a native window or not. Note that
-you can use gdk_window_ensure_native() if a native window is needed.
+Checks whether the window has a native window or not.
 
 Since: 2.22
 
@@ -18161,34 +17986,6 @@ Remove a filter previously added with gdk_window_add_filter().
 </parameter>
 <parameter name="data">
 <parameter_description> user data for previously-added filter function
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_window_reparent">
-<description>
-Reparents @window into the given @new_parent. The window being
-reparented will be unmapped as a side effect.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="new_parent">
-<parameter_description> new parent to move @window into
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X location inside the new parent
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y location inside the new parent
 </parameter_description>
 </parameter>
 </parameters>
