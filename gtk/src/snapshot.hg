@@ -1,0 +1,174 @@
+/* Copyright (C) 2017 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/stylecontext.h>
+
+_DEFS(gtkmm,gtk)
+
+typedef struct _graphene_rect_t graphene_rect_t;
+
+namespace Gdk
+{
+class Pixbuf;
+}
+
+namespace Gtk
+{
+
+/** Auxiliary object for snapshots.
+ *
+ * %Snapshot is an auxiliary object that assists in creating GskRenderNodes
+ * in the Gtk::WidgetCustomRenderer::snapshot_vfunc(). It functions in a similar way to
+ * a cairo context, and maintains a stack of render nodes and their associated
+ * transformations.
+ *
+ * The node at the top of the stack is the the one that append_node()
+ * operates on. Use the push() and pop() functions to change the current node.
+ *
+ * The only way to obtain a %Snapshot object is as an argument to
+ * the Gtk::WidgetCustomRenderer::snapshot_vfunc().
+ *
+ * @newin{3,90}
+ */
+class Snapshot final
+{
+  _CLASS_GENERIC(Snapshot, GtkSnapshot)
+
+public:
+  //TODO: Add more methods. What shall be done with methods that take Gsk or graphene classes?
+
+  /** Creates a new render node, appends it to the current render
+   * node of the snapshot, and makes it the new current render node.
+   *
+   * @newin{3,90}
+   *
+   * @param keep_coordinates If <tt>true</tt>, the current offset and clip will be kept.
+   *   Otherwise, the clip will be unset and the offset will be reset to (0, 0).
+   * @param name The name for the new node, or an empty string for no name.
+   */
+  void push(bool keep_coordinates, const Glib::ustring& name);
+  _IGNORE(gtk_snapshot_push)
+
+  //TODO: These gtk_snapshot_push_*() functions have no documentation.
+  //TODO: Wrap gtk_snapshot_push_transform()?
+  //TODO: Wrap gtk_snapshot_push_opacity()?
+  //TODO: Wrap gtk_snapshot_push_color_matrix()?
+  //TODO: Wrap gtk_snapshot_push_repeat()?
+  //TODO: Wrap gtk_snapshot_push_clip()?
+  //TODO: Wrap gtk_snapshot_push_rounded_clip()?
+  //TODO: Wrap gtk_snapshot_push_shadow()?
+  //TODO: Wrap gtk_snapshot_push_blend()? Has documentation.
+
+  /** Snapshots a cross-fade operation between two images with the
+   * given @a progress.
+   *
+   * Until the first call to pop(), the start image
+   * will be the snapshot. After that call, the end image will be recorded
+   * until the second call to pop().
+   *
+   * Calling this function requires 2 calls to pop().
+   *
+   * @newin{3,90}
+   *
+   * @param progress Progress between 0.0 and 1.0.
+   * @param name The name of the pushed node, or an empty string for no name.
+   */
+  void push_cross_fade(double progress, const Glib::ustring& name);
+  _IGNORE(gtk_snapshot_push_cross_fade)
+
+  _WRAP_METHOD(void pop(), gtk_snapshot_pop)
+
+  _WRAP_METHOD(void offset(int x, int y), gtk_snapshot_offset)
+  _WRAP_METHOD(void get_offset(int& x, int& y) const, gtk_snapshot_get_offset)
+
+  //TODO: Wrap gtk_snapshot_append_node()?
+
+  /** Creates a new render node and appends it to the current render
+   * node of the snapshot, without changing the current node.
+   *
+   * @newin{3,90}
+   *
+   * @param bounds The bounds for the new node.
+   * @param name The name for the new node, or an empty string for no name.
+   * @return A Cairo::Context suitable for drawing the contents of the newly
+   * created render node.
+   */
+  ::Cairo::RefPtr< ::Cairo::Context> append_cairo(const graphene_rect_t* bounds,
+    const Glib::ustring& name);
+
+  /** Creates a new render node and appends it to the current render
+   * node of the snapshot, without changing the current node.
+   *
+   * @newin{3,90}
+   *
+   * @param bounds The bounds for the new node.
+   * @param name The name for the new node, or an empty string for no name.
+   * @return A Cairo::Context suitable for drawing the contents of the newly
+   * created render node.
+   */
+  ::Cairo::RefPtr< ::Cairo::Context> append_cairo(const Gdk::Rectangle& bounds,
+    const Glib::ustring& name);
+  _IGNORE(gtk_snapshot_append_cairo)
+  //TODO: Wrap gtk_snapshot_append_texture()?
+  //TODO: Wrap gtk_snapshot_append_color()?
+
+#m4 _CONVERSION(`const Gdk::Rectangle&', `const cairo_rectangle_int_t*', `($3).gobj()')
+  _WRAP_METHOD(bool clips_rect(const Gdk::Rectangle& bounds) const, gtk_snapshot_clips_rect)
+
+  _WRAP_METHOD(void render_backgrount(const Glib::RefPtr<StyleContext>& context,
+    double x, double y, double width, double height), gtk_snapshot_render_background)
+  _WRAP_METHOD(void render_frame(const Glib::RefPtr<StyleContext>& context,
+    double x, double y, double width, double height), gtk_snapshot_render_frame)
+  _WRAP_METHOD(void render_focus(const Glib::RefPtr<StyleContext>& context,
+    double x, double y, double width, double height), gtk_snapshot_render_focus)
+  _WRAP_METHOD(void render_layout(const Glib::RefPtr<StyleContext>& context,
+    double x, double y, const Glib::RefPtr<Pango::Layout>& layout), gtk_snapshot_render_layout)
+  _WRAP_METHOD(void render_insertion_cursor(const Glib::RefPtr<StyleContext>& context,
+    double x, double y, const Glib::RefPtr<Pango::Layout>& layout, int index,
+    Pango::Direction direction), gtk_snapshot_render_insertion_cursor)
+  _WRAP_METHOD(void render_icon(const Glib::RefPtr<StyleContext>& context,
+    const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double x, double y), gtk_snapshot_render_icon)
+
+  ///Provides access to the underlying C instance.
+  GtkSnapshot* gobj();
+
+  ///Provides access to the underlying C instance.
+  const GtkSnapshot* gobj() const;
+
+  Snapshot() = delete;
+
+  // noncopyable
+  Snapshot(const Snapshot&) = delete;
+  Snapshot& operator=(const Snapshot&) = delete;
+};
+
+} // namespace Gtk
+
+namespace Glib
+{
+/** A C++ wrapper for the C object.
+ *
+ * @param gobject The C instance.
+ * @return The C++ wrapper.
+ *
+ * @relates Gtk::Snapshot
+ *
+ * @newin{3,90}
+ */
+Gtk::Snapshot* wrap(GtkSnapshot* gobject);
+
+} // namespace Glib
+
