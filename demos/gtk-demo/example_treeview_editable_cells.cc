@@ -135,8 +135,6 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   m_HBox.pack_start(m_Button_Remove);
   m_Button_Remove.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
-
-  show_all();
 }
 
 Example_TreeView_EditableCells::~Example_TreeView_EditableCells()

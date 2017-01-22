@@ -262,8 +262,6 @@ Example_IconBrowser::Example_IconBrowser()
 
   on_symbolic_radio_toggled();
   populate();
-
-  show_all_children();
 }
 
 Example_IconBrowser::~Example_IconBrowser()
@@ -929,8 +927,6 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
   m_description.set_max_width_chars(60);
   m_description.set_halign(Gtk::ALIGN_START);
   m_description.set_valign(Gtk::ALIGN_START);
-
-  show_all_children();
 }
 
 DetailDialog::~DetailDialog()

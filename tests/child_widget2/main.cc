@@ -15,7 +15,6 @@ MyWindow::MyWindow() :
 {
   add(vbox);
   vbox.pack_start(b);
-  show_all_children();
 }
 
 int main (int argc, char *argv[])

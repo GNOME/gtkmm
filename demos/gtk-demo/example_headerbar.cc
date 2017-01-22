@@ -69,8 +69,6 @@ Example_HeaderBar::Example_HeaderBar()
   // Layout
   set_titlebar(m_header_bar);
   add(m_text_view);
-
-  show_all_children();
 }
 
 Example_HeaderBar::~Example_HeaderBar()

@@ -1,5 +1,3 @@
-//$Id$ -*- c++ -*-
-
 /* gtkmm example Copyright (C) 2002 gtkmm development team
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,8 +20,6 @@ TestWindow::TestWindow()
 : m_Button("test")
 {
   add(m_Button);
-
-  show_all_children();
 
   //This seems to be 2, and then 3 during destruction. Looks like unref-ing isn't enough - we'll have to gtk_object_destroy() it instead of just unrefing.
   g_warning("m_Button -> refcount = %d\n", G_OBJECT(m_Button.gobj())->ref_count);

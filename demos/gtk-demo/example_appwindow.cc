@@ -124,8 +124,6 @@ Example_AppWindow::Example_AppWindow()
   refTextBuffer->signal_changed().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_changed));
   refTextBuffer->signal_mark_set().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_mark_set));
   on_text_changed();
-
-  show_all();
 }
 
 Example_AppWindow::~Example_AppWindow()

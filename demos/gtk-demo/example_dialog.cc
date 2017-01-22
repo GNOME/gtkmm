@@ -100,8 +100,6 @@ Example_Dialog::Example_Dialog()
   m_Grid.attach(m_Label2, 0, 1, 1, 1);
   m_Grid.attach(m_Entry2, 1, 1, 1, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
-
-  show_all();
 }
 
 Example_Dialog::~Example_Dialog()
@@ -158,8 +156,6 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   m_Entry2.set_text(entry2);
   m_Grid.attach(m_Entry2, 1, 1, 1, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
-
-  show_all();
 }
 
 Glib::ustring Dialog_Interactive::get_entry1() const

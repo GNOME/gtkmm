@@ -98,7 +98,6 @@ DemoWindow::DemoWindow()
   set_default_size (800, 600);
 
   load_file (testgtk_demos[0].filename);
-  show_all();
 }
 
 void DemoWindow::configure_header_bar()
@@ -425,7 +424,6 @@ void DemoWindow::add_data_tabs(const std::string& filename)
         continue;
       }
     }
-    widget->show_all();
     m_Notebook.append_page(*Gtk::manage(widget), resources[i]);
     m_Notebook.child_property_tab_expand(*widget) = true;
   }

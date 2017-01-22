@@ -48,8 +48,6 @@ Example_Overlay::Example_Overlay()
   // Layout
   m_overlay.add(m_scrolled_window);
   add(m_overlay);
-
-  show_all_children();
 }
 
 Example_Overlay::~Example_Overlay()

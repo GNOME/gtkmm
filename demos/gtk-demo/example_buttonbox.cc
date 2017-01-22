@@ -61,8 +61,6 @@ Example_ButtonBox::Example_ButtonBox()
   m_HBox.pack_start( *(create_button_box(false, "Edge", 30, Gtk::BUTTONBOX_EDGE)) );
   m_HBox.pack_start( *(create_button_box(false, "Start", 30, Gtk::BUTTONBOX_START)) );
   m_HBox.pack_start( *(create_button_box(false, "End", 30, Gtk::BUTTONBOX_END)) );
-
-  show_all();
 }
 
 Example_ButtonBox::~Example_ButtonBox()

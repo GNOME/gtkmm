@@ -170,8 +170,6 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
 
   add_columns();
   m_ScrolledWindow.add(m_TreeView);
-
-  show_all();
 }
 
 Example_TreeView_TreeStore::~Example_TreeView_TreeStore()

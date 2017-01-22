@@ -99,8 +99,6 @@ Example_Images::Example_Images()
   m_Frame_Progressive.add(m_Image_Progressive);
 
   start_progressive_loading();
-
-  show_all();
 }
 
 Example_Images::~Example_Images()

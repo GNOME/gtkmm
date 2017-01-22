@@ -122,8 +122,6 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
 
   add_columns();
   m_ScrolledWindow.add(m_TreeView);
-
-  show_all();
 }
 
 Example_TreeView_ListStore::~Example_TreeView_ListStore()

@@ -63,9 +63,9 @@ void test_object_move_assignment_operator()
   g_assert(derived.gobj() == nullptr);
 }
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
-  gtk_init(&argc, &argv);
+  gtk_init();
   Gtk::Main::init_gtkmm_internals();
 
   test_object_move_constructor();

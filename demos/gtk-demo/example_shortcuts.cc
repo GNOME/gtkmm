@@ -94,8 +94,6 @@ Example_Shortcuts::Example_Shortcuts(
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_boxes", "display"));
-
-  show_all();
 }
 
 Example_Shortcuts::~Example_Shortcuts()

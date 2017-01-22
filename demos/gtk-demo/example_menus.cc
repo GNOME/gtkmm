@@ -122,8 +122,6 @@ Example_Menus::Example_Menus()
   m_VBox_Sub2.pack_start(m_Button);
   m_Button.property_can_default() = true;
   m_Button.grab_default();
-
-  show_all();
 }
 
 Example_Menus::~Example_Menus()

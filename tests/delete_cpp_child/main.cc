@@ -34,8 +34,6 @@ AppWindow::AppWindow()
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
 
     button->signal_clicked().connect( sigc::mem_fun(*this, &AppWindow::on_button_clicked));
-
-    show_all_children();
 }
 
 void AppWindow::on_button_clicked()

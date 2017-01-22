@@ -124,8 +124,6 @@ Example_IconView::Example_IconView()
   m_IconView.grab_focus();
 
   add(m_VBox);
-
-  show_all();
 }
 
 int Example_IconView::on_model_sort(const Gtk::TreeModel::const_iterator& a, const Gtk::TreeModel::const_iterator& b)

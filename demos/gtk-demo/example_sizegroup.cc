@@ -108,8 +108,6 @@ Example_SizeGroup::Example_SizeGroup()
   m_VBox.pack_start(m_CheckButton, Gtk::PACK_SHRINK);
   m_CheckButton.set_active();
   m_CheckButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_SizeGroup::on_checkbutton_toggled));
-
-  show_all();
 }
 
 Example_SizeGroup::~Example_SizeGroup()

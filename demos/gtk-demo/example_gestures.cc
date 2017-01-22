@@ -75,8 +75,6 @@ Example_Gestures::Example_Gestures()
   m_GestureZoom = Gtk::GestureZoom::create(m_DrawingArea);
   m_GestureZoom->set_propagation_phase(Gtk::PHASE_BUBBLE);
   m_GestureZoom->signal_scale_changed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_zoom_scale_changed));
-
-  show_all();
 }
 
 Example_Gestures::~Example_Gestures()

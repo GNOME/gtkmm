@@ -62,8 +62,6 @@ Example_ColorSel::Example_ColorSel()
   m_VBox.pack_start(m_Button, Gtk::PACK_SHRINK);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_ColorSel::on_button_clicked));
-
-  show_all();
 }
 
 Example_ColorSel::~Example_ColorSel()

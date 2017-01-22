@@ -91,8 +91,6 @@ Example_TextView::Example_TextView()
 
   attach_widgets(m_View1);
   attach_widgets(*m_pView2);
-
-  show_all();
 }
 
 Example_TextView::~Example_TextView()
@@ -427,7 +425,6 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     if(pWidget)
     {
       text_view.add_child_at_anchor(*pWidget, refAnchor);
-      pWidget->show_all();
     }
 
     ++i;
@@ -436,7 +433,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
 
 void Example_TextView::on_button_clicked()
 {
-  m_WindowEasterEgg.show_all();
+  m_WindowEasterEgg.present();
 }
 
 Window_EasterEgg::Window_EasterEgg()
@@ -457,6 +454,8 @@ Window_EasterEgg::Window_EasterEgg()
   m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   add(m_ScrolledWindow);
   m_ScrolledWindow.add(*m_pTextView);
+
+  hide();
 }
 
 Window_EasterEgg::~Window_EasterEgg()

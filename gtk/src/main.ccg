@@ -40,24 +40,9 @@ Main*         Main::instance_ = nullptr;
 
 /**** Gtk::Main -- construction/destruction ********************************/
 
-Main::Main(int& argc, char**& argv, bool set_locale)
-{
-  init(&argc, &argv, set_locale);
-}
-
-Main::Main(int* argc, char*** argv, bool set_locale)
-{
-  init(argc, argv, set_locale);
-}
-
-/*Main::Main(int* argc, char*** argv, const std::string& parameter_string, const std::vector<const Glib::OptionEntry&>& entries, const std::string& translation_domain)
-{
-  init(argc, argv, parameter_string, entries, translation_domain);
-}*/
-
 Main::Main(bool set_locale)
 {
-  init(nullptr, nullptr, set_locale);
+  init(set_locale);
 }
 
 Main::~Main()
@@ -76,7 +61,7 @@ Main::~Main()
 }
 
 // protected
-void Main::init(int* argc, char*** argv, bool set_locale)
+void Main::init(bool set_locale)
 {
   if(instance_)
   {
@@ -88,30 +73,10 @@ void Main::init(int* argc, char*** argv, bool set_locale)
       gtk_disable_setlocale();
 
     //TODO: Add support for gtk_init_check().
-    gtk_init(argc, argv);
+    gtk_init();
 
     init_gtkmm_internals();
     instance_ = this;
-  }
-}
-
-Main::Main(int& argc, char**& argv, Glib::OptionContext& option_context)
-{
-  if(instance_)
-  {
-    g_warning("Gtk::Main::init() called twice");
-  }
-  else
-  {
-    init_gtkmm_internals();
-    instance_ = this;
-
-    //This reimplements some stuff from gtk_init_with_options(),
-    //without calling check_setugid(), because that is not public API.
-
-    add_gtk_option_group(option_context);
-
-    option_context.parse(argc, argv);
   }
 }
 
@@ -142,15 +107,6 @@ void Main::init_gtkmm_internals()
 
     init_done = true;
   }
-}
-
-void Main::add_gtk_option_group(Glib::OptionContext& option_context, bool open_default_display)
-{
-  //Get the option group:
-  Glib::OptionGroup gtkgroup( gtk_get_option_group(open_default_display) ); //Takes ownership of the GOptionGroup.
-
-  //Give it to the option_context, which will also then own the underlying GOptionGroup, deleting it when necessary:
-  option_context.add_group(gtkgroup);
 }
 
 _DEPRECATE_IFDEF_START

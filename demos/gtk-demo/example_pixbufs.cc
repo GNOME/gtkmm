@@ -98,8 +98,6 @@ Example_Pixbufs::Example_Pixbufs()
     Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
     dialog.run();
   }
-
-  show_all();
 }
 
 Example_Pixbufs::~Example_Pixbufs()

@@ -62,8 +62,6 @@ Example_FlowBox::Example_FlowBox()
   // Layout
   m_scrolled_window.add(m_flow_box);
   add(m_scrolled_window);
-
-  show_all_children();
 }
 
 Example_FlowBox::~Example_FlowBox()

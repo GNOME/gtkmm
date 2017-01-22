@@ -33,8 +33,6 @@ MyWindow::MyWindow()
   m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
   m_Box.pack_start(m_Button);
   add(m_Box);
-
-  show_all_children();
 }
 
 void MyWindow::on_button_clicked()

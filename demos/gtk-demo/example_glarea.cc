@@ -100,8 +100,6 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_VBox.add(m_Button);
   // Connect clicked to close of window
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Gtk::Window::close));
-
-  show_all();
 }
 
 Example_GLArea::~Example_GLArea()

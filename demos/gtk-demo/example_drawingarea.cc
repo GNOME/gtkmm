@@ -108,7 +108,6 @@ Example_DrawingArea::Example_DrawingArea()
                                     Gdk::BUTTON_PRESS_MASK |
                                     Gdk::POINTER_MOTION_MASK |
                                     Gdk::STRUCTURE_MASK);
-  show_all();
 }
 
 Example_DrawingArea::~Example_DrawingArea()

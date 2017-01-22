@@ -15,7 +15,6 @@ class Dlg : public sigc::trackable
       dlg_->get_content_area()->pack_start(*btn);
       dlg_->add_button("_OK", Gtk::RESPONSE_OK);
       dlg_->signal_response().connect(sigc::mem_fun(*this, &Dlg::on_response));
-      dlg_->show_all();
     }
 
     ~Dlg()

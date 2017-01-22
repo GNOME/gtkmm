@@ -140,8 +140,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   }
 
   initialize_displays();
-
-  show_all();
 }
 
 Example_ChangeDisplay::~Example_ChangeDisplay()
@@ -222,8 +220,6 @@ void Example_ChangeDisplay::on_button_display_open()
   dialog.get_content_area()->add(entry);
 
   entry.grab_focus();
-
-  dialog.show_all_children();
 
   Glib::RefPtr<Gdk::Display> refResult;
   while (!refResult)
@@ -383,8 +379,6 @@ Popup::Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& promp
 
   m_Label.property_margin() = 10;
   m_Frame.add(m_Label);
-
-  show_all_children();
 }
 
 Popup::~Popup()

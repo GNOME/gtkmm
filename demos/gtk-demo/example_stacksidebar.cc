@@ -75,8 +75,6 @@ Example_StackSidebar::Example_StackSidebar()
     }
     m_Stack.add(*widget, m_page_names[i], m_page_names[i]);
   }
-
-  show_all();
 }
 
 Example_StackSidebar::~Example_StackSidebar()

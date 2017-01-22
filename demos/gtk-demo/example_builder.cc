@@ -112,8 +112,6 @@ Example_Builder::Example_Builder(
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_F7, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
-
-  show_all();
 }
 
 Example_Builder::~Example_Builder()
