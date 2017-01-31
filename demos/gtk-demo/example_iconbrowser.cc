@@ -200,8 +200,8 @@ Example_IconBrowser::Example_IconBrowser()
   m_header.pack_end(m_header_radio_button_box);
   m_header_radio_button_box.pack_start(m_normal_radio);
   m_header_radio_button_box.pack_start(m_symbolic_radio);
-  m_normal_radio.set_mode(false); // Make it look as a normal button
-  m_symbolic_radio.set_mode(false);
+  m_normal_radio.set_draw_indicator(false); // Make it look as a normal button
+  m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
 
   m_button_size_group = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_VERTICAL);
