@@ -43,9 +43,8 @@ ExampleWindow::~ExampleWindow()
 
 int main(int argc, char* argv[])
 {
-   Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   ExampleWindow window;
-  return app->run(window);
+  return app->run(window, argc, argv);
 }

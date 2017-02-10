@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
     argc1 = 1; // Don't give the command line arguments to Gtk::Application.
   }
 
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc1, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_string(gladefile);
 
@@ -166,15 +166,15 @@ int main(int argc, char* argv[])
   const GObject* const derived_button = (GObject*)main_win->get_derived_button()->gobj();
   const GObject* const standard_button = (GObject*)main_win->get_standard_button()->gobj();
 
-  std::cout << "Before app->run(*main_win)" << std::endl
+  std::cout << "Before app->run(*main_win, argc1, argv)" << std::endl
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
     << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
 
-  const int result = app->run(*main_win);
+  const int result = app->run(*main_win, argc1, argv);
 
-  std::cout << "After app->run(*main_win)" << std::endl
+  std::cout << "After app->run(*main_win, argc1, argv)" << std::endl
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl

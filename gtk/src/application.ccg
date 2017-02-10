@@ -93,23 +93,12 @@ Application::Application(const Glib::ustring& application_id, Gio::ApplicationFl
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
   //Note that GApplication complains about "" but allows nullptr, so we avoid passing "".
   Glib::ObjectBase(nullptr),
-  Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? nullptr : application_id.c_str()), "flags", GApplicationFlags(flags), nullptr)),
-  m_argc(0),
-  m_argv(nullptr)
+  Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? nullptr : application_id.c_str()), "flags", GApplicationFlags(flags), nullptr))
 {
-  gtk_init();
-  set_cxx_locale_to_c_locale();
-}
-
-Application::Application(int& argc, char**& argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags)
-:
-  // Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  //Note that GApplication complains about "" but allows nullptr, so we avoid passing "".
-  Glib::ObjectBase(nullptr),
-  Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? nullptr : application_id.c_str()), "flags", GApplicationFlags(flags), nullptr)),
-  m_argc(argc),
-  m_argv(argv)
-{
+  // gtk_init() is called by the 'startup' default signal handler when g_application_run() is called.
+  // It's also called here, to make it possible for users of gtkmm to create
+  // a window and other widgets before calling run().
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=639925
   gtk_init();
   set_cxx_locale_to_c_locale();
 }
@@ -117,11 +106,6 @@ Application::Application(int& argc, char**& argv, const Glib::ustring& applicati
 Glib::RefPtr<Application> Application::create(const Glib::ustring& application_id, Gio::ApplicationFlags flags)
 {
   return Glib::RefPtr<Application>( new Application(application_id, flags) );
-}
-
-Glib::RefPtr<Application> Application::create(int& argc, char**& argv, const Glib::ustring& application_id, Gio::ApplicationFlags flags)
-{
-  return Glib::RefPtr<Application>( new Application(argc, argv, application_id, flags) );
 }
 
 void Application::on_window_hide(Window* window)
@@ -177,13 +161,13 @@ int Application::run(Window& window)
       sigc::mem_fun(*this, &Application::on_activate_add_and_show_main_window),
       &window));
 
-  const auto result = Gio::Application::run(m_argc, m_argv);
+  const auto result = Gio::Application::run(0, nullptr);
   return result;
 }
 
 int Application::run()
 {
-  const auto result = Gio::Application::run(m_argc, m_argv);
+  const auto result = Gio::Application::run(0, nullptr);
   return result;
 }
 

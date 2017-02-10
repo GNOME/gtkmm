@@ -1,5 +1,3 @@
-//$Id$ -*- c++ -*-
-
 /* gtkmm example Copyright (C) 2002 gtkmm development team
  *
  * This program is free software; you can redistribute it and/or modify
@@ -103,8 +101,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    Glib::RefPtr<Gtk::Application> app =
-      Gtk::Application::create(argc, argv);
+    Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
     //Here we can see the parsed values of our custom command-line arguments:
 
@@ -126,7 +123,7 @@ int main(int argc, char *argv[])
     //Any standard GTK+ command-line arguments will have an effect on this window:
     //Try --name="bobble" to change the window's title to "bobble", for instance.
     Gtk::Window testWindow;
-    return app->run(testWindow); //Shows the window and returns when it is closed.
+    return app->run(testWindow, argc, argv); //Shows the window and returns when it is closed.
   }
   catch(const Glib::Error& ex)
   {

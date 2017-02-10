@@ -55,10 +55,11 @@ protected:
   DerivedScrolledWindow m_ScrolledWindow;
 };
 
-int main ( int argc, char *argv[] ) {
-
-  Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv);
+int main (int /* argc */, char** /* argv */)
+{
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   Instance instance;
+
+  return 0;
 }

@@ -18,10 +18,9 @@ void on_object_qdata_destroyed(gpointer data)
   g_warning("on_object_qdata_destroyed():  c instance=%p", (void*)data);
 }
 
-int main(int argc, char**argv)
+int main (int /* argc */, char** /* argv */)
 {
-  Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   Gtk::Dialog* pDialog = new Gtk::Dialog();
   Gtk::Box* pBox = pDialog->get_content_area();
@@ -36,4 +35,6 @@ int main(int argc, char**argv)
   delete pDialog;
 
   g_warning("after delete");
+
+  return 0;
 }

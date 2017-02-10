@@ -1,5 +1,3 @@
-//$Id$ -*- c++ -*-
-
 /* gtkmm example Copyright (C) 2002 gtkmm development team
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,9 +19,8 @@
 
 int main(int argc, char *argv[])
 {
-  Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   TestWindow testWindow;
-  return app->run(testWindow); //Shows the window and returns when it is closed.
+  return app->run(testWindow, argc, argv); //Shows the window and returns when it is closed.
 }

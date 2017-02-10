@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* main.cc
  *
  * Copyright (C) 2001-2002 The gtkmm Development Team
@@ -24,10 +22,9 @@
 
 int main (int argc, char *argv[])
 {
-  Glib::RefPtr<Gtk::Application> app =
-    Gtk::Application::create(argc, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
 
   DemoWindow window;
 
-  return app->run(window);
+  return app->run(window, argc, argv);
 }
