@@ -24,7 +24,7 @@ namespace Gtk
 namespace AccelMap
 {
 
-void add_entry(const std::string& accel_path,
+void add_entry(const Glib::ustring& accel_path,
                guint accel_key,
                Gdk::ModifierType accel_mods)
 {
@@ -32,7 +32,7 @@ void add_entry(const std::string& accel_path,
                             (GdkModifierType)accel_mods);
 }
 
-bool change_entry(const std::string& accel_path,
+bool change_entry(const Glib::ustring& accel_path,
                   guint accel_key,
                   Gdk::ModifierType accel_mods,
                   bool replace)
@@ -51,12 +51,12 @@ void save(const std::string& filename)
   gtk_accel_map_save(filename.c_str());
 }
 
-void lock_path(const std::string& accel_path)
+void lock_path(const Glib::ustring& accel_path)
 {
   gtk_accel_map_lock_path(accel_path.c_str());
 }
 
-void unlock_path(const std::string& accel_path)
+void unlock_path(const Glib::ustring& accel_path)
 {
   gtk_accel_map_unlock_path(accel_path.c_str());
 }

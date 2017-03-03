@@ -31,8 +31,6 @@ namespace Gtk
 namespace AccelMap
 {
 
-//TODO: Why is the accel_path a std::string, instead of a Glib::ustring? murrayc.
-
 /** Registers a new accelerator with the global accelerator map.
  * This function should only be called once per accel_path
  * with the canonical accel_key and accel_mods for this path.
@@ -53,7 +51,7 @@ namespace AccelMap
  * @param accel_mods the accelerator modifiers
  *
  */
-void add_entry(const std::string& accel_path,
+void add_entry(const Glib::ustring& accel_path,
                guint accel_key,
                Gdk::ModifierType accel_mods);
 
@@ -70,7 +68,7 @@ void add_entry(const std::string& accel_path,
  * @param replace     true if other accelerators may be deleted upon conflicts
  * @result     true if the accelerator could be changed, false otherwise
  */
-bool change_entry(const std::string& accel_path,
+bool change_entry(const Glib::ustring& accel_path,
                   guint accel_key,
                   Gdk::ModifierType accel_mods,
                   bool replace);
@@ -107,7 +105,7 @@ void save(const std::string& filename);
  *
  * @newin{2,4}
  */
-void lock_path(const std::string& accel_path);
+void lock_path(const Glib::ustring& accel_path);
 
 /** Unlocks the given accelerator path. Refer to gtk_accel_map_lock_path()
  * about accelerator path locking.
@@ -116,7 +114,7 @@ void lock_path(const std::string& accel_path);
  *
  * @newin{2,4}
  */
-void unlock_path(const std::string& accel_path);
+void unlock_path(const Glib::ustring& accel_path);
 
 /** Looks up the accelerator entry for accel_path.
  * @param accel_path A valid accelerator path.
