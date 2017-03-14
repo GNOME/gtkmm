@@ -891,7 +891,7 @@ const int DetailDialog::m_icon_size[n_icon_sizes] = { 16, 24, 32, 48, 64 };
 
 // Definition of detail dialog methods.
 DetailDialog::DetailDialog(Gtk::Window& parent)
-: Gtk::Dialog("", parent, Gtk::DIALOG_MODAL | Gtk::DIALOG_USE_HEADER_BAR)
+: Gtk::Dialog("", parent, true, true)
 {
   set_resizable(false);
   Gtk::Box* content_area = get_content_area();
