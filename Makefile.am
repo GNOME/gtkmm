@@ -43,11 +43,11 @@ nodist_gtkmm_libinclude_HEADERS = gtk/gtkmmconfig.h
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
 
-include $(srcdir)/MSVC_Net2013/filelist.am
+include $(srcdir)/MSVC_Net2017/filelist.am
 include $(srcdir)/win32_installer/filelist.am
 
 text_files = COPYING.tools PORTING README.SUN README.win32
-msvc_files = $(addprefix MSVC_Net2013/,$(msvc_net2013_data))
+msvc_files = $(addprefix MSVC_Net2017/,$(msvc_net2017_data))
 winstall_files = $(addprefix win32_installer/,$(windows_installer_files))
 
 dist_noinst_DATA = $(text_files) $(msvc_files) $(winstall_files)
