@@ -31,6 +31,7 @@ check_PROGRAMS =			\
 	property_notification/test	\
 	refcount_dialog/test		\
 	scrolledwindow/test		\
+	tree_model_iterator/test \
 	wrap_existing/test
 
 TESTS =	object_move/test \
@@ -51,6 +52,7 @@ object_move_test_SOURCES           = object_move/main.cc
 property_notification_test_SOURCES = property_notification/main.cc
 refcount_dialog_test_SOURCES       = refcount_dialog/main.cc
 scrolledwindow_test_SOURCES        = scrolledwindow/main.cc
+tree_model_iterator_test_SOURCES   = tree_model_iterator/main.cc
 wrap_existing_test_SOURCES         = wrap_existing/main.cc
 
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
