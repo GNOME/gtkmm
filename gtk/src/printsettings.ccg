@@ -19,7 +19,6 @@
 
 #include <gtk/gtk.h>
 #include <glib.h>
-#include <memory> // std::unique_ptr
 
 namespace // anonymous
 {
@@ -125,26 +124,18 @@ std::vector<PageRange> PrintSettings::get_page_ranges() const
   GtkPageRange* page_ranges =
     gtk_print_settings_get_page_ranges(const_cast<GtkPrintSettings*>(gobj()), &num_ranges);
 
-  std::vector<PageRange> cpp_ranges;
-  for (int i = 0; i < num_ranges; ++i)
-    cpp_ranges.emplace_back(page_ranges[i].start, page_ranges[i].end);
-
-  // gtk_print_settings_get_page_ranges() gives us a copy. Free page_ranges!
-  g_free(page_ranges);
-  return cpp_ranges;
+  // We get a copy of page_ranges. Logically our ownership is deep, but
+  // since page_ranges contains elements instead of pointers to elements,
+  // ArrayHandler shall delete only the container. Thus OWNERSHIP_SHALLOW.
+  return Glib::ArrayHandler<PageRange, PageRangeTraits>::array_to_vector(
+    page_ranges, num_ranges, Glib::OWNERSHIP_SHALLOW);
 }
 
 void PrintSettings::set_page_ranges(const std::vector<PageRange>& page_ranges)
 {
-  // gtk_print_settings_set_page_ranges() does not take ownership of c_ranges.
-  // std::unique_ptr will delete it.
-  std::unique_ptr<GtkPageRange[]> c_ranges(new GtkPageRange[page_ranges.size()]);
-  for (std::size_t i = 0; i < page_ranges.size(); ++i)
-  {
-    c_ranges[i].start = page_ranges[i].start;
-    c_ranges[i].end = page_ranges[i].end;
-  }
-  gtk_print_settings_set_page_ranges(gobj(), c_ranges.get(), page_ranges.size());
+  gtk_print_settings_set_page_ranges(gobj(),
+    Glib::ArrayHandler<PageRange, PageRangeTraits>::vector_to_array(page_ranges).data(),
+    page_ranges.size());
 }
 
 bool PrintSettings::load_from_key_file(const Glib::KeyFile& key_file)

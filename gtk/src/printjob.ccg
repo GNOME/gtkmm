@@ -62,17 +62,16 @@ std::vector<PageRange> PrintJob::get_page_ranges() const
   const GtkPageRange* page_ranges =
     gtk_print_job_get_page_ranges(const_cast<GtkPrintJob*>(gobj()), &num_ranges);
 
-  std::vector<PageRange> cpp_ranges;
-  for (int i = 0; i < num_ranges; ++i)
-    cpp_ranges.emplace_back(page_ranges[i].start, page_ranges[i].end);
-
-  // gtk_print_job_get_page_ranges() does not give us a copy. Don't free page_ranges!
-  return cpp_ranges;
+  // We don't get a copy of page_ranges. Don't delete it.
+  return Glib::ArrayHandler<PageRange, PageRangeTraits>::array_to_vector(
+    page_ranges, num_ranges, Glib::OWNERSHIP_NONE);
 }
 
 void PrintJob::set_page_ranges(const std::vector<PageRange>& page_ranges)
 {
   // gtk_print_job_set_page_ranges() will take ownership of c_ranges, and free it with g_free().
+  // This is unusual. ArrayHandler::vector_to_array() can't be used.
+  // It does not take a Glib::OwnershipType parameter.
   GtkPageRange* c_ranges = g_new0(GtkPageRange, page_ranges.size());
   for (std::size_t i = 0; i < page_ranges.size(); ++i)
   {
