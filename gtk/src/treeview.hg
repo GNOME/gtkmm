@@ -70,7 +70,7 @@ namespace TreeView_Private
   void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path_string, const Glib::ustring& new_text, int model_column, const Glib::RefPtr<Gtk::TreeModel>& model);
 
   template <class ColumnType> inline
-  void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter, int model_column, const Glib::ustring& format);
+  void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter, int model_column, const Glib::ustring& format);
 }
 
 #endif //DOXYGEN_SHOULD_SKIP_THIS
@@ -690,9 +690,9 @@ public:
    * A common way to implement this is to have a boolean column in the model, whose values the slot returns.
    *
    * For instance,
-   * bool on_row_separator(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::iterator& iter);
+   * bool on_row_separator(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::const_iterator& iter);
    */
-  typedef sigc::slot<bool(const Glib::RefPtr<TreeModel>&, const TreeModel::iterator&)> SlotRowSeparator;
+  typedef sigc::slot<bool(const Glib::RefPtr<TreeModel>&, const TreeModel::const_iterator&)> SlotRowSeparator;
 
   /** Sets the row separator function, which is used to determine whether a row should be drawn as a separator.
    */
@@ -872,7 +872,7 @@ int TreeView::append_column_numeric(const Glib::ustring& title, const TreeModelC
 
 
   //Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
-  typedef void (*type_fptr)(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter, int model_column, const Glib::ustring& format);
+  typedef void (*type_fptr)(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter, int model_column, const Glib::ustring& format);
   type_fptr fptr = TreeView_Private::_auto_cell_data_func<ColumnType>;
 
   //Connect a cell_data callback, to show the number's text representation in the specified format:
@@ -1138,7 +1138,7 @@ void _auto_store_on_cellrenderer_text_edited_string(const Glib::ustring& path_st
   //Get the row from the path:
   if(model)
   {
-    Gtk::TreeModel::iterator iter = model->get_iter(path);
+    auto iter = model->get_iter(path);
     if(iter)
     {
         //Store the user's new text in the model:
@@ -1158,7 +1158,7 @@ void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path
   //Get the row from the path:
   if(model)
   {
-    Gtk::TreeModel::iterator iter = model->get_iter(path);
+    auto iter = model->get_iter(path);
     if(iter)
     {
       //std::istringstream astream(new_text); //Put it in a stream.
@@ -1185,7 +1185,7 @@ void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path
 }
 
 template <class ColumnType> inline
-void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterator& iter, int model_column, const Glib::ustring& format)
+void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter, int model_column, const Glib::ustring& format)
 {
   Gtk::CellRendererText* pTextRenderer = dynamic_cast<Gtk::CellRendererText*>(cell);
   if(!pTextRenderer)
@@ -1197,7 +1197,7 @@ void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::iterato
     if(iter)
     {
       //Get the value from the model.
-      Gtk::TreeModel::Row row = *iter;
+      const auto row = *iter;
       ColumnType value = ColumnType();
       row.get_value(model_column, value);
 
