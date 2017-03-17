@@ -168,7 +168,7 @@ void Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo
 
 bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfigure*)
 {
-  const Gtk::Allocation allocation = m_DrawingArea_Scribble.get_allocation();
+  const auto allocation = m_DrawingArea_Scribble.get_allocation();
   m_surface =
     m_DrawingArea_Scribble.get_window()->create_similar_surface(
       Cairo::CONTENT_COLOR, allocation.get_width(), allocation.get_height());
@@ -201,7 +201,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
     if(refWindow)
     {
       int x = 0, y = 0;
-      Gdk::ModifierType state = Gdk::ModifierType(0);
+      auto state = Gdk::ModifierType(0);
       const Glib::RefPtr<const Gdk::Device> device =
         Glib::wrap(motion_event->device, true); // true == take_copy
       refWindow->get_device_position(device, x, y, state);

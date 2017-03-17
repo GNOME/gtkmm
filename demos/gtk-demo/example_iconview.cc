@@ -184,19 +184,19 @@ void Example_IconView::fill_store()
   {
     Glib::Dir dir(m_parent); //throws an exception if it fails.
 
-    std::string name = dir.read_name();
+    auto name = dir.read_name();
     while(!name.empty())
     {
       /* We ignore hidden files that start with a '.' */
       if (name[0] != '.')
       {
-        std::string path = Glib::build_filename(m_parent, name);
+        auto path = Glib::build_filename(m_parent, name);
         bool is_dir = Glib::file_test(path, Glib::FILE_TEST_IS_DIR);
 
-        Glib::ustring display_name = Glib::filename_to_utf8(name);
+        auto display_name = Glib::filename_to_utf8(name);
 
-        Gtk::TreeModel::iterator iter = m_model->append();
-        Gtk::TreeModel::Row row = *iter;
+        auto iter = m_model->append();
+        auto row = *iter;
         row[m_columns.path] = path;
         row[m_columns.display_name] = display_name;
         row[m_columns.is_directory] = is_dir;
@@ -215,10 +215,10 @@ void Example_IconView::fill_store()
 
 void Example_IconView::on_iconview_item_activated(const Gtk::TreeModel::Path& path)
 {
-  Gtk::TreeModel::iterator iter = m_model->get_iter(path);
+  auto iter = m_model->get_iter(path);
   if(iter)
   {
-    Gtk::TreeModel::Row row = *iter;
+    auto row = *iter;
     const bool is_dir = row[m_columns.is_directory];
     const std::string filepath = row[m_columns.path];
     if(is_dir)

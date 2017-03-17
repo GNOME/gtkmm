@@ -120,7 +120,7 @@ void DemoWindow::fill_tree()
    */
   for(Demo* d = testgtk_demos; d && d->title; ++d)
   {
-    Gtk::TreeRow row = *(m_refTreeStore->append());
+    auto row = *(m_refTreeStore->append());
 
     row[columns.title]    = d->title;
     row[columns.filename] = d->filename;
@@ -129,7 +129,7 @@ void DemoWindow::fill_tree()
 
     for(Demo* child = d->children; child && child->title; ++child)
     {
-      Gtk::TreeRow child_row = *(m_refTreeStore->append(row.children()));
+      auto child_row = *(m_refTreeStore->append(row.children()));
 
       child_row[columns.title]    = child->title;
       child_row[columns.filename] = child->filename;
@@ -162,7 +162,7 @@ void DemoWindow::on_run_button_clicked()
 {
   if(m_pWindow_Example == nullptr) //Don't open a second window.
   {
-    if(const Gtk::TreeModel::iterator iter = m_refTreeSelection->get_selected())
+    if(const auto iter = m_refTreeSelection->get_selected())
     {
       m_TreePath = m_refTreeStore->get_path(iter);
 
@@ -177,7 +177,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
 
   if(m_pWindow_Example == nullptr) //Don't open a second window.
   {
-    if(const Gtk::TreeModel::iterator iter = m_TreeView.get_model()->get_iter(m_TreePath))
+    if(const auto iter = m_TreeView.get_model()->get_iter(m_TreePath))
     {
       run_example(*iter);
     }
@@ -202,16 +202,16 @@ void DemoWindow::run_example(Gtk::TreeModel::Row& row)
 bool DemoWindow::select_function(const Glib::RefPtr<Gtk::TreeModel>& model,
                                  const Gtk::TreeModel::Path& path, bool)
 {
-  const Gtk::TreeModel::iterator iter = model->get_iter(path);
+  const auto iter = model->get_iter(path);
   return iter->children().empty(); // only allow leaf nodes to be selected
 }
 
 void DemoWindow::on_treeselection_changed()
 {
-  if(const Gtk::TreeModel::iterator iter = m_refTreeSelection->get_selected())
+  if(const auto iter = m_refTreeSelection->get_selected())
   {
-    const Glib::ustring filename = (*iter)[demo_columns().filename];
-    const Glib::ustring title = (*iter)[demo_columns().title];
+    const auto filename = (*iter)[demo_columns().filename];
+    const auto title = (*iter)[demo_columns().title];
 
     load_file(Glib::filename_from_utf8(filename));
     m_HeaderBar.set_title(title);
@@ -255,7 +255,7 @@ void DemoWindow::load_file(const std::string& filename)
 
     int state = 0;
     bool in_para = false;
-    Gtk::TextBuffer::iterator start = refBufferInfo->get_iter_at_offset(0);
+    auto start = refBufferInfo->get_iter_at_offset(0);
     for (int i = 0; lines[i] != NULL; i++)
     {
       /* Make sure \r is stripped at the end for the poor windows people */
@@ -286,7 +286,7 @@ void DemoWindow::load_file(const std::string& filename)
 
       	  if (q > p)
     	    {
-    	      Gtk::TextBuffer::iterator end = start;
+    	      auto end = start;
 
             const Glib::ustring strTemp (p, q);
     	      end = refBufferInfo->insert(end, strTemp);
@@ -383,7 +383,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
   }
   for (unsigned int i = 0; i < resources.size(); ++i)
   {
-    const std::string resource_name = resource_dir + "/" + resources[i];
+    const auto resource_name = resource_dir + "/" + resources[i];
     Gtk::Widget* widget = nullptr;
     Gtk::Image* image = new Gtk::Image();
     image->set_from_resource(resource_name);
@@ -442,7 +442,7 @@ void DemoWindow::on_example_window_hide()
 {
   if(m_pWindow_Example)
   {
-    if(const Gtk::TreeModel::iterator iter = m_refTreeStore->get_iter(m_TreePath))
+    if(const auto iter = m_refTreeStore->get_iter(m_TreePath))
     {
       (*iter)[demo_columns().italic] = false;
 

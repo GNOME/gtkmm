@@ -14,7 +14,7 @@ test_const_conversion() {
 static void
 test_assignment_from_const() {
   Gtk::TreeModel::iterator non_const_iter;
-  Gtk::TreeModel::const_iterator const_iter = non_const_iter;
+  auto const_iter = non_const_iter;
   assert(const_iter == non_const_iter);
 }
 
@@ -26,7 +26,7 @@ static void
 test_assignment_to_const() {
   Gtk::TreeModel::const_iterator const_iter;
   // This should not compile:
-  Gtk::TreeModel::iterator non_const_iter = const_iter;
+  auto non_const_iter = const_iter;
   assert(const_iter == non_const_iter);
 }
 */

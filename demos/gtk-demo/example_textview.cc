@@ -184,7 +184,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
    * iterator to point to just after the inserted text.
    */
 
-  Gtk::TextBuffer::iterator iter = refBuffer->get_iter_at_offset(0);
+  auto iter = refBuffer->get_iter_at_offset(0);
 
   iter = refBuffer->insert(iter, "The text widget can display text with all kinds of nifty attributes. It also supports multiple views of the same buffer; this demo is showing the same buffer in two places.\n\n");
   iter = refBuffer->insert_with_tag(iter, "Font styles. ", "heading");
@@ -375,8 +375,8 @@ bool Example_TextView::find_anchor(Gtk::TextBuffer::iterator& iter)
 
 void Example_TextView::attach_widgets(Gtk::TextView& text_view)
 {
-  Glib::RefPtr<Gtk::TextBuffer> refBuffer = text_view.get_buffer();
-  Gtk::TextBuffer::iterator iter = refBuffer->begin();
+  auto refBuffer = text_view.get_buffer();
+  auto iter = refBuffer->begin();
 
   int i = 0;
   while(find_anchor(iter)) //previously created with create_child_anchor().
@@ -440,8 +440,8 @@ Window_EasterEgg::Window_EasterEgg()
 {
   set_default_size(300, 400);
 
-  Glib::RefPtr<Gtk::TextBuffer> refBuffer = Gtk::TextBuffer::create();
-  Gtk::TextBuffer::iterator iter = refBuffer->end();
+  auto refBuffer = Gtk::TextBuffer::create();
+  auto iter = refBuffer->end();
 
   iter = refBuffer->insert(iter, "This buffer is shared by a set of nested text views.\n Nested view:\n");
   Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = refBuffer->create_child_anchor(iter);

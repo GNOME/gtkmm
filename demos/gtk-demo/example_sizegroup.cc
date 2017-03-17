@@ -116,7 +116,7 @@ Example_SizeGroup::~Example_SizeGroup()
 
 void Example_SizeGroup::on_checkbutton_toggled()
 {
-  Gtk::SizeGroupMode new_mode = Gtk::SIZE_GROUP_HORIZONTAL;
+  auto new_mode = Gtk::SIZE_GROUP_HORIZONTAL;
 
   if(m_CheckButton.get_active())
     new_mode = Gtk::SIZE_GROUP_HORIZONTAL;

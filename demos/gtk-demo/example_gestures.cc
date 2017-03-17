@@ -90,7 +90,7 @@ void Example_Gestures::on_drawing_area_draw(const ::Cairo::RefPtr< ::Cairo::Cont
 
   if (m_GestureRotate->is_recognized() || m_GestureZoom->is_recognized())
   {
-    Cairo::Matrix matrix = Cairo::translation_matrix(xc, yc);
+    auto matrix = Cairo::translation_matrix(xc, yc);
     cr->save();
 
     const double angle = m_GestureRotate->get_angle_delta();

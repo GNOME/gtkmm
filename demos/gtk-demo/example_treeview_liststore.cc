@@ -159,7 +159,7 @@ void Example_TreeView_ListStore::create_model()
 
 void Example_TreeView_ListStore::liststore_add_item(const CellItem_Bug& foo)
 {
-  Gtk::TreeRow row = *(m_refListStore->append());
+  auto row = *(m_refListStore->append());
 
   row[m_columns.fixed]       = foo.m_fixed;
   row[m_columns.number]      = foo.m_number;

@@ -179,7 +179,7 @@ void Example_ChangeDisplay::initialize_displays()
 
   for(auto refDisplay : refDisplayManager->list_displays())
   {
-    Gtk::TreeRow row = *(m_refListStore_Display->append());
+    auto row = *(m_refListStore_Display->append());
     row[m_columns_display.m_name] = refDisplay->get_name();;
     row[m_columns_display.m_display] = refDisplay;
 
@@ -228,7 +228,7 @@ void Example_ChangeDisplay::on_button_display_open()
     if (response_id != Gtk::RESPONSE_OK)
       break;
 
-    Glib::ustring new_screen_name = entry.get_text();
+    auto new_screen_name = entry.get_text();
 
     if( !new_screen_name.empty() )
     {
@@ -250,7 +250,7 @@ void Example_ChangeDisplay::on_button_display_close()
 void Example_ChangeDisplay::on_treeview_display_selection_changed()
 {
   Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView_Display.get_selection();
-  Gtk::TreeModel::iterator iter = refSelection->get_selected();
+  auto iter = refSelection->get_selected();
   if(iter)
     m_refCurrentDisplay = (*iter)[m_columns_display.m_display];
   else
@@ -310,7 +310,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
   //TODO: Find a suitable replacement for this:
   //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
   //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
-  const Gdk::GrabStatus grabbed = Gdk::GRAB_SUCCESS;
+  const auto grabbed = Gdk::GRAB_SUCCESS;
   if(grabbed == Gdk::GRAB_SUCCESS )
   {
     m_popup_clicked = false;

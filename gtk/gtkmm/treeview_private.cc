@@ -36,7 +36,7 @@ void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell
   try
   {
     // use Slot::operator()
-    Gtk::TreeModel::iterator cppiter = Gtk::TreeModel::iterator(model, iter);
+    auto cppiter = Gtk::TreeModel::iterator(model, iter);
     if(!cppiter.get_model_gobject())
     {
       g_warning("SignalProxy_CellData_gtk_callback() The cppiter has no model\n");

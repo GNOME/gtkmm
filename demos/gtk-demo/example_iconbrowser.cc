@@ -305,8 +305,8 @@ void Example_IconBrowser::on_context_list_selected_rows_changed()
 
 void Example_IconBrowser::on_icon_view_item_activated(const Gtk::TreeModel::Path& path)
 {
-  Gtk::TreeModel::iterator iter = m_filter_model->get_iter(path);
-  Gtk::TreeModel::Row row = *iter;
+  auto iter = m_filter_model->get_iter(path);
+  const auto row = *iter;
   const Glib::ustring name = row[m_store->get_text_column()];
   const Glib::ustring description = row[m_store->m_columns.description];
   if (name.empty() || !Gtk::IconTheme::get_default()->has_icon(name))
@@ -327,7 +327,7 @@ bool Example_IconBrowser::on_icon_view_query_tooltip(int x, int y,
   if (!m_icon_view.get_tooltip_context_iter(x, y, keyboard_tooltip, iter))
     return false;
 
-  Gtk::TreeModel::Row row = *iter;
+  const auto row = *iter;
   const Glib::ustring description = row[m_store->m_columns.description];
   if (description.empty())
     return false;
@@ -845,16 +845,16 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
 void Example_IconBrowser::add_icon(const Glib::ustring& name,
   const Glib::ustring& description, const Glib::ustring& context_id)
 {
-  Glib::ustring regular_name = name;
+  auto regular_name = name;
   if (!Gtk::IconTheme::get_default()->has_icon(regular_name))
     regular_name.clear();
 
-  Glib::ustring symbolic_name = name + "-symbolic";
+  auto symbolic_name = name + "-symbolic";
   if (!Gtk::IconTheme::get_default()->has_icon(symbolic_name))
     symbolic_name.clear();
 
   // Add a new row to the IconInfoStore (which is a ListStore).
-  Gtk::TreeModel::Row row = *(m_store->append());
+  auto row = *(m_store->append());
   row[m_store->m_columns.name] = regular_name;
   row[m_store->m_columns.symbolic_name] = symbolic_name;
   row[m_store->m_columns.description] = description;
@@ -872,12 +872,12 @@ bool Example_IconBrowser::is_icon_visible(const Gtk::TreeModel::const_iterator& 
   bool visible = false;
   if (search)
   {
-    const Glib::ustring search_text = m_search_entry.get_text();
+    const auto search_text = m_search_entry.get_text();
     visible = name.find(search_text) != std::string::npos;
   }
   else
   {
-    const Glib::ustring context_id = row[m_store->m_columns.context_id];
+    const auto context_id = row[m_store->m_columns.context_id];
     visible = context_id == m_current_context_id;
   }
   return visible;
@@ -962,7 +962,7 @@ void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& 
 Glib::RefPtr<Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
 {
   Glib::RefPtr<Gtk::StyleContext> context = m_image[size_index].get_style_context();
-  Gtk::IconInfo info = Gtk::IconTheme::get_default()->lookup_icon(
+  auto info = Gtk::IconTheme::get_default()->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
   Glib::RefPtr<Gdk::Pixbuf> pixbuf;
   try
@@ -1006,7 +1006,7 @@ bool IconInfoStore::drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
     return false;
 
   const auto row = *iter;
-  const Glib::ustring name = row[m_text_column];
+  const auto name = row[m_text_column];
   selection_data.set_text(name);
   return true;
 }

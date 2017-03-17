@@ -111,7 +111,7 @@ void Example_Pixbufs::load_pixbufs()
   if(m_refPixbuf_Background)
     return; /* already loaded earlier */
 
-  std::string resource_name_background = std::string("/pixbufs/") + BACKGROUND_NAME;
+  auto resource_name_background = std::string("/pixbufs/") + BACKGROUND_NAME;
 
   m_refPixbuf_Background = Gdk::Pixbuf::create_from_resource(resource_name_background);
 
@@ -120,7 +120,7 @@ void Example_Pixbufs::load_pixbufs()
 
   for(unsigned i = 0; i < N_IMAGES; ++i)
   {
-    std::string resource_name = std::string("/pixbufs/") + image_names[i];
+    auto resource_name = std::string("/pixbufs/") + image_names[i];
 
     Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_resource(resource_name);
 

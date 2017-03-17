@@ -269,7 +269,7 @@ void Example_TreeView_TreeStore::create_model()
 
 #if 0 /* testing code: should work, try it out if you like */
 
-  Gtk::TreeIterChildren children = m_refTreeStore->children();
+  auto children = m_refTreeStore->children();
 
   for(auto node : children)
   {
@@ -287,7 +287,7 @@ void Example_TreeView_TreeStore::create_model()
 
 void Example_TreeView_TreeStore::treestore_add_item(const CellItem_Holiday& foo)
 {
-  Gtk::TreeRow row = *(m_refTreeStore->append());
+  auto row = *(m_refTreeStore->append());
 
   row[m_columns.holiday_name] = foo.m_label;
   row[m_columns.alex]         = foo.m_alex;
@@ -301,7 +301,7 @@ void Example_TreeView_TreeStore::treestore_add_item(const CellItem_Holiday& foo)
   //Add Children:
   for(const auto& child : foo.m_children)
   {
-    Gtk::TreeRow child_row = *(m_refTreeStore->append(row.children()));
+    auto child_row = *(m_refTreeStore->append(row.children()));
 
     child_row[m_columns.holiday_name] = child.m_label;
     child_row[m_columns.alex]         = child.m_alex;

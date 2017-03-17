@@ -144,7 +144,7 @@ void Example_AppWindow::on_text_changed()
   Glib::RefPtr<Gtk::TextBuffer> refBuffer = m_TextView.get_buffer();
   gint count = refBuffer->get_char_count();
 
-  Gtk::TextBuffer::iterator iter = refBuffer->get_iter_at_mark(refBuffer->get_insert());
+  auto iter = refBuffer->get_iter_at_mark(refBuffer->get_insert());
 
   gint row = iter.get_line();
   gint col = iter.get_line_offset();

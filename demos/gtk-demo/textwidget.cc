@@ -338,7 +338,7 @@ void TextWidget::fontify()
 
   iterStart = m_refTextBuffer->get_iter_at_offset(0);
 
-  Gtk::TextBuffer::iterator iterNext = iterStart;
+  auto iterNext = iterStart;
   while(iterNext.forward_line())
   {
     bool start = true;
