@@ -46,7 +46,7 @@ Example_AppWindow::Example_AppWindow()
     using namespace Gtk::Menu_Helpers;
 
     //File menu:
-    Gtk::Menu* pMenuFile = Gtk::manage( new Gtk::Menu() );
+    auto pMenuFile = Gtk::manage( new Gtk::Menu() );
     MenuList& list_file = pMenuFile->items();
     list_file.push_back( MenuElem("_New", "<control>N", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
     list_file.push_back( MenuElem("_Open", "<control>O", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
@@ -56,11 +56,11 @@ Example_AppWindow::Example_AppWindow()
     list_file.push_back( MenuElem("_Quit", "<control>Q", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
 
     //Preferences menu:
-    Gtk::Menu* pMenuPreferences = Gtk::manage( new Gtk::Menu() );
+    auto pMenuPreferences = Gtk::manage( new Gtk::Menu() );
     MenuList& list_preferences = pMenuPreferences->items();
 
     // Create a submenu
-    Gtk::Menu* pMenuSub_Color = Gtk::manage( new Gtk::Menu());
+    auto pMenuSub_Color = Gtk::manage( new Gtk::Menu());
     MenuList& list_sub = pMenuSub_Color->items();
     list_sub.push_back( MenuElem("_Red", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
     list_sub.push_back( MenuElem("_Green", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
@@ -69,7 +69,7 @@ Example_AppWindow::Example_AppWindow()
     list_preferences.push_back( MenuElem("_Color", *pMenuSub_Color) );
 
     // Create a submenu
-    Gtk::Menu* pMenuSub_Shape = Gtk::manage( new Gtk::Menu());
+    auto pMenuSub_Shape = Gtk::manage( new Gtk::Menu());
     list_sub = pMenuSub_Shape->items();
     list_sub.push_back( MenuElem("_Square", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
     list_sub.push_back( MenuElem("_Rectangle", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
@@ -78,7 +78,7 @@ Example_AppWindow::Example_AppWindow()
     list_preferences.push_back( MenuElem("_Shape", *pMenuSub_Shape) );
 
     //Help menu:
-    Gtk::Menu* pMenuHelp = Gtk::manage( new Gtk::Menu() );
+    auto pMenuHelp = Gtk::manage( new Gtk::Menu() );
     MenuList& list_help = pMenuHelp->items();
     list_help.push_back( MenuElem("_About", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
 
@@ -120,7 +120,7 @@ Example_AppWindow::Example_AppWindow()
   m_Grid.attach(m_Statusbar, 0,    3,   1,     1);
 
   /* Show text widget info in the statusbar */
-  Glib::RefPtr<Gtk::TextBuffer> refTextBuffer = m_TextView.get_buffer();
+  auto refTextBuffer = m_TextView.get_buffer();
   refTextBuffer->signal_changed().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_changed));
   refTextBuffer->signal_mark_set().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_mark_set));
   on_text_changed();
@@ -141,7 +141,7 @@ void Example_AppWindow::on_text_changed()
 {
   m_Statusbar.pop();
 
-  Glib::RefPtr<Gtk::TextBuffer> refBuffer = m_TextView.get_buffer();
+  auto refBuffer = m_TextView.get_buffer();
   gint count = refBuffer->get_char_count();
 
   auto iter = refBuffer->get_iter_at_mark(refBuffer->get_insert());

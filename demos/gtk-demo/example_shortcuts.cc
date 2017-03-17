@@ -26,7 +26,7 @@ protected:
 Gtk::Window* do_shortcuts()
 {
   // Load the XML file and instantiate its widgets:
-  Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create();
+  auto builder = Gtk::Builder::create();
   try
   {
     builder->add_from_resource("/shortcuts/example_shortcuts.ui");
@@ -102,7 +102,7 @@ Example_Shortcuts::~Example_Shortcuts()
 
 void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::ustring& view)
 {
-  Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create();
+  auto builder = Gtk::Builder::create();
   try
   {
     builder->add_from_resource("/shortcuts/example_" + id + ".ui");

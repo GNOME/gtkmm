@@ -76,7 +76,7 @@ test_window::test_window()
 
 int main(int argc, char *argv[])
 {
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
   test_window foo;
   return app->run(foo, argc, argv);
 }

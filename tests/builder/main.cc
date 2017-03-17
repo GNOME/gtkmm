@@ -150,9 +150,9 @@ int main(int argc, char* argv[])
     argc1 = 1; // Don't give the command line arguments to Gtk::Application.
   }
 
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
 
-  Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_string(gladefile);
+  auto builder = Gtk::Builder::create_from_string(gladefile);
 
   MainWindow* main_win = nullptr;
   builder->get_widget_derived("main_window", main_win);

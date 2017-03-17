@@ -164,7 +164,7 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
 
   /* create tree view */
   m_TreeView.set_model(m_refTreeStore);
-  Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = m_TreeView.get_selection();
+  auto refTreeSelection = m_TreeView.get_selection();
   refTreeSelection->set_mode(Gtk::SELECTION_MULTIPLE);
 
 
@@ -319,10 +319,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for holiday names */
   {
     int cols_count = m_TreeView.append_column("Holiday",  m_columns.holiday_name);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRenderer* pRenderer = pColumn->get_first_cell();
+      auto pRenderer = pColumn->get_first_cell();
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->set_clickable();
@@ -332,10 +332,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for Alex */
   {
     int cols_count = m_TreeView.append_column_editable("Alex", m_columns.alex);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
+      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
@@ -350,10 +350,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for Havoc */
   {
     int cols_count = m_TreeView.append_column_editable("Havoc", m_columns.havoc);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
+      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
@@ -367,10 +367,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for Tim */
   {
     int cols_count = m_TreeView.append_column_editable("Tim", m_columns.tim);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
+      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
@@ -385,10 +385,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for Owen */
   {
     int cols_count = m_TreeView.append_column_editable("Owen", m_columns.owen);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
+      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
@@ -402,10 +402,10 @@ void Example_TreeView_TreeStore::add_columns()
   /* column for Dave */
   {
     int cols_count = m_TreeView.append_column("Dave", m_columns.dave);
-    Gtk::TreeViewColumn* pColumn = m_TreeView.get_column(cols_count-1);
+    auto pColumn = m_TreeView.get_column(cols_count-1);
     if(pColumn)
     {
-      Gtk::CellRendererToggle* pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
+      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
       pRenderer->property_xalign().set_value(0.0);
 
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);

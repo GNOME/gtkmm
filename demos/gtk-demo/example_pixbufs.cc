@@ -122,7 +122,7 @@ void Example_Pixbufs::load_pixbufs()
   {
     auto resource_name = std::string("/pixbufs/") + image_names[i];
 
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_resource(resource_name);
+    auto pixbuf = Gdk::Pixbuf::create_from_resource(resource_name);
 
     m_images[i] = pixbuf;
   }

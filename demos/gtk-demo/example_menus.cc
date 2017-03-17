@@ -67,7 +67,7 @@ Example_Menus::Example_Menus()
 
   {
     //Note:: It's generally easier to use the Gtk::Builder API.
-    Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
+    auto pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
     pMenuItem->set_submenu( *(create_menu(2)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
@@ -88,7 +88,7 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_VBox_Sub1);
 
   {
-    Gtk::Menu* pMenu = create_menu(1);
+    auto pMenu = create_menu(1);
     pMenu->set_accel_group(get_accel_group());
 
     Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::SeparatorMenuItem());
@@ -133,7 +133,7 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
   if (depth < 1)
     return nullptr;
 
-  Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
+  auto pMenu = Gtk::manage(new Gtk::Menu());
 
   {
     Gtk::RadioMenuItem::Group radiogroup;
@@ -143,14 +143,14 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
       char buf[32];
       sprintf(buf, "item %2d - %d", depth, j);
 
-      Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::RadioMenuItem(radiogroup, buf));
+      auto pMenuItem = Gtk::manage(new Gtk::RadioMenuItem(radiogroup, buf));
       pMenu->append(*pMenuItem);
       pMenuItem->show();
 
       if(i == 3)
         pMenuItem->set_sensitive(false);
 
-      Gtk::Menu* pSubMenu = create_menu(depth - 1);
+      auto pSubMenu = create_menu(depth - 1);
       if(pSubMenu)
         pMenuItem->set_submenu(*pSubMenu);
     }

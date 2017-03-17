@@ -75,7 +75,7 @@ Example_TextView::Example_TextView()
    * by itself with refBuffer->new(), then later create
    * a view widget.
    */
-  Glib::RefPtr<Gtk::TextBuffer> refBuffer = m_View1.get_buffer();
+  auto refBuffer = m_View1.get_buffer();
   m_pView2 = Gtk::manage( new Gtk::TextView(refBuffer) );
 
   m_ScrolledWindow1.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -172,7 +172,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   try
   {
     refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
-    Glib::RefPtr<Gdk::Pixbuf> refScaled = refPixbuf->scale_simple(32, 32, Gdk::INTERP_BILINEAR);
+    auto refScaled = refPixbuf->scale_simple(32, 32, Gdk::INTERP_BILINEAR);
     refPixbuf = refScaled;
   }
   catch (const Glib::Error& error)
@@ -340,7 +340,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
   iter = refBuffer->insert(iter, "You can put widgets in the buffer: Here's a button: ");
 
-  Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = refBuffer->create_child_anchor(iter);
+  auto refAnchor = refBuffer->create_child_anchor(iter);
   iter = refBuffer->insert(refBuffer->end(), " and a menu: ");
   refAnchor = refBuffer->create_child_anchor(iter); //TODO: Maybe this should be a method of the Iterator.
   iter = refBuffer->insert(refBuffer->end(), " and a scale: ");
@@ -381,17 +381,17 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
   int i = 0;
   while(find_anchor(iter)) //previously created with create_child_anchor().
   {
-    Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = iter.get_child_anchor();
+    auto refAnchor = iter.get_child_anchor();
     Gtk::Widget* pWidget = nullptr;
     if (i == 0)
     {
-      Gtk::Button* pButton = Gtk::manage( new Gtk::Button("Click Me") );
+      auto pButton = Gtk::manage( new Gtk::Button("Click Me") );
       pButton->signal_clicked().connect(sigc::mem_fun(*this, &Example_TextView::on_button_clicked));
       pWidget = pButton;
     }
     else if (i == 1)
     {
-      Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
+      auto pCombo = Gtk::manage( new Gtk::ComboBoxText() );
       pCombo->append("Option 1");
       pCombo->append("Option 2");
       pCombo->append("Option 3");
@@ -400,7 +400,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 2)
     {
-      Gtk::Scale* pHScale = Gtk::manage( new Gtk::Scale(Gtk::ORIENTATION_HORIZONTAL) );
+      auto pHScale = Gtk::manage( new Gtk::Scale(Gtk::ORIENTATION_HORIZONTAL) );
       pHScale->set_range(0, 100);
       pHScale->set_size_request(70, -1);
 
@@ -408,7 +408,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 3)
       {
-        Gtk::Image* pImage = Gtk::manage( new Gtk::Image() );
+        auto pImage = Gtk::manage( new Gtk::Image() );
         pImage->set_from_resource("/textview/floppybuddy.gif");
         pWidget = pImage;
       }
@@ -444,7 +444,7 @@ Window_EasterEgg::Window_EasterEgg()
   auto iter = refBuffer->end();
 
   iter = refBuffer->insert(iter, "This buffer is shared by a set of nested text views.\n Nested view:\n");
-  Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = refBuffer->create_child_anchor(iter);
+  auto refAnchor = refBuffer->create_child_anchor(iter);
   refBuffer->insert(refBuffer->end(), "\nDon't do this in real applications, please.\n");
 
   m_pTextView = Gtk::manage( new Gtk::TextView(refBuffer) );
@@ -467,10 +467,10 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
   if (depth > 4)
     return;
 
-  Gtk::TextView* pChildView = Gtk::manage( new Gtk::TextView(view.get_buffer()));
+  auto pChildView = Gtk::manage( new Gtk::TextView(view.get_buffer()));
 
   /* Frame is to add a black border around each child view */
-  Gtk::Frame* pFrame = Gtk::manage( new Gtk::Frame());
+  auto pFrame = Gtk::manage( new Gtk::Frame());
 
   pFrame->add(*pChildView);
 

@@ -130,7 +130,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
     m_TreeView_Display.append_column("Name", m_columns_display.m_name);
 
     //Connect signal:
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = m_TreeView_Display.get_selection();
+    auto refSelection = m_TreeView_Display.get_selection();
     refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_display_selection_changed) );
 
     m_VBox.pack_start(m_Frame_Display);
@@ -153,11 +153,11 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
 {
-  Gtk::Box* pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
+  auto pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
   pHBox->property_margin() = 8;
   frame.add(*pHBox);
 
-  Gtk::ScrolledWindow* pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );
+  auto pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );
   pScrolledWindow->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
   pScrolledWindow->set_shadow_type(Gtk::SHADOW_IN);
   pHBox->pack_start(*pScrolledWindow);
@@ -165,7 +165,7 @@ void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treevi
   treeview.set_headers_visible(false);
   pScrolledWindow->add(treeview);
 
-  Glib::RefPtr<Gtk::TreeView::Selection> refSelection = treeview.get_selection();
+  auto refSelection = treeview.get_selection();
   refSelection->set_mode(Gtk::SELECTION_BROWSE);
 
   pHBox->pack_start(buttonbox, Gtk::PACK_SHRINK);
@@ -175,7 +175,7 @@ void Example_ChangeDisplay::initialize_displays()
 {
 
 #ifndef G_OS_WIN32
-  Glib::RefPtr<Gdk::DisplayManager> refDisplayManager = Gdk::DisplayManager::get();
+  auto refDisplayManager = Gdk::DisplayManager::get();
 
   for(auto refDisplay : refDisplayManager->list_displays())
   {
@@ -195,7 +195,7 @@ void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<
   auto children = m_refListStore_Display->children();
   for (auto iter = children.begin(); iter != children.end(); ++iter)
   {
-    Glib::RefPtr<Gdk::Display> refDisplay = (*iter)[m_columns_display.m_display];
+    const Glib::RefPtr<Gdk::Display> refDisplay = (*iter)[m_columns_display.m_display];
     if (refDisplay == display)
     {
       m_refListStore_Display->erase(iter);
@@ -249,7 +249,7 @@ void Example_ChangeDisplay::on_button_display_close()
 
 void Example_ChangeDisplay::on_treeview_display_selection_changed()
 {
-  Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView_Display.get_selection();
+  auto refSelection = m_TreeView_Display.get_selection();
   auto iter = refSelection->get_selected();
   if(iter)
     m_refCurrentDisplay = (*iter)[m_columns_display.m_display];
@@ -263,8 +263,8 @@ void Example_ChangeDisplay::on_treeview_display_selection_changed()
  */
 void Example_ChangeDisplay::query_change_display()
 {
-  Glib::RefPtr<Gdk::Screen> refScreen = get_screen();
-  Gtk::Window* pTopLevel = query_for_toplevel(refScreen,
+  auto refScreen = get_screen();
+  auto pTopLevel = query_for_toplevel(refScreen,
    "Please select the toplevel\n"
    "to move to the new screen");
 
@@ -291,7 +291,7 @@ void Example_ChangeDisplay::on_response(int response_id)
  */
 Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
 {
-  Glib::RefPtr<Gdk::Display> refDisplay = screen->get_display();
+  auto refDisplay = screen->get_display();
 
   if(m_pPopup)
   {
@@ -303,7 +303,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   m_pPopup->show();
 
-  Glib::RefPtr<Gdk::Cursor> cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
+  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
 
   Gtk::Window* toplevel = nullptr;
 
@@ -339,7 +339,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   //TODO: This needs to use Device::get_window_at_position(), when we can figure that out.
   //See https://bugzilla.gnome.org/show_bug.cgi?id=638907
   /*
-  Glib::RefPtr<Gdk::Window> refPointerWindow = display->get_window_at_pointer();
+  auto refPointerWindow = display->get_window_at_pointer();
 
   if (refPointerWindow)
   {
@@ -350,7 +350,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
     refPointerWindow->get_user_data(user_data);
     cWidget = (GtkWidget*)user_data;
 
-    Gtk::Widget* pWidget = Glib::wrap(cWidget);
+    auto pWidget = Glib::wrap(cWidget);
     if(pWidget)
       return pWidget->get_toplevel();
   }

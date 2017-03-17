@@ -41,7 +41,7 @@ TextWidget::TextWidget(bool is_source)
   {
     m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
 
-    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("source");
+    auto refTag = m_refTextBuffer->create_tag("source");
     refTag->property_font() = "Courier 12";
 
     refTag = m_refTextBuffer->create_tag("comment");
@@ -74,7 +74,7 @@ TextWidget::TextWidget(bool is_source)
     m_TextView.set_pixels_above_lines(2);
     m_TextView.set_pixels_below_lines(2);
 
-    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("title");
+    auto refTag = m_refTextBuffer->create_tag("title");
     refTag->property_font() = "Sans 18";
   }
 }

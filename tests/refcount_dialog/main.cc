@@ -52,7 +52,7 @@ void MyWindow::on_button_clicked()
 
 int main(int argc, char* argv[])
 {
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
 
   MyWindow win;
   return app->run(win, argc, argv);

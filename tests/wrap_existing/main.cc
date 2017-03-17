@@ -20,9 +20,9 @@ void on_object_qdata_destroyed(gpointer data)
 
 int main (int /* argc */, char** /* argv */)
 {
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
 
-  Gtk::Dialog* pDialog = new Gtk::Dialog();
+  auto pDialog = new Gtk::Dialog();
   Gtk::Box* pBox = pDialog->get_content_area();
 
   //Set a quark and a callback:

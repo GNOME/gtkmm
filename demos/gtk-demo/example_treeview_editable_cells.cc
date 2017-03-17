@@ -119,7 +119,7 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
 
   /* create tree view */
   m_TreeView.set_model(m_refListStore);
-  Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = m_TreeView.get_selection();
+  auto refTreeSelection = m_TreeView.get_selection();
   refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
 
   add_columns();
@@ -223,7 +223,7 @@ void Example_TreeView_EditableCells::on_column_product_edited(const Glib::ustrin
   Gtk::TreePath path(path_string);
 
   //Get the row from the path:
-  Glib::RefPtr<Gtk::TreeModel> refModel = m_TreeView.get_model();
+  auto refModel = m_TreeView.get_model();
   if(refModel)
   {
     auto iter = refModel->get_iter(path);
@@ -247,11 +247,11 @@ void Example_TreeView_EditableCells::add_columns()
 
   //And this is the way that works with the IRIX MipsPro compiler too:
   {
-    Gtk::TreeView::Column* pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Number", m_columns.number));
+    auto pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Number", m_columns.number));
 
     //connect signal handlers for auto-storing of edited cell data
-    Gtk::CellRenderer* pCellRenderer = pViewColumn->get_first_cell();
-    Gtk::CellRendererText* pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
+    auto pCellRenderer = pViewColumn->get_first_cell();
+    auto pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
     if(pCellRenderText)
     {
       //Set the appropriate property,
@@ -265,11 +265,11 @@ void Example_TreeView_EditableCells::add_columns()
   }
 
   {
-    Gtk::TreeView::Column* pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Product", m_columns.product));
+    auto pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Product", m_columns.product));
 
     //connect signal handlers for auto-storing of edited cell data
-    Gtk::CellRenderer* pCellRenderer = pViewColumn->get_first_cell();
-    Gtk::CellRendererText* pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
+    auto pCellRenderer = pViewColumn->get_first_cell();
+    auto pCellRenderText = dynamic_cast<Gtk::CellRendererText*>(pCellRenderer);
     if(pCellRenderText)
     {
       //Set the appropriate property,
@@ -298,7 +298,7 @@ void Example_TreeView_EditableCells::on_button_add_clicked()
 
 void Example_TreeView_EditableCells::on_button_remove_clicked()
 {
-  Glib::RefPtr<Gtk::TreeSelection> refSelection = m_TreeView.get_selection();
+  auto refSelection = m_TreeView.get_selection();
 
   if(const auto iter = refSelection->get_selected())
   {

@@ -29,7 +29,7 @@ sigc::connection SignalProxyChildProperty::connect(const SlotType& sl)
 {
   // Create a proxy to hold our connection info
   // This will be deleted by destroy_notify_handler.
-  Glib::PropertyProxyConnectionNode* pConnectionNode = new Glib::PropertyProxyConnectionNode(sl, obj_->gobj());
+  auto pConnectionNode = new Glib::PropertyProxyConnectionNode(sl, obj_->gobj());
 
   // connect it to gtk+
   // pConnectionNode will be passed as the data argument to the callback.

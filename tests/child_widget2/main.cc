@@ -19,7 +19,7 @@ MyWindow::MyWindow() :
 
 int main (int argc, char *argv[])
 {
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
 
   MyWindow window;
   return app->run(window, argc, argv);

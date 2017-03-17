@@ -195,14 +195,14 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
    */
   if(motion_event && motion_event->window)
   {
-    const Glib::RefPtr<Gdk::Window> refWindow =
+    const auto refWindow =
         Glib::wrap(motion_event->window, true); // true == take_copy
 
     if(refWindow)
     {
       int x = 0, y = 0;
       auto state = Gdk::ModifierType(0);
-      const Glib::RefPtr<const Gdk::Device> device =
+      const auto device =
         Glib::wrap(motion_event->device, true); // true == take_copy
       refWindow->get_device_position(device, x, y, state);
 

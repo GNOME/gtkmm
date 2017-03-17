@@ -19,7 +19,7 @@
 
 int main(int argc, char *argv[])
 {
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create();
+  auto app = Gtk::Application::create();
 
   TestWindow testWindow;
   return app->run(testWindow, argc, argv); //Shows the window and returns when it is closed.

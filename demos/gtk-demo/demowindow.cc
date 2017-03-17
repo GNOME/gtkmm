@@ -138,10 +138,10 @@ void DemoWindow::fill_tree()
     }
   }
 
-  Gtk::CellRendererText* pCell = Gtk::manage(new Gtk::CellRendererText());
+  auto pCell = Gtk::manage(new Gtk::CellRendererText());
   pCell->property_style() = Pango::STYLE_ITALIC;
 
-  Gtk::TreeViewColumn* pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
+  auto pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
   pColumn->add_attribute(pCell->property_text(), columns.title);
   pColumn->add_attribute(pCell->property_style_set(), columns.italic);
 
@@ -235,8 +235,8 @@ void DemoWindow::load_file(const std::string& filename)
     m_TextWidget_Info.wipe();
     m_TextWidget_Source.wipe();
 
-    Glib::RefPtr<Gtk::TextBuffer> refBufferInfo = m_TextWidget_Info.get_buffer();
-    Glib::RefPtr<Gtk::TextBuffer> refBufferSource = m_TextWidget_Source.get_buffer();
+    auto refBufferInfo = m_TextWidget_Info.get_buffer();
+    auto refBufferSource = m_TextWidget_Source.get_buffer();
 
     Glib::RefPtr<const Glib::Bytes> bytes;
     try
@@ -385,7 +385,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
   {
     const auto resource_name = resource_dir + "/" + resources[i];
     Gtk::Widget* widget = nullptr;
-    Gtk::Image* image = new Gtk::Image();
+    auto image = new Gtk::Image();
     image->set_from_resource(resource_name);
     if (image->get_pixbuf() || image->get_animation())
     {
@@ -414,7 +414,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       {
         // Looks like it parses as text. Dump it into a TextWidget then!
         TextWidget* textwidget = new TextWidget(false);
-        Glib::RefPtr<Gtk::TextBuffer> refBuffer = textwidget->get_buffer();
+        auto refBuffer = textwidget->get_buffer();
         refBuffer->set_text(data, data + data_size);
         widget = textwidget;
       }

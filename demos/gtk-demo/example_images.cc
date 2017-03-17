@@ -65,7 +65,7 @@ Example_Images::Example_Images()
   m_Frame_Image.set_valign(Gtk::ALIGN_CENTER);
   m_VBox.pack_start(m_Frame_Image, Gtk::PACK_SHRINK);
 
-  Gtk::Image* pImage = Gtk::manage(new Gtk::Image());
+  auto pImage = Gtk::manage(new Gtk::Image());
   pImage->set_from_resource("/images/gtk-logo-rgb.gif");
   m_Frame_Image.add(*pImage);
 
@@ -233,7 +233,7 @@ bool Example_Images::on_timeout()
 
 void Example_Images::on_loader_area_prepared()
 {
-  const Glib::RefPtr<Gdk::Pixbuf> refPixbuf = m_refPixbufLoader->get_pixbuf();
+  const auto refPixbuf = m_refPixbufLoader->get_pixbuf();
 
   /* Avoid displaying random memory contents, since the pixbuf
    * isn't filled in yet.
@@ -254,7 +254,7 @@ void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, in
    * position of the pixbuf on the display, then we could queue a draw
    * for only the updated area of the image.
    */
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf = m_Image_Progressive.get_pixbuf();
+  auto refPixbuf = m_Image_Progressive.get_pixbuf();
   m_Image_Progressive.set(refPixbuf);
 }
 

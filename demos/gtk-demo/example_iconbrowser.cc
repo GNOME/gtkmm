@@ -287,12 +287,12 @@ void Example_IconBrowser::on_symbolic_radio_toggled()
 
 void Example_IconBrowser::on_context_list_selected_rows_changed()
 {
-  Gtk::ListBoxRow* row = m_context_list.get_selected_row();
+  auto row = m_context_list.get_selected_row();
   if (!row)
     return;
 
   m_search_button.set_active(false);
-  Gtk::Widget* rowchild = row->get_child();
+  auto rowchild = row->get_child();
   IconContextLabel* label = dynamic_cast<IconContextLabel*>(rowchild);
   if (label)
   {
@@ -835,7 +835,7 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
   m_context_list.append(*row);
 
   // Set the tooltip on the list box row.
-  Gtk::Container* listboxrow = row->get_parent();
+  auto listboxrow = row->get_parent();
   listboxrow->set_tooltip_text(description);
 
   if (m_current_context_id.empty())
@@ -894,7 +894,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 : Gtk::Dialog("", parent, true, true)
 {
   set_resizable(false);
-  Gtk::Box* content_area = get_content_area();
+  auto content_area = get_content_area();
   content_area->pack_start(m_grid);
   m_grid.property_margin() = 10;
   m_grid.set_row_spacing(10);
@@ -961,7 +961,7 @@ void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& 
 
 Glib::RefPtr<Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
 {
-  Glib::RefPtr<Gtk::StyleContext> context = m_image[size_index].get_style_context();
+  auto context = m_image[size_index].get_style_context();
   auto info = Gtk::IconTheme::get_default()->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
   Glib::RefPtr<Gdk::Pixbuf> pixbuf;

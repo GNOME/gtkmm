@@ -26,7 +26,7 @@ protected:
 Gtk::Window* do_builder()
 {
   // Load the XML file and instantiate its widgets:
-  Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create();
+  auto builder = Gtk::Builder::create();
   try
   {
     builder->add_from_resource("/builder/example_builder.ui");
@@ -58,13 +58,13 @@ Example_Builder::Example_Builder(
   if (pToolbar)
     pToolbar->get_style_context()->add_class("primary-toolbar");
 
-  Glib::RefPtr<Gio::SimpleActionGroup> refActions = Gio::SimpleActionGroup::create();
+  auto refActions = Gio::SimpleActionGroup::create();
   refActions->add_action("quit", sigc::mem_fun(*this, &Example_Builder::on_file_quit));
   refActions->add_action("about", sigc::mem_fun(*this, &Example_Builder::on_help_about));
   refActions->add_action("help", sigc::mem_fun(*this, &Example_Builder::on_help_help));
   insert_action_group("win", refActions);
 
-  Glib::RefPtr<Gtk::AccelGroup> refAccelGroup = Gtk::AccelGroup::create();
+  auto refAccelGroup = Gtk::AccelGroup::create();
   add_accel_group(refAccelGroup);
 
   Gtk::MenuItem* pMenuItem = nullptr;
