@@ -24,9 +24,9 @@ class ExampleOptionGroup : public Glib::OptionGroup
 public:
   ExampleOptionGroup();
 
-  bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
-  bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
-  void on_error(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  bool on_pre_parse(Glib::OptionContext& context) override;
+  bool on_post_parse(Glib::OptionContext& context) override;
+  void on_error(Glib::OptionContext& context, const Glib::Error& error) override;
 
   //These int instances should live as long as the OptionGroup to which they are added,
   //and as long as the OptionContext to which those OptionGroups are added.
@@ -71,21 +71,21 @@ ExampleOptionGroup::ExampleOptionGroup()
   add_entry(entry5, m_arg_list);
 }
 
-bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context)
 {
   //This is called before the m_arg_* instances are given their values.
-  return Glib::OptionGroup::on_pre_parse(context, group);
+  return Glib::OptionGroup::on_pre_parse(context);
 }
 
-bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context)
 {
   //This is called after the m_arg_* instances are given their values.
-  return Glib::OptionGroup::on_post_parse(context, group);
+  return Glib::OptionGroup::on_post_parse(context);
 }
 
-void ExampleOptionGroup::on_error(Glib::OptionContext& context, Glib::OptionGroup& group)
+void ExampleOptionGroup::on_error(Glib::OptionContext& context, const Glib::Error& error)
 {
-  Glib::OptionGroup::on_error(context, group);
+  Glib::OptionGroup::on_error(context, error);
 }
 
 int main(int argc, char *argv[])
@@ -103,8 +103,11 @@ int main(int argc, char *argv[])
   {
     auto app = Gtk::Application::create();
 
-    //Here we can see the parsed values of our custom command-line arguments:
+    // For a better example of command-line handling with Gtk::Application,
+    // see gtkmm-documentation/examples/book/application/command_line_handling.
+    context.parse(argc, argv);
 
+    //Here we can see the parsed values of our custom command-line arguments:
     std::cout << "parsed values: " << std::endl <<
       "  foo = " << group.m_arg_foo << std::endl <<
       "  filename = " << group.m_arg_filename << std::endl <<
@@ -119,11 +122,8 @@ int main(int argc, char *argv[])
     }
     std::cout << std::endl;
 
-
-    //Any standard GTK+ command-line arguments will have an effect on this window:
-    //Try --name="bobble" to change the window's title to "bobble", for instance.
     Gtk::Window testWindow;
-    return app->run(testWindow, argc, argv); //Shows the window and returns when it is closed.
+    return app->run(testWindow); //Shows the window and returns when it is closed.
   }
   catch(const Glib::Error& ex)
   {
