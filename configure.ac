@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [3.89.5],
+AC_INIT([gtkmm], [3.89.5.1],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -95,7 +95,7 @@ AS_IF([test "x$enable_static" = xyes],
 # gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-4.0 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.54 >= 2.53.1 pangomm-2.42 >= 2.38.2 cairomm-1.16 >= 1.15.3 gtk+-4.0 >= 3.89.5 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.54 >= 2.53.1 pangomm-2.42 >= 2.41.2 cairomm-1.16 >= 1.15.3 gtk+-4.0 >= 3.89.5 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -106,7 +106,7 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 GTKMM_ARG_ENABLE_API_ATKMM
 
 AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-2.26 >= 2.24.2 $GTKMM_MODULES"])
+      [GTKMM_MODULES="atkmm-2.26 >= 2.25.2 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 AC_SUBST([GTKMM_DEMOS_EXTRA_MODULES], ['epoxy >= 1.2'])
