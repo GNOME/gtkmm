@@ -76,8 +76,8 @@ _CONV_ENUM(Gdk,GLError)
 
 _CONVERSION(`guint32&',`guint32*',`&($3)')
 
-_CONVERSION(`EventMask',`gint',`$3')
-_CONVERSION(`Gdk::EventMask',`gint',`$3')
+_CONVERSION(`EventMask',`gint',`static_cast<gint>($3)')
+_CONVERSION(`Gdk::EventMask',`gint',`static_cast<gint>($3)')
 _CONVERSION(`gint',`Gdk::EventMask',`static_cast<Gdk::EventMask>($3)')
 _CONVERSION(`ModifierType&',`GdkModifierType*',`(($2) &($3))')
 _CONVERSION(`WMDecoration&',`GdkWMDecoration*',`(($2) &($3))')

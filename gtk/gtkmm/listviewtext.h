@@ -42,7 +42,7 @@ class ListViewText : public Gtk::TreeView
 {
 public:
 
-  ListViewText(guint columns_count, bool editable = false, Gtk::SelectionMode mode = Gtk::SELECTION_SINGLE);
+  ListViewText(guint columns_count, bool editable = false, Gtk::SelectionMode mode = Gtk::SelectionMode::SINGLE);
   ~ListViewText() noexcept override;
 
   /** Adds a title to column @a column.
