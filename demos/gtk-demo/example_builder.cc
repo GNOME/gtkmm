@@ -71,47 +71,47 @@ Example_Builder::Example_Builder(
   builder->get_widget("new_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_n, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_n, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("open_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_o, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_o, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("save_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_s, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("quit_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_q, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_q, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("copy_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_c, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("cut_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_x, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_x, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("paste_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_v, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("help_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_F1, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_F1, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
 
   builder->get_widget("about_item", pMenuItem);
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_F7, (Gdk::ModifierType)0, Gtk::ACCEL_VISIBLE);
+      GDK_KEY_F7, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
 }
 
 Example_Builder::~Example_Builder()

@@ -25,7 +25,7 @@ protected:
 };
 
 MyWindow::MyWindow()
-: m_Box(Gtk::ORIENTATION_HORIZONTAL),
+: m_Box(Gtk::Orientation::HORIZONTAL),
   m_Button("Show Dialog")
 {
   set_size_request(200, 200);

@@ -52,28 +52,28 @@ Example_Gestures::Example_Gestures()
   set_default_size(400, 400);
 
   add(m_DrawingArea);
-  m_DrawingArea.add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |
-                           Gdk::POINTER_MOTION_MASK | Gdk::TOUCH_MASK);
+  m_DrawingArea.add_events(Gdk::EventMask::BUTTON_PRESS_MASK | Gdk::EventMask::BUTTON_RELEASE_MASK |
+                           Gdk::EventMask::POINTER_MOTION_MASK | Gdk::EventMask::TOUCH_MASK);
   m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.
   m_GestureSwipe = Gtk::GestureSwipe::create(m_DrawingArea);
-  m_GestureSwipe->set_propagation_phase(Gtk::PHASE_BUBBLE);
+  m_GestureSwipe->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureSwipe->signal_swipe().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_swipe_swipe));
   m_GestureSwipe->set_touch_only(false);
 
   m_GestureLongPress = Gtk::GestureLongPress::create(m_DrawingArea);
-  m_GestureLongPress->set_propagation_phase(Gtk::PHASE_BUBBLE);
+  m_GestureLongPress->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureLongPress->signal_pressed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_pressed));
   m_GestureLongPress->signal_end().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_end));
   m_GestureLongPress->set_touch_only(false);
 
   m_GestureRotate = Gtk::GestureRotate::create(m_DrawingArea);
-  m_GestureRotate->set_propagation_phase(Gtk::PHASE_BUBBLE);
+  m_GestureRotate->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureRotate->signal_angle_changed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_rotate_angle_changed));
 
   m_GestureZoom = Gtk::GestureZoom::create(m_DrawingArea);
-  m_GestureZoom->set_propagation_phase(Gtk::PHASE_BUBBLE);
+  m_GestureZoom->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureZoom->signal_scale_changed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_zoom_scale_changed));
 }
 

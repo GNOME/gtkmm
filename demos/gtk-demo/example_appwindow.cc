@@ -104,8 +104,8 @@ Example_AppWindow::Example_AppWindow()
   }
 
 
-  m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-  m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_IN);
+  m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
+  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::IN);
   //                              left  top  width  height
   m_Grid.attach(m_ScrolledWindow, 0,    2,   1,     1);
 
@@ -133,7 +133,7 @@ Example_AppWindow::~Example_AppWindow()
 void Example_AppWindow::on_menu_item()
 {
   Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item", false,
-                            Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE);
+                            Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE);
   dialog.run();
 }
 

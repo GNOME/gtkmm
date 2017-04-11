@@ -99,7 +99,7 @@ Gtk::Window* do_treeview_liststore()
 
 
 Example_TreeView_ListStore::Example_TreeView_ListStore()
-: m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
+: m_VBox(Gtk::Orientation::VERTICAL, 8),
   m_Label("This is the bug list (note: not based on real data, it would be nice to have a nice ODBC interface to bugzilla or so, though).")
 {
   set_title("Gtk::ListStore demo");
@@ -109,8 +109,8 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
   add(m_VBox);
   m_VBox.pack_start(m_Label, Gtk::PACK_SHRINK);
 
-  m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_ETCHED_IN);
-  m_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
+  m_ScrolledWindow.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_VBox.pack_start(m_ScrolledWindow);
 
   /* create model */
@@ -175,7 +175,7 @@ void Example_TreeView_ListStore::add_columns()
     auto pColumn = m_TreeView.get_column(cols_count-1);
 
     /* set this column to a fixed sizing (of 50 pixels) */
-    pColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+    pColumn->set_sizing(Gtk::TreeViewColumnSizing::FIXED);
     pColumn->set_fixed_width(50);
     pColumn->set_clickable();
   }

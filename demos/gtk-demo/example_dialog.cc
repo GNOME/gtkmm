@@ -58,9 +58,11 @@ Gtk::Window* do_dialog()
 
 Example_Dialog::Example_Dialog()
 : m_Frame("Dialogs"),
-  m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8), m_HBox2(Gtk::ORIENTATION_HORIZONTAL, 8),
-  m_Button_Message("_Message Dialog", true), m_Button_Interactive("_Interactive Dialog", true),
+  m_VBox(Gtk::Orientation::VERTICAL, 8),
+  m_HBox(Gtk::Orientation::HORIZONTAL, 8),
+  m_HBox2(Gtk::Orientation::HORIZONTAL, 8),
+  m_Button_Message("_Message Dialog", true),
+  m_Button_Interactive("_Interactive Dialog", true),
   m_Label1("_Entry 1", true),
   m_Label2("E_ntry 2", true)
 {
@@ -79,7 +81,7 @@ Example_Dialog::Example_Dialog()
   m_VBox.pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
   m_HBox.pack_start(m_Button_Message, Gtk::PACK_SHRINK);
-  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL))), Gtk::PACK_SHRINK);
+  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL))), Gtk::PACK_SHRINK);
 
 
   /* Interactive dialog*/
@@ -114,7 +116,7 @@ void Example_Dialog::on_button_message()
     auto buf = Glib::make_unique_ptr_gfree(g_strdup_printf("%d", m_count));
     strMessage += buf.get();
   }
-  Gtk::MessageDialog dialog(*this, strMessage, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true); //true = modal
+  Gtk::MessageDialog dialog(*this, strMessage, false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true); //true = modal
   /*int response =*/ dialog.run();
 
   m_count++;
@@ -132,13 +134,13 @@ void Example_Dialog::on_button_interactive()
 
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
 : Gtk::Dialog("Interactive Dialog", parent, true),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 8),
+  m_HBox(Gtk::Orientation::HORIZONTAL, 8),
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
   m_Image()
 {
-  m_Image.set_from_icon_name("dialog-question", Gtk::ICON_SIZE_DIALOG);
-  add_button("_OK", Gtk::RESPONSE_OK);
-  add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+  m_Image.set_from_icon_name("dialog-question", Gtk::BuiltinIconSize::DIALOG);
+  add_button("_OK", Gtk::ResponseType::OK);
+  add_button("_Cancel", Gtk::ResponseType::CANCEL);
 
   get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
   m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);

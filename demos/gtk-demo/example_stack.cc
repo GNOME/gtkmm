@@ -46,18 +46,18 @@ Example_Stack::Example_Stack()
   m_stack.add(m_spinner, "page3");
 
   // Page 1
-  m_image.set_from_icon_name("gtk3-demo", Gtk::ICON_SIZE_DIALOG);
+  m_image.set_from_icon_name("gtk3-demo", Gtk::BuiltinIconSize::DIALOG);
 
   // Page 2
   m_check_button.set_label("Page 2");
-  m_check_button.set_halign(Gtk::ALIGN_CENTER);
+  m_check_button.set_halign(Gtk::Align::CENTER);
 
   // Page 3
   m_stack.child_property_icon_name(m_spinner) = "face-laugh-symbolic";
   m_spinner.property_active() = true;
 
   // Stack transition
-  m_stack.set_transition_type(Gtk::STACK_TRANSITION_TYPE_CROSSFADE);
+  m_stack.set_transition_type(Gtk::StackTransitionType::CROSSFADE);
 
   // Layout
   m_stack_switcher.set_stack(m_stack);

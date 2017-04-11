@@ -177,12 +177,12 @@ Gtk::Window* do_iconbrowser()
 // Definition of main window methods.
 Example_IconBrowser::Example_IconBrowser()
 :
-  m_header_radio_button_box(Gtk::ORIENTATION_HORIZONTAL, 0),
+  m_header_radio_button_box(Gtk::Orientation::HORIZONTAL, 0),
   m_normal_radio("Normal"),
   m_symbolic_radio("Symbolic"),
-  m_hbox(Gtk::ORIENTATION_HORIZONTAL, 0),
-  m_vseparator(Gtk::ORIENTATION_VERTICAL),
-  m_vcontent_box(Gtk::ORIENTATION_VERTICAL, 0),
+  m_hbox(Gtk::Orientation::HORIZONTAL, 0),
+  m_vseparator(Gtk::Orientation::VERTICAL),
+  m_vcontent_box(Gtk::Orientation::VERTICAL, 0),
   m_details(*this)
 {
   //set_title("Icon Browser"); // Not shown when header bar is shown
@@ -196,7 +196,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_header.set_title("Icon Browser");
   m_header.set_show_close_button(true);
   m_header.pack_end(m_search_button);
-  m_search_button.set_image_from_icon_name("edit-find-symbolic", Gtk::ICON_SIZE_MENU);
+  m_search_button.set_image_from_icon_name("edit-find-symbolic", Gtk::BuiltinIconSize::MENU);
   m_header.pack_end(m_header_radio_button_box);
   m_header_radio_button_box.pack_start(m_normal_radio);
   m_header_radio_button_box.pack_start(m_symbolic_radio);
@@ -204,7 +204,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
 
-  m_button_size_group = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_VERTICAL);
+  m_button_size_group = Gtk::SizeGroup::create(Gtk::SizeGroupMode::VERTICAL);
   m_button_size_group->add_widget(m_normal_radio);
   m_button_size_group->add_widget(m_symbolic_radio);
   m_button_size_group->add_widget(m_search_button);
@@ -212,7 +212,7 @@ Example_IconBrowser::Example_IconBrowser()
   // Main part of the window.
   add(m_hbox);
   m_hbox.pack_start(m_context_list, Gtk::PACK_SHRINK);
-  m_context_list.set_selection_mode(Gtk::SELECTION_SINGLE);
+  m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
   m_hbox.pack_start(m_vseparator, Gtk::PACK_SHRINK);
   m_hbox.pack_start(m_vcontent_box);
   m_vcontent_box.pack_start(m_search_bar, Gtk::PACK_SHRINK);
@@ -221,23 +221,23 @@ Example_IconBrowser::Example_IconBrowser()
   m_binding_search_button_search_entry = Glib::Binding::bind_property(
     m_search_button.property_active(),
     m_search_bar.property_search_mode_enabled(),
-    Glib::BINDING_BIDIRECTIONAL);
+    Glib::BindingFlags::BIDIRECTIONAL);
   m_vcontent_box.pack_start(m_scrolled_window);
-  m_scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+  m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.add(m_icon_view);
   m_icon_view.set_model(m_filter_model);
-  m_icon_view.set_selection_mode(Gtk::SELECTION_NONE);
+  m_icon_view.set_selection_mode(Gtk::SelectionMode::NONE);
   m_icon_view.set_activate_on_single_click(true);
   m_icon_view.pack_start(m_icon_cell);
   m_icon_view.pack_start(m_text_cell);
   m_icon_cell.set_padding(10, 10);
-  m_icon_cell.property_stock_size() = Gtk::ICON_SIZE_DND;
+  m_icon_cell.property_stock_size() = static_cast<guint>(Gtk::BuiltinIconSize::DND);
   m_text_cell.set_padding(10, 10);
   m_text_cell.set_alignment(0.5, 0.5);
 
   // Enable dragging an icon name, and copying it to another program.
   m_icon_view.enable_model_drag_source(
-    std::vector<Gtk::TargetEntry>(), Gdk::BUTTON1_MASK, Gdk::ACTION_COPY);
+    std::vector<Gtk::TargetEntry>(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
   m_icon_view.drag_source_add_text_targets();
 
   m_icon_view.set_has_tooltip(true);
@@ -904,20 +904,20 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
     m_grid.attach(m_event_box[i], i, 0, 1, 1);
     m_event_box[i].add(m_image[i]);
     m_image[i].property_margin() = 4;
-    m_image[i].set_halign(Gtk::ALIGN_CENTER);
-    m_image[i].set_valign(Gtk::ALIGN_END);
+    m_image[i].set_halign(Gtk::Align::CENTER);
+    m_image[i].set_valign(Gtk::Align::END);
 
     // Enable dragging an image, and copying it to another program.
     m_event_box[i].drag_source_set(
-      std::vector<Gtk::TargetEntry>(), Gdk::BUTTON1_MASK, Gdk::ACTION_COPY);
+      std::vector<Gtk::TargetEntry>(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
     m_event_box[i].drag_source_add_image_targets();
     m_event_box[i].signal_drag_data_get().connect(
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
 
     m_grid.attach(m_label[i], i, 1, 1, 1);
     m_label[i].property_margin() = 4;
-    m_label[i].set_halign(Gtk::ALIGN_CENTER);
-    m_label[i].set_valign(Gtk::ALIGN_CENTER);
+    m_label[i].set_halign(Gtk::Align::CENTER);
+    m_label[i].set_valign(Gtk::Align::CENTER);
     std::ostringstream ostr;
     ostr << m_icon_size[i] << 'x' << m_icon_size[i];
     m_label[i].set_text(ostr.str());
@@ -925,8 +925,8 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
   m_grid.attach(m_description, 0, 2, n_icon_sizes, 1);
   m_description.set_line_wrap(true);
   m_description.set_max_width_chars(60);
-  m_description.set_halign(Gtk::ALIGN_START);
-  m_description.set_valign(Gtk::ALIGN_START);
+  m_description.set_halign(Gtk::Align::START);
+  m_description.set_valign(Gtk::Align::START);
 }
 
 DetailDialog::~DetailDialog()
@@ -940,7 +940,7 @@ void DetailDialog::set_image(
 
   for (int i = 0; i < n_icon_sizes; ++i)
   {
-    m_image[i].set_from_icon_name(icon_name, Gtk::ICON_SIZE_MENU);
+    m_image[i].set_from_icon_name(icon_name, Gtk::BuiltinIconSize::MENU);
     m_image[i].set_pixel_size(m_icon_size[i]);
     m_event_box[i].drag_source_set_icon(get_icon(i));
   }

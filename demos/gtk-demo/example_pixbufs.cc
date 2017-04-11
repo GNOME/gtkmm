@@ -83,7 +83,7 @@ Example_Pixbufs::Example_Pixbufs()
     load_pixbufs();
 
     set_size_request(m_back_width, m_back_height);
-    m_refPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, FALSE, 8, m_back_width, m_back_height);
+    m_refPixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::RGB, FALSE, 8, m_back_width, m_back_height);
     m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
     add(m_DrawingArea);
 
@@ -95,7 +95,7 @@ Example_Pixbufs::Example_Pixbufs()
     Glib::ustring strMsg = "Failed to load an image: ";
     strMsg += error.what();
 
-    Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
     dialog.run();
   }
 }
@@ -184,7 +184,7 @@ bool Example_Pixbufs::on_timeout()
 		      dest.width, dest.height,
 		      xpos, ypos,
 		      k, k,
-		      Gdk::INTERP_NEAREST,
+		      Gdk::InterpType::NEAREST,
 		      (int)((i & 1)
 		       ? MAX (127, fabs (255 * sin (f * 2.0 * M_PI)))
 		       : MAX (127, fabs (255 * cos (f * 2.0 * M_PI)))));

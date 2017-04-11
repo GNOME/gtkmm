@@ -51,17 +51,17 @@ Example_SizeGroup::Example_SizeGroup()
 : Gtk::Dialog("Gtk::SizeGroup"),
   m_Frame_Color("Color Options"),
   m_Frame_Line("Line Options"),
-  m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
+  m_VBox(Gtk::Orientation::VERTICAL, 5),
+  m_HBox(Gtk::Orientation::HORIZONTAL, 5),
   m_CheckButton("_Enable grouping", true)
 {
   set_resizable(false);
-  add_button("_Close", Gtk::RESPONSE_CLOSE);
+  add_button("_Close", Gtk::ResponseType::CLOSE);
 
   get_content_area()->pack_start(m_VBox);
   m_VBox.property_margin() = 5;
 
-  m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL),
+  m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SizeGroupMode::HORIZONTAL),
 
   /* Create one frame holding color options
    */
@@ -116,12 +116,12 @@ Example_SizeGroup::~Example_SizeGroup()
 
 void Example_SizeGroup::on_checkbutton_toggled()
 {
-  auto new_mode = Gtk::SIZE_GROUP_HORIZONTAL;
+  auto new_mode = Gtk::SizeGroupMode::HORIZONTAL;
 
   if(m_CheckButton.get_active())
-    new_mode = Gtk::SIZE_GROUP_HORIZONTAL;
+    new_mode = Gtk::SizeGroupMode::HORIZONTAL;
   else
-    new_mode = Gtk::SIZE_GROUP_NONE;
+    new_mode = Gtk::SizeGroupMode::NONE;
 
   m_refSizeGroup->set_mode(new_mode);
 }
@@ -131,7 +131,7 @@ void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
                                 const Glib::ustring& label_text,
                                 const std::list<Glib::ustring>& options)
 {
-  auto pLabel = Gtk::manage(new Gtk::Label(label_text, Gtk::ALIGN_START, Gtk::ALIGN_END, true));
+  auto pLabel = Gtk::manage(new Gtk::Label(label_text, Gtk::Align::START, Gtk::Align::END, true));
 
   grid.attach(*pLabel, 0, row, 1, 1);
   pLabel->set_hexpand();

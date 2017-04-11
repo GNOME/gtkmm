@@ -58,7 +58,7 @@ const DemoColumns& demo_columns()
 
 DemoWindow::DemoWindow()
 : m_RunButton("Run"),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL),
+  m_HBox(Gtk::Orientation::HORIZONTAL),
   m_TextWidget_Info(false),
   m_TextWidget_Source(true)
 {
@@ -73,7 +73,7 @@ DemoWindow::DemoWindow()
   m_TreeView.set_model(m_refTreeStore);
 
   m_refTreeSelection = m_TreeView.get_selection();
-  m_refTreeSelection->set_mode(Gtk::SELECTION_BROWSE);
+  m_refTreeSelection->set_mode(Gtk::SelectionMode::BROWSE);
   m_refTreeSelection->set_select_function( sigc::ptr_fun(&DemoWindow::select_function) );
 
   m_TreeView.set_size_request(200, -1);
@@ -81,7 +81,7 @@ DemoWindow::DemoWindow()
   fill_tree();
 
   //SideBar
-  m_SideBar.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+  m_SideBar.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_SideBar.get_style_context()->add_class("sidebar");
   m_SideBar.add(m_TreeView);
   m_HBox.pack_start(m_SideBar, Gtk::PACK_SHRINK);
@@ -139,7 +139,7 @@ void DemoWindow::fill_tree()
   }
 
   auto pCell = Gtk::manage(new Gtk::CellRendererText());
-  pCell->property_style() = Pango::STYLE_ITALIC;
+  pCell->property_style() = Pango::Style::ITALIC;
 
   auto pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
   pColumn->add_attribute(pCell->property_text(), columns.title);

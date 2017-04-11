@@ -39,7 +39,7 @@ Example_Overlay::Example_Overlay()
   set_title("Overlay");
 
   // Main text view
-  m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_scrolled_window.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.add(m_text_view);
 
   // Entries and labels
@@ -71,48 +71,48 @@ void Example_Overlay::configure_entries_and_labels()
   }
 
   // Then we set align attributes
-  m_entries[0].set_halign(Gtk::ALIGN_END);
-  m_entries[0].set_valign(Gtk::ALIGN_END);
-  m_labels[0].set_halign(Gtk::ALIGN_END);
-  m_labels[0].set_valign(Gtk::ALIGN_END);
+  m_entries[0].set_halign(Gtk::Align::END);
+  m_entries[0].set_valign(Gtk::Align::END);
+  m_labels[0].set_halign(Gtk::Align::END);
+  m_labels[0].set_valign(Gtk::Align::END);
 
-  m_entries[1].set_halign(Gtk::ALIGN_START);
-  m_entries[1].set_valign(Gtk::ALIGN_END);
-  m_labels[1].set_halign(Gtk::ALIGN_START);
-  m_labels[1].set_valign(Gtk::ALIGN_END);
+  m_entries[1].set_halign(Gtk::Align::START);
+  m_entries[1].set_valign(Gtk::Align::END);
+  m_labels[1].set_halign(Gtk::Align::START);
+  m_labels[1].set_valign(Gtk::Align::END);
 
-  m_entries[2].set_halign(Gtk::ALIGN_END);
-  m_entries[2].set_valign(Gtk::ALIGN_START);
-  m_labels[2].set_halign(Gtk::ALIGN_END);
-  m_labels[2].set_valign(Gtk::ALIGN_START);
+  m_entries[2].set_halign(Gtk::Align::END);
+  m_entries[2].set_valign(Gtk::Align::START);
+  m_labels[2].set_halign(Gtk::Align::END);
+  m_labels[2].set_valign(Gtk::Align::START);
 
-  m_entries[3].set_halign(Gtk::ALIGN_START);
-  m_entries[3].set_valign(Gtk::ALIGN_START);
-  m_labels[3].set_halign(Gtk::ALIGN_START);
-  m_labels[3].set_valign(Gtk::ALIGN_START);
+  m_entries[3].set_halign(Gtk::Align::START);
+  m_entries[3].set_valign(Gtk::Align::START);
+  m_labels[3].set_halign(Gtk::Align::START);
+  m_labels[3].set_valign(Gtk::Align::START);
 
-  m_entries[4].set_halign(Gtk::ALIGN_END);
-  m_entries[4].set_valign(Gtk::ALIGN_CENTER);
-  m_labels[4].set_halign(Gtk::ALIGN_END);
-  m_labels[4].set_valign(Gtk::ALIGN_CENTER);
+  m_entries[4].set_halign(Gtk::Align::END);
+  m_entries[4].set_valign(Gtk::Align::CENTER);
+  m_labels[4].set_halign(Gtk::Align::END);
+  m_labels[4].set_valign(Gtk::Align::CENTER);
 
-  m_entries[5].set_halign(Gtk::ALIGN_START);
-  m_entries[5].set_valign(Gtk::ALIGN_CENTER);
-  m_labels[5].set_halign(Gtk::ALIGN_START);
-  m_labels[5].set_valign(Gtk::ALIGN_CENTER);
+  m_entries[5].set_halign(Gtk::Align::START);
+  m_entries[5].set_valign(Gtk::Align::CENTER);
+  m_labels[5].set_halign(Gtk::Align::START);
+  m_labels[5].set_valign(Gtk::Align::CENTER);
 
-  m_entries[6].set_halign(Gtk::ALIGN_CENTER);
-  m_entries[6].set_valign(Gtk::ALIGN_START);
-  m_labels[6].set_halign(Gtk::ALIGN_CENTER);
-  m_labels[6].set_valign(Gtk::ALIGN_START);
+  m_entries[6].set_halign(Gtk::Align::CENTER);
+  m_entries[6].set_valign(Gtk::Align::START);
+  m_labels[6].set_halign(Gtk::Align::CENTER);
+  m_labels[6].set_valign(Gtk::Align::START);
 
-  m_entries[7].set_halign(Gtk::ALIGN_CENTER);
-  m_entries[7].set_valign(Gtk::ALIGN_END);
-  m_labels[7].set_halign(Gtk::ALIGN_CENTER);
-  m_labels[7].set_valign(Gtk::ALIGN_END);
+  m_entries[7].set_halign(Gtk::Align::CENTER);
+  m_entries[7].set_valign(Gtk::Align::END);
+  m_labels[7].set_halign(Gtk::Align::CENTER);
+  m_labels[7].set_valign(Gtk::Align::END);
 
-  m_entries[8].set_halign(Gtk::ALIGN_CENTER);
-  m_entries[8].set_valign(Gtk::ALIGN_CENTER);
-  m_labels[8].set_halign(Gtk::ALIGN_CENTER);
-  m_labels[8].set_valign(Gtk::ALIGN_CENTER);
+  m_entries[8].set_halign(Gtk::Align::CENTER);
+  m_entries[8].set_valign(Gtk::Align::CENTER);
+  m_labels[8].set_halign(Gtk::Align::CENTER);
+  m_labels[8].set_valign(Gtk::Align::CENTER);
 }

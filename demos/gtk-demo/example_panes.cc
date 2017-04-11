@@ -48,30 +48,30 @@ Example_Panes::Example_Panes()
 {
   set_title("Panes");
 
-  Gtk::Box *const pVBox = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+  Gtk::Box *const pVBox = new Gtk::Box(Gtk::Orientation::VERTICAL);
   add(*Gtk::manage(pVBox));
 
-  Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::ORIENTATION_VERTICAL);
+  Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::Orientation::VERTICAL);
   pVBox->pack_start(*Gtk::manage(pVPaned));
   pVPaned->property_margin() = 5;
 
-  Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::ORIENTATION_HORIZONTAL);
+  Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::Orientation::HORIZONTAL);
   pVPaned->add1(*Gtk::manage(pHPaned));
 
   Gtk::Frame *const pFrame1 = new Gtk::Frame();
   pHPaned->add1(*Gtk::manage(pFrame1));
-  pFrame1->set_shadow_type(Gtk::SHADOW_IN);
+  pFrame1->set_shadow_type(Gtk::ShadowType::IN);
   pFrame1->set_size_request(60, 60);
   pFrame1->add(*Gtk::manage(new Gtk::Button("_Hi there", true)));
 
   Gtk::Frame *const pFrame2 = new Gtk::Frame();
   pHPaned->add2(*Gtk::manage(pFrame2));
-  pFrame2->set_shadow_type(Gtk::SHADOW_IN);
+  pFrame2->set_shadow_type(Gtk::ShadowType::IN);
   pFrame2->set_size_request(80, 60);
 
   Gtk::Frame *const pFrame3 = new Gtk::Frame();
   pVPaned->add2(*Gtk::manage(pFrame3));
-  pFrame3->set_shadow_type(Gtk::SHADOW_IN);
+  pFrame3->set_shadow_type(Gtk::ShadowType::IN);
   pFrame3->set_size_request(60, 80);
 
   // Now create check buttons to control sizing

@@ -47,7 +47,7 @@ Gtk::Window* do_headerbar()
 }
 
 Example_HeaderBar::Example_HeaderBar()
-: m_arrow_buttons_box(Gtk::ORIENTATION_HORIZONTAL)
+: m_arrow_buttons_box(Gtk::Orientation::HORIZONTAL)
 {
   // Window properties
   // Window title is set by header bar
@@ -82,7 +82,7 @@ void Example_HeaderBar::configure_send_receive_button()
      GTKMM_DISABLE_DEPRECATED on g++ */
   auto icon = Gio::ThemedIcon::create("mail-send-receive-symbolic", false);
 
-  m_send_receive_image.set(icon, Gtk::ICON_SIZE_BUTTON);
+  m_send_receive_image.set(icon, Gtk::BuiltinIconSize::BUTTON);
   m_send_receive_button.add(m_send_receive_image);
 }
 
@@ -90,8 +90,8 @@ void Example_HeaderBar::configure_arrow_buttons()
 {
   m_arrow_buttons_box.get_style_context()->add_class("linked");
 
-  m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::ICON_SIZE_BUTTON, true);
-  m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+  m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::BuiltinIconSize::BUTTON, true);
+  m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::BuiltinIconSize::BUTTON, true);
 
   m_arrow_buttons_box.add(m_left_arrow_button);
   m_arrow_buttons_box.add(m_right_arrow_button);

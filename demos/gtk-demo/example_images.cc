@@ -46,7 +46,7 @@ Gtk::Window* do_images()
 
 Example_Images::Example_Images()
 :
-  m_VBox                (Gtk::ORIENTATION_VERTICAL, 8),
+  m_VBox                (Gtk::Orientation::VERTICAL, 8),
   m_image_stream        ()
 {
   set_title("Images");
@@ -59,10 +59,10 @@ Example_Images::Example_Images()
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
   m_VBox.pack_start(m_Label_Image, Gtk::PACK_SHRINK);
 
-  m_Frame_Image.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame_Image.set_shadow_type(Gtk::ShadowType::IN);
 
-  m_Frame_Image.set_halign(Gtk::ALIGN_CENTER);
-  m_Frame_Image.set_valign(Gtk::ALIGN_CENTER);
+  m_Frame_Image.set_halign(Gtk::Align::CENTER);
+  m_Frame_Image.set_valign(Gtk::Align::CENTER);
   m_VBox.pack_start(m_Frame_Image, Gtk::PACK_SHRINK);
 
   auto pImage = Gtk::manage(new Gtk::Image());
@@ -74,10 +74,10 @@ Example_Images::Example_Images()
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
   m_VBox.pack_start(m_Label_Animation, Gtk::PACK_SHRINK);
 
-  m_Frame_Animation.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame_Animation.set_shadow_type(Gtk::ShadowType::IN);
 
-  m_Frame_Animation.set_halign(Gtk::ALIGN_CENTER);
-  m_Frame_Animation.set_valign(Gtk::ALIGN_CENTER);
+  m_Frame_Animation.set_halign(Gtk::Align::CENTER);
+  m_Frame_Animation.set_valign(Gtk::Align::CENTER);
   m_VBox.pack_start(m_Frame_Animation, Gtk::PACK_SHRINK);
 
   pImage = Gtk::manage(new Gtk::Image());
@@ -89,7 +89,7 @@ Example_Images::Example_Images()
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
   m_VBox.pack_start(m_Label_Progressive, Gtk::PACK_SHRINK);
 
-  m_Frame_Progressive.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame_Progressive.set_shadow_type(Gtk::ShadowType::IN);
 
   m_VBox.pack_start(m_Frame_Progressive, Gtk::PACK_SHRINK);
 
@@ -141,7 +141,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Failure reading image 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
       dialog.run();
 
       m_image_stream.reset();
@@ -158,7 +158,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Failed to load image: ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
       dialog.run();
 
       m_image_stream.reset();
@@ -184,7 +184,7 @@ bool Example_Images::on_timeout()
         Glib::ustring strMsg = "Failed to close image: ";
         strMsg += error.what();
 
-        Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+        Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
         dialog.run();
 
         m_refPixbufLoader.reset();
@@ -206,7 +206,7 @@ bool Example_Images::on_timeout()
       Glib::ustring strMsg = "Unable to open image 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
       dialog.run();
 
       return false; // uninstall the timeout

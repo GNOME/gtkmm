@@ -31,9 +31,9 @@ Gtk::Window* do_buttonbox()
 Example_ButtonBox::Example_ButtonBox()
 : m_Frame_Horizontal("Horizontal Button Boxes"),
   m_Frame_Vertical("Vertical Button Boxes"),
-  m_VBox_Main(Gtk::ORIENTATION_VERTICAL),
-  m_VBox(Gtk::ORIENTATION_VERTICAL),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL)
+  m_VBox_Main(Gtk::Orientation::VERTICAL),
+  m_VBox(Gtk::Orientation::VERTICAL),
+  m_HBox(Gtk::Orientation::HORIZONTAL)
 {
   set_title("Button Boxes");
 
@@ -47,20 +47,20 @@ Example_ButtonBox::Example_ButtonBox()
   m_VBox.property_margin() = 10;
   m_Frame_Horizontal.add(m_VBox);
 
-  m_VBox.pack_start( *(create_button_box(true, "Spread", 40, Gtk::BUTTONBOX_SPREAD)) );
-  m_VBox.pack_start( *(create_button_box(true, "Edge", 40, Gtk::BUTTONBOX_EDGE)) );
-  m_VBox.pack_start( *(create_button_box(true, "Start", 40, Gtk::BUTTONBOX_START)) );
-  m_VBox.pack_start( *(create_button_box(true, "End", 40, Gtk::BUTTONBOX_END)) );
+  m_VBox.pack_start( *(create_button_box(true, "Spread", 40, Gtk::ButtonBoxStyle::SPREAD)) );
+  m_VBox.pack_start( *(create_button_box(true, "Edge", 40, Gtk::ButtonBoxStyle::EDGE)) );
+  m_VBox.pack_start( *(create_button_box(true, "Start", 40, Gtk::ButtonBoxStyle::START)) );
+  m_VBox.pack_start( *(create_button_box(true, "End", 40, Gtk::ButtonBoxStyle::END)) );
 
   m_VBox_Main.pack_start(m_Frame_Vertical, Gtk::PACK_EXPAND_WIDGET, 10);
 
   m_HBox.property_margin() = 10;
   m_Frame_Vertical.add(m_HBox);
 
-  m_HBox.pack_start( *(create_button_box(false, "Spread", 30, Gtk::BUTTONBOX_SPREAD)) );
-  m_HBox.pack_start( *(create_button_box(false, "Edge", 30, Gtk::BUTTONBOX_EDGE)) );
-  m_HBox.pack_start( *(create_button_box(false, "Start", 30, Gtk::BUTTONBOX_START)) );
-  m_HBox.pack_start( *(create_button_box(false, "End", 30, Gtk::BUTTONBOX_END)) );
+  m_HBox.pack_start( *(create_button_box(false, "Spread", 30, Gtk::ButtonBoxStyle::SPREAD)) );
+  m_HBox.pack_start( *(create_button_box(false, "Edge", 30, Gtk::ButtonBoxStyle::EDGE)) );
+  m_HBox.pack_start( *(create_button_box(false, "Start", 30, Gtk::ButtonBoxStyle::START)) );
+  m_HBox.pack_start( *(create_button_box(false, "End", 30, Gtk::ButtonBoxStyle::END)) );
 }
 
 Example_ButtonBox::~Example_ButtonBox()
@@ -73,10 +73,10 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
 
   Gtk::ButtonBox* pButtonBox = nullptr;
   if (horizontal)
-    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_HORIZONTAL));
+    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::Orientation::HORIZONTAL));
   else
   {
-    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_VERTICAL));
+    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::Orientation::VERTICAL));
     pFrame->set_margin_start(5);
     pFrame->set_margin_end(5);
   }

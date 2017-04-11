@@ -11,7 +11,7 @@ private:
 
 MyWindow::MyWindow() :
   b("hello"),
-  vbox(Gtk::ORIENTATION_VERTICAL)
+  vbox(Gtk::Orientation::VERTICAL)
 {
   add(vbox);
   vbox.pack_start(b);

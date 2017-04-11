@@ -100,15 +100,15 @@ protected:
 
 Example_ChangeDisplay::Example_ChangeDisplay()
 : Gtk::Dialog("Change Display"),
-  m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
+  m_VBox(Gtk::Orientation::VERTICAL, 5),
   m_Frame_Display("Display"),
-  m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5),
+  m_ButtonBox_Display(Gtk::Orientation::VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
   m_pPopup(nullptr),
   m_popup_clicked(false)
 {
-  add_button("_Close", Gtk::RESPONSE_CLOSE);
-  add_button("Change", Gtk::RESPONSE_OK);
+  add_button("_Close", Gtk::ResponseType::CLOSE);
+  add_button("Change", Gtk::ResponseType::OK);
 
   set_default_size(300, 400);
 
@@ -135,7 +135,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
     m_VBox.pack_start(m_Frame_Display);
 
-    m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
+    m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SizeGroupMode::HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
   }
 
@@ -153,20 +153,20 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
 {
-  auto pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
+  auto pHBox = Gtk::manage( new Gtk::Box(Gtk::Orientation::HORIZONTAL, 8) );
   pHBox->property_margin() = 8;
   frame.add(*pHBox);
 
   auto pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );
-  pScrolledWindow->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
-  pScrolledWindow->set_shadow_type(Gtk::SHADOW_IN);
+  pScrolledWindow->set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
+  pScrolledWindow->set_shadow_type(Gtk::ShadowType::IN);
   pHBox->pack_start(*pScrolledWindow);
 
   treeview.set_headers_visible(false);
   pScrolledWindow->add(treeview);
 
   auto refSelection = treeview.get_selection();
-  refSelection->set_mode(Gtk::SELECTION_BROWSE);
+  refSelection->set_mode(Gtk::SelectionMode::BROWSE);
 
   pHBox->pack_start(buttonbox, Gtk::PACK_SHRINK);
 }
@@ -206,10 +206,10 @@ void Example_ChangeDisplay::on_display_closed(bool /* is_error */, Glib::RefPtr<
 void Example_ChangeDisplay::on_button_display_open()
 {
   Gtk::Dialog dialog("Open Display", true);
-  dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-  dialog.add_button("_OK", Gtk::RESPONSE_OK);
+  dialog.add_button("_Cancel", Gtk::ResponseType::CANCEL);
+  dialog.add_button("_OK", Gtk::ResponseType::OK);
 
-  dialog.set_default_response(Gtk::RESPONSE_OK);
+  dialog.set_default_response(Gtk::ResponseType::OK);
 
   Gtk::Entry entry;
   entry.set_activates_default();
@@ -225,7 +225,7 @@ void Example_ChangeDisplay::on_button_display_open()
   while (!refResult)
   {
     gint response_id = dialog.run();
-    if (response_id != Gtk::RESPONSE_OK)
+    if (response_id != Gtk::ResponseType::OK)
       break;
 
     auto new_screen_name = entry.get_text();
@@ -277,7 +277,7 @@ void Example_ChangeDisplay::query_change_display()
 
 void Example_ChangeDisplay::on_response(int response_id)
 {
-  if (response_id == Gtk::RESPONSE_OK)
+  if (response_id == Gtk::ResponseType::OK)
     query_change_display();
   else
     hide();
@@ -303,15 +303,15 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   m_pPopup->show();
 
-  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
+  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::CursorType::CROSSHAIR);
 
   Gtk::Window* toplevel = nullptr;
 
   //TODO: Find a suitable replacement for this:
   //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
   //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
-  const auto grabbed = Gdk::GRAB_SUCCESS;
-  if(grabbed == Gdk::GRAB_SUCCESS )
+  const auto grabbed = Gdk::GrabStatus::SUCCESS;
+  if(grabbed == Gdk::GrabStatus::SUCCESS )
   {
     m_popup_clicked = false;
     m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
@@ -367,14 +367,14 @@ bool Example_ChangeDisplay::on_popup_button_release_event(GdkEventButton* /* eve
 }
 
 Popup::Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
-: Gtk::Window(Gtk::WINDOW_POPUP),
+: Gtk::Window(Gtk::WindowType::POPUP),
   m_Label(prompt)
 {
   set_screen(screen);
   set_modal(true);
-  set_position(Gtk::WIN_POS_CENTER);
+  set_position(Gtk::WindowPosition::CENTER);
 
-  m_Frame.set_shadow_type(Gtk::SHADOW_OUT);
+  m_Frame.set_shadow_type(Gtk::ShadowType::OUT);
   add(m_Frame);
 
   m_Label.property_margin() = 10;

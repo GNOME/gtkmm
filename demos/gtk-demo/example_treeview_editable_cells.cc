@@ -97,9 +97,9 @@ Gtk::Window* do_treeview_editable_cells()
 
 
 Example_TreeView_EditableCells::Example_TreeView_EditableCells()
-: m_VBox(Gtk::ORIENTATION_VERTICAL, 5),
+: m_VBox(Gtk::Orientation::VERTICAL, 5),
   m_Label("Shopping list (you can edit the cells!)"),
-  m_HBox(Gtk::ORIENTATION_HORIZONTAL, 4),
+  m_HBox(Gtk::Orientation::HORIZONTAL, 4),
   m_Button_Add("Add item"),
   m_Button_Remove("Remove item")
 {
@@ -110,8 +110,8 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   add(m_VBox);
   m_VBox.pack_start(m_Label, Gtk::PACK_SHRINK);
 
-  m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_ETCHED_IN);
-  m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
+  m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_VBox.pack_start(m_ScrolledWindow);
 
   /* create model */
@@ -120,7 +120,7 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   /* create tree view */
   m_TreeView.set_model(m_refListStore);
   auto refTreeSelection = m_TreeView.get_selection();
-  refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+  refTreeSelection->set_mode(Gtk::SelectionMode::SINGLE);
 
   add_columns();
   m_ScrolledWindow.add(m_TreeView);

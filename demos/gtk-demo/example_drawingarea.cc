@@ -50,7 +50,7 @@ Gtk::Window* do_drawingarea()
 
 Example_DrawingArea::Example_DrawingArea()
 :
-  m_VBox(Gtk::ORIENTATION_VERTICAL, 8)
+  m_VBox(Gtk::Orientation::VERTICAL, 8)
 {
   set_title("Drawing Area");
 
@@ -63,7 +63,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_Label_Checkerboard.set_markup("<u>Checkerboard pattern</u>");
   m_VBox.pack_start(m_Label_Checkerboard, Gtk::PACK_SHRINK);
 
-  m_Frame_Checkerboard.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame_Checkerboard.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame_Checkerboard);
 
   /* set a minimum size */
@@ -80,7 +80,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_Label_Scribble.set_markup("<u>Scribble area</u>");
   m_VBox.pack_start(m_Label_Scribble, Gtk::PACK_SHRINK);
 
-  m_Frame_Scribble.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame_Scribble.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame_Scribble);
 
   /* set a minimum size */
@@ -104,10 +104,10 @@ Example_DrawingArea::Example_DrawingArea()
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to.
    */
-  m_DrawingArea_Scribble.add_events(Gdk::LEAVE_NOTIFY_MASK |
-                                    Gdk::BUTTON_PRESS_MASK |
-                                    Gdk::POINTER_MOTION_MASK |
-                                    Gdk::STRUCTURE_MASK);
+  m_DrawingArea_Scribble.add_events(Gdk::EventMask::LEAVE_NOTIFY_MASK |
+                                    Gdk::EventMask::BUTTON_PRESS_MASK |
+                                    Gdk::EventMask::POINTER_MOTION_MASK |
+                                    Gdk::EventMask::STRUCTURE_MASK);
 }
 
 Example_DrawingArea::~Example_DrawingArea()
@@ -206,7 +206,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
         Glib::wrap(motion_event->device, true); // true == take_copy
       refWindow->get_device_position(device, x, y, state);
 
-      if((state & Gdk::BUTTON1_MASK) != 0)
+      if((state & Gdk::ModifierType::BUTTON1_MASK) != Gdk::ModifierType::BUTTON1_MASK)
         scribble_draw_brush(x, y);
     }
   }

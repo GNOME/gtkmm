@@ -37,10 +37,10 @@ Gtk::Window* do_stacksidebar()
 
 Example_StackSidebar::Example_StackSidebar()
 :
-  m_Box(Gtk::ORIENTATION_HORIZONTAL),
+  m_Box(Gtk::Orientation::HORIZONTAL),
   m_HeaderBar(),
   m_StackSidebar(),
-  m_Separator(Gtk::ORIENTATION_VERTICAL),
+  m_Separator(Gtk::Orientation::VERTICAL),
   m_Stack()
 {
   m_HeaderBar.set_show_close_button(true);
@@ -54,7 +54,7 @@ Example_StackSidebar::Example_StackSidebar()
   m_Box.pack_start(m_Separator, Gtk::PACK_SHRINK);
   m_Box.pack_start(m_Stack, Gtk::PACK_EXPAND_WIDGET);
 
-  m_Stack.set_transition_type(Gtk::STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
+  m_Stack.set_transition_type(Gtk::StackTransitionType::SLIDE_UP_DOWN);
   m_StackSidebar.set_stack(m_Stack);
 
   // Stack pages
@@ -65,7 +65,7 @@ Example_StackSidebar::Example_StackSidebar()
     if (i == 0)
     {
       auto image = Gtk::manage(new Gtk::Image());
-      image->set_from_icon_name("help-about", Gtk::ICON_SIZE_MENU);
+      image->set_from_icon_name("help-about", Gtk::BuiltinIconSize::MENU);
       image->set_pixel_size(256);
       widget = image;
     }

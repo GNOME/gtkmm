@@ -60,7 +60,7 @@ Gtk::Window* do_iconview()
 }
 
 Example_IconView::Example_IconView()
-: m_VBox(Gtk::ORIENTATION_VERTICAL),
+: m_VBox(Gtk::Orientation::VERTICAL),
   m_ButtonUp(),
   m_ButtonHome()
 {
@@ -90,22 +90,22 @@ Example_IconView::Example_IconView()
   m_ButtonHome.set_sensitive();
   m_Toolbar.append(m_ButtonHome);
 
-  m_ScrolledWindow.set_shadow_type(Gtk::SHADOW_ETCHED_IN);
-  m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
+  m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
   m_VBox.pack_start(m_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
 
   //Create the data model:
   m_model = Gtk::ListStore::create(m_columns);
   m_model->set_default_sort_func( sigc::mem_fun(*this, &Example_IconView::on_model_sort) );
-  m_model->set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SORT_ASCENDING);
+  m_model->set_sort_column(Gtk::TreeSortable::DEFAULT_SORT_COLUMN_ID, Gtk::SortType::ASCENDING);
 
   /* and fill it with the contents of '/' */
   m_parent = "/";
   fill_store();
 
   m_IconView.set_model(m_model);
-  m_IconView.set_selection_mode(Gtk::SELECTION_MULTIPLE);
+  m_IconView.set_selection_mode(Gtk::SelectionMode::MULTIPLE);
 
   //Connect signals:
   m_ButtonUp.signal_clicked().connect( sigc::mem_fun(*this, &Example_IconView::on_button_up) );
@@ -191,7 +191,7 @@ void Example_IconView::fill_store()
       if (name[0] != '.')
       {
         auto path = Glib::build_filename(m_parent, name);
-        bool is_dir = Glib::file_test(path, Glib::FILE_TEST_IS_DIR);
+        bool is_dir = Glib::file_test(path, Glib::FileTest::IS_DIR);
 
         auto display_name = Glib::filename_to_utf8(name);
 

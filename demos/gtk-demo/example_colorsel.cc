@@ -34,7 +34,7 @@ Gtk::Window* do_colorsel()
 }
 
 Example_ColorSel::Example_ColorSel()
-: m_VBox(Gtk::ORIENTATION_VERTICAL, 8),
+: m_VBox(Gtk::Orientation::VERTICAL, 8),
   m_Button("_Change the above color", true)
 {
   set_title("Color Chooser");
@@ -43,7 +43,7 @@ Example_ColorSel::Example_ColorSel()
   add(m_VBox);
 
   // Create the color swatch area
-  m_Frame.set_shadow_type(Gtk::SHADOW_IN);
+  m_Frame.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame);
 
   // set a fixed size
@@ -56,8 +56,8 @@ Example_ColorSel::Example_ColorSel()
 
   m_Frame.add(m_DrawingArea);
 
-  m_Button.set_halign(Gtk::ALIGN_END);
-  m_Button.set_valign(Gtk::ALIGN_CENTER);
+  m_Button.set_halign(Gtk::Align::END);
+  m_Button.set_valign(Gtk::Align::CENTER);
 
   m_VBox.pack_start(m_Button, Gtk::PACK_SHRINK);
 
@@ -76,7 +76,7 @@ void Example_ColorSel::on_button_clicked()
 
   const int response = dialog.run();
 
-  if(response == Gtk::RESPONSE_OK)
+  if(response == Gtk::ResponseType::OK)
   {
     m_Color = dialog.get_rgba();
   }

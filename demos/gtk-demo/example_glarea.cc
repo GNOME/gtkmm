@@ -37,9 +37,9 @@ public:
   ~Example_GLArea() override;
 
 protected:
-  Gtk::Box m_VBox {Gtk::ORIENTATION_VERTICAL, false};
+  Gtk::Box m_VBox {Gtk::Orientation::VERTICAL, false};
   Gtk::GLArea m_GLArea;
-  Gtk::Box m_Controls {Gtk::ORIENTATION_VERTICAL, false};
+  Gtk::Box m_Controls {Gtk::Orientation::VERTICAL, false};
   Gtk::Button m_Button {"Quit"};
 
   GLuint m_Vao {0};
@@ -170,7 +170,7 @@ bool Example_GLArea::render(const Glib::RefPtr<Gdk::GLContext>& /* context */)
 
 Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
 {
-  auto box = Gtk::manage(new Gtk::Box{Gtk::ORIENTATION_HORIZONTAL, false});
+  auto box = Gtk::manage(new Gtk::Box{Gtk::Orientation::HORIZONTAL, false});
 
   const char* text;
 
@@ -206,7 +206,7 @@ Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
   adj->signal_value_changed().connect(
     sigc::bind(sigc::mem_fun(*this, &Example_GLArea::on_axis_value_change), axis, adj)
                                       );
-  auto slider = Gtk::manage(new Gtk::Scale{adj, Gtk::ORIENTATION_HORIZONTAL});
+  auto slider = Gtk::manage(new Gtk::Scale{adj, Gtk::Orientation::HORIZONTAL});
   box->add(*slider);
   slider->set_hexpand(true);
   slider->show();

@@ -62,7 +62,7 @@ Gtk::Window* do_textview()
 }
 
 Example_TextView::Example_TextView()
-: m_VPaned(Gtk::ORIENTATION_VERTICAL)
+: m_VPaned(Gtk::Orientation::VERTICAL)
 {
   set_default_size(450, 450);
   set_title("Text View");
@@ -78,11 +78,11 @@ Example_TextView::Example_TextView()
   auto refBuffer = m_View1.get_buffer();
   m_pView2 = Gtk::manage( new Gtk::TextView(refBuffer) );
 
-  m_ScrolledWindow1.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow1.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_VPaned.add1(m_ScrolledWindow1);
   m_ScrolledWindow1.add(m_View1);
 
-  m_ScrolledWindow2.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow2.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_VPaned.add2(m_ScrolledWindow2);
   m_ScrolledWindow2.add(*m_pView2);
 
@@ -120,11 +120,11 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   Glib::RefPtr<Gtk::TextBuffer::Tag> refTag;
 
   refTag = refBuffer->create_tag("heading");
-  refTag->property_weight() = Pango::WEIGHT_BOLD;
+  refTag->property_weight() = static_cast<int>(Pango::Weight::BOLD);
   refTag->property_size() = 15 * Pango::SCALE;
 
-  refBuffer->create_tag("italic")->property_style() = Pango::STYLE_ITALIC;
-  refBuffer->create_tag("bold")->property_weight() = Pango::WEIGHT_BOLD;
+  refBuffer->create_tag("italic")->property_style() = Pango::Style::ITALIC;
+  refBuffer->create_tag("bold")->property_weight() = static_cast<int>(Pango::Weight::BOLD);
   refBuffer->create_tag("big")->property_size() = 20 * Pango::SCALE;
   refBuffer->create_tag("xx-small")->property_scale() = Pango::SCALE_XX_SMALL;
   refBuffer->create_tag("x-large")->property_scale() = Pango::SCALE_X_LARGE;
@@ -136,19 +136,19 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refBuffer->create_tag("big_gap_after_line")->property_pixels_below_lines() = 30;
   refBuffer->create_tag("double_spaced_line")->property_pixels_inside_wrap() = 10;
   refBuffer->create_tag("not_editable")->property_editable() = FALSE;
-  refBuffer->create_tag("word_wrap")->property_wrap_mode() = Gtk::WRAP_WORD;
-  refBuffer->create_tag("char_wrap")->property_wrap_mode() = Gtk::WRAP_CHAR;
-  refBuffer->create_tag("no_wrap")->property_wrap_mode() = Gtk::WRAP_NONE;
-  refBuffer->create_tag("center")->property_justification() = Gtk::JUSTIFY_CENTER;
-  refBuffer->create_tag("right_justify")->property_justification() = Gtk::JUSTIFY_RIGHT;
+  refBuffer->create_tag("word_wrap")->property_wrap_mode() = Gtk::WrapMode::WORD;
+  refBuffer->create_tag("char_wrap")->property_wrap_mode() = Gtk::WrapMode::CHAR;
+  refBuffer->create_tag("no_wrap")->property_wrap_mode() = Gtk::WrapMode::NONE;
+  refBuffer->create_tag("center")->property_justification() = Gtk::Justification::CENTER;
+  refBuffer->create_tag("right_justify")->property_justification() = Gtk::Justification::RIGHT;
 
   refTag = refBuffer->create_tag("wide_margins");
   refTag->property_left_margin() = 50;
   refTag->property_right_margin() = 50;
 
   refBuffer->create_tag("strikethrough")->property_strikethrough() = true;
-  refBuffer->create_tag("underline")->property_underline() = Pango::UNDERLINE_SINGLE;
-  refBuffer->create_tag("double_underline")->property_underline() = Pango::UNDERLINE_DOUBLE;
+  refBuffer->create_tag("underline")->property_underline() = Pango::Underline::SINGLE;
+  refBuffer->create_tag("double_underline")->property_underline() = Pango::Underline::DOUBLE;
 
   refTag = refBuffer->create_tag("superscript");
   refTag->property_rise() = 10 * Pango::SCALE;	  /* 10 pixels */
@@ -159,8 +159,8 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   refTag->property_size() = 8 * Pango::SCALE;	   /* 8 points */
 
   refTag = refBuffer->create_tag("rtl_quote");
-  refTag->property_wrap_mode() = Gtk::WRAP_WORD;
-  refTag->property_direction() = Gtk::TEXT_DIR_RTL;
+  refTag->property_wrap_mode() = Gtk::WrapMode::WORD;
+  refTag->property_direction() = Gtk::TextDirection::RTL;
   refTag->property_indent() = 30;
   refTag->property_left_margin() = 20;
   refTag->property_right_margin() = 20;
@@ -172,7 +172,7 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   try
   {
     refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
-    auto refScaled = refPixbuf->scale_simple(32, 32, Gdk::INTERP_BILINEAR);
+    auto refScaled = refPixbuf->scale_simple(32, 32, Gdk::InterpType::BILINEAR);
     refPixbuf = refScaled;
   }
   catch (const Glib::Error& error)
@@ -400,7 +400,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 2)
     {
-      auto pHScale = Gtk::manage( new Gtk::Scale(Gtk::ORIENTATION_HORIZONTAL) );
+      auto pHScale = Gtk::manage( new Gtk::Scale(Gtk::Orientation::HORIZONTAL) );
       pHScale->set_range(0, 100);
       pHScale->set_size_request(70, -1);
 
@@ -451,7 +451,7 @@ Window_EasterEgg::Window_EasterEgg()
 
   recursive_attach_view(0, *m_pTextView, refAnchor);
 
-  m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   add(m_ScrolledWindow);
   m_ScrolledWindow.add(*m_pTextView);
 

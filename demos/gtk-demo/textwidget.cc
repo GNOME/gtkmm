@@ -28,8 +28,8 @@ using std::strlen;
 
 TextWidget::TextWidget(bool is_source)
 {
-  set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-  set_shadow_type (Gtk::SHADOW_IN);
+  set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
+  set_shadow_type (Gtk::ShadowType::IN);
 
   m_refTextBuffer = Gtk::TextBuffer::create();
   m_TextView.set_buffer(m_refTextBuffer);
@@ -39,7 +39,7 @@ TextWidget::TextWidget(bool is_source)
 
   if (is_source)
   {
-    m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
+    m_TextView.set_wrap_mode (Gtk::WrapMode::NONE);
 
     auto refTag = m_refTextBuffer->create_tag("source");
     refTag->property_font() = "Courier 12";
@@ -53,24 +53,24 @@ TextWidget::TextWidget(bool is_source)
     refTag = m_refTextBuffer->create_tag("string");
 
     refTag->property_foreground() = "RosyBrown";
-    refTag->property_weight() = Pango::WEIGHT_BOLD;
+    refTag->property_weight() = static_cast<int>(Pango::Weight::BOLD);
 
 
     refTag = m_refTextBuffer->create_tag("control");
     refTag->property_foreground() = "purple";
 
     refTag = m_refTextBuffer->create_tag("preprocessor");
-    refTag->property_style() = Pango::STYLE_OBLIQUE;
+    refTag->property_style() = Pango::Style::OBLIQUE;
     refTag->property_foreground() = "burlywood4";
 
     refTag = m_refTextBuffer->create_tag("function");
-    refTag->property_weight() = Pango::WEIGHT_BOLD;
+    refTag->property_weight() = static_cast<int>(Pango::Weight::BOLD);
     refTag->property_foreground() = "DarkGoldenrod4";
   }
   else
   {
     // Make it a bit nicer for text.
-    m_TextView.set_wrap_mode (Gtk::WRAP_WORD);
+    m_TextView.set_wrap_mode (Gtk::WrapMode::WORD);
     m_TextView.set_pixels_above_lines(2);
     m_TextView.set_pixels_below_lines(2);
 

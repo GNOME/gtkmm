@@ -53,10 +53,10 @@ Gtk::Window* do_menus()
 }
 
 Example_Menus::Example_Menus()
-: m_VBox1(Gtk::ORIENTATION_VERTICAL),
-  m_VBox_Sub1(Gtk::ORIENTATION_VERTICAL, 10),
-  m_VBox_Sub2(Gtk::ORIENTATION_VERTICAL, 10),
-  m_Separator(Gtk::ORIENTATION_HORIZONTAL),
+: m_VBox1(Gtk::Orientation::VERTICAL),
+  m_VBox_Sub1(Gtk::Orientation::VERTICAL, 10),
+  m_VBox_Sub2(Gtk::Orientation::VERTICAL, 10),
+  m_Separator(Gtk::Orientation::HORIZONTAL),
   m_Button("close")
 {
   set_title("menus");
@@ -96,18 +96,18 @@ Example_Menus::Example_Menus()
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerate Me"));
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE );
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1, Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE);
     pMenu->append(*pMenuItem);
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Locked"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE | Gtk::AccelFlags::LOCKED);
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Frozen"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE);
     pMenuItem->show();
   }
 
