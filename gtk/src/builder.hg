@@ -500,8 +500,8 @@ public:
    * @code
    * MyDerivedDialog* pDialog1 = nullptr;
    * MyDerivedDialog* pDialog2 = nullptr;
-   * refBuilder->get_widget_derived("mydialog1", pDialog1);
-   * refBuilder->get_widget_derived("mydialog2", pDialog2, "A storm is imminent!", true);
+   * get_widget_derived(refBuilder, "mydialog1", pDialog1);
+   * get_widget_derived(refBuilder, "mydialog2", pDialog2, "A storm is imminent!", true);
    * @endcode
    *
    * @note
@@ -515,14 +515,14 @@ public:
    * @retval widget A pointer to the widget, or <tt>nullptr</tt> on failure.
    */
   template <typename T_Widget, typename... Args> inline
-  void get_widget_derived(const Glib::ustring& name, T_Widget*& widget, Args&&... args)
+  static void get_widget_derived(const Glib::RefPtr<Gtk::Builder>& builder, const Glib::ustring& name, T_Widget*& widget, Args&&... args)
   {
      // Initialize output parameter:
      widget = nullptr;
 
      // Get the widget from the GtkBuilder file.
      using cwidget_type = typename T_Widget::BaseObjectType;
-     auto pCWidget = (cwidget_type*)get_cwidget(name);
+     auto pCWidget = (cwidget_type*)builder->get_cwidget(name);
 
      //The error was already reported by get_cwidget().
      if(!pCWidget)
@@ -548,9 +548,7 @@ public:
        //Create a new C++ instance to wrap the existing C instance:
 
        //Set the output variable. We needed to do this because we can not template the return type.
-       Glib::RefPtr<Gtk::Builder> refThis(this);
-       refThis->reference(); //take a copy.
-       widget = new T_Widget(pCWidget, refThis, std::forward<Args>(args)...);
+       widget = new T_Widget(pCWidget, builder, std::forward<Args>(args)...);
        // Don't add reference to widget. That's done only in methods that return
        // a Glib::RefPtr<Something>.
      }
@@ -560,9 +558,9 @@ public:
    * @newin{3,8}
    */
   template <typename T_Widget, typename... Args> inline
-  void get_widget_derived(const Glib::ustring& name, const T_Widget*& widget, Args&&... args) const
+  static void get_widget_derived(const Glib::RefPtr<const Gtk::Builder>& builder, const Glib::ustring& name, const T_Widget*& widget, Args&&... args)
   {
-    const_cast<Builder*>(this)->get_widget_derived(name, widget, std::forward<Args>(args)...);
+    get_widget_derived(std::const_pointer_cast<Gtk::Builder>(builder), name, widget, std::forward<Args>(args)...);
   }
 
 #m4 _CONVERSION(`GSList*',`std::vector<Glib::RefPtr<Glib::Object> >',`Glib::SListHandler<Glib::RefPtr<Glib::Object> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')

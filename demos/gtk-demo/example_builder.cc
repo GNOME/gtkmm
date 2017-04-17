@@ -39,7 +39,7 @@ Gtk::Window* do_builder()
 
   // Get the GtkBuilder-instantiated window:
   Example_Builder* pWindow = nullptr;
-  builder->get_widget_derived("window1", pWindow);
+  Gtk::Builder::get_widget_derived(builder, "window1", pWindow);
   if (!pWindow)
   {
     std::cout << "Could not get 'window1' from the builder." << std::endl;

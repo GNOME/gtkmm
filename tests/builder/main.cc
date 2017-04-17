@@ -114,8 +114,8 @@ public:
     std::cout << "MainWindow::ctor" << std::endl;
 
     // Called twice just to see if two calls affect the ref count.
-    refBuilder->get_widget_derived("derived_button", m_pDerivedButton, "face-smile");
-    refBuilder->get_widget_derived("derived_button", m_pDerivedButton);
+    Gtk::Builder::get_widget_derived(refBuilder, "derived_button", m_pDerivedButton, "face-smile");
+    Gtk::Builder::get_widget_derived(refBuilder, "derived_button", m_pDerivedButton);
     refBuilder->get_widget("standard_button", m_pStandardButton);
     refBuilder->get_widget("standard_button", m_pStandardButton);
 
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
   auto builder = Gtk::Builder::create_from_string(gladefile);
 
   MainWindow* main_win = nullptr;
-  builder->get_widget_derived("main_window", main_win);
+  Gtk::Builder::get_widget_derived(builder, "main_window", main_win);
 
   Gtk::Button* orph_button = nullptr;
   builder->get_widget("orphaned_button", orph_button);
