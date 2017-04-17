@@ -61,7 +61,7 @@ Example_SizeGroup::Example_SizeGroup()
   get_content_area()->pack_start(m_VBox);
   m_VBox.property_margin() = 5;
 
-  m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SizeGroupMode::HORIZONTAL),
+  m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL),
 
   /* Create one frame holding color options
    */
@@ -116,12 +116,12 @@ Example_SizeGroup::~Example_SizeGroup()
 
 void Example_SizeGroup::on_checkbutton_toggled()
 {
-  auto new_mode = Gtk::SizeGroupMode::HORIZONTAL;
+  auto new_mode = Gtk::SizeGroup::Mode::HORIZONTAL;
 
   if(m_CheckButton.get_active())
-    new_mode = Gtk::SizeGroupMode::HORIZONTAL;
+    new_mode = Gtk::SizeGroup::Mode::HORIZONTAL;
   else
-    new_mode = Gtk::SizeGroupMode::NONE;
+    new_mode = Gtk::SizeGroup::Mode::NONE;
 
   m_refSizeGroup->set_mode(new_mode);
 }

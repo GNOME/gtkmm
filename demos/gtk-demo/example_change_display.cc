@@ -135,7 +135,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
     m_VBox.pack_start(m_Frame_Display);
 
-    m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SizeGroupMode::HORIZONTAL);
+    m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
   }
 

@@ -204,7 +204,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
 
-  m_button_size_group = Gtk::SizeGroup::create(Gtk::SizeGroupMode::VERTICAL);
+  m_button_size_group = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::VERTICAL);
   m_button_size_group->add_widget(m_normal_radio);
   m_button_size_group->add_widget(m_symbolic_radio);
   m_button_size_group->add_widget(m_search_button);
