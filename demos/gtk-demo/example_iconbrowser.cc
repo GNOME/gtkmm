@@ -221,7 +221,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_binding_search_button_search_entry = Glib::Binding::bind_property(
     m_search_button.property_active(),
     m_search_bar.property_search_mode_enabled(),
-    Glib::BindingFlags::BIDIRECTIONAL);
+    Glib::Binding::Flags::BIDIRECTIONAL);
   m_vcontent_box.pack_start(m_scrolled_window);
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.add(m_icon_view);
