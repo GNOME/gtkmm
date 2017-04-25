@@ -254,7 +254,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_icon_view.signal_item_activated().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_icon_view_item_activated));
   m_icon_view.signal_query_tooltip().connect(
-    sigc::mem_fun(*this, &Example_IconBrowser::on_icon_view_query_tooltip));
+    sigc::mem_fun(*this, &Example_IconBrowser::on_icon_view_query_tooltip), false);
   m_search_bar.property_search_mode_enabled().signal_changed().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_search_bar_search_mode_enabled_changed));
   m_search_entry.signal_search_changed().connect(

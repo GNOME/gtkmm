@@ -93,13 +93,13 @@ Example_DrawingArea::Example_DrawingArea()
 
   /* Signal used to handle backing surface */
   m_DrawingArea_Scribble.signal_configure_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event), false);
 
   /* Event signals */
   m_DrawingArea_Scribble.signal_motion_notify_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_motion_notify_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_motion_notify_event), false);
   m_DrawingArea_Scribble.signal_button_press_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_button_press_event));
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_button_press_event), false);
 
   /* Ask to receive events the drawing area doesn't normally
    * subscribe to.

@@ -85,7 +85,7 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   // Important that the unrealize signal calls our handler to clean up
   // GL resources _before_ the default unrealize handler is called (the "false")
   m_GLArea.signal_unrealize().connect(sigc::mem_fun(*this, &Example_GLArea::unrealize), false);
-  m_GLArea.signal_render().connect(sigc::mem_fun(*this, &Example_GLArea::render));
+  m_GLArea.signal_render().connect(sigc::mem_fun(*this, &Example_GLArea::render), false);
 
   m_VBox.add(m_Controls);
   m_Controls.set_hexpand(true);

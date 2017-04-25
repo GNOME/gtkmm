@@ -314,8 +314,8 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
   if(grabbed == Gdk::GrabStatus::SUCCESS )
   {
     m_popup_clicked = false;
-    m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
-
+    m_pPopup->signal_button_release_event().connect(
+      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event), false);
 
     // Process events until clicked is set by button_release_event_cb.
     // We pass in may_block=true since we want to wait if there
