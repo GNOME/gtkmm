@@ -303,7 +303,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 
   m_pPopup->show();
 
-  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::CursorType::CROSSHAIR);
+  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::Cursor::Type::CROSSHAIR);
 
   Gtk::Window* toplevel = nullptr;
 
