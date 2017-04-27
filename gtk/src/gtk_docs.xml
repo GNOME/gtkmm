@@ -3,7 +3,7 @@
 <description>
 The signal which gets emitted to activate a URI.
 Applications may connect to it to override the default behaviour,
-which is to call gtk_show_uri().
+which is to call gtk_show_uri_on_window().
 
 Since: 2.24
 
@@ -1056,31 +1056,6 @@ Describes how the border of a UI element should be rendered.
 </parameter>
 </parameters>
 </enum>
-
-<property name="GtkBox:expand">
-<description>
-Whether the child should receive extra space when the parent grows.
-
-Note that the #GtkWidget:halign, #GtkWidget:valign, #GtkWidget:hexpand
-and #GtkWidget:vexpand properties are the preferred way to influence
-child size allocation in containers.
-
-In contrast to #GtkWidget:hexpand, the expand child property does
-not cause the box to expand itself.
-
-</description>
-</property>
-
-<property name="GtkBox:fill">
-<description>
-Whether the child should receive extra space when the parent grows.
-
-Note that the #GtkWidget:halign, #GtkWidget:valign, #GtkWidget:hexpand
-and #GtkWidget:vexpand properties are the preferred way to influence
-child size allocation in containers.
-
-</description>
-</property>
 
 <property name="GtkBuilder:translation-domain">
 <description>
@@ -7151,7 +7126,7 @@ Since: 2.18
 <description>
 The signal which gets emitted to activate a URI.
 Applications may connect to it to override the default behaviour,
-which is to call gtk_show_uri().
+which is to call gtk_show_uri_on_window().
 
 Since: 2.18
 
@@ -7253,18 +7228,6 @@ to this signal and append your menuitems to the @menu.
 </parameters>
 <return></return>
 </signal>
-
-<property name="GtkLabel:angle">
-<description>
-The angle that the baseline of the label makes with the horizontal,
-in degrees, measured counterclockwise. An angle of 90 reads from
-from bottom to top, an angle of 270, from top to bottom. Ignored
-if the label is selectable.
-
-Since: 2.6
-
-</description>
-</property>
 
 <property name="GtkLabel:ellipsize">
 <description>
@@ -7578,7 +7541,7 @@ developer
 The ::activate-link signal is emitted each time the #GtkLinkButton
 has been clicked.
 
-The default handler will call gtk_show_uri() with the URI stored inside
+The default handler will call gtk_show_uri_on_window() with the URI stored inside
 the #GtkLinkButton:uri property.
 
 To override the default behavior, you can connect to the ::activate-link
@@ -10804,9 +10767,6 @@ the GtkRange::change-value signal is responsible for clamping the
 value to the desired number of decimal digits; the default GTK+
 handler clamps the value based on #GtkRange:round-digits.
 
-It is not possible to use delayed update policies in an overridden
-#GtkRange::change-value handler.
-
 Since: 2.6
 
 </description>
@@ -11334,6 +11294,9 @@ when the child of a #GtkRevealer widget is shown or hidden.
 Signal which allows you to change how the scale value is displayed.
 Connect a signal handler which returns an allocated string representing 
 @value. That string will then be used to display the scale's value.
+
+If no user-provided handlers are installed, the value will be displayed on
+its own, rounded according to the value of the #GtkScale:digits property.
 
 Here's an example signal handler which displays a value 1.0 as
 with &quot;--&gt;1.0&lt;--&quot;.
@@ -16629,6 +16592,9 @@ automatically for all new windows.
 
 <signal name="GtkWidget::mnemonic-activate">
 <description>
+The default handler for this signal activates @widget if @group_cycling
+is %FALSE, or just makes @widget grab focus if @group_cycling is %TRUE.
+
 
 </description>
 <parameters>
@@ -16636,8 +16602,8 @@ automatically for all new windows.
 <parameter_description> the object which received the signal.
 </parameter_description>
 </parameter>
-<parameter name="arg1">
-<parameter_description>
+<parameter name="group_cycling">
+<parameter_description> %TRUE if there are other widgets with the same mnemonic
 </parameter_description>
 </parameter>
 </parameters>
@@ -22666,25 +22632,6 @@ Since: 3.10
 </return>
 </function>
 
-<function name="gtk_box_get_center_widget">
-<description>
-Retrieves the center widget of the box.
-
-Since: 3.12
-
-</description>
-<parameters>
-<parameter name="box">
-<parameter_description> a #GtkBox
-</parameter_description>
-</parameter>
-</parameters>
-<return> the center widget
-or %NULL in case no center widget is set.
-
-</return>
-</function>
-
 <function name="gtk_box_get_homogeneous">
 <description>
 Returns whether the box is homogeneous (all children are the
@@ -22756,20 +22703,6 @@ packed with reference to the end of @box.
 <parameter_description> the #GtkWidget to be added to @box
 </parameter_description>
 </parameter>
-<parameter name="expand">
-<parameter_description> %TRUE if the new child is to be given extra space allocated
-to @box. The extra space will be divided evenly between all children
-of @box that use this option
-</parameter_description>
-</parameter>
-<parameter name="fill">
-<parameter_description> %TRUE if space given to @child by the @expand option is
-actually allocated to @child, rather than just padding it.  This
-parameter has no effect if @expand is set to %FALSE.  A child is
-always allocated the full height of a horizontal #GtkBox and the full width
-of a vertical #GtkBox.  This option affects the other dimension
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -22790,20 +22723,6 @@ to the start of @box.
 <parameter_description> the #GtkWidget to be added to @box
 </parameter_description>
 </parameter>
-<parameter name="expand">
-<parameter_description> %TRUE if the new child is to be given extra space allocated
-to @box. The extra space will be divided evenly between all children
-that use this option
-</parameter_description>
-</parameter>
-<parameter name="fill">
-<parameter_description> %TRUE if space given to @child by the @expand option is
-actually allocated to @child, rather than just padding it.  This
-parameter has no effect if @expand is set to %FALSE.  A child is
-always allocated the full height of a horizontal #GtkBox and the full width
-of a vertical #GtkBox. This option affects the other dimension
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -22820,16 +22739,6 @@ Obtains information about how @child is packed into @box.
 </parameter>
 <parameter name="child">
 <parameter_description> the #GtkWidget of the child to query
-</parameter_description>
-</parameter>
-<parameter name="expand">
-<parameter_description> pointer to return location for expand child
-property
-</parameter_description>
-</parameter>
-<parameter name="fill">
-<parameter_description> pointer to return location for fill child
-property
 </parameter_description>
 </parameter>
 <parameter name="pack_type">
@@ -22898,29 +22807,6 @@ Since: 3.10
 <return></return>
 </function>
 
-<function name="gtk_box_set_center_widget">
-<description>
-Sets a center widget; that is a child widget that will be
-centered with respect to the full width of the box, even
-if the children at either side take up different amounts
-of space.
-
-Since: 3.12
-
-</description>
-<parameters>
-<parameter name="box">
-<parameter_description> a #GtkBox
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> the widget to center
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_box_set_child_packing">
 <description>
 Sets the way @child is packed into @box.
@@ -22933,14 +22819,6 @@ Sets the way @child is packed into @box.
 </parameter>
 <parameter name="child">
 <parameter_description> the #GtkWidget of the child to set
-</parameter_description>
-</parameter>
-<parameter name="expand">
-<parameter_description> the new value of the expand child property
-</parameter_description>
-</parameter>
-<parameter name="fill">
-<parameter_description> the new value of the fill child property
 </parameter_description>
 </parameter>
 <parameter name="pack_type">
@@ -24341,7 +24219,7 @@ Since: 3.10
 </description>
 <parameters>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -31139,28 +31017,6 @@ has been set explicitly.
 </return>
 </function>
 
-<function name="gtk_container_get_focus_child">
-<description>
-Returns the current focus child widget inside @container. This is not the
-currently focused widget. That can be obtained by calling
-gtk_window_get_focus().
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="container">
-<parameter_description> a #GtkContainer
-</parameter_description>
-</parameter>
-</parameters>
-<return> The child widget which will receive the
-focus inside @container when the @container is focused,
-or %NULL if none is set.
-
-</return>
-</function>
-
 <function name="gtk_container_get_focus_hadjustment">
 <description>
 Retrieves the horizontal focus adjustment for the container. See
@@ -32674,7 +32530,7 @@ A convenient way to sensitize/desensitize dialog buttons.
 
 <function name="gtk_disable_setlocale">
 <description>
-Prevents gtk_init(), gtk_init_check(), gtk_init_with_args() and
+Prevents gtk_init(), gtk_init_check() and
 gtk_parse_args() from automatically
 calling `setlocale (LC_ALL, &quot;&quot;)`. You would
 want to use this function if you wanted to set the locale for
@@ -40837,8 +40693,8 @@ If @label is %NULL, the label is omitted.
 
 <function name="gtk_frame_set_label">
 <description>
-Sets the text of the label. If @label is %NULL,
-the current label is removed.
+Removes the current #GtkFrame:label-widget. If @label is not %NULL, creates a
+new #GtkLabel with that text and adds it as the #GtkFrame:label-widget.
 
 </description>
 <parameters>
@@ -40884,9 +40740,8 @@ will be completely above or below the frame.
 
 <function name="gtk_frame_set_label_widget">
 <description>
-Sets the label widget for the frame. This is the widget that
-will appear embedded in the top edge of the frame as a
-title.
+Sets the #GtkFrame:label-widget for the frame. This is the widget that
+will appear embedded in the top edge of the frame as a title.
 
 </description>
 <parameters>
@@ -40904,7 +40759,10 @@ title.
 
 <function name="gtk_frame_set_shadow_type">
 <description>
-Sets the shadow type for @frame.
+Sets the #GtkFrame:shadow-type for @frame, i.e. whether it is drawn without
+(GTK_SHADOW_NONE) or with (other values) a visible border. Values other than
+GTK_SHADOW_NONE are treated identically by #GtkFrame. The chosen type is
+applied by removing or adding the .flat class to the main CSS node, frame.
 
 </description>
 <parameters>
@@ -41275,11 +41133,11 @@ Since: 3.14
 </parameter_description>
 </parameter>
 <parameter name="sequence">
-<parameter_description> a #GdkEventSequence
+<parameter_description> a #GdkEventSequence or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @gesture is handling @sequence
+<return> %TRUE if @gesture is handling @sequence, %FALSE otherwise
 
 </return>
 </function>
@@ -46966,7 +46824,7 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -47130,7 +46988,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -47190,7 +47048,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="surface">
-<parameter_description> a cairo_surface_t
+<parameter_description> a cairo_surface_t or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -47699,25 +47557,6 @@ Destroys a key hash created with gtk_key_hash_new()
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_label_get_angle">
-<description>
-Gets the angle of rotation for the label. See
-gtk_label_set_angle().
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-</parameters>
-<return> the angle of rotation for the label
-
-</return>
 </function>
 
 <function name="gtk_label_get_attributes">
@@ -48261,30 +48100,6 @@ this function has no effect. If @start_offset or
 </parameter>
 <parameter name="end_offset">
 <parameter_description> end offset (in characters not bytes)
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_label_set_angle">
-<description>
-Sets the angle of rotation for the label. An angle of 90 reads from
-from bottom to top, an angle of 270, from top to bottom. The angle
-setting for the label is ignored if the label is selectable,
-wrapped, or ellipsized.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-<parameter name="angle">
-<parameter_description> the angle that the baseline of the label makes with
-the horizontal, in degrees, measured counterclockwise
 </parameter_description>
 </parameter>
 </parameters>
@@ -66566,9 +66381,10 @@ Since: 3.0
 
 <function name="gtk_scale_set_digits">
 <description>
-Sets the number of decimal places to which the value is rounded when it is
-changed. This also sets the number of digits shown in the displayed value
-when using the default handler for the #GtkScale::format-value signal.
+Sets the number of decimal places that are displayed in the value. Also
+causes the value of the adjustment to be rounded to this number of digits
+whenever it is changed, so the retrieved value matches the displayed one, if
+#GtkScale:draw-value is TRUE at the time of the change.
 
 Note that rounding to a small number of digits can interfere with
 the smooth autoscrolling that is built into #GtkScale. As an alternative,
@@ -66582,7 +66398,8 @@ value yourself.
 </parameter_description>
 </parameter>
 <parameter name="digits">
-<parameter_description> the number of decimal places to which the value will be rounded
+<parameter_description> the number of decimal places to display,
+e.g. use 1 to display 1.0, 2 to display 1.00, etc
 </parameter_description>
 </parameter>
 </parameters>
@@ -68667,18 +68484,13 @@ Since: 2.6
 
 <function name="gtk_show_uri">
 <description>
-This is a convenience function for launching the default application
-to show the uri. The uri must be of a form understood by GIO (i.e. you
-need to install gvfs to get support for uri schemes such as http://
-or ftp://, as only local files are handled by GIO itself).
-Typical examples are
-- `file:///home/gnome/pict.jpg`
-- `http://www.gnome.org`
-- `mailto:me@gnome.org`
+A convenience function for launching the default application
+to show the uri. Like gtk_show_uri_on_window(), but takes a screen
+as transient parent instead of a window.
 
-Ideally the timestamp is taken from the event triggering
-the gtk_show_uri() call. If timestamp is not known you can take
-%GDK_CURRENT_TIME.
+Note that this function is deprecated as it does not pass the necessary
+information for helpers to parent their dialog properly, when run from
+sandboxed applications for example.
 
 Since: 2.14
 
@@ -68709,9 +68521,21 @@ or %NULL for the default screen
 
 <function name="gtk_show_uri_on_window">
 <description>
-A convenience function for launching the default application
-to show the uri. Like gtk_show_uri(), but takes a window
-as transient parent instead of a screen.
+This is a convenience function for launching the default application
+to show the uri. The uri must be of a form understood by GIO (i.e. you
+need to install gvfs to get support for uri schemes such as http://
+or ftp://, as only local files are handled by GIO itself).
+Typical examples are
+- `file:///home/gnome/pict.jpg`
+- `http://www.gnome.org`
+- `mailto:me@gnome.org`
+
+Ideally the timestamp is taken from the event triggering
+the gtk_show_uri() call. If timestamp is not known you can take
+%GDK_CURRENT_TIME.
+
+This is the recommended call to be used as it passes information
+necessary for sandbox helpers to parent their dialogs properly.
 
 Since: 3.22
 
@@ -90853,31 +90677,6 @@ if there’s no ancestor.
 <description>
 Gets the value of the #GtkWidget:valign property.
 
-For backwards compatibility reasons this method will never return
-%GTK_ALIGN_BASELINE, but instead it will convert it to
-%GTK_ALIGN_FILL. If your widget want to support baseline aligned
-children it must use gtk_widget_get_valign_with_baseline(), or
-`g_object_get (widget, &quot;valign&quot;, &amp;value, NULL)`, which will
-also report the true value.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> the vertical alignment of @widget, ignoring baseline alignment
-</return>
-</function>
-
-<function name="gtk_widget_get_valign_with_baseline">
-<description>
-Gets the value of the #GtkWidget:valign property, including
-%GTK_ALIGN_BASELINE.
-
-Since: 3.10
 
 </description>
 <parameters>
@@ -90887,7 +90686,6 @@ Since: 3.10
 </parameter>
 </parameters>
 <return> the vertical alignment of @widget
-
 </return>
 </function>
 
@@ -91282,7 +91080,8 @@ interested in whether there was an intersection.
 </parameter_description>
 </parameter>
 <parameter name="intersection">
-<parameter_description> rectangle to store intersection of @widget and @area
+<parameter_description> rectangle to store
+intersection of @widget and @area
 </parameter_description>
 </parameter>
 </parameters>
@@ -91601,10 +91400,6 @@ position for the natural size, or %NULL
 <description>
 Emits the #GtkWidget::mnemonic-activate signal.
 
-The default handler for this signal activates the @widget if
-@group_cycling is %FALSE, and just grabs the focus if @group_cycling
-is %TRUE.
-
 
 </description>
 <parameters>
@@ -91613,7 +91408,7 @@ is %TRUE.
 </parameter_description>
 </parameter>
 <parameter name="group_cycling">
-<parameter_description>  %TRUE if there are other widgets with the same mnemonic
+<parameter_description> %TRUE if there are other widgets with the same mnemonic
 </parameter_description>
 </parameter>
 </parameters>
@@ -93432,11 +93227,11 @@ Since: 3.8
 <function name="gtk_widget_set_parent">
 <description>
 This function is useful only when implementing subclasses of
-#GtkContainer.
-Sets the container as the parent of @widget, and takes care of
+#GtkWidget.
+Sets @parent as the parent widget of @widget, and takes care of
 some details such as updating the state and style of the child
-to reflect its new location. The opposite function is
-gtk_widget_unparent().
+to reflect its new location and resizing the parent. The opposite
+function is gtk_widget_unparent().
 
 </description>
 <parameters>
@@ -93445,7 +93240,7 @@ gtk_widget_unparent().
 </parameter_description>
 </parameter>
 <parameter name="parent">
-<parameter_description> parent container
+<parameter_description> parent widget
 </parameter_description>
 </parameter>
 </parameters>
@@ -94189,8 +93984,8 @@ a widget to be unmapped if it’s currently mapped.
 <function name="gtk_widget_unparent">
 <description>
 This function is only for use in widget implementations.
-Should be called by implementations of the remove method
-on #GtkContainer, to dissociate a child from the container.
+Should be called by parent widgets to dissociate @widget
+from the parent.
 
 </description>
 <parameters>
@@ -95419,26 +95214,6 @@ Since 2.22
 </return>
 </function>
 
-<function name="gtk_window_has_toplevel_focus">
-<description>
-Returns whether the input focus is within this GtkWindow.
-For real toplevel windows, this is identical to gtk_window_is_active(),
-but for embedded windows, like #GtkPlug, the results will differ.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GtkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the input focus is within this GtkWindow
-
-</return>
-</function>
-
 <function name="gtk_window_iconify">
 <description>
 Asks to iconify (i.e. minimize) the specified @window. Note that
@@ -95473,7 +95248,6 @@ Returns whether the window is part of the current active toplevel.
 The return value is %TRUE if the window is active toplevel itself.
 You might use this function if you wanted to draw a widget
 differently in an active window from a widget in an inactive window.
-See gtk_window_has_toplevel_focus()
 
 Since: 2.4
 
