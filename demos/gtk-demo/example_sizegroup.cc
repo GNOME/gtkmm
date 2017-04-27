@@ -58,14 +58,14 @@ Example_SizeGroup::Example_SizeGroup()
   set_resizable(false);
   add_button("_Close", Gtk::ResponseType::CLOSE);
 
-  get_content_area()->pack_start(m_VBox);
+  get_content_area()->pack_start(m_VBox, Gtk::PackOptions::EXPAND_WIDGET);
   m_VBox.property_margin() = 5;
 
   m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL),
 
   /* Create one frame holding color options
    */
-  m_VBox.pack_start(m_Frame_Color);
+  m_VBox.pack_start(m_Frame_Color, Gtk::PackOptions::EXPAND_WIDGET);
 
   m_Grid_Color.property_margin() = 5;
   m_Grid_Color.set_row_spacing(5);

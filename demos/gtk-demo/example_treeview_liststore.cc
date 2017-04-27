@@ -111,7 +111,7 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-  m_VBox.pack_start(m_ScrolledWindow);
+  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
 
   /* create model */
   create_model();

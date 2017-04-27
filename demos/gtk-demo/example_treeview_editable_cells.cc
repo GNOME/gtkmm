@@ -112,7 +112,7 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_VBox.pack_start(m_ScrolledWindow);
+  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
 
   /* create model */
   create_model();
@@ -128,11 +128,11 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   /* some buttons */
   m_VBox.pack_start(m_HBox, Gtk::PackOptions::SHRINK);
 
-  m_HBox.pack_start(m_Button_Add);
+  m_HBox.pack_start(m_Button_Add, Gtk::PackOptions::EXPAND_WIDGET);
   m_Button_Add.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
 
-  m_HBox.pack_start(m_Button_Remove);
+  m_HBox.pack_start(m_Button_Remove, Gtk::PackOptions::EXPAND_WIDGET);
   m_Button_Remove.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
 }

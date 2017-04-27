@@ -198,8 +198,8 @@ Example_IconBrowser::Example_IconBrowser()
   m_header.pack_end(m_search_button);
   m_search_button.set_image_from_icon_name("edit-find-symbolic", Gtk::BuiltinIconSize::MENU);
   m_header.pack_end(m_header_radio_button_box);
-  m_header_radio_button_box.pack_start(m_normal_radio);
-  m_header_radio_button_box.pack_start(m_symbolic_radio);
+  m_header_radio_button_box.pack_start(m_normal_radio, Gtk::PackOptions::EXPAND_WIDGET);
+  m_header_radio_button_box.pack_start(m_symbolic_radio, Gtk::PackOptions::EXPAND_WIDGET);
   m_normal_radio.set_draw_indicator(false); // Make it look as a normal button
   m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
@@ -214,7 +214,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_hbox.pack_start(m_context_list, Gtk::PackOptions::SHRINK);
   m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
   m_hbox.pack_start(m_vseparator, Gtk::PackOptions::SHRINK);
-  m_hbox.pack_start(m_vcontent_box);
+  m_hbox.pack_start(m_vcontent_box, Gtk::PackOptions::EXPAND_WIDGET);
   m_vcontent_box.pack_start(m_search_bar, Gtk::PackOptions::SHRINK);
   m_search_bar.add(m_search_entry);
   // The search bar is shown when the search toggle button is pressed.
@@ -222,7 +222,7 @@ Example_IconBrowser::Example_IconBrowser()
     m_search_button.property_active(),
     m_search_bar.property_search_mode_enabled(),
     Glib::Binding::Flags::BIDIRECTIONAL);
-  m_vcontent_box.pack_start(m_scrolled_window);
+  m_vcontent_box.pack_start(m_scrolled_window, Gtk::PackOptions::EXPAND_WIDGET);
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.add(m_icon_view);
   m_icon_view.set_model(m_filter_model);
@@ -895,7 +895,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 {
   set_resizable(false);
   auto content_area = get_content_area();
-  content_area->pack_start(m_grid);
+  content_area->pack_start(m_grid, Gtk::PackOptions::EXPAND_WIDGET);
   m_grid.property_margin() = 10;
   m_grid.set_row_spacing(10);
   m_grid.set_column_spacing(10);

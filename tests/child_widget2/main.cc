@@ -14,7 +14,7 @@ MyWindow::MyWindow() :
   vbox(Gtk::Orientation::VERTICAL)
 {
   add(vbox);
-  vbox.pack_start(b);
+  vbox.pack_start(b, Gtk::PackOptions::EXPAND_WIDGET);
 }
 
 int main (int argc, char *argv[])

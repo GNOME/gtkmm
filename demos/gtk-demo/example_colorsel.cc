@@ -44,7 +44,7 @@ Example_ColorSel::Example_ColorSel()
 
   // Create the color swatch area
   m_Frame.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame);
+  m_VBox.pack_start(m_Frame, Gtk::PackOptions::EXPAND_WIDGET);
 
   // set a fixed size
   m_DrawingArea.set_content_width(200);

@@ -113,7 +113,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   set_default_size(300, 400);
 
   m_VBox.property_margin() = 8;
-  get_content_area()->pack_start(m_VBox);
+  get_content_area()->pack_start(m_VBox, Gtk::PackOptions::EXPAND_WIDGET);
 
 
   //Display:
@@ -133,7 +133,7 @@ Example_ChangeDisplay::Example_ChangeDisplay()
     auto refSelection = m_TreeView_Display.get_selection();
     refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_display_selection_changed) );
 
-    m_VBox.pack_start(m_Frame_Display);
+    m_VBox.pack_start(m_Frame_Display, Gtk::PackOptions::EXPAND_WIDGET);
 
     m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
@@ -160,7 +160,7 @@ void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treevi
   auto pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );
   pScrolledWindow->set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   pScrolledWindow->set_shadow_type(Gtk::ShadowType::IN);
-  pHBox->pack_start(*pScrolledWindow);
+  pHBox->pack_start(*pScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
 
   treeview.set_headers_visible(false);
   pScrolledWindow->add(treeview);

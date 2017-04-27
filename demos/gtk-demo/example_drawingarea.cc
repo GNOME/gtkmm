@@ -64,7 +64,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_VBox.pack_start(m_Label_Checkerboard, Gtk::PackOptions::SHRINK);
 
   m_Frame_Checkerboard.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame_Checkerboard);
+  m_VBox.pack_start(m_Frame_Checkerboard, Gtk::PackOptions::EXPAND_WIDGET);
 
   /* set a minimum size */
   m_DrawingArea_Checkerboard.set_content_width(100);
@@ -81,7 +81,7 @@ Example_DrawingArea::Example_DrawingArea()
   m_VBox.pack_start(m_Label_Scribble, Gtk::PackOptions::SHRINK);
 
   m_Frame_Scribble.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame_Scribble);
+  m_VBox.pack_start(m_Frame_Scribble, Gtk::PackOptions::EXPAND_WIDGET);
 
   /* set a minimum size */
   m_DrawingArea_Scribble.set_content_width(100);

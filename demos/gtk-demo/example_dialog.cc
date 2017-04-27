@@ -147,7 +147,7 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
-  m_HBox.pack_start(m_Grid);
+  m_HBox.pack_start(m_Grid, Gtk::PackOptions::EXPAND_WIDGET);
 
   m_Grid.attach(m_Label1, 0, 0, 1, 1);
   m_Entry1.set_text(entry1);

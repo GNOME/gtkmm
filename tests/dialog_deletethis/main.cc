@@ -12,7 +12,7 @@ class Dlg : public sigc::trackable
       dlg_ = new Gtk::Dialog("Test Dialog");
       Gtk::Button *btn = manage(new Gtk::Button("ClickMe"));
       btn->signal_clicked().connect(sigc::mem_fun(*this, &Dlg::on_button_clicked));
-      dlg_->get_content_area()->pack_start(*btn);
+      dlg_->get_content_area()->pack_start(*btn, Gtk::PackOptions::EXPAND_WIDGET);
       dlg_->add_button("_OK", Gtk::ResponseType::OK);
       dlg_->signal_response().connect(sigc::mem_fun(*this, &Dlg::on_response));
       dlg_->show();

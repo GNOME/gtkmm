@@ -52,7 +52,7 @@ Example_Panes::Example_Panes()
   add(*Gtk::manage(pVBox));
 
   Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::Orientation::VERTICAL);
-  pVBox->pack_start(*Gtk::manage(pVPaned));
+  pVBox->pack_start(*Gtk::manage(pVPaned), Gtk::PackOptions::EXPAND_WIDGET);
   pVPaned->property_margin() = 5;
 
   Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::Orientation::HORIZONTAL);
