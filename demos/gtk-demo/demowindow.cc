@@ -84,7 +84,7 @@ DemoWindow::DemoWindow()
   m_SideBar.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_SideBar.get_style_context()->add_class("sidebar");
   m_SideBar.add(m_TreeView);
-  m_HBox.pack_start(m_SideBar, Gtk::PACK_SHRINK);
+  m_HBox.pack_start(m_SideBar, Gtk::PackOptions::SHRINK);
 
   //Notebook:
   m_Notebook.popup_enable();

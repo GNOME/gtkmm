@@ -63,7 +63,7 @@ Example_Menus::Example_Menus()
 
   add(m_VBox1);
 
-  m_VBox1.pack_start(m_MenuBar, Gtk::PACK_SHRINK);
+  m_VBox1.pack_start(m_MenuBar, Gtk::PackOptions::SHRINK);
 
   {
     //Note:: It's generally easier to use the Gtk::Builder API.
@@ -111,11 +111,11 @@ Example_Menus::Example_Menus()
     pMenuItem->show();
   }
 
-  m_VBox1.pack_start(m_Separator, Gtk::PACK_SHRINK);
+  m_VBox1.pack_start(m_Separator, Gtk::PackOptions::SHRINK);
 
 
   m_VBox_Sub2.property_margin() = 10;
-  m_VBox1.pack_start(m_VBox_Sub2, Gtk::PACK_SHRINK);
+  m_VBox1.pack_start(m_VBox_Sub2, Gtk::PackOptions::SHRINK);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));
 

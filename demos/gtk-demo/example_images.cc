@@ -57,13 +57,13 @@ Example_Images::Example_Images()
   /* Image */
 
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
-  m_VBox.pack_start(m_Label_Image, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label_Image, Gtk::PackOptions::SHRINK);
 
   m_Frame_Image.set_shadow_type(Gtk::ShadowType::IN);
 
   m_Frame_Image.set_halign(Gtk::Align::CENTER);
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
-  m_VBox.pack_start(m_Frame_Image, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Frame_Image, Gtk::PackOptions::SHRINK);
 
   auto pImage = Gtk::manage(new Gtk::Image());
   pImage->set_from_resource("/images/gtk-logo-rgb.gif");
@@ -72,13 +72,13 @@ Example_Images::Example_Images()
   /* Animation */
 
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
-  m_VBox.pack_start(m_Label_Animation, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label_Animation, Gtk::PackOptions::SHRINK);
 
   m_Frame_Animation.set_shadow_type(Gtk::ShadowType::IN);
 
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
-  m_VBox.pack_start(m_Frame_Animation, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Frame_Animation, Gtk::PackOptions::SHRINK);
 
   pImage = Gtk::manage(new Gtk::Image());
   pImage->set_from_resource("/images/floppybuddy.gif");
@@ -87,11 +87,11 @@ Example_Images::Example_Images()
   /* Progressive */
 
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
-  m_VBox.pack_start(m_Label_Progressive, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label_Progressive, Gtk::PackOptions::SHRINK);
 
   m_Frame_Progressive.set_shadow_type(Gtk::ShadowType::IN);
 
-  m_VBox.pack_start(m_Frame_Progressive, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Frame_Progressive, Gtk::PackOptions::SHRINK);
 
   /* Create an empty image for now; the progressive loader
    * will create the pixbuf and fill it in.

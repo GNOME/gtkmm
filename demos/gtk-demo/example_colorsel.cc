@@ -59,7 +59,7 @@ Example_ColorSel::Example_ColorSel()
   m_Button.set_halign(Gtk::Align::END);
   m_Button.set_valign(Gtk::Align::CENTER);
 
-  m_VBox.pack_start(m_Button, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Button, Gtk::PackOptions::SHRINK);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_ColorSel::on_button_clicked));
 }

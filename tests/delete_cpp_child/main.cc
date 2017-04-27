@@ -24,13 +24,13 @@ AppWindow::AppWindow()
 
     Gtk::Button* button = Gtk::manage(new Gtk::Button("Delete Label"));
 
-    vbox->pack_start(*button, Gtk::PACK_SHRINK);
+    vbox->pack_start(*button, Gtk::PackOptions::SHRINK);
 
 
     //m_label = manage (new Gtk::Label ("test"));
     m_label = new Gtk::Label("test");
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
-    vbox->pack_start(*m_label, Gtk::PACK_SHRINK);
+    vbox->pack_start(*m_label, Gtk::PackOptions::SHRINK);
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
 
     button->signal_clicked().connect( sigc::mem_fun(*this, &AppWindow::on_button_clicked));

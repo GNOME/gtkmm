@@ -80,7 +80,7 @@ Example_IconView::Example_IconView()
     std::cout << error.what() << std::endl;
   }
 
-  m_VBox.pack_start(m_Toolbar, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Toolbar, Gtk::PackOptions::SHRINK);
 
   m_ButtonUp.set_is_important();
   m_ButtonUp.set_sensitive();
@@ -93,7 +93,7 @@ Example_IconView::Example_IconView()
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 
-  m_VBox.pack_start(m_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
+  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
 
   //Create the data model:
   m_model = Gtk::ListStore::create(m_columns);

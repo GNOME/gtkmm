@@ -61,7 +61,7 @@ Example_DrawingArea::Example_DrawingArea()
    * Create the checkerboard area
    */
   m_Label_Checkerboard.set_markup("<u>Checkerboard pattern</u>");
-  m_VBox.pack_start(m_Label_Checkerboard, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label_Checkerboard, Gtk::PackOptions::SHRINK);
 
   m_Frame_Checkerboard.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame_Checkerboard);
@@ -78,7 +78,7 @@ Example_DrawingArea::Example_DrawingArea()
    * Create the scribble area
    */
   m_Label_Scribble.set_markup("<u>Scribble area</u>");
-  m_VBox.pack_start(m_Label_Scribble, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label_Scribble, Gtk::PackOptions::SHRINK);
 
   m_Frame_Scribble.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame_Scribble);

@@ -75,8 +75,8 @@ Example_Panes::Example_Panes()
   pFrame3->set_size_request(60, 80);
 
   // Now create check buttons to control sizing
-  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pHPaned, "Horizontal", "Left", "Right")), Gtk::PACK_SHRINK);
-  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pVPaned, "Vertical", "Top", "Bottom")),   Gtk::PACK_SHRINK);
+  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pHPaned, "Horizontal", "Left", "Right")), Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pVPaned, "Vertical", "Top", "Bottom")),   Gtk::PackOptions::SHRINK);
 }
 
 Example_Panes::~Example_Panes()

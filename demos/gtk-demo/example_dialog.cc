@@ -78,22 +78,22 @@ Example_Dialog::Example_Dialog()
 
 
   /* Standard message dialog */
-  m_VBox.pack_start(m_HBox, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_HBox, Gtk::PackOptions::SHRINK);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
-  m_HBox.pack_start(m_Button_Message, Gtk::PACK_SHRINK);
-  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL))), Gtk::PACK_SHRINK);
+  m_HBox.pack_start(m_Button_Message, Gtk::PackOptions::SHRINK);
+  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL))), Gtk::PackOptions::SHRINK);
 
 
   /* Interactive dialog*/
-  m_VBox.pack_start(m_HBox2, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_HBox2, Gtk::PackOptions::SHRINK);
   m_Button_Interactive.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_interactive));
-  m_HBox2.pack_start(m_VBox2, Gtk::PACK_SHRINK);
-  m_VBox2.pack_start(m_Button_Interactive, Gtk::PACK_SHRINK);
+  m_HBox2.pack_start(m_VBox2, Gtk::PackOptions::SHRINK);
+  m_VBox2.pack_start(m_Button_Interactive, Gtk::PackOptions::SHRINK);
 
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
-  m_HBox2.pack_start(m_Grid, Gtk::PACK_SHRINK);
+  m_HBox2.pack_start(m_Grid, Gtk::PackOptions::SHRINK);
 
   m_Grid.attach(m_Label1, 0, 0, 1, 1);
   m_Grid.attach(m_Entry1, 1, 0, 1, 1);
@@ -142,8 +142,8 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   add_button("_OK", Gtk::ResponseType::OK);
   add_button("_Cancel", Gtk::ResponseType::CANCEL);
 
-  get_content_area()->pack_start(m_HBox, Gtk::PACK_SHRINK);
-  m_HBox.pack_start(m_Image, Gtk::PACK_SHRINK);
+  get_content_area()->pack_start(m_HBox, Gtk::PackOptions::SHRINK);
+  m_HBox.pack_start(m_Image, Gtk::PackOptions::SHRINK);
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);

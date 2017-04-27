@@ -42,7 +42,7 @@ Example_ButtonBox::Example_ButtonBox()
 
   m_Frame_Horizontal.set_margin_top(10);
   m_Frame_Horizontal.set_margin_bottom(10);
-  m_VBox_Main.pack_start(m_Frame_Horizontal, Gtk::PACK_EXPAND_WIDGET);
+  m_VBox_Main.pack_start(m_Frame_Horizontal, Gtk::PackOptions::EXPAND_WIDGET);
   m_Frame_Horizontal.set_margin_top(10);
   m_Frame_Horizontal.set_margin_bottom(10);
 
@@ -54,7 +54,7 @@ Example_ButtonBox::Example_ButtonBox()
   m_VBox.pack_start( *(create_button_box(true, "Start", 40, Gtk::ButtonBoxStyle::START)) );
   m_VBox.pack_start( *(create_button_box(true, "End", 40, Gtk::ButtonBoxStyle::END)) );
 
-  m_VBox_Main.pack_start(m_Frame_Vertical, Gtk::PACK_EXPAND_WIDGET);
+  m_VBox_Main.pack_start(m_Frame_Vertical, Gtk::PackOptions::EXPAND_WIDGET);
 
   m_HBox.property_margin() = 10;
   m_Frame_Vertical.add(m_HBox);

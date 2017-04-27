@@ -107,7 +107,7 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
 
   m_VBox.property_margin() = 8;
   add(m_VBox);
-  m_VBox.pack_start(m_Label, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Label, Gtk::PackOptions::SHRINK);
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);

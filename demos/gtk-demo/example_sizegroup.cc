@@ -82,7 +82,7 @@ Example_SizeGroup::Example_SizeGroup()
 
   /* And another frame holding line style options
    */
-  m_VBox.pack_start(m_Frame_Line, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_Frame_Line, Gtk::PackOptions::SHRINK);
 
   m_Grid_Line.property_margin() = 5;
   m_Grid_Line.set_row_spacing(5);
@@ -105,7 +105,7 @@ Example_SizeGroup::Example_SizeGroup()
   add_row(m_Grid_Line, 1, m_refSizeGroup, "_Line ends", end_options);
 
   /* And a check button to turn grouping on and off */
-  m_VBox.pack_start(m_CheckButton, Gtk::PACK_SHRINK);
+  m_VBox.pack_start(m_CheckButton, Gtk::PackOptions::SHRINK);
   m_CheckButton.set_active();
   m_CheckButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_SizeGroup::on_checkbutton_toggled));
 }

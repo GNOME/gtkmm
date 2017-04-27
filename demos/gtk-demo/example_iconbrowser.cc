@@ -211,11 +211,11 @@ Example_IconBrowser::Example_IconBrowser()
 
   // Main part of the window.
   add(m_hbox);
-  m_hbox.pack_start(m_context_list, Gtk::PACK_SHRINK);
+  m_hbox.pack_start(m_context_list, Gtk::PackOptions::SHRINK);
   m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
-  m_hbox.pack_start(m_vseparator, Gtk::PACK_SHRINK);
+  m_hbox.pack_start(m_vseparator, Gtk::PackOptions::SHRINK);
   m_hbox.pack_start(m_vcontent_box);
-  m_vcontent_box.pack_start(m_search_bar, Gtk::PACK_SHRINK);
+  m_vcontent_box.pack_start(m_search_bar, Gtk::PackOptions::SHRINK);
   m_search_bar.add(m_search_entry);
   // The search bar is shown when the search toggle button is pressed.
   m_binding_search_button_search_entry = Glib::Binding::bind_property(
