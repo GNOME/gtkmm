@@ -99,6 +99,8 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
   pButton->set_icon_name("help-browser");
   pButtonBox->add(*pButton);
 
+  pFrame->set_hexpand();
+  pFrame->set_vexpand();
   return pFrame;
 }
 

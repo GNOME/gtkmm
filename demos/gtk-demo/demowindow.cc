@@ -94,6 +94,7 @@ DemoWindow::DemoWindow()
   m_Notebook.child_property_tab_expand(m_TextWidget_Info) = true;
   m_Notebook.child_property_tab_expand(m_TextWidget_Source) = true;
   m_HBox.pack_start(m_Notebook, Gtk::PackOptions::EXPAND_WIDGET);
+  m_HBox.set_vexpand(true);
 
   set_default_size (800, 600);
 

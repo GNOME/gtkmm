@@ -129,6 +129,8 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   m_VBox.pack_start(m_HBox, Gtk::PackOptions::SHRINK);
 
   m_HBox.pack_start(m_Button_Add, Gtk::PackOptions::EXPAND_WIDGET);
+  m_HBox.set_vexpand(false);
+
   m_Button_Add.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
 
