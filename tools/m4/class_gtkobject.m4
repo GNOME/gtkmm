@@ -278,10 +278,11 @@ ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
   ///Provides access to the underlying C GtkObject.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
-_H_VFUNCS_AND_SIGNALS()
-
 private:
 _IMPORT(SECTION_CLASS2)
+
+public:
+_H_VFUNCS_AND_SIGNALS()
 
 ')
 
