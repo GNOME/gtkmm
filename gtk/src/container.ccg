@@ -188,7 +188,7 @@ void Container_Class::forall_vfunc_callback(GtkContainer* self,
       {
         if (callback == &container_foreach_callback)
         {
-          // This call comes from Container::forall() or Container::foreach(),
+          // This call comes from Container::foreach(),
           // or is a recursive call. Don't create another slot layer.
           // callback_data is a pointer to a Container::ForeachSlot.
           const auto slot = static_cast<Container::ForeachSlot*>(callback_data);
@@ -225,12 +225,15 @@ void Container_Class::forall_vfunc_callback(GtkContainer* self,
 
 void Container::foreach(const Container::ForeachSlot& slot)
 {
+  // gtk_container_foreach() calls the virtual function GtkContainerClass.forall,
+  // and thus Container_Class::forall_vfunc_callback().
   ForeachSlot slot_copy (slot);
   gtk_container_foreach(gobj(), &container_foreach_callback, &slot_copy);
 }
 
 void Container::forall(const Container::ForeachSlot& slot)
 {
+  // gtk_container_forall() does not call Container_Class::forall_vfunc_callback().
   ForeachSlot slot_copy (slot);
   gtk_container_forall(gobj(), &container_foreach_callback, &slot_copy);
 }
