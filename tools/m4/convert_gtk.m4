@@ -518,11 +518,11 @@ _CONVERSION(`const Requisition&', `GtkRequisition*', `($2)(&$3)')
 _CONVERSION(`GtkRequisition*', `Requisition&', `($2)(*$3)')
 _CONVERSION(`GtkRequisition*', `Requisition*', `($2)($3)')
 _CONVERSION(`Requisition*', `GtkRequisition*', `($2)($3)')
-_CONVERSION(`GtkRequisition', `Requisition', `($2)($3)')
+_CONVERSION(`GtkRequisition', `Requisition', `static_cast<$2>($3)')
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
-_CONVERSION(`Allocation',`GtkAllocation',`($2)(*($3.gobj()))')
+_CONVERSION(`Allocation',`GtkAllocation',`static_cast<$2>(*($3.gobj()))')
 
 _CONVERSION(`GtkEntry*',`Entry*',__RP2P)
 _CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
@@ -555,7 +555,7 @@ _CONVERSION(`ListBoxRow&',`GtkListBoxRow*',__FR2P)
 _CONVERSION(`ListBoxRow*',`GtkListBoxRow*',__FP2P)
 
 #RecentFilter
-_CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`($2)$3')
+_CONVERSION(`GtkRecentFilterFlags',`RecentFilterFlags',`static_cast<$2>($3)')
 _CONVERSION(`const Glib::RefPtr<RecentFilter>&', `GtkRecentFilter*', __CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkRecentFilter*',`Glib::RefPtr<RecentFilter>', `Glib::wrap($3)')
 _CONVERSION(`GtkRecentFilter*',`Glib::RefPtr<const RecentFilter>', `Glib::wrap($3)')
@@ -583,7 +583,7 @@ _CONVERSION(`GtkPaperSize*',`const PaperSize',`Glib::wrap($3, true)')
 _CONVERSION(`const PaperSize&',`GtkPaperSize*',__FCR2P)
 
 #PageSetup
-_CONVERSION(`GtkPageOrientation',`PageOrientation',`($2)$3')
+_CONVERSION(`GtkPageOrientation',`PageOrientation',`static_cast<$2>($3)')
 
 _CONVERSION(`PageSetup&',`GtkPageSetup*',__FR2P)
 _CONVERSION(`const PageSetup&',`GtkPageSetup*',__FCR2P)
@@ -592,10 +592,10 @@ _CONVERSION(`const Glib::RefPtr<PageSetup>',`GtkPageSetup*',__CONVERT_REFPTR_TO_
 _CONVERSION(`const Glib::RefPtr<PageSetup>&',`GtkPageSetup*',__CONVERT_REFPTR_TO_P($3))
 
 #PrintSettings
-_CONVERSION(`GtkPrintDuplex',`PrintDuplex',`($2)$3')
-_CONVERSION(`GtkPrintQuality',`PrintQuality',`($2)$3')
-_CONVERSION(`GtkPrintPages',`PrintPages',`($2)$3')
-_CONVERSION(`GtkPageSet',`PageSet',`($2)$3')
+_CONVERSION(`GtkPrintDuplex',`PrintDuplex',`static_cast<$2>($3)')
+_CONVERSION(`GtkPrintQuality',`PrintQuality',`static_cast<$2>($3)')
+_CONVERSION(`GtkPrintPages',`PrintPages',`static_cast<$2>($3)')
+_CONVERSION(`GtkPageSet',`PageSet',`static_cast<$2>($3)')
 
 _CONVERSION(`PrintSettings&',`GtkPrintSettings*',__FR2P)
 _CONVERSION(`const PrintSettings&',`GtkPrintSettings*',__FCR2P)
@@ -606,8 +606,8 @@ _CONVERSION(`const Glib::RefPtr<PrintSettings>&',`GtkPrintSettings*',__CONVERT_R
 _CONVERSION(`const Glib::RefPtr<PrintContext>',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
 
-_CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`($2)$3')
-_CONVERSION(`GtkPrintStatus',`PrintStatus',`($2)$3')
+_CONVERSION(`GtkPrintOperationResult',`PrintOperationResult',`static_cast<$2>($3)')
+_CONVERSION(`GtkPrintStatus',`PrintStatus',`static_cast<$2>($3)')
 
 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Context>&',`cairo_t*',`($3)->cobj()')
 _CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Context>&',`cairo_t*',`const_cast<cairo_t*>(($3)->cobj())')
@@ -621,7 +621,7 @@ _CONVERSION(`GtkPrinter*',`Glib::RefPtr<const Printer>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($3))
 
 #PrintJob
-_CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`($2)$3')
+_CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`static_cast<$2>($3)')
 
 #Tooltip
 #TODO: This should not be here:
@@ -677,7 +677,7 @@ _CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CO
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<Gio::ActionGroup>',`Glib::wrap($3)')
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<const Gio::ActionGroup>',`Glib::wrap($3)')
 
-_CONVERSION(`GtkDragResult',`DragResult',`($2)$3')
+_CONVERSION(`GtkDragResult',`DragResult',`static_cast<$2>($3)')
 
 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
 _CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
