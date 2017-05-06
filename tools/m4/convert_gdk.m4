@@ -243,7 +243,7 @@ _CONVERSION(`GdkMonitor*',`Glib::RefPtr<const Monitor>', `Glib::wrap($3)')
 _CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<DeviceManager>', `Glib::wrap($3)')
 _CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<const DeviceManager>', `Glib::wrap($3)')
 
-_CONVERSION(`gpointer',`const void*', `($2)($3)')
+_CONVERSION(`gpointer',`const void*', `static_cast<$2>($3)')
 
 
 # Glib::ListHandle<> (gdkmm) -> GList (gdk)
@@ -284,11 +284,11 @@ _CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
 _CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomString::to_c_type($3)')
 
 dnl NativeWindow
-_CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`($2)($3)')
-_CONVERSION(`GdkNativeWindow',`NativeWindow',`($2)($3)')
-_CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`($2)($3)')
-_CONVERSION(`NativeWindow',`GdkNativeWindow',`($2)($3)')
-_CONVERSION(`GdkEvent*',`const GdkEvent*',`($2)($3)')
+_CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`static_cast<$2>($3)')
+_CONVERSION(`GdkNativeWindow',`NativeWindow',`static_cast<$2>($3)')
+_CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
+_CONVERSION(`NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
+_CONVERSION(`GdkEvent*',`const GdkEvent*',`($3)')
 
 
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3, true))
