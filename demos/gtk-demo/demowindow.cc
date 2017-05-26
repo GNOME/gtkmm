@@ -47,7 +47,7 @@ struct DemoColumns : public Gtk::TreeModelColumnRecord
 };
 
 // Singleton accessor function.
-const DemoColumns& demo_columns()
+const auto& demo_columns()
 {
   static DemoColumns column_record;
   return column_record;
@@ -114,12 +114,12 @@ void DemoWindow::configure_header_bar()
 
 void DemoWindow::fill_tree()
 {
-  const DemoColumns& columns = demo_columns();
+  const auto& columns = demo_columns();
 
   /* this code only supports 1 level of children. If we
    * want more we probably have to use a recursing function.
    */
-  for(Demo* d = testgtk_demos; d && d->title; ++d)
+  for (auto d = testgtk_demos; d && d->title; ++d)
   {
     auto row = *(m_refTreeStore->append());
 
@@ -128,7 +128,7 @@ void DemoWindow::fill_tree()
     row[columns.slot]     = d->slot;
     row[columns.italic]   = false;
 
-    for(Demo* child = d->children; child && child->title; ++child)
+    for (auto child = d->children; child && child->title; ++child)
     {
       auto child_row = *(m_refTreeStore->append(row.children()));
 
@@ -187,7 +187,7 @@ void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
 
 void DemoWindow::run_example(Gtk::TreeModel::Row& row)
 {
-  const DemoColumns& columns = demo_columns();
+  const auto& columns = demo_columns();
 
   const type_slotDo& slot = row[columns.slot];
 
@@ -372,7 +372,7 @@ void DemoWindow::load_file(const std::string& filename)
 void DemoWindow::add_data_tabs(const std::string& filename)
 {
   // We can get the resource_dir from the filename by removing "example_" and ".cc".
-  const std::string resource_dir = "/" + filename.substr(8, filename.size()-11);
+  const auto resource_dir = "/" + filename.substr(8, filename.size() - 11);
   std::vector<std::string> resources;
   try
   {
@@ -410,11 +410,11 @@ void DemoWindow::add_data_tabs(const std::string& filename)
         continue;
       }
       gsize data_size = 0;
-      const char* data = static_cast<const char*>(bytes->get_data(data_size));
+      auto data = static_cast<const char*>(bytes->get_data(data_size));
       if (g_utf8_validate(data, data_size, nullptr))
       {
         // Looks like it parses as text. Dump it into a TextWidget then!
-        TextWidget* textwidget = new TextWidget(false);
+        auto textwidget = new TextWidget(false);
         auto refBuffer = textwidget->get_buffer();
         refBuffer->set_text(data, data + data_size);
         widget = textwidget;
@@ -433,7 +433,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
 void DemoWindow::remove_data_tabs()
 {
   // Remove all tabs except Info and Source.
-  for (int i = m_Notebook.get_n_pages(); i-- > 2;)
+  for (auto i = m_Notebook.get_n_pages(); i-- > 2;)
   {
     m_Notebook.remove_page(i);
   }
