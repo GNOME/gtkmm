@@ -11,11 +11,6 @@
 
 #include "gtkmm.h"
 
-// 2014-09-19: The pan-[up,down,start,end]-symbolic icons are new.
-// See https://bugzilla.gnome.org/show_bug.cgi?id=729565
-// If they are not available in your selected icon theme, perhaps you can
-// use the go-[up,down,previous,next]-symbolic icons.
-
 class Example_HeaderBar : public Gtk::Window
 {
 public:
