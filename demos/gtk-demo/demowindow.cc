@@ -19,17 +19,20 @@
 #include "config.h"
 #endif
 
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/treeviewcolumn.h>
+#include "demowindow.h"
+
+#include "demos.h"
+#include "textwidget.h"
+
 #include <glibmm/bytes.h>
 #include <glibmm/convert.h>
 #include <giomm/resource.h>
-#include "demowindow.h"
-#include "textwidget.h"
-#include "demos.h"
-#include <iostream>
-#include <cstring>
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/treeviewcolumn.h>
+
 #include <cstddef>
+#include <cstring>
+#include <iostream>
 
 using std::isspace;
 using std::strlen;
