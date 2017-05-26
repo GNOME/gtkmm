@@ -3,7 +3,7 @@
  * Stack widgets in static positions over a main widget.
  */
 
-#include "gtkmm.h"
+#include <gtkmm.h>
 
 class Example_Overlay : public Gtk::Window
 {

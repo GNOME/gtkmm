@@ -19,7 +19,7 @@
 
 #include <cstring>
 #include "textwidget.h"
-#include "pangomm/fontdescription.h"
+#include <pangomm/fontdescription.h>
 
 using std::strstr;
 using std::strncmp;

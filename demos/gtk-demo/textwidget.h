@@ -22,8 +22,8 @@
 #ifndef _TEXTWIDGET_H
 #define _TEXTWIDGET_H
 
-#include "gtkmm/scrolledwindow.h"
-#include "gtkmm/textview.h"
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textview.h>
 
 
 class TextWidget : public Gtk::ScrolledWindow

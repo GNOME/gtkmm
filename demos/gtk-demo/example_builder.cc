@@ -3,8 +3,8 @@
  * Demonstrates an interface loaded from a XML description.
  */
 
-#include "gtkmm.h"
-#include "gtk/gtk.h"
+#include <gtkmm.h>
+#include <gtk/gtk.h>
 #include <iostream> // For std::cout
 
 class Example_Builder : public Gtk::Window
