@@ -433,7 +433,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
 void DemoWindow::remove_data_tabs()
 {
   // Remove all tabs except Info and Source.
-  for (int i = m_Notebook.get_n_pages(); i > 1; --i)
+  for (int i = m_Notebook.get_n_pages(); i-- > 2;)
   {
     m_Notebook.remove_page(i);
   }
