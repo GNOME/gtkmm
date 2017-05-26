@@ -123,7 +123,7 @@ void DemoWindow::fill_tree()
   /* this code only supports 1 level of children. If we
    * want more we probably have to use a recursing function.
    */
-  for (auto d = testgtk_demos; d && d->title; ++d)
+  for (auto d = testgtk_demos; d->title; ++d)
   {
     auto row = *(m_refTreeStore->append());
 
