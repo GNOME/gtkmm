@@ -29,6 +29,7 @@
 #include "demos.h"
 #include <iostream>
 #include <cstring>
+#include <cstddef>
 
 using std::isspace;
 using std::strlen;
@@ -257,7 +258,7 @@ void DemoWindow::load_file(const std::string& filename)
     int state = 0;
     bool in_para = false;
     auto start = refBufferInfo->get_iter_at_offset(0);
-    for (int i = 0; lines[i] != NULL; i++)
+    for (std::size_t i = 0; lines[i] != NULL; i++)
     {
       /* Make sure \r is stripped at the end for the poor windows people */
       lines[i] = g_strchomp(lines[i]);
@@ -382,7 +383,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
   {
     // Ignore this exception. It's no error, if resource_dir does not exist.
   }
-  for (unsigned int i = 0; i < resources.size(); ++i)
+  for (std::size_t i = 0; i < resources.size(); ++i)
   {
     const auto resource_name = resource_dir + "/" + resources[i];
     Gtk::Widget* widget = nullptr;
