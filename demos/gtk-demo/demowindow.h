@@ -18,15 +18,15 @@
 #ifndef _DEMOWINDOW_H
 #define _DEMOWINDOW_H
 
-#include "gtkmm/window.h"
-#include "gtkmm/headerbar.h"
-#include "gtkmm/button.h"
-#include "gtkmm/notebook.h"
-#include "gtkmm/scrolledwindow.h"
-#include "gtkmm/box.h"
+#include <gtkmm/window.h>
+#include <gtkmm/headerbar.h>
+#include <gtkmm/button.h>
+#include <gtkmm/notebook.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/box.h>
 
-#include "gtkmm/treestore.h"
-#include "gtkmm/treeview.h"
+#include <gtkmm/treestore.h>
+#include <gtkmm/treeview.h>
 #include "textwidget.h"
 #include <stdio.h>
 

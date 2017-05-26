@@ -9,7 +9,7 @@
  * It is commonly used with Gtk::Window::set_titlebar()
  */
 
-#include "gtkmm.h"
+#include <gtkmm.h>
 
 class Example_HeaderBar : public Gtk::Window
 {

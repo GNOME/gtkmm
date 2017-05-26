@@ -3,9 +3,9 @@
  * Dialog widgets are used to pop up a transient window for user feedback.
  */
 
-#include "gtkmm.h"
-#include "gtk/gtk.h"
-#include "stdio.h"
+#include <gtkmm.h>
+#include <gtk/gtk.h>
+#include <stdio.h>
 
 class Example_Dialog : public Gtk::Window
 {

@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "gtkmm/main.h"
+#include <gtkmm/main.h>
 #include "demowindow.h"
 
 int main (int argc, char *argv[])

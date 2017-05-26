@@ -3,8 +3,8 @@
  * The Button Box widgets are used to arrange buttons with padding.
  */
 
-#include "gtkmm.h"
-#include "gtk/gtk.h"
+#include <gtkmm.h>
+#include <gtk/gtk.h>
 
 class Example_ButtonBox : public Gtk::Window
 {

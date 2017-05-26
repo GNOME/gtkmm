@@ -6,7 +6,7 @@
  * The children of a FlowBox are regular widgets
  */
 
-#include "gtkmm.h"
+#include <gtkmm.h>
 
 class Example_FlowBox : public Gtk::Window
 {

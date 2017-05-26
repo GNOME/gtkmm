@@ -6,7 +6,7 @@
  * Gtk::StackSwitcher adds buttons to control which child is visible.
  */
 
-#include "gtkmm.h"
+#include <gtkmm.h>
 
 class Example_Stack : public Gtk::Window
 {

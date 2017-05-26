@@ -23,7 +23,7 @@
  * do that. There's a separate demo for Gtk::Builder.
  */
 
-#include "gtkmm.h"
+#include <gtkmm.h>
 #include <stdio.h>
 
 class Example_Menus : public Gtk::Window
