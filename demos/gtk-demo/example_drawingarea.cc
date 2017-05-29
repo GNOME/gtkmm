@@ -100,14 +100,6 @@ Example_DrawingArea::Example_DrawingArea()
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_motion_notify_event), false);
   m_DrawingArea_Scribble.signal_button_press_event().connect(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_button_press_event), false);
-
-  /* Ask to receive events the drawing area doesn't normally
-   * subscribe to.
-   */
-  m_DrawingArea_Scribble.add_events(Gdk::EventMask::LEAVE_NOTIFY_MASK |
-                                    Gdk::EventMask::BUTTON_PRESS_MASK |
-                                    Gdk::EventMask::POINTER_MOTION_MASK |
-                                    Gdk::EventMask::STRUCTURE_MASK);
 }
 
 Example_DrawingArea::~Example_DrawingArea()

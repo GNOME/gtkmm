@@ -52,8 +52,6 @@ Example_Gestures::Example_Gestures()
   set_default_size(400, 400);
 
   add(m_DrawingArea);
-  m_DrawingArea.add_events(Gdk::EventMask::BUTTON_PRESS_MASK | Gdk::EventMask::BUTTON_RELEASE_MASK |
-                           Gdk::EventMask::POINTER_MOTION_MASK | Gdk::EventMask::TOUCH_MASK);
   m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.
