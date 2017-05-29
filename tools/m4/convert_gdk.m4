@@ -278,7 +278,6 @@ _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$
 
 
 _CONVERSION(GdkFont*, Gdk::Font, `Gdk::Font($3)')
-_CONVERSION(GdkEvent*, Event, `Event($3)')
 
 _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 
@@ -297,6 +296,10 @@ _CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
 _CONVERSION(`NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
 _CONVERSION(`GdkEvent*',`const GdkEvent*',`($3)')
 
+dnl GdkEvent
+_CONVERSION(`GdkEvent*',`Event',`Event($3)')
+_CONVERSION(`Event&',`GdkEvent*',`($3).gobj()')
+_CONVERSION(`const Event&',`const GdkEvent*',`($3).gobj()')
 
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3, true))
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
