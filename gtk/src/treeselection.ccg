@@ -157,7 +157,16 @@ TreeModel::iterator TreeSelection::get_selected(Glib::RefPtr<TreeModel>& model)
 
 TreeModel::const_iterator TreeSelection::get_selected(Glib::RefPtr<const TreeModel>& model) const
 {
-  return const_cast<TreeSelection*>(this)->get_selected(model);
+  TreeModel::iterator iter;
+  GtkTreeModel* model_gobject = nullptr;
+
+  // If no row is selected, *iter.gobj() is set to an invalid iterator.
+  gtk_tree_selection_get_selected(const_cast<GtkTreeSelection*>(gobj()), &model_gobject, iter.gobj());
+
+  model = Glib::wrap(model_gobject, true);
+
+  iter.set_model_refptr(std::const_pointer_cast<TreeModel>(model));
+  return iter;
 }
 
 void TreeSelection::selected_foreach_iter(const SlotForeachIter& slot) const
