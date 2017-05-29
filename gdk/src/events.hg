@@ -1,0 +1,1129 @@
+/* Copyright (C) 2017 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_DEFS(gdkmm,gdk)
+_CC_INCLUDE(gdk/gdk.h)
+
+#include <glibmm/refptr.h>
+#include <gdkmm/event.h>
+#include <gdkmm/enums.h>
+#include <gdkmm/rectangle.h>
+#include <gdkmm/types.h>
+#include <gdkmm/window.h>
+
+// All subclasses of Gdk::Event.
+//
+// Keeping the subclasses in a separate file makes it easier to avoid cyclic
+// inclusions (where a.h includes b.h, and b.h includes a.h).
+// One file per subclass would result in too many small files.
+
+namespace Gdk
+{
+class Device;
+
+/** Representing an event sequence.
+ * Used to differentiate between multiple touches on multitouch touchscreens.
+ */
+struct EventSequence;
+
+/** Generated when a key is pressed or released.
+ *
+ * get_event_type() will return Gdk::Event::Type::KEY_PRESS or
+ * Gdk::Event::Type::KEY_RELEASE.
+ *
+ * @newin{3,90}
+ */
+class EventKey : public Event
+{
+  _CLASS_GDKEVENT(EventKey, GdkEventKey, Event, GdkEvent)
+  _IGNORE(gdk_event_new, gdk_event_copy, gdk_event_free)
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+  _IGNORE(gdk_event_get_time)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+  _IGNORE(gdk_event_get_state)
+
+  /**
+   * Returns the key that was pressed or released. See the <gdk/gdkkeysyms.h>
+   * header file for a complete list of GDK key codes.
+   */
+  _MEMBER_GET(keyval, keyval, guint, guint)
+  _IGNORE(gdk_event_get_keyval)
+
+  /**
+   * Returns the raw code of the key that was pressed or released.
+   */
+  _MEMBER_GET(hardware_keycode, hardware_keycode, guint16, guint16)
+  _IGNORE(gdk_event_get_keycode)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_get_scancode)
+  int get_scancode() const;
+
+  /**
+   * Returns the keyboard group
+   */
+  _MEMBER_GET(group, group, guint8, guint8)
+
+  /**
+   * Returns @c true if the hardware keycode is mapped to a modifier key
+   */
+  _MEMBER_GET(is_modifier, is_modifier, bool, guint)
+
+  // Belong to the base class:
+  _IGNORE(gdk_event_get_event_type, gdk_event_get_window, gdk_event_get_screen,
+    gdk_event_get_seat, gdk_event_get, gdk_event_peek, gdk_event_put,
+    gdk_events_pending, gdk_event_get_device_tool, gdk_event_set_device_tool)
+};
+
+/** Represents a mouse button press or release event.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::BUTTON_PRESS,
+ * Gdk::Event::Type::DOUBLE_BUTTON_PRESS, Gdk::Event::Type::TRIPLE_BUTTON_PRESS
+ * or Gdk::Event::Type::BUTTON_RELEASE.
+ *
+ * Double and triple-clicks result in a sequence of events being received. For
+ * double-clicks the order of events will be:
+ *
+ * @code
+ * Gdk::Event::Type::BUTTON_PRESS
+ * Gdk::Event::Type::BUTTON_RELEASE
+ * Gdk::Event::Type::BUTTON_PRESS
+ * Gdk::Event::Type::DOUBLE_BUTTON_PRESS
+ * Gdk::Event::Type::BUTTON_RELEASE
+ * @endcode
+ *
+ * Note that the first click is received just like a normal button press, while
+ * the second click results in a Gdk::Event::Type::DOUBLE_BUTTON_PRESS being
+ * received just after the Gdk::Event::Type::BUTTON_PRESS.
+ *
+ * Triple-clicks are very similar to double-clicks, except that
+ * Gdk::Event::Type::TRIPLE_BUTTON_PRESS is inserted after the third click.
+ * The order of the events is:
+ *
+ * @code
+ * Gdk::Event::Type::BUTTON_PRESS
+ * Gdk::Event::Type::BUTTON_RELEASE
+ * Gdk::Event::Type::BUTTON_PRESS
+ * Gdk::Event::Type::DOUBLE_BUTTON_PRESS
+ * Gdk::Event::Type::BUTTON_RELEASE
+ * Gdk::Event::Type::BUTTON_PRESS
+ * Gdk::Event::Type::TRIPLE_BUTTON_PRESS
+ * Gdk::Event::Type::BUTTON_RELEASE
+ * @endcode
+ *
+ * For a double click to occur, the second button press must occur within 1/4 of
+ * a second of the first. For a triple click to occur, the third button press
+ * must also occur within 1/2 second of the first button press.
+ *
+ * @newin{3,90}
+ */
+class EventButton : public Event
+{
+  _CLASS_GDKEVENT(EventButton, GdkEventButton, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+  _IGNORE(gdk_event_get_coords)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+  _IGNORE(gdk_event_get_root_coords)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_get_axis)
+  bool get_axis(Gdk::AxisUse axis_use, double& value) const;
+
+  /**
+   * Returns the number of the button which was pressed or released, numbered
+   * from 1 to 5. Normally button 1 is the left mouse button, 2 is the middle
+   * button, and 3 is the right button. On 2-button mice, the middle button can
+   * often be simulated by pressing both mouse buttons together
+   */
+  _MEMBER_GET(button, button, guint, guint)
+  _IGNORE(gdk_event_get_button)
+
+  /**
+   * Returns the device where the event originated from.
+   */
+  _MEMBER_GET_GOBJECT(device, device, Gdk::Device, GdkDevice*)
+  _IGNORE(gdk_event_get_device)
+
+  /** Extracts the click count from an event.
+   * @return The click count (0..3).
+   */
+  guint get_click_count() const;
+  _IGNORE(gdk_event_get_click_count)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_triggers_context_menu)
+  bool shall_trigger_context_menu() const;
+};
+
+/** Generated when the mouse is scrolled.
+ *
+ * These events are from button presses for the buttons 4 to 7. Wheel mice are
+ * usually configured to generate button press events for buttons 4 and 5 when
+ * the wheel is turned.
+ *
+ * get_event_type() will return Gdk::Event::Type::SCROLL.
+ *
+ * Some GDK backends can also generate 'smooth' scroll events, which can be
+ * recognized by the Gdk::ScrollDirection::SMOOTH scroll direction. For these,
+ * scroll deltas can be obtained with get_delta_x() and get_delta_y().
+ *
+ * @newin{3,90}
+ */
+class EventScroll : public Event
+{
+  _CLASS_GDKEVENT(EventScroll, GdkEventScroll, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  /**
+   * Returns the scroll delta in the X axis. Meaningful only if get_direction()
+   * returns Gdk::ScrollDirection::SMOOTH
+   */
+  _MEMBER_GET(delta_x, delta_x, double, gdouble)
+  _IGNORE(gdk_event_get_scroll_deltas)
+
+  /**
+   * Returns the scroll delta in the Y axis. Meaningful only if get_direction()
+   * returns Gdk::ScrollDirection::SMOOTH
+   */
+  _MEMBER_GET(delta_y, delta_y, double, gdouble)
+
+  /**
+   * Returns the direction of the scroll.
+   */
+  _MEMBER_GET(direction, direction, ScrollDirection, GdkScrollDirection)
+  _IGNORE(gdk_event_get_scroll_direction)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_is_scroll_stop_event)
+  bool is_scroll_stop_event() const;
+
+  /**
+   * Returns the device where the event originated from.
+   */
+  _MEMBER_GET_GOBJECT(device, device, Gdk::Device, GdkDevice*)
+};
+
+/** Generated when a mouse pointer is moved.
+ *
+ * get_event_type() will return Gdk::Event::Type::MOTION_NOTIFY.
+ *
+ * @newin{3,90}
+ */
+class EventMotion : public Event
+{
+  _CLASS_GDKEVENT(EventMotion, GdkEventMotion, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_get_axis)
+  bool get_axis(Gdk::AxisUse axis_use, double& value) const;
+
+#m4 _CONVERSION(`gint16',`bool',`$3')
+  /**
+   * Returns @c true if the event is motion hint.
+   *
+   * Motion hints are received only if Gdk::EventMask::POINTER_MOTION_HINT_MASK is set.
+   * It is used to reduce the number of Gdk::Event::Type::MOTION_NOTIFY events received.
+   * Normally a Gdk::Event::Type::MOTION_NOTIFY event is received each time the mouse
+   * moves. However, if the application spends a lot of time processing the
+   * event (updating the display, for example), it can lag behind the position
+   * of the mouse. When using Gdk::EventMask::POINTER_MOTION_HINT_MASK, fewer
+   * Gdk::Event::Type::MOTION_NOTIFY events will be sent, some of which are marked as a
+   * hint. To receive more motion events after a motion hint event, the
+   * application needs to ask for more, by calling request_motions().
+   */
+  _MEMBER_GET(is_hint, is_hint, bool, gint16)
+
+  _WRAP_METHOD(void request_motions(), gdk_event_request_motions)
+
+  /**
+   * Returns the device where the event originated from.
+   */
+  _MEMBER_GET_GOBJECT(device, device, Gdk::Device, GdkDevice*)
+};
+
+/** Generated during an attached touchscreen is touched.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::TOUCH_BEGIN,
+ * Gdk::Event::Type::TOUCH_UPDATE, Gdk::Event::Type::TOUCH_END or
+ * Gdk::Event::Type::TOUCH_CANCEL.
+ *
+ * Touch events are grouped into sequences by means of the sequence field, which
+ * can also be obtained with get_event_sequence(). Each sequence
+ * begins with a Gdk::Event::Type::TOUCH_BEGIN event, followed by any number of
+ * Gdk::Event::Type::TOUCH_UPDATE events, and ends with a Gdk::Event::Type::TOUCH_END
+ * (or Gdk::Event::Type::TOUCH_CANCEL) event. With multitouch devices, there may
+ * be several active sequences at the same time.
+ *
+ * @newin{3,90}
+ */
+class EventTouch : public Event
+{
+  _CLASS_GDKEVENT(EventTouch, GdkEventTouch, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  _WRAP_METHOD_DOCS_ONLY(gdk_event_get_axis)
+  bool get_axis(Gdk::AxisUse axis_use, double& value) const;
+
+#m4 _CONVERSION(`const GdkEventSequence*',`const Gdk::EventSequence*',`reinterpret_cast<$2>($3)')
+  /**
+   * Returns the event sequence that the event belongs to
+   */
+  _MEMBER_GET(event_sequence, sequence, const Gdk::EventSequence*, const GdkEventSequence*)
+  _IGNORE(gdk_event_get_event_sequence)
+
+  /**
+   * Returns @c true if the event should be used for emulating pointer event
+   */
+  _MEMBER_GET(is_emulating_pointer, emulating_pointer, bool, gboolean)
+  _IGNORE(gdk_event_get_pointer_emulated)
+
+  /**
+   * Returns the device where the event originated from.
+   */
+  _MEMBER_GET_GOBJECT(device, device, Gdk::Device, GdkDevice*)
+};
+
+/** Generated when the mouse pointer leaves or enters the window.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::LEAVE_NOTIFY or
+ * Gdk::Event::Type::ENTER_NOTIFY.
+ *
+ * @newin{3,90}
+ */
+class EventCrossing : public Event
+{
+  _CLASS_GDKEVENT(EventCrossing, GdkEventCrossing, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the window that was entered or left
+   */
+  _MEMBER_GET_GOBJECT(subwindow, subwindow, Gdk::Window, GdkWindow*)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  /*** Returns the crossing mode.
+   * Gdk::CrossingMode::GTK_GRAB, Gdk::CrossingMode::GTK_UNGRAB, and
+   * Gdk::CrossingMode::STATE_CHANGED are always synthesized, never native.
+   */
+  _MEMBER_GET(mode, mode, Gdk::CrossingMode, GdkCrossingMode)
+
+  /**
+   * Returns the kind of crossing that has been made
+   */
+  _MEMBER_GET(detail, detail, Gdk::NotifyType, GdkNotifyType)
+
+  /**
+   * Returns @c true if the window was the focus window, @c false otherwise
+   */
+  _MEMBER_GET(focus, focus, bool, gboolean)
+};
+
+/** Generated when all or part of a window becomes visible and needs to be
+ * redrawn.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::EXPOSE, Gdk::Event::Type::DAMAGE.
+ *
+ * @newin{3,90}
+ */
+class EventExpose : public Event
+{
+  _CLASS_GDKEVENT(EventExpose, GdkEventExpose, Event, GdkEvent)
+
+public:
+
+#m4 _CONVERSION(`GdkRectangle',`const Gdk::Rectangle&',`Glib::wrap(&$3)')
+  /**
+   * Returns the bounding box of the region to be redrawn
+   */
+  _MEMBER_GET(area, area, const Gdk::Rectangle&, GdkRectangle)
+
+#m4 _CONVERSION(`cairo_region_t*',`::Cairo::RefPtr<const ::Cairo::Region>',`::Cairo::RefPtr<::Cairo::Region>(new ::Cairo::Region($3, false /* take ref */))')
+  /**
+   * Returns the region to be redrawn
+   */
+  _MEMBER_GET(region, region, ::Cairo::RefPtr<const ::Cairo::Region>, cairo_region_t*);
+
+  /**
+   * Returns the number of contiguous Gdk::Event::Type::EXPOSE events following this one.
+   * The only use for this is "exposure compression", i.e. handling all contiguous
+   * Gdk::Event::Type::EXPOSE events in one go, though GDK performs some exposure
+   * compression so this is not normally needed.
+   */
+  _MEMBER_GET(count, count, int, gint)
+};
+
+// GdkEventVisibility is deprecated. It's not used in gtk+ 4.
+
+/** Generated when the keyboard focus changes.
+ *
+ * get_event_type() will return Gdk::Event::Type::FOCUS_CHANGE.
+ *
+ * @newin{3,90}
+ */
+class EventFocus : public Event
+{
+  _CLASS_GDKEVENT(EventFocus, GdkEventFocus, Event, GdkEvent)
+
+public:
+
+  /**
+   * @c true if the window gained focus, @c false if lost
+   */
+  _MEMBER_GET(focus, in, bool, gint16)
+};
+
+/** Generated when the position or size of a window changes.
+ *
+ * get_event_type() will return Gdk::Event::Type::CONFIGURE.
+ *
+ * @newin{3,90}
+ */
+class EventConfigure : public Event
+{
+  _CLASS_GDKEVENT(EventConfigure, GdkEventConfigure, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the new X coordinate of the window, relative to its parent
+   */
+  _MEMBER_GET(x, x, int, gint)
+
+  /**
+   * Returns the new Y coordinate of the window, relative to its parent
+   */
+  _MEMBER_GET(y, y, int, gint)
+
+  /**
+   * Returns the new width of the window
+   */
+  _MEMBER_GET(width, width, int, gint)
+
+  /**
+   * Returns the new height of the window
+   */
+  _MEMBER_GET(height, height, int, gint)
+
+  /**
+   * Convenience method to access all position and size information at once
+   */
+  Gdk::Rectangle get_rect() const;
+};
+
+/** Rarely used event. Generated when a property of a window changes.
+ *
+ * get_event_type() will return Gdk::Event::Type::PROPERTY_NOTIFY.
+ *
+ * @newin{3,90}
+ */
+class EventProperty : public Event
+{
+  _CLASS_GDKEVENT(EventProperty, GdkEventProperty, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the atom indicating the property that was changed
+   */
+  _MEMBER_GET(atom, atom, GdkAtom, GdkAtom)
+
+  /**
+   * Identifies whether the property was changed (Gdk::PropertyState::NEW_VALUE) or
+   * deleted (Gdk::PropertyState::DELETE).
+   */
+  _MEMBER_GET(state, state, Gdk::PropertyState, GdkPropertyState)
+};
+
+/** Rarely used event. Generated when a selection is requested or ownership of a
+ * selection is taken over by another client application.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::SELECTION_CLEAR,
+ * Gdk::Event::Type::SELECTION_NOTIFY or Gdk::Event::Type::SELECTION_REQUEST.
+ *
+ * @newin{3,90}
+ */
+class EventSelection : public Event
+{
+  _CLASS_GDKEVENT(EventSelection, GdkEventSelection, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the atom identifying the selection
+   */
+  _MEMBER_GET(selection, selection, GdkAtom, GdkAtom)
+
+  /**
+   * Returns the atom identifying the target to which the selection should be
+   * converted
+   */
+  _MEMBER_GET(target, target, GdkAtom, GdkAtom)
+
+  /**
+   * Returns the atom identifying the property in which to place the result of
+   * the conversion
+   */
+  _MEMBER_GET(property, property, GdkAtom, GdkAtom)
+
+  /**
+   * Checks whether there's window on which to place the property. The results
+   * are undefined if has_requestor() returns @c false and get_requestor()
+   * is called.
+   */
+  bool has_requestor() const;
+
+  /**
+   * Returns the window on which to place the property. The results are
+   * undefined if has_requestor() would return @c false before the call.
+   */
+  _MEMBER_GET_GOBJECT(requestor, requestor, Gdk::Window, GdkWindow*)
+};
+
+/** Rarely used event. Generated when the owner of a selection changes. On X11,
+ * this information is only available if the X server supports the XFIXES
+ * extension.
+ *
+ * get_event_type() will return Gdk::Event::Type::OWNER_CHANGE.
+ *
+ * @newin{3,90}
+ */
+class EventOwnerChange : public Event
+{
+  _CLASS_GDKEVENT(EventOwnerChange, GdkEventOwnerChange, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the time at which the ownership changed
+   */
+  _MEMBER_GET(selection_time, selection_time, guint32, guint32)
+
+  /**
+   * Returns the atom identifying the selection
+   */
+  _MEMBER_GET(selection, selection, GdkAtom, GdkAtom)
+
+  /**
+   * Returns the reason of the ownership change
+   */
+  _MEMBER_GET(reason, reason, Gdk::OwnerChange, GdkOwnerChange)
+
+  /**
+   * Checks whether there's new owner of the selection. The results are
+   * undefined if has_owner() returns @c false and get_owner() is called.
+   */
+  bool has_owner() const;
+
+  /**
+   * Returns the window which is the new owner of the selection. The results are
+   * undefined if has_owner() would return @c false before the call.
+   */
+  _MEMBER_GET_GOBJECT(owner, owner, Gdk::Window, GdkWindow*)
+};
+
+/** Generated during Drag-and-Drop (DND) operations.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::DRAG_ENTER,
+ * Gdk::Event::Type::DRAG_LEAVE, Gdk::Event::Type::DRAG_MOTION,
+ * Gdk::Event::Type::DRAG_STATUS, Gdk::Event::Type::DROP_START
+ * or Gdk::Event::Type::DROP_FINISHED.
+ *
+ * @newin{3,90}
+ */
+class EventDND : public Event
+{
+  _CLASS_GDKEVENT(EventDND, GdkEventDND, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root screen. Only
+   * meaningful if get_event_type() returns Gdk::Event::Type::DRAG_MOTION or
+   * Gdk::Event::Type::DROP_START.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+
+  /**
+   * Returns the drag context
+   */
+#m4 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<const Gdk::DragContext>', `Glib::wrap($3)')
+  _MEMBER_GET_GOBJECT(context, context, Gdk::DragContext, GdkDragContext*)
+};
+
+/** Rarely used event. Generated when a stylus has moved in or out of contact
+ * with the tablet, or perhaps that the user's finger has moved in or out of
+ * contact with a touch screen.
+ *
+ * This event type will be used pretty rarely. It only is important for XInput
+ * aware programs that are drawing their own cursor.
+ *
+ * get_event_type() will return one of Gdk::Event::Type::PROXIMITY_IN,
+ * Gdk::Event::Type::PROXIMITY_OUT.
+ *
+ * @newin{3,90}
+ */
+class EventProximity : public Event
+{
+  _CLASS_GDKEVENT(EventProximity, GdkEventProximity, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the device where the event originated from.
+   */
+  _MEMBER_GET_GOBJECT(device, device, Gdk::Device, GdkDevice*)
+};
+
+/** Generated when the state of the toplevel window changes.
+ *
+ * get_event_type() will return Gdk::Event::Type::WINDOW_STATE.
+ *
+ * @newin{3,90}
+ */
+class EventWindowState : public Event
+{
+  _CLASS_GDKEVENT(EventWindowState, GdkEventWindowState, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns a bit mask identifying which bits of the state have been changed
+   */
+  _MEMBER_GET(mask, changed_mask, Gdk::Window::State, GdkWindowState)
+
+  /**
+   * Returns the new window state
+   */
+  _MEMBER_GET(state, new_window_state, Gdk::Window::State, GdkWindowState)
+
+};
+
+/** Generated when a setting is modified.
+ *
+ * get_event_type() will return Gdk::Event::Type::SETTING.
+ *
+ * @newin{3,90}
+ */
+class EventSetting : public Event
+{
+  _CLASS_GDKEVENT(EventSetting, GdkEventSetting, Event, GdkEvent)
+
+public:
+
+  /**
+   * Specifies what happened to the setting.
+   */
+  _MEMBER_GET(action, action, Gdk::SettingAction, GdkSettingAction)
+
+  /**
+   * Returns the name of the setting
+   */
+  _MEMBER_GET(name, name, Glib::ustring, const char*)
+
+};
+
+/** Generated when a pointer or keyboard grab is broken. On X11, this happens
+ * when the grab window becomes unviewable (i.e. it or one of its ancestors is
+ * unmapped), or if the same application grabs the pointer or keyboard again.
+ * Note that implicit grabs (which are initiated by button presses) can also
+ * cause Gdk::EventGrabBroken events.
+ *
+ * get_event_type() will return Gdk::Event::Type::GRAB_BROKEN.
+ *
+ * @newin{3,90}
+ */
+class EventGrabBroken : public Event
+{
+  _CLASS_GDKEVENT(EventGrabBroken, GdkEventGrabBroken, Event, GdkEvent)
+
+public:
+
+  /**
+   * @c true if a keyboard grab was broken, @c false if a pointer grab was
+   * broken
+   */
+  bool is_keyboard() const;
+
+  /**
+   * @c true if the broken grab was implicit.
+   */
+  bool is_implicit() const;
+
+  /**
+   * Checks whether this event was caused by another grab in the same
+   * application. In this case, get_grab_window() can be used to acquire the
+   * new grab window. The results are undefined if has_grab_window() returns
+   * @c false and get_grab_window() is called.
+   */
+  bool has_grab_window() const;
+
+  /**
+   * Returns the new grab window. The results are undefined if
+   * has_grab_window() would return @c false before the call.
+   */
+  _MEMBER_GET_GOBJECT(grab_window, grab_window, Gdk::Window, GdkWindow*)
+};
+
+/** Generated during touchpad swipe gestures.
+ *
+ * get_event_type() will return Gdk::Event::Type::TOUCHPAD_SWIPE.
+ *
+ * @newin{3,90}
+ */
+class EventTouchpadSwipe : public Event
+{
+  _CLASS_GDKEVENT(EventTouchpadSwipe, GdkEventTouchpadSwipe, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the current phase of the gesture.
+   */
+  _MEMBER_GET(phase, phase, TouchpadGesturePhase, GdkTouchpadGesturePhase)
+
+#m4 _CONVERSION(`gint8',`int',`$3')
+  /**
+   * Returns the number of fingers triggering the swipe.
+   */
+  _MEMBER_GET(n_fingers, n_fingers, int, gint8)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the movement delta in the X axis of the swipe focal point.
+   */
+  _MEMBER_GET(dx, dx, double, gdouble)
+
+  /**
+   * Returns the movement delta in the Y axis of the swipe focal point.
+   */
+  _MEMBER_GET(dy, dy, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root of the screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root of the screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+};
+
+/** Generated during touchpad swipe gestures.
+ *
+ * get_event_type() will return Gdk::Event::Type::TOUCHPAD_PINCH.
+ *
+ * @newin{3,90}
+ */
+class EventTouchpadPinch : public Event
+{
+  _CLASS_GDKEVENT(EventTouchpadPinch, GdkEventTouchpadPinch, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the current phase of the gesture.
+   */
+  _MEMBER_GET(phase, phase, TouchpadGesturePhase, GdkTouchpadGesturePhase)
+
+  /**
+   * Returns the number of fingers triggering the swipe.
+   */
+  _MEMBER_GET(n_fingers, n_fingers, int, gint8)
+
+  /**
+   * Returns a bit mask representing the state of the modifier keys (e.g.
+   * Control, Shift and Alt) and the pointer buttons.
+   */
+  _MEMBER_GET(state, state, ModifierType, GdkModifierType)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(x, x, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the window.
+   */
+  _MEMBER_GET(y, y, double, gdouble)
+
+  /**
+   * Returns the movement delta in the X axis of the swipe focal point.
+   */
+  _MEMBER_GET(dx, dx, double, gdouble)
+
+  /**
+   * Returns the movement delta in the Y axis of the swipe focal point.
+   */
+  _MEMBER_GET(dy, dy, double, gdouble)
+
+  /**
+   * Returns the angle change in radians. Negative angles denote counter-
+   * clockwise movements.
+   */
+  _MEMBER_GET(angle_delta, angle_delta, double, gdouble)
+
+  /**
+   * Returns the current scale, relative to that at the time of the
+   * corresponding Gdk::TouchpadGesturePhase::BEGIN event.
+   */
+  _MEMBER_GET(scale, scale, double, gdouble)
+
+  /**
+   * Returns the X coordinate of the pointer relative to the root of the screen.
+   */
+  _MEMBER_GET(root_x, x_root, double, gdouble)
+
+  /**
+   * Returns the Y coordinate of the pointer relative to the root of the screen.
+   */
+  _MEMBER_GET(root_y, y_root, double, gdouble)
+};
+
+/** Generated during Gdk::InputSource::TABLET_PAD button presses and releases.
+ *
+ * get_event_type() will return Gdk::Event::Type::PAD_BUTTON_PRESS or
+ * Gdk::Event::Type::PAD_BUTTON_RELEASE.
+ *
+ * @newin{3,90}
+ */
+class EventPadButton : public Event
+{
+  _CLASS_GDKEVENT(EventPadButton, GdkEventPadButton, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the pad group the button belongs to.
+   * A Gdk::InputSource::TABLET_PAD device may have one or more groups
+   * containing a set of buttons/rings/strips each.
+   */
+  _MEMBER_GET(group, group, guint, guint)
+
+  /**
+   * Returns the pad button that was pressed.
+   */
+  _MEMBER_GET(button, button, guint, guint)
+
+  /**
+   * Returns the current mode of @a group.
+   * Different groups in a Gdk::InputSource::TABLET_PAD device may have
+   * different current modes.
+   */
+  _MEMBER_GET(mode, mode, guint, guint)
+};
+
+/** Generated during Gdk::InputSource::TABLET_PAD interaction with tactile sensors.
+ *
+ * get_event_type() will return Gdk::Event::Type::PAD_RING or
+ * Gdk::Event::Type::PAD_STRIP.
+ *
+ * @newin{3,90}
+ */
+class EventPadAxis : public Event
+{
+  _CLASS_GDKEVENT(EventPadAxis, GdkEventPadAxis, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the pad group the ring/strip belongs to.
+   * A Gdk::InputSource::TABLET_PAD device may have one or more groups
+   * containing a set of buttons/rings/strips each.
+   */
+  _MEMBER_GET(group, group, guint, guint)
+
+  /**
+   * Returns the number of strip/ring that was interacted.
+   * This number is 0-indexed.
+   */
+  _MEMBER_GET(index, index, guint, guint)
+
+  /**
+   * Returns the current mode of @a group.
+   * Different groups in a Gdk::InputSource::TABLET_PAD device may have
+   * different current modes.
+   */
+  _MEMBER_GET(mode, mode, guint, guint)
+
+  /**
+   * Returns the current value for the given axis.
+   */
+  _MEMBER_GET(value, value, double, gdouble)
+};
+
+/** Generated during Gdk::InputSource::TABLET_PAD mode switches in a group.
+ *
+ * get_event_type() will return Gdk::Event::Type::PAD_GROUP_MODE.
+ *
+ * @newin{3,90}
+ */
+class EventPadGroupMode : public Event
+{
+  _CLASS_GDKEVENT(EventPadGroupMode, GdkEventPadGroupMode, Event, GdkEvent)
+
+public:
+
+  /**
+   * Returns the timestamp of the event in milliseconds
+   */
+  _MEMBER_GET(time, time, guint32, guint32)
+
+  /**
+   * Returns the pad group that is switching mode.
+   * A Gdk::InputSource::TABLET_PAD device may have one or more groups
+   * containing a set of buttons/rings/strips each.
+   */
+  _MEMBER_GET(group, group, guint, guint)
+
+  /**
+   * Returns the new mode of @a group.
+   * Different groups in a Gdk::InputSource::TABLET_PAD device may have
+   * different current modes.
+   */
+  _MEMBER_GET(mode, mode, guint, guint)
+};
+
+} // namespace Gdk
