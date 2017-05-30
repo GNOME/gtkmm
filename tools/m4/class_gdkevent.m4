@@ -47,8 +47,7 @@ __NAMESPACE_BEGIN__
 inline void swap(__CPPNAME__& lhs, __CPPNAME__& rhs) noexcept
   { lhs.swap(rhs); }
 
-/**
- * Wraps a C event instance without making unnecessary copy when the ownership
+/** Wraps a C event instance without making unnecessary copy when the ownership
  * can not be acquired.
  *
  * The @a event pointer must not be deleted until last usage of the returned
@@ -71,12 +70,11 @@ namespace Glib
 {
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`',`dnl else
 
-/**
- * A Glib::wrap() method for this object.
+/** A Glib::wrap() method for this object.
  *
  * @param object The C instance.
- * @param take_copy False if the result should take ownership of the C instance.
- * True if it should take a new copy.
+ * @param take_copy @c false if the result should take ownership of the C instance,
+ *        @c true if it should take a new copy.
  * @result A C++ instance that wraps this C instance.
  *
  * @relates __NAMESPACE__::__CPPNAME__
@@ -133,9 +131,6 @@ ifelse(__CPPPARENT__,,`dnl base class
 
 __CPPNAME__::__CPPNAME__`'(__CNAME__* gobject, bool make_a_copy)
 :
-  // For Event wrappers, make_a_copy is false by default.  The static
-  // Event wrappers must not take a copy, thus make_a_copy = false
-  // ensures identical behaviour if the default argument is used.
 ifelse(__CPPPARENT__,,`dnl base class
   gobject_((make_a_copy && gobject) ? gdk_event_copy(gobject) : gobject)
 ',`dnl else i.e. subclass
@@ -198,6 +193,8 @@ ifelse(__CPPPARENT__,,`dnl base class
 ')dnl endif
 }
 
+// The reinterpret_cast works because __CPPNAME__ is a standard-layout class
+// whose only data member is a ifelse(__CPARENT__,,`__CNAME__',`__CPARENT__') pointer.
 const __CPPNAME__& wrap_event(const __CNAME__*& event)
 {
   return reinterpret_cast<const __CPPNAME__&>(event);
@@ -223,25 +220,24 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   using CppObjectType = __CPPNAME__;
   using BaseObjectType = __CNAME__;
-ifelse(__CPPPARENT__,,`dnl base class
-
-  static GType get_type() G_GNUC_CONST;
-')dnl
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-  /**
-   * Creates an invalid event object. Calling any member functions is undefined
-   * behavior.
+ifelse(__CPPPARENT__,,`dnl base class
+  /// Get the GType for this class, for use with the underlying GObject type system.
+  static GType get_type() G_GNUC_CONST;
+')dnl
+
+  /** Creates an invalid event object.
+   * Calling any member functions other than operator bool() is undefined behavior.
    */
   __CPPNAME__`'();
 
-  /**
-   * Wraps a C event instance. This constructor either acquires ownership of
-   * @a gobject, or copies it.
+  /** Wraps a C event instance.
+   * This constructor either acquires ownership of @a gobject, or copies it.
    *
    * @param gobject %Event to wrap.
    * @param make_a_copy If @c false, the ownership of @a gobject is acquired,
-   *        otherwise, a copy is made.
+   *        otherwise a copy is made.
    */
   explicit __CPPNAME__`'(__CNAME__* gobject, bool make_a_copy = false);
 ifelse(__CPPPARENT__,`',`dnl Only add for Gdk::Event
@@ -259,22 +255,22 @@ _IMPORT(SECTION_DTOR_DOCUMENTATION)
   void swap(__CPPNAME__& other) noexcept;
 
 ifelse(__CPPPARENT__,,`dnl
-  ///Provides access to the underlying C instance.
-  __CNAME__*       gobj()       { return gobject_; }
+  /// Provides access to the underlying C instance.
+  __CNAME__* gobj() noexcept { return gobject_; }
 
-  ///Provides access to the underlying C instance.
-  const __CNAME__* gobj() const { return gobject_; }
+  /// Provides access to the underlying C instance.
+  const __CNAME__* gobj() const noexcept { return gobject_; }
 ',`dnl else
   /// Provides access to the underlying C instance.
-  __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(__CPPPARENT__::gobj()); }
+  __CNAME__* gobj() noexcept { return reinterpret_cast<__CNAME__*>(__CPPPARENT__::gobj()); }
 
   /// Provides access to the underlying C instance.
-  const __CNAME__* gobj() const { return reinterpret_cast<const __CNAME__*>(__CPPPARENT__::gobj()); }
+  const __CNAME__* gobj() const noexcept { return reinterpret_cast<const __CNAME__*>(__CPPPARENT__::gobj()); }
 ')dnl endif
 
-  /**
-   * Provides access to the underlying C instance. The caller is responsible for
-   * freeing it with gdk_event_free(). Use when directly setting fields in structs.
+  /** Provides access to the underlying C instance.
+   * The caller is responsible for freeing it with gdk_event_free().
+   * Use when directly setting fields in structs.
    */
   __CNAME__* gobj_copy() const;
 
