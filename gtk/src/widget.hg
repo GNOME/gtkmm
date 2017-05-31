@@ -29,7 +29,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <gtkmm/object.h>
 #include <gtkmm/buildable.h>
-#include <gdkmm/event.h>
+#include <gdkmm/events.h>
 #include <gdkmm/types.h>
 #include <gdkmm/window.h>
 #include <gdkmm/dragcontext.h>
@@ -147,9 +147,10 @@ public:
   _IGNORE(gtk_widget_can_activate_accel)
   //Probably not useful. Too C-specific: _WRAP_METHOD(bool can_activate_accel(guint signal_id) const, gtk_widget_can_activate_accel)
 
-  //TODO: Use C++ type
-  _WRAP_METHOD(bool event(GdkEvent* gdk_event), gtk_widget_event)
-  _WRAP_METHOD(bool send_focus_change(GdkEvent* gdk_event), gtk_widget_send_focus_change)
+  _WRAP_METHOD(bool event(const Gdk::Event& gdk_event), gtk_widget_event)
+  // We use Gdk::EventFocus& rather than Gdk::Event&. See GTK+ bug https://bugzilla.gnome.org/show_bug.cgi?id=709544
+#m4 _CONVERSION(`Gdk::EventFocus&',`GdkEvent*',`($3).Event::gobj()')
+  _WRAP_METHOD(bool send_focus_change(Gdk::EventFocus& gdk_event), gtk_widget_send_focus_change)
   _WRAP_METHOD(bool activate(), gtk_widget_activate)
 
   // gtk_widget_reparent() has been removed, but we want to keep Gtk::Widget::reparent().
@@ -439,7 +440,8 @@ public:
   _WRAP_METHOD(void drag_source_add_uri_targets(), gtk_drag_source_add_uri_targets)
   _WRAP_METHOD(void drag_source_add_image_targets(), gtk_drag_source_add_image_targets)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(const Glib::RefPtr<TargetList>& targets, Gdk::DragAction actions, int button, GdkEvent* gdk_event, int x, int y), gtk_drag_begin_with_coordinates, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(const Glib::RefPtr<TargetList>& targets,
+    Gdk::DragAction actions, int button, Gdk::Event& gdk_event, int x, int y), gtk_drag_begin_with_coordinates, refreturn)
   _WRAP_METHOD(bool drag_check_threshold(int start_x, int start_y, int current_x, int current_y), gtk_drag_check_threshold)
 
   //These should be a method of Gdk::DragContext, but gdkmm can't depend on gtkmm.
@@ -569,22 +571,30 @@ public:
   _WRAP_SIGNAL(bool mnemonic_activate(bool group_cycling), "mnemonic_activate")
   _WRAP_SIGNAL(void grab_focus(), "grab_focus")
   _WRAP_SIGNAL(bool focus(DirectionType direction), "focus")
-  _WRAP_SIGNAL(bool event(GdkEvent* gdk_event), "event")
+#m4 _CONVERSION(`GdkEvent*',`Gdk::Event&',`Gdk::wrap_event($3)')
+  _WRAP_SIGNAL(bool event(Gdk::Event& gdk_event), "event")
   // The event_after signal can't have a default handler because the wrapped C signal has no default handler.
-  _WRAP_SIGNAL(void event_after(GdkEvent* gdk_event), "event_after", no_default_handler)
+  _WRAP_SIGNAL(void event_after(Gdk::Event& gdk_event), "event_after", no_default_handler)
 
+#m4 _CONVERSION(`GdkEventButton*',`Gdk::EventButton&',`Gdk::wrap_event($3)')
   /// Event triggered by user pressing button.
-  _WRAP_SIGNAL(bool button_press_event(GdkEventButton* button_event),"button_press_event")
+  _WRAP_SIGNAL(bool button_press_event(Gdk::EventButton& button_event),"button_press_event")
 
   /// Event triggered by user releasing button.
-  _WRAP_SIGNAL(bool button_release_event(GdkEventButton* release_event), "button_release_event")
+  _WRAP_SIGNAL(bool button_release_event(Gdk::EventButton& release_event), "button_release_event")
 
-  _WRAP_SIGNAL(bool scroll_event(GdkEventScroll* scroll_event), "scroll_event")
+#m4 _CONVERSION(`GdkEventScroll*',`Gdk::EventScroll&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventScroll&',`GdkEventScroll*',`($3).gobj()')
+  _WRAP_SIGNAL(bool scroll_event(Gdk::EventScroll& scroll_event), "scroll_event")
 
+#m4 _CONVERSION(`GdkEventMotion*',`Gdk::EventMotion&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventMotion&',`GdkEventMotion*',`($3).gobj()')
   /// Event triggered by user moving pointer.
-  _WRAP_SIGNAL(bool motion_notify_event(GdkEventMotion* motion_event), "motion_notify_event")
+  _WRAP_SIGNAL(bool motion_notify_event(Gdk::EventMotion& motion_event), "motion_notify_event")
 
-  _WRAP_SIGNAL(bool delete_event(GdkEventAny* any_event), "delete_event")
+#m4 _CONVERSION(`GdkEventAny*',`Gdk::Event&',`wrap_event_any($3)')
+#m4 _CONVERSION(`Gdk::Event&',`GdkEventAny*',`reinterpret_cast<GdkEventAny*>(($3).gobj())')
+  _WRAP_SIGNAL(bool delete_event(Gdk::Event& any_event), "delete_event")
 
 #m4begin
 dnl// Hook in special code to catch explicit uses of gtk_object_destroy() by
@@ -607,31 +617,46 @@ dnl
   //_WRAP_SIGNAL(bool draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr), "draw")
   _IGNORE_SIGNAL(draw)
 
+#m4 _CONVERSION(`GdkEventKey*',`Gdk::EventKey&',`Gdk::wrap_event($3)')
   /// Event triggered by a key press will widget has focus.
-  _WRAP_SIGNAL(bool key_press_event(GdkEventKey* key_event), "key_press_event")
+  _WRAP_SIGNAL(bool key_press_event(Gdk::EventKey& key_event), "key_press_event")
 
   /// Event triggered by a key release will widget has focus.
-  _WRAP_SIGNAL(bool key_release_event(GdkEventKey* key_event), "key_release_event")
+  _WRAP_SIGNAL(bool key_release_event(Gdk::EventKey& key_event), "key_release_event")
 
+#m4 _CONVERSION(`GdkEventCrossing*',`Gdk::EventCrossing&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventCrossing&',`GdkEventCrossing*',`($3).gobj()')
   /// Event triggered by pointer entering widget area.
-  _WRAP_SIGNAL(bool enter_notify_event(GdkEventCrossing* crossing_event), "enter_notify_event")
+  _WRAP_SIGNAL(bool enter_notify_event(Gdk::EventCrossing& crossing_event), "enter_notify_event")
 
   /// Event triggered by pointer leaving widget area.
-  _WRAP_SIGNAL(bool leave_notify_event(GdkEventCrossing* crossing_event), "leave_notify_event")
+  _WRAP_SIGNAL(bool leave_notify_event(Gdk::EventCrossing& crossing_event), "leave_notify_event")
 
+#m4 _CONVERSION(`GdkEventConfigure*',`Gdk::EventConfigure&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventConfigure&',`GdkEventConfigure*',`($3).gobj()')
   /// Event triggered by a window resizing.
-  _WRAP_SIGNAL(bool configure_event(GdkEventConfigure* configure_event), "configure_event")
-  _WRAP_SIGNAL(bool focus_in_event(GdkEventFocus* focus_event), "focus_in_event")
-  _WRAP_SIGNAL(bool focus_out_event(GdkEventFocus* gdk_event), "focus_out_event")
-  _WRAP_SIGNAL(bool map_event(GdkEventAny* any_event), "map_event")
-  _WRAP_SIGNAL(bool unmap_event(GdkEventAny* any_event), "unmap_event")
-  _WRAP_SIGNAL(bool property_notify_event(GdkEventProperty* property_event), "property_notify_event")
-  _WRAP_SIGNAL(bool selection_clear_event(GdkEventSelection* selection_event), "selection_clear_event")
-  _WRAP_SIGNAL(bool selection_request_event(GdkEventSelection* selection_event), "selection_request_event")
-  _WRAP_SIGNAL(bool selection_notify_event(GdkEventSelection* selection_event), "selection_notify_event")
-  _WRAP_SIGNAL(bool proximity_in_event(GdkEventProximity* proximity_event), "proximity_in_event")
-  _WRAP_SIGNAL(bool proximity_out_event(GdkEventProximity* proximity_event), "proximity_out_event")
-  _WRAP_SIGNAL(bool window_state_event(GdkEventWindowState* window_state_event), "window_state_event")
+  _WRAP_SIGNAL(bool configure_event(Gdk::EventConfigure& configure_event), "configure_event")
+#m4 _CONVERSION(`GdkEventFocus*',`Gdk::EventFocus&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventFocus&',`GdkEventFocus*',`($3).gobj()')
+  _WRAP_SIGNAL(bool focus_in_event(Gdk::EventFocus& focus_event), "focus_in_event")
+  _WRAP_SIGNAL(bool focus_out_event(Gdk::EventFocus& gdk_event), "focus_out_event")
+  _WRAP_SIGNAL(bool map_event(Gdk::Event& any_event), "map_event")
+  _WRAP_SIGNAL(bool unmap_event(Gdk::Event& any_event), "unmap_event")
+#m4 _CONVERSION(`GdkEventProperty*',`Gdk::EventProperty&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventProperty&',`GdkEventProperty*',`($3).gobj()')
+  _WRAP_SIGNAL(bool property_notify_event(Gdk::EventProperty& property_event), "property_notify_event")
+#m4 _CONVERSION(`GdkEventSelection*',`Gdk::EventSelection&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventSelection&',`GdkEventSelection*',`($3).gobj()')
+  _WRAP_SIGNAL(bool selection_clear_event(Gdk::EventSelection& selection_event), "selection_clear_event")
+  _WRAP_SIGNAL(bool selection_request_event(Gdk::EventSelection& selection_event), "selection_request_event")
+  _WRAP_SIGNAL(bool selection_notify_event(Gdk::EventSelection& selection_event), "selection_notify_event")
+#m4 _CONVERSION(`GdkEventProximity*',`Gdk::EventProximity&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventProximity&',`GdkEventProximity*',`($3).gobj()')
+  _WRAP_SIGNAL(bool proximity_in_event(Gdk::EventProximity& proximity_event), "proximity_in_event")
+  _WRAP_SIGNAL(bool proximity_out_event(Gdk::EventProximity& proximity_event), "proximity_out_event")
+#m4 _CONVERSION(`GdkEventWindowState*',`Gdk::EventWindowState&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventWindowState&',`GdkEventWindowState*',`($3).gobj()')
+  _WRAP_SIGNAL(bool window_state_event(Gdk::EventWindowState& window_state_event), "window_state_event")
 
   //We use the optional custom_c_callback parameter with _WRAP_SIGNAL() for some of these,
   //so that we can write special code to wrap the non-const SelectionData& output parameters:
@@ -668,10 +693,13 @@ _CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true
 #m4 _CONVERSION(`GtkTooltip*',`const Glib::RefPtr<Tooltip>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Tooltip>& tooltip), "query_tooltip")
 
-  //(This was added to GTK+ 2.8 but forgotten by us until gtkmm 2.13/14):
-  _WRAP_SIGNAL(bool grab_broken_event(GdkEventGrabBroken* grab_broken_event), "grab_broken_event")
+#m4 _CONVERSION(`GdkEventGrabBroken*',`Gdk::EventGrabBroken&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventGrabBroken&',`GdkEventGrabBroken*',`($3).gobj()')
+  _WRAP_SIGNAL(bool grab_broken_event(Gdk::EventGrabBroken& grab_broken_event), "grab_broken_event")
 
-  _WRAP_SIGNAL(bool touch_event(GdkEventTouch* touch_event), "touch_event")
+#m4 _CONVERSION(`GdkEventTouch*',`Gdk::EventTouch&',`Gdk::wrap_event($3)')
+#m4 _CONVERSION(`Gdk::EventTouch&',`GdkEventTouch*',`($3).gobj()')
+  _WRAP_SIGNAL(bool touch_event(Gdk::EventTouch& touch_event), "touch_event")
 
   _WRAP_PROPERTY("name", Glib::ustring)
   _WRAP_PROPERTY("parent", Container*)

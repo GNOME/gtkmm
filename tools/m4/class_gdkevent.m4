@@ -229,6 +229,8 @@ ifelse(__CPPPARENT__,,`dnl base class
 
   /** Creates an invalid event object.
    * Calling any member functions other than operator bool() is undefined behavior.
+   * An invalid event object can be used in a function call, if the underlying
+   * C function expects a NULL __CNAME__ pointer.
    */
   __CPPNAME__`'();
 

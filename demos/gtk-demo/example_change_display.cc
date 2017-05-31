@@ -62,7 +62,7 @@ protected:
 
   virtual void on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display);
 
-  virtual bool on_popup_button_release_event(GdkEventButton* event);
+  virtual bool on_popup_button_release_event(Gdk::EventButton& event);
 
   void on_response(int response_id) override;
 
@@ -360,7 +360,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
 }
 
 
-bool Example_ChangeDisplay::on_popup_button_release_event(GdkEventButton* /* event */)
+bool Example_ChangeDisplay::on_popup_button_release_event(Gdk::EventButton& /* event */)
 {
   m_popup_clicked = true;
   return true;

@@ -294,12 +294,19 @@ _CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`static_cast<$2>($3)')
 _CONVERSION(`GdkNativeWindow',`NativeWindow',`static_cast<$2>($3)')
 _CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
 _CONVERSION(`NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
-_CONVERSION(`GdkEvent*',`const GdkEvent*',`($3)')
 
-dnl GdkEvent
-_CONVERSION(`GdkEvent*',`Event',`Event($3)')
+dnl GdkEvent and GdkEventSequence
+_CONVERSION(`GdkEvent*',`Event',`Glib::wrap($3)')
+_CONVERSION(`GdkEvent*',`Gdk::Event',`Glib::wrap($3)')
+_CONVERSION(`const GdkEvent*',`Gdk::Event',`Glib::wrap(const_cast<GdkEvent*>($3), true)')
 _CONVERSION(`Event&',`GdkEvent*',`($3).gobj()')
+_CONVERSION(`Gdk::Event&',`GdkEvent*',`($3).gobj()')
 _CONVERSION(`const Event&',`const GdkEvent*',`($3).gobj()')
+_CONVERSION(`const Gdk::Event&',`const GdkEvent*',`($3).gobj()')
+_CONVERSION(`Gdk::EventButton&',`GdkEventButton*',`($3).gobj()')
+_CONVERSION(`Gdk::EventKey&',`GdkEventKey*',`($3).gobj()')
+_CONVERSION(`Gdk::EventSequence*',`GdkEventSequence*',`reinterpret_cast<$2>($3)')
+_CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)')
 
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3, true))
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))

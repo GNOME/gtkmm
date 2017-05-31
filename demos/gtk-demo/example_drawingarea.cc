@@ -27,9 +27,9 @@ protected:
   void on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
   //signal handlers:
-  bool on_drawingarea_scribble_configure_event(GdkEventConfigure* event);
-  bool on_drawingarea_scribble_motion_notify_event(GdkEventMotion* event);
-  bool on_drawingarea_scribble_button_press_event(GdkEventButton* event);
+  bool on_drawingarea_scribble_configure_event(Gdk::EventConfigure& event);
+  bool on_drawingarea_scribble_motion_notify_event(Gdk::EventMotion& event);
+  bool on_drawingarea_scribble_button_press_event(Gdk::EventButton& event);
 
   void scribble_draw_brush(int x, int y);
 
@@ -158,7 +158,7 @@ void Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo
   cr->paint();
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfigure*)
+bool Example_DrawingArea::on_drawingarea_scribble_configure_event(Gdk::EventConfigure&)
 {
   const auto allocation = m_DrawingArea_Scribble.get_allocation();
   m_surface =
@@ -172,7 +172,7 @@ bool Example_DrawingArea::on_drawingarea_scribble_configure_event(GdkEventConfig
   return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMotion* motion_event)
+bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(Gdk::EventMotion& motion_event)
 {
   if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
@@ -181,21 +181,19 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
    * don't call Gdk::Window::get_device_position() you'll only get a single motion
    * event.  The reason is that we specified Gdk::POINTER_MOTION_HINT_MASK to
    * Gtk::Widget::add_events().  If we hadn't specified that, we could just use
-   * motion_event->x, motion_event->y as the pointer location. But we'd also get deluged in
+   * motion_event.get_x(), motion_event.get_y() as the pointer location. But we'd also get deluged in
    * events.  By requesting the next event as we handle the current one, we
    * avoid getting a huge number of events faster than we can cope.
    */
-  if(motion_event && motion_event->window)
+  if(motion_event && motion_event.get_window())
   {
-    const auto refWindow =
-        Glib::wrap(motion_event->window, true); // true == take_copy
+    const auto refWindow = motion_event.get_window();
 
     if(refWindow)
     {
       int x = 0, y = 0;
       auto state = Gdk::ModifierType(0);
-      const auto device =
-        Glib::wrap(motion_event->device, true); // true == take_copy
+      const auto device = motion_event.get_device();
       refWindow->get_device_position(device, x, y, state);
 
       if((state & Gdk::ModifierType::BUTTON1_MASK) != Gdk::ModifierType::BUTTON1_MASK)
@@ -207,13 +205,13 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(GdkEventMo
   return true;
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(GdkEventButton* button_event)
+bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(Gdk::EventButton& button_event)
 {
   if(!m_surface)
     return false; // paranoia check, in case we haven't gotten a configure event
 
-  if(button_event->button == 1)
-    scribble_draw_brush(int(button_event->x), int(button_event->y));
+  if(button_event.get_button() == 1)
+    scribble_draw_brush(int(button_event.get_x()), int(button_event.get_y()));
 
   // We've handled the event, stop processing.
   return true;

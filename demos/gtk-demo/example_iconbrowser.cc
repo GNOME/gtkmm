@@ -120,7 +120,7 @@ public:
 
 protected:
   // Signal handlers:
-  bool on_window_key_press_event(GdkEventKey* event);
+  bool on_window_key_press_event(Gdk::EventKey& event);
   void on_symbolic_radio_toggled();
   void on_context_list_selected_rows_changed();
   void on_icon_view_item_activated(const Gtk::TreeModel::Path& path);
@@ -268,7 +268,7 @@ Example_IconBrowser::~Example_IconBrowser()
 {
 }
 
-bool Example_IconBrowser::on_window_key_press_event(GdkEventKey* key_press_event)
+bool Example_IconBrowser::on_window_key_press_event(Gdk::EventKey& key_press_event)
 {
   return m_search_bar.handle_event(key_press_event);
 }

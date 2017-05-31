@@ -19,7 +19,7 @@ protected:
   // Signal handlers:
   void on_gesture_swipe_swipe(double velocity_x, double velocity_y);
   void on_gesture_long_press_pressed(double x, double y);
-  void on_gesture_long_press_end(GdkEventSequence* sequence);
+  void on_gesture_long_press_end(Gdk::EventSequence* sequence);
   void on_gesture_rotate_angle_changed(double angle, double angle_delta);
   void on_gesture_zoom_scale_changed(double scale);
 
@@ -142,7 +142,7 @@ void Example_Gestures::on_gesture_long_press_pressed(double /* x */, double /* y
   m_DrawingArea.queue_draw();
 }
 
-void Example_Gestures::on_gesture_long_press_end(GdkEventSequence* /* sequence */)
+void Example_Gestures::on_gesture_long_press_end(Gdk::EventSequence* /* sequence */)
 {
   m_long_pressed = false;
   m_DrawingArea.queue_draw();
