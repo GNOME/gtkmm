@@ -1,4 +1,3 @@
-/* $Id$ */
 #ifndef _GTKMM_ACCELKEY_H
 #define _GTKMM_ACCELKEY_H
 
@@ -45,7 +44,7 @@ public:
 
  /** AccelKey constructor.
   * @param accel_key For instance, 'q'
-  * @param accel_mods For instance, Gdk::CONTROL_MASK
+  * @param accel_mods For instance, Gdk::ModifierType::CONTROL_MASK
   * @param accel_path For instance, "<MainWindow>/File/Open"
   */
   AccelKey(guint accel_key, Gdk::ModifierType accel_mods,
