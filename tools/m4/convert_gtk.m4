@@ -258,7 +258,6 @@ _CONVERSION(`GtkWidget*',`ScrolledWindow*',`Glib::wrap((GtkScrolledWindow*)($3))
 _CONVERSION(`GtkWidget*',`Window*',`Glib::wrap((GtkWindow*)($3))')
 _CONVERSION(`GtkWidget*',`TreeView*',`Glib::wrap((GtkTreeView*)($3))')
 _CONVERSION(`GtkWidget*',`ButtonBox*',`Glib::wrap((GtkButtonBox*)($3))')
-_CONVERSION(`GtkWidget*',`ComboDropDown*',`Glib::wrap((GtkList*)($3))')
 _CONVERSION(`GtkWidget*',`Image*',`Glib::wrap((GtkImage*)($3))')
 _CONVERSION(`GtkWidget*',`ToolItem*',`Glib::wrap((GtkToolItem*)($3))')
 _CONVERSION(`GtkWidget*',`FileChooserDialog*',`Glib::wrap((GtkFileChooserDialog*)($3))')
@@ -278,7 +277,6 @@ _CONVERSION(`GtkWidget*',`const Gtk::Tree*',__RP2CPD)
 _CONVERSION(`GtkWidget*',`const ScrolledWindow*',`Glib::wrap((GtkScrolledWindow*)($3))')
 _CONVERSION(`GtkWidget*',`const Window*',`Glib::wrap((GtkWindow*)($3))')
 _CONVERSION(`GtkWidget*',`const TreeView*',`Glib::wrap((GtkTreeView*)($3))')
-_CONVERSION(`GtkWidget*',`const ComboDropDown*',`Glib::wrap((GtkList*)($3))')
 _CONVERSION(`GtkWidget*',`const FileChooserDialog*',`Glib::wrap((GtkFileChooserDialog*)($3))')
 
 _CONVERSION(`RadioButton&',`GtkRadioButton*',`($3).gobj()')
@@ -298,7 +296,6 @@ _CONVERSION(`FileChooserDialog&',`GtkWidget*',__FR2PD)
 # Ref (Gtkmm) -> Ptr (gtk+)
 define(`__FR2P',`($`'3).gobj()')
 define(`__FCR2P',`const_cast<$`'2>(($`'3).gobj())')
-_CONVERSION(`Gtk::Style&',`GtkStyle*',__FR2P)
 _CONVERSION(`Gtk::Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Widget&',`GtkWidget*',__FR2P)
 _CONVERSION(`Window&',`GtkWindow*',__FR2P)
@@ -309,48 +306,6 @@ _CONVERSION(`const ToolItem&',`GtkToolItem*',__FCR2P)
 _CONVERSION(`ToolItemGroup&',`GtkToolItemGroup*',__FR2P)
 _CONVERSION(`Gtk::Entry&',`GtkEntry*',__FR2P)
 _CONVERSION(`Stack&',`GtkStack*',__FR2P)
-
-# Glib::ListHandle<> (gtkmm) -> GList (gtk+)
-_CONVERSION(`const Glib::ListHandle<Glib::ustring>&',`GList*',`$3.data()')
-_CONVERSION(`const Glib::ListHandle<Widget*>&',`GList*',`$3.data()')
-_CONVERSION(`const Glib::ListHandle<const Widget*>&',`GList*',`$3.data()')
-_CONVERSION(`const Glib::ListHandle<Window*>&',`GList*',`$3.data()')
-_CONVERSION(`const Glib::ListHandle<const Window*>&',`GList*',`$3.data()')
-
-# GList (gtk+) -> Glib::ListHandle<> (gtkmm)
-define(`__FL2H_DEEP',`$`'2($`'3, Glib::OWNERSHIP_DEEP)')
-define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
-define(`__FL2H_NONE',`$`'2($`'3, Glib::OWNERSHIP_NONE)')
-
-_CONVERSION(`GList*',`Glib::ListHandle<Widget*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<const Widget*>',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle<Widget*>',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle<const Widget*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<Window*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<TreeViewColumn*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<const TreeViewColumn*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<CellRenderer*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<const CellRenderer*>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<TreeModel::Row>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<const TreeModel::Row>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<RecentInfo> >',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<RecentInfo>',__FL2H_SHALLOW)
-_CONVERSION(`GList*',`Glib::ListHandle<const RecentInfo>', __FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Tag> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Tag> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextTag> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextTag> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextMark> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextMark> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<TextBuffer::Mark> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const TextBuffer::Mark> >',__FL2H_SHALLOW)
-
-_CONVERSION(`GSList*',`Glib::SListHandle<Glib::ustring>',__FL2H_DEEP)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<PixbufFormat> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const PixbufFormat> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`SListHandle_PixbufFormat',__FL2H_DEEP)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<RecentFilter> >',__FL2H_SHALLOW)
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const RecentFilter> >', __FL2H_SHALLOW)
 
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
 
@@ -372,16 +327,7 @@ _CONVERSION(Gtk::Notebook_Helpers::Page*,GtkNotebookPage*,`($1)((void*)($3))',`(
 
 _CONVERSION(`GtkSettings*',`Glib::RefPtr<Settings>', Glib::wrap($3))
 
-_CONVERSION(`Glib::RefPtr<IconSet>&',`GtkIconSet*',__CONVERT_REFPTR_TO_P($3))
-_CONVERSION(`const Glib::RefPtr<IconSet>&',`GtkIconSet*',__CONVERT_REFPTR_TO_P($3))
-_CONVERSION(`GtkIconSet*',`Glib::RefPtr<IconSet>',`Glib::wrap($3)')
-
-_CONVERSION(`IconSource&',`GtkIconSource*',__FR2P)
-_CONVERSION(`const IconSource&',`const GtkIconSource*',__FR2P)
-_CONVERSION(`const GtkIconSource*',`const IconSource&',`Glib::wrap(const_cast<GtkIconSource*>($3), true)')
-
 _CONVERSION(`GtkIconTheme*',`Glib::RefPtr<IconTheme>',`Glib::wrap($3)')
-_CONVERSION(`GList*',`Glib::ListHandle<Glib::ustring>',__FL2H_SHALLOW)
 
 _CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<WindowGroup>',`Glib::wrap($3)')
 _CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<const WindowGroup>',`Glib::wrap($3)')
@@ -434,9 +380,7 @@ _CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<const EntryBuffer>',`Glib::wrap($3)'
 _CONVERSION(`const Glib::RefPtr<EntryBuffer>&',`GtkEntryBuffer*',__CONVERT_REFPTR_TO_P)
 
 # Tree:
-#_CONVERSION(`const TreeIter&',`const GtkTreeIter*',__FR2P)
 _CONVERSION(`const iterator&',`const GtkTreeIter*',__FR2P)
-#_CONVERSION(`const TreeIter&',`GtkTreeIter*',__FCR2P)
 _CONVERSION(`const iterator&',`GtkTreeIter*',__FCR2P)
 _CONVERSION(`const const_iterator&',`GtkTreeIter*',__FCR2P)
 _CONVERSION(`const TreeModel::Row&',`GtkTreeIter*',__FCR2P)
@@ -471,7 +415,6 @@ _CONVERSION(`CellEditable*',`GtkCellEditable*',`Glib::unwrap($3)')
 _CONVERSION(`GtkClipboard*',`Glib::RefPtr<Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GtkClipboard*',`Glib::RefPtr<const Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Clipboard>&',`GtkClipboard*',__CONVERT_REFPTR_TO_P($3))
-#_CONVERSION(`GtkClipboard*',`Gtk::Clipboard&',`Glib::wrap($3, true)')
 
 _CONVERSION(`SelectionData',`GtkSelectionData*', `($3).gobj()')
 _CONVERSION(`const SelectionData&',`const GtkSelectionData*', __FR2P)
@@ -495,14 +438,7 @@ _CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
-#_CONVERSION(`GtkTooltips*',`Tooltips&', `Glib::wrap($3)')
-_CONVERSION(`GtkTooltips*',`Tooltips*', `Glib::wrap($3)')
-_CONVERSION(`Tooltips*',`GtkTooltips*',`Glib::unwrap($3)')
-_CONVERSION(`Tooltips&',`GtkTooltips*',__FR2P)
-
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
-
-#_CONVERSION(`GtkAllocation*',`Allocation&',`($2)(Glib::wrap($3))')
 
 #TargetList
 _CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
@@ -566,10 +502,6 @@ _CONVERSION(`GtkRecentInfo*',`Glib::RefPtr<const RecentInfo>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<RecentInfo>&',`GtkRecentInfo*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const RecentInfo>&',`GtkRecentInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gtk::RecentInfo))
 
-_CONVERSION(`Glib::StringArrayHandle&',`gchar**',`const_cast<gchar**>(($3).data())')
-_CONVERSION(`Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
-_CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
-
 #RecentManager
 _CONVERSION(`GtkRecentManager*',`Glib::RefPtr<RecentManager>',`Glib::wrap($3)')
 _CONVERSION(`GtkRecentManager*',`Glib::RefPtr<const RecentManager>',`Glib::wrap($3)')
@@ -623,11 +555,6 @@ _CONVERSION(`const Glib::RefPtr<Printer>&',`GtkPrinter*',__CONVERT_REFPTR_TO_P($
 #PrintJob
 _CONVERSION(`GtkPrintCapabilities',`PrintCapabilities',`static_cast<$2>($3)')
 
-#Tooltip
-#TODO: This should not be here:
-_CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P($3))
-
-
 # Used by Signals:
 # TODO: Move these to the .hg files.
 # The true here means "take reference", because the code that emits the signal does not do a ref for the receiving signal handler.
@@ -639,15 +566,10 @@ _CONVERSION(`TreeViewColumn*',`GtkTreeViewColumn*',__FP2P)
 _CONVERSION(`GtkSelectionData*',`const SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`GtkSelectionData*',`SelectionData&', `SelectionData_WithoutOwnership($3)')
 _CONVERSION(`const Glib::RefPtr<const TreeModel>&',`GtkTreeModel*',__CONVERT_CONST_REFPTR_TO_P)
-#_CONVERSION(`GtkTreeIter*',`const TreeModel::iterator&',Glib::wrap($3, true))
 _CONVERSION(`CellRenderer*',`GtkCellRenderer*',__FP2P)
 _CONVERSION(`GtkCellRenderer*',`CellRenderer*',__RP2P)
 
 _CONVERSION(`Align',`float',`_gtkmm_align_float_from_enum($3)')
-
-# Used by AboutDialog:
-#_CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`($3).data())')
-_CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
 
 _CONVERSION(`const Glib::RefPtr<Gio::AsyncResult>&',`GAsyncResult*',__CONVERT_REFPTR_TO_P)
 
@@ -681,6 +603,7 @@ _CONVERSION(`GtkDragResult',`DragResult',`static_cast<$2>($3)')
 
 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
 _CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
+_CONVERSION(`const WidgetPath&',`GtkWidgetPath*',`const_cast<WidgetPath&>($3).gobj()')
 
 # Used by LockButton
 _CONVERSION(`Glib::RefPtr<Gio::Permission>&',`GPermission*',__CONVERT_REFPTR_TO_P)

@@ -43,10 +43,8 @@ _CONV_ENUM(Gdk,Fill)
 _CONV_ENUM(Gdk,FillRule)
 _CONV_ENUM(Gdk,FullscreenMode)
 _CONV_ENUM(Gdk,Function)
-_CONV_ENUM(Gdk,GCValuesMask)
 _CONV_ENUM(Gdk,Gravity)
 _CONV_ENUM(Gdk,GrabOwnership)
-_CONV_ENUM(Gdk,ImageType)
 _CONV_ENUM(Gdk,InputCondition)
 _CONV_ENUM(Gdk,InputMode)
 _CONV_ENUM(Gdk,InputSource)
@@ -59,7 +57,6 @@ _CONV_ENUM(Gdk,NotifyType)
 _CONV_ENUM(Gdk,OverlapType)
 _CONV_ENUM(Gdk,OwnerChange)
 _CONV_ENUM(Gdk,PropertyState)
-_CONV_ENUM(Gdk,RgbDither)
 _CONV_ENUM(Gdk,ScrollDirection)
 _CONV_INCLASS_ENUM(Gdk,Seat,Capabilities)
 _CONV_ENUM(Gdk,SettingAction)
@@ -91,8 +88,6 @@ _CONVERSION(`WMDecoration&',`GdkWMDecoration*',`(($2) &($3))')
 _CONVERSION(`GdkDragProtocol&',`GdkDragProtocol*',`&($3)')
 
 _CONVERSION(`GdkRectangle&',`GdkRectangle*',`&$3',`*$3')
-_CONVERSION(`GdkRgbCmap&',`GdkRgbCmap*',`&$3',`*$3')
-
 
 _CONVERSION(`GdkKeymap*',`const GdkKeymap*',`$3')
 
@@ -107,30 +102,23 @@ _CONVERSION(`Rectangle&',`GdkRectangle*',($3).gobj())
 _CONVERSION(`Gdk::Rectangle&',`GdkRectangle*',($3).gobj())
 _CONVERSION(`const Rectangle&',`const GdkRectangle*',($3).gobj())
 _CONVERSION(`const Gdk::Rectangle&',`const GdkRectangle*',($3).gobj())
-_CONVERSION(`Font&',`GdkFont*',($3).gobj())
 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Region>&',`const cairo_region_t*',`(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Region>&',`cairo_region_t*',`const_cast<cairo_region_t*>(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Region>&',`const cairo_region_t*',`(($3) ? ($3)->cobj() : nullptr)')
 
 _CONVERSION(`const Glib::RefPtr<Cursor>&',`GdkCursor*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Cursor>&',`GdkCursor*',__CONVERT_CONST_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<Gdk::Pixmap>&',`GdkPixmap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Window>&',`GdkWindow*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Window>&',`GdkWindow*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<GLContext>&',`GdkGLContext*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::GLContext>&',`GdkGLContext*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<DrawContext>&',`GdkDrawContext*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<DrawingContext>&',`GdkDrawingContext*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<Pixmap>&',`GdkPixmap*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<Gdk::Pixmap>&',`GdkPixmap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Bitmap>&',`GdkBitmap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Bitmap>&',`GdkBitmap*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Drawable>&',`GdkDrawable*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Drawable>&',`GdkDrawable*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Drawable>&',`GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
-_CONVERSION(`const Glib::RefPtr<Image>&',`GdkImage*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<const Image>&',`GdkImage*',__CONVERT_CONST_REFPTR_TO_P_SUN(Image))
-_CONVERSION(`const Glib::RefPtr<Gdk::Image>&',`GdkImage*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Pixbuf>&',`GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Pixbuf>&',`const GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Pixbuf>&',`GdkPixbuf*',__CONVERT_CONST_REFPTR_TO_P_SUN(Pixbuf))
@@ -150,13 +138,11 @@ _CONVERSION(`const Glib::RefPtr<const Device>&',`GdkDevice*',__CONVERT_CONST_REF
 _CONVERSION(`const Glib::RefPtr<const Gdk::Screen>&',`GdkScreen*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Screen))
 
 define(`__CFR2P',`const_cast<$`'2>($`'3.gobj())')
-_CONVERSION(const Font&,GdkFont*,__CFR2P)
 _CONVERSION(const Gdk::Rectangle&,GdkRectangle*,__CFR2P)
 _CONVERSION(const Rectangle&,GdkRectangle*,__CFR2P)
 _CONVERSION(const Geometry&,const GdkGeometry*,&($3))
 _CONVERSION(const Gdk::Geometry&,GdkGeometry*,const_cast<$2>(&($3)))
 _CONVERSION(const Geometry&,GdkGeometry*,const_cast<$2>(&($3)))
-_CONVERSION(const RgbCmap&,GdkRgbCmap*,__CFR2P)
 
 _CONVERSION(`Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap($3)')
 _CONVERSION(`const Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap(const_cast<Gdk::Rectangle*>($3))')
@@ -164,27 +150,17 @@ _CONVERSION(`GdkRectangle*',`Gdk::Rectangle*',`&Glib::wrap($3)')
 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle*',`&Glib::wrap($3)')
 
 # Special treatment for the Sun Forte compiler
-#_CONVERSION(const Glib::RefPtr<const Gdk::Pixmap>&,GdkPixmap*,__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(const Glib::RefPtr<const Gdk::Window>&,GdkWindow*,__CONVERT_CONST_REFPTR_TO_P)
-#_CONVERSION(const Glib::RefPtr<const Gdk::Colormap>&,GdkColormap*,__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(const Glib::RefPtr<const Gdk::Visual>&,GdkVisual*,__CONVERT_CONST_REFPTR_TO_P)
 #_CONVERSION(const Glib::RefPtr<const Gdk::Bitmap>&,GdkBitmap*,__CONVERT_CONST_REFPTR_TO_P)
-#_CONVERSION(const Glib::RefPtr<const Gdk::Image>&,GdkImage*,__CONVERT_CONST_REFPTR_TO_P)
-#_CONVERSION(const Glib::RefPtr<const Gdk::GC>&,GdkGC*,__CONVERT_CONST_REFPTR_TO_P)
 
 _CONVERSION(`const Glib::RefPtr<const Gdk::Device>&', `GdkDevice*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Device))
-_CONVERSION(`const Glib::RefPtr<const Gdk::Pixmap>&', `GdkPixmap*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Pixmap))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Window>&', `GdkWindow*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Window))
 _CONVERSION(`const Glib::RefPtr<const Window>&', `GdkWindow*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Window))
 _CONVERSION(`const Glib::RefPtr<const Gdk::GLContext>&', `GdkGLContext*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::GLContext))
 _CONVERSION(`const Glib::RefPtr<const GLContext>&', `GdkGLContext*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::GLContext))
-_CONVERSION(`const Glib::RefPtr<const Gdk::Colormap>&', `GdkColormap*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Colormap))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Visual>&', `GdkVisual*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Visual))
 _CONVERSION(`const Glib::RefPtr<const Gdk::Bitmap>&', `GdkBitmap*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Bitmap))
-_CONVERSION(`const Glib::RefPtr<const Gdk::Image>&', `GdkImage*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Image))
-_CONVERSION(`const Glib::RefPtr<const Image>&', `GdkImage*',__CONVERT_CONST_REFPTR_TO_P_SUN(Image))
-_CONVERSION(`const Glib::RefPtr<const Gdk::GC>&', `GdkGC*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::GC))
-_CONVERSION(`const Glib::RefPtr<const GC>&', `GdkGC*',__CONVERT_CONST_REFPTR_TO_P_SUN(GC))
 #_CONVERSION(`const Glib::RefPtr<const Gdk::Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gdk::Drawable))
 #_CONVERSION(`const Glib::RefPtr<const Drawable>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
 #_CONVERSION(`const Glib::RefPtr<const Display>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
@@ -201,16 +177,11 @@ _CONVERSION(`GdkGLContext*',`Glib::RefPtr<const Gdk::GLContext>', `Glib::wrap($3
 _CONVERSION(`GdkDrawContext*',`Glib::RefPtr<DrawContext>', `Glib::wrap($3)')
 _CONVERSION(`GdkDrawContext*',`Glib::RefPtr<const DrawContext>', `Glib::wrap($3)')
 _CONVERSION(`GdkDrawingContext*',`Glib::RefPtr<DrawingContext>', `Glib::wrap($3)')
-_CONVERSION(`GdkPixmap*',`Glib::RefPtr<Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
-_CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
-_CONVERSION(`GdkPixmap*',`Glib::RefPtr<const Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
-_CONVERSION(`GdkPixmap*',`Glib::RefPtr<Gdk::Pixmap>', `Glib::wrap((GdkPixmapObject*)($3))')
 _CONVERSION(`GdkCursor*',`Glib::RefPtr<Cursor>', `Glib::wrap($3)')
 _CONVERSION(`GdkCursor*',`Glib::RefPtr<const Cursor>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<Gdk::Visual>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<Visual>', `Glib::wrap($3)')
 _CONVERSION(`GdkVisual*',`Glib::RefPtr<const Visual>', `Glib::wrap($3)')
-_CONVERSION(`GdkImage*',`Glib::RefPtr<Image>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<Pixbuf>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<Gdk::Pixbuf>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<const Gdk::Pixbuf>', `Glib::wrap($3)')
@@ -218,8 +189,6 @@ _CONVERSION(`GdkPixbufAnimationIter*',`Glib::RefPtr<PixbufAnimationIter>', `Glib
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<Gdk::Pixbuf>', Glib::wrap($3))
 _CONVERSION(`GdkPixbufAnimation*',`Glib::RefPtr<Gdk::PixbufAnimation>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbufAnimation*',`Glib::RefPtr<const Gdk::PixbufAnimation>', `Glib::wrap($3)')
-_CONVERSION(`GdkGC*',`Glib::RefPtr<Gdk::GC>', `Glib::wrap($3)')
-_CONVERSION(`GdkGC*',`Glib::RefPtr<const Gdk::GC>', `Glib::wrap($3)')
 
 _CONVERSION(`GdkDisplay*',`Glib::RefPtr<Display>', `Glib::wrap($3)')
 _CONVERSION(`GdkDisplay*',`Glib::RefPtr<const Display>', `Glib::wrap($3)')
@@ -253,47 +222,18 @@ _CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<const DeviceManager>', `Glib::wrap
 _CONVERSION(`gpointer',`const void*', `static_cast<$2>($3)')
 
 
-# Glib::ListHandle<> (gdkmm) -> GList (gdk)
-_CONVERSION(`const Glib::ListHandle< Glib::RefPtr<Gdk::Pixbuf> >&',`GList*',`$3.data()')
-_CONVERSION(`const Glib::ListHandle< Glib::RefPtr<const Gdk::Pixbuf> >&',`GList*',`$3.data()')
-
-# GList (gdk) -> Glib::ListHandle<> (gdkmm)
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Gdk::Pixbuf> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Gdk::Pixbuf> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Device> >',`$2($3, Glib::OWNERSHIP_NONE)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Device> >',`$2($3, Glib::OWNERSHIP_NONE)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Visual> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Visual> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Window> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Window> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Display> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Display> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`gchar**',`Glib::StringArrayHandle',`$2($3)')
-
-
-
-
 # XPM data
 _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$3')
 
 
-_CONVERSION(GdkFont*, Gdk::Font, `Gdk::Font($3)')
-
 _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 
-dnl _CONVERSION(GdkPixmap*,Gdk::Pixmap&,`Glib::unwrap_boxed($3)',`$3')
 dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
 
 dnl Atom -> string and vice versa
 _CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomString::to_cpp_type($3)')
 _CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
 _CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomString::to_c_type($3)')
-
-dnl NativeWindow
-_CONVERSION(`GdkNativeWindow',`Gdk::NativeWindow',`static_cast<$2>($3)')
-_CONVERSION(`GdkNativeWindow',`NativeWindow',`static_cast<$2>($3)')
-_CONVERSION(`Gdk::NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
-_CONVERSION(`NativeWindow',`GdkNativeWindow',`static_cast<$2>($3)')
 
 dnl GdkEvent and GdkEventSequence
 _CONVERSION(`GdkEvent*',`Event',`Glib::wrap($3)')
@@ -310,6 +250,4 @@ _CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)'
 
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3, true))
 _CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
-
-_CONVERSION(`const Widgetpath&',`GtkWidgetPath*',`const_cast<WidgetPath&>($3).gobj()')
 
