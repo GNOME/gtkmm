@@ -19,47 +19,9 @@
 include(convert_glib.m4)
 
 #
-# Table of widgets
-#
-
-_EQUAL(gboolean,int)
-_EQUAL(gint,int)
-_EQUAL(gint*,int*)
-_EQUAL(gint&,int&)
-_EQUAL(guint,unsigned int)
-_EQUAL(guint*,unsigned int*)
-_EQUAL(guint&,unsigned int&)
-_EQUAL(gdouble,double)
-_EQUAL(gdouble*,double*)
-_EQUAL(gfloat, float)
-_EQUAL(float*,gfloat[])
-
-_EQUAL(GdkAtom,Gdk::Atom)
-_EQUAL(const-char*,const-gchar*)
-_EQUAL(return-char*,return-gchar*)
-_EQUAL(gpointer,void*)
-_EQUAL(gconstpointer,const void*)
-
-#
 # Basic Types
-_CONVERSION(`int',`bool',`$3')
-_CONVERSION(`bool',`int',`static_cast<int>($3)')
-_CONVERSION(`unsigned int',`bool',`$3')
-_CONVERSION(`bool',`unsigned int',`static_cast<unsigned int>($3)')
-_CONVERSION(`int&',`gint*',`&($3)')
-_CONVERSION(`gint*',`int&',`*($3)')
-_CONVERSION(`guint&',`guint*',`&($3)')
-_CONVERSION(`double&',`gdouble*',`&($3)')
-_CONVERSION(`float&',`gfloat*',`&($3)')
-_CONVERSION(`gchar**',`char**',`$3')
-_CONVERSION(`char**',`gchar**',`$3')
-_CONVERSION(`gpointer&',`gpointer*',`&($3)')
-_CONVERSION(`void*&',`gpointer*',`&($3)')
-
 _CONVERSION(`time_t&',`time_t*',`&($3)')
 _CONVERSION(`time_t',`std::time_t',`$3')
-
-_CONVERSION(`GError*&',`GError**',`&($3)')
 
 _CONVERSION(`ui_merge_id',`guint',`$3')
 _CONVERSION(`guint',`ui_merge_id',`$3')
