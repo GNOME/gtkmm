@@ -34,26 +34,7 @@ namespace Gtk
  */
 
 _CC_INCLUDE(gtk/gtk.h)
-_WRAP_ENUM(ResponseType, GtkResponseType)
-
-// A response ID can be either a ResponseType or an int.
-// Allow comparison between ResponseType and int.
-
-/// @relates Gtk::Dialog
-inline bool operator==(int lhs, ResponseType rhs)
-{ return lhs == static_cast<int>(rhs); }
-
-/// @relates Gtk::Dialog
-inline bool operator==(ResponseType lhs, int rhs)
-{ return static_cast<int>(lhs) == rhs; }
-
-/// @relates Gtk::Dialog
-inline bool operator!=(int lhs, ResponseType rhs)
-{ return !(lhs == rhs); }
-
-/// @relates Gtk::Dialog
-inline bool operator!=(ResponseType lhs, int rhs)
-{ return !(lhs == rhs); }
+_WRAP_ENUM(ResponseType, GtkResponseType, CONV_TO_INT)
 
 /** Create popup windows.
  *
@@ -90,30 +71,19 @@ class Dialog : public Window
   _UNMANAGEABLE
   _IGNORE(gtk_dialog_add_buttons)
 public:
-  /// Helper class for implicit conversion from ResponseType to int in some situations.
-  class ResponseTypeOrInt
-  {
-    int m_response_id;
-  public:
-    ResponseTypeOrInt(int response_id) : m_response_id(response_id) {}
-    ResponseTypeOrInt(ResponseType response_id) : m_response_id(static_cast<int>(response_id)) {}
-    operator int() { return m_response_id; }
-  };
-
   _CTOR_DEFAULT()
   explicit Dialog(const Glib::ustring& title, bool modal = false, bool use_header_bar = false);
   Dialog(const Glib::ustring& title, Gtk::Window& parent, bool modal = false, bool use_header_bar = false);
 
-#m4 _CONVERSION(`ResponseTypeOrInt',`gint',`$3')
-  _WRAP_METHOD(void add_action_widget(Widget& child, ResponseTypeOrInt response_id), gtk_dialog_add_action_widget)
-  _WRAP_METHOD(Button* add_button(const Glib::ustring& button_text, ResponseTypeOrInt response_id), gtk_dialog_add_button)
-  _WRAP_METHOD(void set_response_sensitive(ResponseTypeOrInt response_id, bool setting = true), gtk_dialog_set_response_sensitive)
-  _WRAP_METHOD(void set_default_response(ResponseTypeOrInt response_id), gtk_dialog_set_default_response)
-  _WRAP_METHOD(Widget* get_widget_for_response(ResponseTypeOrInt response_id), gtk_dialog_get_widget_for_response)
-  _WRAP_METHOD(const Widget* get_widget_for_response(ResponseTypeOrInt response_id) const, gtk_dialog_get_widget_for_response, constversion)
+  _WRAP_METHOD(void add_action_widget(Widget& child, int response_id), gtk_dialog_add_action_widget)
+  _WRAP_METHOD(Button* add_button(const Glib::ustring& button_text, int response_id), gtk_dialog_add_button)
+  _WRAP_METHOD(void set_response_sensitive(int response_id, bool setting = true), gtk_dialog_set_response_sensitive)
+  _WRAP_METHOD(void set_default_response(int response_id), gtk_dialog_set_default_response)
+  _WRAP_METHOD(Widget* get_widget_for_response(int response_id), gtk_dialog_get_widget_for_response)
+  _WRAP_METHOD(const Widget* get_widget_for_response(int response_id) const, gtk_dialog_get_widget_for_response, constversion)
   _WRAP_METHOD(int get_response_for_widget(const Gtk::Widget& widget) const, gtk_dialog_get_response_for_widget)
 
-  _WRAP_METHOD(void response(ResponseTypeOrInt response_id), gtk_dialog_response)
+  _WRAP_METHOD(void response(int response_id), gtk_dialog_response)
 
   /** Blocks in a recursive main loop until the dialog either emits the
    * Gtk::Dialog::signal_response() signal, or is destroyed. If the dialog is
@@ -142,7 +112,7 @@ public:
    * int result = dialog.run();
    * switch (result)
    * {
-   * case static_cast<int>(Gtk::ResponseType::ACCEPT):
+   * case Gtk::ResponseType::ACCEPT:
    *   do_application_specific_something();
    *   break;
    * default:
