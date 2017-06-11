@@ -53,7 +53,7 @@ TextWidget::TextWidget(bool is_source)
     refTag = m_refTextBuffer->create_tag("string");
 
     refTag->property_foreground() = "RosyBrown";
-    refTag->property_weight() = static_cast<int>(Pango::Weight::BOLD);
+    refTag->property_weight() = Pango::Weight::BOLD;
 
 
     refTag = m_refTextBuffer->create_tag("control");
@@ -64,7 +64,7 @@ TextWidget::TextWidget(bool is_source)
     refTag->property_foreground() = "burlywood4";
 
     refTag = m_refTextBuffer->create_tag("function");
-    refTag->property_weight() = static_cast<int>(Pango::Weight::BOLD);
+    refTag->property_weight() = Pango::Weight::BOLD;
     refTag->property_foreground() = "DarkGoldenrod4";
   }
   else
