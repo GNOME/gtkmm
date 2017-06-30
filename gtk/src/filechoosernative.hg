@@ -1,0 +1,155 @@
+/* Copyright (C) 2017 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/nativedialog.h>
+#include <gtkmm/filechooser.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/nativedialog_p.h)
+
+namespace Gtk
+{
+class Window;
+
+/** A native file chooser dialog, suitable for “File/Open” or “File/Save” commands.
+ *
+ * %FileChooserNative is an abstraction of a dialog box suitable
+ * for use with “File/Open” or “File/Save as” commands. By default, this
+ * just uses a Gtk::FileChooserDialog to implement the actual dialog.
+ * However, on certain platforms, such as Windows, the native platform
+ * file chooser is used instead. When the application is running in a
+ * sandboxed environment without direct filesystem access (such as Flatpak),
+ * %FileChooserNative may call the proper APIs (portals) to let the user
+ * choose a file and make it available to the application.
+ *
+ * While the API of %FileChooserNative closely mirrors FileChooserDialog, the main
+ * difference is that there is no access to any Gtk::Window or Gtk::Widget for the dialog.
+ * This is required, as there may not be one in the case of a platform native dialog.
+ * Showing, hiding and running the dialog is handled by the NativeDialog functions.
+ *
+ * <h2>Response Codes</h2>
+ *
+ * %FileChooserNative inherits from NativeDialog, which means it
+ * will return Gtk::ResponseType::ACCEPT if the user accepted, and
+ * Gtk::ResponseType::CANCEL if he pressed cancel. It can also return
+ * Gtk::ResponseType::DELETE_EVENT if the window was unexpectedly closed.
+ *
+ * <h2>Differences from FileChooserDialog</h2>
+ *
+ * There are a few things in the FileChooser API that are not
+ * possible to use with %FileChooserNative, as such use would
+ * prohibit the use of a native dialog.
+ *
+ * There is no support for the signals that are emitted when the user
+ * navigates in the dialog, including:
+ * * FileChooser::signal_current_folder_changed()
+ * * FileChooser::signal_selection_changed()
+ * * FileChooser::signal_file_activated()
+ * * FileChooser::signal_confirm_overwrite()
+ *
+ * You can also not use the methods that directly control user navigation:
+ * * FileChooser::unselect_filename()
+ * * FileChooser::select_all()
+ * * FileChooser::unselect_all()
+ *
+ * If you need any of the above you will have to use FileChooserDialog directly.
+ *
+ * No operations that change the dialog work while the dialog is
+ * visible. Set all the properties that are required before showing the dialog.
+ *
+ * <h2>Win32 details</h2>
+ *
+ * On windows the IFileDialog implementation (added in Windows Vista) is
+ * used. It supports many of the features that FileChooserDialog
+ * does, but there are some things it does not handle:
+ *
+ * * Extra widgets added with FileChooser::set_extra_widget().
+ *
+ * * Use of custom previews by connecting to FileChooser::signal_update_preview().
+ *
+ * * Any Gtk::FileFilter added using a mimetype or custom filter.
+ *
+ * If any of these features are used the regular FileChooserDialog
+ * will be used in place of the native one.
+ *
+ * <h2>Portal details</h2>
+ *
+ * When the org.freedesktop.portal.FileChooser portal is available on the
+ * session bus, it is used to bring up an out-of-process file chooser. Depending
+ * on the kind of session the application is running in, this may or may not
+ * be a GTK+ file chooser. In this situation, the following things are not
+ * supported and will be silently ignored:
+ *
+ * * Extra widgets added with FileChooser::set_extra_widget().
+ *
+ * * Use of custom previews by connecting to FileChooser::signal_update_preview().
+ *
+ * * Any Gtk::FileFilter added with a custom filter.
+ *
+ * @see Gtk::FileChooser, Gtk::NativeDialog, Gtk::FileChooserDialog
+ * @newin{3,92}
+ */
+class FileChooserNative : public NativeDialog, public FileChooser
+{
+  _CLASS_GOBJECT(FileChooserNative, GtkFileChooserNative, GTK_FILE_CHOOSER_NATIVE, NativeDialog, GtkNativeDialog)
+  _IMPLEMENTS_INTERFACE(FileChooser)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  /** There is no create() method that corresponds to this constructor,
+   * because this constructor shall only be used by derived classes.
+   */
+  _CTOR_DEFAULT
+
+  /** Constructs a %FileChooserNative.
+   */
+  FileChooserNative(const Glib::ustring& title, Window& parent, FileChooser::Action action,
+    const Glib::ustring& accept_label, const Glib::ustring& cancel_label);
+
+  /** Constructs a %FileChooserNative.
+   */
+  FileChooserNative(const Glib::ustring& title, FileChooser::Action action,
+    const Glib::ustring& accept_label, const Glib::ustring& cancel_label);
+  _IGNORE(gtk_file_chooser_native_new)
+
+public:
+  /** Creates a %FileChooserNative.
+   *
+   * @newin{3,92}
+   *
+   * @param title Title of the native.
+   * @param parent Transient parent of the native.
+   * @param action Open or save mode for the dialog.
+   * @param accept_label Text to go in the accept button, or empty string for the default.
+   * @param cancel_label Text to go in the cancel button, or empty string for the default.
+   * @return A Glib::RefPtr to a new %FileChooserNative.
+   */
+  _WRAP_CREATE(const Glib::ustring& title, Window& parent{?},
+    FileChooser::Action action, const Glib::ustring& accept_label = Glib::ustring(),
+    const Glib::ustring& cancel_label = Glib::ustring())
+
+  _WRAP_METHOD(Glib::ustring get_accept_label() const, gtk_file_chooser_native_get_accept_label, newin "3,92")
+  _WRAP_METHOD(void set_accept_label(const Glib::ustring& accept_label{NULL} = Glib::ustring()), gtk_file_chooser_native_set_accept_label, newin "3,92")
+  _WRAP_METHOD(Glib::ustring get_cancel_label() const, gtk_file_chooser_native_get_cancel_label, newin "3,92")
+  _WRAP_METHOD(void set_cancel_label(const Glib::ustring& cancel_label{NULL} = Glib::ustring()), gtk_file_chooser_native_set_cancel_label, newin "3,92")
+
+  _WRAP_PROPERTY("accept-label", Glib::ustring, newin "3,92")
+  _WRAP_PROPERTY("cancel-label", Glib::ustring, newin "3,92")
+
+  // FileChooserNative has no signals
+};
+
+} // namespace Gtk
