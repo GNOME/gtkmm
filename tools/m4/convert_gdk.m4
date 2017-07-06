@@ -248,6 +248,6 @@ _CONVERSION(`Gdk::EventKey&',`GdkEventKey*',`($3).gobj()')
 _CONVERSION(`Gdk::EventSequence*',`GdkEventSequence*',`reinterpret_cast<$2>($3)')
 _CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)')
 
-_CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3, true))
-_CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3, true))
+_CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3))
+_CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3))
 
