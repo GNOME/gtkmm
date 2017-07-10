@@ -25,23 +25,17 @@ static void SignalProxy_Custom_gtk_callback(GtkPrintJob* print_job, gpointer dat
 
   try
   {
+    if (gerror)
+      Glib::Error::throw_exception(g_error_copy(gerror));
 
     // Create a suitable C++ instance to pass to the C++ method;
     auto job = Glib::wrap(print_job);
-
-    if (gerror) Glib::Error::throw_exception(const_cast<GError*>(gerror)); //TODO: Remove the case when this is fixed in glibmm.
     (*the_slot)(job);
-
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-}
-
-static void SignalProxy_Custom_gtk_callback_destroy(void* data)
-{
-  delete static_cast<Gtk::PrintJob::SlotPrintJobComplete*>(data);
 }
 
 namespace Gtk
@@ -50,10 +44,11 @@ namespace Gtk
 void PrintJob::send(const SlotPrintJobComplete& slot)
 {
   // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  // It will be deleted when SignalProxy_Custom_gtk_callback_destroy() is called.
+  // It will be deleted when Glib::destroy_notify_delete<SlotPrintJobComplete>() is called.
   auto slot_copy = new SlotPrintJobComplete(slot);
 
-  gtk_print_job_send(gobj(), &SignalProxy_Custom_gtk_callback, slot_copy, &SignalProxy_Custom_gtk_callback_destroy);
+  gtk_print_job_send(gobj(), &SignalProxy_Custom_gtk_callback, slot_copy,
+   &Glib::destroy_notify_delete<SlotPrintJobComplete>);
 }
 
 std::vector<PageRange> PrintJob::get_page_ranges() const
