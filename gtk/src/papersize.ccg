@@ -57,12 +57,15 @@ PaperSize::PaperSize(const Glib::ustring& name, const Glib::ustring& display_nam
                                      GtkUnit(unit)))
 {}
 
-//TODO: Add an operator bool() so we can detect if this succeeded:
-//TODO: No, throw the error/exception instead.
 PaperSize::PaperSize(const Glib::KeyFile& key_file, const Glib::ustring& group_name)
-:
-  gobject_(gtk_paper_size_new_from_key_file(const_cast<GKeyFile*>(key_file.gobj()), (group_name.empty() ? nullptr : group_name.c_str()) , nullptr /* GError */))
-{}
+{
+  GError* gerror = nullptr;
+  gobject_ = gtk_paper_size_new_from_key_file(const_cast<GKeyFile*>(key_file.gobj()),
+    Glib::c_str_or_nullptr(group_name), &gerror);
+
+  if (gerror)
+    Glib::Error::throw_exception(gerror);
+}
 
 bool PaperSize::equal(const PaperSize& other) const
 {
