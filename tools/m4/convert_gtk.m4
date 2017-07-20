@@ -422,6 +422,7 @@ _CONVERSION(`GtkRequisition', `Requisition', `static_cast<$2>($3)')
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
+_CONVERSION(`const Allocation&',`const GtkAllocation*',`($3.gobj())')
 _CONVERSION(`Allocation',`GtkAllocation',`static_cast<$2>(*($3.gobj()))')
 
 _CONVERSION(`GtkEntry*',`Entry*',__RP2P)
