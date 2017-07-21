@@ -16,17 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmm/range.h>
+#include <gtkmm/widget.h>
+#include <gtkmm/orientable.h>
 
 _DEFS(gtkmm,gtk)
-_PINCLUDE(gtkmm/private/range_p.h)
+_PINCLUDE(gtkmm/private/widget_p.h)
+
+namespace Gdk
+{
+class EventScroll;
+}
 
 namespace Gtk
 {
+class Adjustment;
 
-/** A Scrollbar.
+/** A %Scrollbar.
  *
- * The #Scrollbar widget is a horizontal or vertical scrollbar,
+ * The %Scrollbar widget is a horizontal or vertical scrollbar,
  * depending on the value of the orientation property.
  *
  * The position of the thumb in a scrollbar is controlled by the scroll
@@ -40,17 +47,28 @@ namespace Gtk
  *
  * @ingroup Widgets
  */
-class Scrollbar
- : public Range{
-  _CLASS_GTKOBJECT(Scrollbar,GtkScrollbar,GTK_SCROLLBAR,Gtk::Range,GtkRange)
+class Scrollbar : public Widget, public Orientable
+{
+  _CLASS_GTKOBJECT(Scrollbar, GtkScrollbar, GTK_SCROLLBAR,Gtk::Widget, GtkWidget)
+  _IMPLEMENTS_INTERFACE(Orientable)
 
 public:
   _CTOR_DEFAULT()
 
-  //Note that we try to use the same defaul parameter value as the default property value.
+  //Note that we try to use the same default parameter value as the default property value.
   explicit Scrollbar(const Glib::RefPtr<Adjustment>& adjustment, Orientation orientation = Orientation::HORIZONTAL);
   _IGNORE(gtk_scrollbar_new)
 
+  _WRAP_METHOD(void set_adjustment(const Glib::RefPtr<Adjustment>& adjustment), gtk_scrollbar_set_adjustment)
+  void unset_adjustment();
+
+  _WRAP_METHOD(Glib::RefPtr<Adjustment> get_adjustment(), gtk_scrollbar_get_adjustment, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Adjustment> get_adjustment() const, gtk_scrollbar_get_adjustment, refreturn, constversion)
+
+#m4 _CONVERSION(`const Gdk::EventScroll&',`const GdkEventScroll*',`($3).gobj()')
+  _WRAP_METHOD(double get_wheel_delta(const Gdk::EventScroll& event) const, gtk_scrollbar_get_wheel_delta)
+
+  _WRAP_PROPERTY("adjustment", Glib::RefPtr<Adjustment>)
 };
 
 } //namespace Gtk
