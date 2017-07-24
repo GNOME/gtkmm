@@ -17,25 +17,56 @@
 
 #include <gdk/gdk.h>
 
+namespace
+{
+
+inline GdkTimeCoord* time_coord_copy(const GdkTimeCoord* gobject)
+{
+  // If gobject == nullptr, g_memdup() returns nullptr.
+  return static_cast<GdkTimeCoord*>(g_memdup(gobject, sizeof(GdkTimeCoord)));
+}
+
+} // anonymous namespace
+
 namespace Gdk
 {
 
-TimeCoord::TimeCoord(GdkTimeCoord* castitem)
-: gobject_(castitem)
+TimeCoord::TimeCoord(GdkTimeCoord* gobject, bool make_a_copy)
+:
+  gobject_((make_a_copy && gobject) ? time_coord_copy(gobject) : gobject)
 {}
 
-TimeCoord::TimeCoord(TimeCoord&& other) noexcept
-: gobject_(std::move(other.gobject_))
+TimeCoord::TimeCoord(const TimeCoord& other)
+:
+  gobject_(time_coord_copy(other.gobject_))
+{}
+
+TimeCoord& TimeCoord::operator=(const TimeCoord& other)
 {
+  g_free(gobject_);
+  gobject_ = time_coord_copy(other.gobject_);
+  return *this;
+}
+
+TimeCoord::TimeCoord(TimeCoord&& other) noexcept
+:
+  gobject_(std::move(other.gobject_))
+{
+  other.gobject_ = nullptr;
 }
 
 TimeCoord& TimeCoord::operator=(TimeCoord&& other) noexcept
 {
+  g_free(gobject_);
   gobject_ = std::move(other.gobject_);
-
   other.gobject_ = nullptr;
-
   return *this;
+}
+
+TimeCoord::~TimeCoord() noexcept
+{
+  // If gobject_ == nullptr, g_free() does nothing.
+  g_free(gobject_);
 }
 
 double TimeCoord::get_value_at_axis(guint index) const
