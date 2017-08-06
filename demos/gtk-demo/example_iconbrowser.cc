@@ -104,7 +104,6 @@ protected:
 
   // Child widgets:
   Gtk::Grid m_grid;
-  Gtk::EventBox m_event_box[n_icon_sizes];
   Gtk::Image m_image[n_icon_sizes];
   Gtk::Label m_label[n_icon_sizes];
   Gtk::Label m_description;
@@ -901,20 +900,19 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
   m_grid.set_column_spacing(10);
   for (int i = 0; i < n_icon_sizes; ++i)
   {
-    m_grid.attach(m_event_box[i], i, 0, 1, 1);
-    m_event_box[i].add(m_image[i]);
+    m_grid.attach(m_image[i], i, 0);
     m_image[i].property_margin() = 4;
     m_image[i].set_halign(Gtk::Align::CENTER);
     m_image[i].set_valign(Gtk::Align::END);
 
     // Enable dragging an image, and copying it to another program.
-    m_event_box[i].drag_source_set(
+    m_image[i].drag_source_set(
       std::vector<Gtk::TargetEntry>(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
-    m_event_box[i].drag_source_add_image_targets();
-    m_event_box[i].signal_drag_data_get().connect(
+    m_image[i].drag_source_add_image_targets();
+    m_image[i].signal_drag_data_get().connect(
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
 
-    m_grid.attach(m_label[i], i, 1, 1, 1);
+    m_grid.attach(m_label[i], i, 1);
     m_label[i].property_margin() = 4;
     m_label[i].set_halign(Gtk::Align::CENTER);
     m_label[i].set_valign(Gtk::Align::CENTER);
@@ -942,7 +940,7 @@ void DetailDialog::set_image(
   {
     m_image[i].set_from_icon_name(icon_name, Gtk::BuiltinIconSize::MENU);
     m_image[i].set_pixel_size(m_icon_size[i]);
-    m_event_box[i].drag_source_set_icon(get_icon(i));
+    m_image[i].drag_source_set_icon(get_icon(i));
   }
   if (description.empty())
     m_description.hide();

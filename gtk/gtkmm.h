@@ -142,7 +142,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/entry.h>
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
-#include <gtkmm/eventbox.h>
 #include <gtkmm/eventcontroller.h>
 #include <gtkmm/filechooser.h>
 #include <gtkmm/filechooserbutton.h>
