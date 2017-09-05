@@ -3712,6 +3712,19 @@ Since: 2.20
 <return></return>
 </signal>
 
+<signal name="GtkEntry::show-emoji-icon">
+<description>
+When this is %TRUE, the entry will show an emoji icon in the secondary
+icon position that brings up the Emoji chooser when clicked.
+
+Since: 3.92
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkEntry::tabs">
 <description>
 A list of tabstops to apply to the text of the entry.
@@ -6954,6 +6967,14 @@ first word of each sentence
 </parameter>
 <parameter name="GTK_INPUT_HINT_VERTICAL_WRITING">
 <parameter_description> The text is vertical. Since 3.18
+</parameter_description>
+</parameter>
+<parameter name="GTK_INPUT_HINT_EMOJI">
+<parameter_description> Suggest offering Emoji support. Since 3.22.20
+</parameter_description>
+</parameter>
+<parameter name="GTK_INPUT_HINT_NO_EMOJI">
+<parameter_description> Suggest not offering Emoji support. Since 3.22.20
 </parameter_description>
 </parameter>
 </parameters>
@@ -18837,6 +18858,8 @@ Since: 3.6
 <description>
 Sets the closure to be monitored by this accelerator label. The closure
 must be connected to an accelerator group; see gtk_accel_group_connect().
+Passing %NULL for @accel_closure will dissociate @accel_label from its
+current closure, if any.
 
 </description>
 <parameters>
@@ -18845,7 +18868,8 @@ must be connected to an accelerator group; see gtk_accel_group_connect().
 </parameter_description>
 </parameter>
 <parameter name="accel_closure">
-<parameter_description> the closure to monitor for accelerator changes.
+<parameter_description> the closure to monitor for accelerator changes,
+or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -18854,7 +18878,8 @@ must be connected to an accelerator group; see gtk_accel_group_connect().
 
 <function name="gtk_accel_label_set_accel_widget">
 <description>
-Sets the widget to be monitored by this accelerator label.
+Sets the widget to be monitored by this accelerator label. Passing %NULL for
+@accel_widget will dissociate @accel_label from its current widget, if any.
 
 </description>
 <parameters>
@@ -18863,7 +18888,7 @@ Sets the widget to be monitored by this accelerator label.
 </parameter_description>
 </parameter>
 <parameter name="accel_widget">
-<parameter_description> the widget to be monitored.
+<parameter_description> the widget to be monitored, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -22191,7 +22216,8 @@ added, so you do not need to unref it.
 </parameter_description>
 </parameter>
 </parameters>
-<return> pointer to child of the #GtkBin
+<return> the child of @bin, or %NULL if it does
+not have a child.
 </return>
 </function>
 
@@ -28024,7 +28050,7 @@ Since: 3.92
 
 <function name="gtk_center_box_get_center_widget">
 <description>
-Gets the center widget.
+Gets the center widget, or %NULL if there is none.
 
 Since: 3.92
 
@@ -28042,7 +28068,7 @@ Since: 3.92
 
 <function name="gtk_center_box_get_end_widget">
 <description>
-Gets the end widget.
+Gets the end widget, or %NULL if there is none.
 
 Since: 3.92
 
@@ -28060,7 +28086,7 @@ Since: 3.92
 
 <function name="gtk_center_box_get_start_widget">
 <description>
-Gets the start widget.
+Gets the start widget, or %NULL if there is none.
 
 Since: 3.92
 
@@ -28118,7 +28144,7 @@ Since: 3.92
 
 <function name="gtk_center_box_set_center_widget">
 <description>
-Sets the center widget.
+Sets the center widget. To remove the existing center widget, pas %NULL.
 
 Since: 3.92
 
@@ -28129,7 +28155,7 @@ Since: 3.92
 </parameter_description>
 </parameter>
 <parameter name="child">
-<parameter_description> the child
+<parameter_description> the new center widget, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -28138,7 +28164,7 @@ Since: 3.92
 
 <function name="gtk_center_box_set_end_widget">
 <description>
-Sets the end widget.
+Sets the end widget. To remove the existing end widget, pass %NULL.
 
 Since: 3.92
 
@@ -28149,7 +28175,7 @@ Since: 3.92
 </parameter_description>
 </parameter>
 <parameter name="child">
-<parameter_description> the child
+<parameter_description> the new end widget, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -28158,7 +28184,7 @@ Since: 3.92
 
 <function name="gtk_center_box_set_start_widget">
 <description>
-Sets the start widget.
+Sets the start widget. To remove the existing start widget, pass %NULL.
 
 Since: 3.92
 
@@ -28169,7 +28195,7 @@ Since: 3.92
 </parameter_description>
 </parameter>
 <parameter name="child">
-<parameter_description> the child
+<parameter_description> the new start widget, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -29663,7 +29689,8 @@ Since: 3.0
 
 <function name="gtk_combo_box_get_active_iter">
 <description>
-Sets @iter to point to the current active item, if it exists.
+Sets @iter to point to the currently active item, if any item is active.
+Otherwise, @iter is left unchanged.
 
 Since: 2.4
 
@@ -29674,11 +29701,11 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="iter">
-<parameter_description> The uninitialized #GtkTreeIter
+<parameter_description> A #GtkTreeIter
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE, if @iter was set
+<return> %TRUE if @iter was set, %FALSE otherwise
 
 </return>
 </function>
@@ -31143,44 +31170,6 @@ from the toplevel down to and including @child.
 </parameters>
 <return> A newly created #GtkWidgetPath
 </return>
-</function>
-
-<function name="gtk_container_propagate_draw">
-<description>
-When a container receives a call to the draw function, it must send
-synthetic #GtkWidget::draw calls to all children that don’t have their
-own #GdkWindows. This function provides a convenient way of doing this.
-A container, when it receives a call to its #GtkWidget::draw function,
-calls gtk_container_propagate_draw() once for each child, passing in
-the @cr the container received.
-
-gtk_container_propagate_draw() takes care of translating the origin of @cr,
-and deciding whether the draw needs to be sent to the child. It is a
-convenient and optimized way of getting the same effect as calling
-gtk_widget_draw() on the child directly.
-
-In most cases, a container can simply either inherit the
-#GtkWidget::draw implementation from #GtkContainer, or do some drawing
-and then chain to the ::draw implementation from #GtkContainer.
-
-</description>
-<parameters>
-<parameter name="container">
-<parameter_description> a #GtkContainer
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> a child of @container
-</parameter_description>
-</parameter>
-<parameter name="cr">
-<parameter_description> Cairo context as passed to the container. If you want to use @cr
-in container’s draw function, consider using cairo_save() and
-cairo_restore() before calling this function.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_container_remove">
@@ -34432,7 +34421,8 @@ This function is useful when drawing something to the
 entry in a draw callback.
 
 If the entry is not realized or has no icon at the given position,
-@icon_area is filled with zeros.
+@icon_area is filled with zeros. Otherwise, @icon_area will be filled
+with the icon's allocation, relative to @entry's allocation.
 
 See also gtk_entry_get_text_area()
 
@@ -35517,6 +35507,12 @@ Use %NULL for @tooltip to remove an existing tooltip.
 See also gtk_widget_set_tooltip_text() and 
 gtk_entry_set_icon_tooltip_markup().
 
+If you unset the widget tooltip via gtk_widget_set_tooltip_text() or
+gtk_widget_set_tooltip_markup(), this sets GtkWidget:has-tooltip to %FALSE,
+which suppresses icon tooltips too. You can resolve this by then calling
+gtk_widget_set_has_tooltip() to set GtkWidget:has-tooltip back to %TRUE, or
+setting at least one non-empty tooltip on any icon achieves the same result.
+
 Since: 2.16
 
 </description>
@@ -35905,136 +35901,6 @@ Since: 2.10
 <parameter name="wait">
 <parameter_description> if %TRUE, wait in a recursive mainloop until
 all printers are enumerated; otherwise return early
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_event_box_get_above_child">
-<description>
-Returns whether the event box window is above or below the
-windows of its child. See gtk_event_box_set_above_child()
-for details.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="event_box">
-<parameter_description> a #GtkEventBox
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the event box window is above the
-window of its child
-
-</return>
-</function>
-
-<function name="gtk_event_box_get_visible_window">
-<description>
-Returns whether the event box has a visible window.
-See gtk_event_box_set_visible_window() for details.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="event_box">
-<parameter_description> a #GtkEventBox
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the event box window is visible
-
-</return>
-</function>
-
-<function name="gtk_event_box_new">
-<description>
-Creates a new #GtkEventBox.
-
-
-</description>
-<parameters>
-</parameters>
-<return> a new #GtkEventBox
-</return>
-</function>
-
-<function name="gtk_event_box_set_above_child">
-<description>
-Set whether the event box window is positioned above the windows
-of its child, as opposed to below it. If the window is above, all
-events inside the event box will go to the event box. If the window
-is below, events in windows of child widgets will first got to that
-widget, and then to its parents.
-
-The default is to keep the window below the child.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="event_box">
-<parameter_description> a #GtkEventBox
-</parameter_description>
-</parameter>
-<parameter name="above_child">
-<parameter_description> %TRUE if the event box window is above its child
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_event_box_set_visible_window">
-<description>
-Set whether the event box uses a visible or invisible child
-window. The default is to use visible windows.
-
-In an invisible window event box, the window that the
-event box creates is a %GDK_INPUT_ONLY window, which
-means that it is invisible and only serves to receive
-events.
-
-A visible window event box creates a visible (%GDK_INPUT_OUTPUT)
-window that acts as the parent window for all the widgets
-contained in the event box.
-
-You should generally make your event box invisible if
-you just want to trap events. Creating a visible window
-may cause artifacts that are visible to the user, especially
-if the user is using a theme with gradients or pixmaps.
-
-The main reason to create a non input-only event box is if
-you want to set the background to a different color or
-draw on it.
-
-There is one unexpected issue for an invisible event box that has its
-window below the child. (See gtk_event_box_set_above_child().)
-Since the input-only window is not an ancestor window of any windows
-that descendent widgets of the event box create, events on these
-windows aren’t propagated up by the windowing system, but only by GTK+.
-The practical effect of this is if an event isn’t in the event
-mask for the descendant window (see gtk_widget_add_events()),
-it won’t be received by the event box.
-
-This problem doesn’t occur for visible event boxes, because in
-that case, the event box window is actually the ancestor of the
-descendant windows, not just at the same place on the screen.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="event_box">
-<parameter_description> a #GtkEventBox
-</parameter_description>
-</parameter>
-<parameter name="visible_window">
-<parameter_description> %TRUE to make the event box have a visible window
 </parameter_description>
 </parameter>
 </parameters>
@@ -67946,43 +67812,6 @@ Since: 2.6
 <return></return>
 </function>
 
-<function name="gtk_show_uri">
-<description>
-A convenience function for launching the default application
-to show the uri. Like gtk_show_uri_on_window(), but takes a screen
-as transient parent instead of a window.
-
-Note that this function is deprecated as it does not pass the necessary
-information for helpers to parent their dialog properly, when run from
-sandboxed applications for example.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="screen">
-<parameter_description> screen to show the uri on
-or %NULL for the default screen
-</parameter_description>
-</parameter>
-<parameter name="uri">
-<parameter_description> the uri to show
-</parameter_description>
-</parameter>
-<parameter name="timestamp">
-<parameter_description> a timestamp to prevent focus stealing
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError that is returned in case of errors
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, %FALSE on error
-
-</return>
-</function>
-
 <function name="gtk_show_uri_on_window">
 <description>
 This is a convenience function for launching the default application
@@ -67995,7 +67824,7 @@ Typical examples are
 - `mailto:me@gnome.org`
 
 Ideally the timestamp is taken from the event triggering
-the gtk_show_uri() call. If timestamp is not known you can take
+the gtk_show_uri_on_window() call. If timestamp is not known you can take
 %GDK_CURRENT_TIME.
 
 This is the recommended call to be used as it passes information
@@ -79530,6 +79359,8 @@ Sets the #GtkMenuItem used in the toolbar overflow menu. The
 @menu_item_id is used to identify the caller of this function and
 should also be used with gtk_tool_item_get_proxy_menu_item().
 
+See also #GtkToolItem::create-menu-proxy.
+
 Since: 2.4
 
 </description>
@@ -80494,10 +80325,12 @@ size of icons.
 
 <function name="gtk_toolbar_set_show_arrow">
 <description>
-Sets whether to show an overflow menu when
-@toolbar doesn’t have room for all items on it. If %TRUE,
-items that there are not room are available through an
-overflow menu.
+Sets whether to show an overflow menu when @toolbar isn’t allocated enough
+size to show all of its items. If %TRUE, items which can’t fit in @toolbar,
+and which have a proxy menu item set by gtk_tool_item_set_proxy_menu_item()
+or #GtkToolItem::create-menu-proxy, will be available in an overflow menu,
+which can be opened by an added arrow button. If %FALSE, @toolbar will
+request enough size to fit all of its child items without any overflow.
 
 Since: 2.4
 
@@ -89393,7 +89226,7 @@ Returns the parent widget of @widget.
 
 <function name="gtk_widget_get_parent_window">
 <description>
-Gets @widget’s parent window.
+Gets @widget’s parent window, or %NULL if it does not have one.
 
 
 </description>
@@ -89403,7 +89236,8 @@ Gets @widget’s parent window.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the parent window of @widget.
+<return> the parent window of @widget, or %NULL
+if it does not have a parent window.
 </return>
 </function>
 
@@ -91498,10 +91332,6 @@ Convenience function that calls gtk_widget_queue_draw_region() on
 the region created from the given coordinates.
 
 The region here is specified in widget coordinates.
-Widget coordinates are a bit odd; for historical reasons, they are
-defined as @widget-&gt;window coordinates for widgets that return %TRUE for
-gtk_widget_get_has_window(), and are relative to @widget-&gt;allocation.x,
-@widget-&gt;allocation.y otherwise.
 
 @width or @height may be 0, in this case this function does
 nothing. Negative values for @width and @height are not allowed.
@@ -92464,40 +92294,6 @@ Since: 2.18
 <return></return>
 </function>
 
-<function name="gtk_widget_set_redraw_on_allocate">
-<description>
-Sets whether the entire widget is queued for drawing when its size
-allocation changes. By default, this setting is %TRUE and
-the entire widget is redrawn on every size change. If your widget
-leaves the upper left unchanged when made bigger, turning this
-setting off will improve performance.
-
-Note that for widgets where gtk_widget_get_has_window() is %FALSE
-setting this flag to %FALSE turns off all allocation on resizing:
-the widget will not even redraw if its position changes; this is to
-allow containers that don’t draw anything to avoid excess
-invalidations. If you set this flag on a widget with no window that
-does draw on @widget-&gt;window, you are
-responsible for invalidating both the old and new allocation of the
-widget when the widget is moved and responsible for invalidating
-regions newly when the widget increases size.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="redraw_on_allocate">
-<parameter_description> if %TRUE, the entire widget will be redrawn
-when it is allocated to a new size. Otherwise, only the
-new portion of the widget will be redrawn.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_widget_set_sensitive">
 <description>
 Sets the sensitivity of a widget. A widget is sensitive if the user
@@ -92682,14 +92478,11 @@ Since: 2.12
 
 <function name="gtk_widget_set_tooltip_window">
 <description>
-Replaces the default, usually yellow, window used for displaying
+Replaces the default window used for displaying
 tooltips with @custom_window. GTK+ will take care of showing and
 hiding @custom_window at the right moment, to behave likewise as
 the default tooltip window. If @custom_window is %NULL, the default
 tooltip window will be used.
-
-If the custom window should have the default theming it needs to
-have the name “gtk-tooltip”, see gtk_widget_set_name().
 
 Since: 2.12
 
