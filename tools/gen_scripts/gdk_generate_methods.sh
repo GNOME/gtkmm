@@ -18,5 +18,7 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
 # Process files whose names end with .h, but not with private.h.
 # Exclude gtk+/gdk/gdkinternals.h.
-$H2DEF_PY "$PREFIX"/gtk+/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h > "$OUT_DIR"/gdk_methods.defs
-$H2DEF_PY "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h > "$OUT_DIR"/gdk_pixbuf_methods.defs
+$H2DEF_PY "$PREFIX"/gtk+/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h \
+          "$PREFIX"/gtk+/build/gdk/*.h > "$OUT_DIR"/gdk_methods.defs
+$H2DEF_PY "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h \
+          "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf/*.h > "$OUT_DIR"/gdk_pixbuf_methods.defs

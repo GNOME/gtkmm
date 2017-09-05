@@ -14,7 +14,7 @@ ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gtk/src"
 
 PARAMS="--with-properties --no-recursion"
-for dir in "$PREFIX"/gtk+/{gtk,gtk/deprecated}; do
+for dir in "$PREFIX"/gtk+/{gtk,gtk/deprecated} "$PREFIX"/gtk+/build/gtk; do
   if [ -d "$dir" ]; then
     PARAMS="$PARAMS -s $dir"
   fi

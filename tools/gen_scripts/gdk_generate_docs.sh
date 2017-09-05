@@ -14,7 +14,8 @@ ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
 PARAMS="--with-properties --no-recursion"
-for dir in "$PREFIX"/gtk+/{gdk,gdk/deprecated} "$PREFIX"/gdk-pixbuf/gdk-pixbuf; do
+for dir in "$PREFIX"/gtk+/{gdk,gdk/deprecated} "$PREFIX"/gtk+/build/gdk \
+           "$PREFIX"/gdk-pixbuf/gdk-pixbuf "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf; do
   if [ -d "$dir" ]; then
     PARAMS="$PARAMS -s $dir"
   fi

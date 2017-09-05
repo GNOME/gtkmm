@@ -18,5 +18,7 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
 # Process files whose names end with .h, but not with private.h.
 # Exclude gtk+/gdk/gdkinternals.h.
-$ENUM_PL "$PREFIX"/gtk+/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h > "$OUT_DIR"/gdk_enums.defs
-$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h > "$OUT_DIR"/gdk_pixbuf_enums.defs
+$ENUM_PL "$PREFIX"/gtk+/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h \
+         "$PREFIX"/gtk+/build/gdk/*.h > "$OUT_DIR"/gdk_enums.defs
+$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h \
+         "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf/*.h > "$OUT_DIR"/gdk_pixbuf_enums.defs
