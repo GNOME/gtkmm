@@ -9,7 +9,7 @@ if [ -z "$JHBUILD_SOURCES" ]; then
   exit 1;
 fi
 
-PREFIX="$JHBUILD_SOURCES/gtk+"
+PREFIX="$JHBUILD_SOURCES/gtk+-3"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gtk/src"
 

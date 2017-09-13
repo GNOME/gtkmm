@@ -14,8 +14,11 @@ ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gdk/src"
 
 PARAMS="--with-properties --no-recursion"
-for dir in "$PREFIX"/gtk+/{gdk,gdk/deprecated} "$PREFIX"/gdk-pixbuf/gdk-pixbuf; do
-  PARAMS="$PARAMS -s $dir"
+for dir in "$PREFIX"/gtk+-3/{gdk,gdk/deprecated} \
+           "$PREFIX"/gdk-pixbuf/gdk-pixbuf "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf; do
+  if [ -d "$dir" ]; then
+    PARAMS="$PARAMS -s $dir"
+  fi
 done
 
 DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
