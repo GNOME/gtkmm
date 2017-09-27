@@ -91,9 +91,11 @@ const Glib::Class& Application::custom_class_init()
 Application::Application(const Glib::ustring& application_id, Gio::Application::Flags flags)
 :
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  //Note that GApplication complains about "" but allows nullptr, so we avoid passing "".
+  // GApplication complains about "" but allows nullptr, so we avoid passing "".
   Glib::ObjectBase(nullptr),
-  Gio::Application(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? nullptr : application_id.c_str()), "flags", GApplicationFlags(flags), nullptr))
+  Gio::Application(Glib::ConstructParams(custom_class_init(),
+    "application_id", Glib::c_str_or_nullptr(application_id),
+    "flags", static_cast<GApplicationFlags>(flags), nullptr))
 {
   // gtk_init() is called by the 'startup' default signal handler when g_application_run() is called.
   // It's also called here, to make it possible for users of gtkmm to create
