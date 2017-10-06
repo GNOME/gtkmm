@@ -18,4 +18,4 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
 # Process files whose names end with .h, but not with private.h.
 $ENUM_PL "$PREFIX"/gtk/!(*private).h "$PREFIX"/gtk/deprecated/!(*private).h \
-         "$PREFIX"/gtk/build/gtk/*.h > "$OUT_DIR"/gtk_enums.defs
+         "$PREFIX"/build/gtk/*.h > "$OUT_DIR"/gtk_enums.defs

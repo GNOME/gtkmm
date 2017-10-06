@@ -18,4 +18,4 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
 # Process files whose names end with .h, but not with private.h.
 $H2DEF_PY "$PREFIX"/gtk/!(*private).h "$PREFIX"/gtk/deprecated/!(*private).h \
-          "$PREFIX"/gtk/build/gtk/*.h > "$OUT_DIR"/gtk_methods.defs
+          "$PREFIX"/build/gtk/*.h > "$OUT_DIR"/gtk_methods.defs
