@@ -1317,14 +1317,6 @@ above.
 See the [input handling overview][chap-input-handling] for details of
 [event masks][event-masks] and [event propagation][event-propagation].
 
-%GDK_POINTER_MOTION_HINT_MASK is deprecated. It is a special mask
-to reduce the number of %GDK_MOTION_NOTIFY events received. When using
-%GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will
-be sent, some of which are marked as a hint (the is_hint member is
-%TRUE). To receive more motion events after a motion hint event,
-the application needs to asks for more, by calling
-gdk_event_request_motions().
-
 Since GTK 3.8, motion events are already compressed by default, independent
 of this mechanism. This compression can be disabled with
 gdk_window_set_event_compression(). See the documentation of that function
@@ -1345,10 +1337,6 @@ events, so different sequences may be distinguished.
 </parameter>
 <parameter name="GDK_POINTER_MOTION_MASK">
 <parameter_description> receive all pointer motion events
-</parameter_description>
-</parameter>
-<parameter name="GDK_POINTER_MOTION_HINT_MASK">
-<parameter_description> deprecated. see the explanation above
 </parameter_description>
 </parameter>
 <parameter name="GDK_BUTTON_MOTION_MASK">
@@ -1452,13 +1440,6 @@ Do not confuse these events with the signals that GTK+ widgets emit.
 Although many of these events result in corresponding signals being emitted,
 the events are often transformed or filtered along the way.
 
-In some language bindings, the values %GDK_2BUTTON_PRESS and
-%GDK_3BUTTON_PRESS would translate into something syntactically
-invalid (eg `Gdk.EventType.2ButtonPress`, where a
-symbol is not allowed to start with a number). In that case, the
-aliases %GDK_DOUBLE_BUTTON_PRESS and %GDK_TRIPLE_BUTTON_PRESS can
-be used instead.
-
 </description>
 <parameters>
 <parameter name="GDK_NOTHING">
@@ -1486,25 +1467,6 @@ redrawn.
 </parameter>
 <parameter name="GDK_BUTTON_PRESS">
 <parameter_description> a mouse button has been pressed.
-</parameter_description>
-</parameter>
-<parameter name="GDK_2BUTTON_PRESS">
-<parameter_description> a mouse button has been double-clicked (clicked twice
-within a short period of time). Note that each click also generates a
-%GDK_BUTTON_PRESS event.
-</parameter_description>
-</parameter>
-<parameter name="GDK_DOUBLE_BUTTON_PRESS">
-<parameter_description> alias for %GDK_2BUTTON_PRESS, added in 3.6.
-</parameter_description>
-</parameter>
-<parameter name="GDK_3BUTTON_PRESS">
-<parameter_description> a mouse button has been clicked 3 times in a short period
-of time. Note that each click also generates a %GDK_BUTTON_PRESS event.
-</parameter_description>
-</parameter>
-<parameter name="GDK_TRIPLE_BUTTON_PRESS">
-<parameter_description> alias for %GDK_3BUTTON_PRESS, added in 3.6.
 </parameter_description>
 </parameter>
 <parameter name="GDK_BUTTON_RELEASE">
@@ -3577,7 +3539,40 @@ decorations.
 </parameter_description>
 </parameter>
 <parameter name="GDK_WINDOW_STATE_TILED">
-<parameter_description> the window is in a tiled state, Since 3.10
+<parameter_description> the window is in a tiled state, Since 3.10. Since 3.91.2, this
+is deprecated in favor of per-edge information.
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_TOP_TILED">
+<parameter_description> whether the top edge is tiled, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_TOP_RESIZABLE">
+<parameter_description> whether the top edge is resizable, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_RIGHT_TILED">
+<parameter_description> whether the right edge is tiled, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_RIGHT_RESIZABLE">
+<parameter_description> whether the right edge is resizable, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_BOTTOM_TILED">
+<parameter_description> whether the bottom edge is tiled, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_BOTTOM_RESIZABLE">
+<parameter_description> whether the bottom edge is resizable, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_LEFT_TILED">
+<parameter_description> whether the left edge is tiled, Since 3.91.2
+</parameter_description>
+</parameter>
+<parameter name="GDK_WINDOW_STATE_LEFT_RESIZABLE">
+<parameter_description> whether the left edge is resizable, Since 3.91.2
 </parameter_description>
 </parameter>
 </parameters>
@@ -6293,8 +6288,7 @@ be sent.
 <function name="gdk_display_set_double_click_distance">
 <description>
 Sets the double click distance (two clicks within this distance
-count as a double click and result in a #GDK_2BUTTON_PRESS event).
-See also gdk_display_set_double_click_time().
+count as a double click). See also gdk_display_set_double_click_time().
 Applications should not set this, it is a global 
 user-configured setting.
 
@@ -6317,8 +6311,7 @@ Since: 2.4
 <function name="gdk_display_set_double_click_time">
 <description>
 Sets the double click time (two clicks within this time interval
-count as a double click and result in a #GDK_2BUTTON_PRESS event).
-Applications should not set this, it is a global 
+count as a double click). Applications should not set this, it is a global
 user-configured setting.
 
 Since: 2.2
@@ -7403,6 +7396,28 @@ with gdk_event_free().
 </return>
 </function>
 
+<function name="gdk_event_get_axes">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="axes">
+<parameter_description> the array of values for all axes
+</parameter_description>
+</parameter>
+<parameter name="n_axes">
+<parameter_description> the length of array
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_axis">
 <description>
 Extract the axis value for a particular axis use from
@@ -7496,6 +7511,42 @@ Extract the event window relative x/y coordinates from an event.
 </return>
 </function>
 
+<function name="gdk_event_get_crossing_detail">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="detail">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_crossing_mode">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_device">
 <description>
 If the event contains a “device” field, this function will return
@@ -7540,6 +7591,24 @@ Since: 3.22
 </return>
 </function>
 
+<function name="gdk_event_get_drag_context">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_event_sequence">
 <description>
 If @event if of type %GDK_TOUCH_BEGIN, %GDK_TOUCH_UPDATE,
@@ -7575,6 +7644,78 @@ Since: 3.10
 </parameters>
 <return> a #GdkEventType
 
+</return>
+</function>
+
+<function name="gdk_event_get_focus_in">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="focus_in">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_grab_window">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="window">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_key_group">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_key_is_modifier">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="is_modifier">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
 </return>
 </function>
 
@@ -7624,6 +7765,68 @@ Since: 3.2
 </return>
 </function>
 
+<function name="gdk_event_get_pad_axis_value">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_pad_button">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="button">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_pad_group_mode">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_pointer_emulated">
 <description>
 #event: a #GdkEvent
@@ -7635,6 +7838,28 @@ Since: 3.22
 </parameters>
 <return> %TRUE if this event is emulated
 
+</return>
+</function>
+
+<function name="gdk_event_get_property">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="property">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
 </return>
 </function>
 
@@ -7774,6 +7999,68 @@ Since: 3.20
 </return>
 </function>
 
+<function name="gdk_event_get_selection">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="selection">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_selection_property">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="property">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="requestor">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_setting">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="setting">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_source_device">
 <description>
 This function returns the hardware (slave) #GdkDevice that has
@@ -7823,6 +8110,24 @@ as if the event had no state field.
 </return>
 </function>
 
+<function name="gdk_event_get_string">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="string">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
 <function name="gdk_event_get_time">
 <description>
 Returns the time stamp from @event, if there is one; otherwise
@@ -7837,6 +8142,118 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter>
 </parameters>
 <return> time stamp field from @event
+</return>
+</function>
+
+<function name="gdk_event_get_touch_emulating_pointer">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="emulating">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_touchpad_angle_delta">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="delta">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_touchpad_deltas">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_touchpad_gesture_n_fingers">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="n_fingers">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_touchpad_gesture_phase">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="phase">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
+</return>
+</function>
+
+<function name="gdk_event_get_touchpad_scale">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="scale">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
 </return>
 </function>
 
@@ -7855,6 +8272,28 @@ Since: 3.10
 </parameters>
 <return> The #GdkWindow associated with the event
 
+</return>
+</function>
+
+<function name="gdk_event_get_window_state">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="changed">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="new_state">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, otherwise %FALSE
 </return>
 </function>
 
@@ -7954,38 +8393,6 @@ queue if event-&gt;any.window is %NULL. See gdk_display_put_event().
 <parameters>
 <parameter name="event">
 <parameter_description> a #GdkEvent.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_event_request_motions">
-<description>
-Request more motion notifies if @event is a motion notify hint event.
-
-This function should be used instead of gdk_window_get_pointer() to
-request further motion notifies, because it also works for extension
-events where motion notifies are provided for devices other than the
-core pointer. Coordinate extraction, processing and requesting more
-motion events from a %GDK_MOTION_NOTIFY event usually works like this:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-{
-// motion_event handler
-x = motion_event-&gt;x;
-y = motion_event-&gt;y;
-// handle (x,y) motion
-gdk_event_request_motions (motion_event); // handles is_hint events
-}
-]|
-
-Since: 2.12
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a valid #GdkEvent
 </parameter_description>
 </parameter>
 </parameters>
