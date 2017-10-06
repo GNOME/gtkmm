@@ -15,24 +15,87 @@
  */
 
 #include <gdkmm/device.h>
+#include <gdkmm/dragcontext.h>
+
+namespace
+{
+
+Gdk::ModifierType common_get_state(const GdkEvent* event)
+{
+  GdkModifierType state = static_cast<GdkModifierType>(0);
+  gdk_event_get_state(event, &state);
+  return static_cast<Gdk::ModifierType>(state);
+}
+
+} // anonymous namespace
 
 namespace Gdk
 {
+// *** EventKey ***
+
+guint32 EventKey::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+ModifierType EventKey::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+guint EventKey::get_keyval() const
+{
+  guint keyval = 0;
+  gdk_event_get_keyval(Event::gobj(), &keyval);
+  return keyval;
+}
+
+guint16 EventKey::get_keycode() const
+{
+  guint16 keycode = 0;
+  gdk_event_get_keycode(Event::gobj(), &keycode);
+  return keycode;
+}
+
 int EventKey::get_scancode() const
 {
   return gdk_event_get_scancode(const_cast<GdkEvent*>(Event::gobj()));
 }
 
-guint EventButton::get_click_count() const
+guint EventKey::get_key_group() const
 {
-  guint click_count = 0;
-  gdk_event_get_click_count(Event::gobj(), &click_count);
-  return click_count;
+  guint group = 0;
+  gdk_event_get_key_group(Event::gobj(), &group);
+  return group;
 }
 
-bool EventButton::shall_trigger_context_menu() const
+bool EventKey::get_key_is_modifier() const
 {
-  return gdk_event_triggers_context_menu(Event::gobj());
+  gboolean is_modifier = false;
+  gdk_event_get_key_is_modifier(Event::gobj(), &is_modifier);
+  return is_modifier;
+}
+
+// *** EventButton ***
+
+guint32 EventButton::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+ModifierType EventButton::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventButton::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventButton::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
 }
 
 bool EventButton::get_axis(Gdk::AxisUse axis_use, double& value) const
@@ -40,9 +103,134 @@ bool EventButton::get_axis(Gdk::AxisUse axis_use, double& value) const
   return gdk_event_get_axis(Event::gobj(), static_cast<GdkAxisUse>(axis_use), &value);
 }
 
+guint EventButton::get_button() const
+{
+  guint button = 0;
+  gdk_event_get_button(Event::gobj(), &button);
+  return button;
+}
+
+Glib::RefPtr<Gdk::Device> EventButton::get_device()
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+Glib::RefPtr<const Gdk::Device> EventButton::get_device() const
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+bool EventButton::shall_trigger_context_menu() const
+{
+  return gdk_event_triggers_context_menu(Event::gobj());
+}
+
+// *** EventScroll ***
+
+guint32 EventScroll::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+ModifierType EventScroll::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventScroll::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventScroll::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
+bool EventScroll::get_scroll_deltas(double& delta_x, double& delta_y) const
+{
+  return gdk_event_get_scroll_deltas(Event::gobj(), &delta_x, &delta_y);
+}
+
+ScrollDirection EventScroll::get_scroll_direction() const
+{
+  GdkScrollDirection direction = GDK_SCROLL_SMOOTH;
+  gboolean retval = gdk_event_get_scroll_direction(Event::gobj(), &direction);
+  return retval ? static_cast<ScrollDirection>(direction) : ScrollDirection::SMOOTH;
+}
+
+bool EventScroll::is_scroll_stop_event() const
+{
+  return gdk_event_is_scroll_stop_event(Event::gobj());
+}
+
+Glib::RefPtr<Gdk::Device> EventScroll::get_device()
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+Glib::RefPtr<const Gdk::Device> EventScroll::get_device() const
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+// *** EventMotion ***
+
+guint32 EventMotion::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+ModifierType EventMotion::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventMotion::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventMotion::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
 bool EventMotion::get_axis(Gdk::AxisUse axis_use, double& value) const
 {
   return gdk_event_get_axis(Event::gobj(), static_cast<GdkAxisUse>(axis_use), &value);
+}
+
+Glib::RefPtr<Gdk::Device> EventMotion::get_device()
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+Glib::RefPtr<const Gdk::Device> EventMotion::get_device() const
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+// *** EventTouch ***
+
+guint32 EventTouch::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+ModifierType EventTouch::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventTouch::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventTouch::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
 }
 
 bool EventTouch::get_axis(Gdk::AxisUse axis_use, double& value) const
@@ -50,39 +238,368 @@ bool EventTouch::get_axis(Gdk::AxisUse axis_use, double& value) const
   return gdk_event_get_axis(Event::gobj(), static_cast<GdkAxisUse>(axis_use), &value);
 }
 
-bool EventScroll::is_scroll_stop_event() const
+const EventSequence* EventTouch::get_event_sequence() const
 {
-  return gobj()->is_stop;
+  return reinterpret_cast<EventSequence*>(gdk_event_get_event_sequence(Event::gobj()));
 }
 
-Gdk::Rectangle EventConfigure::get_rect() const
+bool EventTouch::get_touch_emulating_pointer() const
 {
-  return Gdk::Rectangle(gobj()->x, gobj()->y, gobj()->width, gobj()->height);
+  gboolean emulating = false;
+  gdk_event_get_touch_emulating_pointer(Event::gobj(), &emulating);
+  return emulating;
 }
 
-bool EventSelection::has_requestor() const
+bool EventTouch::get_pointer_emulated() const
 {
-  return gobj()->requestor != nullptr;
+  return gdk_event_get_pointer_emulated(const_cast<GdkEvent*>(Event::gobj()));
 }
 
-bool EventOwnerChange::has_owner() const
+Glib::RefPtr<Gdk::Device> EventTouch::get_device()
 {
-  return gobj()->owner != nullptr;
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
 }
 
-bool EventGrabBroken::is_keyboard() const
+Glib::RefPtr<const Gdk::Device> EventTouch::get_device() const
 {
-  return gobj()->keyboard;
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
 }
 
-bool EventGrabBroken::is_implicit() const
+// *** EventCrossing ***
+
+guint32 EventCrossing::get_time() const
 {
-  return gobj()->implicit;
+  return gdk_event_get_time(Event::gobj());
 }
 
-bool EventGrabBroken::has_grab_window() const
+ModifierType EventCrossing::get_state() const
 {
-  return gobj()->grab_window != nullptr;
+  return common_get_state(Event::gobj());
 }
 
-} //namespace Gdk
+void EventCrossing::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventCrossing::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
+CrossingMode EventCrossing::get_crossing_mode() const
+{
+  GdkCrossingMode mode = GDK_CROSSING_NORMAL;
+  gdk_event_get_crossing_mode(Event::gobj(), &mode);
+  return static_cast<CrossingMode>(mode);
+}
+
+NotifyType EventCrossing::get_crossing_detail() const
+{
+  GdkNotifyType detail = GDK_NOTIFY_UNKNOWN;
+  gdk_event_get_crossing_detail(Event::gobj(), &detail);
+  return static_cast<NotifyType>(detail);
+}
+
+// *** EventExpose ***
+
+// *** EventFocus ***
+
+bool EventFocus::get_focus_in() const
+{
+  gboolean focus_in = false;
+  gdk_event_get_focus_in(Event::gobj(), &focus_in);
+  return focus_in;
+}
+
+// *** EventConfigure ***
+
+void EventConfigure::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+// *** EventProperty ***
+
+guint32 EventProperty::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+GdkAtom EventProperty::get_property_atom() const
+{
+  GdkAtom property = GDK_NONE;
+  GdkPropertyState state = GDK_PROPERTY_DELETE;
+  gdk_event_get_property(Event::gobj(), &property, &state);
+  return property;
+}
+
+PropertyState EventProperty::get_property_state() const
+{
+  GdkAtom property = GDK_NONE;
+  GdkPropertyState state = GDK_PROPERTY_DELETE;
+  gdk_event_get_property(Event::gobj(), &property, &state);
+  return static_cast<PropertyState>(state);
+}
+
+// *** EventSelection ***
+
+guint32 EventSelection::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+GdkAtom EventSelection::get_selection() const
+{
+  GdkAtom selection = GDK_NONE;
+  gdk_event_get_selection(Event::gobj(), &selection);
+  return selection;
+}
+
+Glib::RefPtr<Gdk::Window> EventSelection::get_selection_property(GdkAtom& property, GdkAtom& target)
+{
+  GdkWindow* requestor = nullptr;
+  gdk_event_get_selection_property(Event::gobj(), &property, &target, &requestor);
+  return Glib::wrap(requestor, true);
+}
+
+Glib::RefPtr<const Gdk::Window> EventSelection::get_selection_property(GdkAtom& property, GdkAtom& target) const
+{
+  return const_cast<EventSelection*>(this)->get_selection_property(property, target);
+}
+
+// *** EventOwnerChange ***
+
+guint32 EventOwnerChange::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+GdkAtom EventOwnerChange::get_selection() const
+{
+  GdkAtom selection = GDK_NONE;
+  gdk_event_get_selection(Event::gobj(), &selection);
+  return selection;
+}
+
+// *** EventDND ***
+
+guint32 EventDND::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+void EventDND::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
+Glib::RefPtr<Gdk::DragContext> EventDND::get_drag_context()
+{
+  GdkDragContext* context = nullptr;
+  gdk_event_get_drag_context(Event::gobj(), &context);
+  return Glib::wrap(context, true);
+}
+
+Glib::RefPtr<const Gdk::DragContext> EventDND::get_drag_context() const
+{
+  return const_cast<EventDND*>(this)->get_drag_context();
+}
+
+// *** EventProximity ***
+
+guint32 EventProximity::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+Glib::RefPtr<Gdk::Device> EventProximity::get_device()
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+Glib::RefPtr<const Gdk::Device> EventProximity::get_device() const
+{
+  return Glib::wrap(gdk_event_get_device(Event::gobj()), true);
+}
+
+// *** EventWindowState ***
+
+void EventWindowState::get_window_state(Gdk::Window::State& changed,
+  Gdk::Window::State& new_state) const
+{
+  GdkWindowState c_changed = static_cast<GdkWindowState>(0);
+  GdkWindowState c_new_state = static_cast<GdkWindowState>(0);
+  gdk_event_get_window_state(Event::gobj(), &c_changed, &c_new_state);
+  changed = static_cast<Gdk::Window::State>(c_changed);
+  new_state = static_cast<Gdk::Window::State>(c_new_state);
+}
+
+// *** EventSetting ***
+
+Glib::ustring EventSetting::get_setting() const
+{
+  const char* setting = nullptr;
+  gdk_event_get_setting(Event::gobj(), &setting);
+  return Glib::convert_const_gchar_ptr_to_ustring(setting);
+}
+
+// *** EventGrabBroken ***
+
+Glib::RefPtr<Gdk::Window> EventGrabBroken::get_grab_window()
+{
+  GdkWindow* window = nullptr;
+  gdk_event_get_grab_window(Event::gobj(), &window);
+  return Glib::wrap(window, true);
+}
+
+Glib::RefPtr<const Gdk::Window> EventGrabBroken::get_grab_window() const
+{
+  return const_cast<EventGrabBroken*>(this)->get_grab_window();
+}
+
+// *** EventTouchpadSwipe ***
+
+guint32 EventTouchpadSwipe::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+TouchpadGesturePhase EventTouchpadSwipe::get_touchpad_gesture_phase() const
+{
+  GdkTouchpadGesturePhase phase = GDK_TOUCHPAD_GESTURE_PHASE_CANCEL;
+  gdk_event_get_touchpad_gesture_phase(Event::gobj(), &phase);
+  return static_cast<TouchpadGesturePhase>(phase);
+}
+
+guint EventTouchpadSwipe::get_touchpad_gesture_n_fingers() const
+{
+  guint n_fingers = 0;
+  gdk_event_get_touchpad_gesture_n_fingers(Event::gobj(), &n_fingers);
+  return n_fingers;
+}
+
+ModifierType EventTouchpadSwipe::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventTouchpadSwipe::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventTouchpadSwipe::get_touchpad_deltas(double& dx, double& dy) const
+{
+  gdk_event_get_touchpad_deltas(Event::gobj(), &dx, &dy);
+}
+
+void EventTouchpadSwipe::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
+// *** EventTouchpadPinch ***
+
+guint32 EventTouchpadPinch::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+TouchpadGesturePhase EventTouchpadPinch::get_touchpad_gesture_phase() const
+{
+  GdkTouchpadGesturePhase phase = GDK_TOUCHPAD_GESTURE_PHASE_CANCEL;
+  gdk_event_get_touchpad_gesture_phase(Event::gobj(), &phase);
+  return static_cast<TouchpadGesturePhase>(phase);
+}
+
+guint EventTouchpadPinch::get_touchpad_gesture_n_fingers() const
+{
+  guint n_fingers = 0;
+  gdk_event_get_touchpad_gesture_n_fingers(Event::gobj(), &n_fingers);
+  return n_fingers;
+}
+
+ModifierType EventTouchpadPinch::get_state() const
+{
+  return common_get_state(Event::gobj());
+}
+
+void EventTouchpadPinch::get_coords(double& x_win, double& y_win) const
+{
+  gdk_event_get_coords(Event::gobj(), &x_win, &y_win);
+}
+
+void EventTouchpadPinch::get_touchpad_deltas(double& dx, double& dy) const
+{
+  gdk_event_get_touchpad_deltas(Event::gobj(), &dx, &dy);
+}
+
+double EventTouchpadPinch::get_touchpad_angle_delta() const
+{
+  double delta = 0.0;
+  gdk_event_get_touchpad_angle_delta(Event::gobj(), &delta);
+  return delta;
+}
+
+double EventTouchpadPinch::get_touchpad_scale() const
+{
+  double scale = 0.0;
+  gdk_event_get_touchpad_scale(Event::gobj(), &scale);
+  return scale;
+}
+
+void EventTouchpadPinch::get_root_coords(double& x_root, double& y_root) const
+{
+  gdk_event_get_root_coords(Event::gobj(), &x_root, &y_root);
+}
+
+// *** EventPadButton ***
+
+guint32 EventPadButton::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+void EventPadButton::get_pad_group_mode(guint& group, guint& mode) const
+{
+  gdk_event_get_pad_group_mode(Event::gobj(), &group, &mode);
+}
+
+guint EventPadButton::get_pad_button() const
+{
+  guint button = 0;
+  gdk_event_get_pad_button(Event::gobj(), &button);
+  return button;
+}
+
+// *** EventPadAxis ***
+
+guint32 EventPadAxis::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+void EventPadAxis::get_pad_group_mode(guint& group, guint& mode) const
+{
+  gdk_event_get_pad_group_mode(Event::gobj(), &group, &mode);
+}
+
+void EventPadAxis::get_pad_axis_value(guint& index, double& value) const
+{
+  gdk_event_get_pad_axis_value(Event::gobj(), &index, &value);
+}
+
+// *** EventPadGroupMode ***
+
+guint32 EventPadGroupMode::get_time() const
+{
+  return gdk_event_get_time(Event::gobj());
+}
+
+void EventPadGroupMode::get_pad_group_mode(guint& group, guint& mode) const
+{
+  gdk_event_get_pad_group_mode(Event::gobj(), &group, &mode);
+}
+
+} // namespace Gdk

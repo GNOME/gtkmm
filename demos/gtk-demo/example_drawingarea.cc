@@ -211,7 +211,12 @@ bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(Gdk::EventB
     return false; // paranoia check, in case we haven't gotten a configure event
 
   if(button_event.get_button() == 1)
-    scribble_draw_brush(int(button_event.get_x()), int(button_event.get_y()));
+  {
+    double x = 0.0;
+    double y = 0.0;
+    button_event.get_coords(x, y);
+    scribble_draw_brush(int(x), int(y));
+   }
 
   // We've handled the event, stop processing.
   return true;
