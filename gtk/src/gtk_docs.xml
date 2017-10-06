@@ -2822,10 +2822,10 @@ Since: 2.14
 <property name="GtkComboBox:column-span-column">
 <description>
 If this is set to a non-negative value, it must be the index of a column
-of type %G_TYPE_INT in the model.
-
-The values of that column are used to determine how many columns a value
-in the list will span.
+of type %G_TYPE_INT in the model. The value in that column for each item
+will determine how many columns that item will span in the popup.
+Therefore, values in this column must be greater than zero, and the sum of
+an item’s column position + span should not exceed #GtkComboBox:wrap-width.
 
 Since: 2.4
 
@@ -2905,11 +2905,9 @@ Since: 2.10
 <property name="GtkComboBox:row-span-column">
 <description>
 If this is set to a non-negative value, it must be the index of a column
-of type %G_TYPE_INT in the model.
-
-The values of that column are used to determine how many rows a value in
-the list will span. Therefore, the values in the model column pointed to
-by this property must be greater than zero and not larger than wrap-width.
+of type %G_TYPE_INT in the model. The value in that column for each item
+will determine how many rows that item will span in the popup. Therefore,
+values in this column must be greater than zero.
 
 Since: 2.4
 
@@ -2918,9 +2916,8 @@ Since: 2.4
 
 <property name="GtkComboBox:wrap-width">
 <description>
-If wrap-width is set to a positive value, the list will be
-displayed in multiple columns, the number of columns is
-determined by wrap-width.
+If wrap-width is set to a positive value, items in the popup will be laid
+out along multiple columns, starting a new row on reaching the wrap width.
 
 Since: 2.4
 
@@ -8760,6 +8757,15 @@ location for the allocation
 <return> %TRUE if the @allocation has been filled
 </return>
 </signal>
+
+<property name="GtkOverlay:blur">
+<description>
+Blur the content behind this child with a Gaussian blur of this radius.
+
+Since: 3.92
+
+</description>
+</property>
 
 <property name="GtkOverlay:index">
 <description>
@@ -19533,7 +19539,7 @@ Since: 3.90
 </parameter_description>
 </parameter>
 </parameters>
-<return>  the current value of the GtkActionBar:revealed property.
+<return> the current value of the #GtkActionBar:revealed property.
 
 </return>
 </function>
@@ -19616,11 +19622,12 @@ Since: 3.12
 
 <function name="gtk_action_bar_set_revealed">
 <description>
-Sets the GtkActionBar:revealed property to @revealed. This will cause
-@action_bar to show up with a slide-in transition.
+Sets the #GtkActionBar:revealed property to @revealed. Changing this will
+make @action_bar reveal (%TRUE) or conceal (%FALSE) itself via a sliding
+transition.
 
-Note that this settings does not automatically show @action_bar and thus won't
-have any effect if it is invisible.
+Note: this does not show or hide @action_bar in the #GtkWidget:visible sense,
+so revealing has no effect if #GtkWidget:visible is %FALSE.
 
 Since: 3.90
 
@@ -40222,8 +40229,8 @@ will appear embedded in the top edge of the frame as a title.
 <function name="gtk_frame_set_shadow_type">
 <description>
 Sets the #GtkFrame:shadow-type for @frame, i.e. whether it is drawn without
-(GTK_SHADOW_NONE) or with (other values) a visible border. Values other than
-GTK_SHADOW_NONE are treated identically by #GtkFrame. The chosen type is
+(%GTK_SHADOW_NONE) or with (other values) a visible border. Values other than
+%GTK_SHADOW_NONE are treated identically by GtkFrame. The chosen type is
 applied by removing or adding the .flat class to the main CSS node, frame.
 
 </description>
@@ -46646,7 +46653,7 @@ Since: 3.90
 </parameter_description>
 </parameter>
 </parameters>
-<return>  the current value of the GtkInfoBar:revealed property.
+<return> the current value of the #GtkInfoBar:revealed property.
 
 </return>
 </function>
@@ -46804,18 +46811,18 @@ Since: 2.18
 
 <function name="gtk_info_bar_set_revealed">
 <description>
-Sets the GtkInfoBar:revealed property to @revealed. This will cause
-@info_bar to show up with a slide-in transition.
+Sets the #GtkInfoBar:revealed property to @revealed. Changing this will make
+@info_bar reveal (%TRUE) or conceal (%FALSE) itself via a sliding transition.
 
-Note that this settings does not automatically show @info_bar and thus won't
-have any effect if it is invisible.
+Note: this does not show or hide @info_bar in the #GtkWidget:visible sense,
+so revealing has no effect if #GtkWidget:visible is %FALSE.
 
 Since: 3.90
 
 </description>
 <parameters>
 <parameter name="info_bar">
-<parameter_description> a #GtkActionBar
+<parameter_description> a #GtkInfoBar
 </parameter_description>
 </parameter>
 <parameter name="revealed">
@@ -47794,7 +47801,7 @@ and toggle focus between the colliding widgets otherwise.
 </parameter_description>
 </parameter>
 <parameter name="widget">
-<parameter_description> the target #GtkWidget
+<parameter_description> the target #GtkWidget, or %NULL to unset
 </parameter_description>
 </parameter>
 </parameters>
@@ -61249,7 +61256,8 @@ Begins tracking progress for a new animation. Clears all previous state.
 <function name="gtk_propagate_event">
 <description>
 Sends an event to a widget, propagating the event to parent widgets
-if the event remains unhandled.
+if the event remains unhandled. This function will emit the event
+through all the hierarchy of @widget through all propagation phases.
 
 Events received by GTK+ from GDK normally begin in gtk_main_do_event().
 Depending on the type of event, existence of modal dialogs, grabs, etc.,
@@ -79374,7 +79382,7 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="menu_item">
-<parameter_description> a #GtkMenuItem to be used in the overflow menu
+<parameter_description> a #GtkMenuItem to use in the overflow menu, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -94475,8 +94483,16 @@ Since: 2.4
 <description>
 Sets or unsets the #GtkApplication associated with the window.
 
-The application will be kept alive for at least as long as the window
-is open.
+The application will be kept alive for at least as long as it has any windows
+associated with it (see g_application_hold() for a way to keep it alive
+without windows).
+
+Normally, the connection between the application and the window will remain
+until the window is destroyed, but you can explicitly remove it by setting
+the @application to %NULL.
+
+This is equivalent to calling gtk_application_remove_window() and/or
+gtk_application_add_window() on the old/new applications as relevant.
 
 Since: 3.0
 
@@ -94487,7 +94503,7 @@ Since: 3.0
 </parameter_description>
 </parameter>
 <parameter name="application">
-<parameter_description> a #GtkApplication, or %NULL
+<parameter_description> a #GtkApplication, or %NULL to unset
 </parameter_description>
 </parameter>
 </parameters>
