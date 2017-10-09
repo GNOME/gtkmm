@@ -100,10 +100,10 @@ public:
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
-  ///Provides access to the underlying C GtkObject.
+  /// Provides access to the underlying C GObject.
   GObject*       gobj()       { return reinterpret_cast<GObject*>(gobject_); }
 
-  ///Provides access to the underlying C GtkObject.
+  /// Provides access to the underlying C GObject.
   const GObject* gobj() const { return reinterpret_cast<GObject*>(gobject_); }
 
 public:

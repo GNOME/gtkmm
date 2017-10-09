@@ -272,10 +272,10 @@ ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
-  ///Provides access to the underlying C GtkObject.
+  /// Provides access to the underlying C GObject.
   __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(gobject_); }
 
-  ///Provides access to the underlying C GtkObject.
+  /// Provides access to the underlying C GObject.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
 _H_VFUNCS_AND_SIGNALS()
@@ -284,5 +284,3 @@ private:
 _IMPORT(SECTION_CLASS2)
 
 ')
-
-
