@@ -17,10 +17,44 @@
  */
 
 #include <gtkmm/cellrenderer.h>
+#include <glibmm/value.h>
 #include <giomm/icon.h>
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/cellrenderer_p.h)
 
+extern "C"
+{
+GType cairo_gobject_surface_get_type();
+}
+
+namespace Glib
+{
+//TODO: If we decide to allow adding ABI to gtkmm-3, make this specialization
+// more like the one in gtkmm-4, gdk/gdkmm/value_cairo.h.
+/** Specialization of Glib::Value<> for Cairo::RefPtr<Cairo::Surface>.
+ * Needed for Gtk::CellRendererPixbuf::property_surface().
+ */
+template <>
+class Value<::Cairo::RefPtr<::Cairo::Surface>> : public ValueBase_Boxed
+{
+public:
+  using T = ::Cairo::Surface;
+  using CppType = ::Cairo::RefPtr<T>;
+  using CType = T::cobject;
+
+  static GType value_type() { return cairo_gobject_surface_get_type(); }
+
+  void set(const CppType& data) { set_boxed(data->cobj()); }
+
+  CppType get() const
+  {
+    CType* CObj = static_cast<CType*>(get_boxed());
+    T* CppObj = new T(CObj, false); // false == take reference
+    return CppType(CppObj);
+  }
+};
+
+} // namespace Glib
 
 namespace Gtk
 {
