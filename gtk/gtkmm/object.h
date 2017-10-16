@@ -44,15 +44,18 @@ T* manage(T* obj)
   return obj;
 }
 
-/** Gtk::Object is the base class for all widgets, and for a few non-widget objects such as
- * Gtk::Adjustment. Gtk::Object predates Glib::Object; non-widgets that derive from Gtk::Object
+/** %Gtk::Object is the base class for all widgets, and for a few non-widget objects
+ * such as Gtk::CellRenderer.
+ *
+ * %Gtk::Object predates Glib::Object; non-widgets that derive from %Gtk::Object
  * rather than Glib::Object do so for backward compatibility reasons.
  *
- * The most interesting difference between Gtk::Object and Glib::Object is the ability to use Gtk::manage() to delegate memory management to the container widget. Gtk::Objects can also be
- * explicitly deleted at any time, instead of using only reference-counting, and container widgets
- * can respond when their child objects are being deleted (for instance by removing the widget).
+ * The most interesting difference between %Gtk::Object and Glib::Object is the ability
+ * to use Gtk::manage() to delegate memory management to the container widget.
+ * Gtk::Objects can also be explicitly deleted at any time, instead of using only
+ * reference-counting, and container widgets can respond when their child objects
+ * are being deleted (for instance by removing the widget).
  */
-
 class GTKMM_API Object : public Glib::Object
 {
   public:
@@ -62,14 +65,6 @@ class GTKMM_API Object : public Glib::Object
   typedef GObject BaseObjectType;
   typedef GObjectClass BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-#ifdef GTKMM_DISABLE_DEPRECATED
-  /** This prevents use of Gtk::Object-derived classes with RefPtr.
-   * RefPtr should only be used with classes that have create() methods
-   * that return RefPtr.
-   */
-  typedef int dont_allow_use_in_glib_refptr_;
-#endif
 
   Object(Object&& src) noexcept;
   Object& operator=(Object&& src) noexcept;
