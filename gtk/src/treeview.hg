@@ -20,7 +20,7 @@
 _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <vector>
-
+#include <cstdlib> // std::strto*()
 #include <gtkmm/container.h>
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/treeselection.h>
@@ -69,6 +69,9 @@ namespace TreeView_Private
 
   template <class ColumnType> inline
   void _auto_cell_data_func(Gtk::CellRenderer* cell, const Gtk::TreeModel::const_iterator& iter, int model_column, const Glib::ustring& format);
+
+  template <typename T>
+  T _convert_from_ustring_to_numeric_type(const Glib::ustring& text);
 }
 
 #endif //DOXYGEN_SHOULD_SKIP_THIS
@@ -203,7 +206,7 @@ public:
    * This convenience template uses TreeView::Column::set_cell_data_func(), so the numeric formatting will
    * be deactivated if you specify your own cell_data callback by calling set_cell_data_func() again.
    *
-   * Note that the user's input will be interpreted as decimal (base 10), regardless of the @a format.
+   * Note that the @a format does not influence the interpretation of the user's input.
    *
    * @param title The text to be used in the title header of this column.
    * @param model_column The column in the TreeModel that will be rendered by this View column.
@@ -889,7 +892,6 @@ int TreeView::append_column_numeric_editable(const Glib::ustring& title, const T
   int cols_count = append_column_numeric(title, model_column, format);
 
   //connect signal handlers for auto-storing of edited cell data
-  //Note: This will only work for base-10 (decimal) formatted numbers:
   CellRenderer *const cell = get_column_cell_renderer(cols_count - 1);
   if(cell)
   {
@@ -1000,7 +1002,7 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
       )
     );
 
-    //We use bind<1> instead of bind because some compilers need the extra hint.
+    //We use bind<-1> instead of bind because some compilers need the extra hint.
   }
 }
 
@@ -1053,6 +1055,46 @@ void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::Cel
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace TreeView_Private
 {
+
+// Primary template falls back to std::strtod()
+template <typename T>
+T _convert_from_ustring_to_numeric_type(const Glib::ustring& text)
+{
+  return std::strtod(text.c_str(), nullptr);
+}
+
+// Floating point specializations
+template<>
+float _convert_from_ustring_to_numeric_type<float>(const Glib::ustring& text);
+
+template<>
+long double _convert_from_ustring_to_numeric_type<long double>(const Glib::ustring& text);
+
+// Integral specializations
+template<>
+short _convert_from_ustring_to_numeric_type<short>(const Glib::ustring& text);
+
+template<>
+unsigned short _convert_from_ustring_to_numeric_type<unsigned short>(const Glib::ustring& text);
+
+template<>
+int _convert_from_ustring_to_numeric_type<int>(const Glib::ustring& text);
+
+template<>
+unsigned int _convert_from_ustring_to_numeric_type<unsigned int>(const Glib::ustring& text);
+
+template<>
+long _convert_from_ustring_to_numeric_type<long>(const Glib::ustring& text);
+
+template<>
+unsigned long _convert_from_ustring_to_numeric_type<unsigned long>(const Glib::ustring& text);
+
+template<>
+long long _convert_from_ustring_to_numeric_type<long long>(const Glib::ustring& text);
+
+template<>
+unsigned long long _convert_from_ustring_to_numeric_type<unsigned long long>(const Glib::ustring& text);
+
 
 template <class ColumnType> inline
 void _connect_auto_store_editable_signal_handler(Gtk::TreeView* this_p, Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<ColumnType>& model_column)
@@ -1147,25 +1189,9 @@ void _auto_store_on_cellrenderer_text_edited_numerical(const Glib::ustring& path
     auto iter = model->get_iter(path);
     if(iter)
     {
-      //std::istringstream astream(new_text); //Put it in a stream.
-      //ColumnType new_value = ColumnType();
-      //new_value << astream; //Get it out of the stream as the numerical type.
-
-      //Convert the text to a number, using the same logic used by GtkCellRendererText when it stores numbers.
-      ColumnType new_value = ColumnType();
-      try
-      {
-        new_value =  static_cast<ColumnType>( std::stod(new_text) );
-      }
-      catch(const std::invalid_argument&)
-      {
-         //Intentionally ignored.
-         //Applications can use their own logic if they want to handle invalid input differently.
-      }
-
-      //Store the user's new text in the model:
+      // Convert the user's new text to a number, and store the number in the model:
       Gtk::TreeRow row = *iter;
-      row.set_value(model_column, (ColumnType)new_value);
+      row.set_value(model_column, _convert_from_ustring_to_numeric_type<ColumnType>(new_text));
     }
   }
 }

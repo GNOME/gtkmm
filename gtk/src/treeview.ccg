@@ -15,8 +15,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <climits> // INT_MIN, etc.
 #include <glibmm/vectorutils.h>
-
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/treeview_private.h>
 #include <gtkmm/treemodel.h>
@@ -471,5 +471,79 @@ void TreeView::unset_row_separator_func()
 {
   gtk_tree_view_set_row_separator_func(gobj(), nullptr, nullptr, nullptr);
 }
+
+namespace TreeView_Private
+{
+// Complete specializations of _convert_from_ustring_to_numeric_type()
+
+// Floating point specializations
+template<>
+float _convert_from_ustring_to_numeric_type<float>(const Glib::ustring& text)
+{
+  return std::strtof(text.c_str(), nullptr);
+}
+
+template<>
+long double _convert_from_ustring_to_numeric_type<long double>(const Glib::ustring& text)
+{
+  return std::strtold(text.c_str(), nullptr);
+}
+
+// Integral specializations
+template<>
+short _convert_from_ustring_to_numeric_type<short>(const Glib::ustring& text)
+{
+  const auto result = std::strtol(text.c_str(), nullptr, 0);
+  return (result < SHRT_MIN) ? SHRT_MIN :
+        ((result > SHRT_MAX) ? SHRT_MAX : static_cast<short>(result));
+}
+
+template<>
+unsigned short _convert_from_ustring_to_numeric_type<unsigned short>(const Glib::ustring& text)
+{
+  const auto result = std::strtoul(text.c_str(), nullptr, 0);
+  return (result > USHRT_MAX) ? USHRT_MAX : static_cast<unsigned short>(result);
+}
+
+template<>
+int _convert_from_ustring_to_numeric_type<int>(const Glib::ustring& text)
+{
+  const auto result = std::strtol(text.c_str(), nullptr, 0);
+  return (result < INT_MIN) ? INT_MIN :
+        ((result > INT_MAX) ? INT_MAX : static_cast<int>(result));
+}
+
+template<>
+unsigned int _convert_from_ustring_to_numeric_type<unsigned int>(const Glib::ustring& text)
+{
+  const auto result = std::strtoul(text.c_str(), nullptr, 0);
+  return (result > UINT_MAX) ? UINT_MAX : static_cast<unsigned int>(result);
+}
+
+template<>
+long _convert_from_ustring_to_numeric_type<long>(const Glib::ustring& text)
+{
+  return std::strtol(text.c_str(), nullptr, 0);
+}
+
+template<>
+unsigned long _convert_from_ustring_to_numeric_type<unsigned long>(const Glib::ustring& text)
+{
+  return std::strtoul(text.c_str(), nullptr, 0);
+}
+
+template<>
+long long _convert_from_ustring_to_numeric_type<long long>(const Glib::ustring& text)
+{
+  return std::strtoll(text.c_str(), nullptr, 0);
+}
+
+template<>
+unsigned long long _convert_from_ustring_to_numeric_type<unsigned long long>(const Glib::ustring& text)
+{
+  return std::strtoull(text.c_str(), nullptr, 0);
+}
+
+} // namespace TreeView_Private
 
 } // namespace Gtk
