@@ -474,7 +474,87 @@ void TreeView::unset_row_separator_func()
 
 namespace TreeView_Private
 {
-// Complete specializations of _convert_from_ustring_to_numeric_type()
+// Specializations of _connect_auto_store_editable_signal_handler()
+
+//bool specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<bool>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<bool>& model_column)
+{
+  Gtk::CellRendererToggle* pCellToggle = dynamic_cast<Gtk::CellRendererToggle*>(pCellRenderer);
+  if(pCellToggle)
+  {
+    //Set the appropriate property,
+    pCellToggle->property_activatable() = true;
+
+    //Connect to the appropriate signal, sending the model_column too
+
+    sigc::slot<void(const Glib::ustring&, int)> slot_temp =
+      sigc::bind<-1>(
+        sigc::mem_fun(*this_p, &Gtk::TreeView::_auto_store_on_cellrenderer_toggle_edited_with_model),
+        this_p->get_model()
+      );
+
+    pCellToggle->signal_toggled().connect(
+      sigc::bind<-1>(
+        slot_temp,
+        model_column.index()
+      )
+    );
+
+    //We use bind<-1> instead of bind because some compilers need the extra hint.
+  }
+}
+
+//int specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<int>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<int>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<int>(this_p, pCellRenderer, model_column);
+}
+
+//unsigned int specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<unsigned int>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<unsigned int>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<unsigned int>(this_p, pCellRenderer, model_column);
+}
+
+//long specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<long>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<long>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<long>(this_p, pCellRenderer, model_column);
+}
+
+//unsigned long specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<unsigned long>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<unsigned long>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<unsigned long>(this_p, pCellRenderer, model_column);
+}
+
+//float specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<float>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<float>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<float>(this_p, pCellRenderer, model_column);
+}
+
+//double specialization:
+template<>
+void _connect_auto_store_editable_signal_handler<double>(Gtk::TreeView* this_p,
+  Gtk::CellRenderer* pCellRenderer, const Gtk::TreeModelColumn<double>& model_column)
+{
+  _connect_auto_store_numeric_editable_signal_handler<double>(this_p, pCellRenderer, model_column);
+}
+
+// Specializations of _convert_from_ustring_to_numeric_type()
 
 // Floating point specializations
 template<>
