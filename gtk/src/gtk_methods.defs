@@ -1921,6 +1921,7 @@
     '("visited" "GTK_STATE_FLAG_VISITED")
     '("checked" "GTK_STATE_FLAG_CHECKED")
     '("drop-active" "GTK_STATE_FLAG_DROP_ACTIVE")
+    '("focus-visible" "GTK_STATE_FLAG_FOCUS_VISIBLE")
   )
 )
 
@@ -2178,8 +2179,6 @@
   (gtype-id "GTK_TYPE_IMAGE_TYPE")
   (values
     '("empty" "GTK_IMAGE_EMPTY")
-    '("pixbuf" "GTK_IMAGE_PIXBUF")
-    '("animation" "GTK_IMAGE_ANIMATION")
     '("icon-name" "GTK_IMAGE_ICON_NAME")
     '("gicon" "GTK_IMAGE_GICON")
     '("surface" "GTK_IMAGE_SURFACE")
@@ -3002,7 +3001,7 @@
 (define-method get_logo
   (of-object "GtkAboutDialog")
   (c-name "gtk_about_dialog_get_logo")
-  (return-type "GdkPixbuf*")
+  (return-type "cairo_surface_t*")
 )
 
 (define-method set_logo
@@ -3010,7 +3009,7 @@
   (c-name "gtk_about_dialog_set_logo")
   (return-type "none")
   (parameters
-    '("GdkPixbuf*" "logo")
+    '("cairo_surface_t*" "logo")
   )
 )
 
@@ -6567,20 +6566,6 @@
   )
 )
 
-(define-method get_size
-  (of-object "GtkCellRenderer")
-  (c-name "gtk_cell_renderer_get_size")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("const-GdkRectangle*" "cell_area")
-    '("gint*" "x_offset")
-    '("gint*" "y_offset")
-    '("gint*" "width")
-    '("gint*" "height")
-  )
-)
-
 (define-method snapshot
   (of-object "GtkCellRenderer")
   (c-name "gtk_cell_renderer_snapshot")
@@ -7313,6 +7298,15 @@
   )
 )
 
+(define-method set_surface
+  (of-object "GtkClipboard")
+  (c-name "gtk_clipboard_set_surface")
+  (return-type "none")
+  (parameters
+    '("cairo_surface_t*" "surface")
+  )
+)
+
 (define-method request_contents
   (of-object "GtkClipboard")
   (c-name "gtk_clipboard_request_contents")
@@ -7421,6 +7415,12 @@
     '("GdkAtom**" "targets")
     '("gint*" "n_targets")
   )
+)
+
+(define-method wait_for_surface
+  (of-object "GtkClipboard")
+  (c-name "gtk_clipboard_wait_for_surface")
+  (return-type "cairo_surface_t*")
 )
 
 (define-method wait_is_text_available
@@ -8656,17 +8656,6 @@
   )
 )
 
-(define-function gtk_drag_set_icon_pixbuf
-  (c-name "gtk_drag_set_icon_pixbuf")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("GdkPixbuf*" "pixbuf")
-    '("gint" "hot_x")
-    '("gint" "hot_y")
-  )
-)
-
 (define-function gtk_drag_set_icon_surface
   (c-name "gtk_drag_set_icon_surface")
   (return-type "none")
@@ -8881,6 +8870,15 @@
   (parameters
     '("GtkWidget*" "widget")
     '("GdkPixbuf*" "pixbuf")
+  )
+)
+
+(define-function gtk_drag_source_set_icon_surface
+  (c-name "gtk_drag_source_set_icon_surface")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("cairo_surface_t*" "surface")
   )
 )
 
@@ -9722,13 +9720,13 @@
   )
 )
 
-(define-method set_icon_from_pixbuf
+(define-method set_icon_from_surface
   (of-object "GtkEntry")
-  (c-name "gtk_entry_set_icon_from_pixbuf")
+  (c-name "gtk_entry_set_icon_from_surface")
   (return-type "none")
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
-    '("GdkPixbuf*" "pixbuf")
+    '("cairo_surface_t*" "surface")
   )
 )
 
@@ -9761,10 +9759,10 @@
   )
 )
 
-(define-method get_icon_pixbuf
+(define-method get_icon_surface
   (of-object "GtkEntry")
-  (c-name "gtk_entry_get_icon_pixbuf")
-  (return-type "GdkPixbuf*")
+  (c-name "gtk_entry_get_icon_surface")
+  (return-type "cairo_surface_t*")
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
   )
@@ -12828,6 +12826,12 @@
   )
 )
 
+(define-method load_texture
+  (of-object "GtkIconInfo")
+  (c-name "gtk_icon_info_load_texture")
+  (return-type "GskTexture*")
+)
+
 (define-method load_icon_async
   (of-object "GtkIconInfo")
   (c-name "gtk_icon_info_load_icon_async")
@@ -13512,14 +13516,6 @@
   )
 )
 
-(define-function gtk_image_new_from_animation
-  (c-name "gtk_image_new_from_animation")
-  (return-type "GtkWidget*")
-  (parameters
-    '("GdkPixbufAnimation*" "animation")
-  )
-)
-
 (define-function gtk_image_new_from_icon_name
   (c-name "gtk_image_new_from_icon_name")
   (return-type "GtkWidget*")
@@ -13579,15 +13575,6 @@
   )
 )
 
-(define-method set_from_animation
-  (of-object "GtkImage")
-  (c-name "gtk_image_set_from_animation")
-  (return-type "none")
-  (parameters
-    '("GdkPixbufAnimation*" "animation")
-  )
-)
-
 (define-method set_from_icon_name
   (of-object "GtkImage")
   (c-name "gtk_image_set_from_icon_name")
@@ -13632,16 +13619,10 @@
   (return-type "GtkImageType")
 )
 
-(define-method get_pixbuf
+(define-method get_surface
   (of-object "GtkImage")
-  (c-name "gtk_image_get_pixbuf")
-  (return-type "GdkPixbuf*")
-)
-
-(define-method get_animation
-  (of-object "GtkImage")
-  (c-name "gtk_image_get_animation")
-  (return-type "GdkPixbufAnimation*")
+  (c-name "gtk_image_get_surface")
+  (return-type "cairo_surface_t*")
 )
 
 (define-method get_icon_name
@@ -21480,15 +21461,6 @@
   )
 )
 
-(define-method get_icon
-  (of-object "GtkRecentInfo")
-  (c-name "gtk_recent_info_get_icon")
-  (return-type "GdkPixbuf*")
-  (parameters
-    '("gint" "size")
-  )
-)
-
 (define-method get_gicon
   (of-object "GtkRecentInfo")
   (c-name "gtk_recent_info_get_gicon")
@@ -22779,6 +22751,21 @@
   (return-type "gboolean")
   (parameters
     '("GdkPixbuf*" "pixbuf")
+  )
+)
+
+(define-method get_surface
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_get_surface")
+  (return-type "cairo_surface_t*")
+)
+
+(define-method set_surface
+  (of-object "GtkSelectionData")
+  (c-name "gtk_selection_data_set_surface")
+  (return-type "gboolean")
+  (parameters
+    '("cairo_surface_t*" "surface")
   )
 )
 
@@ -25338,7 +25325,6 @@
   (parameters
     '("GtkWidget*" "widget")
     '("cairo_t*" "cr")
-    '("GList**" "widgets")
   )
 )
 
@@ -33038,7 +33024,7 @@
   (c-name "gtk_window_set_icon")
   (return-type "none")
   (parameters
-    '("GdkPixbuf*" "icon")
+    '("cairo_surface_t*" "icon")
   )
 )
 
@@ -33064,7 +33050,7 @@
 (define-method get_icon
   (of-object "GtkWindow")
   (c-name "gtk_window_get_icon")
-  (return-type "GdkPixbuf*")
+  (return-type "cairo_surface_t*")
 )
 
 (define-method get_icon_name
@@ -33090,7 +33076,7 @@
   (c-name "gtk_window_set_default_icon")
   (return-type "none")
   (parameters
-    '("GdkPixbuf*" "icon")
+    '("cairo_surface_t*" "icon")
   )
 )
 

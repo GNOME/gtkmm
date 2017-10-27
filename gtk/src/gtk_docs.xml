@@ -3910,15 +3910,6 @@ Since: 2.16
 </description>
 </property>
 
-<property name="GtkEntry:primary-icon-pixbuf">
-<description>
-A pixbuf to use as the primary icon for the entry.
-
-Since: 2.16
-
-</description>
-</property>
-
 <property name="GtkEntry:primary-icon-sensitive">
 <description>
 Whether the primary icon is sensitive.
@@ -3938,6 +3929,15 @@ Since: 2.16
 <property name="GtkEntry:primary-icon-storage-type">
 <description>
 The representation which is used for the primary icon of the entry.
+
+Since: 2.16
+
+</description>
+</property>
+
+<property name="GtkEntry:primary-icon-surface">
+<description>
+A surface to use as the primary icon for the entry.
 
 Since: 2.16
 
@@ -4019,15 +4019,6 @@ Since: 2.16
 </description>
 </property>
 
-<property name="GtkEntry:secondary-icon-pixbuf">
-<description>
-An pixbuf to use as the secondary icon for the entry.
-
-Since: 2.16
-
-</description>
-</property>
-
 <property name="GtkEntry:secondary-icon-sensitive">
 <description>
 Whether the secondary icon is sensitive.
@@ -4047,6 +4038,15 @@ Since: 2.16
 <property name="GtkEntry:secondary-icon-storage-type">
 <description>
 The representation which is used for the secondary icon of the entry.
+
+Since: 2.16
+
+</description>
+</property>
+
+<property name="GtkEntry:secondary-icon-surface">
+<description>
+An surface to use as the secondary icon for the entry.
 
 Since: 2.16
 
@@ -6811,8 +6811,8 @@ Since: 3.0
 Describes the image data representation used by a #GtkImage. If you
 want to get the image from the widget, you can only get the
 currently-stored representation. e.g.  if the
-gtk_image_get_storage_type() returns #GTK_IMAGE_PIXBUF, then you can
-call gtk_image_get_pixbuf().  For empty images, you can request any
+gtk_image_get_storage_type() returns #GTK_IMAGE_SURFACE, then you can
+call gtk_image_get_surface().  For empty images, you can request any
 storage type (call any of the &quot;get&quot; functions), but they will all
 return %NULL values.
 
@@ -6820,14 +6820,6 @@ return %NULL values.
 <parameters>
 <parameter name="GTK_IMAGE_EMPTY">
 <parameter_description> there is no image displayed by the widget
-</parameter_description>
-</parameter>
-<parameter name="GTK_IMAGE_PIXBUF">
-<parameter_description> the widget contains a #GdkPixbuf
-</parameter_description>
-</parameter>
-<parameter name="GTK_IMAGE_ANIMATION">
-<parameter_description> the widget contains a #GdkPixbufAnimation
 </parameter_description>
 </parameter>
 <parameter name="GTK_IMAGE_ICON_NAME">
@@ -11140,7 +11132,7 @@ Indicated the relief to be drawn around a #GtkButton.
 <enum name="GtkResponseType">
 <description>
 Predefined values for use as response ids in gtk_dialog_add_button().
-All predefined values are negative, GTK+ leaves positive values for
+All predefined values are negative; GTK+ leaves values of 0 or greater for
 application-defined response ids.
 
 </description>
@@ -12085,8 +12077,14 @@ Since: 3.14
 
 <property name="GtkSettings:gtk-primary-button-warps-slider">
 <description>
-Whether a click in a #GtkRange trough should scroll to the click position or
-scroll by a single page in the respective direction.
+If the value of this setting is %TRUE, clicking the primary button in a
+#GtkRange trough will move the slider, and hence set the range’s value, to
+the point that you clicked. If it is %FALSE, a primary click will cause the
+slider/value to move by the range’s page-size towards the point clicked.
+
+Whichever action you choose for the primary button, the other action will
+be available by holding Shift and primary-clicking, or (since GTK+ 3.22.25)
+clicking the middle mouse button.
 
 Since: 3.6
 
@@ -13003,6 +13001,10 @@ classes and sometimes uses different names.
 </parameter>
 <parameter name="GTK_STATE_FLAG_DROP_ACTIVE">
 <parameter_description> Widget is highlighted as a drop target for DND. Since 3.20
+</parameter_description>
+</parameter>
+<parameter name="GTK_STATE_FLAG_FOCUS_VISIBLE">
+<parameter_description> Widget has the visible focus. Since: 3.92
 </parameter_description>
 </parameter>
 </parameters>
@@ -17873,7 +17875,7 @@ Since: 3.0
 
 <function name="gtk_about_dialog_get_logo">
 <description>
-Returns the pixbuf displayed as logo in the about dialog.
+Returns the surface displayed as logo in the about dialog.
 
 Since: 2.6
 
@@ -17884,9 +17886,9 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> the pixbuf displayed as logo. The
-pixbuf is owned by the about dialog. If you want to keep a
-reference to it, you have to call g_object_ref() on it.
+<return> the surface displayed as logo. The
+surface is owned by the about dialog. If you want to keep a
+reference to it, you have to call cairo_surface_reference() on it.
 
 </return>
 </function>
@@ -18193,7 +18195,7 @@ Since: 3.0
 
 <function name="gtk_about_dialog_set_logo">
 <description>
-Sets the pixbuf to be displayed as logo in the about dialog.
+Sets the surface to be displayed as logo in the about dialog.
 If it is %NULL, the default window icon set with
 gtk_window_set_default_icon() will be used.
 
@@ -18206,7 +18208,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="logo">
-<parameter_description> a #GdkPixbuf, or %NULL
+<parameter_description> a #cairo_surface_t, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -18215,7 +18217,7 @@ Since: 2.6
 
 <function name="gtk_about_dialog_set_logo_icon_name">
 <description>
-Sets the pixbuf to be displayed as logo in the about dialog.
+Sets the surface to be displayed as logo in the about dialog.
 If it is %NULL, the default window icon set with
 gtk_window_set_default_icon() will be used.
 
@@ -18266,7 +18268,8 @@ of the language which is currently used in the user interface.
 Using gettext(), a simple way to achieve that is to mark the
 string for translation:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gtk_about_dialog_set_translator_credits (about,
+GtkWidget *about = gtk_about_dialog_new ();
+gtk_about_dialog_set_translator_credits (GTK_ABOUT_DIALOG (about),
 _(&quot;translator-credits&quot;));
 ]|
 It is a good idea to use the customary msgid “translator-credits” for this
@@ -18796,6 +18799,39 @@ be needed by applications.
 </return>
 </function>
 
+<function name="gtk_accel_label_get_label">
+<description>
+Returns the current label, set via gtk_accel_label_set_label()
+
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> @accel_label's label
+
+</return>
+</function>
+
+<function name="gtk_accel_label_get_use_underline">
+<description>
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> Whether the accel label interprets underscores in it's
+GtkAccelLabel:label property as mnemonic indicators.
+See gtk_accel_label_set_use_underline() and gtk_label_set_use_underline();
+</return>
+</function>
+
 <function name="gtk_accel_label_new">
 <description>
 Creates a new #GtkAccelLabel.
@@ -18895,6 +18931,44 @@ Sets the widget to be monitored by this accelerator label. Passing %NULL for
 </parameter>
 <parameter name="accel_widget">
 <parameter_description> the widget to be monitored, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accel_label_set_label">
+<description>
+Sets the label part of the accel label.
+
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+<parameter name="text">
+<parameter_description> The new label text
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accel_label_set_use_underline">
+<description>
+Controls whether to interpret underscores in the text label of @accel_label
+as mnemonic indicators. See also gtk_label_set_use_underline()
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+<parameter name="setting">
+<parameter_description> Whether to use underlines in the label or not
 </parameter_description>
 </parameter>
 </parameters>
@@ -19839,14 +19913,14 @@ Since: 3.4
 Sets the action-name and associated string target value of an
 actionable widget.
 
-This allows for the effect of both gtk_actionable_set_action_name()
-and gtk_actionable_set_action_target_value() in the common case that
-the target is string-valued.
+@detailed_action_name is a string in the format accepted by
+g_action_parse_detailed_name().
 
-@detailed_action_name is a string of the form
-`&quot;action::target&quot;` where `action`
-is the action name and `target` is the string to use
-as the target.
+(Note that prior to version 3.22.25,
+this function is only usable for actions with a simple &quot;s&quot; target, and
+@detailed_action_name must be of the form `&quot;action::target&quot;` where
+`action` is the action name and `target` is the string to use
+as the target.)
 
 Since: 3.4
 
@@ -22242,9 +22316,14 @@ be of the given type). There must be @n_args pairs in total.
 ## Adding a Key Binding
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gtk_binding_entry_add_signal (binding_set, keyval, modmask,
-&quot;move-cursor&quot;, 3,
-G_TYPE_ENUM, step,
+GtkBindingSet *binding_set;
+GdkModifierType modmask = GDK_CONTROL_MASK;
+int count = 1;
+gtk_binding_entry_add_signal (binding_set,
+GDK_KEY_space,
+modmask,
+&quot;move-cursor&quot;, 2,
+GTK_TYPE_MOVEMENT_STEP, GTK_MOVEMENT_PAGES,
 G_TYPE_INT, count,
 G_TYPE_BOOLEAN, FALSE);
 ]|
@@ -27169,53 +27248,6 @@ Since: 2.18
 </return>
 </function>
 
-<function name="gtk_cell_renderer_get_size">
-<description>
-Obtains the width and height needed to render the cell. Used by view 
-widgets to determine the appropriate size for the cell_area passed to
-gtk_cell_renderer_snapshot().  If @cell_area is not %NULL, fills in the
-x and y offsets (if set) of the cell relative to this location. 
-
-Please note that the values set in @width and @height, as well as those 
-in @x_offset and @y_offset are inclusive of the xpad and ypad properties.
-
-
-Deprecated: 3.0: Use gtk_cell_renderer_get_preferred_size() instead.
-
-</description>
-<parameters>
-<parameter name="cell">
-<parameter_description> a #GtkCellRenderer
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> the widget the renderer is rendering to
-</parameter_description>
-</parameter>
-<parameter name="cell_area">
-<parameter_description> The area a cell will be allocated, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="x_offset">
-<parameter_description> location to return x offset of cell relative to @cell_area, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="y_offset">
-<parameter_description> location to return y offset of cell relative to @cell_area, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> location to return width needed to render a cell, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> location to return height needed to render a cell, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_cell_renderer_get_state">
 <description>
 Translates the cell renderer state to #GtkStateFlags,
@@ -28964,6 +28996,28 @@ Since: 2.6
 <return></return>
 </function>
 
+<function name="gtk_clipboard_set_surface">
+<description>
+Sets the contents of the clipboard to the given cairo image surface.
+GTK+ will take responsibility for responding for requests for the
+image, and for converting the image into the requested format.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> a #GtkClipboard object
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> a cairo image surface
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_clipboard_set_text">
 <description>
 Sets the contents of the clipboard to the given UTF-8 string. GTK+ will
@@ -29184,6 +29238,32 @@ selection data failed. (This could happen for various
 reasons, in particular if the clipboard was empty or
 if the contents of the clipboard could not be
 converted into text form.)
+
+</return>
+</function>
+
+<function name="gtk_clipboard_wait_for_surface">
+<description>
+Requests the contents of the clipboard as image and converts
+the result to a cairo surface. This function waits for
+the data to be received using the main loop, so events,
+timeouts, etc, may be dispatched during the wait.
+
+Since: 2.6
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> a #GtkClipboard
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated cairo surface
+object which must be disposed with cairo_surface_destroy(), or
+%NULL if retrieving the selection data failed. (This could
+happen for various reasons, in particular if the clipboard
+was empty or if the contents of the clipboard could not be
+converted into an image.)
 
 </return>
 </function>
@@ -32926,6 +33006,28 @@ release it when it is no longer needed.
 <return></return>
 </function>
 
+<function name="gtk_drag_source_set_icon_surface">
+<description>
+Sets the icon that will be used for drags from a particular widget
+from a cairo surface. GTK+ retains a reference for @surface and will
+release it when it is no longer needed.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> the cairo surface for the drag icon
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_drag_source_set_target_list">
 <description>
 Changes the target types that this widget offers for drag-and-drop.
@@ -34487,7 +34589,7 @@ Since: 2.16
 <description>
 Retrieves the #GIcon used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-stock, pixbuf, or icon name).
+stock, surface, or icon name).
 
 Since: 2.16
 
@@ -34512,7 +34614,7 @@ or if the icon is not a #GIcon
 <description>
 Retrieves the icon name used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-pixbuf, stock or gicon).
+surface, stock or gicon).
 
 Since: 2.16
 
@@ -34529,33 +34631,6 @@ Since: 2.16
 </parameters>
 <return> An icon name, or %NULL if no icon is set or if the icon
 wasn’t set from an icon name
-
-</return>
-</function>
-
-<function name="gtk_entry_get_icon_pixbuf">
-<description>
-Retrieves the image used for the icon.
-
-Unlike the other methods of setting and getting icon data, this
-method will work regardless of whether the icon was set using a
-#GdkPixbuf, a #GIcon or an icon name.
-
-Since: 2.16
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> A #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="icon_pos">
-<parameter_description> Icon position
-</parameter_description>
-</parameter>
-</parameters>
-<return> A #GdkPixbuf, or %NULL if no icon is
-set for this position.
 
 </return>
 </function>
@@ -34602,6 +34677,33 @@ Since: 2.16
 </parameter>
 </parameters>
 <return> image representation being used
+
+</return>
+</function>
+
+<function name="gtk_entry_get_icon_surface">
+<description>
+Retrieves the image used for the icon.
+
+Unlike the other methods of setting and getting icon data, this
+method will work regardless of whether the icon was set using a
+#cairo_surface_t, a #GIcon or an icon name.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> A #GtkEntry
+</parameter_description>
+</parameter>
+<parameter name="icon_pos">
+<parameter_description> Icon position
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #cairo_surface_t, or %NULL if no icon is
+set for this position.
 
 </return>
 </function>
@@ -35422,13 +35524,13 @@ Since: 2.16
 <return></return>
 </function>
 
-<function name="gtk_entry_set_icon_from_pixbuf">
+<function name="gtk_entry_set_icon_from_surface">
 <description>
-Sets the icon shown in the specified position using a pixbuf.
+Sets the icon shown in the specified position using a image surface.
 
-If @pixbuf is %NULL, no icon will be shown in the specified position.
+If @surface is %NULL, no icon will be shown in the specified position.
 
-Since: 2.16
+Since: 3.94
 
 </description>
 <parameters>
@@ -35440,8 +35542,8 @@ Since: 2.16
 <parameter_description> Icon position
 </parameter_description>
 </parameter>
-<parameter name="pixbuf">
-<parameter_description> A #GdkPixbuf, or %NULL
+<parameter name="surface">
+<parameter_description> An image #cairo_surface, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -43284,6 +43386,28 @@ to the icon.
 </return>
 </function>
 
+<function name="gtk_icon_info_load_texture">
+<description>
+Returns a texture object that can be used to render the icon
+with GSK.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="icon_info">
+<parameter_description> a #GtkIconInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> the icon texture; this may be a newly
+created texture or a new reference to an exiting texture, so you must
+not modify the icon. Use g_object_unref() to release your
+reference.
+
+</return>
+</function>
+
 <function name="gtk_icon_info_new_for_pixbuf">
 <description>
 Creates a #GtkIconInfo for a #GdkPixbuf.
@@ -46007,27 +46131,6 @@ Since: 2.8
 <return></return>
 </function>
 
-<function name="gtk_image_get_animation">
-<description>
-Gets the #GdkPixbufAnimation being displayed by the #GtkImage.
-The storage type of the image must be %GTK_IMAGE_EMPTY or
-%GTK_IMAGE_ANIMATION (see gtk_image_get_storage_type()).
-The caller of this function does not own a reference to the
-returned animation.
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> the displayed animation, or %NULL if
-the image is empty
-</return>
-</function>
-
 <function name="gtk_image_get_gicon">
 <description>
 Gets the #GIcon and size being displayed by the #GtkImage.
@@ -46088,27 +46191,6 @@ icon name, or %NULL
 <return></return>
 </function>
 
-<function name="gtk_image_get_pixbuf">
-<description>
-Gets the #GdkPixbuf being displayed by the #GtkImage.
-The storage type of the image must be %GTK_IMAGE_EMPTY or
-%GTK_IMAGE_PIXBUF (see gtk_image_get_storage_type()).
-The caller of this function does not own a reference to the
-returned pixbuf.
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> the displayed pixbuf, or %NULL if
-the image is empty
-</return>
-</function>
-
 <function name="gtk_image_get_pixel_size">
 <description>
 Gets the pixel size used for named icons.
@@ -46145,6 +46227,28 @@ the return value will be %GTK_IMAGE_EMPTY.
 </return>
 </function>
 
+<function name="gtk_image_get_surface">
+<description>
+Gets the image #cairo_surface_t being displayed by the #GtkImage.
+The storage type of the image must be %GTK_IMAGE_EMPTY or
+%GTK_IMAGE_SURFACE (see gtk_image_get_storage_type()).
+The caller of this function does not own a reference to the
+returned surface.
+
+Since: 3.94.0
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the displayed surface, or %NULL if
+the image is empty
+</return>
+</function>
+
 <function name="gtk_image_new">
 <description>
 Creates a new empty #GtkImage widget.
@@ -46157,30 +46261,6 @@ Creates a new empty #GtkImage widget.
 </return>
 </function>
 
-<function name="gtk_image_new_from_animation">
-<description>
-Creates a #GtkImage displaying the given animation.
-The #GtkImage does not assume a reference to the
-animation; you still need to unref it if you own references.
-#GtkImage will add its own reference rather than adopting yours.
-
-Note that the animation frames are shown using a timeout with
-#G_PRIORITY_DEFAULT. When using animations to indicate busyness,
-keep in mind that the animation will only be shown if the main loop
-is not busy with something that has a higher priority.
-
-
-</description>
-<parameters>
-<parameter name="animation">
-<parameter_description> an animation
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkImage widget
-</return>
-</function>
-
 <function name="gtk_image_new_from_file">
 <description>
 Creates a new #GtkImage displaying the file @filename. If the file
@@ -46188,13 +46268,9 @@ isn’t found or can’t be loaded, the resulting #GtkImage will
 display a “broken image” icon. This function never returns %NULL,
 it always returns a valid #GtkImage widget.
 
-If the file contains an animation, the image will contain an
-animation.
-
 If you need to detect failures to load the file, use
 gdk_pixbuf_new_from_file() to load the file yourself, then create
-the #GtkImage from the pixbuf. (Or for animations, use
-gdk_pixbuf_animation_new_from_file()).
+the #GtkImage from the surface.
 
 The storage type (gtk_image_get_storage_type()) of the returned
 image is not defined, it will be whatever is appropriate for
@@ -46269,6 +46345,9 @@ The #GtkImage does not assume a reference to the
 pixbuf; you still need to unref it if you own references.
 #GtkImage will add its own reference rather than adopting yours.
 
+This is a helper for gtk_image_new_from_surface, and you can't
+get back the exact pixbuf once this is called, only a surface.
+
 Note that this function just creates an #GtkImage from the pixbuf. The
 #GtkImage created will not react to state changes. Should you want that, 
 you should use gtk_image_new_from_icon_name().
@@ -46292,13 +46371,9 @@ isn’t found or can’t be loaded, the resulting #GtkImage will
 display a “broken image” icon. This function never returns %NULL,
 it always returns a valid #GtkImage widget.
 
-If the file contains an animation, the image will contain an
-animation.
-
 If you need to detect failures to load the file, use
 gdk_pixbuf_new_from_file() to load the file yourself, then create
-the #GtkImage from the pixbuf. (Or for animations, use
-gdk_pixbuf_animation_new_from_file()).
+the #GtkImage from the pixbuf.
 
 The storage type (gtk_image_get_storage_type()) of the returned
 image is not defined, it will be whatever is appropriate for
@@ -46337,25 +46412,6 @@ Since: 3.10
 <return> a new #GtkImage
 
 </return>
-</function>
-
-<function name="gtk_image_set_from_animation">
-<description>
-Causes the #GtkImage to display the given animation (or display
-nothing, if you set the animation to %NULL).
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-<parameter name="animation">
-<parameter_description> the #GdkPixbufAnimation
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_image_set_from_file">
@@ -46427,6 +46483,10 @@ Since: 2.6
 <function name="gtk_image_set_from_pixbuf">
 <description>
 See gtk_image_new_from_pixbuf() for details.
+
+Note: This is a helper for gtk_image_new_from_surface, and you can't
+get back the exact pixbuf once this is called, only a surface.
+
 
 </description>
 <parameters>
@@ -47700,6 +47760,8 @@ If the @str is external data, you may need to escape it with
 g_markup_escape_text() or g_markup_printf_escaped():
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
+GtkWidget *label = gtk_label_new (NULL);
+const char *str = &quot;...&quot;;
 const char *format = &quot;&lt;span style=\&quot;italic\&quot;&gt;\%s&lt;/span&gt;&quot;;
 char *markup;
 
@@ -63741,29 +63803,6 @@ Use g_strfreev() to free it.
 </return>
 </function>
 
-<function name="gtk_recent_info_get_icon">
-<description>
-Retrieves the icon of size @size associated to the resource MIME type.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="info">
-<parameter_description> a #GtkRecentInfo
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> the size of the icon in pixels
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkPixbuf containing the icon,
-or %NULL. Use g_object_unref() when finished using the icon.
-
-</return>
-</function>
-
 <function name="gtk_recent_info_get_mime_type">
 <description>
 Gets the MIME type of the resource.
@@ -67185,6 +67224,28 @@ Since: 2.16
 </return>
 </function>
 
+<function name="gtk_selection_data_get_surface">
+<description>
+Gets the contents of the selection data as a cairo surface.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="selection_data">
+<parameter_description> a #GtkSelectionData
+</parameter_description>
+</parameter>
+</parameters>
+<return> if the selection data
+contained a recognized image type and it could be converted to a
+cairo surface, a newly allocated surface is returned, otherwise
+%NULL.  If the result is non-%NULL it must be freed with
+g_object_unref().
+
+</return>
+</function>
+
 <function name="gtk_selection_data_get_target">
 <description>
 Retrieves the target of the selection.
@@ -67322,6 +67383,31 @@ Since: 2.6
 </parameter>
 <parameter name="pixbuf">
 <parameter_description> a #GdkPixbuf
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the selection was successfully set,
+otherwise %FALSE.
+
+</return>
+</function>
+
+<function name="gtk_selection_data_set_surface">
+<description>
+Sets the contents of the selection from a cairo image surface.
+The surface is converted to the form determined by
+@selection_data-&gt;target.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="selection_data">
+<parameter_description> a #GtkSelectionData
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> a cairo image surface
 </parameter_description>
 </parameter>
 </parameters>
@@ -68457,7 +68543,7 @@ Since: 3.90
 
 <function name="gtk_snapshot_render_insertion_cursor">
 <description>
-Draws a text caret on @cr at the specified index of @layout.
+Draws a text caret using @snapshot at the specified index of @layout.
 
 Since: 3.90
 
@@ -69942,13 +70028,13 @@ functions will make use of this new class for styling.
 In the CSS file format, a #GtkEntry defining a “search”
 class, would be matched by:
 
-|[
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
 entry.search { ... }
 ]|
 
 While any widget defining a “search” class would be
 matched by:
-|[
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
 .search { ... }
 ]|
 
@@ -88543,9 +88629,6 @@ guaranteed to be completely contained within the
 gtk_widget_size_allocate() allocation, however. So a #GtkContainer
 is guaranteed that its children stay inside the assigned bounds,
 but not that they have exactly the bounds the container assigned.
-There is no way to get the original allocation assigned by
-gtk_widget_size_allocate(), since it isn’t stored; if a container
-implementation needs that information it will have to track it itself.
 
 Since: 2.18
 
@@ -92694,7 +92777,7 @@ position and (optionally) baseline to their child widgets.
 
 In this function, the allocation and baseline may be adjusted. The given
 allocation will be forced to be bigger than the widget's minimum size,
-as well as at least 1×1 in size.
+as well as at least 0×0 in size.
 
 Since: 3.10
 
@@ -93268,7 +93351,7 @@ such as a title bar via gtk_window_set_decorated().
 <description>
 Gets the value set by gtk_window_set_default_icon_list().
 The list is a copy and should be freed with g_list_free(),
-but the pixbufs in the list have not had their reference count
+but the surfaces in the list have not had their reference count
 incremented.
 
 
@@ -93711,7 +93794,9 @@ implemented as an asynchronous operation, GTK+ cannot guarantee in any
 way that this code:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
-// width and height are set elsewhere
+GtkWindow *window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
+int width = 500;
+int height = 300;
 gtk_window_resize (window, width, height);
 
 int new_width, new_height;
@@ -93739,13 +93824,16 @@ inside a handler for the #GtkWidget::configure-event signal:
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 static void
-on_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
+on_size_allocate (GtkWidget *widget,
+const GtkAllocation *allocation,
+int baseline,
+GtkAllocation *out_clip)
 {
 int new_width, new_height;
 
 gtk_window_get_size (GTK_WINDOW (widget), &amp;new_width, &amp;new_height);
 
-...
+// ...
 }
 ]|
 
@@ -94624,7 +94712,7 @@ to unset the default widget for the toplevel
 <function name="gtk_window_set_default_icon">
 <description>
 Sets an icon to be used as fallback for windows that haven't
-had gtk_window_set_icon() called on them from a pixbuf.
+had gtk_window_set_icon() called on them from a surface.
 
 Since: 2.4
 
@@ -94675,7 +94763,7 @@ See gtk_window_set_icon_list() for more details.
 </description>
 <parameters>
 <parameter name="list">
-<parameter_description> a list of #GdkPixbuf
+<parameter_description> a list of #cairo_surface_t image surfaces
 </parameter_description>
 </parameter>
 </parameters>
@@ -94955,7 +95043,7 @@ Sets the icon for @window.
 Warns on failure if @err is %NULL.
 
 This function is equivalent to calling gtk_window_set_icon()
-with a pixbuf created by loading the image from @filename.
+with a surface created by loading the image from @filename.
 
 Since: 2.2
 
@@ -95014,7 +95102,7 @@ set the icon on transient windows.
 </parameter_description>
 </parameter>
 <parameter name="list">
-<parameter_description> list of #GdkPixbuf
+<parameter_description> list of image surfaces
 </parameter_description>
 </parameter>
 </parameters>
