@@ -244,17 +244,17 @@ void Example_Images::on_loader_area_prepared()
 
 void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, int/*height*/)
 {
-  /* We know the pixbuf inside the Gtk::Image has changed, but the image
-   * itself doesn't know this; so give it a hint by setting the pixbuf
+  /* We know the cairo surface inside the Gtk::Image has changed, but the image
+   * itself doesn't know this; so give it a hint by setting the surface
    * again. Queuing a redraw used to be sufficient, but nowadays Gtk::Image
-   * uses GtkIconHelper which caches the pixbuf state and will just redraw
+   * uses GtkIconHelper which caches the surface state and will just redraw
    * from the cache.
    * If we wanted to be really efficient, we could use a drawing area or
    * something instead of a Gtk::Image, so we could control the exact
-   * position of the pixbuf on the display, then we could queue a draw
+   * position of the surface on the display, then we could queue a draw
    * for only the updated area of the image.
    */
-  auto refPixbuf = m_Image_Progressive.get_pixbuf();
-  m_Image_Progressive.set(refPixbuf);
+  auto refSurface = m_Image_Progressive.get_surface();
+  m_Image_Progressive.set(refSurface);
 }
 

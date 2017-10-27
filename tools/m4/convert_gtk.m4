@@ -510,6 +510,9 @@ _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Context>&',`cairo_t*',`($3)->cobj()
 _CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Context>&',`cairo_t*',`const_cast<cairo_t*>(($3)->cobj())')
 _CONVERSION(`const ::Cairo::FontOptions&',`const cairo_font_options_t*',`($3).cobj()')
 
+_CONVERSION(`const Cairo::RefPtr<Cairo::Surface>&',`cairo_surface_t*',`(($3) ? ($3)->cobj() : nullptr)')
+_CONVERSION(`cairo_surface_t*',`Cairo::RefPtr<Cairo::Surface>',`Gdk::Cairo::wrap($3)')
+_CONVERSION(`cairo_surface_t*',`Cairo::RefPtr<const Cairo::Surface>',`Gdk::Cairo::wrap($3)')
 
 #Printer
 _CONVERSION(`GtkPrinter*',`Glib::RefPtr<Printer>',`Glib::wrap($3)')

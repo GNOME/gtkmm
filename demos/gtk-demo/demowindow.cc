@@ -392,7 +392,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
     Gtk::Widget* widget = nullptr;
     auto image = new Gtk::Image();
     image->set_from_resource(resource_name);
-    if (image->get_pixbuf() || image->get_animation())
+    if (image->get_surface())
     {
       widget = image;
     }
