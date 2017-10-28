@@ -15,6 +15,7 @@
  */
 
 #include <gtk/gtk.h>
+#include <gdkmm/cairoutils.h>
 
 /* Why reinterpret_cast<Snapshot*>(gobject) is needed:
  *
@@ -49,7 +50,7 @@ void Snapshot::push_cross_fade(double progress, const Glib::ustring& name)
     gtk_snapshot_push_cross_fade(gobj(), progress, "%s", name.c_str());
 }
 
-::Cairo::RefPtr< ::Cairo::Context> Snapshot::append_cairo(
+Cairo::RefPtr<Cairo::Context> Snapshot::append_cairo(
   const graphene_rect_t* bounds, const Glib::ustring& name)
 {
   cairo_t* cr = nullptr;
@@ -58,11 +59,10 @@ void Snapshot::push_cross_fade(double progress, const Glib::ustring& name)
   else
     cr = gtk_snapshot_append_cairo(gobj(), bounds, "%s", name.c_str());
 
-  return ::Cairo::make_refptr_for_instance< ::Cairo::Context>(
-    new ::Cairo::Context(cr, true /* has_reference */));
+  return Gdk::Cairo::wrap(cr, true /* has_reference */);
 }
 
-::Cairo::RefPtr< ::Cairo::Context> Snapshot::append_cairo(
+Cairo::RefPtr<Cairo::Context> Snapshot::append_cairo(
   const Gdk::Rectangle& bounds, const Glib::ustring& name)
 {
   graphene_rect_t rect;

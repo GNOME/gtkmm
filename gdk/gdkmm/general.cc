@@ -15,6 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gdkmm/cairoutils.h>
 #include <gdkmm/general.h>
 #include <gdk/gdk.h>
 
@@ -63,14 +64,14 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context)
 
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface)
 {
-  return ::Cairo::make_refptr_for_instance(new ::Cairo::Region(gdk_cairo_region_create_from_surface(surface->cobj()), true));
+  return Gdk::Cairo::wrap(gdk_cairo_region_create_from_surface(surface->cobj()), true);
 }
 
 ::Cairo::RefPtr< ::Cairo::Surface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
   int scale, const Glib::RefPtr<Gdk::Window>& for_window)
 {
-  return ::Cairo::make_refptr_for_instance(new ::Cairo::Surface(gdk_cairo_surface_create_from_pixbuf(
-    pixbuf->gobj(), scale, for_window ? for_window->gobj() : nullptr), true));
+  return Gdk::Cairo::wrap(gdk_cairo_surface_create_from_pixbuf(
+    pixbuf->gobj(), scale, for_window ? for_window->gobj() : nullptr), true);
 }
 
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
