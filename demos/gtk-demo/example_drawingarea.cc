@@ -27,11 +27,13 @@ protected:
   void on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
   //signal handlers:
-  bool on_drawingarea_scribble_configure_event(Gdk::EventConfigure& event);
+  void on_drawingarea_scribble_size_allocate(const Gtk::Allocation& allocation,
+    int baseline, Gtk::Allocation& out_clip);
   bool on_drawingarea_scribble_motion_notify_event(Gdk::EventMotion& event);
   bool on_drawingarea_scribble_button_press_event(Gdk::EventButton& event);
 
-  void scribble_draw_brush(int x, int y);
+  void scribble_create_surface();
+  void scribble_draw_brush(double x, double y);
 
   //Member widgets:
   Gtk::Frame m_Frame_Checkerboard, m_Frame_Scribble;
@@ -39,7 +41,7 @@ protected:
   Gtk::Label m_Label_Checkerboard, m_Label_Scribble;
   Gtk::DrawingArea m_DrawingArea_Checkerboard, m_DrawingArea_Scribble;
 
-  Cairo::RefPtr<Cairo::Surface> m_surface;
+  Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 };
 
 //Called by DemoWindow;
@@ -91,9 +93,8 @@ Example_DrawingArea::Example_DrawingArea()
   m_DrawingArea_Scribble.set_draw_func(
       sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_draw));
 
-  /* Signal used to handle backing surface */
-  m_DrawingArea_Scribble.signal_configure_event().connect(
-      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_configure_event), false);
+  m_DrawingArea_Scribble.signal_size_allocate().connect(
+      sigc::mem_fun(*this, &Example_DrawingArea::on_drawingarea_scribble_size_allocate));
 
   /* Event signals */
   m_DrawingArea_Scribble.signal_motion_notify_event().connect(
@@ -151,55 +152,39 @@ void Example_DrawingArea::on_drawingarea_checkerboard_draw(const Cairo::RefPtr<C
 void Example_DrawingArea::on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr,
   int, int)
 {
-  if (!m_surface)
-    return; // paranoia check, in case we haven't gotten a configure event
-
   cr->set_source(m_surface, 0, 0);
   cr->paint();
 }
 
-bool Example_DrawingArea::on_drawingarea_scribble_configure_event(Gdk::EventConfigure&)
+// Create a new surface of the appropriate size to store our scribbles.
+void Example_DrawingArea::scribble_create_surface()
 {
   const auto allocation = m_DrawingArea_Scribble.get_allocation();
-  m_surface =
-    m_DrawingArea_Scribble.get_window()->create_similar_surface(
-      Cairo::CONTENT_COLOR, allocation.get_width(), allocation.get_height());
-  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+  m_surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,
+    allocation.get_width(), allocation.get_height());
+
+  // Initialize the surface to white.
+  auto cr = Cairo::Context::create(m_surface);
   cr->set_source_rgb(1, 1, 1);
   cr->paint();
+}
 
-  /* We've handled the configure event, no need for further processing. */
-  return true;
+void Example_DrawingArea::on_drawingarea_scribble_size_allocate(
+  const Gtk::Allocation& /* allocation */, int /* baseline */,
+  Gtk::Allocation& /* out_clip */)
+{
+  scribble_create_surface();
 }
 
 bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(Gdk::EventMotion& motion_event)
 {
-  if(!m_surface)
-    return false; // paranoia check, in case we haven't gotten a configure event
-
-  /* This call is very important; it requests the next motion event.  If you
-   * don't call Gdk::Window::get_device_position() you'll only get a single motion
-   * event.  The reason is that we specified Gdk::POINTER_MOTION_HINT_MASK to
-   * Gtk::Widget::add_events().  If we hadn't specified that, we could just use
-   * motion_event.get_x(), motion_event.get_y() as the pointer location. But we'd also get deluged in
-   * events.  By requesting the next event as we handle the current one, we
-   * avoid getting a huge number of events faster than we can cope.
-   */
-  if(motion_event && motion_event.get_window())
+  if ((motion_event.get_state() & Gdk::ModifierType::BUTTON1_MASK) == Gdk::ModifierType::BUTTON1_MASK)
   {
-    const auto refWindow = motion_event.get_window();
-
-    if(refWindow)
-    {
-      int x = 0, y = 0;
-      auto state = Gdk::ModifierType(0);
-      const auto device = motion_event.get_device();
-      refWindow->get_device_position(device, x, y, state);
-
-      if((state & Gdk::ModifierType::BUTTON1_MASK) != Gdk::ModifierType::BUTTON1_MASK)
-        scribble_draw_brush(x, y);
-    }
-  }
+    double x = 0.0;
+    double y = 0.0;
+    motion_event.get_coords(x, y);
+    scribble_draw_brush(x, y);
+   }
 
   // We've handled it, stop processing.
   return true;
@@ -207,31 +192,33 @@ bool Example_DrawingArea::on_drawingarea_scribble_motion_notify_event(Gdk::Event
 
 bool Example_DrawingArea::on_drawingarea_scribble_button_press_event(Gdk::EventButton& button_event)
 {
-  if(!m_surface)
-    return false; // paranoia check, in case we haven't gotten a configure event
-
-  if(button_event.get_button() == 1)
+  if (button_event.get_button() == GDK_BUTTON_PRIMARY)
   {
     double x = 0.0;
     double y = 0.0;
     button_event.get_coords(x, y);
-    scribble_draw_brush(int(x), int(y));
+    scribble_draw_brush(x, y);
    }
 
   // We've handled the event, stop processing.
   return true;
 }
 
-/* Draw a rectangle on the screen.
- */
-void Example_DrawingArea::scribble_draw_brush(int x, int y)
+// Draw a rectangle on the screen.
+void Example_DrawingArea::scribble_draw_brush(double x, double y)
 {
-  const Gdk::Rectangle update_rect (x - 3, y - 3, 6, 6);
+  if (!m_surface ||
+       m_surface->get_width() != m_DrawingArea_Scribble.get_allocated_width() ||
+       m_surface->get_height() != m_DrawingArea_Scribble.get_allocated_height())
+    scribble_create_surface();
 
-  Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+  const Gdk::Rectangle update_rect((int)x - 3, (int)y - 3, 6, 6);
+
+  // Paint to the surface, where we store our state.
+  auto cr = Cairo::Context::create(m_surface);
   Gdk::Cairo::add_rectangle_to_path(cr, update_rect);
   cr->fill();
 
-  // Now invalidate the affected region of the drawing area.
-  m_DrawingArea_Scribble.get_window()->invalidate_rect(update_rect, false);
+  m_DrawingArea_Scribble.queue_draw_area(update_rect.get_x(), update_rect.get_y(),
+    update_rect.get_width(), update_rect.get_height());
 }
