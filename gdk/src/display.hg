@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include <gdkmm/screen.h>
 #include <gdkmm/applaunchcontext.h>
 #include <gdkmm/types.h> //For ModifierType
 #include <gdkmm/event.h>
@@ -39,11 +38,11 @@ class Window;
 
  /** Gdk::Display object's purpose is two fold:
  *   To grab/ungrab keyboard focus and mouse pointer
- *   To manage and provide information about the Gdk::Screen(s) available for this Gdk::Display
+ *   To manage and provide information about the Gdk::Monitor(s) available for this Gdk::Display
  *
  * Gdk::Display objects are the GDK representation of the X Display which can be described as a workstation consisting
  * of a keyboard a pointing device (such as a mouse) and one or more screens. It is used to open and keep track of
- * various Gdk::Screen objects currently instantiated by the application. It is also used to grab and release the keyboard
+ * various Gdk::Monitor objects currently instantiated by the application. It is also used to grab and release the keyboard
  * and the mouse pointer.
  */
 class Display : public Glib::Object
@@ -56,9 +55,6 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<Display> open(const Glib::ustring& display_name), gdk_display_open, refreturn)
 
   _WRAP_METHOD(Glib::ustring get_name() const, gdk_display_get_name)
-
-  _WRAP_METHOD(Glib::RefPtr<Screen> get_default_screen(), gdk_display_get_default_screen, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Screen> get_default_screen() const, gdk_display_get_default_screen, refreturn, constversion)
 
   _WRAP_METHOD(bool device_is_grabbed(const Glib::RefPtr<const Gdk::Device>& device) const, gdk_display_device_is_grabbed)
   _WRAP_METHOD(void beep(), gdk_display_beep)
@@ -156,6 +152,10 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Monitor> get_monitor_at_window(const Glib::RefPtr<Window>& window), gdk_display_get_monitor_at_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Monitor> get_monitor_at_window(const Glib::RefPtr<Window>& window) const, gdk_display_get_monitor_at_window, refreturn, constversion)
 
+  template <class ValueType>
+  bool get_setting(const Glib::ustring& name, ValueType& value) const;
+  _IGNORE(gdk_display_get_setting)
+
   //We use no_default_handler because GdkDisplayClass is private.
 
   _WRAP_SIGNAL(void closed(bool is_error), closed, no_default_handler)
@@ -174,5 +174,18 @@ public:
 
   // We don't wrap the vfuncs because GdkDisplayClass is private.
 };
+
+template <class ValueType>
+bool Display::get_setting(const Glib::ustring& name, ValueType& value) const
+{
+  Glib::Value<ValueType> glibmmvalue;
+  glibmmvalue.init(Glib::Value<ValueType>::value_type());
+
+  gboolean result = gdk_display_get_setting(const_cast<GdkDisplay*>(gobj()), name.c_str(), glibmmvalue.gobj());
+
+  value = glibmmvalue.get();
+  return result;
+}
+
 
 } // namespace Gdk

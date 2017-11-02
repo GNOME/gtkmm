@@ -32,7 +32,7 @@
 class Popup : public Gtk::Window
 {
 public:
-  Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
+  Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt);
   ~Popup() override;
 
 protected:
@@ -52,7 +52,7 @@ protected:
   virtual void initialize_displays();
   virtual void query_change_display();
   virtual Gtk::Widget* find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& display);
-  virtual Gtk::Window* query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt);
+  virtual Gtk::Window* query_for_toplevel(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt);
 
   //signal handlers:
   virtual void on_button_display_open();
@@ -263,15 +263,15 @@ void Example_ChangeDisplay::on_treeview_display_selection_changed()
  */
 void Example_ChangeDisplay::query_change_display()
 {
-  auto refScreen = get_screen();
-  auto pTopLevel = query_for_toplevel(refScreen,
+  auto refDisplay = get_display();
+  auto pTopLevel = query_for_toplevel(refDisplay,
    "Please select the toplevel\n"
-   "to move to the new screen");
+   "to move to the new display");
 
   if (pTopLevel)
-    pTopLevel->set_screen( m_refCurrentDisplay->get_default_screen() );
+    pTopLevel->set_display(m_refCurrentDisplay);
   else
-    refScreen->get_display()->beep();
+    refDisplay->beep();
 }
 
 
@@ -289,21 +289,19 @@ void Example_ChangeDisplay::on_response(int response_id)
  * the mouse. When the mouse is released, returns the toplevel
  * window under the pointer, or NULL, if there is none.
  */
-Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
+Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
 {
-  auto refDisplay = screen->get_display();
-
   if(m_pPopup)
   {
     delete m_pPopup;
     m_pPopup = nullptr;
   }
 
-  m_pPopup = new Popup(screen, prompt);
+  m_pPopup = new Popup(display, prompt);
 
   m_pPopup->show();
 
-  auto cursor = Gdk::Cursor::create(refDisplay, Gdk::Cursor::Type::CROSSHAIR);
+  auto cursor = Gdk::Cursor::create(display, "crosshair");
 
   Gtk::Window* toplevel = nullptr;
 
@@ -323,7 +321,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
     while (!m_popup_clicked)
       Gtk::Main::iteration(true);
 
-    toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(screen->get_display()));
+    toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(display));
     if (toplevel == m_pPopup)
        toplevel = nullptr;
   }
@@ -366,11 +364,11 @@ bool Example_ChangeDisplay::on_popup_button_release_event(Gdk::EventButton& /* e
   return true;
 }
 
-Popup::Popup(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
+Popup::Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
 : Gtk::Window(Gtk::WindowType::POPUP),
   m_Label(prompt)
 {
-  set_screen(screen);
+  set_display(display);
   set_modal(true);
   set_position(Gtk::WindowPosition::CENTER);
 

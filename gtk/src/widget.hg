@@ -34,7 +34,6 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gdkmm/window.h>
 #include <gdkmm/dragcontext.h>
 #include <gdkmm/pixbuf.h>
-#include <gdkmm/screen.h>
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
 #include <gtkmm/targetlist.h>
@@ -294,11 +293,6 @@ public:
   _WRAP_METHOD(Widget* get_ancestor(GType widget_type), gtk_widget_get_ancestor)
   _WRAP_METHOD(const Widget* get_ancestor(GType widget_type) const, gtk_widget_get_ancestor, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Screen> get_screen(), gtk_widget_get_screen, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Screen> get_screen() const, gtk_widget_get_screen, refreturn, constversion)
-
-  _WRAP_METHOD(bool has_screen() const, gtk_widget_has_screen)
-
   _WRAP_METHOD(int get_scale_factor() const, gtk_widget_get_scale_factor)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Display> get_display(), gtk_widget_get_display, refreturn)
@@ -534,17 +528,7 @@ public:
 #m4 _CONVERSION(`GdkRectangle*',`Allocation&',`Glib::wrap($3)')
   _WRAP_SIGNAL(void size_allocate(const Allocation& allocation, int baseline, Allocation& out_clip), "size_allocate")
 
-// Changed signals -- inform widget of internal changes.
-// We rename parent_set => parent_changed
-//  and      style_set  => style_changed
-//  to avoid confusion with set_parent and set_style.
-
   _WRAP_SIGNAL(void state_flags_changed(Gtk::StateFlags previous_state_flags), "state-flags-changed")
-
-  /// Informs objects that their parent changed.
-  //- The widget passed is the former parent, which may be 0 if
-  //- there was no parent. (was parent_set in GTK+)
-  _WRAP_SIGNAL(void parent_changed(Widget* previous_parent), "parent_set")
 
   _WRAP_SIGNAL(void hierarchy_changed(Widget* previous_toplevel), "hierarchy_changed")
 
@@ -663,8 +647,8 @@ dnl
   _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_drop")
   _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint info, guint time), "drag_data_received")
 
-_CONVERSION(`GdkScreen*',`const Glib::RefPtr<Gdk::Screen>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(void screen_changed(const Glib::RefPtr<Gdk::Screen>& previous_screen), "screen_changed")
+_CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Gdk::Display>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void display_changed(const Glib::RefPtr<Gdk::Display>& previous_display), "display_changed")
 
 //TODO: The signal_id is very C-like here:
   //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
@@ -785,17 +769,6 @@ dnl
     klass->hierarchy_changed = &hierarchy_changed_callback_custom;
   _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
     static void hierarchy_changed_callback_custom(GtkWidget* self, GtkWidget* p0);
-  _POP()
-#m4end
-
-#m4begin
-dnl// Hook in custom parent_set callback.
-dnl// It will use the generated callback.
-dnl
-  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-    klass->parent_set = &parent_set_callback_custom;
-  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-    static void parent_set_callback_custom(GtkWidget* self, GtkWidget* p0);
   _POP()
 #m4end
 

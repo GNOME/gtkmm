@@ -22,7 +22,6 @@
 #define _GDKMM_GDKMM_H_
 
 #include <gdkmm/types.h>
-#include <gdkmm/visual.h>
 #include <gdkmm/window.h>
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/pixbufanimation.h>
@@ -37,7 +36,6 @@
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/devicemanager.h>
-#include <gdkmm/screen.h>
 #include <gdkmm/seat.h>
 #include <gdkmm/monitor.h>
 #include <gdkmm/general.h>
