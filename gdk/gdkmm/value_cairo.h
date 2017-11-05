@@ -53,10 +53,14 @@ GType get_base_type<::Cairo::Surface>();
 
 namespace Glib
 {
-/** Partial specialization of Glib::Value<> for Cairo::RefPtr<> to a Cairomm object.
+/** Specialization of Glib::Value<> for Cairo::RefPtr<Cairo::Region>
+ * and Cairo::RefPtr<Cairo::Surface>.
  */
-template <typename T, typename Enable>
-class Value<::Cairo::RefPtr<T>, Enable> : public ValueBase_Boxed
+template <typename T>
+class Value<::Cairo::RefPtr<T>, typename std::enable_if<
+  std::is_base_of<::Cairo::Region, T>::value ||
+  std::is_base_of<::Cairo::Surface, T>::value>::type>
+: public ValueBase_Boxed
 {
 public:
   using CppType = ::Cairo::RefPtr<T>;
