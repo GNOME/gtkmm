@@ -301,7 +301,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::D
 
   m_pPopup->show();
 
-  auto cursor = Gdk::Cursor::create(display, "crosshair");
+  auto cursor = Gdk::Cursor::create("crosshair");
 
   Gtk::Window* toplevel = nullptr;
 

@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gdkmm/display.h>
 #include <gdkmm/pixbuf.h>
+#include <gdkmm/texture.h>
 
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -34,31 +34,32 @@ class Cursor : public Glib::Object
 
 protected:
 
-  explicit Cursor(const Glib::RefPtr<Display>& display, const Glib::ustring& name);
-  _IGNORE(gdk_cursor_new_from_name)
-
 public:
-  _WRAP_ENUM(Type, GdkCursorType)
-
   //We use _WRAP_METHOD() instead of _WRAP_CREATE() and constructors,
   //because the gdk_cursor_new_*() functions actually return existing instances sometimes,
   //but constructors assume that they own the instance.
   //And we would have to have to use the gdk_cursor_new_*() functions in the constructors anyway,
   //because they do more than just call g_object_new().
-  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const Glib::RefPtr<Pixbuf>& pixbuf, int x, int y), gdk_cursor_new_from_pixbuf)
+  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Pixbuf>& pixbuf, int x, int y, const Glib::RefPtr<Cursor>& fallback = {}), gdk_cursor_new_from_pixbuf)
+  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<const Texture>& texture, int hotspot_x, int hotspot_y, const Glib::RefPtr<Cursor>& fallback = {}), gdk_cursor_new_from_texture)
+  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::ustring& name, const Glib::RefPtr<Cursor>& fallback = {}), gdk_cursor_new_from_name)
 
-  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const ::Cairo::RefPtr< ::Cairo::Surface>& surface, double x, double y), gdk_cursor_new_from_surface)
+  _WRAP_METHOD(Glib::RefPtr<Cursor> get_fallback(), gdk_cursor_get_fallback, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Cursor> get_fallback() const, gdk_cursor_get_fallback, refreturn, constversion)
 
-  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const Glib::ustring& name), gdk_cursor_new_from_name)
+  _WRAP_METHOD(Glib::ustring get_name() const, gdk_cursor_get_name)
 
-  _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_cursor_get_display, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_cursor_get_display, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Texture> get_texture(), gdk_cursor_get_texture, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Texture> get_texture() const, gdk_cursor_get_texture, refreturn, constversion)
 
-  // gdk_cursor_get_image() returns a pointer to a newly created GdkPixbuf, or NULL.
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_image() const, gdk_cursor_get_image)
+  _WRAP_METHOD(int get_hotspot_x() const, gdk_cursor_get_hotspot_x)
+  _WRAP_METHOD(int get_hotspot_y() const, gdk_cursor_get_hotspot_y)
 
-  // gdk_cursor_get_surface() returns a pointer to a newly created cairo_surface_t, or NULL.
-  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Surface> get_surface(double& x_hot, double& y_hot) const, gdk_cursor_get_surface)
+  _WRAP_PROPERTY("fallback", Glib::RefPtr<Cursor>)
+  _WRAP_PROPERTY("hotspot-x", int)
+  _WRAP_PROPERTY("hotspot-y", int)
+  _WRAP_PROPERTY("name", Glib::ustring)
+  _WRAP_PROPERTY("texture", Glib::RefPtr<Texture>)
 };
 
 } //namespace Gdk
