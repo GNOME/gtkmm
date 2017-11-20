@@ -3603,6 +3603,24 @@ This signal has no default bindings.
 <return></return>
 </signal>
 
+<signal name="GtkEntry::insert-emoji">
+<description>
+The ::insert-emoji signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to present the Emoji chooser for the entry.
+
+The default bindings for this signal are Ctrl-. and Ctrl-;
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkEntry::move-cursor">
 <description>
 The ::move-cursor signal is a
@@ -6314,36 +6332,23 @@ text direction. Since 3.14.
 
 <enum name="GtkIconSize">
 <description>
-Built-in stock icon sizes.
+Built-in icon sizes.
+
+Icon sizes default to being inherited. Where they cannot be
+inherited, text size is the default.
 
 </description>
 <parameters>
-<parameter name="GTK_ICON_SIZE_INVALID">
-<parameter_description> Invalid size.
+<parameter name="GTK_ICON_SIZE_INHERIT">
+<parameter_description> Keep the size of the parent element
 </parameter_description>
 </parameter>
-<parameter name="GTK_ICON_SIZE_MENU">
-<parameter_description> Size appropriate for menus (16px).
+<parameter name="GTK_ICON_SIZE_NORMAL">
+<parameter_description> Size similar to text size
 </parameter_description>
 </parameter>
-<parameter name="GTK_ICON_SIZE_SMALL_TOOLBAR">
-<parameter_description> Size appropriate for small toolbars (16px).
-</parameter_description>
-</parameter>
-<parameter name="GTK_ICON_SIZE_LARGE_TOOLBAR">
-<parameter_description> Size appropriate for large toolbars (24px)
-</parameter_description>
-</parameter>
-<parameter name="GTK_ICON_SIZE_BUTTON">
-<parameter_description> Size appropriate for buttons (16px)
-</parameter_description>
-</parameter>
-<parameter name="GTK_ICON_SIZE_DND">
-<parameter_description> Size appropriate for drag and drop (32px)
-</parameter_description>
-</parameter>
-<parameter name="GTK_ICON_SIZE_DIALOG">
-<parameter_description> Size appropriate for dialogs (48px)
+<parameter name="GTK_ICON_SIZE_LARGE">
+<parameter_description> Large size, for example in an icon view
 </parameter_description>
 </parameter>
 </parameters>
@@ -13765,36 +13770,6 @@ what case it is in.
 </parameters>
 </enum>
 
-<signal name="GtkTextTag::event">
-<description>
-The ::event signal is emitted when an event occurs on a region of the
-buffer marked with this tag.
-
-
-</description>
-<parameters>
-<parameter name="tag">
-<parameter_description> the #GtkTextTag on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="object">
-<parameter_description> the object the event was fired from (typically a #GtkTextView)
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> the event which triggered the signal
-</parameter_description>
-</parameter>
-<parameter name="iter">
-<parameter_description> a #GtkTextIter pointing at the location the event occurred
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE to stop other handlers from being invoked for the
-event. %FALSE to propagate the event further.
-</return>
-</signal>
-
 <property name="GtkTextTag:accumulative-margin">
 <description>
 Whether the margins accumulate or override each other.
@@ -14699,29 +14674,6 @@ Since: 2.20
 </description>
 </property>
 
-<property name="GtkToolPalette:icon-size">
-<description>
-The size of the icons in a tool palette. When this property is set,
-it overrides the default setting.
-
-This should only be used for special-purpose tool palettes, normal
-application tool palettes should respect the user preferences for the
-size of icons.
-
-Since: 2.20
-
-</description>
-</property>
-
-<property name="GtkToolPalette:icon-size-set">
-<description>
-Is %TRUE if the #GtkToolPalette:icon-size property has been set.
-
-Since: 2.20
-
-</description>
-</property>
-
 <property name="GtkToolPalette:toolbar-style">
 <description>
 The style of items in the tool palette.
@@ -14839,30 +14791,6 @@ Emitted when the style of the toolbar changes.
 </parameters>
 <return></return>
 </signal>
-
-<property name="GtkToolbar:icon-size">
-<description>
-The size of the icons in a toolbar is normally determined by
-the toolbar-icon-size setting. When this property is set, it 
-overrides the setting. 
-
-This should only be used for special-purpose toolbars, normal
-application toolbars should respect the user preferences for the
-size of icons.
-
-Since: 2.10
-
-</description>
-</property>
-
-<property name="GtkToolbar:icon-size-set">
-<description>
-Is %TRUE if the icon-size property has been set.
-
-Since: 2.10
-
-</description>
-</property>
 
 <enum name="GtkToolbarStyle">
 <description>
@@ -15905,11 +15833,6 @@ gtk_drag_finish (context, FALSE, FALSE, time);
 <parameter_description> the received data
 </parameter_description>
 </parameter>
-<parameter name="info">
-<parameter_description> the info that has been registered with the target in the
-#GtkTargetList
-</parameter_description>
-</parameter>
 <parameter name="time">
 <parameter_description> the timestamp at which the data was received
 </parameter_description>
@@ -16081,7 +16004,7 @@ gtk_drag_highlight (widget);
 }
 
 target = gtk_drag_dest_find_target (widget, context, NULL);
-if (target == GDK_NONE)
+if (target == NULL)
 gdk_drag_status (context, 0, time);
 else
 {
@@ -24284,10 +24207,6 @@ Since: 3.10
 <parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
-<parameter name="size">
-<parameter_description> an icon size (#GtkIconSize)
-</parameter_description>
-</parameter>
 </parameters>
 <return> a new #GtkButton displaying the themed icon
 
@@ -28687,7 +28606,7 @@ Since: 2.2
 Returns the clipboard object for the given selection.
 Cut/copy/paste menu items and keyboard shortcuts should use
 the default clipboard, returned by passing %GDK_SELECTION_CLIPBOARD for @selection.
-(%GDK_NONE is supported as a synonym for GDK_SELECTION_CLIPBOARD
+(%NULL is supported as a synonym for GDK_SELECTION_CLIPBOARD
 for backwards compatibility reasons.)
 The currently-selected object or text should be provided on the clipboard
 identified by #GDK_SELECTION_PRIMARY. Cut/copy/paste menu items
@@ -28695,7 +28614,7 @@ conceptually copy the contents of the #GDK_SELECTION_PRIMARY clipboard
 to the default clipboard, i.e. they copy the selection to what the
 user sees as the clipboard.
 
-(Passing #GDK_NONE is the same as using `gdk_atom_intern
+(Passing #NULL is the same as using `gdk_atom_intern
 (&quot;CLIPBOARD&quot;, FALSE)`.
 
 See the
@@ -28979,8 +28898,8 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing
-information about which forms should be stored or %NULL
+<parameter_description> The targets (data formats) in which the
+functions can provide the data or %NULL
 to indicate that all forms should be stored.
 </parameter_description>
 </parameter>
@@ -29077,12 +28996,8 @@ to call to get the actual data when it is requested.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing information
-about the available forms for the clipboard data
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> number of elements in @targets
+<parameter_description> The targets (data formats) in which the
+functions can provide the data
 </parameter_description>
 </parameter>
 <parameter name="get_func">
@@ -29124,12 +29039,8 @@ in.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing information
-about the available forms for the clipboard data
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> number of elements in @targets
+<parameter_description> The targets (data formats) in which the
+functions can provide the data
 </parameter_description>
 </parameter>
 <parameter name="get_func">
@@ -32411,7 +32322,7 @@ Since: 2.6
 <description>
 Looks for a match between the supported targets of @context and the
 @dest_target_list, returning the first matching target, otherwise
-returning %GDK_NONE. @dest_target_list should usually be the return
+returning %NULL. @dest_target_list should usually be the return
 value from gtk_drag_dest_get_target_list(), but some widgets may
 have different valid targets for different parts of the widget; in
 that case, they will have to implement a drag_motion handler that
@@ -32435,7 +32346,7 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter>
 </parameters>
 <return> first target that the source offers
-and the dest can accept, or %GDK_NONE
+and the dest can accept, or %NULL
 </return>
 </function>
 
@@ -32529,14 +32440,9 @@ gdk_drag_status (context, GDK_ACTION_MOVE, time);
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> a pointer to an array of
-#GtkTargetEntrys indicating the drop types that this @widget will
+<parameter_description> the drop types that this @widget will
 accept, or %NULL. Later you can access the list with
 gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of entries in @targets
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -32947,12 +32853,8 @@ clicks and drags on the widget. The widget must have a window.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> the table of targets
-that the drag will support, may be %NULL
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of items in @targets
+<parameter_description> the targets that the drag will support,
+may be %NULL
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -43446,37 +43348,6 @@ Since: 2.14
 </return>
 </function>
 
-<function name="gtk_icon_size_lookup">
-<description>
-Obtains the pixel size of a semantic icon size @size:
-#GTK_ICON_SIZE_MENU, #GTK_ICON_SIZE_BUTTON, etc.  This function
-isn’t normally needed, gtk_icon_theme_load_icon() is the usual
-way to get an icon for rendering, then just look at the size of
-the rendered pixbuf. The rendered pixbuf may not even correspond to
-the width/height returned by gtk_icon_size_lookup(), because themes
-are free to render the pixbuf however they like, including changing
-the usual size.
-
-
-</description>
-<parameters>
-<parameter name="size">
-<parameter_description> an icon size (#GtkIconSize)
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> location to store icon width
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> location to store icon height
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @size was a valid size
-</return>
-</function>
-
 <function name="gtk_icon_theme_add_resource_path">
 <description>
 Adds a resource path that will be looked at when looking
@@ -44318,12 +44189,7 @@ Since: 2.8
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> the table of targets that the drag will
-support
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of items in @targets
+<parameter_description> the targets that the drag will support
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -44353,12 +44219,7 @@ Since: 2.8
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> the table of targets that the drag will
-support
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of items in @targets
+<parameter_description> the targets that the drag will support
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -46155,6 +46016,10 @@ The storage type of the image must be %GTK_IMAGE_EMPTY or
 The caller of this function does not own a reference to the
 returned #GIcon.
 
+Note: This function was changed in 3.94 not to use out parameters
+anymore, but return the GIcon directly. See gtk_image_get_icon_size()
+for a way to get the icon size.
+
 Since: 2.14
 
 </description>
@@ -46163,18 +46028,10 @@ Since: 2.14
 <parameter_description> a #GtkImage
 </parameter_description>
 </parameter>
-<parameter name="gicon">
-<parameter_description> place to store a
-#GIcon, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> place to store an icon size
-(#GtkIconSize), or %NULL
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> a #GIcon, or %NULL
+
+</return>
 </function>
 
 <function name="gtk_image_get_icon_name">
@@ -46185,6 +46042,10 @@ The storage type of the image must be %GTK_IMAGE_EMPTY or
 The returned string is owned by the #GtkImage and should not
 be freed.
 
+Note: This function was changed in 3.94 not to use out parameters
+anymore, but return the icon name directly. See gtk_image_get_icon_size()
+for a way to get the icon size.
+
 Since: 2.6
 
 </description>
@@ -46193,18 +46054,28 @@ Since: 2.6
 <parameter_description> a #GtkImage
 </parameter_description>
 </parameter>
-<parameter name="icon_name">
-<parameter_description> place to store an
-icon name, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> place to store an icon size
-(#GtkIconSize), or %NULL
+</parameters>
+<return> the icon name, or %NULL
+
+</return>
+</function>
+
+<function name="gtk_image_get_icon_size">
+<description>
+Gets the icon size used by the @image when rendering icons.
+
+Since: 3.90
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the image size used by icons
+
+</return>
 </function>
 
 <function name="gtk_image_get_pixel_size">
@@ -46334,16 +46205,16 @@ If the icon name isn’t known, a “broken image” icon will be
 displayed instead.  If the current icon theme is changed, the icon
 will be updated appropriately.
 
+Note: Before 3.94, this function was taking an extra icon size
+argument. See gtk_image_set_icon_size() for another way to set
+the icon size.
+
 Since: 2.14
 
 </description>
 <parameters>
 <parameter name="icon">
 <parameter_description> an icon
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> a stock icon size (#GtkIconSize)
 </parameter_description>
 </parameter>
 </parameters>
@@ -46359,16 +46230,16 @@ If the icon name isn’t known, a “broken image” icon will be
 displayed instead.  If the current icon theme is changed, the icon
 will be updated appropriately.
 
+Note: Before 3.94, this function was taking an extra icon size
+argument. See gtk_image_set_icon_size() for another way to set
+the icon size.
+
 Since: 2.6
 
 </description>
 <parameters>
 <parameter name="icon_name">
 <parameter_description> an icon name or %NULL
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> a stock icon size (#GtkIconSize)
 </parameter_description>
 </parameter>
 </parameters>
@@ -46475,6 +46346,10 @@ See gtk_image_new_from_file() for details.
 <description>
 See gtk_image_new_from_gicon() for details.
 
+Note: Before 3.94, this function was taking an extra icon size
+argument. See gtk_image_set_icon_size() for another way to set
+the icon size.
+
 Since: 2.14
 
 </description>
@@ -46487,10 +46362,6 @@ Since: 2.14
 <parameter_description> an icon
 </parameter_description>
 </parameter>
-<parameter name="size">
-<parameter_description> an icon size (#GtkIconSize)
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -46498,6 +46369,10 @@ Since: 2.14
 <function name="gtk_image_set_from_icon_name">
 <description>
 See gtk_image_new_from_icon_name() for details.
+
+Note: Before 3.94, this function was taking an extra icon size
+argument. See gtk_image_set_icon_size() for another way to set
+the icon size.
 
 Since: 2.6
 
@@ -46509,10 +46384,6 @@ Since: 2.6
 </parameter>
 <parameter name="icon_name">
 <parameter_description> an icon name or %NULL
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> an icon size (#GtkIconSize)
 </parameter_description>
 </parameter>
 </parameters>
@@ -46593,6 +46464,26 @@ Since: 3.94
 </parameter>
 <parameter name="surface">
 <parameter_description> a #GdkTexture or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_image_set_icon_size">
+<description>
+Suggests an icon size to the theme for named icons.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+<parameter name="icon_size">
+<parameter_description> the new icon size
 </parameter_description>
 </parameter>
 </parameters>
@@ -51746,7 +51637,7 @@ Since: 3.94
 <parameter_description> a #GtkMenu
 </parameter_description>
 </parameter>
-<parameter name="screen">
+<parameter name="display">
 <parameter_description> a #GdkDisplay, or %NULL if the display should be
 determined by the widget the menu is attached to
 </parameter_description>
@@ -53792,7 +53683,6 @@ GdkDragContext   *context,
 gint              x,
 gint              y,
 GtkSelectionData *data,
-guint             info,
 guint             time,
 gpointer          user_data)
 {
@@ -65530,10 +65420,6 @@ Since: 2.12
 
 </description>
 <parameters>
-<parameter name="size">
-<parameter_description> a stock icon size (#GtkIconSize)
-</parameter_description>
-</parameter>
 <parameter name="min">
 <parameter_description> the minimum value of the scale (usually 0)
 </parameter_description>
@@ -67052,10 +66938,6 @@ given widget and selection.
 <parameter_description> target to add.
 </parameter_description>
 </parameter>
-<parameter name="info">
-<parameter_description> A unsigned integer which will be passed back to the application.
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -67076,11 +66958,7 @@ for a given widget and selection.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> a table of targets to add
-</parameter_description>
-</parameter>
-<parameter name="ntargets">
-<parameter_description>  number of entries in @targets
+<parameter_description> the targets to add
 </parameter_description>
 </parameter>
 </parameters>
@@ -71111,63 +70989,6 @@ Since: 3.14
 <return></return>
 </function>
 
-<function name="gtk_target_entry_copy">
-<description>
-Makes a copy of a #GtkTargetEntry and its data.
-
-
-</description>
-<parameters>
-<parameter name="data">
-<parameter_description> a pointer to a #GtkTargetEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> a pointer to a copy of @data.
-Free with gtk_target_entry_free()
-</return>
-</function>
-
-<function name="gtk_target_entry_free">
-<description>
-Frees a #GtkTargetEntry returned from
-gtk_target_entry_new() or gtk_target_entry_copy().
-
-</description>
-<parameters>
-<parameter name="data">
-<parameter_description> a pointer to a #GtkTargetEntry.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_target_entry_new">
-<description>
-Makes a new #GtkTargetEntry.
-
-
-</description>
-<parameters>
-<parameter name="target">
-<parameter_description> String identifier for target
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> Set of flags, see #GtkTargetFlags
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
-</parameter_description>
-</parameter>
-</parameters>
-<return> a pointer to a new #GtkTargetEntry.
-Free with gtk_target_entry_free()
-</return>
-</function>
-
 <function name="gtk_target_list_add">
 <description>
 Appends another target to a #GtkTargetList.
@@ -71186,10 +71007,6 @@ Appends another target to a #GtkTargetList.
 <parameter_description> the flags for this target
 </parameter_description>
 </parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -71205,10 +71022,6 @@ Since: 2.6
 <parameters>
 <parameter name="list">
 <parameter_description> a #GtkTargetList
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
 </parameter_description>
 </parameter>
 <parameter name="writable">
@@ -71233,10 +71046,6 @@ Since: 2.10
 <parameters>
 <parameter name="list">
 <parameter_description> a #GtkTargetList
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
 </parameter_description>
 </parameter>
 <parameter name="deserializable">
@@ -71287,10 +71096,6 @@ Since: 2.6
 <parameter_description> a #GtkTargetList
 </parameter_description>
 </parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -71331,14 +71136,27 @@ Looks up a given target in a #GtkTargetList.
 <parameter_description> an interned atom representing the target to search for
 </parameter_description>
 </parameter>
-<parameter name="info">
-<parameter_description> a pointer to the location to store
-application info for target, or %NULL
-</parameter_description>
-</parameter>
 </parameters>
 <return> %TRUE if the target was found, otherwise %FALSE
 </return>
+</function>
+
+<function name="gtk_target_list_merge">
+<description>
+Merges all targets from @source into @target.
+
+</description>
+<parameters>
+<parameter name="target">
+<parameter_description> the #GtkTargetList to merge into
+</parameter_description>
+</parameter>
+<parameter name="source">
+<parameter_description> the #GtkTargeList to merge from
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_target_list_new">
@@ -71409,52 +71227,6 @@ If the resulting reference count is zero, frees the list.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_target_table_free">
-<description>
-This function frees a target table as returned by
-gtk_target_table_new_from_list()
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="targets">
-<parameter_description> a #GtkTargetEntry array
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of entries in the array
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_target_table_new_from_list">
-<description>
-This function creates an #GtkTargetEntry array that contains the
-same targets as the passed %list. The returned table is newly
-allocated and should be freed using gtk_target_table_free() when no
-longer needed.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GtkTargetList
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> return location for the number ot targets in the table
-</parameter_description>
-</parameter>
-</parameters>
-<return> the new table.
-
-</return>
 </function>
 
 <function name="gtk_targets_include_image">
@@ -76531,34 +76303,6 @@ Since: 3.20
 <return></return>
 </function>
 
-<function name="gtk_text_tag_event">
-<description>
-Emits the “event” signal on the #GtkTextTag.
-
-
-</description>
-<parameters>
-<parameter name="tag">
-<parameter_description> a #GtkTextTag
-</parameter_description>
-</parameter>
-<parameter name="event_object">
-<parameter_description> object that received the event, such as a widget
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> the event
-</parameter_description>
-</parameter>
-<parameter name="iter">
-<parameter_description> location where the event was received
-</parameter_description>
-</parameter>
-</parameters>
-<return> result of signal emission (whether the event was handled)
-</return>
-</function>
-
 <function name="gtk_text_tag_get_priority">
 <description>
 Get the tag priority.
@@ -78805,27 +78549,6 @@ items.
 </return>
 </function>
 
-<function name="gtk_tool_item_get_icon_size">
-<description>
-Returns the icon size used for @tool_item. Custom subclasses of
-#GtkToolItem should call this function to find out what size icons
-they should use.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="tool_item">
-<parameter_description> a #GtkToolItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GtkIconSize indicating the icon size
-used for @tool_item
-
-</return>
-</function>
-
 <function name="gtk_tool_item_get_is_important">
 <description>
 Returns whether @tool_item is considered important. See
@@ -79849,25 +79572,6 @@ Since: 2.20
 </return>
 </function>
 
-<function name="gtk_tool_palette_get_icon_size">
-<description>
-Gets the size of icons in the tool palette.
-See gtk_tool_palette_set_icon_size().
-
-Since: 2.20
-
-</description>
-<parameters>
-<parameter name="palette">
-<parameter_description> a #GtkToolPalette
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkIconSize of icons in the tool palette
-
-</return>
-</function>
-
 <function name="gtk_tool_palette_get_style">
 <description>
 Gets the style (icons, text or both) of items in the tool palette.
@@ -79999,27 +79703,6 @@ Since: 2.20
 <return></return>
 </function>
 
-<function name="gtk_tool_palette_set_icon_size">
-<description>
-Sets the size of icons in the tool palette.
-
-Since: 2.20
-
-</description>
-<parameters>
-<parameter name="palette">
-<parameter_description> a #GtkToolPalette
-</parameter_description>
-</parameter>
-<parameter name="icon_size">
-<parameter_description> the #GtkIconSize that icons in the tool
-palette shall have
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_tool_palette_set_style">
 <description>
 Sets the style (text, icons or both) of items in the tool palette.
@@ -80034,23 +79717,6 @@ Since: 2.20
 </parameter>
 <parameter name="style">
 <parameter_description> the #GtkToolbarStyle that items in the tool palette shall have
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_tool_palette_unset_icon_size">
-<description>
-Unsets the tool palette icon size set with gtk_tool_palette_set_icon_size(),
-so that user preferences will be used to determine the icon size.
-
-Since: 2.20
-
-</description>
-<parameters>
-<parameter name="palette">
-<parameter_description> a #GtkToolPalette
 </parameter_description>
 </parameter>
 </parameters>
@@ -80090,25 +79756,6 @@ Since: 2.20
 </parameter>
 </parameters>
 <return> the current ellipsize mode of @shell
-
-</return>
-</function>
-
-<function name="gtk_tool_shell_get_icon_size">
-<description>
-Retrieves the icon size for the tool shell. Tool items must not call this
-function directly, but rely on gtk_tool_item_get_icon_size() instead.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="shell">
-<parameter_description> a #GtkToolShell
-</parameter_description>
-</parameter>
-</parameters>
-<return> the current size (#GtkIconSize) for icons of @shell
 
 </return>
 </function>
@@ -80262,22 +79909,6 @@ Since: 2.4
 </parameters>
 <return> The position corresponding to the point (@x, @y) on the toolbar.
 
-</return>
-</function>
-
-<function name="gtk_toolbar_get_icon_size">
-<description>
-Retrieves the icon size for the toolbar. See gtk_toolbar_set_icon_size().
-
-
-</description>
-<parameters>
-<parameter name="toolbar">
-<parameter_description> a #GtkToolbar
-</parameter_description>
-</parameter>
-</parameters>
-<return> the current icon size for the icons on the toolbar.
 </return>
 </function>
 
@@ -80452,31 +80083,6 @@ Since: 2.4
 <return></return>
 </function>
 
-<function name="gtk_toolbar_set_icon_size">
-<description>
-This function sets the size of stock icons in the toolbar. You
-can call it both before you add the icons and after they’ve been
-added. The size you set will override user preferences for the default
-icon size.
-
-This should only be used for special-purpose toolbars, normal
-application toolbars should respect the user preferences for the
-size of icons.
-
-</description>
-<parameters>
-<parameter name="toolbar">
-<parameter_description> A #GtkToolbar
-</parameter_description>
-</parameter>
-<parameter name="icon_size">
-<parameter_description> The #GtkIconSize that stock icons in the toolbar shall have.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_toolbar_set_show_arrow">
 <description>
 Sets whether to show an overflow menu when @toolbar isn’t allocated enough
@@ -80514,21 +80120,6 @@ Alters the view of @toolbar to display either icons only, text only, or both.
 </parameter>
 <parameter name="style">
 <parameter_description> the new style for @toolbar.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_toolbar_unset_icon_size">
-<description>
-Unsets toolbar icon size set with gtk_toolbar_set_icon_size(), so that
-user preferences will be used to determine the icon size.
-
-</description>
-<parameters>
-<parameter name="toolbar">
-<parameter_description> a #GtkToolbar
 </parameter_description>
 </parameter>
 </parameters>
@@ -80615,10 +80206,6 @@ Since: 2.20
 <parameter_description> a #GIcon representing the icon, or %NULL
 </parameter_description>
 </parameter>
-<parameter name="size">
-<parameter_description> a stock icon size (#GtkIconSize)
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -80639,10 +80226,6 @@ Since: 2.14
 </parameter>
 <parameter name="icon_name">
 <parameter_description> an icon name, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> a stock icon size (#GtkIconSize)
 </parameter_description>
 </parameter>
 </parameters>
@@ -85455,8 +85038,7 @@ this method sets #GtkTreeView:reorderable to %FALSE.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> the table of targets that
-the drag will support
+<parameter_description> the targets that the drag will support
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
@@ -85488,11 +85070,7 @@ method sets #GtkTreeView:reorderable to %FALSE.
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> the table of targets that the drag will support
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the number of items in @targets
+<parameter_description> the targets that the drag will support
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -88920,29 +88498,6 @@ gtk_widget_set_default_direction().
 </return>
 </function>
 
-<function name="gtk_widget_get_device_enabled">
-<description>
-Returns whether @device can interact with @widget and its
-children. See gtk_widget_set_device_enabled().
-
-Since: 3.0
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE is @device is enabled for @widget
-
-</return>
-</function>
-
 <function name="gtk_widget_get_direction">
 <description>
 Gets the reading direction for a particular widget. See
@@ -92068,35 +91623,6 @@ direction has not been explicitly set by gtk_widget_set_direction().
 <parameter name="dir">
 <parameter_description> the new default direction. This cannot be
 %GTK_TEXT_DIR_NONE.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_set_device_enabled">
-<description>
-Enables or disables a #GdkDevice to interact with @widget
-and all its children.
-
-It does so by descending through the #GdkWindow hierarchy
-and enabling the same mask that is has for core events
-(i.e. the one that gdk_window_get_events() returns).
-
-Since: 3.0
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-<parameter name="enabled">
-<parameter_description> whether to enable the device
 </parameter_description>
 </parameter>
 </parameters>
