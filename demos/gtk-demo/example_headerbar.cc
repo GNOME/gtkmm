@@ -72,12 +72,9 @@ Example_HeaderBar::~Example_HeaderBar()
 
 void Example_HeaderBar::configure_send_receive_button()
 {
-  /* the 'const' is required, to avoid C2668/Ambiguous call errors
-     on some compilers, such as Visual Studio or when compiling without
-     GTKMM_DISABLE_DEPRECATED on g++ */
   auto icon = Gio::ThemedIcon::create("mail-send-receive-symbolic", false);
 
-  m_send_receive_image.set(icon, Gtk::BuiltinIconSize::BUTTON);
+  m_send_receive_image.set(icon);
   m_send_receive_button.add(m_send_receive_image);
 }
 
@@ -85,8 +82,8 @@ void Example_HeaderBar::configure_arrow_buttons()
 {
   m_arrow_buttons_box.get_style_context()->add_class("linked");
 
-  m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::BuiltinIconSize::BUTTON, true);
-  m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::BuiltinIconSize::BUTTON, true);
+  m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::IconSize::INHERIT, true);
+  m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::IconSize::INHERIT, true);
 
   m_arrow_buttons_box.add(m_left_arrow_button);
   m_arrow_buttons_box.add(m_right_arrow_button);

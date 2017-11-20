@@ -58,10 +58,10 @@ void Widget_signal_hide_callback(GObject* self, void* data)
 
 //These signal callbacks are custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext* p0,GtkSelectionData* p1,guint p2,guint p3,void* data)
+static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext* p0,GtkSelectionData* p1,guint p2,void* data)
 {
   using namespace Gtk;
-  typedef sigc::slot<void(const Glib::RefPtr<Gdk::DragContext>&,SelectionData&,guint,guint)> SlotType;
+  typedef sigc::slot<void(const Glib::RefPtr<Gdk::DragContext>&,SelectionData&,guint)> SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -71,7 +71,7 @@ static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         SelectionData_WithoutOwnership temp_instance(p1);
-        (*static_cast<SlotType*>(slot))( Glib::wrap(p0, true), temp_instance, p2, p3 );
+        (*static_cast<SlotType*>(slot))(Glib::wrap(p0, true), temp_instance, p2);
       }
     }
     catch(...)
@@ -81,10 +81,10 @@ static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext
   }
 }
 
-static void Widget_signal_selection_get_callback(GtkWidget* self, GtkSelectionData* p0,guint p1,guint p2,void* data)
+static void Widget_signal_selection_get_callback(GtkWidget* self, GtkSelectionData* p0,guint p1,void* data)
 {
   using namespace Gtk;
-  typedef sigc::slot<void(SelectionData&, guint, guint)> SlotType;
+  typedef sigc::slot<void(SelectionData&, guint)> SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -94,7 +94,7 @@ static void Widget_signal_selection_get_callback(GtkWidget* self, GtkSelectionDa
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         SelectionData_WithoutOwnership temp_instance(p0);
-        (*static_cast<SlotType*>(slot))( temp_instance, p1, p2 );
+        (*static_cast<SlotType*>(slot))(temp_instance, p1);
       }
     }
     catch(...)
@@ -162,7 +162,7 @@ void Widget_Class::hide_callback(GtkWidget* self)
 
 //These default handler callbacks are custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-void Widget_Class::selection_get_callback(GtkWidget* self, GtkSelectionData* p0, guint p1, guint p2)
+void Widget_Class::selection_get_callback(GtkWidget* self, GtkSelectionData* p0, guint p1)
 {
   const auto obj = dynamic_cast<CppObjectType*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -178,7 +178,7 @@ void Widget_Class::selection_get_callback(GtkWidget* self, GtkSelectionData* p0,
     {
       // Call the virtual member method, which derived classes might override.
       SelectionData_WithoutOwnership temp_instance(p0);
-      obj->on_selection_get(temp_instance, p1, p2);
+      obj->on_selection_get(temp_instance, p1);
     }
     catch(...)
     {
@@ -193,11 +193,11 @@ void Widget_Class::selection_get_callback(GtkWidget* self, GtkSelectionData* p0,
 
     // Call the original underlying C function:
     if(base && base->selection_get)
-      (*base->selection_get)(self, p0, p1, p2);
+      (*base->selection_get)(self, p0, p1);
   }
 }
 
-void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, GtkSelectionData* p1, guint p2, guint p3)
+void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, GtkSelectionData* p1, guint p2)
 {
   const auto obj = dynamic_cast<CppObjectType*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -213,7 +213,7 @@ void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, G
     {
       // Call the virtual member method, which derived classes might override.
       SelectionData_WithoutOwnership temp_instance(p1);
-      obj->on_drag_data_get(Glib::wrap(p0, true), temp_instance, p2, p3);
+      obj->on_drag_data_get(Glib::wrap(p0, true), temp_instance, p2);
     }
     catch(...)
     {
@@ -228,7 +228,7 @@ void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, G
 
     // Call the original underlying C function:
     if(base && base->drag_data_get)
-      (*base->drag_data_get)(self, p0, p1, p2, p3);
+      (*base->drag_data_get)(self, p0, p1, p2);
   }
 }
 
@@ -423,29 +423,7 @@ int Widget::get_height() const
 
 void Widget::drag_dest_set(DestDefaults flags, Gdk::DragAction actions)
 {
-  gtk_drag_dest_set(gobj(), (GtkDestDefaults)flags, nullptr, 0, (GdkDragAction)actions);
-}
-
-void Widget::drag_dest_set(const std::vector<TargetEntry>& targets,
-                           DestDefaults flags, Gdk::DragAction actions)
-{
-  // I've used Gdk::ACTION_COPY as the default, because Gdk::ACTION_DEFAULT means that
-  // it's never a drag destination, so it would seem like this method didn't work. murrayc.
-  gtk_drag_dest_set(
-      gobj(), (GtkDestDefaults)flags,
-      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data(),
-      targets.size(), (GdkDragAction)actions);
-}
-
-void Widget::drag_source_set(const std::vector<TargetEntry>& targets,
-                             Gdk::ModifierType start_button_mask, Gdk::DragAction actions)
-{
-  // I've used Gdk::MODIFIER_MASK as the default, because it seems
-  // to mean 'whatever is possible in the context'. murrayc.
-  gtk_drag_source_set(
-      gobj(), (GdkModifierType)start_button_mask,
-      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data(),
-      targets.size(), (GdkDragAction)actions);
+  gtk_drag_dest_set(gobj(), (GtkDestDefaults)flags, nullptr, (GdkDragAction)actions);
 }
 
 Widget* Widget::drag_get_source_widget(const Glib::RefPtr<Gdk::DragContext>& context) //static

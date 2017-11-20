@@ -46,7 +46,8 @@ Example_Stack::Example_Stack()
   m_stack.add(m_spinner, "page3");
 
   // Page 1
-  m_image.set_from_icon_name("gtk3-demo", Gtk::BuiltinIconSize::DIALOG);
+  m_image.set_from_icon_name("gtk3-demo");
+  m_image.set_pixel_size(48);
 
   // Page 2
   m_check_button.set_label("Page 2");

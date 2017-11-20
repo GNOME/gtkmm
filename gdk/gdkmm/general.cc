@@ -23,11 +23,6 @@
 namespace Gdk
 {
 
-void flush()
-{
-  gdk_flush();
-}
-
 namespace Cairo
 {
 

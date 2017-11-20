@@ -65,7 +65,7 @@ Example_StackSidebar::Example_StackSidebar()
     if (i == 0)
     {
       auto image = Gtk::manage(new Gtk::Image());
-      image->set_from_icon_name("help-about", Gtk::BuiltinIconSize::MENU);
+      image->set_from_icon_name("help-about");
       image->set_pixel_size(256);
       widget = image;
     }

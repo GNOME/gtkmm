@@ -138,7 +138,8 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
   m_Image()
 {
-  m_Image.set_from_icon_name("dialog-question", Gtk::BuiltinIconSize::DIALOG);
+  m_Image.set_from_icon_name("dialog-question");
+  m_Image.set_icon_size(Gtk::IconSize::LARGE);
   add_button("_OK", Gtk::ResponseType::OK);
   add_button("_Cancel", Gtk::ResponseType::CANCEL);
 

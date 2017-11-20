@@ -46,14 +46,6 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/object_p.h)
 
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern "C"
-{
-typedef struct _GtkTargetEntry GtkTargetEntry;
-}
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 namespace Gtk
 {
 
@@ -284,9 +276,6 @@ public:
   _WRAP_METHOD(void set_opacity(double opacity), gtk_widget_set_opacity)
   _WRAP_METHOD(double get_opacity() const, gtk_widget_get_opacity)
 
-  _WRAP_METHOD(void set_device_enabled(const Glib::RefPtr<Gdk::Device>& device, bool enabled = true), gtk_widget_set_device_enabled)
-  _WRAP_METHOD(bool get_device_enabled(const Glib::RefPtr<const Gdk::Device>& device) const, gtk_widget_get_device_enabled)
-
   _WRAP_METHOD(Container* get_toplevel(), gtk_widget_get_toplevel)
   _WRAP_METHOD(const Container* get_toplevel() const, gtk_widget_get_toplevel, constversion)
 
@@ -389,8 +378,12 @@ public:
 
   //TODO: Change the defaults? Maybe we should use ALL for DestDefaults. See other drag_dest_set() methods here and in other widgets.
   void drag_dest_set(DestDefaults flags = DestDefaults(0), Gdk::DragAction actions = Gdk::DragAction(0));
-  void drag_dest_set(const std::vector<TargetEntry>& targets, DestDefaults flags = DestDefaults::ALL, Gdk::DragAction actions = Gdk::DragAction::COPY);
-  _IGNORE(gtk_drag_dest_set)
+
+  // I've used Gdk::DragAction::COPY as the default, because Gdk::DragAction::DEFAULT means that
+  // it's never a drag destination, so it would seem like this method didn't work. murrayc.
+  _WRAP_METHOD(void drag_dest_set(const Glib::RefPtr<TargetList>& targets{.},
+    DestDefaults flags{.} = DestDefaults::ALL,
+    Gdk::DragAction actions{.} = Gdk::DragAction::COPY), gtk_drag_dest_set)
 
   _WRAP_METHOD(void drag_dest_unset(), gtk_drag_dest_unset)
   _WRAP_METHOD(Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::RefPtr<TargetList>& target_list) const, gtk_drag_dest_find_target)
@@ -404,8 +397,11 @@ public:
   _WRAP_METHOD(void drag_dest_add_image_targets(), gtk_drag_dest_add_image_targets)
   _WRAP_METHOD(void drag_dest_add_uri_targets(), gtk_drag_dest_add_uri_targets)
 
-  void drag_source_set(const std::vector<TargetEntry>& targets, Gdk::ModifierType start_button_mask = Gdk::ModifierType::MODIFIER_MASK, Gdk::DragAction actions = Gdk::DragAction::COPY);
-  _IGNORE(gtk_drag_source_set)
+  // I've used Gdk::ModifierType::MODIFIER_MASK as the default, because it seems
+  // to mean 'whatever is possible in the context'. murrayc.
+  _WRAP_METHOD(void drag_source_set(const Glib::RefPtr<TargetList>& targets{.},
+    Gdk::ModifierType start_button_mask{.} = Gdk::ModifierType::MODIFIER_MASK,
+    Gdk::DragAction actions{.} = Gdk::DragAction::COPY), gtk_drag_source_set)
 
   _WRAP_METHOD(void drag_source_unset(), gtk_drag_source_unset)
 
@@ -632,20 +628,20 @@ dnl
 
   //We use the optional custom_c_callback parameter with _WRAP_SIGNAL() for some of these,
   //so that we can write special code to wrap the non-const SelectionData& output parameters:
-  _WRAP_SIGNAL(void selection_get(SelectionData& selection_data, guint info, guint time), "selection_get", custom_c_callback)
+  _WRAP_SIGNAL(void selection_get(SelectionData& selection_data, guint time), "selection_get", custom_c_callback)
   _WRAP_SIGNAL(void selection_received(const SelectionData& selection_data, guint time), "selection_received")
 
 #m4 _CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
 
   _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::DragContext>& context), "drag_begin")
   _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::DragContext>& context), "drag_end")
-  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data, guint info, guint time), "drag_data_get", custom_c_callback)
+  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data, guint time), "drag_data_get", custom_c_callback)
   _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
   _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context, DragResult result), "drag_failed")
   _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time), "drag_leave")
   _WRAP_SIGNAL(bool drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_motion")
   _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_drop")
-  _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint info, guint time), "drag_data_received")
+  _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint time), "drag_data_received")
 
 _CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Gdk::Display>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void display_changed(const Glib::RefPtr<Gdk::Display>& previous_display), "display_changed")

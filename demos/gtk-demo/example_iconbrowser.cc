@@ -93,7 +93,7 @@ public:
 protected:
   // Signal handler:
   void on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context,
-    Gtk::SelectionData& selection_data, guint info, guint time, int size_index);
+    Gtk::SelectionData& selection_data, guint time, int size_index);
 
   Glib::RefPtr<Gdk::Pixbuf> get_icon(int size_index);
 
@@ -195,7 +195,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_header.set_title("Icon Browser");
   m_header.set_show_close_button(true);
   m_header.pack_end(m_search_button);
-  m_search_button.set_image_from_icon_name("edit-find-symbolic", Gtk::BuiltinIconSize::MENU);
+  m_search_button.set_image_from_icon_name("edit-find-symbolic");
   m_header.pack_end(m_header_radio_button_box);
   m_header_radio_button_box.pack_start(m_normal_radio, Gtk::PackOptions::EXPAND_WIDGET);
   m_header_radio_button_box.pack_start(m_symbolic_radio, Gtk::PackOptions::EXPAND_WIDGET);
@@ -230,13 +230,13 @@ Example_IconBrowser::Example_IconBrowser()
   m_icon_view.pack_start(m_icon_cell);
   m_icon_view.pack_start(m_text_cell);
   m_icon_cell.set_padding(10, 10);
-  m_icon_cell.property_stock_size() = static_cast<guint>(Gtk::BuiltinIconSize::DND);
+  m_icon_cell.property_stock_size() = static_cast<guint>(Gtk::IconSize::LARGE);
   m_text_cell.set_padding(10, 10);
   m_text_cell.set_alignment(0.5, 0.5);
 
   // Enable dragging an icon name, and copying it to another program.
   m_icon_view.enable_model_drag_source(
-    std::vector<Gtk::TargetEntry>(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
+    Gtk::TargetList::create({}), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
   m_icon_view.drag_source_add_text_targets();
 
   m_icon_view.set_has_tooltip(true);
@@ -907,7 +907,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 
     // Enable dragging an image, and copying it to another program.
     m_image[i].drag_source_set(
-      std::vector<Gtk::TargetEntry>(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
+      Gtk::TargetList::create({}), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
     m_image[i].drag_source_add_image_targets();
     m_image[i].signal_drag_data_get().connect(
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
@@ -938,7 +938,7 @@ void DetailDialog::set_image(
 
   for (int i = 0; i < n_icon_sizes; ++i)
   {
-    m_image[i].set_from_icon_name(icon_name, Gtk::BuiltinIconSize::MENU);
+    m_image[i].set_from_icon_name(icon_name);
     m_image[i].set_pixel_size(m_icon_size[i]);
     m_image[i].drag_source_set_icon(get_icon(i));
   }
@@ -952,7 +952,7 @@ void DetailDialog::set_image(
 }
 
 void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& /* context */,
-  Gtk::SelectionData& selection_data, guint /* info */, guint /* time */, int size_index)
+  Gtk::SelectionData& selection_data, guint /* time */, int size_index)
 {
   selection_data.set_pixbuf(get_icon(size_index));
 }

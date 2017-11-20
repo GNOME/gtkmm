@@ -53,14 +53,14 @@ SignalProxy_GetClear::SignalProxy_GetClear(const Gtk::Clipboard::SlotGet& slot_g
 {}
 
 static void SignalProxy_GetClear_gtk_callback_get(GtkClipboard*, GtkSelectionData* selection_data,
-                                            unsigned int info, void* data)
+                                            void* data)
 {
   const auto self = static_cast<SignalProxy_GetClear*>(data);
 
   try
   {
     Gtk::SelectionData_WithoutOwnership cppSelectionData(selection_data);
-    (self->slot_get_)(cppSelectionData, info);
+    (self->slot_get_)(cppSelectionData);
   }
   catch(...)
   {
@@ -198,7 +198,7 @@ static void SignalProxy_ImageReceived_gtk_callback(GtkClipboard*, GdkPixbuf* ima
 namespace Gtk
 {
 
-bool Clipboard::set(const std::vector<TargetEntry>& targets,
+bool Clipboard::set(const Glib::RefPtr<TargetList>& targets,
                     const SlotGet& slot_get, const SlotClear& slot_clear)
 {
   // Create a signal proxy. A pointer to this will be passed through the callback's data parameter.
@@ -206,8 +206,7 @@ bool Clipboard::set(const std::vector<TargetEntry>& targets,
 
   return gtk_clipboard_set_with_data(
       gobj(),
-      Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data (),
-      targets.size(),
+      targets->gobj(),
       &SignalProxy_GetClear_gtk_callback_get,
       &SignalProxy_GetClear_gtk_callback_clear,
       pSignalProxy);
@@ -291,21 +290,16 @@ std::vector<Glib::ustring> Clipboard::wait_for_targets() const
   return Glib::ArrayHandler<Glib::ustring, Gdk::AtomStringTraits>::array_to_vector(atoms, n_targets, Glib::OWNERSHIP_SHALLOW);
 }
 
-void Clipboard::set_can_store(const std::vector<TargetEntry>& targets)
-{
-  gtk_clipboard_set_can_store( gobj(), Glib::ArrayHandler<TargetEntry, TargetEntryTraits>::vector_to_array(targets).data (), targets.size() );
-}
-
 void Clipboard::set_can_store()
 {
-  gtk_clipboard_set_can_store( gobj(), nullptr, 0 /* See C docs */ );
+  gtk_clipboard_set_can_store(gobj(), nullptr);
 }
 
 std::string Clipboard::wait_for_rich_text(const Glib::RefPtr<TextBuffer>& buffer, std::string& format)
 {
   std::string result;
 
-  GdkAtom format_atom = GDK_NONE;
+  GdkAtom format_atom = nullptr;
   gsize length = 0;
   guint8* text = gtk_clipboard_wait_for_rich_text(const_cast<GtkClipboard*>(gobj()), buffer->gobj(), &format_atom, &length);
   if(text && length)

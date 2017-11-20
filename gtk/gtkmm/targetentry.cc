@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* targetentry.cc
  *
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -33,24 +30,21 @@ TargetEntry::TargetEntry()
   memset(&gobject_, 0, sizeof(gobject_));
 }
 
-TargetEntry::TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags, guint info)
+TargetEntry::TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags)
 {
   set_target(target);
   set_flags(flags);
-  set_info(info);
 }
 
 TargetEntry::TargetEntry(const GtkTargetEntry& gobject)
 {
   set_target(gobject.target);
-  set_info(gobject.info);
   set_flags(TargetFlags(gobject.flags));
 }
 
 TargetEntry::TargetEntry(const TargetEntry& src)
 {
   set_target(src.get_target());
-  set_info(src.get_info());
   set_flags(src.get_flags());
 }
 
@@ -66,7 +60,6 @@ TargetEntry& TargetEntry::operator=(const TargetEntry& src)
   if(&src != this)
   {
     set_target(src.get_target());
-    set_info(src.get_info());
     set_flags(src.get_flags());
   }
 
@@ -91,16 +84,6 @@ Gtk::TargetFlags TargetEntry::get_flags() const
 void TargetEntry::set_flags(Gtk::TargetFlags flags)
 {
   gobject_.flags = (guint)(flags);
-}
-
-guint TargetEntry::get_info() const
-{
-  return gobject_.info;
-}
-
-void TargetEntry::set_info(guint info)
-{
-  gobject_.info = info;
 }
 
 GtkTargetEntry* TargetEntry::gobj()

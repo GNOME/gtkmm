@@ -21,7 +21,7 @@
 #include <gdkmm/display.h>
 #include <gdkmm/events.h>
 #include <gdkmm/pixbuf.h>
-#include <gtkmm/targetentry.h>
+#include <gtkmm/targetlist.h>
 #include <gtkmm/selectiondata.h>
 #include <glibmm/object.h>
 
@@ -75,11 +75,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::Display> get_display(), gtk_clipboard_get_display, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Display> get_display() const, gtk_clipboard_get_display, refreturn, constversion)
 
-  /// For instance: void on_get(Gtk::SelectionData& selection_data, guint info);
-  typedef sigc::slot<void(SelectionData&, guint)> SlotGet;
+  /// For instance: void on_get(Gtk::SelectionData& selection_data);
+  using SlotGet = sigc::slot<void(SelectionData&)>;
 
   /// For instance: void on_clear();
-  typedef sigc::slot<void()> SlotClear;
+  using SlotClear = sigc::slot<void()>;
 
  /** Virtually sets the contents of the specified clipboard by providing
   * a list of supported formats for the clipboard data and a function
@@ -94,7 +94,7 @@ public:
   *               the clipboard data failed then the provided callback methods
   *               will be ignored.
   */
-  bool set(const std::vector<TargetEntry>& targets, const SlotGet& slot_get, const SlotClear& slot_clear);
+  bool set(const Glib::RefPtr<TargetList>& targets, const SlotGet& slot_get, const SlotClear& slot_clear);
   _IGNORE(gtk_clipboard_set_with_owner, gtk_clipboard_set_with_data)
 
   _WRAP_METHOD(Glib::RefPtr<Glib::Object> get_owner(), gtk_clipboard_get_owner, refreturn)
@@ -295,9 +295,9 @@ public:
    * This value is reset when the clipboard owner changes. Where the clipboard data is stored is platform
    * dependent, see Gdk::Display::store_clipboard() for more information.
    *
-   * @param targets Array containing information about which forms should be stored.
+   * @param targets The targets (data formats) in which the functions can provide the data.
    */
-  void set_can_store(const std::vector<TargetEntry>& targets);
+  _WRAP_METHOD(void set_can_store(const Glib::RefPtr<TargetList>& targets), gtk_clipboard_set_can_store)
 
   /** Hints that all forms of clipboard data should be stored somewhere when the application exits or when store()
    * is called.

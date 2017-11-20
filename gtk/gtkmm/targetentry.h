@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GTKMM_TARGETENTRY_H
 #define _GTKMM_TARGETENTRY_H
-
-/* $Id$ */
 
 /* targetentry.h
  *
@@ -42,7 +39,7 @@ class TargetEntry
 {
 public:
   TargetEntry();
-  explicit TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags = Gtk::TargetFlags(0), guint info = 0);
+  explicit TargetEntry(const Glib::ustring& target, Gtk::TargetFlags flags = Gtk::TargetFlags(0));
   explicit TargetEntry(const GtkTargetEntry& gobject);
   TargetEntry(const TargetEntry& src);
   virtual ~TargetEntry() noexcept;
@@ -54,9 +51,6 @@ public:
 
   Gtk::TargetFlags get_flags() const;
   void set_flags(Gtk::TargetFlags flags);
-
-  guint get_info() const;
-  void set_info(guint info);
 
   //Use this when you have to use an array of GdkTargetEntrys
   //This TargetEntry will still own the string memory.

@@ -30,8 +30,6 @@
 namespace Gdk
 {
 
-void flush();
-
 namespace Cairo
 {
 
