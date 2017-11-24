@@ -221,6 +221,16 @@ _CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<const DeviceManager>', `Glib::wrap
 
 _CONVERSION(`gpointer',`const void*', `static_cast<$2>($3)')
 
+# ContentFormats
+_CONVERSION(`const Glib::RefPtr<ContentFormats>&',`GdkContentFormats*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const ContentFormats>&',`GdkContentFormats*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const ContentFormats>&',`const GdkContentFormats*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gdk::ContentFormats>&',`GdkContentFormats*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Gdk::ContentFormats>&',`GdkContentFormats*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GdkContentFormats*',`Glib::RefPtr<ContentFormats>',`Glib::wrap($3)')
+_CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const ContentFormats>',`Glib::wrap($3)')
+_CONVERSION(`GdkContentFormats*',`Glib::RefPtr<Gdk::ContentFormats>',`Glib::wrap($3)')
+_CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const Gdk::ContentFormats>',`Glib::wrap($3)')
 
 # XPM data
 _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$3')

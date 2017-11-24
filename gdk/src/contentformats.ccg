@@ -1,0 +1,74 @@
+/* Copyright (C) 2017 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/vectorutils.h>
+
+namespace Gdk
+{
+
+Glib::RefPtr<ContentFormats> ContentFormats::create(const std::vector<Glib::ustring>& mime_types)
+{
+  return Glib::wrap(gdk_content_formats_new(Glib::ArrayHandler<Glib::ustring>::vector_to_array(mime_types).data(), mime_types.size()));
+}
+
+Glib::RefPtr<ContentFormats> ContentFormats::create(const Glib::ustring& mime_type)
+{
+  const char* c_mime_type = mime_type.c_str();
+  return Glib::wrap(gdk_content_formats_new(&c_mime_type, 1));
+}
+
+std::vector<GType> ContentFormats::get_gtypes() const
+{
+  gsize n_gtypes = 0;
+  const GType* gtype_array = gdk_content_formats_get_gtypes(const_cast<GdkContentFormats*>(gobj()), &n_gtypes);
+  return Glib::ArrayHandler<GType>::array_to_vector(gtype_array, n_gtypes, Glib::OWNERSHIP_NONE);
+}
+
+std::vector<Glib::ustring> ContentFormats::get_mime_types() const
+{
+  gsize n_mime_types = 0;
+  const char* const* mime_type_array = gdk_content_formats_get_mime_types(const_cast<GdkContentFormats*>(gobj()), &n_mime_types);
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(mime_type_array, n_mime_types, Glib::OWNERSHIP_NONE);
+}
+
+Glib::RefPtr<ContentFormats> ContentFormats::join(const Glib::RefPtr<const ContentFormats>& second) const
+{
+  // gdk_content_formats_union() unref's *this! Compensate for that.
+  reference();
+  return Glib::wrap(gdk_content_formats_union(const_cast<GdkContentFormats*>(gobj()), Glib::unwrap(second)));
+}
+
+} // namespace Gdk
+
+namespace Glib
+{
+
+GType Value<RefPtr<Gdk::ContentFormats> >::value_type()
+{
+  return gdk_content_formats_get_type();
+}
+
+void Value<RefPtr<Gdk::ContentFormats> >::set(const CppType& data)
+{
+  set_boxed(Glib::unwrap(data));
+}
+
+Value<RefPtr<Gdk::ContentFormats>>::CppType Value<RefPtr<Gdk::ContentFormats>>::get() const
+{
+  return Glib::wrap(static_cast<CType>(get_boxed()), true);
+}
+
+} // namespace Glib

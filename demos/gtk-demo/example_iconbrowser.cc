@@ -236,7 +236,7 @@ Example_IconBrowser::Example_IconBrowser()
 
   // Enable dragging an icon name, and copying it to another program.
   m_icon_view.enable_model_drag_source(
-    Gtk::TargetList::create({}), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
+    Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
   m_icon_view.drag_source_add_text_targets();
 
   m_icon_view.set_has_tooltip(true);
@@ -907,7 +907,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 
     // Enable dragging an image, and copying it to another program.
     m_image[i].drag_source_set(
-      Gtk::TargetList::create({}), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
+      Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
     m_image[i].drag_source_add_image_targets();
     m_image[i].signal_drag_data_get().connect(
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));

@@ -77,7 +77,6 @@ _CONV_ENUM(Gtk,SortType)
 _CONV_INCLASS_ENUM(Gtk,SpinButton,UpdatePolicy)
 _CONV_ENUM(Gtk,SpinType)
 _CONV_ENUM(Gtk,StackTransitionType)
-_CONV_ENUM(Gtk,TargetFlags)
 _CONV_ENUM(Gtk,TextDirection)
 _CONV_ENUM(Gtk,TextSearchFlags)
 _CONV_ENUM(Gtk,TextWindowType)
@@ -399,12 +398,6 @@ _CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
-
-#TargetList
-_CONVERSION(`const Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_CONST_REFPTR_TO_P)
-_CONVERSION(`Glib::RefPtr<TargetList>&',`GtkTargetList*',__CONVERT_REFPTR_TO_P($3))
-_CONVERSION(`GtkTargetList*',`Glib::RefPtr<TargetList>',`Glib::wrap($3)')
-_CONVERSION(`GtkTargetList*',`Glib::RefPtr<const TargetList>',`Glib::wrap($3)')
 
 #IconInfo
 _CONVERSION(`GtkIconInfo*',`IconInfo',`Glib::wrap($3)')
