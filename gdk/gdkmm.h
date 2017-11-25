@@ -40,5 +40,6 @@
 #include <gdkmm/texture.h>
 #include <gdkmm/monitor.h>
 #include <gdkmm/general.h>
+#include <gdkmm/contentformatsbuilder.h>
 
 #endif /* _GDKMM_GDKMM_H_ */

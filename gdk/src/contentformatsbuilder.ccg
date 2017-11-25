@@ -21,10 +21,16 @@ ContentFormatsBuilder::ContentFormatsBuilder()
 {
 }
 
+ContentFormatsBuilder::ContentFormatsBuilder(GdkContentFormatsBuilder* castitem)
+: gobject_(castitem)
+{
+  // Always takes ownership - never takes copy.
+}
+
 ContentFormatsBuilder::ContentFormatsBuilder(ContentFormatsBuilder&& other) noexcept
 : gobject_(std::move(other.gobject_))
 {
-  other.gobject_ = gdk_content_formats_builder_new();
+  other.gobject_ = nullptr;
 }
 
 ContentFormatsBuilder& ContentFormatsBuilder::operator=(ContentFormatsBuilder&& other) noexcept
@@ -38,14 +44,19 @@ ContentFormatsBuilder::~ContentFormatsBuilder()
 {
   // The only way to destroy a GdkContentFormatsBuilder instance is to
   // make a GdkContentFormats instance, and unref it.
-  gdk_content_formats_unref(gdk_content_formats_builder_free(gobj()));
+  if (gobj())
+    gdk_content_formats_unref(gdk_content_formats_builder_free(gobj()));
+}
+
+ContentFormatsBuilder::operator bool() const noexcept
+{
+  return gobj() != nullptr;
 }
 
 Glib::RefPtr<ContentFormats> ContentFormatsBuilder::make_content_formats()
 {
   GdkContentFormats* formats = gdk_content_formats_builder_free(gobj());
-  // Make sure gobject_ is a valid pointer.
-  gobject_ = gdk_content_formats_builder_new();
+  gobject_ = nullptr;
   return Glib::wrap(formats);
 }
 

@@ -25,7 +25,7 @@ namespace Gdk
  *
  * @newin{3,94}
  */
-class ContentFormatsBuilder final
+class ContentFormatsBuilder
 {
   _CLASS_GENERIC(ContentFormatsBuilder, GdkContentFormatsBuilder)
 public:
@@ -37,15 +37,30 @@ public:
   ContentFormatsBuilder();
   _IGNORE(gdk_content_formats_builder_new)
 
-  // Can't be copied.
+  /** This always takes ownership of the underlying GdkContentFormatsBuilder,
+   * so it is only useful with C functions that return a newly-allocated GdkContentFormatsBuilder.
+   */
+  explicit ContentFormatsBuilder(GdkContentFormatsBuilder* castitem);
+
+  // noncopyable
   ContentFormatsBuilder(const ContentFormatsBuilder& other) = delete;
   ContentFormatsBuilder& operator=(const ContentFormatsBuilder& other) = delete;
 
+  // movable
   ContentFormatsBuilder(ContentFormatsBuilder&& other) noexcept;
   ContentFormatsBuilder& operator=(ContentFormatsBuilder&& other) noexcept;
 
   ~ContentFormatsBuilder();
-  
+
+  /** Checks whether the content formats builder is valid.
+   * For instance,
+   * @code
+   * if (builder)
+   *   do_something();
+   * @endcode
+   */
+  explicit operator bool() const noexcept;
+
   _WRAP_METHOD(void add_formats(const Glib::RefPtr<const ContentFormats>& formats),
     gdk_content_formats_builder_add_formats)
   _WRAP_METHOD(void add_gtype(GType gtype), gdk_content_formats_builder_add_gtype)
@@ -54,19 +69,20 @@ public:
 
   /** Makes a new Gdk::ContentFormats from the builder.
    *
-   * The builder is reset to an empty builder, as if it had been newly constructed.
+   * The builder becomes invalid. The only safe operations after a call
+   * to %make_content_formats() are operator bool() and the destructor.
    *
    * @return A new Gdk::ContentFormats with all the formats added to the builder.
    */
   Glib::RefPtr<ContentFormats> make_content_formats();
   _IGNORE(gdk_content_formats_builder_free)
 
-  ///Provides access to the underlying C object.
-  GdkContentFormatsBuilder* gobj() { return gobject_; }
-  ///Provides access to the underlying C object.
-  const GdkContentFormatsBuilder* gobj() const { return gobject_; }
+  /// Provides access to the underlying C object.
+  GdkContentFormatsBuilder* gobj() noexcept { return gobject_; }
+  /// Provides access to the underlying C object.
+  const GdkContentFormatsBuilder* gobj() const noexcept { return gobject_; }
 
-private:
+protected:
   GdkContentFormatsBuilder* gobject_;
 };
 
