@@ -1,9 +1,7 @@
 #ifndef _GTKMM_ACCELKEY_H
 #define _GTKMM_ACCELKEY_H
 
-/* menu_elems.h
- *
- * Copyright (C) 1998-2002 The gtkmm Development Team
+/* Copyright (C) 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,11 +27,10 @@ namespace Gtk
 
 /** Defines accelerator key combinations.
  * For instance, pressing Control-Q to activate the File|Quit menu item.
- * Typedefed as Gtk::Menu::AccelKey
  *
  * By defining accelerator paths you can allow the user of your application
  * to change accelerators himself. An example of an accelerator might be
- * "<MainWindow>/File/Open". Modified accelerators may be saved
+ * "<MainWindow>/File/Open". Modified accelerators may be saved.
  * @see Gtk::AccelMap
  * @ingroup Menus
  */
@@ -48,7 +45,7 @@ public:
   * @param accel_path For instance, "<MainWindow>/File/Open"
   */
   AccelKey(guint accel_key, Gdk::ModifierType accel_mods,
-           const Glib::ustring& accel_path = "");
+           const Glib::ustring& accel_path = Glib::ustring());
 
   /** AccelKey constructor.
    * @param accelerator For instance, &quot;&lt;control&gt;q&quot; - Use
