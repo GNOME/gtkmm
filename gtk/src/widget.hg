@@ -249,6 +249,9 @@ public:
   Allocation get_allocation() const;
   _IGNORE(gtk_widget_get_allocation)
 
+  _WRAP_METHOD(int get_width() const, gtk_widget_get_width)
+  _WRAP_METHOD(int get_height() const, gtk_widget_get_height)
+
   /** Retrieves the widget’s clip area.
    *
    * The clip area is the area in which all of the widget's drawing will
@@ -337,6 +340,10 @@ public:
 					       int src_x, int src_y,
 					       int& dest_x, int& dest_y), gtk_widget_translate_coordinates)
 
+  _WRAP_METHOD(bool contains(double x, double y) const, gtk_widget_contains)
+  _WRAP_METHOD(Widget* pick(double x, double y), gtk_widget_pick)
+  _WRAP_METHOD(const Widget* pick(double x, double y) const, gtk_widget_pick, constversion)
+
   _WRAP_METHOD(void reset_style(), gtk_widget_reset_style)
 
   _WRAP_METHOD(Glib::RefPtr<Pango::Context> create_pango_context(), gtk_widget_create_pango_context)
@@ -364,6 +371,24 @@ public:
 
   _WRAP_METHOD(void shape_combine_region(const Cairo::RefPtr<const Cairo::Region>& region), gtk_widget_shape_combine_region)
   _WRAP_METHOD(void input_shape_combine_region(const Cairo::RefPtr<const Cairo::Region>& region), gtk_widget_input_shape_combine_region)
+
+  _WRAP_METHOD(void set_cursor(const Glib::RefPtr<Gdk::Cursor>& cursor), gtk_widget_set_cursor)
+
+  /** Sets a named cursor to be shown when pointer devices point towards the widget.
+   *
+   * This is a utility function that creates a cursor and then sets it on the widget.
+   *
+   * If the @a name is an empty string, the widget will use the cursor specified via CSS
+   * or the parent widget. If neither specifies a cursor, the default cursor
+   * will be shown. This is the default behavior.
+   *
+   * @newin{3,94}
+   *
+   * @param name The name of the cursor, or an empty string to use the default cursor.
+   */
+  _WRAP_METHOD(void set_cursor(const Glib::ustring& name{NULL} = {}), gtk_widget_set_cursor_from_name)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Cursor> get_cursor(), gtk_widget_get_cursor, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Cursor> get_cursor() const, gtk_widget_get_cursor, refreturn, constversion)
 
   _WRAP_METHOD(WidgetPath get_path() const, gtk_widget_get_path)
 
@@ -447,9 +472,6 @@ public:
   _WRAP_METHOD(Glib::ustring get_tooltip_markup() const, gtk_widget_get_tooltip_markup)
   _WRAP_METHOD(void set_has_tooltip(bool has_tooltip = TRUE), gtk_widget_set_has_tooltip)
   _WRAP_METHOD(bool get_has_tooltip() const, gtk_widget_get_has_tooltip)
-
-  int get_width() const;
-  int get_height() const;
 
   _WRAP_METHOD(bool in_destruction() const, gtk_widget_in_destruction)
 
@@ -648,6 +670,8 @@ dnl
   _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_drop")
   _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const SelectionData& selection_data, guint time), "drag_data_received")
 
+  // The accel_closures_changed signal can't have a default handler because the wrapped C signal has no default handler.
+  _WRAP_SIGNAL(void accel_closures_changed(), "accel_closures_changed", no_default_handler)
 _CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Gdk::Display>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void display_changed(const Glib::RefPtr<Gdk::Display>& previous_display), "display_changed")
 
@@ -687,6 +711,7 @@ _CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Gdk::Display>&',`Glib::wrap($3, tr
   _WRAP_PROPERTY("can_default", bool)
   _WRAP_PROPERTY("has_default", bool)
   _WRAP_PROPERTY("receives_default", bool)
+  _WRAP_PROPERTY("cursor", Glib::RefPtr<Gdk::Cursor>)
   _WRAP_PROPERTY("has_tooltip", bool)
   _WRAP_PROPERTY("tooltip_markup", Glib::ustring)
   _WRAP_PROPERTY("tooltip_text", Glib::ustring)
@@ -720,6 +745,8 @@ protected:
 
   _WRAP_VFUNC(void compute_expand(bool& hexpand_p, bool& vexpand_p), compute_expand,
     custom_vfunc_callback, custom_vfunc)
+  _WRAP_VFUNC(bool contains(double x, double y) const, contains)
+  _WRAP_VFUNC(Widget* pick(double x, double y), pick)
 
   // The snapshot vfunc must not be wrapped here. It would interfere with the way
   // gtk+ selects either the snapshot vfunc or the draw signal for rendering widgets.
