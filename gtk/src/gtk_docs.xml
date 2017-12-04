@@ -2109,19 +2109,18 @@ Since: 2.14
 <property name="GtkCellRendererPixbuf:icon-name">
 <description>
 The name of the themed icon to display.
-This property only has an effect if not overridden by &quot;stock_id&quot; 
-or &quot;pixbuf&quot; properties.
+This property only has an effect if not overridden by the &quot;pixbuf&quot; property.
 
 Since: 2.8 
 
 </description>
 </property>
 
-<property name="GtkCellRendererPixbuf:stock-size">
+<property name="GtkCellRendererPixbuf:icon-size">
 <description>
 The #GtkIconSize value that specifies the size of the rendered icon.
 
-Since: 2.2
+Since: 3.94
 
 </description>
 </property>
@@ -2513,28 +2512,6 @@ to discover the new state.
 <parameters>
 <parameter name="checkmenuitem">
 <parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkClipboard::owner-change">
-<description>
-The ::owner-change signal is emitted when GTK+ receives an
-event that indicates that the ownership of the selection
-associated with @clipboard has changed.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> the #GtkClipboard on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> the @GdkEventOwnerChange event
 </parameter_description>
 </parameter>
 </parameters>
@@ -4465,6 +4442,129 @@ Since: 3.14
 </description>
 </property>
 
+<signal name="GtkEventControllerScroll::decelerate">
+<description>
+Emitted after scroll is finished if the #GTK_EVENT_CONTROLLER_SCROLL_KINETIC
+flag is set. @vel_x and @vel_y express the initial velocity that was
+imprinted by the scroll events. @vel_x and @vel_y are expressed in
+pixels/ms.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="vel_x">
+<parameter_description> X velocity
+</parameter_description>
+</parameter>
+<parameter name="vel_y">
+<parameter_description> Y velocity
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll">
+<description>
+Signals that the widget should scroll by the
+amount specified by @dx and @dy.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description> X delta
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description> Y delta
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll-begin">
+<description>
+Signals that a new scrolling operation has begun. It will
+only be emitted on devices capable of it.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll-end">
+<description>
+Signals that a new scrolling operation has finished. It will
+only be emitted on devices capable of it.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkEventControllerScroll:flags">
+<description>
+The flags affecting event controller behavior
+
+Since: 3.93
+
+</description>
+</property>
+
+<enum name="GtkEventControllerScrollFlags">
+<description>
+Describes the behavior of a #GtkEventControllerScroll.
+
+Since: 3.93
+
+</description>
+<parameters>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_NONE">
+<parameter_description> Don't emit scroll.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_VERTICAL">
+<parameter_description> Emit scroll with vertical deltas.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_HORIZONTAL">
+<parameter_description> Emit scroll with horizontal deltas.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_DISCRETE">
+<parameter_description> Only emit deltas that are multiples of 1.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_KINETIC">
+<parameter_description> Emit #GtkEventControllerScroll::decelerate
+after continuous scroll finishes.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES">
+<parameter_description> Emit scroll on both axes.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkEventSequenceState">
 <description>
 Describes the state of a #GdkEventSequence in a #GtkGesture.
@@ -4508,7 +4608,7 @@ chooser is in %GTK_FILE_CHOOSER_ACTION_SAVE mode.
 Most applications just need to turn on the
 #GtkFileChooser:do-overwrite-confirmation property (or call the
 gtk_file_chooser_set_do_overwrite_confirmation() function), and
-they will automatically get a stock confirmation dialog.
+they will automatically get a standard confirmation dialog.
 Applications which need to customize this behavior should do
 that, and also connect to the #GtkFileChooser::confirm-overwrite
 signal.
@@ -4520,7 +4620,7 @@ different filename, it should return
 %GTK_FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN.  If it determines
 that the user is satisfied with his choice of file name, it
 should return %GTK_FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME.
-On the other hand, if it determines that the stock confirmation
+On the other hand, if it determines that the standard confirmation
 dialog should be used, it should return
 %GTK_FILE_CHOOSER_CONFIRMATION_CONFIRM. The following example
 illustrates this.
@@ -5985,6 +6085,42 @@ Since: 3.14
 <parameters>
 <parameter name="gesture">
 <parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkGestureMultiPress::unpaired-release">
+<description>
+This signal is emitted whenever the gesture receives a release
+event that had no previous corresponding press. Due to implicit
+grabs, this can only happen on situations where input is grabbed
+elsewhere mid-press or the pressed widget voluntarily relinquishes
+its implicit grab.
+
+Since: 3.93.
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X coordinate of the event
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y coordinate of the event
+</parameter_description>
+</parameter>
+<parameter name="button">
+<parameter_description> Button being released
+</parameter_description>
+</parameter>
+<parameter name="sequence">
+<parameter_description> Sequence being released
 </parameter_description>
 </parameter>
 </parameters>
@@ -13401,36 +13537,6 @@ See also: gtk_text_buffer_insert_child_anchor().
 <return></return>
 </signal>
 
-<signal name="GtkTextBuffer::insert-pixbuf">
-<description>
-The ::insert-pixbuf signal is emitted to insert a #GdkPixbuf 
-in a #GtkTextBuffer. Insertion actually occurs in the default handler.
-
-Note that if your handler runs before the default handler it must not 
-invalidate the @location iter (or has to revalidate it). 
-The default signal handler revalidates it to be placed after the 
-inserted @pixbuf.
-
-See also: gtk_text_buffer_insert_pixbuf().
-
-</description>
-<parameters>
-<parameter name="textbuffer">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="location">
-<parameter_description> position to insert @pixbuf in @textbuffer
-</parameter_description>
-</parameter>
-<parameter name="pixbuf">
-<parameter_description> the #GdkPixbuf to be inserted
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <signal name="GtkTextBuffer::insert-text">
 <description>
 The ::insert-text signal is emitted to insert text in a #GtkTextBuffer.
@@ -13461,6 +13567,36 @@ gtk_text_buffer_insert_range().
 </parameter>
 <parameter name="len">
 <parameter_description> length of the inserted text in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkTextBuffer::insert-texture">
+<description>
+The ::insert-texture signal is emitted to insert a #GdkTexture
+in a #GtkTextBuffer. Insertion actually occurs in the default handler.
+
+Note that if your handler runs before the default handler it must not
+invalidate the @location iter (or has to revalidate it).
+The default signal handler revalidates it to be placed after the
+inserted @texture.
+
+See also: gtk_text_buffer_insert_texture().
+
+</description>
+<parameters>
+<parameter name="textbuffer">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="location">
+<parameter_description> position to insert @texture in @textbuffer
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> the #GdkTexture to be inserted
 </parameter_description>
 </parameter>
 </parameters>
@@ -13549,7 +13685,7 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> the #GtkClipboard pasted from
+<parameter_description> the #GdkClipboard pasted from
 </parameter_description>
 </parameter>
 </parameters>
@@ -13731,7 +13867,7 @@ Flags affecting how a search is done.
 
 If neither #GTK_TEXT_SEARCH_VISIBLE_ONLY nor #GTK_TEXT_SEARCH_TEXT_ONLY are
 enabled, the match must be exact; the special 0xFFFC character will match
-embedded pixbufs or child widgets.
+embedded textures or child widgets.
 
 </description>
 <parameters>
@@ -13741,7 +13877,7 @@ have invisible text interspersed.
 </parameter_description>
 </parameter>
 <parameter name="GTK_TEXT_SEARCH_TEXT_ONLY">
-<parameter_description> Search only text. A match may have pixbufs or
+<parameter_description> Search only text. A match may have textures or
 child widgets mixed inside the matched range.
 </parameter_description>
 </parameter>
@@ -15675,7 +15811,7 @@ widget was not associated with a screen before
 <description>
 The ::drag-begin signal is emitted on the drag source when a drag is
 started. A typical reason to connect to this signal is to set up a
-custom drag icon with e.g. gtk_drag_source_set_icon_pixbuf().
+custom drag icon with e.g. gtk_drag_source_set_icon_surface().
 
 Note that some widgets set up a drag icon in the default handler of
 this signal, so you may have to use g_signal_connect_after() to
@@ -21183,29 +21319,6 @@ why these operations are inhibited
 request. It should be used as an argument to gtk_application_uninhibit()
 in order to remove the request. If the platform does not support
 inhibiting or the request failed for some reason, 0 is returned.
-
-</return>
-</function>
-
-<function name="gtk_application_is_inhibited">
-<description>
-Determines if any of the actions specified in @flags are
-currently inhibited (possibly by another application).
-
-Since: 3.4
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the #GtkApplication
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> what types of actions should be queried
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if any of the actions specified in @flags are inhibited
 
 </return>
 </function>
@@ -27849,25 +27962,6 @@ Since: 2.6
 </return>
 </function>
 
-<function name="gtk_cell_view_new_with_pixbuf">
-<description>
-Creates a new #GtkCellView widget, adds a #GtkCellRendererPixbuf
-to it, and makes it show @pixbuf.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="pixbuf">
-<parameter_description> the image to display in the cell view
-</parameter_description>
-</parameter>
-</parameters>
-<return> A newly created #GtkCellView widget.
-
-</return>
-</function>
-
 <function name="gtk_cell_view_new_with_text">
 <description>
 Creates a new #GtkCellView widget, adds a #GtkCellRendererText 
@@ -27879,6 +27973,25 @@ Since: 2.6
 <parameters>
 <parameter name="text">
 <parameter_description> the text to display in the cell view
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly created #GtkCellView widget.
+
+</return>
+</function>
+
+<function name="gtk_cell_view_new_with_texture">
+<description>
+Creates a new #GtkCellView widget, adds a #GtkCellRendererPixbuf
+to it, and makes it show @texture.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="texture">
+<parameter_description> the image to display in the cell view
 </parameter_description>
 </parameter>
 </parameters>
@@ -28526,893 +28639,6 @@ into an application using a newer version of GTK+.
 given version, or a string describing the version mismatch.
 The returned string is owned by GTK+ and should not be modified
 or freed.
-</return>
-</function>
-
-<function name="gtk_clipboard_clear">
-<description>
-Clears the contents of the clipboard. Generally this should only
-be called between the time you call gtk_clipboard_set_with_owner()
-or gtk_clipboard_set_with_data(),
-and when the @clear_func you supplied is called. Otherwise, the
-clipboard may be owned by someone else.
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description>  a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_get">
-<description>
-Returns the clipboard object for the given selection.
-See gtk_clipboard_get_for_display() for complete details.
-
-
-</description>
-<parameters>
-<parameter name="selection">
-<parameter_description> a #GdkAtom which identifies the clipboard to use
-</parameter_description>
-</parameter>
-</parameters>
-<return> the appropriate clipboard object. If no clipboard
-already exists, a new one will be created. Once a clipboard
-object has been created, it is persistent and, since it is
-owned by GTK+, must not be freed or unreffed.
-</return>
-</function>
-
-<function name="gtk_clipboard_get_default">
-<description>
-Returns the default clipboard object for use with cut/copy/paste menu items
-and keyboard shortcuts.
-
-Since: 3.16
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay for which the clipboard is to be retrieved.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the default clipboard object.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_get_display">
-<description>
-Gets the #GdkDisplay associated with @clipboard
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkDisplay associated with @clipboard
-
-</return>
-</function>
-
-<function name="gtk_clipboard_get_for_display">
-<description>
-Returns the clipboard object for the given selection.
-Cut/copy/paste menu items and keyboard shortcuts should use
-the default clipboard, returned by passing %GDK_SELECTION_CLIPBOARD for @selection.
-(%NULL is supported as a synonym for GDK_SELECTION_CLIPBOARD
-for backwards compatibility reasons.)
-The currently-selected object or text should be provided on the clipboard
-identified by #GDK_SELECTION_PRIMARY. Cut/copy/paste menu items
-conceptually copy the contents of the #GDK_SELECTION_PRIMARY clipboard
-to the default clipboard, i.e. they copy the selection to what the
-user sees as the clipboard.
-
-(Passing %NULL is the same as using `gdk_atom_intern
-(&quot;CLIPBOARD&quot;, FALSE)`.
-
-See the
-[FreeDesktop Clipboard Specification](http://www.freedesktop.org/Standards/clipboards-spec)
-for a detailed discussion of the “CLIPBOARD” vs. “PRIMARY”
-selections under the X window system. On Win32 the
-#GDK_SELECTION_PRIMARY clipboard is essentially ignored.)
-
-It’s possible to have arbitrary named clipboards; if you do invent
-new clipboards, you should prefix the selection name with an
-underscore (because the ICCCM requires that nonstandard atoms are
-underscore-prefixed), and namespace it as well. For example,
-if your application called “Foo” has a special-purpose
-clipboard, you might call it “_FOO_SPECIAL_CLIPBOARD”.
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay for which the clipboard is to be retrieved or created.
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> a #GdkAtom which identifies the clipboard to use.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the appropriate clipboard object. If no
-clipboard already exists, a new one will be created. Once a clipboard
-object has been created, it is persistent and, since it is owned by
-GTK+, must not be freed or unrefd.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_get_owner">
-<description>
-If the clipboard contents callbacks were set with
-gtk_clipboard_set_with_owner(), and the gtk_clipboard_set_with_data() or
-gtk_clipboard_clear() has not subsequently called, returns the owner set
-by gtk_clipboard_set_with_owner().
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> the owner of the clipboard, if any;
-otherwise %NULL.
-</return>
-</function>
-
-<function name="gtk_clipboard_get_selection">
-<description>
-Gets the selection that this clipboard is for.
-
-Since: 3.22
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> the selection
-
-</return>
-</function>
-
-<function name="gtk_clipboard_request_contents">
-<description>
-Requests the contents of clipboard as the given target.
-When the results of the result are later received the supplied callback
-will be called.
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> an atom representing the form into which the clipboard
-owner should convert the selection.
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> A function to call when the results are received
-(or the retrieval fails). If the retrieval fails the length field of
-@selection_data will be negative.
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_request_formats">
-<description>
-Requests the contents of the clipboard as list of supported formats.
-When the list is later received, @callback will be called.
-
-The @formats parameter to @callback will contain the resulting formats if
-the request succeeded, or %NULL if it failed.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a function to call when the formats are
-received, or the retrieval fails. (It will always be called
-one way or the other.)
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_request_image">
-<description>
-Requests the contents of the clipboard as image. When the image is
-later received, it will be converted to a #GdkPixbuf, and
-@callback will be called.
-
-The @pixbuf parameter to @callback will contain the resulting
-#GdkPixbuf if the request succeeded, or %NULL if it failed. This
-could happen for various reasons, in particular if the clipboard
-was empty or if the contents of the clipboard could not be
-converted into an image.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a function to call when the image is received,
-or the retrieval fails. (It will always be called one way or the other.)
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_request_rich_text">
-<description>
-Requests the contents of the clipboard as rich text. When the rich
-text is later received, @callback will be called.
-
-The @text parameter to @callback will contain the resulting rich
-text if the request succeeded, or %NULL if it failed. The @length
-parameter will contain @text’s length. This function can fail for
-various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into rich text form.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a function to call when the text is received,
-or the retrieval fails. (It will always be called one way or the other.)
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_request_text">
-<description>
-Requests the contents of the clipboard as text. When the text is
-later received, it will be converted to UTF-8 if necessary, and
-@callback will be called.
-
-The @text parameter to @callback will contain the resulting text if
-the request succeeded, or %NULL if it failed. This could happen for
-various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into text form.
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a function to call when the text is received,
-or the retrieval fails. (It will always be called one way or the other.)
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_request_uris">
-<description>
-Requests the contents of the clipboard as URIs. When the URIs are
-later received @callback will be called.
-
-The @uris parameter to @callback will contain the resulting array of
-URIs if the request succeeded, or %NULL if it failed. This could happen
-for various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into URI form.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a function to call when the URIs are received,
-or the retrieval fails. (It will always be called one way or the other.)
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @callback.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_set_can_store">
-<description>
-Hints that the clipboard data should be stored somewhere when the
-application exits or when gtk_clipboard_store () is called.
-
-This value is reset when the clipboard owner changes.
-Where the clipboard data is stored is platform dependent,
-see gdk_display_store_clipboard () for more information.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> The targets (data formats) in which the
-functions can provide the data or %NULL
-to indicate that all forms should be stored.
-</parameter_description>
-</parameter>
-<parameter name="n_formats">
-<parameter_description> number of elements in @formats
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_set_image">
-<description>
-Sets the contents of the clipboard to the given #GdkPixbuf. 
-GTK+ will take responsibility for responding for requests 
-for the image, and for converting the image into the 
-requested format.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard object
-</parameter_description>
-</parameter>
-<parameter name="pixbuf">
-<parameter_description>    a #GdkPixbuf 
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_set_surface">
-<description>
-Sets the contents of the clipboard to the given cairo image surface.
-GTK+ will take responsibility for responding for requests for the
-image, and for converting the image into the requested format.
-
-Since: 3.94
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard object
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> a cairo image surface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_set_text">
-<description>
-Sets the contents of the clipboard to the given UTF-8 string. GTK+ will
-make a copy of the text and take responsibility for responding
-for requests for the text, and for converting the text into
-the requested format.
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard object
-</parameter_description>
-</parameter>
-<parameter name="text">
-<parameter_description>      a UTF-8 string.
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description>       length of @text, in bytes, or -1, in which case
-the length will be determined with strlen().
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_set_with_data">
-<description>
-Virtually sets the contents of the specified clipboard by providing
-a list of supported formats for the clipboard data and a function
-to call to get the actual data when it is requested.
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> The targets (data formats) in which the
-functions can provide the data
-</parameter_description>
-</parameter>
-<parameter name="get_func">
-<parameter_description> function to call to get the actual clipboard data
-</parameter_description>
-</parameter>
-<parameter name="clear_func">
-<parameter_description> when the clipboard contents are set again,
-this function will be called, and @get_func will not be subsequently
-called.
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @get_func and @clear_func.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if setting the clipboard data succeeded.
-If setting the clipboard data failed the provided callback
-functions will be ignored.
-</return>
-</function>
-
-<function name="gtk_clipboard_set_with_owner">
-<description>
-Virtually sets the contents of the specified clipboard by providing
-a list of supported formats for the clipboard data and a function
-to call to get the actual data when it is requested.
-
-The difference between this function and gtk_clipboard_set_with_data()
-is that instead of an generic @user_data pointer, a #GObject is passed
-in.
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> The targets (data formats) in which the
-functions can provide the data
-</parameter_description>
-</parameter>
-<parameter name="get_func">
-<parameter_description> function to call to get the actual clipboard data
-</parameter_description>
-</parameter>
-<parameter name="clear_func">
-<parameter_description> when the clipboard contents are set again,
-this function will be called, and @get_func will not be subsequently
-called
-</parameter_description>
-</parameter>
-<parameter name="owner">
-<parameter_description> an object that “owns” the data. This object will be passed
-to the callbacks when called
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if setting the clipboard data succeeded.
-If setting the clipboard data failed the provided callback
-functions will be ignored.
-</return>
-</function>
-
-<function name="gtk_clipboard_store">
-<description>
-Stores the current clipboard data somewhere so that it will stay
-around after the application has quit.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_clipboard_wait_for_contents">
-<description>
-Requests the contents of the clipboard using the given target.
-This function waits for the data to be received using the main 
-loop, so events, timeouts, etc, may be dispatched during the wait.
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> an atom representing the form into which the clipboard
-owner should convert the selection.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly-allocated #GtkSelectionData object or %NULL
-if retrieving the given target failed. If non-%NULL,
-this value must be freed with gtk_selection_data_free() 
-when you are finished with it.
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_formats">
-<description>
-Returns a list of formats that are present on the clipboard, or %NULL
-if there aren’t any formats available. The returned list must be
-freed with g_free().
-This function waits for the data to be received using the main
-loop, so events, timeouts, etc, may be dispatched during the wait.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> location
-to store an array of formats. The result stored here must
-be freed with g_free().
-</parameter_description>
-</parameter>
-<parameter name="n_formats">
-<parameter_description> location to store number of items in @formats.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if any formats are present on the clipboard,
-otherwise %FALSE.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_image">
-<description>
-Requests the contents of the clipboard as image and converts
-the result to a #GdkPixbuf. This function waits for
-the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly-allocated #GdkPixbuf
-object which must be disposed with g_object_unref(), or
-%NULL if retrieving the selection data failed. (This could
-happen for various reasons, in particular if the clipboard
-was empty or if the contents of the clipboard could not be
-converted into an image.)
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_rich_text">
-<description>
-Requests the contents of the clipboard as rich text.  This function
-waits for the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> return location for the format of the returned data
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> return location for the length of the returned data
-</parameter_description>
-</parameter>
-</parameters>
-<return> a
-newly-allocated binary block of data which must be
-freed with g_free(), or %NULL if retrieving the
-selection data failed. (This could happen for various
-reasons, in particular if the clipboard was empty or
-if the contents of the clipboard could not be
-converted into text form.)
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_surface">
-<description>
-Requests the contents of the clipboard as image and converts
-the result to a cairo surface. This function waits for
-the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly-allocated cairo surface
-object which must be disposed with cairo_surface_destroy(), or
-%NULL if retrieving the selection data failed. (This could
-happen for various reasons, in particular if the clipboard
-was empty or if the contents of the clipboard could not be
-converted into an image.)
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_text">
-<description>
-Requests the contents of the clipboard as text and converts
-the result to UTF-8 if necessary. This function waits for
-the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly-allocated UTF-8 string which must
-be freed with g_free(), or %NULL if retrieving
-the selection data failed. (This could happen
-for various reasons, in particular if the
-clipboard was empty or if the contents of the
-clipboard could not be converted into text form.)
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_for_uris">
-<description>
-Requests the contents of the clipboard as URIs. This function waits
-for the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return>
-a newly-allocated %NULL-terminated array of strings which must
-be freed with g_strfreev(), or %NULL if retrieving the
-selection data failed. (This could happen for various reasons,
-in particular if the clipboard was empty or if the contents of
-the clipboard could not be converted into URI form.)
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_is_image_available">
-<description>
-Test to see if there is an image available to be pasted
-This is done by requesting the TARGETS atom and checking
-if it contains any of the supported image formats. This function 
-waits for the data to be received using the main loop, so events, 
-timeouts, etc, may be dispatched during the wait.
-
-This function is a little faster than calling
-gtk_clipboard_wait_for_image() since it doesn’t need to retrieve
-the actual image data.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE is there is an image available, %FALSE otherwise.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_is_rich_text_available">
-<description>
-Test to see if there is rich text available to be pasted
-This is done by requesting the TARGETS atom and checking
-if it contains any of the supported rich text formats. This function
-waits for the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-This function is a little faster than calling
-gtk_clipboard_wait_for_rich_text() since it doesn’t need to retrieve
-the actual text.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE is there is rich text available, %FALSE otherwise.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_is_target_available">
-<description>
-Checks if a clipboard supports pasting data of a given type. This
-function can be used to determine if a “Paste” menu item should be
-insensitive or not.
-
-If you want to see if there’s text available on the clipboard, use
-gtk_clipboard_wait_is_text_available () instead.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description>    A #GdkAtom indicating which target to look for.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the target is available, %FALSE otherwise.
-
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_is_text_available">
-<description>
-Test to see if there is text available to be pasted
-This is done by requesting the TARGETS atom and checking
-if it contains any of the supported text formats. This function 
-waits for the data to be received using the main loop, so events, 
-timeouts, etc, may be dispatched during the wait.
-
-This function is a little faster than calling
-gtk_clipboard_wait_for_text() since it doesn’t need to retrieve
-the actual text.
-
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE is there is text available, %FALSE otherwise.
-</return>
-</function>
-
-<function name="gtk_clipboard_wait_is_uris_available">
-<description>
-Test to see if there is a list of URIs available to be pasted
-This is done by requesting the TARGETS atom and checking
-if it contains the URI formats. This function
-waits for the data to be received using the main loop, so events, 
-timeouts, etc, may be dispatched during the wait.
-
-This function is a little faster than calling
-gtk_clipboard_wait_for_uris() since it doesn’t need to retrieve
-the actual URI data.
-
-Since: 2.14
-
-</description>
-<parameters>
-<parameter name="clipboard">
-<parameter_description> a #GtkClipboard
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE is there is an URI list available, %FALSE otherwise.
-
 </return>
 </function>
 
@@ -31358,34 +30584,6 @@ how to convert a pixbuf into the format
 <return></return>
 </function>
 
-<function name="gtk_content_formats_add_rich_text_targets">
-<description>
-Appends the rich text targets registered with
-gtk_text_buffer_register_serialize_format() or
-gtk_text_buffer_register_deserialize_format() to the target list. All
-targets are added with the same @info.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GdkContentFormats
-</parameter_description>
-</parameter>
-<parameter name="deserializable">
-<parameter_description> if %TRUE, then deserializable rich text formats
-will be added, serializable formats otherwise.
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_content_formats_add_text_targets">
 <description>
 Appends the text targets supported by #GtkSelectionData to
@@ -31414,10 +30612,6 @@ Since: 2.6
 <parameters>
 <parameter name="list">
 <parameter_description> a #GdkContentFormats
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> an ID that will be passed back to the application
 </parameter_description>
 </parameter>
 </parameters>
@@ -32819,6 +32013,39 @@ with a context for the source side of a drag)
 <return></return>
 </function>
 
+<function name="gtk_drag_set_icon_texture">
+<description>
+Sets @texture as the icon for a given drag. GTK+ retains
+references for the arguments, and will release them when
+they are no longer needed.
+
+To position the texture relative to the mouse, its top
+left will be positioned @hot_x, @hot_y pixels from the
+mouse cursor.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> the context for a drag (This must be called
+with a context for the source side of a drag)
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> the #GdkTexture to use as icon
+</parameter_description>
+</parameter>
+<parameter name="hot_x">
+<parameter_description> the X offset of the hotspot within the icon
+</parameter_description>
+</parameter>
+<parameter name="hot_y">
+<parameter_description> the Y offset of the hotspot within the icon
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_drag_set_icon_widget">
 <description>
 Changes the icon for a widget to a given widget. GTK+
@@ -32992,26 +32219,6 @@ Since: 2.8
 </parameter>
 <parameter name="icon_name">
 <parameter_description> name of icon to use
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_set_icon_pixbuf">
-<description>
-Sets the icon that will be used for drags from a particular widget
-from a #GdkPixbuf. GTK+ retains a reference for @pixbuf and will 
-release it when it is no longer needed.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="pixbuf">
-<parameter_description> the #GdkPixbuf for the drag icon
 </parameter_description>
 </parameter>
 </parameters>
@@ -34601,7 +33808,7 @@ Since: 2.16
 <description>
 Retrieves the #GIcon used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-stock, texture, or icon name).
+texture or icon name).
 
 Since: 2.16
 
@@ -34626,7 +33833,7 @@ or if the icon is not a #GIcon
 <description>
 Retrieves the icon name used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-texture, stock or gicon).
+texture or gicon).
 
 Since: 2.16
 
@@ -36104,6 +35311,67 @@ Since: 3.14
 <return></return>
 </function>
 
+<function name="gtk_event_controller_scroll_get_flags">
+<description>
+Gets the flags conditioning the scroll controller behavior.
+
+Since: 3.93
+
+</description>
+<parameters>
+<parameter name="scroll">
+<parameter_description> a #GtkEventControllerScroll
+</parameter_description>
+</parameter>
+</parameters>
+<return> the controller flags.
+
+</return>
+</function>
+
+<function name="gtk_event_controller_scroll_new">
+<description>
+Creates a new event controller that will handle scroll events
+for the given @widget.
+
+Since: 3.93
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> behavior flags
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkEventControllerScroll
+
+</return>
+</function>
+
+<function name="gtk_event_controller_scroll_set_flags">
+<description>
+Sets the flags conditioning scroll controller behavior.
+
+Since: 3.93
+
+</description>
+<parameters>
+<parameter name="scroll">
+<parameter_description> a #GtkEventControllerScroll
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> behavior flags
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_event_controller_set_propagation_phase">
 <description>
 Sets the propagation phase at which a controller handles events.
@@ -36780,7 +36048,7 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="first_button_text">
-<parameter_description> stock ID or text to go in the first button, or %NULL
+<parameter_description> text to go in the first button, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -37335,7 +36603,7 @@ with g_slist_free(), and the filenames with g_free().
 
 <function name="gtk_file_chooser_get_use_preview_label">
 <description>
-Gets whether a stock label should be drawn with the name of the previewed
+Gets whether a label should be drawn with the name of the previewed
 file.  See gtk_file_chooser_set_use_preview_label().
 
 
@@ -37926,7 +37194,7 @@ is %FALSE by default.
 If set to %TRUE, the @chooser will emit the
 #GtkFileChooser::confirm-overwrite signal when appropriate.
 
-If all you need is the stock confirmation dialog, set this property to %TRUE.
+If all you need is the standard confirmation dialog, set this property to %TRUE.
 You can override the way confirmation is done by actually handling the
 #GtkFileChooser::confirm-overwrite signal; please refer to its documentation
 for the details.
@@ -38288,7 +37556,7 @@ Since: 2.4
 
 <function name="gtk_file_chooser_set_use_preview_label">
 <description>
-Sets whether the file chooser should display a stock label with the name of
+Sets whether the file chooser should display a label with the name of
 the file that is being previewed; the default is %TRUE.  Applications that
 want to draw the whole preview area themselves should set this to %FALSE and
 display the name themselves in their preview widget.
@@ -38304,7 +37572,7 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="use_label">
-<parameter_description> whether to display a stock label with the name of the previewed file
+<parameter_description> whether to display a label with the name of the previewed file
 </parameter_description>
 </parameter>
 </parameters>
@@ -46346,8 +45614,8 @@ The #GtkImage does not assume a reference to the
 pixbuf; you still need to unref it if you own references.
 #GtkImage will add its own reference rather than adopting yours.
 
-This is a helper for gtk_image_new_from_surface, and you can't
-get back the exact pixbuf once this is called, only a surface.
+This is a helper for gtk_image_new_from_texture(), and you can't
+get back the exact pixbuf once this is called, only a texture.
 
 Note that this function just creates an #GtkImage from the pixbuf. The
 #GtkImage created will not react to state changes. Should you want that, 
@@ -46412,6 +45680,29 @@ Since: 3.10
 </parameters>
 <return> a new #GtkImage
 
+</return>
+</function>
+
+<function name="gtk_image_new_from_texture">
+<description>
+Creates a new #GtkImage displaying @texture.
+The #GtkImage does not assume a reference to the
+texture; you still need to unref it if you own references.
+#GtkImage will add its own reference rather than adopting yours.
+
+Note that this function just creates an #GtkImage from the texture. The
+#GtkImage created will not react to state changes. Should you want that, 
+you should use gtk_image_new_from_icon_name().
+
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> a #GdkTexture, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkImage
 </return>
 </function>
 
@@ -46485,8 +45776,8 @@ Since: 2.6
 <description>
 See gtk_image_new_from_pixbuf() for details.
 
-Note: This is a helper for gtk_image_new_from_surface, and you can't
-get back the exact pixbuf once this is called, only a surface.
+Note: This is a helper for gtk_image_set_from_texture(), and you can't
+get back the exact pixbuf once this is called, only a texture.
 
 
 </description>
@@ -46553,7 +45844,7 @@ Since: 3.94
 <parameter_description> a #GtkImage
 </parameter_description>
 </parameter>
-<parameter name="surface">
+<parameter name="texture">
 <parameter_description> a #GdkTexture or %NULL
 </parameter_description>
 </parameter>
@@ -49849,8 +49140,8 @@ in.  Note that only types derived from standard GObject fundamental types
 are supported.
 
 As an example, `gtk_list_store_new (3, G_TYPE_INT, G_TYPE_STRING,
-GDK_TYPE_PIXBUF);` will create a new #GtkListStore with three columns, of type
-int, string and #GdkPixbuf respectively.
+GDK_TYPE_TEXTURE);` will create a new #GtkListStore with three columns, of type
+int, string and #GdkTexture, respectively.
 
 
 </description>
@@ -62554,7 +61845,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="first_button_text">
-<parameter_description> stock ID or text to go in the first button, or %NULL
+<parameter_description> text to go in the first button, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -62592,7 +61883,7 @@ Since: 2.10
 </parameter_description>
 </parameter>
 <parameter name="first_button_text">
-<parameter_description> stock ID or text to go in the first button, or %NULL
+<parameter_description> text to go in the first button, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -64862,9 +64153,9 @@ Since: 3.0
 
 <function name="gtk_render_icon">
 <description>
-Renders the icon in @pixbuf at the specified @x and @y coordinates.
+Renders the icon in @texture at the specified @x and @y coordinates.
 
-This function will render the icon in @pixbuf at exactly its size,
+This function will render the icon in @texture at exactly its size,
 regardless of scaling factors, which may not be appropriate when
 drawing on displays with high pixel densities.
 
@@ -64883,16 +64174,16 @@ Since: 3.2
 <parameter_description> a #cairo_t
 </parameter_description>
 </parameter>
-<parameter name="pixbuf">
-<parameter_description> a #GdkPixbuf containing the icon to draw
+<parameter name="texture">
+<parameter_description> a #GdkTexture containing the icon to draw
 </parameter_description>
 </parameter>
 <parameter name="x">
-<parameter_description> X position for the @pixbuf
+<parameter_description> X position for the @texture
 </parameter_description>
 </parameter>
 <parameter name="y">
-<parameter_description> Y position for the @pixbuf
+<parameter_description> Y position for the @texture 
 </parameter_description>
 </parameter>
 </parameters>
@@ -67380,6 +66671,28 @@ If the result is non-%NULL it must be freed with g_free().
 </return>
 </function>
 
+<function name="gtk_selection_data_get_texture">
+<description>
+Gets the contents of the selection data as a #GdkPixbuf.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="selection_data">
+<parameter_description> a #GtkSelectionData
+</parameter_description>
+</parameter>
+</parameters>
+<return> if the selection data
+contained a recognized image type and it could be converted to a
+#GdkTexture, a newly allocated texture is returned, otherwise
+%NULL.  If the result is non-%NULL it must be freed with
+g_object_unref().
+
+</return>
+</function>
+
 <function name="gtk_selection_data_get_uris">
 <description>
 Gets the contents of the selection data as array of URIs.
@@ -67511,6 +66824,31 @@ otherwise %FALSE.
 </return>
 </function>
 
+<function name="gtk_selection_data_set_texture">
+<description>
+Sets the contents of the selection from a #GdkTexture.
+The surface is converted to the form determined by
+@selection_data-&gt;target.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="selection_data">
+<parameter_description> a #GtkSelectionData
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> a #GdkTexture
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the selection was successfully set,
+otherwise %FALSE.
+
+</return>
+</function>
+
 <function name="gtk_selection_data_set_uris">
 <description>
 Sets the contents of the selection from a list of URIs.
@@ -67559,32 +66897,6 @@ how to convert a pixbuf into the format
 </parameters>
 <return> %TRUE if @selection_data holds a list of targets,
 and a suitable target for images is included, otherwise %FALSE.
-
-</return>
-</function>
-
-<function name="gtk_selection_data_targets_include_rich_text">
-<description>
-Given a #GtkSelectionData object holding a list of targets,
-determines if any of the targets in @targets can be used to
-provide rich text.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="selection_data">
-<parameter_description> a #GtkSelectionData object
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @selection_data holds a list of targets,
-and a suitable target for rich text is included,
-otherwise %FALSE.
 
 </return>
 </function>
@@ -67819,7 +67131,7 @@ Since: 3.94
 
 </description>
 <parameters>
-<parameter name="screen">
+<parameter name="display">
 <parameter_description> a #GdkDisplay.
 </parameter_description>
 </parameter>
@@ -68568,40 +67880,6 @@ Since: 3.90
 </parameter>
 <parameter name="height">
 <parameter_description> rectangle height
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_snapshot_render_icon">
-<description>
-Creates a render node for rendering @pixbuf according to the style
-information in @context, and appends it to the current node of @snapshot,
-without changing the current node.
-
-Since: 3.90
-
-</description>
-<parameters>
-<parameter name="snapshot">
-<parameter_description> a #GtkSnapshot
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the #GtkStyleContext to use
-</parameter_description>
-</parameter>
-<parameter name="pixbuf">
-<parameter_description> the #GdkPixbuf to render
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X origin of the rectangle
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y origin of the rectangle
 </parameter_description>
 </parameter>
 </parameters>
@@ -71109,34 +70387,6 @@ otherwise %FALSE.
 </return>
 </function>
 
-<function name="gtk_targets_include_rich_text">
-<description>
-Determines if any of the targets in @targets can be used to
-provide rich text.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="targets">
-<parameter_description> an array of #GdkAtoms
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> the length of @targets
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @targets include a suitable target for rich text,
-otherwise %FALSE.
-
-</return>
-</function>
-
 <function name="gtk_targets_include_text">
 <description>
 Determines if any of the targets in @targets can be used to
@@ -71392,7 +70642,8 @@ Since: 2.12
 <description>
 Adds @clipboard to the list of clipboards in which the selection 
 contents of @buffer are available. In most cases, @clipboard will be 
-the #GtkClipboard of type %GDK_SELECTION_PRIMARY for a view of @buffer.
+the #GdkClipboard returned by gdk_widget_get_primary_clipboard()
+for a view of @buffer.
 
 </description>
 <parameters>
@@ -71401,7 +70652,7 @@ the #GtkClipboard of type %GDK_SELECTION_PRIMARY for a view of @buffer.
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description> a #GdkClipboard
 </parameter_description>
 </parameter>
 </parameters>
@@ -71543,7 +70794,7 @@ Copies the currently-selected text to a clipboard.
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> the #GtkClipboard object to copy to
+<parameter_description> the #GdkClipboard object to copy to
 </parameter_description>
 </parameter>
 </parameters>
@@ -71669,7 +70920,7 @@ said text if it’s editable.
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> the #GtkClipboard object to cut to
+<parameter_description> the #GdkClipboard object to cut to
 </parameter_description>
 </parameter>
 <parameter name="default_editable">
@@ -71812,116 +71063,6 @@ uneditable text).
 </return>
 </function>
 
-<function name="gtk_text_buffer_deserialize">
-<description>
-This function deserializes rich text in format @format and inserts
-it at @iter.
-
-@formats to be used must be registered using
-gtk_text_buffer_register_deserialize_format() or
-gtk_text_buffer_register_deserialize_tagset() beforehand.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="register_buffer">
-<parameter_description> the #GtkTextBuffer @format is registered with
-</parameter_description>
-</parameter>
-<parameter name="content_buffer">
-<parameter_description> the #GtkTextBuffer to deserialize into
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> the rich text format to use for deserializing
-</parameter_description>
-</parameter>
-<parameter name="iter">
-<parameter_description> insertion point for the deserialized text
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> data to deserialize
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> length of @data
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for a #GError
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, %FALSE otherwise.
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_deserialize_get_can_create_tags">
-<description>
-This functions returns the value set with
-gtk_text_buffer_deserialize_set_can_create_tags()
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a #GdkAtom representing a registered rich text format
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether deserializing this format may create tags
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_deserialize_set_can_create_tags">
-<description>
-Use this function to allow a rich text deserialization function to
-create new tags in the receiving buffer. Note that using this
-function is almost always a bad idea, because the rich text
-functions you register should know how to map the rich text format
-they handler to your text buffers set of tags.
-
-The ability of creating new (arbitrary!) tags in the receiving buffer
-is meant for special rich text formats like the internal one that
-is registered using gtk_text_buffer_register_deserialize_tagset(),
-because that format is essentially a dump of the internal structure
-of the source buffer, including its tag names.
-
-You should allow creation of tags only if you know what you are
-doing, e.g. if you defined a tagset name for your application
-suite’s text buffers and you know that it’s fine to receive new
-tags from these buffers, because you know that your application can
-handle the newly created tags.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a #GdkAtom representing a registered rich text format
-</parameter_description>
-</parameter>
-<parameter name="can_create_tags">
-<parameter_description> whether deserializing this format may create tags
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_text_buffer_end_user_action">
 <description>
 Should be paired with a call to gtk_text_buffer_begin_user_action().
@@ -71976,53 +71117,6 @@ count is cached, so this function is very fast.
 </parameter>
 </parameters>
 <return> number of characters in the buffer
-</return>
-</function>
-
-<function name="gtk_text_buffer_get_copy_target_list">
-<description>
-This function returns the list of targets this text buffer can
-provide for copying and as DND source. The targets in the list are
-added with @info values from the #GtkTextBufferTargetInfo enum,
-using gdk_content_formats_add_rich_text_targets() and
-gdk_content_formats_add_text_targets().
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkContentFormats
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_get_deserialize_formats">
-<description>
-This function returns the rich text deserialize formats registered
-with @buffer using gtk_text_buffer_register_deserialize_format() or
-gtk_text_buffer_register_deserialize_tagset()
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="n_formats">
-<parameter_description> return location for the number of formats
-</parameter_description>
-</parameter>
-</parameters>
-<return> an array of
-#GdkAtoms representing the registered formats.
-
 </return>
 </function>
 
@@ -72302,28 +71396,6 @@ editor.
 </return>
 </function>
 
-<function name="gtk_text_buffer_get_paste_target_list">
-<description>
-This function returns the list of targets this text buffer supports
-for pasting and as DND destination. The targets in the list are
-added with @info values from the #GtkTextBufferTargetInfo enum,
-using gtk_content_formats_add_rich_text_targets() and
-gtk_content_formats_add_text_targets().
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkContentFormats
-
-</return>
-</function>
-
 <function name="gtk_text_buffer_get_selection_bound">
 <description>
 Returns the mark that represents the selection bound.  Equivalent
@@ -72379,31 +71451,6 @@ whether text is selected.
 </return>
 </function>
 
-<function name="gtk_text_buffer_get_serialize_formats">
-<description>
-This function returns the rich text serialize formats registered
-with @buffer using gtk_text_buffer_register_serialize_format() or
-gtk_text_buffer_register_serialize_tagset()
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="n_formats">
-<parameter_description> return location for the number of formats
-</parameter_description>
-</parameter>
-</parameters>
-<return> an array of
-#GdkAtoms representing the registered formats.
-
-</return>
-</function>
-
 <function name="gtk_text_buffer_get_slice">
 <description>
 Returns the text in the range [@start,@end). Excludes undisplayed
@@ -72414,7 +71461,7 @@ embedded images, so byte and character indexes into
 the returned string do correspond to byte
 and character indexes into the buffer. Contrast with
 gtk_text_buffer_get_text(). Note that 0xFFFC can occur in normal
-text as well, so it is not a reliable indicator that a pixbuf or
+text as well, so it is not a reliable indicator that a texture or
 widget is in the buffer.
 
 
@@ -72702,38 +71749,9 @@ Since: 3.16
 <return></return>
 </function>
 
-<function name="gtk_text_buffer_insert_pixbuf">
-<description>
-Inserts an image into the text buffer at @iter. The image will be
-counted as one character in character counts, and when obtaining
-the buffer contents as a string, will be represented by the Unicode
-“object replacement character” 0xFFFC. Note that the “slice”
-variants for obtaining portions of the buffer as a string include
-this character for pixbufs, but the “text” variants do
-not. e.g. see gtk_text_buffer_get_slice() and
-gtk_text_buffer_get_text().
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="iter">
-<parameter_description> location to insert the pixbuf
-</parameter_description>
-</parameter>
-<parameter name="pixbuf">
-<parameter_description> a #GdkPixbuf
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_text_buffer_insert_range">
 <description>
-Copies text, tags, and pixbufs between @start and @end (the order
+Copies text, tags, and texture between @start and @end (the order
 of @start and @end doesn’t matter) and inserts the copy at @iter.
 Used instead of simply getting/inserting text because it preserves
 images and tags. If @start and @end are in a different buffer from
@@ -72798,6 +71816,35 @@ gtk_text_view_get_editable() is appropriate here.
 </parameters>
 <return> whether an insertion was possible at @iter
 </return>
+</function>
+
+<function name="gtk_text_buffer_insert_texture">
+<description>
+Inserts an image into the text buffer at @iter. The image will be
+counted as one character in character counts, and when obtaining
+the buffer contents as a string, will be represented by the Unicode
+“object replacement character” 0xFFFC. Note that the “slice”
+variants for obtaining portions of the buffer as a string include
+this character for texture, but the “text” variants do
+not. e.g. see gtk_text_buffer_get_slice() and
+gtk_text_buffer_get_text().
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+<parameter name="iter">
+<parameter_description> location to insert the texture
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> a #GdkTexture
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_text_buffer_insert_with_tags">
@@ -72952,7 +71999,7 @@ be inserted.
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> the #GtkClipboard to paste from
+<parameter_description> the #GdkClipboard to paste from
 </parameter_description>
 </parameter>
 <parameter name="override_location">
@@ -72991,142 +72038,6 @@ be optimized.
 <return></return>
 </function>
 
-<function name="gtk_text_buffer_register_deserialize_format">
-<description>
-This function registers a rich text deserialization @function along with
-its @mime_type with the passed @buffer.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="mime_type">
-<parameter_description> the format’s mime-type
-</parameter_description>
-</parameter>
-<parameter name="function">
-<parameter_description> the deserialize function to register
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> @function’s user_data
-</parameter_description>
-</parameter>
-<parameter name="user_data_destroy">
-<parameter_description> a function to call when @user_data is no longer needed
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkAtom that corresponds to the
-newly registered format’s mime-type.
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_register_deserialize_tagset">
-<description>
-This function registers GTK+’s internal rich text serialization
-format with the passed @buffer. See
-gtk_text_buffer_register_serialize_tagset() for details.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="tagset_name">
-<parameter_description> an optional tagset name, on %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkAtom that corresponds to the
-newly registered format’s mime-type.
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_register_serialize_format">
-<description>
-This function registers a rich text serialization @function along with
-its @mime_type with the passed @buffer.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="mime_type">
-<parameter_description> the format’s mime-type
-</parameter_description>
-</parameter>
-<parameter name="function">
-<parameter_description> the serialize function to register
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> @function’s user_data
-</parameter_description>
-</parameter>
-<parameter name="user_data_destroy">
-<parameter_description> a function to call when @user_data is no longer needed
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkAtom that corresponds to the
-newly registered format’s mime-type.
-
-</return>
-</function>
-
-<function name="gtk_text_buffer_register_serialize_tagset">
-<description>
-This function registers GTK+’s internal rich text serialization
-format with the passed @buffer. The internal format does not comply
-to any standard rich text format and only works between #GtkTextBuffer
-instances. It is capable of serializing all of a text buffer’s tags
-and embedded pixbufs.
-
-This function is just a wrapper around
-gtk_text_buffer_register_serialize_format(). The mime type used
-for registering is “application/x-gtk-text-buffer-rich-text”, or
-“application/x-gtk-text-buffer-rich-text;format=@tagset_name” if a
-@tagset_name was passed.
-
-The @tagset_name can be used to restrict the transfer of rich text
-to buffers with compatible sets of tags, in order to avoid unknown
-tags from being pasted. It is probably the common case to pass an
-identifier != %NULL here, since the %NULL tagset requires the
-receiving buffer to deal with with pasting of arbitrary tags.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="tagset_name">
-<parameter_description> an optional tagset name, on %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkAtom that corresponds to the
-newly registered format’s mime-type.
-
-</return>
-</function>
-
 <function name="gtk_text_buffer_remove_all_tags">
 <description>
 Removes all tags in the range between @start and @end.  Be careful
@@ -73155,7 +72066,7 @@ that add tags.
 
 <function name="gtk_text_buffer_remove_selection_clipboard">
 <description>
-Removes a #GtkClipboard added with 
+Removes a #GdkClipboard added with 
 gtk_text_buffer_add_selection_clipboard().
 
 </description>
@@ -73165,7 +72076,7 @@ gtk_text_buffer_add_selection_clipboard().
 </parameter_description>
 </parameter>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard added to @buffer by 
+<parameter_description> a #GdkClipboard added to @buffer by 
 gtk_text_buffer_add_selection_clipboard()
 </parameter_description>
 </parameter>
@@ -73258,50 +72169,6 @@ Since: 2.4
 <return></return>
 </function>
 
-<function name="gtk_text_buffer_serialize">
-<description>
-This function serializes the portion of text between @start
-and @end in the rich text format represented by @format.
-
-@formats to be used must be registered using
-gtk_text_buffer_register_serialize_format() or
-gtk_text_buffer_register_serialize_tagset() beforehand.
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="register_buffer">
-<parameter_description> the #GtkTextBuffer @format is registered with
-</parameter_description>
-</parameter>
-<parameter name="content_buffer">
-<parameter_description> the #GtkTextBuffer to serialize
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> the rich text format to use for serializing
-</parameter_description>
-</parameter>
-<parameter name="start">
-<parameter_description> start of block of text to serialize
-</parameter_description>
-</parameter>
-<parameter name="end">
-<parameter_description> end of block of test to serialize
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> return location for the length of the serialized data
-</parameter_description>
-</parameter>
-</parameters>
-<return> the serialized
-data, encoded as @format
-
-</return>
-</function>
-
 <function name="gtk_text_buffer_set_mark">
 <description>
 Move the mark to the given position, if not @should_exist, 
@@ -73376,50 +72243,6 @@ Deletes current contents of @buffer, and inserts @text instead. If
 </parameter>
 <parameter name="len">
 <parameter_description> length of @text in bytes
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_text_buffer_unregister_deserialize_format">
-<description>
-This function unregisters a rich text format that was previously
-registered using gtk_text_buffer_register_deserialize_format() or
-gtk_text_buffer_register_deserialize_tagset().
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a #GdkAtom representing a registered rich text format.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_text_buffer_unregister_serialize_format">
-<description>
-This function unregisters a rich text format that was previously
-registered using gtk_text_buffer_register_serialize_format() or
-gtk_text_buffer_register_serialize_tagset()
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a #GdkAtom representing a registered rich text format.
 </parameter_description>
 </parameter>
 </parameters>
@@ -73744,7 +72567,7 @@ instead of backward.
 
 <function name="gtk_text_iter_backward_text_chars">
 <description>
-Moves backward by @count text characters (pixbufs, widgets,
+Moves backward by @count text characters (textures, widgets,
 etc. do not count as characters for this). Equivalent to moving
 through the results of gtk_text_iter_get_text(), rather than
 gtk_text_iter_get_slice().
@@ -74436,7 +73259,7 @@ negative, moves backward instead of forward.
 
 <function name="gtk_text_iter_forward_text_chars">
 <description>
-Moves forward by @count text characters (pixbufs, widgets,
+Moves forward by @count text characters (textures, widgets,
 etc. do not count as characters for this). Equivalent to moving
 through the results of gtk_text_iter_get_text(), rather than
 gtk_text_iter_get_slice().
@@ -74919,24 +73742,6 @@ offset back into an iterator.
 </return>
 </function>
 
-<function name="gtk_text_iter_get_pixbuf">
-<description>
-If the element at @iter is a pixbuf, the pixbuf is returned
-(with no new reference count added). Otherwise,
-%NULL is returned.
-
-
-</description>
-<parameters>
-<parameter name="iter">
-<parameter_description> an iterator
-</parameter_description>
-</parameter>
-</parameters>
-<return> the pixbuf at @iter
-</return>
-</function>
-
 <function name="gtk_text_iter_get_slice">
 <description>
 Returns the text in the given range. A “slice” is an array of
@@ -74945,7 +73750,7 @@ character 0xFFFC for iterable non-character elements in the buffer,
 such as images.  Because images are encoded in the slice, byte and
 character offsets in the returned array will correspond to byte
 offsets in the text buffer. Note that 0xFFFC can occur in normal
-text as well, so it is not a reliable indicator that a pixbuf or
+text as well, so it is not a reliable indicator that a texture or
 widget is in the buffer.
 
 
@@ -75004,6 +73809,23 @@ gtk_text_iter_get_slice().
 </parameter>
 </parameters>
 <return> array of characters from the buffer
+</return>
+</function>
+
+<function name="gtk_text_iter_get_texture">
+<description>
+If the element at @iter is a texture, the texture is returned
+(with no new reference count added). Otherwise, %NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> an iterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> the texture at @iter
 </return>
 </function>
 
@@ -80021,9 +78843,9 @@ Since: 2.12
 <function name="gtk_tooltip_set_icon">
 <description>
 Sets the icon of the tooltip (which is in front of the text) to be
-@pixbuf.  If @pixbuf is %NULL, the image will be hidden.
+@texture.  If @texure is %NULL, the image will be hidden.
 
-Since: 2.12
+Since: 3.94
 
 </description>
 <parameters>
@@ -80031,8 +78853,8 @@ Since: 2.12
 <parameter_description> a #GtkTooltip
 </parameter_description>
 </parameter>
-<parameter name="pixbuf">
-<parameter_description> a #GdkPixbuf, or %NULL
+<parameter name="texture">
+<parameter_description> a #GdkTexture, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -83157,8 +81979,8 @@ in.  Note that only types derived from standard GObject fundamental types
 are supported.
 
 As an example, `gtk_tree_store_new (3, G_TYPE_INT, G_TYPE_STRING,
-GDK_TYPE_PIXBUF);` will create a new #GtkTreeStore with three columns, of type
-#gint, #gchararray, and #GdkPixbuf respectively.
+GDK_TYPE_TEXTURE);` will create a new #GtkTreeStore with three columns, of type
+#gint, #gchararray, and #GdkTexture respectively.
 
 
 </description>
@@ -88282,12 +87104,13 @@ Since: 3.14
 
 <function name="gtk_widget_get_clipboard">
 <description>
-Returns the clipboard object for the given selection to
-be used with @widget. @widget must have a #GdkDisplay
-associated with it, so must be attached to a toplevel
-window.
+This is a utility function to get the clipboard object for the
+#GdkDisplay that @widget is using.
 
-Since: 2.2
+Note that this function always works, even when @widget is not
+realized yet.
+
+Since: 3.94
 
 </description>
 <parameters>
@@ -88295,19 +87118,8 @@ Since: 2.2
 <parameter_description> a #GtkWidget
 </parameter_description>
 </parameter>
-<parameter name="selection">
-<parameter_description> a #GdkAtom which identifies the clipboard
-to use. %GDK_SELECTION_CLIPBOARD gives the
-default clipboard. Another common value
-is %GDK_SELECTION_PRIMARY, which gives
-the primary X selection.
-</parameter_description>
-</parameter>
 </parameters>
-<return> the appropriate clipboard object. If no
-clipboard already exists, a new one will
-be created. Once a clipboard object has
-been created, it is persistent for all time.
+<return> the appropriate clipboard object.
 
 </return>
 </function>
@@ -88938,6 +87750,28 @@ Since: 3.90
 </parameter>
 </parameters>
 <return> The widget's previous sibling
+
+</return>
+</function>
+
+<function name="gtk_widget_get_primary_clipboard">
+<description>
+This is a utility function to get the primary clipboard object 
+for the #GdkDisplay that @widget is using.
+
+Note that this function always works, even when @widget is not
+realized yet.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the appropriate clipboard object.
 
 </return>
 </function>

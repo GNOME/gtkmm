@@ -1,5 +1,12 @@
 ;; -*- scheme -*-
 ; object definitions ...
+(define-object ContentProvider
+  (in-module "Gdk")
+  (parent "GObject")
+  (c-name "GdkContentProvider")
+  (gtype-id "GDK_TYPE_CONTENT_PROVIDER")
+)
+
 (define-object FrameClockIdle
   (in-module "Gdk")
   (parent "GdkFrameClock")
@@ -107,22 +114,6 @@
   )
 )
 
-(define-enum DragProtocol
-  (in-module "Gdk")
-  (c-name "GdkDragProtocol")
-  (gtype-id "GDK_TYPE_DRAG_PROTOCOL")
-  (values
-    '("none" "GDK_DRAG_PROTO_NONE")
-    '("motif" "GDK_DRAG_PROTO_MOTIF")
-    '("xdnd" "GDK_DRAG_PROTO_XDND")
-    '("rootwin" "GDK_DRAG_PROTO_ROOTWIN")
-    '("win32-dropfiles" "GDK_DRAG_PROTO_WIN32_DROPFILES")
-    '("ole2" "GDK_DRAG_PROTO_OLE2")
-    '("local" "GDK_DRAG_PROTO_LOCAL")
-    '("wayland" "GDK_DRAG_PROTO_WAYLAND")
-  )
-)
-
 (define-enum FilterReturn
   (in-module "Gdk")
   (c-name "GdkFilterReturn")
@@ -169,7 +160,6 @@
     '("client-event" "GDK_CLIENT_EVENT")
     '("scroll" "GDK_SCROLL")
     '("window-state" "GDK_WINDOW_STATE")
-    '("owner-change" "GDK_OWNER_CHANGE")
     '("grab-broken" "GDK_GRAB_BROKEN")
     '("damage" "GDK_DAMAGE")
     '("touch-begin" "GDK_TOUCH_BEGIN")
@@ -275,17 +265,6 @@
     '("bottom-resizable" "GDK_WINDOW_STATE_BOTTOM_RESIZABLE")
     '("left-tiled" "GDK_WINDOW_STATE_LEFT_TILED")
     '("left-resizable" "GDK_WINDOW_STATE_LEFT_RESIZABLE")
-  )
-)
-
-(define-enum OwnerChange
-  (in-module "Gdk")
-  (c-name "GdkOwnerChange")
-  (gtype-id "GDK_TYPE_OWNER_CHANGE")
-  (values
-    '("new-owner" "GDK_OWNER_CHANGE_NEW_OWNER")
-    '("destroy" "GDK_OWNER_CHANGE_DESTROY")
-    '("close" "GDK_OWNER_CHANGE_CLOSE")
   )
 )
 
@@ -832,7 +811,316 @@
 
 
 
+;; From gdkclipboard.h
+
+(define-function gdk_clipboard_get_type
+  (c-name "gdk_clipboard_get_type")
+  (return-type "GType")
+)
+
+(define-method get_display
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_get_display")
+  (return-type "GdkDisplay*")
+)
+
+(define-method get_formats
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_get_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method is_local
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_is_local")
+  (return-type "gboolean")
+)
+
+(define-method get_content
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_get_content")
+  (return-type "GdkContentProvider*")
+)
+
+(define-method store_async
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_store_async")
+  (return-type "none")
+  (parameters
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method store_finish
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_store_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_async
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_async")
+  (return-type "none")
+  (parameters
+    '("const-char**" "mime_types")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_finish
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_finish")
+  (return-type "GInputStream*")
+  (parameters
+    '("const-char**" "out_mime_type")
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_value_async
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_value_async")
+  (return-type "none")
+  (parameters
+    '("GType" "type")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_value_finish
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_value_finish")
+  (return-type "const-GValue*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_texture_async
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_texture_async")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_texture_finish
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_texture_finish")
+  (return-type "GdkTexture*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_text_async
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_text_async")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_text_finish
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_read_text_finish")
+  (return-type "char*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method set_content
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_set_content")
+  (return-type "gboolean")
+  (parameters
+    '("GdkContentProvider*" "provider")
+  )
+)
+
+(define-method set_text
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_set_text")
+  (return-type "none")
+  (parameters
+    '("const-char*" "text")
+  )
+)
+
+(define-method set_texture
+  (of-object "GdkClipboard")
+  (c-name "gdk_clipboard_set_texture")
+  (return-type "none")
+  (parameters
+    '("GdkTexture*" "texture")
+  )
+)
+
+
+
+;; From gdkcontentdeserializer.h
+
+(define-function gdk_content_deserializer_get_type
+  (c-name "gdk_content_deserializer_get_type")
+  (return-type "GType")
+)
+
+(define-method get_mime_type
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_mime_type")
+  (return-type "const-char*")
+)
+
+(define-method get_gtype
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_gtype")
+  (return-type "GType")
+)
+
+(define-method get_value
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_value")
+  (return-type "GValue*")
+)
+
+(define-method get_input_stream
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_input_stream")
+  (return-type "GInputStream*")
+)
+
+(define-method get_priority
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_priority")
+  (return-type "int")
+)
+
+(define-method get_cancellable
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_cancellable")
+  (return-type "GCancellable*")
+)
+
+(define-method get_user_data
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_user_data")
+  (return-type "gpointer")
+)
+
+(define-method set_task_data
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_set_task_data")
+  (return-type "none")
+  (parameters
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method get_task_data
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_get_task_data")
+  (return-type "gpointer")
+)
+
+(define-method return_success
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_return_success")
+  (return-type "none")
+)
+
+(define-method return_error
+  (of-object "GdkContentDeserializer")
+  (c-name "gdk_content_deserializer_return_error")
+  (return-type "none")
+  (parameters
+    '("GError*" "error")
+  )
+)
+
+(define-method union_deserialize_gtypes
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_union_deserialize_gtypes")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method union_deserialize_mime_types
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_union_deserialize_mime_types")
+  (return-type "GdkContentFormats*")
+)
+
+(define-function gdk_content_register_deserializer
+  (c-name "gdk_content_register_deserializer")
+  (return-type "none")
+  (parameters
+    '("const-char*" "mime_type")
+    '("GType" "type")
+    '("GdkContentDeserializeFunc" "deserialize")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function gdk_content_deserialize_async
+  (c-name "gdk_content_deserialize_async")
+  (return-type "none")
+  (parameters
+    '("GInputStream*" "stream")
+    '("const-char*" "mime_type")
+    '("GType" "type")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gdk_content_deserialize_finish
+  (c-name "gdk_content_deserialize_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GValue*" "value")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From gdkcontentformats.h
+
+(define-function gdk_intern_mime_type
+  (c-name "gdk_intern_mime_type")
+  (return-type "const-char*")
+  (parameters
+    '("const-char*" "string")
+  )
+)
 
 (define-function gdk_content_formats_get_type
   (c-name "gdk_content_formats_get_type")
@@ -846,6 +1134,14 @@
   (parameters
     '("const-char**" "mime_types")
     '("guint" "n_mime_types")
+  )
+)
+
+(define-function gdk_content_formats_new_for_gtype
+  (c-name "gdk_content_formats_new_for_gtype")
+  (return-type "GdkContentFormats*")
+  (parameters
+    '("GType" "type")
   )
 )
 
@@ -909,8 +1205,24 @@
   (return-type "gboolean")
   (parameters
     '("const-GdkContentFormats*" "second")
-    '("GType*" "out_gtype")
-    '("const-char**" "out_mime_type")
+  )
+)
+
+(define-method match_gtype
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_match_gtype")
+  (return-type "GType")
+  (parameters
+    '("const-GdkContentFormats*" "second")
+  )
+)
+
+(define-method match_mime_type
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_match_mime_type")
+  (return-type "const-char*")
+  (parameters
+    '("const-GdkContentFormats*" "second")
   )
 )
 
@@ -971,6 +1283,222 @@
   )
 )
 
+(define-function gdk_file_list_get_type
+  (c-name "gdk_file_list_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gdkcontentprovider.h
+
+(define-function gdk_content_provider_get_type
+  (c-name "gdk_content_provider_get_type")
+  (return-type "GType")
+)
+
+(define-method ref_formats
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_ref_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method ref_storable_formats
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_ref_storable_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method content_changed
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_content_changed")
+  (return-type "none")
+)
+
+(define-method write_mime_type_async
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_write_mime_type_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "mime_type")
+    '("GOutputStream*" "stream")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method write_mime_type_finish
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_write_mime_type_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_value
+  (of-object "GdkContentProvider")
+  (c-name "gdk_content_provider_get_value")
+  (return-type "gboolean")
+  (parameters
+    '("GValue*" "value")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdkcontentproviderimpl.h
+
+(define-function gdk_content_provider_new_for_value
+  (c-name "gdk_content_provider_new_for_value")
+  (return-type "GdkContentProvider*")
+  (parameters
+    '("const-GValue*" "value")
+  )
+)
+
+(define-function gdk_content_provider_new_for_bytes
+  (c-name "gdk_content_provider_new_for_bytes")
+  (return-type "GdkContentProvider*")
+  (parameters
+    '("const-char*" "mime_type")
+    '("GBytes*" "bytes")
+  )
+)
+
+
+
+;; From gdkcontentserializer.h
+
+(define-function gdk_content_serializer_get_type
+  (c-name "gdk_content_serializer_get_type")
+  (return-type "GType")
+)
+
+(define-method get_mime_type
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_mime_type")
+  (return-type "const-char*")
+)
+
+(define-method get_gtype
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_gtype")
+  (return-type "GType")
+)
+
+(define-method get_value
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_value")
+  (return-type "const-GValue*")
+)
+
+(define-method get_output_stream
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_output_stream")
+  (return-type "GOutputStream*")
+)
+
+(define-method get_priority
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_priority")
+  (return-type "int")
+)
+
+(define-method get_cancellable
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_cancellable")
+  (return-type "GCancellable*")
+)
+
+(define-method get_user_data
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_user_data")
+  (return-type "gpointer")
+)
+
+(define-method set_task_data
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_set_task_data")
+  (return-type "none")
+  (parameters
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method get_task_data
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_get_task_data")
+  (return-type "gpointer")
+)
+
+(define-method return_success
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_return_success")
+  (return-type "none")
+)
+
+(define-method return_error
+  (of-object "GdkContentSerializer")
+  (c-name "gdk_content_serializer_return_error")
+  (return-type "none")
+  (parameters
+    '("GError*" "error")
+  )
+)
+
+(define-method union_serialize_gtypes
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_union_serialize_gtypes")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method union_serialize_mime_types
+  (of-object "GdkContentFormats")
+  (c-name "gdk_content_formats_union_serialize_mime_types")
+  (return-type "GdkContentFormats*")
+)
+
+(define-function gdk_content_register_serializer
+  (c-name "gdk_content_register_serializer")
+  (return-type "none")
+  (parameters
+    '("GType" "type")
+    '("const-char*" "mime_type")
+    '("GdkContentSerializeFunc" "serialize")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function gdk_content_serialize_async
+  (c-name "gdk_content_serialize_async")
+  (return-type "none")
+  (parameters
+    '("GOutputStream*" "stream")
+    '("const-char*" "mime_type")
+    '("const-GValue*" "value")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gdk_content_serialize_finish
+  (c-name "gdk_content_serialize_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gdkcursor.h
@@ -978,17 +1506,6 @@
 (define-function gdk_cursor_get_type
   (c-name "gdk_cursor_get_type")
   (return-type "GType")
-)
-
-(define-function gdk_cursor_new_from_pixbuf
-  (c-name "gdk_cursor_new_from_pixbuf")
-  (return-type "GdkCursor*")
-  (parameters
-    '("GdkPixbuf*" "pixbuf")
-    '("gint" "x")
-    '("gint" "y")
-    '("GdkCursor*" "fallback")
-  )
 )
 
 (define-function gdk_cursor_new_from_texture
@@ -1326,35 +1843,6 @@
 
 
 
-;; From gdkdevicemanager.h
-
-(define-function gdk_device_manager_get_type
-  (c-name "gdk_device_manager_get_type")
-  (return-type "GType")
-)
-
-(define-method get_display
-  (of-object "GdkDeviceManager")
-  (c-name "gdk_device_manager_get_display")
-  (return-type "GdkDisplay*")
-)
-
-(define-method list_devices
-  (of-object "GdkDeviceManager")
-  (c-name "gdk_device_manager_list_devices")
-  (return-type "GList*")
-  (parameters
-    '("GdkDeviceType" "type")
-  )
-)
-
-(define-function gdk_disable_multidevice
-  (c-name "gdk_disable_multidevice")
-  (return-type "none")
-)
-
-
-
 ;; From gdkdevicepad.h
 
 (define-function gdk_device_pad_get_type
@@ -1578,6 +2066,18 @@
   )
 )
 
+(define-method get_clipboard
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_clipboard")
+  (return-type "GdkClipboard*")
+)
+
+(define-method get_primary_clipboard
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_primary_clipboard")
+  (return-type "GdkClipboard*")
+)
+
 (define-method supports_clipboard_persistence
   (of-object "GdkDisplay")
   (c-name "gdk_display_supports_clipboard_persistence")
@@ -1615,12 +2115,6 @@
   (parameters
     '("const-gchar*" "startup_id")
   )
-)
-
-(define-method get_device_manager
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_get_device_manager")
-  (return-type "GdkDeviceManager*")
 )
 
 (define-method get_app_launch_context
@@ -1803,12 +2297,6 @@
   (return-type "GdkWindow*")
 )
 
-(define-method get_protocol
-  (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_protocol")
-  (return-type "GdkDragProtocol")
-)
-
 (define-function gdk_drag_status
   (c-name "gdk_drag_status")
   (return-type "none")
@@ -1875,52 +2363,6 @@
     '("GdkContentFormats*" "formats")
     '("gint" "x_root")
     '("gint" "y_root")
-  )
-)
-
-(define-function gdk_drag_find_window
-  (c-name "gdk_drag_find_window")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("GdkWindow*" "drag_window")
-    '("gint" "x_root")
-    '("gint" "y_root")
-    '("GdkWindow**" "dest_window")
-    '("GdkDragProtocol*" "protocol")
-  )
-)
-
-(define-function gdk_drag_motion
-  (c-name "gdk_drag_motion")
-  (return-type "gboolean")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("GdkWindow*" "dest_window")
-    '("GdkDragProtocol" "protocol")
-    '("gint" "x_root")
-    '("gint" "y_root")
-    '("GdkDragAction" "suggested_action")
-    '("GdkDragAction" "possible_actions")
-    '("guint32" "time_")
-  )
-)
-
-(define-function gdk_drag_drop
-  (c-name "gdk_drag_drop")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("guint32" "time_")
-  )
-)
-
-(define-function gdk_drag_abort
-  (c-name "gdk_drag_abort")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("guint32" "time_")
   )
 )
 
@@ -2569,15 +3011,6 @@
   (return-type "gboolean")
   (parameters
     '("GdkAtom*" "selection")
-  )
-)
-
-(define-method get_owner_change_reason
-  (of-object "GdkEvent")
-  (c-name "gdk_event_get_owner_change_reason")
-  (return-type "gboolean")
-  (parameters
-    '("GdkOwnerChange*" "reason")
   )
 )
 
@@ -4570,25 +5003,6 @@
   )
 )
 
-(define-method set_source_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_source_events")
-  (return-type "none")
-  (parameters
-    '("GdkInputSource" "source")
-    '("GdkEventMask" "event_mask")
-  )
-)
-
-(define-method get_source_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_source_events")
-  (return-type "GdkEventMask")
-  (parameters
-    '("GdkInputSource" "source")
-  )
-)
-
 (define-method set_icon_list
   (of-object "GdkWindow")
   (c-name "gdk_window_set_icon_list")
@@ -4781,15 +5195,6 @@
   (of-object "GdkWindow")
   (c-name "gdk_window_register_dnd")
   (return-type "none")
-)
-
-(define-method get_drag_protocol
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_drag_protocol")
-  (return-type "GdkDragProtocol")
-  (parameters
-    '("GdkWindow**" "target")
-  )
 )
 
 (define-method begin_resize_drag
@@ -5046,11 +5451,6 @@
   (return-type "GType")
 )
 
-(define-function gdk_drag_protocol_get_type
-  (c-name "gdk_drag_protocol_get_type")
-  (return-type "GType")
-)
-
 (define-function gdk_filter_return_get_type
   (c-name "gdk_filter_return_get_type")
   (return-type "GType")
@@ -5088,11 +5488,6 @@
 
 (define-function gdk_window_state_get_type
   (c-name "gdk_window_state_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_owner_change_get_type
-  (c-name "gdk_owner_change_get_type")
   (return-type "GType")
 )
 
