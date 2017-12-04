@@ -168,12 +168,12 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
-  Glib::RefPtr<Gdk::Pixbuf> refPixbuf;
+  Glib::RefPtr<Gdk::Texture> refTexture;
   try
   {
-    refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
+    auto refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
     auto refScaled = refPixbuf->scale_simple(32, 32, Gdk::InterpType::BILINEAR);
-    refPixbuf = refScaled;
+    refTexture = Gdk::Texture::create_for_pixbuf(refScaled);
   }
   catch (const Glib::Error& error)
   {
@@ -238,11 +238,11 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert_with_tag(iter, "Images. ", "heading");
 
   iter = refBuffer->insert(iter, "The buffer can have images in it: ");
-  if (refPixbuf)
+  if (refTexture)
   {
-    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
-    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
-    iter = refBuffer->insert_pixbuf(iter, refPixbuf);
+    iter = refBuffer->insert_texture(iter, refTexture);
+    iter = refBuffer->insert_texture(iter, refTexture);
+    iter = refBuffer->insert_texture(iter, refTexture);
   }
   iter = refBuffer->insert(iter, " for example.\n\n");
 

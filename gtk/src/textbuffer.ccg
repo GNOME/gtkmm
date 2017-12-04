@@ -22,69 +22,6 @@
 #include <gtkmm/textmark.h>
 #include <gtkmm/textiter.h>
 
-namespace // anonymous
-{
-extern "C"
-{
-
-static guint8* SignalProxy_Serialize(GtkTextBuffer* /* register_buffer */,
-                                     GtkTextBuffer* content_buffer,
-                                     const GtkTextIter* start, const GtkTextIter* end,
-                                     gsize* length,
-                                     gpointer user_data)
-{
-  auto the_slot = static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
-
-  try
-  {
-    return (*the_slot)(Glib::wrap(content_buffer, true),
-      Glib::wrap_const_iter(start), Glib::wrap_const_iter(end), *length);
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  return nullptr;
-}
-
-static void SignalProxy_Serialize_gtk_callback_destroy(void* user_data)
-{
-  delete static_cast<Gtk::TextBuffer::SlotSerialize*>(user_data);
-}
-
-static gboolean SignalProxy_Deserialize(GtkTextBuffer* /* register_buffer */,
-                                        GtkTextBuffer* content_buffer,
-                                        GtkTextIter* iter, const guint8* data,
-                                        gsize length, gboolean create_tags,
-                                        gpointer user_data,
-                                        GError** error)
-{
-  auto the_slot = static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
-
-  try
-  {
-    return (*the_slot)(Glib::wrap(content_buffer, true),
-      Glib::wrap_iter(iter), data, length, create_tags);
-  }
-  catch (Glib::Error& err)
-  {
-    err.propagate(error);
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  return false;
-}
-
-static void SignalProxy_Deserialize_gtk_callback_destroy(void* user_data)
-{
-  delete static_cast<Gtk::TextBuffer::SlotDeserialize*>(user_data);
-}
-
-} // extern "C"
-} // anonymous namespace
-
 namespace Gtk
 {
 
@@ -254,10 +191,10 @@ TextBuffer::iterator TextBuffer::insert(const iterator& pos, const char* text_be
   return iterCopy;
 }
 
-TextBuffer::iterator TextBuffer::insert_pixbuf(const iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf)
+TextBuffer::iterator TextBuffer::insert_texture(const iterator& pos, const Glib::RefPtr<Gdk::Texture>& texture)
 {
   iterator iterCopy (pos);
-  gtk_text_buffer_insert_pixbuf(gobj(), iterCopy.gobj(), pixbuf->gobj());
+  gtk_text_buffer_insert_texture(gobj(), iterCopy.gobj(), texture->gobj());
   return iterCopy;
 }
 
@@ -546,18 +483,6 @@ TextBuffer::erase_interactive(const iterator& range_begin, const iterator& range
   return pair_iter_success;
 }
 
-void TextBuffer::paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, const iterator& override_location,
-                                 bool default_editable)
-{
-  gtk_text_buffer_paste_clipboard(gobj(), clipboard->gobj(),
-      const_cast<GtkTextIter*>(override_location.gobj()), default_editable);
-}
-
-void TextBuffer::paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable)
-{
-  gtk_text_buffer_paste_clipboard(gobj(), clipboard->gobj(), nullptr, default_editable);
-}
-
 TextBuffer::iterator TextBuffer::get_iter_at_child_anchor(const Glib::RefPtr<ChildAnchor>& anchor)
 {
   iterator iter;
@@ -579,56 +504,6 @@ Glib::ustring TextBuffer::get_text(bool include_hidden_chars) const
 {
   auto unconst = const_cast<TextBuffer*>(this); //Because begin() and end() are not const.
   return get_text(unconst->begin(), unconst->end(), include_hidden_chars);
-}
-
-std::vector<Glib::ustring> TextBuffer::get_serialize_formats() const
-{
-  int n_atoms = 0;
-  auto atoms = gtk_text_buffer_get_serialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
-  return Glib::ArrayHandler<Glib::ustring, Gdk::AtomUstringTraits>::array_to_vector(atoms, n_atoms, Glib::OWNERSHIP_SHALLOW);
-}
-
-std::vector<Glib::ustring> TextBuffer::get_deserialize_formats() const
-{
-  int n_atoms = 0;
-  auto atoms = gtk_text_buffer_get_deserialize_formats(const_cast<GtkTextBuffer*>(gobj()), &n_atoms);
-  return Glib::ArrayHandler<Glib::ustring, Gdk::AtomUstringTraits>::array_to_vector(atoms, n_atoms, Glib::OWNERSHIP_SHALLOW);
-}
-
-Glib::ustring TextBuffer::register_serialize_format(const Glib::ustring& mime_type, const SlotSerialize& slot)
-{
-  auto slot_copy = new SlotSerialize(slot);
-  auto atom = gtk_text_buffer_register_serialize_format(gobj(), mime_type.c_str(),
-                &SignalProxy_Serialize, slot_copy, &SignalProxy_Serialize_gtk_callback_destroy);
-
-  //Convert the atom to a string:
-  Glib::ustring atom_as_string;
-  char* atom_name = gdk_atom_name(atom);
-  if (atom_name)
-  {
-    atom_as_string = atom_name;
-    g_free(atom_name);
-  }
-
-  return atom_as_string;
-}
-
-Glib::ustring TextBuffer::register_deserialize_format(const Glib::ustring& mime_type, const SlotDeserialize& slot)
-{
-  auto slot_copy = new SlotDeserialize(slot);
-  auto atom = gtk_text_buffer_register_deserialize_format(gobj(), mime_type.c_str(),
-                &SignalProxy_Deserialize, slot_copy, &SignalProxy_Deserialize_gtk_callback_destroy);
-
-  //Convert the atom to a string:
-  Glib::ustring atom_as_string;
-  char* atom_name = gdk_atom_name(atom);
-  if (atom_name)
-  {
-    atom_as_string = atom_name;
-    g_free(atom_name);
-  }
-
-  return atom_as_string;
 }
 
 } // namespace Gtk

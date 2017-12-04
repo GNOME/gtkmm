@@ -36,10 +36,11 @@ int main(int /* argc */, char** /* argv */)
   gtk_init();
 
   std::cout << get_defs( GDK_TYPE_APP_LAUNCH_CONTEXT )
+            << get_defs( GDK_TYPE_CLIPBOARD )
+            << get_defs( GDK_TYPE_CONTENT_PROVIDER )
             << get_defs( GDK_TYPE_DRAG_CONTEXT )
             << get_defs( GDK_TYPE_CURSOR )
             << get_defs( GDK_TYPE_DEVICE )
-            << get_defs( GDK_TYPE_DEVICE_MANAGER )
             << get_defs( GDK_TYPE_DISPLAY )
 #if !defined(G_OS_WIN32)
             << get_defs( GDK_TYPE_DISPLAY_MANAGER )

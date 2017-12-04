@@ -230,7 +230,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_icon_view.pack_start(m_icon_cell);
   m_icon_view.pack_start(m_text_cell);
   m_icon_cell.set_padding(10, 10);
-  m_icon_cell.property_stock_size() = static_cast<guint>(Gtk::IconSize::LARGE);
+  m_icon_cell.property_icon_size() = Gtk::IconSize::LARGE;
   m_text_cell.set_padding(10, 10);
   m_text_cell.set_alignment(0.5, 0.5);
 
@@ -940,7 +940,7 @@ void DetailDialog::set_image(
   {
     m_image[i].set_from_icon_name(icon_name);
     m_image[i].set_pixel_size(m_icon_size[i]);
-    m_image[i].drag_source_set_icon(get_icon(i));
+    m_image[i].drag_source_set_icon(icon_name);
   }
   if (description.empty())
     m_description.hide();

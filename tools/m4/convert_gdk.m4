@@ -220,10 +220,14 @@ _CONVERSION(`GdkTexture*',`Glib::RefPtr<const Gdk::Texture>', `Glib::wrap($3)')
 _CONVERSION(`GdkMonitor*',`Glib::RefPtr<Monitor>', `Glib::wrap($3)')
 _CONVERSION(`GdkMonitor*',`Glib::RefPtr<const Monitor>', `Glib::wrap($3)')
 
-_CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<DeviceManager>', `Glib::wrap($3)')
-_CONVERSION(`GdkDeviceManager*',`Glib::RefPtr<const DeviceManager>', `Glib::wrap($3)')
-
 _CONVERSION(`gpointer',`const void*', `static_cast<$2>($3)')
+
+# Clipboard
+_CONVERSION(`const Glib::RefPtr<Gdk::Clipboard>&',`GdkClipboard*',__CONVERT_REFPTR_TO_P($3))
+_CONVERSION(`GdkClipboard*',`Glib::RefPtr<Clipboard>',`Glib::wrap($3)')
+_CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Clipboard>',`Glib::wrap($3)')
+_CONVERSION(`GdkClipboard*',`Glib::RefPtr<Gdk::Clipboard>',`Glib::wrap($3)')
+_CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Gdk::Clipboard>',`Glib::wrap($3)')
 
 # ContentFormats
 _CONVERSION(`const Glib::RefPtr<ContentFormats>&',`GdkContentFormats*',__CONVERT_REFPTR_TO_P)

@@ -25,8 +25,8 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textmark.h>
 #include <gtkmm/textiter.h>
-#include <gtkmm/clipboard.h>
-#include <gdkmm/pixbuf.h>
+#include <gdkmm/clipboard.h>
+#include <gdkmm/texture.h>
 #include <gtkmmconfig.h>
 #include <utility>
 
@@ -204,7 +204,7 @@ public:
   bool insert_interactive_at_cursor(const char* text_begin, const char* text_end,
                                     bool default_editable = true);
 
-  /** Copies text, tags, and pixbufs between @a range_begin and @a range_end (the order of range_begin and range_begin doesn't
+  /** Copies text, tags, and texture between @a range_begin and @a range_end (the order of range_begin and range_begin doesn't
    * matter) and inserts the copy at @a pos. Used instead of simply getting/inserting text because it preserves images and tags.
    * If range_begin and range_end are in a different buffer, the two buffers must share the same tag table.
    *
@@ -369,8 +369,8 @@ public:
 
   _WRAP_METHOD(Glib::ustring get_slice(const const_iterator& range_start, const const_iterator& range_end, bool include_hidden_chars = true) const, gtk_text_buffer_get_slice)
 
-  iterator insert_pixbuf(const iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
-  _IGNORE(gtk_text_buffer_insert_pixbuf)
+  iterator insert_texture(const iterator& pos, const Glib::RefPtr<Gdk::Texture>& texture);
+  _IGNORE(gtk_text_buffer_insert_texture)
 
   iterator insert_child_anchor(const iterator& pos, const Glib::RefPtr<ChildAnchor>& anchor);
   _IGNORE(gtk_text_buffer_insert_child_anchor)
@@ -481,13 +481,12 @@ public:
 
   _WRAP_METHOD(bool get_has_selection() const, gtk_text_buffer_get_has_selection)
 
-  _WRAP_METHOD(void add_selection_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_add_selection_clipboard)
-  _WRAP_METHOD(void remove_selection_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_remove_selection_clipboard)
-  _WRAP_METHOD(void cut_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable = true), gtk_text_buffer_cut_clipboard)
-  _WRAP_METHOD(void copy_clipboard(const Glib::RefPtr<Clipboard>& clipboard), gtk_text_buffer_copy_clipboard)
-  void paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, const iterator& override_location, bool default_editable = true);
-  void paste_clipboard(const Glib::RefPtr<Clipboard>& clipboard, bool default_editable = true);
-  _IGNORE(gtk_text_buffer_paste_clipboard)
+  _WRAP_METHOD(void add_selection_clipboard(const Glib::RefPtr<Gdk::Clipboard>& clipboard), gtk_text_buffer_add_selection_clipboard)
+  _WRAP_METHOD(void remove_selection_clipboard(const Glib::RefPtr<Gdk::Clipboard>& clipboard), gtk_text_buffer_remove_selection_clipboard)
+  _WRAP_METHOD(void cut_clipboard(const Glib::RefPtr<Gdk::Clipboard>& clipboard, bool default_editable = true), gtk_text_buffer_cut_clipboard)
+  _WRAP_METHOD(void copy_clipboard(const Glib::RefPtr<Gdk::Clipboard>& clipboard), gtk_text_buffer_copy_clipboard)
+  _WRAP_METHOD(void paste_clipboard(const Glib::RefPtr<Gdk::Clipboard>& clipboard, const iterator& override_location{?},
+     bool default_editable = true), gtk_text_buffer_paste_clipboard)
 
   _WRAP_METHOD(bool get_selection_bounds(iterator& range_start, iterator& range_end), gtk_text_buffer_get_selection_bounds)
   _WRAP_METHOD(bool get_selection_bounds(const_iterator& range_start, const_iterator& range_end) const, gtk_text_buffer_get_selection_bounds)
@@ -499,90 +498,6 @@ public:
   _WRAP_METHOD(void begin_user_action(), gtk_text_buffer_begin_user_action)
   _WRAP_METHOD(void end_user_action(), gtk_text_buffer_end_user_action)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::ContentFormats> get_copy_target_list(), gtk_text_buffer_get_copy_target_list, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentFormats> get_copy_target_list() const, gtk_text_buffer_get_copy_target_list, refreturn, constversion)
-  _WRAP_METHOD(Glib::RefPtr<Gdk::ContentFormats> get_paste_target_list(), gtk_text_buffer_get_paste_target_list, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentFormats> get_paste_target_list() const, gtk_text_buffer_get_paste_target_list, refreturn, constversion)
-
-  /** For instance,<br>
-   * guint8* on_serialize(const Glib::RefPtr<TextBuffer>& content_buffer, const const_iterator& range_start, const const_iterator& range_end, gsize& length);
-   *
-   * @param content_buffer The TextBuffer to serialize. It may be different from
-   *        the TextBuffer where the serialize format is registered.
-   * @param range_start Start of the block of text to serialize.
-   * @param range_end End of the block of text to serialize.
-   * @param[out] length The length of the serialized data.
-   * @return A newly-allocated array of guint8 which contains the serialized data, or <tt>nullptr</tt> if an error occurred.
-   */
- typedef sigc::slot<guint8*(const Glib::RefPtr<TextBuffer>&, const const_iterator&, const const_iterator&, gsize&)> SlotSerialize;
-
-  /** For instance,<br>
-   * bool on_deserialize(const Glib::RefPtr<TextBuffer>& content_buffer, iterator& iter, const guint8* data, gsize length, bool create_tags);
-   *
-   * @param content_buffer The TextBuffer to deserialize into. It may be different
-   *        from the TextBuffer where the deserialize format is registered.
-   * @param iter Insertion point for the deserialized text.
-   * @param data Data to deserialize.
-   * @param length Length of data.
-   * @param create_tags <tt>true</tt> if deserializing may create tags.
-   * @return <tt>true</tt> on success, <tt>false</tt> otherwise.
-   * @throw Glib::Error If the deserialize slot throws a Glib::Error or an object
-   *        derived from Glib::Error, the exception will be propagated out from
-   *        the calling deserialize() method.
-   */
-  typedef sigc::slot<bool(const Glib::RefPtr<TextBuffer>&, iterator&, const guint8*, gsize, bool)> SlotDeserialize;
-
-  /** This function registers a rich text serialization @a slot along with
-   * its @a mime_type with this TextBuffer.
-   *
-   * @newin{3,16}
-   *
-   * @param mime_type The format’s mime-type.
-   * @param slot The serialize slot to register.
-   * @return The newly registered format’s mime-type.
-   */
-  Glib::ustring register_serialize_format(const Glib::ustring& mime_type, const SlotSerialize& slot);
-  _IGNORE(gtk_text_buffer_register_serialize_format)
-
-  _WRAP_METHOD(Glib::ustring register_serialize_tagset(const Glib::ustring& tagset_name), gtk_text_buffer_register_serialize_tagset)
-
-  /** This function registers a rich text deserialization @a slot along with
-   * its @a mime_type with this TextBuffer.
-   *
-   * @newin{3,16}
-   *
-   * @param mime_type The format’s mime-type.
-   * @param slot The deserialize slot to register.
-   * @return The newly registered format’s mime-type.
-   */
-  Glib::ustring register_deserialize_format(const Glib::ustring& mime_type, const SlotDeserialize& slot);
-  _IGNORE(gtk_text_buffer_register_deserialize_format)
-
-  _WRAP_METHOD(Glib::ustring register_deserialize_tagset(const Glib::ustring& tagset_name), gtk_text_buffer_register_deserialize_tagset)
-
-  _WRAP_METHOD(void unregister_serialize_format(const Glib::ustring& format), gtk_text_buffer_unregister_serialize_format)
-  _WRAP_METHOD(void unregister_deserialize_format(const Glib::ustring& format), gtk_text_buffer_unregister_deserialize_format)
-
-  _WRAP_METHOD(void set_can_create_tags(const Glib::ustring& format, bool can_create_tags = true), gtk_text_buffer_deserialize_set_can_create_tags)
-  _WRAP_METHOD(bool get_can_create_tags(const Glib::ustring& format) const, gtk_text_buffer_deserialize_get_can_create_tags)
-
-
-  std::vector<Glib::ustring> get_serialize_formats() const;
-  _IGNORE(gtk_text_buffer_get_serialize_formats)
-  std::vector<Glib::ustring> get_deserialize_formats() const;
-  _IGNORE(gtk_text_buffer_get_deserialize_formats)
-
-  _WRAP_METHOD(guint8* serialize(const Glib::RefPtr<TextBuffer>& content_buffer,
-                                 const Glib::ustring& format,
-                                 const const_iterator& range_start,
-                                 const const_iterator& range_end,
-                                 gsize& length) const, gtk_text_buffer_serialize)
-
-  _WRAP_METHOD(bool deserialize(const Glib::RefPtr<TextBuffer>& content_buffer,
-                                const Glib::ustring& format,
-                                iterator& iter, const guint8* data,
-                                gsize length), gtk_text_buffer_deserialize, errthrow)
-
 #m4begin
 dnl // HACK: Override the default conversion to deal correctly
 dnl // with non-0-terminated strings in insert_text_callback().
@@ -591,8 +506,8 @@ _CONVERSION(`GtkTextIter*',`TextBuffer::iterator&',Glib::wrap_iter($3))
 #m4end
   _WRAP_SIGNAL(void insert(TextBuffer::iterator& pos, const Glib::ustring& text, int bytes), "insert_text")
 
-#m4 _CONVERSION(`GdkPixbuf*',`const Glib::RefPtr<Gdk::Pixbuf>&', Glib::wrap($3, true))
-  _WRAP_SIGNAL(void insert_pixbuf(TextBuffer::iterator& pos, const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), "insert_pixbuf")
+#m4 _CONVERSION(`GdkTexture*',`const Glib::RefPtr<Gdk::Texture>&', Glib::wrap($3, true))
+  _WRAP_SIGNAL(void insert_texture(TextBuffer::iterator& pos, const Glib::RefPtr<Gdk::Texture>& texture), "insert_texture")
 
 #m4 _CONVERSION(`GtkTextChildAnchor*',`const Glib::RefPtr<ChildAnchor>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void insert_child_anchor(TextBuffer::iterator& pos, const Glib::RefPtr<ChildAnchor>& anchor), "insert_child_anchor")
@@ -612,9 +527,9 @@ _CONVERSION(`GtkTextIter*',`TextBuffer::iterator&',Glib::wrap_iter($3))
   _WRAP_SIGNAL(void begin_user_action(), "begin_user_action")
   _WRAP_SIGNAL(void end_user_action(), "end_user_action")
 
-#m4 _CONVERSION(`GtkClipboard*',`const Glib::RefPtr<Gtk::Clipboard>&', Glib::wrap($3, true))
-#m4 _CONVERSION(`const Glib::RefPtr<Gtk::Clipboard>&', `GtkClipboard*', Glib::unwrap($3))
-  _WRAP_SIGNAL(void paste_done(const Glib::RefPtr<Gtk::Clipboard>& clipboard), "paste_done")
+#m4 _CONVERSION(`GdkClipboard*',`const Glib::RefPtr<Gdk::Clipboard>&', Glib::wrap($3, true))
+#m4 _CONVERSION(`const Glib::RefPtr<Gdk::Clipboard>&', `GdkClipboard*', Glib::unwrap($3))
+  _WRAP_SIGNAL(void paste_done(const Glib::RefPtr<Gdk::Clipboard>& clipboard), "paste_done")
 
   _WRAP_PROPERTY("tag-table", Glib::RefPtr<TextBuffer::TagTable>)
   _WRAP_PROPERTY("text", Glib::ustring)
