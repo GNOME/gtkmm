@@ -49,7 +49,7 @@ Example_HeaderBar::Example_HeaderBar()
   set_default_size(600, 400);
 
   // Configuration
-  m_header_bar.set_show_close_button();
+  m_header_bar.set_show_title_buttons();
   m_header_bar.set_title("Welcome to Facebook - Log in, sign up or learn more");
   m_header_bar.set_has_subtitle(false);
 

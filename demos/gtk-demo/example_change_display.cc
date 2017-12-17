@@ -26,8 +26,10 @@
  *  - Using Gtk::Dialog
  */
 
-#include <gtkmm.h>
+//TODO: Remove this undef when we know what to use instead of signal_button_release_event().
+#undef GTKMM_DISABLE_DEPRECATED
 
+#include <gtkmm.h>
 
 class Popup : public Gtk::Window
 {

@@ -13,6 +13,10 @@
  * to clear the area.
  */
 
+//TODO: Remove this undef when we know what to use instead of
+// signal_motion_notify_event() and signal_button_release_event().
+#undef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm.h>
 
 class Example_DrawingArea : public Gtk::Window

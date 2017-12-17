@@ -43,7 +43,7 @@ Example_StackSidebar::Example_StackSidebar()
   m_Separator(Gtk::Orientation::VERTICAL),
   m_Stack()
 {
-  m_HeaderBar.set_show_close_button(true);
+  m_HeaderBar.set_show_title_buttons(true);
   set_titlebar(m_HeaderBar);
   set_title("Stack Sidebar demo");
   set_default_size(500, 350);

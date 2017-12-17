@@ -107,7 +107,7 @@ DemoWindow::DemoWindow()
 
 void DemoWindow::configure_header_bar()
 {
-  m_HeaderBar.set_show_close_button();
+  m_HeaderBar.set_show_title_buttons();
   m_HeaderBar.pack_start(m_RunButton);
 
   m_RunButton.get_style_context()->add_class("suggested-action");

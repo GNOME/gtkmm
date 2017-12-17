@@ -193,7 +193,7 @@ Example_IconBrowser::Example_IconBrowser()
   // The header bar.
   set_titlebar(m_header);
   m_header.set_title("Icon Browser");
-  m_header.set_show_close_button(true);
+  m_header.set_show_title_buttons(true);
   m_header.pack_end(m_search_button);
   m_search_button.set_image_from_icon_name("edit-find-symbolic");
   m_header.pack_end(m_header_radio_button_box);
