@@ -20,5 +20,9 @@ for dir in "$PREFIX"/gtk+/{gtk,gtk/deprecated} "$PREFIX"/gtk+/build/gtk; do
   fi
 done
 
+# Exclude gtkdnd-quartz.c. Function descriptions in gtkdnd-quartz.c can
+# replace better descriptions in gtkdnd.c, if gtkdnd-quartz.c is processed.
+PARAMS="$PARAMS -x $PREFIX/gtk+/gtk/gtkdnd-quartz.c"
+
 DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
 $DOCEXTRACT_TO_XML_PY $PARAMS > "$OUT_DIR/gtk_docs.xml"
