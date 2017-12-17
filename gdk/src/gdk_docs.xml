@@ -782,10 +782,6 @@ Since: 3.20
 <description>
 A new action is being chosen for the drag and drop operation.
 
-This signal will only be emitted if the #GdkDragContext manages
-the drag and drop operation. See gdk_drag_context_manage_dnd()
-for more information.
-
 Since: 3.20
 
 </description>
@@ -805,10 +801,6 @@ Since: 3.20
 <signal name="GdkDragContext::cancel">
 <description>
 The drag and drop operation was cancelled.
-
-This signal will only be emitted if the #GdkDragContext manages
-the drag and drop operation. See gdk_drag_context_manage_dnd()
-for more information.
 
 Since: 3.20
 
@@ -832,10 +824,6 @@ The drag and drop operation was finished, the drag destination
 finished reading all data. The drag source can now free all
 miscellaneous data.
 
-This signal will only be emitted if the #GdkDragContext manages
-the drag and drop operation. See gdk_drag_context_manage_dnd()
-for more information.
-
 Since: 3.20
 
 </description>
@@ -852,10 +840,6 @@ Since: 3.20
 <description>
 The drag and drop operation was performed on an accepting client.
 
-This signal will only be emitted if the #GdkDragContext manages
-the drag and drop operation. See gdk_drag_context_manage_dnd()
-for more information.
-
 Since: 3.20
 
 </description>
@@ -871,6 +855,34 @@ Since: 3.20
 </parameters>
 <return></return>
 </signal>
+
+<property name="GdkDragContext:content">
+<description>
+The #GdkContentProvider or %NULL if the context is not a source-side
+context.
+
+Since: 3.94
+
+</description>
+</property>
+
+<property name="GdkDragContext:display">
+<description>
+The #GdkDisplay that the drag context belongs to.
+
+Since: 3.94
+
+</description>
+</property>
+
+<property name="GdkDragContext:formats">
+<description>
+The possible formats that the context can provide its data in.
+
+Since: 3.94
+
+</description>
+</property>
 
 <property name="GdkDrawContext:display">
 <description>
@@ -1111,22 +1123,6 @@ Note that GTK+ discards these events for %GDK_WINDOW_CHILD windows.
 <parameter_description> the window has been unmapped.
 </parameter_description>
 </parameter>
-<parameter name="GDK_PROPERTY_NOTIFY">
-<parameter_description> a property on the window has been changed or deleted.
-</parameter_description>
-</parameter>
-<parameter name="GDK_SELECTION_CLEAR">
-<parameter_description> the application has lost ownership of a selection.
-</parameter_description>
-</parameter>
-<parameter name="GDK_SELECTION_REQUEST">
-<parameter_description> another application has requested a selection.
-</parameter_description>
-</parameter>
-<parameter name="GDK_SELECTION_NOTIFY">
-<parameter_description> a selection has been received.
-</parameter_description>
-</parameter>
 <parameter name="GDK_PROXIMITY_IN">
 <parameter_description> an input device has moved into contact with a sensing
 surface (e.g. a touchscreen or graphics tablet).
@@ -1150,40 +1146,17 @@ surface.
 progress.
 </parameter_description>
 </parameter>
-<parameter name="GDK_DRAG_STATUS">
-<parameter_description> the status of the drag operation initiated by the window
-has changed.
-</parameter_description>
-</parameter>
 <parameter name="GDK_DROP_START">
 <parameter_description> a drop operation onto the window has started.
-</parameter_description>
-</parameter>
-<parameter name="GDK_DROP_FINISHED">
-<parameter_description> the drop operation initiated by the window has completed.
-</parameter_description>
-</parameter>
-<parameter name="GDK_CLIENT_EVENT">
-<parameter_description> a message has been received from another application.
 </parameter_description>
 </parameter>
 <parameter name="GDK_SCROLL">
 <parameter_description> the scroll wheel was turned
 </parameter_description>
 </parameter>
-<parameter name="GDK_WINDOW_STATE">
-<parameter_description> the state of a window has changed. See #GdkWindowState
-for the possible window states
-</parameter_description>
-</parameter>
 <parameter name="GDK_GRAB_BROKEN">
 <parameter_description> a pointer or keyboard grab was broken. This event type
 was added in 2.8.
-</parameter_description>
-</parameter>
-<parameter name="GDK_DAMAGE">
-<parameter_description> the content of the window has been changed. This event type
-was added in 2.14.
 </parameter_description>
 </parameter>
 <parameter name="GDK_TOUCH_BEGIN">
@@ -2405,45 +2378,6 @@ which must be repeated.
 </parameters>
 </enum>
 
-<enum name="GdkPropMode">
-<description>
-Describes how existing data is combined with new data when
-using gdk_property_change().
-
-</description>
-<parameters>
-<parameter name="GDK_PROP_MODE_REPLACE">
-<parameter_description> the new data replaces the existing data.
-</parameter_description>
-</parameter>
-<parameter name="GDK_PROP_MODE_PREPEND">
-<parameter_description> the new data is prepended to the existing data.
-</parameter_description>
-</parameter>
-<parameter name="GDK_PROP_MODE_APPEND">
-<parameter_description> the new data is appended to the existing data.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
-<enum name="GdkPropertyState">
-<description>
-Specifies the type of a property change for a #GdkEventProperty.
-
-</description>
-<parameters>
-<parameter name="GDK_PROPERTY_NEW_VALUE">
-<parameter_description> the property value was changed.
-</parameter_description>
-</parameter>
-<parameter name="GDK_PROPERTY_DELETE">
-<parameter_description> the property was deleted.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
 <enum name="GdkScrollDirection">
 <description>
 Specifies the direction for #GdkEventScroll.
@@ -2597,6 +2531,10 @@ Since: 3.20
 </parameter>
 <parameter name="GDK_SEAT_CAPABILITY_KEYBOARD">
 <parameter_description> The seat has keyboard(s) attached
+</parameter_description>
+</parameter>
+<parameter name="GDK_SEAT_CAPABILITY_TABLET_PAD">
+<parameter_description> The seat has drawing tablet pad(s) attached
 </parameter_description>
 </parameter>
 <parameter name="GDK_SEAT_CAPABILITY_ALL_POINTING">
@@ -3277,74 +3215,6 @@ Since: 2.14
 <return></return>
 </function>
 
-<function name="gdk_atom_intern">
-<description>
-Finds or creates an atom corresponding to a given string.
-
-
-</description>
-<parameters>
-<parameter name="atom_name">
-<parameter_description> a string.
-</parameter_description>
-</parameter>
-<parameter name="only_if_exists">
-<parameter_description> if %TRUE, GDK is allowed to not create a new atom, but
-just return %NULL if the requested atom doesn’t already
-exists. Currently, the flag is ignored, since checking the
-existance of an atom is as expensive as creating it.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the atom corresponding to @atom_name.
-</return>
-</function>
-
-<function name="gdk_atom_intern_static_string">
-<description>
-Finds or creates an atom corresponding to a given string.
-
-Note that this function is identical to gdk_atom_intern() except
-that if a new #GdkAtom is created the string itself is used rather
-than a copy. This saves memory, but can only be used if the string
-will always exist. It can be used with statically
-allocated strings in the main program, but not with statically
-allocated memory in dynamically loaded modules, if you expect to
-ever unload the module again (e.g. do not use this function in
-GTK+ theme engines).
-
-Since: 2.10
-
-</description>
-<parameters>
-<parameter name="atom_name">
-<parameter_description> a static string
-</parameter_description>
-</parameter>
-</parameters>
-<return> the atom corresponding to @atom_name
-
-</return>
-</function>
-
-<function name="gdk_atom_name">
-<description>
-Determines the string corresponding to an atom.
-
-
-</description>
-<parameters>
-<parameter name="atom">
-<parameter_description> a #GdkAtom.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly-allocated string containing the string
-corresponding to @atom. When you are done with the
-return value, you should free it using g_free().
-</return>
-</function>
-
 <function name="gdk_cairo_draw_from_gl">
 <description>
 This is the main way to draw GL content in GTK+. It takes a render buffer ID 
@@ -3674,7 +3544,7 @@ Gets the formats that the clipboard can provide its current contents in.
 
 <function name="gdk_clipboard_is_local">
 <description>
-Returns if the clipboard is local. A clipboard is consideredlocal if it was
+Returns if the clipboard is local. A clipboard is considered local if it was
 last claimed by the running application.
 
 Note that gdk_clipboard_get_content() may return %NULL even on a local
@@ -3947,6 +3817,29 @@ ignore.
 </return>
 </function>
 
+<function name="gdk_clipboard_set">
+<description>
+Sets the clipboard to contain the value collected from the given
+varargs.
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> a #GdkClipboard
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> type of value to set
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> value contents conforming to @type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_clipboard_set_content">
 <description>
 Sets a new content provider on @clipboard. The clipboard will claim the
@@ -4008,6 +3901,47 @@ Puts the given @texture into the clipboard.
 </parameter>
 <parameter name="texture">
 <parameter_description> a #GdkTexture to put into the clipboard
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_clipboard_set_valist">
+<description>
+Sets the clipboard to contain the value collected from the given
+@args.
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> a #GdkClipboard
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> type of value to set
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> varargs containing the value of @type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_clipboard_set_value">
+<description>
+Sets the @clipboard to contain the given @value.
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> a #GdkClipboard
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a #GValue to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -4446,6 +4380,20 @@ If the resulting reference count is zero, frees the formats.
 <return></return>
 </function>
 
+<function name="gdk_content_provider_content_changed">
+<description>
+Emits the #GdkContentProvider::contents-changed signal.
+
+</description>
+<parameters>
+<parameter name="provider">
+<parameter_description> a #GdkContentProvider
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_content_provider_get_value">
 <description>
 Gets the convtents of @provider stored in @value.
@@ -4570,8 +4518,8 @@ The given @stream will not be closed.
 <parameter_description> a #GdkContentProvider
 </parameter_description>
 </parameter>
-<parameter name="type">
-<parameter_description> the #GType to provide the data in
+<parameter name="mime_type">
+<parameter_description> the mime type to provide the data in
 </parameter_description>
 </parameter>
 <parameter name="stream">
@@ -4967,7 +4915,7 @@ Since: 3.0
 </parameter_description>
 </parameter>
 <parameter name="axis_label">
-<parameter_description> #GdkAtom with the axis label.
+<parameter_description> name of the label
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -5556,7 +5504,7 @@ Since: 3.0
 </parameter>
 </parameters>
 <return>
-A #GList of #GdkAtoms, free with g_list_free().
+A #GList of strings, free with g_list_free().
 
 </return>
 </function>
@@ -6077,6 +6025,24 @@ with gdk_event_free().
 </return>
 </function>
 
+<function name="gdk_display_get_keymap">
+<description>
+Returns the #GdkKeymap attached to @display.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GdkKeymap attached to @display.
+
+</return>
+</function>
+
 <function name="gdk_display_get_maximal_cursor_size">
 <description>
 Gets the maximal size to use for cursors on @display.
@@ -6540,7 +6506,7 @@ Since: 2.2
 </parameters>
 <return> a copy of the first #GdkEvent on the event
 queue, or %NULL if no events are in the queue. The returned
-#GdkEvent should be freed with gdk_event_free().
+#GdkEvent should be freed with g_object_unref().
 
 </return>
 </function>
@@ -6564,89 +6530,6 @@ Since: 2.2
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_display_request_selection_notification">
-<description>
-Request #GdkEventOwnerChange events for ownership changes
-of the selection named by the given atom.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> the #GdkAtom naming the selection for which
-ownership change notification is requested
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether #GdkEventOwnerChange events will
-be sent.
-
-</return>
-</function>
-
-<function name="gdk_display_store_clipboard">
-<description>
-Issues a request to the clipboard manager to store the
-clipboard data. On X11, this is a special program that works
-according to the
-[FreeDesktop Clipboard Specification](http://www.freedesktop.org/Standards/clipboard-manager-spec).
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description>          a #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="clipboard_window">
-<parameter_description> a #GdkWindow belonging to the clipboard owner
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description>            a timestamp
-</parameter_description>
-</parameter>
-<parameter name="targets">
-<parameter_description> an array of targets
-that should be saved, or %NULL
-if all available targets should be saved.
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description>        length of the @targets array
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_display_supports_clipboard_persistence">
-<description>
-Returns whether the speicifed display supports clipboard
-persistance; i.e. if it’s possible to store the clipboard data after an
-application has quit. On X11 this checks if a clipboard daemon is
-running.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the display supports clipboard persistance.
-
-</return>
 </function>
 
 <function name="gdk_display_supports_cursor_alpha">
@@ -6708,26 +6591,6 @@ Since: 2.10
 </return>
 </function>
 
-<function name="gdk_display_supports_selection_notification">
-<description>
-Returns whether #GdkEventOwnerChange events will be
-sent when the owner of a selection changes.
-
-Since: 2.6
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether #GdkEventOwnerChange events will
-be sent.
-
-</return>
-</function>
-
 <function name="gdk_display_supports_shapes">
 <description>
 Returns %TRUE if gdk_window_shape_combine_mask() can
@@ -6774,31 +6637,6 @@ Since: 2.2
 <function name="gdk_drag_begin">
 <description>
 Starts a drag and creates a new drag context for it.
-This function assumes that the drag is controlled by the
-client pointer device, use gdk_drag_begin_for_device() to
-begin a drag with a different device.
-
-This function is called by the drag source.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> the source window for this drag.
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> the offered formats
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly created #GdkDragContext
-</return>
-</function>
-
-<function name="gdk_drag_begin_for_device">
-<description>
-Starts a drag and creates a new drag context for it.
 
 This function is called by the drag source.
 
@@ -6813,48 +6651,25 @@ This function is called by the drag source.
 <parameter_description> the device that controls this drag
 </parameter_description>
 </parameter>
-<parameter name="formats">
-<parameter_description> the offered formats
+<parameter name="content">
+<parameter_description> the offered content
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the actions supported by this drag
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description> the x offset to @device's position where the drag nominally started
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description> the y offset to @device's position where the drag nominally started
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly created #GdkDragContext
-</return>
-</function>
-
-<function name="gdk_drag_begin_from_point">
-<description>
-Starts a drag and creates a new drag context for it.
-
-This function is called by the drag source.
-
-Since: 3.20
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> the source window for this drag
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> the device that controls this drag
-</parameter_description>
-</parameter>
-<parameter name="formats">
-<parameter_description> the offered formats
-</parameter_description>
-</parameter>
-<parameter name="x_root">
-<parameter_description> the x coordinate where the drag nominally started
-</parameter_description>
-</parameter>
-<parameter name="y_root">
-<parameter_description> the y coordinate where the drag nominally started
-</parameter_description>
-</parameter>
-</parameters>
-<return> a newly created #GdkDragContext
-
+<return> a newly created #GdkDragContext or
+%NULL on error.
 </return>
 </function>
 
@@ -6908,6 +6723,22 @@ Returns the #GdkDevice associated to the drag context.
 </parameter>
 </parameters>
 <return> The #GdkDevice associated to @context.
+</return>
+</function>
+
+<function name="gdk_drag_context_get_display">
+<description>
+Gets the #GdkDisplay that the drag context was created for.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDisplay
 </return>
 </function>
 
@@ -7006,47 +6837,6 @@ Since: 2.22
 </return>
 </function>
 
-<function name="gdk_drag_context_manage_dnd">
-<description>
-Requests the drag and drop operation to be managed by @context.
-When a drag and drop operation becomes managed, the #GdkDragContext
-will internally handle all input and source-side #GdkEventDND events
-as required by the windowing system.
-
-Once the drag and drop operation is managed, the drag context will
-emit the following signals:
-- The #GdkDragContext::action-changed signal whenever the final action
-to be performed by the drag and drop operation changes.
-- The #GdkDragContext::drop-performed signal after the user performs
-the drag and drop gesture (typically by releasing the mouse button).
-- The #GdkDragContext::dnd-finished signal after the drag and drop
-operation concludes (after all #GdkSelection transfers happen).
-- The #GdkDragContext::cancel signal if the drag and drop operation is
-finished but doesn't happen over an accepting destination, or is
-cancelled through other means.
-
-Since: 3.20
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDragContext
-</parameter_description>
-</parameter>
-<parameter name="ipc_window">
-<parameter_description> Window to use for IPC messaging/events
-</parameter_description>
-</parameter>
-<parameter name="actions">
-<parameter_description> the actions supported by the drag source
-</parameter_description>
-</parameter>
-</parameters>
-<return> #TRUE if the drag and drop operation is managed.
-
-</return>
-</function>
-
 <function name="gdk_drag_context_set_device">
 <description>
 Associates a #GdkDevice to @context, so all Drag and Drop events
@@ -7139,22 +6929,6 @@ Since: 2.6
 </parameters>
 <return> %TRUE if the drop was successful.
 
-</return>
-</function>
-
-<function name="gdk_drag_get_selection">
-<description>
-Returns the selection atom for the current source window.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDragContext.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the selection atom, or %NULL
 </return>
 </function>
 
@@ -7403,22 +7177,6 @@ and gdk_event_new().
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_event_get">
-<description>
-Checks all open displays for a #GdkEvent to process,to be processed
-on, fetching events from the windowing system if necessary.
-See gdk_display_get_event().
-
-
-</description>
-<parameters>
-</parameters>
-<return> the next #GdkEvent to be processed, or %NULL
-if no events are pending. The returned #GdkEvent should be freed
-with gdk_event_free().
-</return>
 </function>
 
 <function name="gdk_event_get_axes">
@@ -7866,28 +7624,6 @@ Since: 3.22
 </return>
 </function>
 
-<function name="gdk_event_get_property">
-<description>
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description>
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, otherwise %FALSE
-</return>
-</function>
-
 <function name="gdk_event_get_root_coords">
 <description>
 Extract the root window relative x/y coordinates from an event.
@@ -7997,50 +7733,6 @@ Since: 3.20
 </parameters>
 <return> The #GdkSeat of this event
 
-</return>
-</function>
-
-<function name="gdk_event_get_selection">
-<description>
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description>
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, otherwise %FALSE
-</return>
-</function>
-
-<function name="gdk_event_get_selection_property">
-<description>
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="requestor">
-<parameter_description>
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, otherwise %FALSE
 </return>
 </function>
 
@@ -8258,28 +7950,6 @@ Since: 3.10
 </return>
 </function>
 
-<function name="gdk_event_get_window_state">
-<description>
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
-<parameter name="changed">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="new_state">
-<parameter_description>
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success, otherwise %FALSE
-</return>
-</function>
-
 <function name="gdk_event_handler_set">
 <description>
 Sets the function to call to handle all events from GDK.
@@ -8349,37 +8019,6 @@ Since: 2.2
 should be freed with gdk_event_free().
 
 </return>
-</function>
-
-<function name="gdk_event_peek">
-<description>
-If there is an event waiting in the event queue of some open
-display, returns a copy of it. See gdk_display_peek_event().
-
-
-</description>
-<parameters>
-</parameters>
-<return> a copy of the first #GdkEvent on some event
-queue, or %NULL if no events are in any queues. The returned
-#GdkEvent should be freed with gdk_event_free().
-</return>
-</function>
-
-<function name="gdk_event_put">
-<description>
-Appends a copy of the given event onto the front of the event
-queue for event-&gt;any.window’s display, or the default event
-queue if event-&gt;any.window is %NULL. See gdk_display_put_event().
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_event_set_device">
@@ -8557,18 +8196,6 @@ Since: 3.0
 </parameters>
 <return> %TRUE if the distance could be calculated.
 
-</return>
-</function>
-
-<function name="gdk_events_pending">
-<description>
-Checks if any events are ready to be processed for any display.
-
-
-</description>
-<parameters>
-</parameters>
-<return> %TRUE if any events are pending.
 </return>
 </function>
 
@@ -9455,18 +9082,6 @@ Since: 2.16
 </return>
 </function>
 
-<function name="gdk_keymap_get_default">
-<description>
-Returns the #GdkKeymap attached to the default display.
-
-
-</description>
-<parameters>
-</parameters>
-<return> the #GdkKeymap attached to the default display.
-</return>
-</function>
-
 <function name="gdk_keymap_get_direction">
 <description>
 Returns the direction of effective layout of the keymap.
@@ -9560,24 +9175,6 @@ for an array of #GdkKeymapKey
 </parameter>
 </parameters>
 <return> %TRUE if keys were found and returned
-</return>
-</function>
-
-<function name="gdk_keymap_get_for_display">
-<description>
-Returns the #GdkKeymap attached to @display.
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkKeymap attached to @display.
-
 </return>
 </function>
 
@@ -12009,7 +11606,7 @@ Queries a pointer to the pixel data of a pixbuf.
 </parameter>
 </parameters>
 <return> A pointer to the pixbuf's pixel data.
-Please see the section on [image data](image-data) for information
+Please see the section on [image data][image-data] for information
 about how the pixel data is stored in memory.
 
 This function will cause an implicit copy of the pixbuf data if the
@@ -12035,7 +11632,7 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> A pointer to the pixbuf's
-pixel data.  Please see the section on [image data](image-data)
+pixel data.  Please see the section on [image data][image-data]
 for information about how the pixel data is stored in memory.
 
 This function will cause an implicit copy of the pixbuf data if the
@@ -14227,153 +13824,6 @@ of @pixdata.
 </return>
 </function>
 
-<function name="gdk_property_change">
-<description>
-Changes the contents of a property on a window.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description> the property to change
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> the new type for the property. If @mode is
-%GDK_PROP_MODE_PREPEND or %GDK_PROP_MODE_APPEND, then this
-must match the existing type or an error will occur.
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> the new format for the property. If @mode is
-%GDK_PROP_MODE_PREPEND or %GDK_PROP_MODE_APPEND, then this
-must match the existing format or an error will occur.
-</parameter_description>
-</parameter>
-<parameter name="mode">
-<parameter_description> a value describing how the new data is to be combined
-with the current data.
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> the data (a `guchar *`
-`gushort *`, or `gulong *`,
-depending on @format), cast to a `guchar *`.
-</parameter_description>
-</parameter>
-<parameter name="nelements">
-<parameter_description> the number of elements of size determined by the format,
-contained in @data.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_property_delete">
-<description>
-Deletes a property from a window.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description> the property to delete
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_property_get">
-<description>
-Retrieves a portion of the contents of a property. If the
-property does not exist, then the function returns %FALSE,
-and %NULL will be stored in @actual_property_type.
-
-The XGetWindowProperty() function that gdk_property_get()
-uses has a very confusing and complicated set of semantics.
-Unfortunately, gdk_property_get() makes the situation
-worse instead of better (the semantics should be considered
-undefined), and also prints warnings to stderr in cases where it
-should return a useful error to the program. You are advised to use
-XGetWindowProperty() directly until a replacement function for
-gdk_property_get() is provided.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description> the property to retrieve
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> the desired property type, or %NULL, if any type of data
-is acceptable. If this does not match the actual
-type, then @actual_format and @actual_length will
-be filled in, a warning will be printed to stderr
-and no data will be returned.
-</parameter_description>
-</parameter>
-<parameter name="offset">
-<parameter_description> the offset into the property at which to begin
-retrieving data, in 4 byte units.
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> the length of the data to retrieve in bytes.  Data is
-considered to be retrieved in 4 byte chunks, so @length
-will be rounded up to the next highest 4 byte boundary
-(so be careful not to pass a value that might overflow
-when rounded up).
-</parameter_description>
-</parameter>
-<parameter name="pdelete">
-<parameter_description> if %TRUE, delete the property after retrieving the
-data.
-</parameter_description>
-</parameter>
-<parameter name="actual_property_type">
-<parameter_description> location to store the
-actual type of the property.
-</parameter_description>
-</parameter>
-<parameter name="actual_format">
-<parameter_description> location to store the actual return format of the
-data; either 8, 16 or 32 bits.
-</parameter_description>
-</parameter>
-<parameter name="actual_length">
-<parameter_description> location to store the length of the retrieved data, in
-bytes.  Data returned in the 32 bit format is stored
-in a long variable, so the actual number of 32 bit
-elements should be be calculated via
-@actual_length / sizeof(glong) to ensure portability to
-64 bit systems.
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> location
-to store a pointer to the data. The retrieved data should be
-freed with g_free() when you are finished using it.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if data was successfully received and stored
-in @data, otherwise %FALSE.
-</return>
-</function>
-
 <function name="gdk_rectangle_contains_point">
 <description>
 Returns #TRUE if @rect contains the point described by @x and @y.
@@ -14717,6 +14167,34 @@ capabilities. This object is owned by GTK+ and must not be freed.
 </return>
 </function>
 
+<function name="gdk_seat_get_master_pointers">
+<description>
+Returns all master pointers with the given capabilities driven by this @seat.
+On most backends this function will return a list with a single element (meaning
+that all input devices drive the same onscreen cursor).
+
+In other backends where there can possibly be multiple foci (eg. wayland),
+this function will return all master #GdkDevices that represent these.
+
+Since: 3.93.
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> The #GdkSeat
+</parameter_description>
+</parameter>
+<parameter name="capabilities">
+<parameter_description> Queried capabilities
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list
+of master pointing devices
+
+</return>
+</function>
+
 <function name="gdk_seat_get_pointer">
 <description>
 Returns the master device that routes pointer events.
@@ -14850,267 +14328,6 @@ Since: 3.20
 <parameters>
 <parameter name="seat">
 <parameter_description> a #GdkSeat
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_selection_convert">
-<description>
-Retrieves the contents of a selection in a given
-form.
-
-</description>
-<parameters>
-<parameter name="requestor">
-<parameter_description> a #GdkWindow.
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> an atom identifying the selection to get the
-contents of.
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> the form in which to retrieve the selection.
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> the timestamp to use when retrieving the
-selection. The selection owner may refuse the
-request if it did not own the selection at
-the time indicated by the timestamp.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_selection_owner_get">
-<description>
-Determines the owner of the given selection.
-
-
-</description>
-<parameters>
-<parameter name="selection">
-<parameter_description> an atom indentifying a selection.
-</parameter_description>
-</parameter>
-</parameters>
-<return> if there is a selection owner
-for this window, and it is a window known to the current process,
-the #GdkWindow that owns the selection, otherwise %NULL. Note
-that the return value may be owned by a different process if a
-foreign window was previously created for that window, but a new
-foreign window will never be created by this call.
-</return>
-</function>
-
-<function name="gdk_selection_owner_get_for_display">
-<description>
-Determine the owner of the given selection.
-
-Note that the return value may be owned by a different
-process if a foreign window was previously created for that
-window, but a new foreign window will never be created by this call.
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> an atom indentifying a selection
-</parameter_description>
-</parameter>
-</parameters>
-<return> if there is a selection owner
-for this window, and it is a window known to the current
-process, the #GdkWindow that owns the selection, otherwise
-%NULL.
-
-</return>
-</function>
-
-<function name="gdk_selection_owner_set">
-<description>
-Sets the owner of the given selection.
-
-
-</description>
-<parameters>
-<parameter name="owner">
-<parameter_description> a #GdkWindow or %NULL to indicate that the
-the owner for the given should be unset.
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> an atom identifying a selection.
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> timestamp to use when setting the selection.
-If this is older than the timestamp given last
-time the owner was set for the given selection, the
-request will be ignored.
-</parameter_description>
-</parameter>
-<parameter name="send_event">
-<parameter_description> if %TRUE, and the new owner is different
-from the current owner, the current owner
-will be sent a SelectionClear event.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the selection owner was successfully
-changed to @owner, otherwise %FALSE.
-</return>
-</function>
-
-<function name="gdk_selection_owner_set_for_display">
-<description>
-Sets the #GdkWindow @owner as the current owner of the selection @selection.
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay
-</parameter_description>
-</parameter>
-<parameter name="owner">
-<parameter_description> a #GdkWindow or %NULL to indicate that the owner for
-the given should be unset
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> an atom identifying a selection
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> timestamp to use when setting the selection
-If this is older than the timestamp given last time the owner was
-set for the given selection, the request will be ignored
-</parameter_description>
-</parameter>
-<parameter name="send_event">
-<parameter_description> if %TRUE, and the new owner is different from the current
-owner, the current owner will be sent a SelectionClear event
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the selection owner was successfully changed to owner,
-otherwise %FALSE.
-
-</return>
-</function>
-
-<function name="gdk_selection_property_get">
-<description>
-Retrieves selection data that was stored by the selection
-data in response to a call to gdk_selection_convert(). This function
-will not be used by applications, who should use the #GtkClipboard
-API instead.
-
-
-</description>
-<parameters>
-<parameter name="requestor">
-<parameter_description> the window on which the data is stored
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> location to store a pointer to the retrieved data.
-       If the retrieval failed, %NULL we be stored here, otherwise, it
-       will be non-%NULL and the returned data should be freed with g_free()
-       when you are finished using it. The length of the
-       allocated memory is one more than the length
-       of the returned data, and the final byte will always
-       be zero, to ensure nul-termination of strings
-</parameter_description>
-</parameter>
-<parameter name="prop_type">
-<parameter_description> location to store the type of the property
-</parameter_description>
-</parameter>
-<parameter name="prop_format">
-<parameter_description> location to store the format of the property
-</parameter_description>
-</parameter>
-</parameters>
-<return> the length of the retrieved data.
-</return>
-</function>
-
-<function name="gdk_selection_send_notify">
-<description>
-Sends a response to SelectionRequest event.
-
-</description>
-<parameters>
-<parameter name="requestor">
-<parameter_description> window to which to deliver response.
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> selection that was requested.
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> target that was selected.
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description> property in which the selection owner stored the
-data, or %NULL to indicate that the request
-was rejected.
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> timestamp.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_selection_send_notify_for_display">
-<description>
-Send a response to SelectionRequest event.
-
-Since: 2.2
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> the #GdkDisplay where @requestor is realized
-</parameter_description>
-</parameter>
-<parameter name="requestor">
-<parameter_description> window to which to deliver response
-</parameter_description>
-</parameter>
-<parameter name="selection">
-<parameter_description> selection that was requested
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> target that was selected
-</parameter_description>
-</parameter>
-<parameter name="property">
-<parameter_description> property in which the selection owner stored the data,
-or %NULL to indicate that the request was rejected
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> timestamp
 </parameter_description>
 </parameter>
 </parameters>
@@ -16740,24 +15957,6 @@ Since: 2.24
 </return>
 </function>
 
-<function name="gdk_window_get_event_compression">
-<description>
-Get the current event compression setting for this window.
-
-Since: 3.12
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if motion events will be compressed
-
-</return>
-</function>
-
 <function name="gdk_window_get_events">
 <description>
 Gets the event mask for @window for all master input devices. See
@@ -18274,33 +17473,6 @@ Since: 3.0
 </parameter>
 <parameter name="event_mask">
 <parameter_description> event mask for @window
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_window_set_event_compression">
-<description>
-Determines whether or not extra unprocessed motion events in
-the event queue can be discarded. If %TRUE only the most recent
-event will be delivered.
-
-Some types of applications, e.g. paint programs, need to see all
-motion events and will benefit from turning off event compression.
-
-By default, event compression is enabled.
-
-Since: 3.12
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="event_compression">
-<parameter_description> %TRUE if motion events should be compressed
 </parameter_description>
 </parameter>
 </parameters>
