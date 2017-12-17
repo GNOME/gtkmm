@@ -16,16 +16,39 @@
 
 #include <glibmm/object.h>
 #include <gdkmm/contentformats.h>
+#include <gdkmm/contentprovider.h>
 #include <gdkmm/display.h>
 #include <gdkmm/texture.h>
 
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
 
+namespace Gio
+{
+class Cancellable;
+}
+
 namespace Gdk
 {
-/** The %Clipboard object represents a clipboard of data shared between different processes
- * or between different widgets in the same process.
+/** Share data between applications for Copy-and-Paste.
+ *
+ * The %Gdk::Clipboard object represents a clipboard of data shared
+ * between different applications or between different parts of
+ * the same application.
+ *
+ * To get a %Clipboard object, use Gdk::Display::get_clipboard() or
+ * Gdk::Display::get_primary_clipboard(). You can find out about the data that
+ * is currently available in a clipboard using get_formats().
+ *
+ * To make text or image data available in a clipboard, use set_text() or
+ * set_texture(). For other data, you can use set_content(),
+ * which takes a Gdk::ContentProvider object.
+ *
+ * To read textual or image data from a clipboard, use read_text_async() or
+ * read_texture_async(). For other data, use read_async(),
+ * which provides a Gio::InputStream object.
+ *
+ * @see Gdk::ContentProvider, Gdk::ContentFormats
  *
  * @newin{3,94}
  */
@@ -39,14 +62,35 @@ public:
   _WRAP_METHOD(Glib::RefPtr<ContentFormats> get_formats(), gdk_clipboard_get_formats, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const ContentFormats> get_formats() const, gdk_clipboard_get_formats, refreturn, constversion)
   _WRAP_METHOD(bool is_local() const, gdk_clipboard_is_local)
-  //TODO: Add many more methods
+  _WRAP_METHOD(Glib::RefPtr<ContentProvider> get_content(), gdk_clipboard_get_content, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const ContentProvider> get_content() const, gdk_clipboard_get_content, refreturn, constversion)
+
+  _WRAP_METHOD(void read_texture_async(const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gdk_clipboard_read_texture_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::RefPtr<Texture> read_texture_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gdk_clipboard_read_texture_finish, errthrow)
+
+  _WRAP_METHOD(void read_text_async(const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gdk_clipboard_read_text_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::ustring read_text_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gdk_clipboard_read_text_finish, errthrow)
+
+  _WRAP_METHOD(bool set_content(const Glib::RefPtr<const ContentProvider>& provider), gdk_clipboard_set_content)
+  /** Clears the clipboard.
+   *
+   * In the rare case of a failure, this function will return <tt>false</tt>.
+   * The clipboard will then continue reporting its old contents.
+   *
+   * @return <tt>true</tt> if unsetting the clipboard succeeded.
+   */
+  bool unset_content();
   _WRAP_METHOD(void set_text(const Glib::ustring& text), gdk_clipboard_set_text)
   _WRAP_METHOD(void set_texture(const Glib::RefPtr<const Texture>& texture), gdk_clipboard_set_texture)
 
   _WRAP_PROPERTY("display", Glib::RefPtr<Display>)
   _WRAP_PROPERTY("formats", Glib::RefPtr<ContentFormats>)
   _WRAP_PROPERTY("local", bool)
-  //TODO: _WRAP_PROPERTY("content", Glib::RefPtr<ContentProvider>)
+  _WRAP_PROPERTY("content", Glib::RefPtr<ContentProvider>)
 
   // There are no public signals or vfuncs.
 };

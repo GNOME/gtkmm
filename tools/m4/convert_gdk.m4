@@ -240,6 +240,11 @@ _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const ContentFormats>',`Glib::wra
 _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<Gdk::ContentFormats>',`Glib::wrap($3)')
 _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const Gdk::ContentFormats>',`Glib::wrap($3)')
 
+# ContentProvider
+_CONVERSION(`const Glib::RefPtr<ContentProvider>&',`GdkContentProvider*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const ContentProvider>&',`GdkContentProvider*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GdkContentProvider*',`Glib::RefPtr<ContentProvider>',`Glib::wrap($3)')
+
 # XPM data
 _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$3')
 

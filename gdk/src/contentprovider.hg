@@ -1,0 +1,73 @@
+/* Copyright (C) 2017 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/refptr.h>
+#include <gdkmm/contentformats.h>
+
+_CC_INCLUDE(gdk/gdk.h)
+
+namespace Gdk
+{
+
+/** Provides content for data transfer between applications.
+ *
+ * A %Gdk::ContentProvider is used to provide content for the clipboard in
+ * a number of formats.
+ *
+ * To create a %ContentProvider, use one of the overloaded create() methods.
+ *
+ * GDK knows how to handle common text and image formats out-of-the-box. See
+ * Gdk::ContentSerializer and Gdk::ContentDeserializer if you want to add support
+ * for application-specific data formats.
+ *
+ * @See Gdk::ContentSerializer, Gdk::ContentDeserializer
+ *
+ * @newin{3,94}
+ */
+class ContentProvider : public Glib::Object
+{
+  _CLASS_GOBJECT(ContentProvider, GdkContentProvider, GDK_CONTENT_PROVIDER, Glib::Object, GObject)
+
+public:
+  // _WRAP_METHOD is used for the create() methods because the gdk_content_provider_new_for_*()
+  // functions do more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<ContentProvider> create(const Glib::ustring& mime_type,
+    const Glib::RefPtr<const Glib::Bytes>& bytes), gdk_content_provider_new_for_bytes)
+  _WRAP_METHOD(static Glib::RefPtr<ContentProvider> create(const Glib::ValueBase& value),
+    gdk_content_provider_new_for_value)
+
+  // ref_formats() and ref_storable_formats() are const because they return
+  // newly created ContentFormats instances.
+  _WRAP_METHOD(Glib::RefPtr<ContentFormats> ref_formats() const, gdk_content_provider_ref_formats)
+  _WRAP_METHOD(Glib::RefPtr<ContentFormats> ref_storable_formats() const, gdk_content_provider_ref_storable_formats)
+
+  _WRAP_METHOD(void content_changed(), gdk_content_provider_content_changed)
+
+  _WRAP_PROPERTY("formats", Glib::RefPtr<ContentFormats>)
+  _WRAP_PROPERTY("storable-formats", Glib::RefPtr<ContentFormats>)
+
+  _WRAP_SIGNAL(void content_changed(), "content-changed")
+
+  // GdkContentProvider contains vfuncs, but it's no use wrapping them as long as
+  // there is no constructor that calls g_object_new() to create a gtkmm__GdkContentProvider
+  // instance. A GdkContentProvider instance never calls an overriding vfunc in
+  // Gdk::ContentProvider.
+};
+
+} // namespace Gdk
