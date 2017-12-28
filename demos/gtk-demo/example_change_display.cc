@@ -331,7 +331,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
        toplevel = nullptr;
   }
 
-  Gdk::flush(); /* Really release the grab */
+  refDisplay->flush(); /* Really release the grab */
 
   return toplevel;
 }

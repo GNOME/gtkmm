@@ -28,13 +28,27 @@
 namespace Gdk
 {
 
+#ifndef GDKMM_DISABLE_DEPRECATED
+/**  @deprecated Use per-monitor information.
+ */
 int screen_width();
+
+/**  @deprecated Use per-monitor information.
+ */
 int screen_height();
 
+/**  @deprecated Use per-monitor information.
+ */
 int screen_width_mm();
+
+/**  @deprecated Use per-monitor information.
+ */
 int screen_height_mm();
 
+/**  @deprecated Use Gdk::Display::flush() instead.
+ */
 void flush();
+#endif //GDKMM_DISABLE_DEPRECATED
 
 namespace Cairo
 {
