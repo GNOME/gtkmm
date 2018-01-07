@@ -1,13 +1,13 @@
 /* Images
  *
- * GtkImage is used to display an image; the image can be in a number of formats.
- * Typically, you load an image into a GdkPixbuf, then display the pixbuf.
+ * Gtk::Image is used to display an image; the image can be in a number of formats.
+ * Typically, you load an image into a Gdk::Pixbuf, then display the pixbuf.
  *
- * This demo code shows some of the more obscure cases, in the simple
- * case a call to gtk_image_new_from_file() is all you need.
+ * This demo code shows some of the more obscure cases. In the simple
+ * case a call to 'new Gtk::Image(filename)' is all you need.
  *
- * If you want to put image data in your program as a C variable,
- * use the make-inline-pixbuf program that comes with GTK+.
+ * If you want to put image data in your program as a resource,
+ * use the glib-compile-resources program that comes with GLib.
  * This way you won't need to depend on loading external files, your
  * application binary can be self-contained.
  */
@@ -21,17 +21,17 @@ public:
   ~Example_Images() override;
 
 protected:
-  virtual void start_progressive_loading();
+  void start_progressive_loading();
 
   //signal handler:
-  virtual bool on_timeout();
-  virtual void on_loader_area_prepared();
-  virtual void on_loader_area_updated(int x, int y, int width, int height);
+  bool on_timeout();
+  void on_loader_area_prepared();
+  void on_loader_area_updated(int x, int y, int width, int height);
 
   //Member widgets:
   Gtk::Box m_VBox;
-  Gtk::Label m_Label_Image, m_Label_Animation, m_Label_Progressive;
-  Gtk::Frame m_Frame_Image, m_Frame_Animation, m_Frame_Progressive;
+  Gtk::Label m_Label_Image, m_Label_Animation, m_Label_ThemedIcon, m_Label_Progressive;
+  Gtk::Frame m_Frame_Image, m_Frame_Animation, m_Frame_ThemedIcon, m_Frame_Progressive;
   Gtk::Image m_Image_Progressive;
   Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
 
@@ -46,8 +46,8 @@ Gtk::Window* do_images()
 
 Example_Images::Example_Images()
 :
-  m_VBox                (Gtk::Orientation::VERTICAL, 8),
-  m_image_stream        ()
+  m_VBox(Gtk::Orientation::VERTICAL, 8),
+  m_image_stream()
 {
   set_title("Images");
 
@@ -83,6 +83,23 @@ Example_Images::Example_Images()
   pImage = Gtk::manage(new Gtk::Image());
   pImage->set_from_resource("/images/floppybuddy.gif");
   m_Frame_Animation.add(*pImage);
+
+  /* Symbolic themed icon */
+
+  m_Label_ThemedIcon.set_markup("<u>Symbolic themed icon</u>");
+  m_VBox.pack_start(m_Label_ThemedIcon, Gtk::PackOptions::SHRINK);
+
+  m_Frame_ThemedIcon.set_shadow_type(Gtk::ShadowType::IN);
+
+  m_Frame_ThemedIcon.set_halign(Gtk::Align::CENTER);
+  m_Frame_ThemedIcon.set_valign(Gtk::Align::CENTER);
+  m_VBox.pack_start(m_Frame_ThemedIcon, Gtk::PackOptions::SHRINK);
+
+  auto icon = Gio::ThemedIcon::create("battery-caution-charging-symbolic", true);
+  pImage = Gtk::manage(new Gtk::Image());
+  pImage->set(icon);
+  pImage->set_icon_size(Gtk::IconSize::LARGE);
+  m_Frame_ThemedIcon.add(*pImage);
 
   /* Progressive */
 
@@ -244,17 +261,7 @@ void Example_Images::on_loader_area_prepared()
 
 void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, int/*height*/)
 {
-  /* We know the cairo surface inside the Gtk::Image has changed, but the image
-   * itself doesn't know this; so give it a hint by setting the surface
-   * again. Queuing a redraw used to be sufficient, but nowadays Gtk::Image
-   * uses GtkIconHelper which caches the surface state and will just redraw
-   * from the cache.
-   * If we wanted to be really efficient, we could use a drawing area or
-   * something instead of a Gtk::Image, so we could control the exact
-   * position of the surface on the display, then we could queue a draw
-   * for only the updated area of the image.
-   */
-  auto refSurface = m_Image_Progressive.get_surface();
-  m_Image_Progressive.set(refSurface);
+  const auto refPixbuf = m_refPixbufLoader->get_pixbuf();
+  m_Image_Progressive.set(refPixbuf);
 }
 
