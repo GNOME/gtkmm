@@ -5526,7 +5526,7 @@ to find out which font was just selected.
 
 Note that this signal is only emitted when the user
 changes the font. If you need to react to programmatic font changes
-as well, use the notify::font-name signal.
+as well, use the notify::font signal.
 
 Since: 2.4
 
@@ -5539,37 +5539,6 @@ Since: 2.4
 </parameters>
 <return></return>
 </signal>
-
-<property name="GtkFontButton:font-name">
-<description>
-The name of the currently selected font.
-
-Since: 2.4
-
-</description>
-</property>
-
-<property name="GtkFontButton:show-size">
-<description>
-If this property is set to %TRUE, the selected font size will be shown 
-in the label. For a more WYSIWYG way to show the selected size, see the 
-::use-size property. 
-
-Since: 2.4
-
-</description>
-</property>
-
-<property name="GtkFontButton:show-style">
-<description>
-If this property is set to %TRUE, the name of the selected font style 
-will be shown in the label. For a more WYSIWYG way to show the selected 
-style, see the ::use-font property. 
-
-Since: 2.4
-
-</description>
-</property>
 
 <property name="GtkFontButton:title">
 <description>
@@ -5635,6 +5604,36 @@ The font description as a #PangoFontDescription.
 </description>
 </property>
 
+<property name="GtkFontChooser:font-features">
+<description>
+The selected font features, in a format that is compatible with
+CSS and with Pango attributes.
+
+Since: 3.94
+
+</description>
+</property>
+
+<property name="GtkFontChooser:language">
+<description>
+The language for which the #GtkFontChooser:font-features were
+selected, in a format that is compatible with CSS and with Pango
+attributes.
+
+Since: 3.94
+
+</description>
+</property>
+
+<property name="GtkFontChooser:level">
+<description>
+The level of granularity to offer for selecting fonts.
+
+Since: 3.94
+
+</description>
+</property>
+
 <property name="GtkFontChooser:preview-text">
 <description>
 The string with which to preview the font.
@@ -5648,6 +5647,31 @@ Whether to show an entry to change the preview text.
 
 </description>
 </property>
+
+<enum name="GtkFontChooserLevel">
+<description>
+This enumeration specifies the granularity of font selection
+that is desired in a font chooser.
+
+</description>
+<parameters>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FONT">
+<parameter_description> Select an individual
+font, including a size. An example would be: &quot;Arial Bold 11&quot;
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FACE">
+<parameter_description> Select a font face,
+without a size. An example would be: &quot;Arial Bold&quot;
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FAMILY">
+<parameter_description> Select a font family, without
+specifying the face. An example would be: &quot;Arial&quot;
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GtkGLArea::create-context">
 <description>
@@ -6533,6 +6557,10 @@ Built-in icon sizes.
 
 Icon sizes default to being inherited. Where they cannot be
 inherited, text size is the default.
+
+All widgets which use GtkIconSize set the normal-icons or large-icons
+style classes correspondingly, and let themes determine the actual size
+to be used with the -gtk-icon-size CSS property.
 
 </description>
 <parameters>
@@ -9642,7 +9670,11 @@ Since: 3.22.26
 </description>
 <parameters>
 <parameter name="sidebar">
-<parameter_description> the object which received the signal.
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags for the operation
 </parameter_description>
 </parameter>
 </parameters>
@@ -14658,14 +14690,6 @@ drawing with the ::draw_layer vfunc.
 
 </description>
 <parameters>
-<parameter name="GTK_TEXT_VIEW_LAYER_BELOW">
-<parameter_description> Old deprecated layer, use %GTK_TEXT_VIEW_LAYER_BELOW_TEXT instead
-</parameter_description>
-</parameter>
-<parameter name="GTK_TEXT_VIEW_LAYER_ABOVE">
-<parameter_description> Old deprecated layer, use %GTK_TEXT_VIEW_LAYER_ABOVE_TEXT instead
-</parameter_description>
-</parameter>
 <parameter name="GTK_TEXT_VIEW_LAYER_BELOW_TEXT">
 <parameter_description> The layer rendered below the text (but above the background).  Since: 3.20
 </parameter_description>
@@ -16632,7 +16656,7 @@ Since: 2.12
 </parameters>
 <return> %TRUE if stopping keyboard navigation is fine, %FALSE
 if the emitting widget should try to handle the keyboard
-navigation attempt in its parent container(s).
+navigation attempt in its parent widget(s).
 
 </return>
 </signal>
@@ -31178,6 +31202,7 @@ so the first button in the list will be the leftmost button in the dialog.
 
 Here’s a simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt;
+GtkWidget *main_app_window; // Window the dialog should show up on
 GtkWidget *dialog;
 GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
 dialog = gtk_dialog_new_with_buttons (&quot;My dialog&quot;,
@@ -31265,14 +31290,17 @@ destroying the dialog if you wish to do so.
 
 Typical usage of this function might be:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+GtkWidget *dialog = gtk_dialog_new ();
+// Set up dialog...
+
+int result = gtk_dialog_run (GTK_DIALOG (dialog));
 switch (result)
 {
 case GTK_RESPONSE_ACCEPT:
-do_application_specific_something ();
+// do_application_specific_something ();
 break;
 default:
-do_nothing_since_dialog_was_cancelled ();
+// do_nothing_since_dialog_was_cancelled ();
 break;
 }
 gtk_widget_destroy (dialog);
@@ -31394,28 +31422,6 @@ to @sizes.
 Initiates a drag on the source side. The function only needs to be used
 when the application is starting drags itself, and is not needed when
 gtk_drag_source_set() is used.
-
-The @event is used to retrieve the timestamp that will be used internally to
-grab the pointer.  If @event is %NULL, then %GDK_CURRENT_TIME will be used.
-However, you should try to pass a real event in all cases, since that can be
-used to get information about the drag.
-
-Generally there are three cases when you want to start a drag by hand by
-calling this function:
-
-1. During a #GtkWidget::button-press-event handler, if you want to start a drag
-immediately when the user presses the mouse button.  Pass the @event
-that you have in your #GtkWidget::button-press-event handler.
-
-2. During a #GtkWidget::motion-notify-event handler, if you want to start a drag
-when the mouse moves past a certain threshold distance after a button-press.
-Pass the @event that you have in your #GtkWidget::motion-notify-event handler.
-
-3. During a timeout handler, if you want to start a drag after the mouse
-button is held down for some time.  Try to save the last event that you got
-from the mouse, using g_object_ref(), and pass it to this function
-(remember to free the event with g_object_unref() when you are done).
-If you can really not pass a real event, pass %NULL instead.
 
 Since: 3.10
 
@@ -34053,13 +34059,8 @@ indices in the layout to byte indices in the entry contents.
 Retrieves the maximum allowed length of the text in
 @entry. See gtk_entry_set_max_length().
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_max_length (buffer);
-]|
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_max_length() on it.
 
 
 </description>
@@ -34191,13 +34192,8 @@ Since: 3.10
 Retrieves the contents of the entry widget.
 See also gtk_editable_get_chars().
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_text (buffer);
-]|
+This is equivalent to getting @entry's #GtkEntryBuffer and calling
+gtk_entry_buffer_get_text() on it.
 
 
 </description>
@@ -34219,13 +34215,9 @@ stored.
 Retrieves the current length of the text in
 @entry. 
 
-This is equivalent to:
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_length() on it.
 
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_length (buffer);
-]|
 
 Since: 2.14
 
@@ -34892,12 +34884,8 @@ Sets the maximum allowed length of the contents of the widget. If
 the current contents are longer than the given length, then they
 will be truncated to fit.
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_set_max_length (buffer, max);
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_set_max_length() on it.
 ]|
 
 </description>
@@ -38785,65 +38773,6 @@ Since: 3.12
 <return></return>
 </function>
 
-<function name="gtk_font_button_get_font_name">
-<description>
-Retrieves the name of the currently selected font. This name includes
-style and size information as well. If you want to render something
-with the font, use this string with pango_font_description_from_string() .
-If you’re interested in peeking certain values (family name,
-style, size, weight) just query these properties from the
-#PangoFontDescription object.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> an internal copy of the font name which must not be freed.
-
-</return>
-</function>
-
-<function name="gtk_font_button_get_show_size">
-<description>
-Returns whether the font size will be shown in the label.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether the font size will be shown in the label.
-
-</return>
-</function>
-
-<function name="gtk_font_button_get_show_style">
-<description>
-Returns whether the name of the font style will be shown in the label.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether the font style will be shown in the label.
-
-</return>
-</function>
-
 <function name="gtk_font_button_get_title">
 <description>
 Retrieves the title of the font chooser dialog.
@@ -38928,68 +38857,6 @@ Since: 2.4
 <return> a new font picker widget.
 
 </return>
-</function>
-
-<function name="gtk_font_button_set_font_name">
-<description>
-Sets or updates the currently-displayed font in font picker dialog.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-<parameter name="fontname">
-<parameter_description> Name of font to display in font chooser dialog
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE
-
-</return>
-</function>
-
-<function name="gtk_font_button_set_show_size">
-<description>
-If @show_size is %TRUE, the font size will be displayed along with the name of the selected font.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-<parameter name="show_size">
-<parameter_description> %TRUE if font size should be displayed in dialog.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_font_button_set_show_style">
-<description>
-If @show_style is %TRUE, the font style will be displayed along with name of the selected font.
-
-Since: 2.4
-
-</description>
-<parameters>
-<parameter name="font_button">
-<parameter_description> a #GtkFontButton
-</parameter_description>
-</parameter>
-<parameter name="show_style">
-<parameter_description> %TRUE if font style should be displayed in label.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_font_button_set_title">
@@ -39177,6 +39044,23 @@ and must not be modified or freed.
 </return>
 </function>
 
+<function name="gtk_font_chooser_get_font_features">
+<description>
+Gets the currently-selected font features.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the currently selected font features
+</return>
+</function>
+
 <function name="gtk_font_chooser_get_font_map">
 <description>
 Gets the custom font map of this font chooser widget,
@@ -39212,6 +39096,40 @@ Since: 3.2
 <return> A n integer representing the selected font size,
 or -1 if no font size is selected.
 
+</return>
+</function>
+
+<function name="gtk_font_chooser_get_language">
+<description>
+Gets the currently-selected language for font features.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the currently selected language
+</return>
+</function>
+
+<function name="gtk_font_chooser_get_level">
+<description>
+Returns the current level of granularity for selecting fonts.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current granularity level
 </return>
 </function>
 
@@ -39359,6 +39277,26 @@ Since: 3.18
 </parameter>
 <parameter name="fontmap">
 <parameter_description> a #PangoFontMap
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_font_chooser_set_level">
+<description>
+Sets the desired level of granularity for selecting fonts.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+<parameter name="level">
+<parameter_description> the desired level of granularity
 </parameter_description>
 </parameter>
 </parameters>
@@ -48961,8 +48899,17 @@ Calling
 `gtk_list_store_insert_with_values (list_store, iter, position...)`
 has the same effect as calling
 |[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+insert_value (GtkListStore *list_store,
+GtkTreeIter  *iter,
+int           position)
+{
 gtk_list_store_insert (list_store, iter, position);
-gtk_list_store_set (list_store, iter, ...);
+gtk_list_store_set (list_store,
+iter
+// ...
+);
+}
 ]|
 with the difference that the former will only emit a row_inserted signal,
 while the latter will emit row_inserted, row_changed and, if the list store
@@ -53051,7 +52998,8 @@ GtkWidget **child;
 notebook = gtk_drag_get_source_widget (context);
 child = (void*) gtk_selection_data_get_data (data);
 
-process_widget (*child);
+// process_widget (*child);
+
 gtk_notebook_detach_tab (GTK_NOTEBOOK (notebook), *child);
 }
 ]|
@@ -60729,9 +60677,9 @@ A common way to set up a group of radio buttons is the following:
 GtkRadioButton *radio_button;
 GtkRadioButton *last_button;
 
-while ( ...more buttons to add... )
+while (some_condition)
 {
-radio_button = gtk_radio_button_new (...);
+radio_button = gtk_radio_button_new (NULL);
 
 gtk_radio_button_join_group (radio_button, last_button);
 last_button = radio_button;
@@ -66144,10 +66092,19 @@ GtkSearchBar *bar = GTK_SEARCH_BAR (user_data);
 return gtk_search_bar_handle_event (bar, event);
 }
 
+static void
+create_toplevel (void)
+{
+GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+GtkWindow *search_bar = gtk_search_bar_new ();
+
+// Add more widgets to the window...
+
 g_signal_connect (window,
 &quot;key-press-event&quot;,
 G_CALLBACK (on_key_press_event),
 search_bar);
+}
 ]|
 
 Since: 3.10
@@ -67369,7 +67326,7 @@ Since: 3.90
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE is @bounds is entirely outside the clip region
+<return> %TRUE if @bounds is entirely outside the clip region
 
 </return>
 </function>
@@ -71773,7 +71730,7 @@ Creates a new text buffer.
 
 <function name="gtk_text_buffer_paste_clipboard">
 <description>
-Pastes the contents of a clipboard. If @override_location is %NULL, the
+Pastes the contents of a clipboard. If @override_location is %NULL, the
 pasted text will be inserted at the cursor position, or the buffer selection
 will be replaced if the selection is non-empty.
 
@@ -75752,9 +75709,13 @@ static gboolean
 gtk_foo_bar_key_press_event (GtkWidget   *widget,
 GdkEventKey *event)
 {
-if ((key-&gt;keyval == GDK_KEY_Return || key-&gt;keyval == GDK_KEY_KP_Enter))
+guint keyval;
+
+gdk_event_get_keyval ((GdkEvent*)event, &amp;keyval);
+
+if (keyval == GDK_KEY_Return || keyval == GDK_KEY_KP_Enter)
 {
-if (gtk_text_view_im_context_filter_keypress (GTK_TEXT_VIEW (view), event))
+if (gtk_text_view_im_context_filter_keypress (GTK_TEXT_VIEW (widget), event))
 return TRUE;
 }
 
@@ -82764,7 +82725,7 @@ gtk_tree_view_column_set_attributes() on the newly created #GtkTreeViewColumn.
 Here’s a simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt;
 enum { TEXT_COLUMN, COLOR_COLUMN, N_COLUMNS };
-...
+// ...
 {
 GtkTreeViewColumn *column;
 GtkCellRenderer   *renderer = gtk_cell_renderer_text_new ();
@@ -87887,13 +87848,20 @@ window was inside a #GtkWindow-derived widget which was in turn
 inside the toplevel #GtkWindow.
 
 To reliably find the toplevel #GtkWindow, use
-gtk_widget_get_toplevel() and call gtk_widget_is_toplevel()
-on the result.
+gtk_widget_get_toplevel() and call GTK_IS_WINDOW()
+on the result. For instance, to get the title of a widget's toplevel
+window, one might use:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-GtkWidget *toplevel = gtk_widget_get_toplevel (widget);
-if (gtk_widget_is_toplevel (toplevel))
+static const char *
+get_widget_toplevel_title (GtkWidget *widget)
 {
-// Perform action on toplevel.
+GtkWidget *toplevel = gtk_widget_get_toplevel (widget);
+if (GTK_IS_WINDOW (toplevel))
+{
+return gtk_window_get_title (GTK_WINDOW (toplevel));
+}
+
+return NULL;
 }
 ]|
 
@@ -88648,6 +88616,9 @@ Measures @widget in the orientation @orientation and for the given @for_size.
 As an example, if @orientation is GTK_ORIENTATION_HORIZONTAL and @for_size is 300,
 this functions will compute the minimum and natural width of @widget if
 it is allocated at a height of 300 pixels.
+
+See [GtkWidget’s geometry management section][geometry-management] for
+a more details on implementing #GtkWidgetClass.measure().
 
 Since: 3.90
 
@@ -91400,8 +91371,7 @@ afterward, because other entities (e.g. the user or
 [window manager][gtk-X11-arch])) could iconify it
 again before your code which assumes deiconification gets to run.
 
-You can track iconification via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property.
 
 </description>
 <parameters>
@@ -91423,8 +91393,7 @@ again, and not all window managers honor requests to fullscreen
 windows. But normally the window will end up fullscreen. Just
 don’t write code that crashes if not.
 
-You can track the fullscreen state via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 Since: 2.2
 
@@ -91443,8 +91412,7 @@ Since: 2.2
 Asks to place @window in the fullscreen state. Note that you shouldn't assume
 the window is definitely full screen afterward.
 
-You can track the fullscreen state via the &quot;window-state-event&quot; signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 </description>
 <parameters>
@@ -92328,8 +92296,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be iconified before it ever appears
 onscreen.
 
-You can track iconification via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property.
 
 </description>
 <parameters>
@@ -92418,9 +92385,8 @@ It’s permitted to call this function before showing a window,
 in which case the window will be maximized when it appears onscreen
 initially.
 
-You can track maximization via the “window-state-event” signal
-on #GtkWidget, or by listening to notifications on the
-#GtkWindow:is-maximized property.
+You can track iconification via the #GdkWindow::state property
+or by listening to notifications on the #GtkWindow:is-maximized property.
 
 </description>
 <parameters>
@@ -93356,8 +93322,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be kept above when it appears onscreen
 initially.
 
-You can track the above state via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 Note that, according to the
 [Extended Window Manager Hints Specification](http://www.freedesktop.org/Standards/wm-spec),
@@ -93395,8 +93360,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be kept below when it appears onscreen
 initially.
 
-You can track the below state via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 Note that, according to the
 [Extended Window Manager Hints Specification](http://www.freedesktop.org/Standards/wm-spec),
@@ -93773,8 +93737,7 @@ write code that crashes if not.
 
 It’s permitted to call this function before showing a window.
 
-You can track stickiness via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property.
 
 </description>
 <parameters>
@@ -93796,8 +93759,7 @@ again, and not all window managers honor requests to unfullscreen
 windows. But normally the window will end up restored to its normal
 state. Just don’t write code that crashes if not.
 
-You can track the fullscreen state via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 Since: 2.2
 
@@ -93820,8 +93782,7 @@ could maximize it again, and not all window
 managers honor requests to unmaximize. But normally the window will
 end up unmaximized. Just don’t write code that crashes if not.
 
-You can track maximization via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property
 
 </description>
 <parameters>
@@ -93842,8 +93803,7 @@ window is definitely unstuck afterward, because other entities
 stick it again. But normally the window will
 end up stuck. Just don’t write code that crashes if not.
 
-You can track stickiness via the “window-state-event” signal
-on #GtkWidget.
+You can track iconification via the #GdkWindow::state property.
 
 </description>
 <parameters>

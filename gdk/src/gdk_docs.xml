@@ -189,6 +189,20 @@ in memory as 0x00, 0xff, 0xee, 0xcc.
 </parameters>
 </enum>
 
+<signal name="GdkClipboard::changed">
+<description>
+The ::changed signal is emitted when the clipboard changes ownership.
+
+</description>
+<parameters>
+<parameter name="clipboard">
+<parameter_description> the object on which the signal was emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <property name="GdkClipboard:content">
 <description>
 The #GdkContentProvider or %NULL if the clipboard is empty or contents are
@@ -269,7 +283,7 @@ Since: 3.94
 
 <enum name="GdkCrossingMode">
 <description>
-Specifies the crossing mode for #GdkEventCrossing.
+Specifies the crossing mode for enter and leave events.
 
 </description>
 <parameters>
@@ -672,6 +686,27 @@ Since: 3.20
 </parameter>
 <parameter name="seat">
 <parameter_description> the seat that was just removed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GdkDisplay::setting-changed">
+<description>
+The ::setting-changed signal is emitted whenever a setting
+changes its value.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="setting">
+<parameter_description> the name of the setting that changed
 </parameter_description>
 </parameter>
 </parameters>
@@ -1971,9 +2006,24 @@ between (keyval, modifiers) pairs from key press and release events.
 </parameters>
 </enum>
 
+<signal name="GdkMonitor::invalidate">
+<description>
+The ::invalidate signal gets emitted when the output represented
+by @monitor gets disconnected.
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> the object on which this signal was emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <enum name="GdkNotifyType">
 <description>
-Specifies the kind of crossing for #GdkEventCrossing.
+Specifies the kind of crossing for enter and leave events.
 
 See the X11 protocol specification of LeaveNotify for
 full details of crossing event generation.
@@ -2380,7 +2430,7 @@ which must be repeated.
 
 <enum name="GdkScrollDirection">
 <description>
-Specifies the direction for #GdkEventScroll.
+Specifies the direction for scroll events.
 
 </description>
 <parameters>
@@ -2402,7 +2452,7 @@ Specifies the direction for #GdkEventScroll.
 </parameter>
 <parameter name="GDK_SCROLL_SMOOTH">
 <parameter_description> the scrolling is determined by the delta values
-in #GdkEventScroll. See gdk_event_get_scroll_deltas(). Since: 3.4
+in scroll events. See gdk_event_get_scroll_deltas(). Since: 3.4
 </parameter_description>
 </parameter>
 </parameters>
@@ -2620,9 +2670,6 @@ a pinch gesture). In these cases, the last event will report the phase
 %GDK_TOUCHPAD_GESTURE_PHASE_CANCEL, this should be used as a hint
 to undo any visible/permanent changes that were done throughout the
 progress of the gesture.
-
-See also #GdkEventTouchpadSwipe and #GdkEventTouchpadPinch.
-
 
 </description>
 <parameters>
@@ -4009,6 +4056,254 @@ ignore.
 </return>
 </function>
 
+<function name="gdk_content_deserialize_async">
+<description>
+Read content from the given input stream and deserialize it, asynchronously.
+When the operation is finished, @callback will be called. You can then
+call gdk_content_deserialize_finish() to get the result of the operation.
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GInputStream to read the serialized content from
+</parameter_description>
+</parameter>
+<parameter name="mime_type">
+<parameter_description> the mime type to deserialize from
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the GType to deserialize from
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the io priority of the operation
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the operation is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_deserialize_finish">
+<description>
+Finishes a content deserialization operation.
+
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> the #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> return location for the result of the operation
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful. In this case, @value is set.
+%FALSE if an error occurred. In this case, @error is set
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_cancellable">
+<description>
+Gets the cancellable that was passed to gdk_content_deserialize_async().
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the cancellable for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_gtype">
+<description>
+Gets the GType to create an instance of.
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the GType for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_input_stream">
+<description>
+Gets the input stream that was passed to gdk_content_deserialize_async().
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the input stream for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_mime_type">
+<description>
+Gets the mime type to deserialize from.
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the mime type for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_priority">
+<description>
+Gets the io priority that was passed to gdk_content_deserialize_async().
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the io priority for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_task_data">
+<description>
+Gets the data that was associated with @deserializer via gdk_content_deserializer_set_task_data().
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the task data for @deserializer
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_user_data">
+<description>
+Gets the user data that was passed when the deserializer was registered.
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the user data for this deserializer
+</return>
+</function>
+
+<function name="gdk_content_deserializer_get_value">
+<description>
+Gets the #GValue to store the deserialized object in.
+
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GValue for the current operation
+</return>
+</function>
+
+<function name="gdk_content_deserializer_return_error">
+<description>
+Indicate that the deserialization has ended with an error.
+This function consumes @error.
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_deserializer_return_success">
+<description>
+Indicate that the deserialization has been successfully completed.
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_deserializer_set_task_data">
+<description>
+Associate data with the current deserialization operation.
+
+</description>
+<parameters>
+<parameter name="deserializer">
+<parameter_description> a #GdkContentDeserializer
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to associate with this operation
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> destroy notify for @data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_content_formats_builder_add_formats">
 <description>
 Appends all formats from @formats to @builder, skipping those that
@@ -4365,6 +4660,74 @@ they had in @second.
 </return>
 </function>
 
+<function name="gdk_content_formats_union_deserialize_gtypes">
+<description>
+Add GTypes for mime types in @formats for which deserializers are
+registered.
+
+Return: a new #GdkContentFormats
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a #GdkContentFormats
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_formats_union_deserialize_mime_types">
+<description>
+Add mime types for GTypes in @formats for which deserializers are
+registered.
+
+Return: a new #GdkContentFormats
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a #GdkContentFormats
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_formats_union_serialize_gtypes">
+<description>
+Add GTypes for the mime types in @formats for which serializers are
+registered.
+
+Return: a new #GdkContentFormats
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a #GdkContentFormats
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_formats_union_serialize_mime_types">
+<description>
+Add mime types for GTypes in @formats for which serializers are
+registered.
+
+Return: a new #GdkContentFormats
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a #GdkContentFormats
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_content_formats_unref">
 <description>
 Decreases the reference count of a #GdkContentFormats by one.
@@ -4572,6 +4935,312 @@ ignore.
 <return> %TRUE if the operation was completed successfully. Otherwise
 @error will be set to describe the failure.
 </return>
+</function>
+
+<function name="gdk_content_register_deserializer">
+<description>
+Registers a function to create objects of a given @type from
+a serialized representation with the given mime type.
+
+</description>
+<parameters>
+<parameter name="mime_type">
+<parameter_description> the mime type which the function can deserialize from
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the type of objects that the function creates
+</parameter_description>
+</parameter>
+<parameter name="deserialize">
+<parameter_description> the callback
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data that @deserialize can access
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> destroy notify for @data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_register_serializer">
+<description>
+Registers a function to convert objects of the given @type to
+a serialized representation with the given mime type.
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> the type of objects that the function can serialize
+</parameter_description>
+</parameter>
+<parameter name="mime_type">
+<parameter_description> the mime type to serialize to
+</parameter_description>
+</parameter>
+<parameter name="serialize">
+<parameter_description> the callback
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data that @serialize can access
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> destroy notify for @data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_serialize_async">
+<description>
+Serialize content and write it to the given output stream, asynchronously.
+When the operation is finished, @callback will be called. You can then
+call gdk_content_serialize_finish() to get the result of the operation.
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream to write the serialized content to
+</parameter_description>
+</parameter>
+<parameter name="mime_type">
+<parameter_description> the mime type to serialize to
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the content to serialize
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the io priority of the operation
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the operation is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_serialize_finish">
+<description>
+Finishes a content serialization operation.
+
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> the #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful, %FALSE if an
+error occurred. In this case, @error is set
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_cancellable">
+<description>
+Gets the cancellable that was passed to gdk_content_serialize_async().
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the cancellable for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_gtype">
+<description>
+Gets the GType to of the object to serialize.
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the GType for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_mime_type">
+<description>
+Gets the mime type to serialize to.
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the mime type for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_output_stream">
+<description>
+Gets the output stream that was passed to gdk_content_serialize_async().
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the output stream for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_priority">
+<description>
+Gets the io priority that was passed to gdk_content_serialize_async().
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the io priority for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_task_data">
+<description>
+Gets the data that was associated with @serializer via gdk_content_serializer_set_task_data().
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the task data for @serializer
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_user_data">
+<description>
+Gets the user data that was passed when the serializer was registered.
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the user data for this serializer
+</return>
+</function>
+
+<function name="gdk_content_serializer_get_value">
+<description>
+Gets the #GValue to read the object to serialize from.
+
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GValue for the current operation
+</return>
+</function>
+
+<function name="gdk_content_serializer_return_error">
+<description>
+Indicate that the serialization has ended with an error.
+This function consumes @error.
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_serializer_return_success">
+<description>
+Indicate that the serialization has been successfully completed.
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_content_serializer_set_task_data">
+<description>
+Associate data with the current serialization operation.
+
+</description>
+<parameters>
+<parameter name="serializer">
+<parameter_description> a #GdkContentSerializer
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to associate with this operation
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> destroy notify for @data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_cursor_get_fallback">
@@ -6018,9 +6687,8 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> the next #GdkEvent to be processed, or %NULL
-if no events are pending. The returned #GdkEvent should be freed
-with gdk_event_free().
+<return> the next #GdkEvent to be processed,
+or %NULL if no events are pending
 
 </return>
 </function>
@@ -6219,6 +6887,34 @@ Since: 3.22
 </parameters>
 <return> the primary monitor, or any monitor if no
 primary monitor is configured by the user
+
+</return>
+</function>
+
+<function name="gdk_display_get_setting">
+<description>
+Retrieves a desktop-wide setting such as double-click time
+for the @display.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of the setting
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> location to store the value of the setting
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the setting existed and a value was stored
+in @value, %FALSE otherwise
 
 </return>
 </function>
@@ -6504,9 +7200,8 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> a copy of the first #GdkEvent on the event
-queue, or %NULL if no events are in the queue. The returned
-#GdkEvent should be freed with g_object_unref().
+<return> the first #GdkEvent on the
+event queue
 
 </return>
 </function>
@@ -7119,6 +7814,68 @@ This function is called by the drag destination.
 <return></return>
 </function>
 
+<function name="gdk_drop_read_async">
+<description>
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+<parameter name="mime_types">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_drop_read_finish">
+<description>
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDragContext
+</parameter_description>
+</parameter>
+<parameter name="out_mime_type">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GInputStream, or %NULL
+
+</return>
+</function>
+
 <function name="gdk_drop_reply">
 <description>
 Accepts or rejects a drop.
@@ -7157,17 +7914,15 @@ resources associated with it (e.g. #GdkWindow’s and strings).
 </parameter_description>
 </parameter>
 </parameters>
-<return> a copy of @event. The returned #GdkEvent should be freed with
-gdk_event_free().
+<return> a copy of @event. Free with g_object_unref()
 </return>
 </function>
 
 <function name="gdk_event_free">
 <description>
 Frees a #GdkEvent, freeing or decrementing any resources associated with it.
-Note that this function should only be called with events returned from
-functions such as gdk_event_peek(), gdk_event_get(), gdk_event_copy()
-and gdk_event_new().
+
+This is equivalent to g_object_unref().
 
 </description>
 <parameters>
@@ -7181,6 +7936,8 @@ and gdk_event_new().
 
 <function name="gdk_event_get_axes">
 <description>
+Extracts all axis values from an event.
+
 
 </description>
 <parameters>
@@ -7296,6 +8053,8 @@ Extract the event window relative x/y coordinates from an event.
 
 <function name="gdk_event_get_crossing_detail">
 <description>
+Extracts the crossing detail from an event.
+
 
 </description>
 <parameters>
@@ -7304,7 +8063,7 @@ Extract the event window relative x/y coordinates from an event.
 </parameter_description>
 </parameter>
 <parameter name="detail">
-<parameter_description>
+<parameter_description> return location for the crossing detail
 </parameter_description>
 </parameter>
 </parameters>
@@ -7314,6 +8073,8 @@ Extract the event window relative x/y coordinates from an event.
 
 <function name="gdk_event_get_crossing_mode">
 <description>
+Extracts the crossing mode from an event.
+
 
 </description>
 <parameters>
@@ -7322,7 +8083,7 @@ Extract the event window relative x/y coordinates from an event.
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description>
+<parameter_description> return location for the crossing mode
 </parameter_description>
 </parameter>
 </parameters>
@@ -7374,8 +8135,26 @@ Since: 3.22
 </return>
 </function>
 
+<function name="gdk_event_get_display">
+<description>
+Retrieves the #GdkDisplay associated to the @event.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkDisplay
+</return>
+</function>
+
 <function name="gdk_event_get_drag_context">
 <description>
+Gets the drag context from a DND event.
+
 
 </description>
 <parameters>
@@ -7384,7 +8163,7 @@ Since: 3.22
 </parameter_description>
 </parameter>
 <parameter name="context">
-<parameter_description>
+<parameter_description> return location for the drag context
 </parameter_description>
 </parameter>
 </parameters>
@@ -7432,6 +8211,8 @@ Since: 3.10
 
 <function name="gdk_event_get_focus_in">
 <description>
+Extracts whether this is a focus-in or focus-out event.
+
 
 </description>
 <parameters>
@@ -7440,7 +8221,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="focus_in">
-<parameter_description>
+<parameter_description> return location for focus direction
 </parameter_description>
 </parameter>
 </parameters>
@@ -7450,6 +8231,8 @@ Since: 3.10
 
 <function name="gdk_event_get_grab_window">
 <description>
+Extracts the grab window from a grab broken event.
+
 
 </description>
 <parameters>
@@ -7458,7 +8241,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="window">
-<parameter_description>
+<parameter_description> Return location for the grab window
 </parameter_description>
 </parameter>
 </parameters>
@@ -7466,8 +8249,28 @@ Since: 3.10
 </return>
 </function>
 
+<function name="gdk_event_get_history">
+<description>
+Retrieves the history of the @event motion, as a list of time and
+coordinates.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent of type %GDK_MOTION_NOTIFY
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list
+of time and coordinates
+</return>
+</function>
+
 <function name="gdk_event_get_key_group">
 <description>
+Extracts the key group from an event.
+
 
 </description>
 <parameters>
@@ -7476,7 +8279,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="group">
-<parameter_description>
+<parameter_description> return location for the key group
 </parameter_description>
 </parameter>
 </parameters>
@@ -7486,6 +8289,9 @@ Since: 3.10
 
 <function name="gdk_event_get_key_is_modifier">
 <description>
+Extracts whether the event is a key event for
+a modifier key.
+
 
 </description>
 <parameters>
@@ -7494,7 +8300,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="is_modifier">
-<parameter_description>
+<parameter_description> return location for the value
 </parameter_description>
 </parameter>
 </parameters>
@@ -7550,6 +8356,8 @@ Since: 3.2
 
 <function name="gdk_event_get_pad_axis_value">
 <description>
+Extracts the information from a pad event.
+
 
 </description>
 <parameters>
@@ -7558,11 +8366,11 @@ Since: 3.2
 </parameter_description>
 </parameter>
 <parameter name="index">
-<parameter_description>
+<parameter_description> Return location for the axis index
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description>
+<parameter_description> Return location for the axis value
 </parameter_description>
 </parameter>
 </parameters>
@@ -7572,6 +8380,9 @@ Since: 3.2
 
 <function name="gdk_event_get_pad_button">
 <description>
+Extracts information about the pressed button from
+a pad event.
+
 
 </description>
 <parameters>
@@ -7580,7 +8391,7 @@ Since: 3.2
 </parameter_description>
 </parameter>
 <parameter name="button">
-<parameter_description>
+<parameter_description> Return location for the button
 </parameter_description>
 </parameter>
 </parameters>
@@ -7590,6 +8401,8 @@ Since: 3.2
 
 <function name="gdk_event_get_pad_group_mode">
 <description>
+Extracts group and mode information from a pad event.
+
 
 </description>
 <parameters>
@@ -7598,11 +8411,11 @@ Since: 3.2
 </parameter_description>
 </parameter>
 <parameter name="group">
-<parameter_description>
+<parameter_description> return location for the group
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description>
+<parameter_description> return location for the mode
 </parameter_description>
 </parameter>
 </parameters>
@@ -7612,12 +8425,17 @@ Since: 3.2
 
 <function name="gdk_event_get_pointer_emulated">
 <description>
-#event: a #GdkEvent
+Returns whether this event is an 'emulated' pointer event (typically
+from a touch event), as opposed to a real one.
 
 Since: 3.22
 
 </description>
 <parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
 </parameters>
 <return> %TRUE if this event is emulated
 
@@ -7764,9 +8582,10 @@ Since: 3.0
 
 <function name="gdk_event_get_state">
 <description>
-If the event contains a “state” field, puts that field in @state. Otherwise
-stores an empty state (0). Returns %TRUE if there was a state field
-in the event. @event may be %NULL, in which case it’s treated
+If the event contains a “state” field, puts that field in @state.
+
+Otherwise stores an empty state (0).
+@event may be %NULL, in which case it’s treated
 as if the event had no state field.
 
 
@@ -7781,12 +8600,15 @@ as if the event had no state field.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if there was a state field in the event 
+<return> %TRUE if there was a state field in the event
 </return>
 </function>
 
 <function name="gdk_event_get_string">
 <description>
+Extracts a string from an event. The string is an
+approximation of the keyval in a key event.
+
 
 </description>
 <parameters>
@@ -7795,7 +8617,7 @@ as if the event had no state field.
 </parameter_description>
 </parameter>
 <parameter name="string">
-<parameter_description>
+<parameter_description> return location for the string
 </parameter_description>
 </parameter>
 </parameters>
@@ -7822,6 +8644,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touch_emulating_pointer">
 <description>
+Extracts whether a touch event is emulating a pointer event.
+
 
 </description>
 <parameters>
@@ -7830,7 +8654,7 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="emulating">
-<parameter_description>
+<parameter_description> Return location for information
 </parameter_description>
 </parameter>
 </parameters>
@@ -7840,6 +8664,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touchpad_angle_delta">
 <description>
+Extracts the angle from a touchpad event.
+
 
 </description>
 <parameters>
@@ -7848,7 +8674,7 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="delta">
-<parameter_description>
+<parameter_description> Return location for angle
 </parameter_description>
 </parameter>
 </parameters>
@@ -7858,6 +8684,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touchpad_deltas">
 <description>
+Extracts delta information from a touchpad event.
+
 
 </description>
 <parameters>
@@ -7866,11 +8694,11 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="dx">
-<parameter_description>
+<parameter_description> return location for x
 </parameter_description>
 </parameter>
 <parameter name="dy">
-<parameter_description>
+<parameter_description> return location for y
 </parameter_description>
 </parameter>
 </parameters>
@@ -7880,6 +8708,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touchpad_gesture_n_fingers">
 <description>
+Extracts the number of fingers from a touchpad event.
+
 
 </description>
 <parameters>
@@ -7888,7 +8718,7 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="n_fingers">
-<parameter_description>
+<parameter_description> return location for the number of fingers
 </parameter_description>
 </parameter>
 </parameters>
@@ -7898,6 +8728,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touchpad_gesture_phase">
 <description>
+Extracts the touchpad gesture phase from a touchpad event.
+
 
 </description>
 <parameters>
@@ -7906,7 +8738,7 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="phase">
-<parameter_description>
+<parameter_description> Return location for the gesture phase
 </parameter_description>
 </parameter>
 </parameters>
@@ -7916,6 +8748,8 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 
 <function name="gdk_event_get_touchpad_scale">
 <description>
+Extracts the scale from a touchpad event.
+
 
 </description>
 <parameters>
@@ -7924,7 +8758,7 @@ returns #GDK_CURRENT_TIME. If @event is %NULL, returns #GDK_CURRENT_TIME.
 </parameter_description>
 </parameter>
 <parameter name="scale">
-<parameter_description>
+<parameter_description> Return location for scale
 </parameter_description>
 </parameter>
 </parameters>
@@ -8002,6 +8836,22 @@ Since: 3.20
 </return>
 </function>
 
+<function name="gdk_event_is_sent">
+<description>
+Returns whether the event was sent explicitly.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event was sent explicitly
+</return>
+</function>
+
 <function name="gdk_event_new">
 <description>
 Creates a new event of the given type. All fields are set to 0.
@@ -8015,9 +8865,7 @@ Since: 2.2
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GdkEvent. The returned #GdkEvent 
-should be freed with gdk_event_free().
-
+<return> a newly-allocated #GdkEvent. Free with g_object_unref()
 </return>
 </function>
 
@@ -8057,6 +8905,24 @@ Since: 3.22
 </parameter>
 <parameter name="tool">
 <parameter_description> tool to set on the event, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_event_set_display">
+<description>
+Sets the display that an event is associated with.
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
 </parameter_description>
 </parameter>
 </parameters>
@@ -14980,6 +15846,180 @@ is not specified; it may be as pseudo-escape sequences
 conversion failed. (It should not fail for any properly
 formed UTF-8 string unless system limits like memory or
 file descriptors are exceeded.)
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_device">
+<description>
+Gets the Vulkan device that this context is using.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkDevice
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_draw_index">
+<description>
+Gets the index of the image that is currently being drawn.
+
+This function can only be used between gdk_window_begin_draw_frame() and
+gdk_window_end_draw_frame() calls for the toplevel window that the
+@context is associated with.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the index of the images that is being drawn
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_draw_semaphore">
+<description>
+Gets the Vulkan semaphore that protects access to the image that is
+currently being drawn.
+
+This function can only be used between gdk_window_begin_draw_frame() and
+gdk_window_end_draw_frame() calls for the toplevel window that the
+@context is associated with.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkSemaphore
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_image">
+<description>
+Gets the image with index @id that this context is using.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the index of the image to return
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkImage
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_image_format">
+<description>
+Gets the image format that this context is using.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkFormat
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_instance">
+<description>
+Gets the Vulkan instance that is associated with @context.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkInstance
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_n_images">
+<description>
+Gets the number of images that this context is using in its swap chain.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of images
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_physical_device">
+<description>
+Gets the Vulkan physical device that this context is using.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkPhysicalDevice
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_queue">
+<description>
+Gets the Vulkan queue that this context is using.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the VkQueue
+</return>
+</function>
+
+<function name="gdk_vulkan_context_get_queue_family_index">
+<description>
+Gets the family index for the queue that this context is using.
+See vkGetPhysicalDeviceQueueFamilyProperties().
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkVulkanContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the index
 </return>
 </function>
 
