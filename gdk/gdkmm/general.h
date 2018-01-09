@@ -52,7 +52,7 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
  * @newin{2,10}
  */
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
-  const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x = 0, double pixbuf_y = 0);
+  const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf, double pixbuf_x = 0, double pixbuf_y = 0);
 
 /** Adds the given rectangle to the current path of the context.
  *

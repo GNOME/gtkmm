@@ -129,6 +129,7 @@ _CONVERSION(`const Glib::RefPtr<const Drawable>&',`GdkDrawable*',__CONVERT_CONST
 _CONVERSION(`const Glib::RefPtr<Pixbuf>&',`GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Pixbuf>&',`const GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Pixbuf>&',`GdkPixbuf*',__CONVERT_CONST_REFPTR_TO_P_SUN(Pixbuf))
+_CONVERSION(`const Glib::RefPtr<const Gdk::Pixbuf>&',`GdkPixbuf*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Pixbuf>&',`GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<Gdk::Pixbuf>',`GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::PixbufAnimation>&',`GdkPixbufAnimation*',__CONVERT_REFPTR_TO_P)

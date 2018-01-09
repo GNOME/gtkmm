@@ -95,7 +95,7 @@ protected:
   void on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context,
     Gtk::SelectionData& selection_data, guint time, int size_index);
 
-  Glib::RefPtr<Gdk::Pixbuf> get_icon(int size_index);
+  Glib::RefPtr<const Gdk::Pixbuf> get_icon(int size_index);
 
   static const int n_icon_sizes = 5;
   static const int m_icon_size[n_icon_sizes];
@@ -957,16 +957,16 @@ void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& 
   selection_data.set_pixbuf(get_icon(size_index));
 }
 
-Glib::RefPtr<Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
+Glib::RefPtr<const Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
 {
   auto context = m_image[size_index].get_style_context();
   auto info = Gtk::IconTheme::get_default()->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf;
+  Glib::RefPtr<const Gdk::Pixbuf> pixbuf;
   try
   {
     bool is_symbolic = false;
-    pixbuf = info.load_symbolic_for_context(context, is_symbolic);
+    pixbuf = info->load_symbolic_for_context(context, is_symbolic);
   }
   catch (const Glib::Error& err)
   {

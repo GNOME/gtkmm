@@ -288,6 +288,8 @@ _CONVERSION(Gtk::Notebook_Helpers::Page*,GtkNotebookPage*,`($1)((void*)($3))',`(
 
 _CONVERSION(`GtkSettings*',`Glib::RefPtr<Settings>', Glib::wrap($3))
 
+_CONVERSION(`GtkIconInfo*',`Glib::RefPtr<IconInfo>',`Glib::wrap($3)')
+_CONVERSION(`GtkIconInfo*',`Glib::RefPtr<const IconInfo>',`Glib::wrap($3)')
 _CONVERSION(`GtkIconTheme*',`Glib::RefPtr<IconTheme>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<WindowGroup>',`Glib::wrap($3)')
@@ -395,9 +397,6 @@ _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
 
-#IconInfo
-_CONVERSION(`GtkIconInfo*',`IconInfo',`Glib::wrap($3)')
-
 _CONVERSION(`Requisition&', `GtkRequisition*', `($2)(&$3)')
 _CONVERSION(`const Requisition&', `GtkRequisition*', `($2)(&$3)')
 _CONVERSION(`GtkRequisition*', `Requisition&', `($2)(*$3)')
@@ -499,6 +498,7 @@ _CONVERSION(`const Cairo::FontOptions&',`const cairo_font_options_t*',`($3).cobj
 _CONVERSION(`const Cairo::RefPtr<const Cairo::Region>&',`cairo_region_t*',`const_cast<cairo_region_t*>(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`const Cairo::RefPtr<const Cairo::Region>&',`const cairo_region_t*',`(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`const Cairo::RefPtr<Cairo::Surface>&',`cairo_surface_t*',`(($3) ? ($3)->cobj() : nullptr)')
+_CONVERSION(`const Cairo::RefPtr<const Cairo::Surface>&',`cairo_surface_t*',`const_cast<cairo_surface_t*>(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`cairo_surface_t*',`Cairo::RefPtr<Cairo::Surface>',`Gdk::Cairo::wrap($3)')
 _CONVERSION(`cairo_surface_t*',`Cairo::RefPtr<const Cairo::Surface>',`Gdk::Cairo::wrap($3)')
 
