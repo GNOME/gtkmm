@@ -47,6 +47,7 @@ int main(int /* argc */, char** /* argv */)
 #endif /* G_OS_WIN32 */
             << get_defs( GDK_TYPE_DRAW_CONTEXT )
             << get_defs( GDK_TYPE_DRAWING_CONTEXT )
+            << get_defs( GDK_TYPE_EVENT )
             << get_defs( GDK_TYPE_MONITOR )
             << get_defs( GDK_TYPE_PIXBUF )
             << get_defs( GDK_TYPE_PIXBUF_ANIMATION )
