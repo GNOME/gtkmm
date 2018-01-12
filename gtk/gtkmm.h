@@ -201,7 +201,6 @@ extern const int gtkmm_micro_version;
 # include <gtkmm/pagesetupunixdialog.h>
 #endif
 #include <gtkmm/papersize.h>
-#include <gtkmm/placessidebar.h>
 #include <gtkmm/popover.h>
 #include <gtkmm/popovermenu.h>
 #include <gtkmm/printcontext.h>
