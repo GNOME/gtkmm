@@ -17,7 +17,9 @@
 
 _DEFS(gdkmm,gdk)
 _CC_INCLUDE(gdk/gdk.h)
+_PINCLUDE(glibmm/private/object_p.h)
 
+#include <glibmm/object.h>
 #include <glibmm/refptr.h>
 #include <glibmm/value.h>
 
@@ -33,7 +35,8 @@ enum { DELETE = GTKMM_MACRO_DEFINITION_DELETE };
 #endif
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern "C" { typedef union _GdkEvent GdkEvent; }
+using GdkEvent = union _GdkEvent;
+using GdkEventClass = struct _GdkEventClass;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 namespace Gdk
@@ -42,28 +45,31 @@ class Display;
 class Seat;
 class Window;
 
-/** Represents an event.
+/** Functions for handling events from the window system.
+ *
+ * In GTK+ applications the events are handled automatically in
+ * gtk_main_do_event() and passed on to the appropriate widgets,
+ * so %Gdk::Event and its subclasses are rarely needed.
  */
-class Event
+class Event : public Glib::Object
 {
-  _CLASS_GDKEVENT(Event, GdkEvent)
-  _IGNORE(gdk_event_new, gdk_event_copy, gdk_event_free)
-public:
+  _CLASS_GOBJECT(Event, GdkEvent, GDK_EVENT, Glib::Object, GObject)
+  _STRUCT_NOT_HIDDEN dnl// _GdkEvent is not a struct, it's a union
+  _IGNORE(gdk_event_new, gdk_event_free)
 
+public:
   _WRAP_ENUM(Type, GdkEventType)
 
-  /** Discover whether the event is valid.
-   * For instance,
-   * @code
-   * if (event)
-   *   do_something();
-   * @endcode
-   *
-   * @newin{3,92}
-   */
-  explicit operator bool() const noexcept;
+protected:
+  _WRAP_CTOR(Event(Type event_type), gdk_event_new)
 
-  _WRAP_METHOD(Event::Type get_event_type() const, gdk_event_get_event_type)
+public:
+  /** Creates a new event of the given type. All fields are set to 0.
+   */
+  _WRAP_CREATE(Type event_type)
+  _WRAP_METHOD(Glib::RefPtr<Event> copy() const, gdk_event_copy)
+
+  _WRAP_METHOD(Type get_event_type() const, gdk_event_get_event_type)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Window> get_window(), gdk_event_get_window, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Window> get_window() const, gdk_event_get_window, refreturn, constversion)
@@ -84,6 +90,8 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Seat> get_seat(), gdk_event_get_seat, refreturn, newin "3,90")
   _WRAP_METHOD(Glib::RefPtr<const Seat> get_seat() const, gdk_event_get_seat, refreturn, constversion, newin "3,90")
+
+  _WRAP_PROPERTY("event-type", Type)
 
   //TODO: If GdkDeviceTool is wrapped in gtkmm, wrap gdk_event_get_device_tool().
   _IGNORE(gdk_event_set_device_tool) dnl// "Should be rarely used"
