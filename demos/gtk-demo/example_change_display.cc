@@ -26,7 +26,7 @@
  *  - Using Gtk::Dialog
  */
 
-//TODO: Remove this undef when we know what to use instead of signal_button_release_event().
+//TODO: Remove this undef when we know what to use instead of signal_event().
 #undef GTKMM_DISABLE_DEPRECATED
 
 #include <gtkmm.h>
@@ -64,7 +64,7 @@ protected:
 
   virtual void on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display);
 
-  virtual bool on_popup_button_release_event(const Glib::RefPtr<Gdk::EventButton>& event);
+  virtual bool on_popup_release_event(const Glib::RefPtr<Gdk::Event>& event);
 
   void on_response(int response_id) override;
 
@@ -314,10 +314,10 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::D
   if(grabbed == Gdk::GrabStatus::SUCCESS )
   {
     m_popup_clicked = false;
-    m_pPopup->signal_button_release_event().connect(
-      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event), false);
+    m_pPopup->signal_event().connect(
+      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_release_event), false);
 
-    // Process events until clicked is set by button_release_event_cb.
+    // Process events until clicked is set by our button release event handler.
     // We pass in may_block=true since we want to wait if there
     // are no events currently.
     while (!m_popup_clicked)
@@ -358,10 +358,14 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
 }
 
 
-bool Example_ChangeDisplay::on_popup_button_release_event(const Glib::RefPtr<Gdk::EventButton>& /* event */)
+bool Example_ChangeDisplay::on_popup_release_event(const Glib::RefPtr<Gdk::Event>& event)
 {
-  m_popup_clicked = true;
-  return true;
+  if (event->get_event_type() == Gdk::Event::Type::BUTTON_RELEASE)
+  {
+    m_popup_clicked = true;
+    return true;
+  }
+  return false;
 }
 
 Popup::Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
