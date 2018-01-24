@@ -26,9 +26,6 @@
  *  - Using Gtk::Dialog
  */
 
-//TODO: Remove this undef when we know what to use instead of signal_event().
-#undef GTKMM_DISABLE_DEPRECATED
-
 #include <gtkmm.h>
 
 class Popup : public Gtk::Window
@@ -64,7 +61,7 @@ protected:
 
   virtual void on_display_closed(bool is_error, Glib::RefPtr<Gdk::Display> display);
 
-  virtual bool on_popup_release_event(const Glib::RefPtr<Gdk::Event>& event);
+  virtual void on_popup_button_released(int n_press, double x, double y);
 
   void on_response(int response_id) override;
 
@@ -92,8 +89,6 @@ protected:
 
   Glib::RefPtr<Gdk::Display> m_refCurrentDisplay;
 
-  Popup* m_pPopup;
-
   bool m_popup_clicked;
 };
 
@@ -106,7 +101,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   m_Frame_Display("Display"),
   m_ButtonBox_Display(Gtk::Orientation::VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
-  m_pPopup(nullptr),
   m_popup_clicked(false)
 {
   add_button("_Close", Gtk::ResponseType::CLOSE);
@@ -146,11 +140,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
 Example_ChangeDisplay::~Example_ChangeDisplay()
 {
-  if(m_pPopup)
-  {
-    delete m_pPopup;
-    m_pPopup = nullptr;
-  }
 }
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
@@ -270,7 +259,7 @@ void Example_ChangeDisplay::query_change_display()
    "Please select the toplevel\n"
    "to move to the new display");
 
-  if (pTopLevel)
+  if (pTopLevel && m_refCurrentDisplay)
     pTopLevel->set_display(m_refCurrentDisplay);
   else
     refDisplay->beep();
@@ -286,36 +275,33 @@ void Example_ChangeDisplay::on_response(int response_id)
 }
 
 
-
 /* Asks the user to click on a window, then waits for them click
  * the mouse. When the mouse is released, returns the toplevel
- * window under the pointer, or NULL, if there is none.
+ * window under the pointer, or nullptr, if there is none.
  */
-Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
+Gtk::Window* Example_ChangeDisplay::query_for_toplevel(
+  const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
 {
-  if(m_pPopup)
-  {
-    delete m_pPopup;
-    m_pPopup = nullptr;
-  }
+  auto device = Glib::wrap(gtk_get_current_event_device(), true);
+  if (!device)
+    return nullptr;
 
-  m_pPopup = new Popup(display, prompt);
-
-  m_pPopup->show();
+  std::unique_ptr<Popup> pPopup(new Popup(display, prompt));
+  pPopup->show();
 
   auto cursor = Gdk::Cursor::create("crosshair");
 
   Gtk::Window* toplevel = nullptr;
+  auto seat = device->get_seat();
 
-  //TODO: Find a suitable replacement for this:
-  //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
-  //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
-  const auto grabbed = Gdk::GrabStatus::SUCCESS;
-  if(grabbed == Gdk::GrabStatus::SUCCESS )
+  if (seat && seat->grab(pPopup->get_window(), Gdk::Seat::Capabilities::ALL_POINTING,
+      false, cursor) == Gdk::GrabStatus::SUCCESS)
   {
     m_popup_clicked = false;
-    m_pPopup->signal_event().connect(
-      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_release_event), false);
+    auto refGesture = Gtk::GestureMultiPress::create(*pPopup);
+    refGesture->set_button(0); // Any button
+    refGesture->signal_released().connect(
+      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_released));
 
     // Process events until clicked is set by our button release event handler.
     // We pass in may_block=true since we want to wait if there
@@ -324,8 +310,8 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::D
       Gtk::Main::iteration(true);
 
     toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(display));
-    if (toplevel == m_pPopup)
-       toplevel = nullptr;
+    if (toplevel == pPopup.get())
+      toplevel = nullptr;
   }
 
   return toplevel;
@@ -334,38 +320,30 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::D
 // Finds the toplevel window under the mouse pointer, if any.
 Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& /* display */)
 {
-  //TODO: This needs to use Device::get_window_at_position(), when we can figure that out.
-  //See https://bugzilla.gnome.org/show_bug.cgi?id=638907
-  /*
-  auto refPointerWindow = display->get_window_at_pointer();
+  auto device = Glib::wrap(gtk_get_current_event_device(), true);
+  if (!device)
+    return nullptr;
 
+  auto refPointerWindow = device->get_window_at_position();
   if (refPointerWindow)
   {
     // The user data field of a GdkWindow is used to store a pointer
     // to the widget that created it.
-    GtkWidget* cWidget = nullptr;
-    gpointer* user_data = nullptr;
-    refPointerWindow->get_user_data(user_data);
-    cWidget = (GtkWidget*)user_data;
+    gpointer user_data = nullptr;
+    refPointerWindow->get_user_data(&user_data);
+    GtkWidget* cWidget = static_cast<GtkWidget*>(user_data);
 
     auto pWidget = Glib::wrap(cWidget);
     if(pWidget)
       return pWidget->get_toplevel();
   }
-  */
 
   return nullptr;
 }
 
-
-bool Example_ChangeDisplay::on_popup_release_event(const Glib::RefPtr<Gdk::Event>& event)
+void Example_ChangeDisplay::on_popup_button_released(int /* n_press */, double /* x */, double /* y */)
 {
-  if (event->get_event_type() == Gdk::Event::Type::BUTTON_RELEASE)
-  {
-    m_popup_clicked = true;
-    return true;
-  }
-  return false;
+  m_popup_clicked = true;
 }
 
 Popup::Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& prompt)
@@ -379,7 +357,7 @@ Popup::Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& pro
   m_Frame.set_shadow_type(Gtk::ShadowType::OUT);
   add(m_Frame);
 
-  m_Label.property_margin() = 10;
+  m_Label.set_margin(10);
   m_Frame.add(m_Label);
 }
 
