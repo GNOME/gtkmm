@@ -90,8 +90,6 @@ protected:
 
   Glib::RefPtr<Gdk::Display> m_refCurrentDisplay;
 
-  Popup* m_pPopup;
-
   bool m_popup_clicked;
 };
 
@@ -104,7 +102,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
   m_Frame_Display("Display"),
   m_ButtonBox_Display(Gtk::ORIENTATION_VERTICAL, 5),
   m_Button_Display_Open("_Open...", true), m_Button_Display_Close("_Close...", true),
-  m_pPopup(nullptr),
   m_popup_clicked(false)
 {
   add_button("_Close", Gtk::RESPONSE_CLOSE);
@@ -146,11 +143,6 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
 Example_ChangeDisplay::~Example_ChangeDisplay()
 {
-  if(m_pPopup)
-  {
-    delete m_pPopup;
-    m_pPopup = nullptr;
-  }
 }
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
@@ -287,38 +279,32 @@ void Example_ChangeDisplay::on_response(int response_id)
 }
 
 
-
 /* Asks the user to click on a window, then waits for them click
  * the mouse. When the mouse is released, returns the toplevel
  * window under the pointer, or NULL, if there is none.
  */
 Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::Screen>& screen, const Glib::ustring& prompt)
 {
+  auto device = Glib::wrap(gtk_get_current_event_device(), true);
+  if (!device)
+    return nullptr;
+
   Glib::RefPtr<Gdk::Display> refDisplay = screen->get_display();
 
-  if(m_pPopup)
-  {
-    delete m_pPopup;
-    m_pPopup = nullptr;
-  }
-
-  m_pPopup = new Popup(screen, prompt);
-
-  m_pPopup->show();
+  std::unique_ptr<Popup> pPopup(new Popup(screen, prompt));
+  pPopup->show();
 
   Glib::RefPtr<Gdk::Cursor> cursor = Gdk::Cursor::create(refDisplay, Gdk::CROSSHAIR);
 
   Gtk::Window* toplevel = nullptr;
+  auto seat = device->get_seat();
 
-  //TODO: Find a suitable replacement for this:
-  //const GdkGrabStatus grabbed =  m_pPopup->get_window()->grab(false, Gdk::BUTTON_RELEASE_MASK, cursor, GDK_CURRENT_TIME);
-  //Check it when the GTK+ example has been updated and file a bug about the unhelpful deprecation comment.
-  const Gdk::GrabStatus grabbed = Gdk::GRAB_SUCCESS;
-  if(grabbed == Gdk::GRAB_SUCCESS )
+  if (seat && seat->grab(pPopup->get_window(), Gdk::SEAT_CAPABILITY_ALL_POINTING,
+      false, cursor) == Gdk::GRAB_SUCCESS)
   {
     m_popup_clicked = false;
-    m_pPopup->signal_button_release_event().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event) );
-
+    pPopup->signal_button_release_event().connect(
+      sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_release_event));
 
     // Process events until clicked is set by button_release_event_cb.
     // We pass in may_block=true since we want to wait if there
@@ -326,9 +312,9 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
     while (!m_popup_clicked)
       Gtk::Main::iteration(true);
 
-    toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(screen->get_display()));
-    if (toplevel == m_pPopup)
-       toplevel = nullptr;
+    toplevel = dynamic_cast<Gtk::Window*>(find_toplevel_at_pointer(refDisplay));
+    if (toplevel == pPopup.get())
+      toplevel = nullptr;
   }
 
   refDisplay->flush(); /* Really release the grab */
@@ -339,25 +325,23 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(const Glib::RefPtr<Gdk::S
 // Finds the toplevel window under the mouse pointer, if any.
 Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<Gdk::Display>& /* display */)
 {
-  //TODO: This needs to use Device::get_window_at_position(), when we can figure that out.
-  //See https://bugzilla.gnome.org/show_bug.cgi?id=638907
-  /*
-  Glib::RefPtr<Gdk::Window> refPointerWindow = display->get_window_at_pointer();
+  auto device = Glib::wrap(gtk_get_current_event_device(), true);
+  if (!device)
+    return nullptr;
 
+  auto refPointerWindow = device->get_window_at_position();
   if (refPointerWindow)
   {
     // The user data field of a GdkWindow is used to store a pointer
     // to the widget that created it.
-    GtkWidget* cWidget = nullptr;
-    gpointer* user_data = nullptr;
-    refPointerWindow->get_user_data(user_data);
-    cWidget = (GtkWidget*)user_data;
+    gpointer user_data = nullptr;
+    refPointerWindow->get_user_data(&user_data);
+    GtkWidget* cWidget = static_cast<GtkWidget*>(user_data);
 
     Gtk::Widget* pWidget = Glib::wrap(cWidget);
     if(pWidget)
       return pWidget->get_toplevel();
   }
-  */
 
   return nullptr;
 }
