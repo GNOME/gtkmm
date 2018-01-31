@@ -18,6 +18,7 @@
 #include <glibmm/vectorutils.h>
 
 #include <gdkmm/contentformats.h>
+#include <gdkmm/frameclock.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/window.h>
 #include <gtkmm/accelgroup.h>
@@ -80,6 +81,24 @@ static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext
       Glib::exception_handlers_invoke();
     }
   }
+}
+
+gboolean SlotTick_gtk_callback(GtkWidget* self, GdkFrameClock* frame_clock, void* data)
+{
+  // Do not try to call a signal on a disassociated wrapper.
+  if (Glib::ObjectBase::_get_current_wrapper((GObject*)self))
+  {
+    auto the_slot = static_cast<Gtk::Widget::SlotTick*>(data);
+    try
+    {
+      return (*the_slot)(Glib::wrap(frame_clock, true));
+    }
+    catch (...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+  return false;
 }
 
 } //anonymous
@@ -511,6 +530,17 @@ void Widget::remove_action_group(const Glib::ustring& name)
 void Widget::set_margin(int margin)
 {
   property_margin() = margin;
+}
+
+guint Widget::add_tick_callback(const SlotTick& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when Glib::destroy_notify_delete<SlotTick>() is called.
+  auto slot_copy = new SlotTick(slot);
+
+  return gtk_widget_add_tick_callback(gobj(), &SlotTick_gtk_callback, slot_copy,
+    &Glib::destroy_notify_delete<SlotTick>);
 }
 
 } // namespace Gtk
