@@ -12,17 +12,14 @@
  */
 
 #include <gtkmm.h>
-#include <math.h>
+#include <cmath>
+#include <algorithm>
 
-#define FRAME_DELAY 50
+namespace
+{
+const char* background_name = "background.jpg";
 
-#define BACKGROUND_NAME "background.jpg"
-
-#ifndef M_PI
-#define M_PI 3.1415927
-#endif
-
-static const char* image_names[] = {
+const char* image_names[] = {
   "apple-red.png",
   "gnome-applets.png",
   "gnome-calendar.png",
@@ -33,11 +30,11 @@ static const char* image_names[] = {
   "gnu-keys.png"
 };
 
+const int n_images = G_N_ELEMENTS(image_names);
 
-enum { N_IMAGES = G_N_ELEMENTS(image_names) };
+const gint64 cycle_time = 3000000; // microseconds
 
-
-
+} // anonymous namespace
 
 class Example_Pixbufs : public Gtk::Window
 {
@@ -49,18 +46,19 @@ protected:
   virtual void load_pixbufs();
   void on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
-  //signal handler:
-  virtual bool on_timeout();
+  // Callback:
+  bool on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock);
 
   //Member widgets:
   Glib::RefPtr<Gdk::Pixbuf> m_refPixbuf;
   Glib::RefPtr<Gdk::Pixbuf> m_refPixbuf_Background;
-  Glib::RefPtr<Gdk::Pixbuf> m_images[N_IMAGES];
+  Glib::RefPtr<Gdk::Pixbuf> m_images[n_images];
   Gtk::DrawingArea m_DrawingArea;
 
-  sigc::connection m_TimeoutConnection;
-  guint m_back_width, m_back_height;
-  gint m_frame_num;
+  guint m_tick_id = 0;
+  guint m_back_width = 0;
+  guint m_back_height = 0;
+  gint64 m_start_time = 0;
 };
 
 //Called by DemoWindow;
@@ -71,10 +69,6 @@ Gtk::Window* do_pixbufs()
 
 Example_Pixbufs::Example_Pixbufs()
 {
-  m_back_width = 0;
-  m_back_height = 0;
-
-
   set_title("Pixbufs");
   set_resizable(false);
 
@@ -83,12 +77,12 @@ Example_Pixbufs::Example_Pixbufs()
     load_pixbufs();
 
     set_size_request(m_back_width, m_back_height);
-    m_refPixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::RGB, FALSE, 8, m_back_width, m_back_height);
+    m_refPixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, m_back_width, m_back_height);
     m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
     add(m_DrawingArea);
 
-    m_TimeoutConnection = Glib::signal_timeout().connect(
-        sigc::mem_fun(*this, &Example_Pixbufs::on_timeout), FRAME_DELAY);
+    m_tick_id = m_DrawingArea.add_tick_callback(
+        sigc::mem_fun(*this, &Example_Pixbufs::on_tick));
   }
   catch (const Glib::Error& error)
   {
@@ -102,23 +96,23 @@ Example_Pixbufs::Example_Pixbufs()
 
 Example_Pixbufs::~Example_Pixbufs()
 {
-  m_TimeoutConnection.disconnect(); //Will probably happen anyway, in the destructor.
+  m_DrawingArea.remove_tick_callback(m_tick_id); // Will probably happen anyway, in the destructor.
 }
 
-/* Loads the m_images for the demo and throws and exception if the operation failed */
+/* Loads the m_images for the demo and throws an exception if the operation failed */
 void Example_Pixbufs::load_pixbufs()
 {
   if(m_refPixbuf_Background)
     return; /* already loaded earlier */
 
-  auto resource_name_background = std::string("/pixbufs/") + BACKGROUND_NAME;
+  auto resource_name_background = std::string("/pixbufs/") + background_name;
 
   m_refPixbuf_Background = Gdk::Pixbuf::create_from_resource(resource_name_background);
 
   m_back_width = m_refPixbuf_Background->get_width();
   m_back_height = m_refPixbuf_Background->get_height();
 
-  for(unsigned i = 0; i < N_IMAGES; ++i)
+  for (int i = 0; i < n_images; ++i)
   {
     auto resource_name = std::string("/pixbufs/") + image_names[i];
 
@@ -135,64 +129,58 @@ void Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& c
   cr->paint();
 }
 
-#define CYCLE_LEN 60
-
-
-/* Timeout handler to regenerate the frame */
-bool Example_Pixbufs::on_timeout()
+/* Handler to regenerate the frame */
+bool Example_Pixbufs::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock)
 {
-  m_refPixbuf_Background->copy_area( 0, 0, m_back_width, m_back_height, m_refPixbuf, 0, 0);
+  m_refPixbuf_Background->copy_area(0, 0, m_back_width, m_back_height, m_refPixbuf, 0, 0);
 
-  double f = (double) (m_frame_num % CYCLE_LEN) / CYCLE_LEN;
+  if (m_start_time == 0)
+    m_start_time = frame_clock->get_frame_time();
 
-  double xmid = m_back_width / 2.0;
-  double ymid = m_back_height / 2.0;
+  const gint64 current_time = frame_clock->get_frame_time();
+  const double f = ((current_time - m_start_time) % cycle_time) / (double)cycle_time;
 
-  double radius = MIN (xmid, ymid) / 2.0;
+  const double xmid = m_back_width / 2.0;
+  const double ymid = m_back_height / 2.0;
 
-  for (int i = 0; i < N_IMAGES; i++)
+  const double radius = std::min(xmid, ymid) / 2.0;
+
+  for (int i = 0; i < n_images; i++)
   {
-    double ang = 2.0 * M_PI * (double) i / N_IMAGES - f * 2.0 * M_PI;
+    const double ang = 2.0 * G_PI * (double)i / n_images - f * 2.0 * G_PI;
 
-    int iw = m_images[i]->get_width();
-    int ih = m_images[i]->get_height();
+    const int iw = m_images[i]->get_width();
+    const int ih = m_images[i]->get_height();
 
-    double r = radius + (radius / 3.0) * sin (f * 2.0 * M_PI);
+    const double r = radius + (radius / 3.0) * std::sin(f * 2.0 * G_PI);
 
-    double xpos = floor (xmid + r * cos(ang) - iw / 2.0 + 0.5);
-    double ypos = floor (ymid + r * sin(ang) - ih / 2.0 + 0.5);
+    const double xpos = std::floor(xmid + r * std::cos(ang) - iw / 2.0 + 0.5);
+    const double ypos = std::floor(ymid + r * std::sin(ang) - ih / 2.0 + 0.5);
 
-    double k = (i & 1) ? sin (f * 2.0 * M_PI) : cos (f * 2.0 * M_PI);
+    double k = (i & 1) ? std::sin(f * 2.0 * G_PI) : std::cos(f * 2.0 * G_PI);
     k = 2.0 * k * k;
-    k = MAX (0.25, k);
+    k = std::max(0.25, k);
 
-    GdkRectangle r1, r2, dest;
-    r1.x = (int)xpos;
-    r1.y = (int)ypos;
-    r1.width = (int)(iw * k);
-    r1.height = (int)(ih * k);
+    const Gdk::Rectangle r1((int)xpos, (int)ypos, (int)(iw * k), (int)(ih * k));
+    const Gdk::Rectangle r2(0, 0, m_back_width, m_back_height);
 
-    r2.x = 0;
-    r2.y = 0;
-    r2.width = m_back_width;
-    r2.height = m_back_height;
-
-    if (gdk_rectangle_intersect (&r1, &r2, &dest))
+    if (r1.intersects(r2))
     {
+      Gdk::Rectangle dest = r1;
+      dest.intersect(r2);
       m_images[i]->composite(m_refPixbuf,
-		      dest.x, dest.y,
-		      dest.width, dest.height,
+		      dest.get_x(), dest.get_y(),
+		      dest.get_width(), dest.get_height(),
 		      xpos, ypos,
 		      k, k,
 		      Gdk::InterpType::NEAREST,
 		      (int)((i & 1)
-		       ? MAX (127, fabs (255 * sin (f * 2.0 * M_PI)))
-		       : MAX (127, fabs (255 * cos (f * 2.0 * M_PI)))));
+		       ? std::max(127.0, std::fabs(255.0 * std::sin(f * 2.0 * G_PI)))
+		       : std::max(127.0, std::fabs(255.0 * std::cos(f * 2.0 * G_PI)))));
     }
   }
 
   m_DrawingArea.queue_draw();
 
-  m_frame_num++;
   return true;
 }
