@@ -1,0 +1,101 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <gdkmm/frametimings.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+_CC_INCLUDE(gdk/gdk.h)
+
+extern "C" typedef struct _GdkFrameClock GdkFrameClock;
+
+namespace Gdk
+{
+/** Frame clock syncs painting to a window or display.
+ *
+ * A %Gdk::FrameClock tells the application when to update and repaint a
+ * window. This may be synced to the vertical refresh rate of the
+ * monitor, for example. Even when the frame clock uses a simple timer
+ * rather than a hardware-based vertical sync, the frame clock helps
+ * because it ensures everything paints at the same time (reducing the
+ * total number of frames). The frame clock can also automatically
+ * stop painting when it knows the frames will not be visible, or
+ * scale back animation framerates.
+ *
+ * %Gdk::FrameClock is designed to be compatible with an OpenGL-based
+ * implementation or with mozRequestAnimationFrame in Firefox,
+ * for example.
+ *
+ * A frame clock is idle until someone requests a frame with
+ * request_phase(). At some later point that makes
+ * sense for the synchronization being implemented, the clock will
+ * process a frame and emit signals for each phase that has been
+ * requested. (See the signals of the %Gdk::FrameClock class for
+ * documentation of the phases. Gdk::FrameClock::Phase::UPDATE and the
+ * signal_update() signal are most interesting for application
+ * writers, and are used to update the animations, using the frame time
+ * given by get_frame_time().
+ *
+ * The frame time is reported in microseconds and generally in the same
+ * timescale as g_get_monotonic_time(), however, it is not the same
+ * as g_get_monotonic_time(). The frame time does not advance during
+ * the time a frame is being painted, and outside of a frame, an attempt
+ * is made so that all calls to get_frame_time() that
+ * are called at a “similar” time get the same value. This means that
+ * if different animations are timed by looking at the difference in
+ * time between an initial value from get_frame_time()
+ * and the value inside the signal_update() signal of the clock,
+ * they will stay exactly synchronized.
+ *
+ * @newin{3,94}
+ */
+class FrameClock : public Glib::Object
+{
+  _CLASS_GOBJECT(FrameClock, GdkFrameClock, GDK_FRAME_CLOCK, Glib::Object, GObject)
+
+public:
+  _WRAP_ENUM(Phase, GdkFrameClockPhase)
+
+  _WRAP_METHOD(gint64 get_frame_time() const, gdk_frame_clock_get_frame_time)
+  _WRAP_METHOD(void request_phase(Phase phase), gdk_frame_clock_request_phase)
+  _WRAP_METHOD(void begin_updating(), gdk_frame_clock_begin_updating)
+  _WRAP_METHOD(void end_updating(), gdk_frame_clock_end_updating)
+  _WRAP_METHOD(gint64 get_frame_counter() const, gdk_frame_clock_get_frame_counter)
+  _WRAP_METHOD(gint64 get_history_start() const, gdk_frame_clock_get_history_start)
+  _WRAP_METHOD(Glib::RefPtr<FrameTimings> get_timings(gint64 frame_counter), gdk_frame_clock_get_timings, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const FrameTimings> get_timings(gint64 frame_counter) const, gdk_frame_clock_get_timings, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<FrameTimings> get_current_timings(), gdk_frame_clock_get_current_timings, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const FrameTimings> get_current_timings() const, gdk_frame_clock_get_current_timings, refreturn, constversion)
+  _WRAP_METHOD(void get_refresh_info(gint64 base_time, gint64& refresh_interval_return,
+    gint64& presentation_time_return) const, gdk_frame_clock_get_refresh_info)
+
+  _IGNORE_SIGNAL("flush-events")dnl// Applications should not handle this signal.
+  _IGNORE_SIGNAL("before-paint")dnl// Applications should generally not handle this signal.
+
+  // no_default_handler because the wrapped C signals have no default handlers.
+  _WRAP_SIGNAL(void update(), "update", no_default_handler)
+  _WRAP_SIGNAL(void layout(), "layout", no_default_handler)
+  _WRAP_SIGNAL(void paint(), "paint", no_default_handler)
+
+  _IGNORE_SIGNAL("after-paint")dnl// Applications should generally not handle this signal.
+  _IGNORE_SIGNAL("resume-events")dnl// Applications should not handle this signal.
+
+  // There are no properties or vfuncs.
+};
+
+} // namespace Gdk

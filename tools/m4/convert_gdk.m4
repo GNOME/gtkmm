@@ -40,6 +40,7 @@ _CONV_INCLASS_ENUM(Gdk,Event,Type)
 _CONV_ENUM(Gdk,ExtensionMode)
 _CONV_ENUM(Gdk,Fill)
 _CONV_ENUM(Gdk,FillRule)
+_CONV_INCLASS_ENUM(Gdk,FrameClock,Phase)
 _CONV_ENUM(Gdk,FullscreenMode)
 _CONV_ENUM(Gdk,Function)
 _CONV_ENUM(Gdk,Gravity)
@@ -245,6 +246,12 @@ _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const Gdk::ContentFormats>',`Glib
 _CONVERSION(`const Glib::RefPtr<ContentProvider>&',`GdkContentProvider*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const ContentProvider>&',`GdkContentProvider*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GdkContentProvider*',`Glib::RefPtr<ContentProvider>',`Glib::wrap($3)')
+
+# FrameClock, FrameTimings
+_CONVERSION(`GdkFrameClock*',`Glib::RefPtr<FrameClock>',`Glib::wrap($3)')
+_CONVERSION(`GdkFrameClock*',`Glib::RefPtr<Gdk::FrameClock>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gdk::FrameClock>&',`GdkFrameClock*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GdkFrameTimings*',`Glib::RefPtr<FrameTimings>',`Glib::wrap($3)')
 
 # XPM data
 _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$3')

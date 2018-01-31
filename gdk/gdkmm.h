@@ -32,6 +32,7 @@
 #include <gdkmm/cursor.h>
 #include <gdkmm/drawingcontext.h>
 #include <gdkmm/events.h>
+#include <gdkmm/frameclock.h>
 #include <gdkmm/glcontext.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/display.h>
