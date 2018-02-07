@@ -335,19 +335,6 @@
   )
 )
 
-(define-enum Status
-  (in-module "Gdk")
-  (c-name "GdkStatus")
-  (gtype-id "GDK_TYPE_STATUS")
-  (values
-    '("ok" "GDK_OK")
-    '("error" "GDK_ERROR")
-    '("error-param" "GDK_ERROR_PARAM")
-    '("error-file" "GDK_ERROR_FILE")
-    '("error-mem" "GDK_ERROR_MEM")
-  )
-)
-
 (define-enum GrabStatus
   (in-module "Gdk")
   (c-name "GdkGrabStatus")
@@ -1244,15 +1231,38 @@
   )
 )
 
+(define-function gdk_content_formats_builder_get_type
+  (c-name "gdk_content_formats_builder_get_type")
+  (return-type "GType")
+)
+
 (define-function gdk_content_formats_builder_new
   (c-name "gdk_content_formats_builder_new")
   (is-constructor-of "GdkContentFormatsBuilder")
   (return-type "GdkContentFormatsBuilder*")
 )
 
-(define-method free
+(define-method ref
   (of-object "GdkContentFormatsBuilder")
-  (c-name "gdk_content_formats_builder_free")
+  (c-name "gdk_content_formats_builder_ref")
+  (return-type "GdkContentFormatsBuilder*")
+)
+
+(define-method unref
+  (of-object "GdkContentFormatsBuilder")
+  (c-name "gdk_content_formats_builder_unref")
+  (return-type "none")
+)
+
+(define-method free_to_formats
+  (of-object "GdkContentFormatsBuilder")
+  (c-name "gdk_content_formats_builder_free_to_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method to_formats
+  (of-object "GdkContentFormatsBuilder")
+  (c-name "gdk_content_formats_builder_to_formats")
   (return-type "GdkContentFormats*")
 )
 
@@ -2015,34 +2025,6 @@
 (define-function gdk_display_get_default
   (c-name "gdk_display_get_default")
   (return-type "GdkDisplay*")
-)
-
-(define-method supports_cursor_alpha
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_supports_cursor_alpha")
-  (return-type "gboolean")
-)
-
-(define-method supports_cursor_color
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_supports_cursor_color")
-  (return-type "gboolean")
-)
-
-(define-method get_default_cursor_size
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_get_default_cursor_size")
-  (return-type "guint")
-)
-
-(define-method get_maximal_cursor_size
-  (of-object "GdkDisplay")
-  (c-name "gdk_display_get_maximal_cursor_size")
-  (return-type "none")
-  (parameters
-    '("guint*" "width")
-    '("guint*" "height")
-  )
 )
 
 (define-method get_default_group
@@ -2924,9 +2906,9 @@
   )
 )
 
-(define-method get_history
+(define-method get_motion_history
   (of-object "GdkEvent")
-  (c-name "gdk_event_get_history")
+  (c-name "gdk_event_get_motion_history")
   (return-type "GList*")
 )
 
@@ -3229,6 +3211,12 @@
 (define-function gdk_keymap_get_type
   (c-name "gdk_keymap_get_type")
   (return-type "GType")
+)
+
+(define-method get_display
+  (of-object "GdkKeymap")
+  (c-name "gdk_keymap_get_display")
+  (return-type "GdkDisplay*")
 )
 
 (define-method lookup_key
@@ -3800,6 +3788,25 @@
   )
 )
 
+(define-function gdk_texture_new_for_gl
+  (c-name "gdk_texture_new_for_gl")
+  (return-type "GdkTexture*")
+  (parameters
+    '("GdkGLContext*" "context")
+    '("guint" "id")
+    '("int" "width")
+    '("int" "height")
+    '("GDestroyNotify" "destroy")
+    '("gpointer" "data")
+  )
+)
+
+(define-method release_gl
+  (of-object "GdkTexture")
+  (c-name "gdk_texture_release_gl")
+  (return-type "none")
+)
+
 (define-method get_width
   (of-object "GdkTexture")
   (c-name "gdk_texture_get_width")
@@ -3819,89 +3826,6 @@
   (parameters
     '("guchar*" "data")
     '("gsize" "stride")
-  )
-)
-
-
-
-;; From gdkthreads.h
-
-(define-function gdk_threads_init
-  (c-name "gdk_threads_init")
-  (return-type "none")
-)
-
-(define-function gdk_threads_enter
-  (c-name "gdk_threads_enter")
-  (return-type "none")
-)
-
-(define-function gdk_threads_leave
-  (c-name "gdk_threads_leave")
-  (return-type "none")
-)
-
-(define-function gdk_threads_add_idle_full
-  (c-name "gdk_threads_add_idle_full")
-  (return-type "guint")
-  (parameters
-    '("gint" "priority")
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
-    '("GDestroyNotify" "notify")
-  )
-)
-
-(define-function gdk_threads_add_idle
-  (c-name "gdk_threads_add_idle")
-  (return-type "guint")
-  (parameters
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
-  )
-)
-
-(define-function gdk_threads_add_timeout_full
-  (c-name "gdk_threads_add_timeout_full")
-  (return-type "guint")
-  (parameters
-    '("gint" "priority")
-    '("guint" "interval")
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
-    '("GDestroyNotify" "notify")
-  )
-)
-
-(define-function gdk_threads_add_timeout
-  (c-name "gdk_threads_add_timeout")
-  (return-type "guint")
-  (parameters
-    '("guint" "interval")
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
-  )
-)
-
-(define-function gdk_threads_add_timeout_seconds_full
-  (c-name "gdk_threads_add_timeout_seconds_full")
-  (return-type "guint")
-  (parameters
-    '("gint" "priority")
-    '("guint" "interval")
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
-    '("GDestroyNotify" "notify")
-  )
-)
-
-(define-function gdk_threads_add_timeout_seconds
-  (c-name "gdk_threads_add_timeout_seconds")
-  (return-type "guint")
-  (parameters
-    '("guint" "interval")
-    '("GSourceFunc" "function")
-    '("gpointer" "data")
   )
 )
 
@@ -5190,11 +5114,6 @@
 
 (define-function gdk_modifier_intent_get_type
   (c-name "gdk_modifier_intent_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_status_get_type
-  (c-name "gdk_status_get_type")
   (return-type "GType")
 )
 
