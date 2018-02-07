@@ -231,7 +231,7 @@ _CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GdkClipboard*',`Glib::RefPtr<Gdk::Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Gdk::Clipboard>',`Glib::wrap($3)')
 
-# ContentFormats
+# ContentFormats, ContentFormatsBuilder
 _CONVERSION(`const Glib::RefPtr<ContentFormats>&',`GdkContentFormats*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const ContentFormats>&',`GdkContentFormats*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const ContentFormats>&',`const GdkContentFormats*',__CONVERT_REFPTR_TO_P)
@@ -241,6 +241,7 @@ _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<ContentFormats>',`Glib::wrap($3)'
 _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const ContentFormats>',`Glib::wrap($3)')
 _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<Gdk::ContentFormats>',`Glib::wrap($3)')
 _CONVERSION(`GdkContentFormats*',`Glib::RefPtr<const Gdk::ContentFormats>',`Glib::wrap($3)')
+_CONVERSION(`GdkContentFormatsBuilder*',`Glib::RefPtr<ContentFormatsBuilder>',`Glib::wrap($3)')
 
 # ContentProvider
 _CONVERSION(`const Glib::RefPtr<ContentProvider>&',`GdkContentProvider*',__CONVERT_REFPTR_TO_P)

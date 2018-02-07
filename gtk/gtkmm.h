@@ -219,11 +219,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
-#include <gtkmm/recentchooser.h>
-#include <gtkmm/recentchooserdialog.h>
-#include <gtkmm/recentchoosermenu.h>
-#include <gtkmm/recentchooserwidget.h>
-#include <gtkmm/recentfilter.h>
 #include <gtkmm/recentinfo.h>
 #include <gtkmm/recentmanager.h>
 #include <gtkmm/revealer.h>
@@ -262,7 +257,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/toolbar.h>
 #include <gtkmm/toolitem.h>
 #include <gtkmm/toolbutton.h>
-#include <gtkmm/toolpalette.h>
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/menutoolbutton.h>
 #include <gtkmm/tooltip.h>

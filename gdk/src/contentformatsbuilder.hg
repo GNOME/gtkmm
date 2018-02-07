@@ -25,65 +25,41 @@ namespace Gdk
  *
  * @newin{3,94}
  */
-class ContentFormatsBuilder
+class ContentFormatsBuilder final
 {
-  _CLASS_GENERIC(ContentFormatsBuilder, GdkContentFormatsBuilder)
+  // ContentFormatsBuilder is registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(ContentFormatsBuilder, GdkContentFormatsBuilder, NONE, gdk_content_formats_builder_ref, gdk_content_formats_builder_unref)
+  _IGNORE(gdk_content_formats_builder_ref, gdk_content_formats_builder_unref)
+
 public:
+  // It's possible to specify gdk_content_formats_builder_new in the _CLASS_OPAQUE_REFCOUNTED()
+  // macro, and have the create() method generated from there, but then it would not
+  // be possible to add documentation to create().
   /** Creates a new %ContentFormatsBuilder object.
    *
    * The resulting builder would create an empty ContentFormats.
    * Use addition functions to add types to it.
+   *
+   * @return A new %ContentFormatsBuilder.
    */
-  ContentFormatsBuilder();
-  _IGNORE(gdk_content_formats_builder_new)
-
-  /** This always takes ownership of the underlying GdkContentFormatsBuilder,
-   * so it is only useful with C functions that return a newly-allocated GdkContentFormatsBuilder.
-   */
-  explicit ContentFormatsBuilder(GdkContentFormatsBuilder* castitem);
-
-  // noncopyable
-  ContentFormatsBuilder(const ContentFormatsBuilder& other) = delete;
-  ContentFormatsBuilder& operator=(const ContentFormatsBuilder& other) = delete;
-
-  // movable
-  ContentFormatsBuilder(ContentFormatsBuilder&& other) noexcept;
-  ContentFormatsBuilder& operator=(ContentFormatsBuilder&& other) noexcept;
-
-  ~ContentFormatsBuilder();
-
-  /** Checks whether the content formats builder is valid.
-   * For instance,
-   * @code
-   * if (builder)
-   *   do_something();
-   * @endcode
-   */
-  explicit operator bool() const noexcept;
+   _WRAP_METHOD(static Glib::RefPtr<ContentFormatsBuilder> create(), gdk_content_formats_builder_new)
 
   _WRAP_METHOD(void add_formats(const Glib::RefPtr<const ContentFormats>& formats),
     gdk_content_formats_builder_add_formats)
-  _WRAP_METHOD(void add_gtype(GType gtype), gdk_content_formats_builder_add_gtype)
   _WRAP_METHOD(void add_mime_type(const Glib::ustring& mime_type),
     gdk_content_formats_builder_add_mime_type)
+  _WRAP_METHOD(void add_gtype(GType gtype), gdk_content_formats_builder_add_gtype)
 
-  /** Makes a new Gdk::ContentFormats from the builder.
+  /** Creates a new Gdk::ContentFormats.
    *
-   * The builder becomes invalid. The only safe operations after a call
-   * to %make_content_formats() are operator bool() and the destructor.
+   * The %ContentFormatsBuilder is reset once this function returns;
+   * you cannot call this function multiple times on the same builder instance.
    *
-   * @return A new Gdk::ContentFormats with all the formats added to the builder.
+   * @return A newly created Gdk::ContentFormats with all the formats added to the builder.
    */
-  Glib::RefPtr<ContentFormats> make_content_formats();
-  _IGNORE(gdk_content_formats_builder_free)
-
-  /// Provides access to the underlying C object.
-  GdkContentFormatsBuilder* gobj() noexcept { return gobject_; }
-  /// Provides access to the underlying C object.
-  const GdkContentFormatsBuilder* gobj() const noexcept { return gobject_; }
-
-protected:
-  GdkContentFormatsBuilder* gobject_;
+  _WRAP_METHOD(Glib::RefPtr<ContentFormats> to_formats(), gdk_content_formats_builder_to_formats)
+  _IGNORE(gdk_content_formats_builder_free_to_formats)dnl// for C programmers
 };
 
 } // namespace Gdk
