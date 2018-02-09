@@ -35,6 +35,7 @@
 #include <gdkmm/frameclock.h>
 #include <gdkmm/glcontext.h>
 #include <gdkmm/rectangle.h>
+#include <gdkmm/devicetool.h>
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/seat.h>
