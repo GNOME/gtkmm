@@ -355,6 +355,12 @@ void DemoWindow::load_file(const std::string& filename)
             p = lines[i];
             state++;
             /* Fall through */
+            // TODO: Replace with [[fallthrough]] annotation (to case 3)
+            // when we ue C++17.
+            /* Reading program body */
+            start = refBufferSource->insert(start, p);
+            start = refBufferSource->insert(start, "\n");
+            break;
           }
       	  else
       	    break;
