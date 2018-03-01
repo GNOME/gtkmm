@@ -117,7 +117,7 @@ protected:
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   void _init_unmanage();
   void destroy_notify_() override;
-  void disconnect_cpp_wrapper();
+  void disconnect_cpp_wrapper(bool prevent_creation_of_another_wrapper = true);
   void _release_c_instance();
 
   // set if flags used by derived classes.

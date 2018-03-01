@@ -92,6 +92,7 @@ void Object::_release_c_instance()
   if (object)
   {
     g_assert(G_IS_OBJECT(object));
+    bool prevent_creation_of_another_wrapper = true;
 
     if(referenced_)
     {
@@ -120,7 +121,17 @@ void Object::_release_c_instance()
         #endif
 
         g_assert(G_IS_OBJECT(object));
-        g_object_run_dispose(object); //Container widgets can respond to this.
+        if (GTK_IS_WIDGET(object) && gtk_widget_get_parent(GTK_WIDGET(object)))
+          // It's a widget which has been added to a container widget.
+          // It can't be safely destroyed, unless you know which container it
+          // was added to and remove it from there. That may or may not be its
+          // immediate parent, returned by gtk_widget_get_parent().
+          // Accept that another wrapper is possibly created if a signal
+          // is emitted or a vfunc is called.
+          // The widget will be destroyed, when the container widget is destroyed.
+          prevent_creation_of_another_wrapper = false;
+        else
+          g_object_run_dispose(object); //Container widgets can respond to this.
       }
     }
     else
@@ -132,12 +143,15 @@ void Object::_release_c_instance()
       #endif
 
       g_assert(G_IS_OBJECT(object));
-      g_object_run_dispose(object);
+      if (GTK_IS_WIDGET(object) && gtk_widget_get_parent(GTK_WIDGET(object)))
+        prevent_creation_of_another_wrapper = false;
+      else
+        g_object_run_dispose(object);
     }
 
     //If the GObject still exists, disconnect the C++ wrapper from it.
     //The C++ wrapper is being deleted right now.
-    disconnect_cpp_wrapper();
+    disconnect_cpp_wrapper(prevent_creation_of_another_wrapper);
 
     //Glib::Object::~Object() will not g_object_unref() it too. because gobject_ is now 0.
   }
@@ -166,7 +180,7 @@ Object::~Object() noexcept
   _release_c_instance();
 }
 
-void Object::disconnect_cpp_wrapper()
+void Object::disconnect_cpp_wrapper(bool prevent_creation_of_another_wrapper)
 {
   //GTKMM_LIFECYCLE:
 
@@ -181,8 +195,9 @@ void Object::disconnect_cpp_wrapper()
     //Prevent gtk vfuncs and default signal handlers from calling our instance methods:
     g_object_steal_qdata((GObject*)gobj(), Glib::quark_); //It will no longer be possible to get the C++ instance from the C instance.
 
-    //Allow us to prevent generation of a new C++ wrapper during destruction:
-    g_object_set_qdata((GObject*)gobj(), Glib::quark_cpp_wrapper_deleted_, (gpointer)true);
+    if (prevent_creation_of_another_wrapper)
+      //Allow us to prevent generation of a new C++ wrapper during destruction:
+      g_object_set_qdata((GObject*)gobj(), Glib::quark_cpp_wrapper_deleted_, (gpointer)true);
 
     //Prevent C++ instance from using GTK+ object:
     gobject_ = nullptr;
