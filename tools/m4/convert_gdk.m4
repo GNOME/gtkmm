@@ -112,6 +112,7 @@ _CONVERSION(`const ::Cairo::RefPtr<const ::Cairo::Region>&',`const cairo_region_
 _CONVERSION(`cairo_region_t*',`::Cairo::RefPtr< ::Cairo::Region>',`Gdk::Cairo::wrap($3)')
 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Surface>&',`cairo_surface_t*',`(($3) ? ($3)->cobj() : nullptr)')
 _CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr< ::Cairo::Surface>',`Gdk::Cairo::wrap($3)')
+_CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr< ::Cairo::ImageSurface>',`Gdk::Cairo::wrap< ::Cairo::ImageSurface>($3)')
 
 _CONVERSION(`const Glib::RefPtr<Cursor>&',`GdkCursor*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Cursor>&',`GdkCursor*',__CONVERT_CONST_REFPTR_TO_P)

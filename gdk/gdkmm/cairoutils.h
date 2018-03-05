@@ -57,6 +57,7 @@ namespace Cairo
 
 /** Creates a Cairo::RefPtr with a C++ wrapper for the C instance.
  *
+ * @tparam T Cairo::Surface or a subclass of Cairo::Surface.
  * @param cobject The C instance.
  * @param has_reference Whether we already have a reference. Otherwise, the
  *        function will take an extra reference.
@@ -65,7 +66,11 @@ namespace Cairo
  *
  * @newin{3,92}
  */
-::Cairo::RefPtr< ::Cairo::Surface> wrap(cairo_surface_t* cobject, bool has_reference = true);
+template <typename T = ::Cairo::Surface, typename = std::enable_if<std::is_base_of< ::Cairo::Surface, T>::value>>
+::Cairo::RefPtr<T> wrap(cairo_surface_t* cobject, bool has_reference = true)
+{
+  return ::Cairo::make_refptr_for_instance<T>(cobject ? new T(cobject, has_reference) : nullptr);
+}
 
 } //namespace Cairo
 } //namespace Gdk

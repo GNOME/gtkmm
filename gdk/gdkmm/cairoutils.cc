@@ -32,11 +32,6 @@ namespace Cairo
   return ::Cairo::make_refptr_for_instance< ::Cairo::Region>(cobject ? new ::Cairo::Region(cobject, has_reference) : nullptr);
 }
 
-::Cairo::RefPtr< ::Cairo::Surface> wrap(cairo_surface_t* cobject, bool has_reference)
-{
-  return ::Cairo::make_refptr_for_instance< ::Cairo::Surface>(cobject ? new ::Cairo::Surface(cobject, has_reference) : nullptr);
-}
-
 } // namespace Cairo
 
 } // namespace Gdk
