@@ -1174,28 +1174,6 @@ added in 3.22.
 </parameters>
 </enum>
 
-<enum name="GdkFilterReturn">
-<description>
-Specifies the result of applying a #GdkFilterFunc to a native event.
-
-</description>
-<parameters>
-<parameter name="GDK_FILTER_CONTINUE">
-<parameter_description> event not handled, continue processing.
-</parameter_description>
-</parameter>
-<parameter name="GDK_FILTER_TRANSLATE">
-<parameter_description> native event translated into a GDK event and stored
-in the `event` structure that was passed in.
-</parameter_description>
-</parameter>
-<parameter name="GDK_FILTER_REMOVE">
-<parameter_description> event handled, terminate processing.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
 <signal name="GdkFrameClock::after-paint">
 <description>
 This signal ends processing of the frame. Applications
@@ -1653,8 +1631,8 @@ image (the filter is designed to be idempotent for 1:1 pixel mapping).
 
 <signal name="GdkKeymap::direction-changed">
 <description>
-The ::direction-changed signal gets emitted when the direction of
-the keymap changes.
+The ::direction-changed signal gets emitted when the direction
+of the keymap changes. See gdk_keymap_get_direction().
 
 </description>
 <parameters>
@@ -9417,6 +9395,66 @@ or -1 to allow auto-detection
 <return></return>
 </function>
 
+<function name="gdk_gl_texture_new">
+<description>
+Creates a new texture for an existing GL texture.
+
+Note that the GL texture must not be modified until @destroy is called,
+which will happen when the GdkTexture object is finalized, or due to
+an explicit call of gdk_texture_release_gl().
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkGLContext
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the ID of a texture that was created with @context
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the nominal width of the texture
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the nominal height of the texture
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> a destroy notify that will be called when the GL resources
+are released
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data that gets passed to @destroy
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly-created #GdkTexture
+</return>
+</function>
+
+<function name="gdk_gl_texture_release">
+<description>
+Releases the GL resources held by a #GdkTexture that
+was created with gdk_texture_new_for_gl().
+
+The texture contents are still available via the
+gdk_texture_download() function, after this function
+has been called.
+
+</description>
+<parameters>
+<parameter name="texture">
+<parameter_description> a #GdkTexture wrapping a GL texture
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_intern_mime_type">
 <description>
 Canonicalizes the given mime type and interns the result.
@@ -9483,6 +9521,8 @@ Returns whether the Caps Lock modifer is locked.
 <function name="gdk_keymap_get_direction">
 <description>
 Returns the direction of effective layout of the keymap.
+The direction of a layout is the direction of the majority of its
+symbols. See pango_unichar_direction().
 
 
 </description>
@@ -14889,47 +14929,6 @@ The data is assumed to be in CAIRO_FORMAT_ARGB32 format.
 </return>
 </function>
 
-<function name="gdk_texture_new_for_gl">
-<description>
-Creates a new texture for an existing GL texture.
-
-Note that the GL texture must not be modified until @destroy is called,
-which will happen when the GdkTexture object is finalized, or due to
-an explicit call of gdk_texture_release_gl().
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkGLContext
-</parameter_description>
-</parameter>
-<parameter name="id">
-<parameter_description> the ID of a texture that was created with @context
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> the nominal width of the texture
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> the nominal height of the texture
-</parameter_description>
-</parameter>
-<parameter name="destroy">
-<parameter_description> a destroy notify that will be called when the GL resources
-are released
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> data that gets passed to @destroy
-</parameter_description>
-</parameter>
-</parameters>
-<return> A newly-created #GdkTexture
-</return>
-</function>
-
 <function name="gdk_texture_new_for_pixbuf">
 <description>
 Creates a new texture object representing the GdkPixbuf.
@@ -15004,25 +15003,6 @@ gdk_texture_new_from_file() to load it.
 </parameters>
 <return> A newly-created texture
 </return>
-</function>
-
-<function name="gdk_texture_release_gl">
-<description>
-Releases the GL resources held by a #GdkTexture that
-was created with gdk_texture_new_for_gl().
-
-The texture contents are still available via the
-gdk_texture_download() function, after this function
-has been called.
-
-</description>
-<parameters>
-<parameter name="texture">
-<parameter_description> a #GdkTexture wrapping a GL texture
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_unicode_to_keyval">
@@ -15237,36 +15217,6 @@ See vkGetPhysicalDeviceQueueFamilyProperties().
 </parameters>
 <return> the index
 </return>
-</function>
-
-<function name="gdk_window_add_filter">
-<description>
-Adds an event filter to @window, allowing you to intercept events
-before they reach GDK. This is a low-level operation and makes it
-easy to break GDK and/or GTK+, so you have to know what you're
-doing. Pass %NULL for @window to get all events for all windows,
-instead of events for a specific window.
-
-If you are interested in X GenericEvents, bear in mind that
-XGetEventData() has been already called on the event, and
-XFreeEventData() must not be called within @function.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="function">
-<parameter_description> filter callback
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> data to pass to filter callback
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_window_beep">
@@ -17350,28 +17300,6 @@ Registers a window as a potential drop destination.
 <parameters>
 <parameter name="window">
 <parameter_description> a #GdkWindow.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_window_remove_filter">
-<description>
-Remove a filter previously added with gdk_window_add_filter().
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-<parameter name="function">
-<parameter_description> previously-added filter function
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> user data for previously-added filter function
 </parameter_description>
 </parameter>
 </parameters>
