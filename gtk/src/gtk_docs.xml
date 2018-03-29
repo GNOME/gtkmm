@@ -1965,12 +1965,6 @@ The #GtkIconSize value that specifies the size of the rendered icon.
 </description>
 </property>
 
-<property name="GtkCellRendererPixbuf:surface">
-<description>
-
-</description>
-</property>
-
 <property name="GtkCellRendererPixbuf:texture">
 <description>
 
@@ -3623,6 +3617,13 @@ The icon name to use for the primary icon for the entry.
 </description>
 </property>
 
+<property name="GtkEntry:primary-icon-paintable">
+<description>
+A #GdkPaintable to use as the primary icon for the entry.
+
+</description>
+</property>
+
 <property name="GtkEntry:primary-icon-sensitive">
 <description>
 Whether the primary icon is sensitive.
@@ -3640,13 +3641,6 @@ when clicked is currently not available.
 <property name="GtkEntry:primary-icon-storage-type">
 <description>
 The representation which is used for the primary icon of the entry.
-
-</description>
-</property>
-
-<property name="GtkEntry:primary-icon-texture">
-<description>
-A #GdkTexture to use as the primary icon for the entry.
 
 </description>
 </property>
@@ -3712,6 +3706,13 @@ The icon name to use for the secondary icon for the entry.
 </description>
 </property>
 
+<property name="GtkEntry:secondary-icon-paintable">
+<description>
+A #GdkPaintable to use as the secondary icon for the entry.
+
+</description>
+</property>
+
 <property name="GtkEntry:secondary-icon-sensitive">
 <description>
 Whether the secondary icon is sensitive.
@@ -3729,13 +3730,6 @@ when clicked is currently not available.
 <property name="GtkEntry:secondary-icon-storage-type">
 <description>
 The representation which is used for the secondary icon of the entry.
-
-</description>
-</property>
-
-<property name="GtkEntry:secondary-icon-texture">
-<description>
-A #GtkTexture to use as the secondary icon for the entry.
 
 </description>
 </property>
@@ -5247,25 +5241,45 @@ Whether to show an entry to change the preview text.
 This enumeration specifies the granularity of font selection
 that is desired in a font chooser.
 
+This enumeration may be extended in the future; applications should
+ignore unknown values.
+
 </description>
 <parameters>
-<parameter name="GTK_FONT_CHOOSER_LEVEL_FONT">
-<parameter_description> Select an individual
-font, including a size. An example would be: &quot;Arial Bold 11&quot;
-</parameter_description>
-</parameter>
-<parameter name="GTK_FONT_CHOOSER_LEVEL_FACE">
-<parameter_description> Select a font face,
-without a size. An example would be: &quot;Arial Bold&quot;
-</parameter_description>
-</parameter>
 <parameter name="GTK_FONT_CHOOSER_LEVEL_FAMILY">
-<parameter_description> Select a font family, without
-specifying the face. An example would be: &quot;Arial&quot;
+<parameter_description> Allow selecting a font family
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_STYLE">
+<parameter_description> Allow selecting a specific font face
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_SIZE">
+<parameter_description> Allow selecting a specific font size
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_VARIATION">
+<parameter_description> Allow changing OpenType font variation axes
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FEATURES">
+<parameter_description> Allow selecting specific OpenType font features
 </parameter_description>
 </parameter>
 </parameters>
 </enum>
+
+<property name="GtkFontChooserWidget:tweak-action">
+<description>
+A toggle action that can be used to switch to the tweak page
+of the font chooser widget, which lets the user tweak the
+OpenType features and variation axes of the selected font.
+
+The action will be enabled or disabled depending on whether
+the selected font has any features or axes.
+
+</description>
+</property>
 
 <signal name="GtkGLArea::create-context">
 <description>
@@ -6471,6 +6485,13 @@ An enum for determining where a dropped item goes.
 </parameters>
 </enum>
 
+<property name="GtkImage:can-shrink">
+<description>
+If the #GtkImage can be made smaller than the image it contains.
+
+</description>
+</property>
+
 <property name="GtkImage:gicon">
 <description>
 The GIcon displayed in the GtkImage. For themed icons,
@@ -6484,6 +6505,14 @@ automatically.
 <description>
 The name of the icon in the icon theme. If the icon theme is
 changed, the image will be updated automatically.
+
+</description>
+</property>
+
+<property name="GtkImage:keep-aspect-ratio">
+<description>
+Whether the GtkImage will render its contents trying to preserve the aspect
+ratio of the contents.
 
 </description>
 </property>
@@ -6519,8 +6548,8 @@ and %GTK_IMAGE_GICON.
 Describes the image data representation used by a #GtkImage. If you
 want to get the image from the widget, you can only get the
 currently-stored representation. e.g.  if the
-gtk_image_get_storage_type() returns #GTK_IMAGE_SURFACE, then you can
-call gtk_image_get_surface().  For empty images, you can request any
+gtk_image_get_storage_type() returns #GTK_IMAGE_PAINTABLE, then you can
+call gtk_image_get_paintable().  For empty images, you can request any
 storage type (call any of the &quot;get&quot; functions), but they will all
 return %NULL values.
 
@@ -6540,14 +6569,9 @@ This image type was added in GTK+ 2.6
 This image type was added in GTK+ 2.14
 </parameter_description>
 </parameter>
-<parameter name="GTK_IMAGE_SURFACE">
-<parameter_description> the widget contains a #cairo_surface_t.
-This image type was added in GTK+ 3.10
-</parameter_description>
-</parameter>
-<parameter name="GTK_IMAGE_TEXTURE">
-<parameter_description> the widget contains a #GdkTexture.
-This image type was added in GTK+ 3.94
+<parameter name="GTK_IMAGE_PAINTABLE">
+<parameter_description> the widget contains a #GdkPaintable.
+This image type was added in GTK+ 3.96
 </parameter_description>
 </parameter>
 </parameters>
@@ -7295,6 +7319,19 @@ The default bindings for this signal is Ctrl-Shift-a.
 <return></return>
 </signal>
 
+<signal name="GtkListBoxRow::activate">
+<description>
+This is a keybinding signal, which will cause this row to be activated.
+
+If you want to be notified when the user activates a row (by key or not),
+use the #GtkListBox::row-activated signal on the row’s parent #GtkListBox.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
 <property name="GtkListBoxRow:activatable">
 <description>
 The property determines whether the #GtkListBox::row-activated
@@ -7306,6 +7343,119 @@ signal will be emitted for this row.
 <property name="GtkListBoxRow:selectable">
 <description>
 The property determines whether this row can be selected.
+
+</description>
+</property>
+
+<property name="GtkMediaControls:media-stream">
+<description>
+The media-stream managed by this object or %NULL if none.
+
+</description>
+</property>
+
+<property name="GtkMediaFile:file">
+<description>
+The file being played back or %NULL if not playing a file.
+
+</description>
+</property>
+
+<property name="GtkMediaFile:input-stream">
+<description>
+The stream being played back or %NULL if not playing a stream, like when playing a file.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:duration">
+<description>
+The stream's duration in microseconds or 0 if unknown.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:ended">
+<description>
+Set when playback has finished.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:error">
+<description>
+%NULL for a properly working stream or the #GError that the stream is in.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:has-audio">
+<description>
+Whether the stream contains audio
+
+</description>
+</property>
+
+<property name="GtkMediaStream:has-video">
+<description>
+Whether the stream contains video
+
+</description>
+</property>
+
+<property name="GtkMediaStream:loop">
+<description>
+Try to restart the media from the beginning once it ended.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:muted">
+<description>
+Whether the audio stream should be muted.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:playing">
+<description>
+Whether the stream is currently playing.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:prepared">
+<description>
+Whether the stream has finished initializing and existence of
+audio and video is known.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:seekable">
+<description>
+Set unless the stream is known to not support seeking.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:seeking">
+<description>
+Set while a seek is in progress.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:timestamp">
+<description>
+The current presentation timestamp in microseconds.
+
+</description>
+</property>
+
+<property name="GtkMediaStream:volume">
+<description>
+Volume of the audio stream.
 
 </description>
 </property>
@@ -7433,7 +7583,7 @@ use gtk_menu_attach_to_widget() directly.
 
 <property name="GtkMenu:menu-type-hint">
 <description>
-The #GdkWindowTypeHint to use for the menu's #GdkWindow.
+The #GdkSurfaceTypeHint to use for the menu's #GdkSurface.
 
 See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
 gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
@@ -10793,7 +10943,7 @@ last char. 600 is a good value for enabling it.
 <description>
 When %TRUE, keyboard navigation and other input-related errors
 will cause a beep. Since the error bell is implemented using
-gdk_window_beep(), the windowing system may offer ways to
+gdk_surface_beep(), the windowing system may offer ways to
 configure the error bell in many ways, such as flashing the
 window or similar visual effects.
 
@@ -11431,7 +11581,7 @@ int value;
 adjustment = gtk_spin_button_get_adjustment (spin);
 value = (int)gtk_adjustment_get_value (adjustment);
 text = g_strdup_printf (&quot;%02d&quot;, value);
-gtk_entry_set_text (GTK_ENTRY (spin), text);
+gtk_spin_button_set_text (spin, text):
 g_free (text);
 
 return TRUE;
@@ -13938,6 +14088,20 @@ See also gtk_print_settings_set_paper_width().
 </parameters>
 </enum>
 
+<property name="GtkVideo:file">
+<description>
+The file played by this video if the video is playing a file.
+
+</description>
+</property>
+
+<property name="GtkVideo:media-stream">
+<description>
+The media-stream played
+
+</description>
+</property>
+
 <property name="GtkVolumeButton:use-symbolic">
 <description>
 Whether to use symbolic icons as the icons. Note that
@@ -14068,7 +14232,7 @@ widget was not associated with a screen before
 <description>
 The ::drag-begin signal is emitted on the drag source when a drag is
 started. A typical reason to connect to this signal is to set up a
-custom drag icon with e.g. gtk_drag_source_set_icon_surface().
+custom drag icon with e.g. gtk_drag_source_set_icon_paintable().
 
 Note that some widgets set up a drag icon in the default handler of
 this signal, so you may have to use g_signal_connect_after() to
@@ -14638,7 +14802,7 @@ if the widget was previously unanchored
 The ::key-press-event signal is emitted when a key is pressed. The signal
 emission will reoccur at the key-repeat rate when the key is kept pressed.
 
-To receive this signal, the #GdkWindow associated to the widget needs
+To receive this signal, the #GdkSurface associated to the widget needs
 to enable the #GDK_KEY_PRESS_MASK mask.
 
 This signal will be sent to the grab widget if there is one.
@@ -14664,7 +14828,7 @@ This signal will be sent to the grab widget if there is one.
 <description>
 The ::key-release-event signal is emitted when a key is released.
 
-To receive this signal, the #GdkWindow associated to the widget needs
+To receive this signal, the #GdkSurface associated to the widget needs
 to enable the #GDK_KEY_RELEASE_MASK mask.
 
 This signal will be sent to the grab widget if there is one.
@@ -14839,7 +15003,7 @@ been emitted, relative to @widget's top
 <signal name="GtkWidget::realize">
 <description>
 The ::realize signal is emitted when @widget is associated with a
-#GdkWindow, which means that gtk_widget_realize() has been called or the
+#GdkSurface, which means that gtk_widget_realize() has been called or the
 widget has been mapped (that is, it is going to be drawn).
 
 </description>
@@ -14949,7 +15113,7 @@ used to, for example, stop an animation on the widget.
 
 <signal name="GtkWidget::unrealize">
 <description>
-The ::unrealize signal is emitted when the #GdkWindow associated with
+The ::unrealize signal is emitted when the #GdkSurface associated with
 @widget is destroyed, which means that gtk_widget_unrealize() has been
 called or the widget has been unmapped (that is, it is going to be
 hidden).
@@ -15100,6 +15264,13 @@ more details about widget scaling.
 </description>
 </property>
 
+<property name="GtkWidget:surface">
+<description>
+The widget's surface if it is realized, %NULL otherwise.
+
+</description>
+</property>
+
 <property name="GtkWidget:tooltip-markup">
 <description>
 Sets the text of tooltip to be the given string, which is marked up
@@ -15151,13 +15322,6 @@ Whether to expand vertically. See gtk_widget_set_vexpand().
 <property name="GtkWidget:vexpand-set">
 <description>
 Whether to use the #GtkWidget:vexpand property. See gtk_widget_get_vexpand_set().
-
-</description>
-</property>
-
-<property name="GtkWidget:window">
-<description>
-The widget's window if it is realized, %NULL otherwise.
 
 </description>
 </property>
@@ -15649,7 +15813,7 @@ Retrieves the license set using gtk_about_dialog_set_license_type()
 
 <function name="gtk_about_dialog_get_logo">
 <description>
-Returns the texture displayed as logo in the about dialog.
+Returns the paintable displayed as logo in the about dialog.
 
 
 </description>
@@ -15659,8 +15823,8 @@ Returns the texture displayed as logo in the about dialog.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the texture displayed as logo. The
-texture is owned by the about dialog. If you want to keep a
+<return> the paintable displayed as logo. The
+paintable is owned by the about dialog. If you want to keep a
 reference to it, you have to call g_object_ref() on it.
 </return>
 </function>
@@ -15964,7 +16128,7 @@ gtk_window_set_default_icon() will be used.
 </parameter_description>
 </parameter>
 <parameter name="logo">
-<parameter_description> a #GdkTexture, or %NULL
+<parameter_description> a #GdkPaintable, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -27209,42 +27373,6 @@ The array must be freed with g_free().
 </return>
 </function>
 
-<function name="gtk_container_focus_sort">
-<description>
-Sorts @children in the correct order for focusing with
-direction type @direction.
-
-
-</description>
-<parameters>
-<parameter name="container">
-<parameter_description> a #GtkContainer
-</parameter_description>
-</parameter>
-<parameter name="children">
-<parameter_description>  a list of descendents of @container (they don't
-have to be direct children)
-</parameter_description>
-</parameter>
-<parameter name="direction">
-<parameter_description> focus direction
-</parameter_description>
-</parameter>
-<parameter name="old_focus">
-<parameter_description> widget to use for the starting position, or %NULL
-to determine this automatically.
-(Note, this argument isn’t used for GTK_DIR_TAB_*,
-which is the only @direction we use currently,
-so perhaps this argument should be removed)
-</parameter_description>
-</parameter>
-</parameters>
-<return> a copy of @children, sorted in correct focusing order,
-with children that aren’t suitable for focusing in this direction
-removed.
-</return>
-</function>
-
 <function name="gtk_container_forall">
 <description>
 Invokes @callback on each direct child of @container, including
@@ -27937,6 +28065,51 @@ structure if the reference count reaches 0.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_css_value_get_dynamic_value">
+<description>
+Gets the dynamic value for a given timestamp. If @monotonic_time is 0,
+the default value is returned.
+
+See gtk_css_value_is_dynamic() for details about dynamic values.
+
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GtkCssValue
+</parameter_description>
+</parameter>
+<parameter name="monotonic_time">
+<parameter_description> the timestamp for which to get the dynamic value
+</parameter_description>
+</parameter>
+</parameters>
+<return> The dynamic value for @value at the given
+timestamp
+</return>
+</function>
+
+<function name="gtk_css_value_is_dynamic">
+<description>
+A &quot;dynamic&quot; value has a different value at different times. This means that
+the value needs to be animated when time is progressing.
+
+Examples of dynamic values are animated images, such as videos or dynamic shaders.
+
+Use gtk_css_value_get_dynamic_value() to get the value for a given timestamp.
+
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GtkCssValue
+</parameter_description>
+</parameter>
+</parameters>
+<return>%TRUE if the value is dynamic
+</return>
 </function>
 
 <function name="gtk_custom_paper_unix_dialog_new">
@@ -28670,7 +28843,7 @@ guint time)
 {
 GdkModifierType mask;
 
-gdk_window_get_pointer (gtk_widget_get_window (widget),
+gdk_surface_get_pointer (gtk_widget_get_surface (widget),
 NULL, NULL, &amp;mask);
 if (mask &amp; GDK_CONTROL_MASK)
 gdk_drag_status (context, GDK_ACTION_COPY, time);
@@ -28931,33 +29104,7 @@ with a context for the source side of a drag)
 <return></return>
 </function>
 
-<function name="gtk_drag_set_icon_surface">
-<description>
-Sets @surface as the icon for a given drag. GTK+ retains
-references for the arguments, and will release them when
-they are no longer needed.
-
-To position the surface relative to the mouse, use
-cairo_surface_set_device_offset() on @surface. The mouse
-cursor will be positioned at the (0,0) coordinate of the
-surface.
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> the context for a drag (This must be called
-with a context for the source side of a drag)
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> the surface to use as icon
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_set_icon_texture">
+<function name="gtk_drag_set_icon_paintable">
 <description>
 Sets @texture as the icon for a given drag. GTK+ retains
 references for the arguments, and will release them when
@@ -28974,8 +29121,8 @@ mouse cursor.
 with a context for the source side of a drag)
 </parameter_description>
 </parameter>
-<parameter name="texture">
-<parameter_description> the #GdkTexture to use as icon
+<parameter name="paintable">
+<parameter_description> the #GdkPaintable to use as icon
 </parameter_description>
 </parameter>
 <parameter name="hot_x">
@@ -29157,11 +29304,10 @@ to a themed icon. See the docs for #GtkIconTheme for more details.
 <return></return>
 </function>
 
-<function name="gtk_drag_source_set_icon_surface">
+<function name="gtk_drag_source_set_icon_paintable">
 <description>
-Sets the icon that will be used for drags from a particular widget
-from a cairo surface. GTK+ retains a reference for @surface and will
-release it when it is no longer needed.
+Sets the icon that will be used for drags from a particular source
+to @paintable.
 
 </description>
 <parameters>
@@ -29169,8 +29315,8 @@ release it when it is no longer needed.
 <parameter_description> a #GtkWidget
 </parameter_description>
 </parameter>
-<parameter name="surface">
-<parameter_description> the cairo surface for the drag icon
+<parameter name="paintable">
+<parameter_description> A #GdkPaintable
 </parameter_description>
 </parameter>
 </parameters>
@@ -30616,7 +30762,7 @@ signal handler.
 <description>
 Retrieves the #GIcon used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-texture or icon name).
+paintable or icon name).
 
 
 </description>
@@ -30639,7 +30785,7 @@ or if the icon is not a #GIcon
 <description>
 Retrieves the icon name used for the icon, or %NULL if there is
 no icon or if the icon was set by some other method (e.g., by
-texture or gicon).
+paintable or gicon).
 
 
 </description>
@@ -30655,6 +30801,29 @@ texture or gicon).
 </parameters>
 <return> An icon name, or %NULL if no icon is set or if the icon
 wasn’t set from an icon name
+</return>
+</function>
+
+<function name="gtk_entry_get_icon_paintable">
+<description>
+Retrieves the #GdkPaintable used for the icon.
+
+If no #GdkPaintable was used for the icon, %NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> A #GtkEntry
+</parameter_description>
+</parameter>
+<parameter name="icon_pos">
+<parameter_description> Icon position
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GdkPaintable, or %NULL if no icon is
+set for this position or the icon set is not a #GdkPaintable.
 </return>
 </function>
 
@@ -30697,29 +30866,6 @@ the return value will be %GTK_IMAGE_EMPTY.
 </parameter>
 </parameters>
 <return> image representation being used
-</return>
-</function>
-
-<function name="gtk_entry_get_icon_texture">
-<description>
-Retrieves the #GdkTexture used for the icon.
-
-If no #GdkTexture was used for the icon, %NULL is returned.
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> A #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="icon_pos">
-<parameter_description> Icon position
-</parameter_description>
-</parameter>
-</parameters>
-<return> A #GdkTexture, or %NULL if no icon is
-set for this position or the icon set is not a #GdkTexture.
 </return>
 </function>
 
@@ -31450,11 +31596,11 @@ If @icon_name is %NULL, no icon will be shown in the specified position.
 <return></return>
 </function>
 
-<function name="gtk_entry_set_icon_from_texture">
+<function name="gtk_entry_set_icon_from_paintable">
 <description>
-Sets the icon shown in the specified position using a #GdkTexture
+Sets the icon shown in the specified position using a #GdkPaintable
 
-If @texture is %NULL, no icon will be shown in the specified position.
+If @paintable is %NULL, no icon will be shown in the specified position.
 
 </description>
 <parameters>
@@ -31466,8 +31612,8 @@ If @texture is %NULL, no icon will be shown in the specified position.
 <parameter_description> Icon position
 </parameter_description>
 </parameter>
-<parameter name="texture">
-<parameter_description> A #GdkTexture, or %NULL
+<parameter name="paintable">
+<parameter_description> A #GdkPaintable, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -35714,23 +35860,13 @@ must not be modified or freed.
 
 <function name="gtk_frame_get_label_align">
 <description>
-Retrieves the X and Y alignment of the frame’s label. See
+Retrieves the X alignment of the frame’s label. See
 gtk_frame_set_label_align().
 
 </description>
 <parameters>
 <parameter name="frame">
 <parameter_description> a #GtkFrame
-</parameter_description>
-</parameter>
-<parameter name="xalign">
-<parameter_description> location to store X alignment of
-frame’s label, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="yalign">
-<parameter_description> location to store X alignment of
-frame’s label, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -35810,8 +35946,8 @@ new #GtkLabel with that text and adds it as the #GtkFrame:label-widget.
 
 <function name="gtk_frame_set_label_align">
 <description>
-Sets the alignment of the frame widget’s label. The
-default values for a newly created frame are 0.0 and 0.5.
+Sets the X alignment of the frame widget’s label. The
+default value for a newly created frame is 0.0.
 
 </description>
 <parameters>
@@ -35823,13 +35959,6 @@ default values for a newly created frame are 0.0 and 0.5.
 <parameter_description> The position of the label along the top edge
 of the widget. A value of 0.0 represents left alignment;
 1.0 represents right alignment.
-</parameter_description>
-</parameter>
-<parameter name="yalign">
-<parameter_description> The y alignment of the label. A value of 0.0 aligns under 
-the frame; 1.0 aligns above the frame. If the values are exactly
-0.0 or 1.0 the gap in the frame won’t be painted because the label
-will be completely above or below the frame.
 </parameter_description>
 </parameter>
 </parameters>
@@ -38389,43 +38518,6 @@ to the icon.
 </return>
 </function>
 
-<function name="gtk_icon_info_load_surface">
-<description>
-Renders an icon previously looked up in an icon theme using
-gtk_icon_theme_lookup_icon(); the size will be based on the size
-passed to gtk_icon_theme_lookup_icon(). Note that the resulting
-surface may not be exactly this size; an icon theme may have icons
-that differ slightly from their nominal sizes, and in addition GTK+
-will avoid scaling icons that it considers sufficiently close to the
-requested size or for which the source image would have to be scaled
-up too far. (This maintains sharpness.). This behaviour can be changed
-by passing the %GTK_ICON_LOOKUP_FORCE_SIZE flag when obtaining
-the #GtkIconInfo. If this flag has been specified, the pixbuf
-returned by this function will be scaled to the exact size.
-
-
-</description>
-<parameters>
-<parameter name="icon_info">
-<parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
-</parameter_description>
-</parameter>
-<parameter name="for_window">
-<parameter_description> #GdkWindow to optimize drawing for, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> location for error information on failure, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> the rendered icon; this may be a newly
-created icon or a new reference to an internal icon, so you must
-not modify the icon. Use cairo_surface_destroy() to release your
-reference to the icon.
-</return>
-</function>
-
 <function name="gtk_icon_info_load_symbolic">
 <description>
 Loads an icon, modifying it to match the system colours for the foreground,
@@ -39137,60 +39229,6 @@ your reference to the icon. %NULL if the icon isn’t found.
 </return>
 </function>
 
-<function name="gtk_icon_theme_load_surface">
-<description>
-Looks up an icon in an icon theme for a particular window scale,
-scales it to the given size and renders it into a cairo surface. This is a
-convenience function; if more details about the icon are needed,
-use gtk_icon_theme_lookup_icon() followed by
-gtk_icon_info_load_surface().
-
-Note that you probably want to listen for icon theme changes and
-update the icon. This is usually done by connecting to the
-GtkWidget::style-set signal.
-
-
-</description>
-<parameters>
-<parameter name="icon_theme">
-<parameter_description> a #GtkIconTheme
-</parameter_description>
-</parameter>
-<parameter name="icon_name">
-<parameter_description> the name of the icon to lookup
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> the desired icon size. The resulting icon may not be
-exactly this size; see gtk_icon_info_load_icon().
-</parameter_description>
-</parameter>
-<parameter name="scale">
-<parameter_description> desired scale
-</parameter_description>
-</parameter>
-<parameter name="for_window">
-<parameter_description> #GdkWindow to optimize drawing for, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> flags modifying the behavior of the icon lookup
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> Location to store error information on failure,
-or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the rendered icon; this may be
-a newly created icon or a new reference to an internal icon, so
-you must not modify the icon. Use cairo_surface_destroy() to
-release your reference to the icon. %NULL if the icon isn’t
-found.
-</return>
-</function>
-
 <function name="gtk_icon_theme_lookup_by_gicon">
 <description>
 Looks up an icon and returns a #GtkIconInfo containing information
@@ -39199,7 +39237,7 @@ into a pixbuf using gtk_icon_info_load_icon().
 
 When rendering on displays with high pixel densities you should not
 use a @size multiplied by the scaling factor returned by functions
-like gdk_window_get_scale_factor(). Instead, you should use
+like gdk_surface_get_scale_factor(). Instead, you should use
 gtk_icon_theme_lookup_by_gicon_for_scale(), as the assets loaded
 for a given scaling factor may be different.
 
@@ -39275,7 +39313,7 @@ combines these two steps if all you need is the pixbuf.)
 
 When rendering on displays with high pixel densities you should not
 use a @size multiplied by the scaling factor returned by functions
-like gdk_window_get_scale_factor(). Instead, you should use
+like gdk_surface_get_scale_factor(). Instead, you should use
 gtk_icon_theme_lookup_icon_for_scale(), as the assets loaded
 for a given scaling factor may be different.
 
@@ -41210,6 +41248,22 @@ Resets the image to be empty.
 <return></return>
 </function>
 
+<function name="gtk_image_get_can_shrink">
+<description>
+Gets the value set via gtk_image_set_can_shrink().
+
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the image can be made smaller than its contents
+</return>
+</function>
+
 <function name="gtk_image_get_gicon">
 <description>
 Gets the #GIcon and size being displayed by the #GtkImage.
@@ -41274,6 +41328,43 @@ Gets the icon size used by the @image when rendering icons.
 </return>
 </function>
 
+<function name="gtk_image_get_keep_aspect_ratio">
+<description>
+Gets the value set via gtk_image_set_keep_aspect_ratio().
+
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the image tries to keep the contents' aspect ratio
+</return>
+</function>
+
+<function name="gtk_image_get_paintable">
+<description>
+Gets the image #GdkPaintable being displayed by the #GtkImage.
+The storage type of the image must be %GTK_IMAGE_EMPTY or
+%GTK_IMAGE_PAINTABLE (see gtk_image_get_storage_type()).
+The caller of this function does not own a reference to the
+returned paintable.
+
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the displayed paintable, or %NULL if
+the image is empty
+</return>
+</function>
+
 <function name="gtk_image_get_pixel_size">
 <description>
 Gets the pixel size used for named icons.
@@ -41305,48 +41396,6 @@ the return value will be %GTK_IMAGE_EMPTY.
 </parameter>
 </parameters>
 <return> image representation being used
-</return>
-</function>
-
-<function name="gtk_image_get_surface">
-<description>
-Gets the image #cairo_surface_t being displayed by the #GtkImage.
-The storage type of the image must be %GTK_IMAGE_EMPTY or
-%GTK_IMAGE_SURFACE (see gtk_image_get_storage_type()).
-The caller of this function does not own a reference to the
-returned surface.
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> the displayed surface, or %NULL if
-the image is empty
-</return>
-</function>
-
-<function name="gtk_image_get_texture">
-<description>
-Gets the image #GdkTexture being displayed by the #GtkImage.
-The storage type of the image must be %GTK_IMAGE_EMPTY or
-%GTK_IMAGE_TEXTURE (see gtk_image_get_storage_type()).
-The caller of this function does not own a reference to the
-returned texture.
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> the displayed texture, or %NULL if
-the image is empty
 </return>
 </function>
 
@@ -41435,6 +41484,28 @@ the icon size.
 </return>
 </function>
 
+<function name="gtk_image_new_from_paintable">
+<description>
+Creates a new #GtkImage displaying @paintable.
+The #GtkImage does not assume a reference to the
+paintable; you still need to unref it if you own references.
+#GtkImage will add its own reference rather than adopting yours.
+
+The #GtkImage will track changes to the @paintable and update
+its size and contents in response to it.
+
+
+</description>
+<parameters>
+<parameter name="paintable">
+<parameter_description> a #GdkPaintable, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkImage
+</return>
+</function>
+
 <function name="gtk_image_new_from_pixbuf">
 <description>
 Creates a new #GtkImage displaying @pixbuf.
@@ -41488,46 +41559,30 @@ displaying the file.
 </return>
 </function>
 
-<function name="gtk_image_new_from_surface">
+<function name="gtk_image_set_can_shrink">
 <description>
-Creates a new #GtkImage displaying @surface.
-The #GtkImage does not assume a reference to the
-surface; you still need to unref it if you own references.
-#GtkImage will add its own reference rather than adopting yours.
+If set to %TRUE, the @image can be made smaller than its contents.
+The contents will be scaled down when rendering.
 
+If you want to still force a minimum size manually, consider using
+gtk_widget_set_size_request().
+
+Also of note is that a similar function for growing does not exist
+because the grow behavior can be controlled via
+gtk_widget_set_halign() and gtk_widget_set_valign().
 
 </description>
 <parameters>
-<parameter name="surface">
-<parameter_description> a #cairo_surface_t, or %NULL
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+<parameter name="can_shrink">
+<parameter_description> if the @image can be made smaller than its contents
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GtkImage
-</return>
-</function>
-
-<function name="gtk_image_new_from_texture">
-<description>
-Creates a new #GtkImage displaying @texture.
-The #GtkImage does not assume a reference to the
-texture; you still need to unref it if you own references.
-#GtkImage will add its own reference rather than adopting yours.
-
-Note that this function just creates an #GtkImage from the texture. The
-#GtkImage created will not react to state changes. Should you want that, 
-you should use gtk_image_new_from_icon_name().
-
-
-</description>
-<parameters>
-<parameter name="texture">
-<parameter_description> a #GdkTexture, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkImage
-</return>
+<return></return>
 </function>
 
 <function name="gtk_image_set_from_file">
@@ -41592,13 +41647,30 @@ the icon size.
 <return></return>
 </function>
 
+<function name="gtk_image_set_from_paintable">
+<description>
+See gtk_image_new_from_paintable() for details.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+<parameter name="paintable">
+<parameter_description> a #GdkPaintable or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_image_set_from_pixbuf">
 <description>
 See gtk_image_new_from_pixbuf() for details.
 
-Note: This is a helper for gtk_image_set_from_texture(), and you can't
-get back the exact pixbuf once this is called, only a texture.
-
+Note: This is a helper for gtk_image_set_from_paintable(), and you can't
+get back the exact pixbuf once this is called, only a paintable.
 
 </description>
 <parameters>
@@ -41632,42 +41704,6 @@ See gtk_image_new_from_resource() for details.
 <return></return>
 </function>
 
-<function name="gtk_image_set_from_surface">
-<description>
-See gtk_image_new_from_surface() for details.
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> a cairo_surface_t or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_image_set_from_texture">
-<description>
-See gtk_image_new_from_texture() for details.
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-<parameter name="texture">
-<parameter_description> a #GdkTexture or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_image_set_icon_size">
 <description>
 Suggests an icon size to the theme for named icons.
@@ -41680,6 +41716,29 @@ Suggests an icon size to the theme for named icons.
 </parameter>
 <parameter name="icon_size">
 <parameter_description> the new icon size
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_image_set_keep_aspect_ratio">
+<description>
+If set to %TRUE, the @image will render its contents according to
+their aspect ratio. That means that empty space may show up at the
+top/bottom or left/right of @image.
+
+If set to %FALSE or if the contents provide no aspect ratio, the
+contents will be stretched over the image's whole area.
+
+</description>
+<parameters>
+<parameter name="image">
+<parameter_description> a #GtkImage
+</parameter_description>
+</parameter>
+<parameter name="keep_aspect_ratio">
+<parameter_description> whether to keep aspect ratio
 </parameter_description>
 </parameter>
 </parameters>
@@ -45198,6 +45257,754 @@ when it regains control.
 <return></return>
 </function>
 
+<function name="gtk_media_controls_get_media_stream">
+<description>
+Gets the media stream managed by @controls or %NULL if none.
+
+
+</description>
+<parameters>
+<parameter name="controls">
+<parameter_description> a #GtkMediaControls
+</parameter_description>
+</parameter>
+</parameters>
+<return> The media stream managed by @controls
+</return>
+</function>
+
+<function name="gtk_media_controls_new">
+<description>
+Creates a new #GtkMediaControls managing the @stream passed to it.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GtkMediaStream to
+manage or %NULL for none.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkMediaControls
+</return>
+</function>
+
+<function name="gtk_media_file_clear">
+<description>
+Resets the media file to be empty. 
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_file_get_file">
+<description>
+Returns the file that @self is currently playing from.
+
+When @self is not playing or not playing from a file,
+%NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> The currently playing file or %NULL if not
+playing from a file.
+</return>
+</function>
+
+<function name="gtk_media_file_get_input_stream">
+<description>
+Returns the stream that @self is currently playing from.
+
+When @self is not playing or not playing from a stream,
+%NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> The currently playing stream or %NULL if not
+playing from a stream.
+</return>
+</function>
+
+<function name="gtk_media_file_new">
+<description>
+Creates a new empty media file.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkMediaFile
+</return>
+</function>
+
+<function name="gtk_media_file_new_for_file">
+<description>
+Creates a new media file to play @file. 
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> The file to play
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkMediaFile playing @file
+</return>
+</function>
+
+<function name="gtk_media_file_new_for_filename">
+<description>
+This is a utility function that converts the given @filename
+to a #GFile and calls gtk_media_file_new_for_file().
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> filename to open
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkMediaFile playing @filename
+</return>
+</function>
+
+<function name="gtk_media_file_new_for_input_stream">
+<description>
+Creates a new media file to play @stream. If you want the
+resulting media to be seekable, the stream should implement
+the #GSeekable interface.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> The stream to play
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkMediaFile
+</return>
+</function>
+
+<function name="gtk_media_file_new_for_resource">
+<description>
+This is a utility function that converts the given @resource
+to a #GFile and calls gtk_media_file_new_for_file().
+
+
+</description>
+<parameters>
+<parameter name="resource_path">
+<parameter_description> resource path to open
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkMediaFile playing @resource_path
+</return>
+</function>
+
+<function name="gtk_media_file_set_file">
+<description>
+If any file is still playing, stop playing it.
+
+Then start playing the given @file.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+<parameter name="file">
+<parameter_description> the file to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_file_set_filename">
+<description>
+This is a utility function that converts the given @filename
+to a #GFile and calls gtk_media_file_set_file().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> name of file to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_file_set_input_stream">
+<description>
+If anything is still playing, stop playing it. Then start
+playing the given @stream.
+
+Full control about the @stream is assumed for the duration of
+playback. The stream will not bt be closed.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+<parameter name="stream">
+<parameter_description> the stream to play from
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_file_set_resource">
+<description>
+This is a utility function that converts the given @resource_path
+to a #GFile and calls gtk_media_file_set_file().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaFile
+</parameter_description>
+</parameter>
+<parameter name="resource_path">
+<parameter_description> path to resource to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_ended">
+<description>
+Pauses the media stream and marks it as ended. This is a hint only, calls
+to GtkMediaStream.play() may still happen.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_error">
+<description>
+Sets @self into an error state using a printf()-style format string.
+
+This is a utility function that calls gtk_media_stream_gerror(). See
+that function for details.  
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="domain">
+<parameter_description> error domain
+</parameter_description>
+</parameter>
+<parameter name="code">
+<parameter_description> error code
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> printf()-style format for error message
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> parameters for message format
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_error_valist">
+<description>
+Sets @self into an error state using a printf()-style format string.
+
+This is a utility function that calls gtk_media_stream_gerror(). See
+that function for details.  
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="domain">
+<parameter_description> error domain
+</parameter_description>
+</parameter>
+<parameter name="code">
+<parameter_description> error code
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> printf()-style format for error message
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> #va_list of parameters for the message format
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_gerror">
+<description>
+Sets @self into an error state. This will pause the stream
+(you can check for an error via gtk_media_stream_get_error() in
+your GtkMediaStream.pause() implementation), abort pending seeks
+and mark the stream as prepared.
+
+To unset an error, the stream must be reset via a call to
+gtk_media_stream_unprepared().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> the #GError to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_get_duration">
+<description>
+Gets the duration of the stream. If the duration is not known,
+0 will be returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkmediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> the duration of the stream or 0 if not known.
+</return>
+</function>
+
+<function name="gtk_media_stream_get_error">
+<description>
+If the stream is in an error state, returns the #GError explaining that state.
+Any type of error can be reported here depending on the implementation of the
+media stream.
+
+A media stream in an error cannot be operated on, calls like
+gtk_media_stream_play() or gtk_media_stream_seek() will not have any effect.
+
+#GtkMediaStream itself does not provide a way to unset an error, but
+implementations may provide options. For example, a #GtkMediaFile will unset
+errors when a new source is set with ie gtk_media_file_set_file().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> %NULL if not in an error state or
+the #GError of the stream
+</return>
+</function>
+
+<function name="gtk_media_stream_get_loop">
+<description>
+Returns whether the stream is set to loop. See
+gtk_media_stream_set_loop() for details.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the stream should loop
+</return>
+</function>
+
+<function name="gtk_media_stream_get_muted">
+<description>
+Returns whether the audio for the stream is muted.
+See gtk_media_stream_set_muted() for details.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the stream is muted
+</return>
+</function>
+
+<function name="gtk_media_stream_get_volume">
+<description>
+Returns the volume of the audio for the stream.
+See gtk_media_stream_set_volume() for details.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> volume of the stream from 0.0 to 1.0
+</return>
+</function>
+
+<function name="gtk_media_stream_is_seekable">
+<description>
+Checks if a stream may be seekable.
+
+This is meant to be a hint. Streams may not allow seeking even if
+this function returns %TRUE. However, if this function returns
+%FALSE, streams are guaranteed to not be seekable and user interfaces
+may hide controls that allow seeking.
+
+It is allowed to call gtk_media_stream_seek() on a non-seekable
+stream, though it will not do anything.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the stream may support seeking
+</return>
+</function>
+
+<function name="gtk_media_stream_is_seeking">
+<description>
+Checks if there is currently a seek operation going on.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a seek operation is ongoing.
+</return>
+</function>
+
+<function name="gtk_media_stream_prepared">
+<description>
+Called by #GtkMediaStream implementations to advertise the stream
+being ready to play and providing details about the stream.
+
+Note that the arguments are hints. If the stream implementation
+cannot determine the correct values, it is better to err on the
+side of caution and return %TRUE. User interfaces will use those
+values to determine what controls to show.
+
+This function may not be called again until the stream has been
+reset via gtk_media_stream_unprepared().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="has_audio">
+<parameter_description> %TRUE if the stream should advertise audio support
+</parameter_description>
+</parameter>
+<parameter name="has_video">
+<parameter_description> %TRUE if the stream should advertise video support
+</parameter_description>
+</parameter>
+<parameter name="seekable">
+<parameter_description> %TRUE if the stream should advertise seekability
+</parameter_description>
+</parameter>
+<parameter name="duration">
+<parameter_description> The duration of the stream or 0 if unknown
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_realize">
+<description>
+Called by users to attach the media stream to a #GdkSurface they manage.
+The stream can then access the resources of @surface for its rendering
+purposes. In particular, media streams might want to create
+#GdkGLContexts or sync to the #GdkFrameClock.
+
+Whoever calls this function is responsible for calling
+gtk_media_stream_unrealize() before either the stream or @surface get
+destroyed.
+
+Multiple calls to this function may happen from different users of the
+video, even with the same @surface. Each of these calls must be followed
+by its own call to gtk_media_stream_unrealize().
+
+It is not required to call this function to make a media stream work.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> a #GdkSurface
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_seek">
+<description>
+Start a seek operation on @self to @timestamp. If @timestamp is out of range,
+it will be clamped.
+
+Seek operations may not finish instantly. While a seek operation is
+in process, the GtkMediaStream:seeking property will be set.
+
+When calling gtk_media_stream_seek() during an ongoing seek operation,
+the new seek wil override any pending seek.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> timestamp to seek to.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_seek_failed">
+<description>
+Ends a seek operation started via GtkMediaStream.seek() as a failure.
+This will not cause an error on the stream and will assume that
+playback continues as if no seek had happened.
+
+See gtk_media_stream_seek_success() for the other way of
+ending a seek.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_seek_success">
+<description>
+Ends a seek operation started via GtkMediaStream.seek() successfully.
+This function will unset the GtkMediaStream:ended property if it was
+set.
+
+See gtk_media_stream_seek_failed() for the other way of
+ending a seek.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_set_loop">
+<description>
+Sets whether the stream should loop, ie restart playback from
+the beginning instead of stopping at the end.
+
+Not all streams may support looping, in particular non-seekable
+streams. Those streams will ignore the loop setting and just end.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="loop">
+<parameter_description> %TRUE if the stream should loop
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_set_muted">
+<description>
+Sets whether the audio stream should be muted. Muting a stream will
+cause no audio to be played, but it does not modify the volume.
+This means that muting and then unmuting the stream will restore
+the volume settings.
+
+If the stream has no audio, calling this function will still work
+but it will not have an audible effect.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="muted">
+<parameter_description> %TRUE if the stream should be muted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_set_volume">
+<description>
+Sets the volume of the audio stream. This function call will work even if
+the stream is muted.
+
+The given @volume should range from 0.0 for silence to 1.0 for as loud as
+possible. Values outside of this range will be clamped to the nearest
+value.
+
+If the stream has no audio or is muted, calling this function will still
+work but it will not have an immediate audible effect. When the stream is
+unmuted, the new volume setting will take effect.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="volume">
+<parameter_description> New volume of the stream from 0.0 to 1.0
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_unprepared">
+<description>
+Resets a given media stream implementation. gtk_media_stream_prepared()
+can now be called again.
+
+This function will also reset any error state the stream was in.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_unrealize">
+<description>
+Undoes a previous call to gtk_media_stream_realize() and causes
+the stream to release all resources it had allocated from @surface.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream previously realized
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> the #GdkSurface the stream was realized with
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_media_stream_update">
+<description>
+Media stream implementations should regularly call this function to
+update the timestamp reported by the stream. It is up to
+implementations to call this at the frequency they deem appropriate.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> the new timestamp
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_menu_attach">
 <description>
 Adds a new #GtkMenuItem to a (table) menu. The number of “cells” that
@@ -46259,7 +47066,7 @@ See gtk_menu_popup_at_widget () and gtk_menu_popup_at_pointer (), which
 handle more common cases for popping up menus.
 
 @menu will be positioned at @rect, aligning their anchor points. @rect is
-relative to the top-left corner of @rect_window. @rect_anchor and
+relative to the top-left corner of @rect_surface. @rect_anchor and
 @menu_anchor determine anchor points on @rect and @menu to pin together.
 @menu can optionally be offset by #GtkMenu:rect-anchor-dx and
 #GtkMenu:rect-anchor-dy.
@@ -46278,8 +47085,8 @@ Other properties that influence the behaviour of this function are
 <parameter_description> the #GtkMenu to pop up
 </parameter_description>
 </parameter>
-<parameter name="rect_window">
-<parameter_description> the #GdkWindow @rect is relative to
+<parameter name="rect_surface">
+<parameter_description> the #GdkSurface @rect is relative to
 </parameter_description>
 </parameter>
 <parameter name="rect">
@@ -59419,26 +60226,6 @@ g_object_unref().
 </return>
 </function>
 
-<function name="gtk_selection_data_get_surface">
-<description>
-Gets the contents of the selection data as a cairo surface.
-
-
-</description>
-<parameters>
-<parameter name="selection_data">
-<parameter_description> a #GtkSelectionData
-</parameter_description>
-</parameter>
-</parameters>
-<return> if the selection data
-contained a recognized image type and it could be converted to a
-cairo surface, a newly allocated surface is returned, otherwise
-%NULL.  If the result is non-%NULL it must be freed with
-g_object_unref().
-</return>
-</function>
-
 <function name="gtk_selection_data_get_target">
 <description>
 Retrieves the target of the selection.
@@ -59591,29 +60378,6 @@ The pixbuf is converted to the form determined by
 </parameter>
 <parameter name="pixbuf">
 <parameter_description> a #GdkPixbuf
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the selection was successfully set,
-otherwise %FALSE.
-</return>
-</function>
-
-<function name="gtk_selection_data_set_surface">
-<description>
-Sets the contents of the selection from a cairo image surface.
-The surface is converted to the form determined by
-@selection_data-&gt;target.
-
-
-</description>
-<parameters>
-<parameter name="selection_data">
-<parameter_description> a #GtkSelectionData
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> a cairo image surface
 </parameter_description>
 </parameter>
 </parameters>
@@ -60225,6 +60989,38 @@ You should try to avoid calling this function if @color is transparent.
 <return></return>
 </function>
 
+<function name="gtk_snapshot_append_layout">
+<description>
+Creates render nodes for rendering @layout in the given foregound @color
+and appends them to the current node of @snapshot without changing the
+current node.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="layout">
+<parameter_description> the #PangoLayout to render
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> the foreground color to render the layout in
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a printf() style format string for the name for the new node
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments to insert into the format string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_snapshot_append_node">
 <description>
 Appends @node to the current render node of @snapshot,
@@ -60297,6 +61093,40 @@ Tests whether the rectangle is entirely outside the clip region of @snapshot.
 </return>
 </function>
 
+<function name="gtk_snapshot_free_to_node">
+<description>
+Returns the node that was constructed by @snapshot
+and frees @snapshot.
+
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-created #GskRenderNode
+</return>
+</function>
+
+<function name="gtk_snapshot_free_to_paintable">
+<description>
+Returns a paintable for the node that was
+constructed by @snapshot and frees @snapshot.
+
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-created #GdkPaintable
+</return>
+</function>
+
 <function name="gtk_snapshot_get_offset">
 <description>
 Queries the offset managed by @snapshot. This offset is the
@@ -60328,10 +61158,10 @@ you.
 <return></return>
 </function>
 
-<function name="gtk_snapshot_get_renderer">
+<function name="gtk_snapshot_get_record_names">
 <description>
-Obtains the #GskRenderer that this snapshot will be
-rendered with.
+Obtains whether the snapshot is recording names
+for debugging.
 
 
 </description>
@@ -60341,7 +61171,35 @@ rendered with.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GskRenderer
+<return> whether the snapshot records names
+</return>
+</function>
+
+<function name="gtk_snapshot_new">
+<description>
+Creates a new #GtkSnapshot.
+
+
+</description>
+<parameters>
+<parameter name="record_names">
+<parameter_description> whether to keep node names (for debugging purposes)
+</parameter_description>
+</parameter>
+<parameter name="clip">
+<parameter_description> the clip region to use, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a printf-style format string to create the node name
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments for @name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated #GtkSnapshot
 </return>
 </function>
 
@@ -60652,6 +61510,46 @@ without changing the current node.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_snapshot_to_node">
+<description>
+Returns the render node that was constructed
+by @snapshot. After calling this function, it
+is no longer possible to add more nodes to
+@snapshot. The only function that should be
+called after this is gtk_snapshot_unref().
+
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return> the constructed #GskRenderNode
+</return>
+</function>
+
+<function name="gtk_snapshot_to_paintable">
+<description>
+Returns a paintable encapsulating the render node
+that was constructed by @snapshot. After calling
+this function, it is no longer possible to add more
+nodes to @snapshot. The only function that should be
+called after this is gtk_snapshot_unref().
+
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GdkPaintable
+</return>
 </function>
 
 <function name="gtk_spin_button_configure">
@@ -67641,6 +68539,30 @@ it.
 <return></return>
 </function>
 
+<function name="gtk_text_util_create_drag_icon">
+<description>
+Creates a drag and drop icon from @text.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> #GtkWidget to extract the pango context
+</parameter_description>
+</parameter>
+<parameter name="text">
+<parameter_description> a #gchar to render the icon
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> length of @text, or -1 for NUL-terminated text
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkPaintable to use as DND icon
+</return>
+</function>
+
 <function name="gtk_text_view_add_child_at_anchor">
 <description>
 Adds a child widget in the text buffer, at the given @anchor.
@@ -67756,7 +68678,7 @@ views, since they depend on the contents of the #GtkTextBuffer.
 </return>
 </function>
 
-<function name="gtk_text_view_buffer_to_window_coords">
+<function name="gtk_text_view_buffer_to_surface_coords">
 <description>
 Converts coordinate (@buffer_x, @buffer_y) to coordinates for the window
 @win, and stores the result in (@window_x, @window_y). 
@@ -67940,7 +68862,7 @@ returned locations will be adjusted to account for the preedit
 cursor’s offset within the preedit sequence.
 
 The rectangle position is in buffer coordinates; use
-gtk_text_view_buffer_to_window_coords() to convert these
+gtk_text_view_buffer_to_surface_coords() to convert these
 coordinates to coordinates for one of the windows in the text view.
 
 </description>
@@ -68126,7 +69048,7 @@ zero, or the number of characters in the grapheme.
 <description>
 Gets a rectangle which roughly contains the character at @iter.
 The rectangle position is in buffer coordinates; use
-gtk_text_view_buffer_to_window_coords() to convert these
+gtk_text_view_buffer_to_surface_coords() to convert these
 coordinates to coordinates for one of the windows in the text view.
 
 </description>
@@ -68215,7 +69137,7 @@ edge of the line.
 <description>
 Gets the y coordinate of the top of the line containing @iter,
 and the height of the line. The coordinate is a buffer coordinate;
-convert to window coordinates with gtk_text_view_buffer_to_window_coords().
+convert to window coordinates with gtk_text_view_buffer_to_surface_coords().
 
 </description>
 <parameters>
@@ -68381,7 +69303,7 @@ Gets the top margin for text in the @text_view.
 <description>
 Fills @visible_rect with the currently-visible
 region of the buffer, in buffer coordinates. Convert to window coordinates
-with gtk_text_view_buffer_to_window_coords().
+with gtk_text_view_buffer_to_surface_coords().
 
 </description>
 <parameters>
@@ -70453,7 +71375,7 @@ and gtk_tooltip_set_icon().
 <function name="gtk_tooltip_set_icon">
 <description>
 Sets the icon of the tooltip (which is in front of the text) to be
-@texture.  If @texure is %NULL, the image will be hidden.
+@paintable.  If @paintable is %NULL, the image will be hidden.
 
 </description>
 <parameters>
@@ -70461,8 +71383,8 @@ Sets the icon of the tooltip (which is in front of the text) to be
 <parameter_description> a #GtkTooltip
 </parameter_description>
 </parameter>
-<parameter name="texture">
-<parameter_description> a #GdkTexture, or %NULL
+<parameter name="paintable">
+<parameter_description> a #GdkPaintable, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -77159,6 +78081,201 @@ gtk_tree_view_enable_model_drag_source(). Calling this method sets
 <return></return>
 </function>
 
+<function name="gtk_video_get_file">
+<description>
+Gets the file played by @self or %NULL if not playing back
+a file.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+</parameters>
+<return> The file played by @self
+</return>
+</function>
+
+<function name="gtk_video_get_media_stream">
+<description>
+Gets the media stream managed by @self or %NULL if none.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+</parameters>
+<return> The media stream managed by @self
+</return>
+</function>
+
+<function name="gtk_video_new">
+<description>
+Creates a new empty #GtkVideo.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkVideo
+</return>
+</function>
+
+<function name="gtk_video_new_for_file">
+<description>
+Creates a #GtkVideo to play back the given @file.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkVideo
+</return>
+</function>
+
+<function name="gtk_video_new_for_filename">
+<description>
+Creates a #GtkVideo to play back the given @filename.
+
+This is a utility function that calls gtk_video_new_for_file(),
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> filename to play back
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkVideo
+</return>
+</function>
+
+<function name="gtk_video_new_for_media_stream">
+<description>
+Creates a #GtkVideo to play back the given @stream.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GtkMediaStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkVideo
+</return>
+</function>
+
+<function name="gtk_video_new_for_resource">
+<description>
+Creates a #GtkVideo to play back the resource at the
+given @resource_path.
+
+This is a utility function that calls gtk_video_new_for_file(),
+
+
+</description>
+<parameters>
+<parameter name="resource_path">
+<parameter_description> resource path to play back
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkVideo
+</return>
+</function>
+
+<function name="gtk_video_set_file">
+<description>
+Makes @self play the given @file.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="file">
+<parameter_description> the file to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_video_set_filename">
+<description>
+Makes @self play the given @filename.
+
+This is a utility function that calls gtk_video_set_file(),
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> the filename to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_video_set_media_stream">
+<description>
+Sets the media stream to be played back. @self will take full control
+of managing the media stream. If you want to manage a media stream
+yourself, consider using a #GtkImage for display.
+
+If you want to display a file, consider using gtk_video_set_file()
+instead.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="stream">
+<parameter_description> The media stream to play or %NULL to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_video_set_resource">
+<description>
+Makes @self play the resource at the given @resource_path.
+
+This is a utility function that calls gtk_video_set_file(),
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="resource_path">
+<parameter_description> the resource to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_viewport_get_shadow_type">
 <description>
 Gets the shadow type of the #GtkViewport. See
@@ -78093,9 +79210,9 @@ gtk_widget_is_drawable()) and a size must have been allocated.
 <description>
 Notifies the user about an input-related error on this widget.
 If the #GtkSettings:gtk-error-bell setting is %TRUE, it calls
-gdk_window_beep(), otherwise it does nothing.
+gdk_surface_beep(), otherwise it does nothing.
 
-Note that the effect of gdk_window_beep() can be configured in many
+Note that the effect of gdk_surface_beep() can be configured in many
 ways, depending on the windowing backend and the desktop environment
 or window manager that is used.
 
@@ -78461,7 +79578,7 @@ details.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the cursor curently in use or %NULL
+<return> the cursor currently in use or %NULL
 to use the default.
 </return>
 </function>
@@ -78641,6 +79758,23 @@ alignment.
 </return>
 </function>
 
+<function name="gtk_widget_get_has_surface">
+<description>
+Determines whether @widget has a #GdkSurface of its own. See
+gtk_widget_set_has_surface().
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @widget has a surface, %FALSE otherwise
+</return>
+</function>
+
 <function name="gtk_widget_get_has_tooltip">
 <description>
 Returns the current value of the has-tooltip property.  See
@@ -78655,23 +79789,6 @@ Returns the current value of the has-tooltip property.  See
 </parameter>
 </parameters>
 <return> current value of has-tooltip on @widget.
-</return>
-</function>
-
-<function name="gtk_widget_get_has_window">
-<description>
-Determines whether @widget has a #GdkWindow of its own. See
-gtk_widget_set_has_window().
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @widget has a window, %FALSE otherwise
 </return>
 </function>
 
@@ -78951,7 +80068,7 @@ Returns the parent widget of @widget.
 </return>
 </function>
 
-<function name="gtk_widget_get_parent_window">
+<function name="gtk_widget_get_parent_surface">
 <description>
 Gets @widget’s parent window, or %NULL if it does not have one.
 
@@ -79121,7 +80238,7 @@ Retrieves the internal scale factor that maps from window coordinates
 to the actual device pixels. On traditional systems this is 1, on
 high density outputs, it can be a higher value (typically 2).
 
-See gdk_window_get_scale_factor().
+See gdk_surface_get_scale_factor().
 
 
 </description>
@@ -79258,6 +80375,22 @@ gtk_widget_set_support_multidevice() for more information.
 </parameter>
 </parameters>
 <return> %TRUE if @widget is multidevice aware.
+</return>
+</function>
+
+<function name="gtk_widget_get_surface">
+<description>
+Returns the widget’s surface if it is realized, %NULL otherwise
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> @widget’s surface.
 </return>
 </function>
 
@@ -79484,22 +80617,6 @@ events, see gtk_widget_contains().
 </return>
 </function>
 
-<function name="gtk_widget_get_window">
-<description>
-Returns the widget’s window if it is realized, %NULL otherwise
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> @widget’s window.
-</return>
-</function>
-
 <function name="gtk_widget_grab_default">
 <description>
 Causes @widget to become the default widget. @widget must be able to be
@@ -79688,9 +80805,9 @@ should take precedence over properties set in the private template XML.
 
 <function name="gtk_widget_input_shape_combine_region">
 <description>
-Sets an input shape for this widget’s GDK window. This allows for
+Sets an input shape for this widget’s GDK surface. This allows for
 windows which react to mouse click in a nonrectangular region, see
-gdk_window_input_shape_combine_region() for more information.
+gdk_surface_input_shape_combine_region() for more information.
 
 </description>
 <parameters>
@@ -81048,7 +82165,7 @@ except that the widget is not invalidated.
 <function name="gtk_widget_realize">
 <description>
 Creates the GDK (windowing system) resources associated with a
-widget.  For example, @widget-&gt;window will be created when a widget
+widget.  For example, @widget-&gt;surface will be created when a widget
 is realized.  Normally realization happens implicitly; if you show
 a widget and all its parent containers, then the widget will be
 realized and mapped automatically.
@@ -81076,14 +82193,14 @@ called after the widget is realized automatically, such as
 <return></return>
 </function>
 
-<function name="gtk_widget_register_window">
+<function name="gtk_widget_register_surface">
 <description>
-Registers a #GdkWindow with the widget and sets it up so that
-the widget receives events for it. Call gtk_widget_unregister_window()
-when destroying the window.
+Registers a #GdkSurface with the widget and sets it up so that
+the widget receives events for it. Call gtk_widget_unregister_surface()
+when destroying the surface.
 
-Before 3.8 you needed to call gdk_window_set_user_data() directly to set
-this up. This is now deprecated and you should use gtk_widget_register_window()
+Before 3.8 you needed to call gdk_surface_set_user_data() directly to set
+this up. This is now deprecated and you should use gtk_widget_register_surface()
 instead. Old code will keep working as is, although some new features like
 transparency might not work perfectly.
 
@@ -81093,8 +82210,8 @@ transparency might not work perfectly.
 <parameter_description> a #GtkWidget
 </parameter_description>
 </parameter>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="surface">
+<parameter_description> a #GdkSurface
 </parameter_description>
 </parameter>
 </parameters>
@@ -81205,9 +82322,9 @@ GdkEvent *fevent = gdk_event_new (GDK_FOCUS_CHANGE);
 
 fevent-&gt;focus_change.type = GDK_FOCUS_CHANGE;
 fevent-&gt;focus_change.in = TRUE;
-fevent-&gt;focus_change.window = _gtk_widget_get_window (widget);
-if (fevent-&gt;focus_change.window != NULL)
-g_object_ref (fevent-&gt;focus_change.window);
+fevent-&gt;focus_change.surface = _gtk_widget_get_surface (widget);
+if (fevent-&gt;focus_change.surface != NULL)
+g_object_ref (fevent-&gt;focus_change.surface);
 
 gtk_widget_send_focus_change (widget, fevent);
 
@@ -81396,7 +82513,7 @@ cursor
 <description>
 Sets a named cursor to be shown when pointer devices point towards @widget.
 
-This is a utility function that calls creates a cursor via
+This is a utility function that creates a cursor via
 gdk_cursor_new_from_name() and then sets it on @widget with
 gtk_widget_set_cursor(). See those 2 functions for details.
 
@@ -81543,6 +82660,33 @@ See the #GtkWidget:halign property.
 <return></return>
 </function>
 
+<function name="gtk_widget_set_has_surface">
+<description>
+Specifies whether @widget has a #GdkSurface of its own. Note that
+all realized widgets have a non-%NULL “window” pointer
+(gtk_widget_get_surface() never returns a %NULL surface when a widget
+is realized), but for many of them it’s actually the #GdkSurface of
+one of its parent widgets. Widgets that do not create a %window for
+themselves in #GtkWidget::realize must announce this by
+calling this function with @has_surface = %FALSE.
+
+This function should only be called by widget implementations,
+and they should call it in their init() function.
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="has_surface">
+<parameter_description> whether or not @widget has a surface.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_set_has_tooltip">
 <description>
 Sets the has-tooltip property on @widget to @has_tooltip.  See
@@ -81556,33 +82700,6 @@ Sets the has-tooltip property on @widget to @has_tooltip.  See
 </parameter>
 <parameter name="has_tooltip">
 <parameter_description> whether or not @widget has a tooltip.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_set_has_window">
-<description>
-Specifies whether @widget has a #GdkWindow of its own. Note that
-all realized widgets have a non-%NULL “window” pointer
-(gtk_widget_get_window() never returns a %NULL window when a widget
-is realized), but for many of them it’s actually the #GdkWindow of
-one of its parent widgets. Widgets that do not create a %window for
-themselves in #GtkWidget::realize must announce this by
-calling this function with @has_window = %FALSE.
-
-This function should only be called by widget implementations,
-and they should call it in their init() function.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="has_window">
-<parameter_description> whether or not @widget has a window.
 </parameter_description>
 </parameter>
 </parameters>
@@ -81818,11 +82935,11 @@ function is gtk_widget_unparent().
 <return></return>
 </function>
 
-<function name="gtk_widget_set_parent_window">
+<function name="gtk_widget_set_parent_surface">
 <description>
 Sets a non default parent window for @widget.
 
-For #GtkWindow classes, setting a @parent_window effects whether
+For #GtkWindow classes, setting a @parent_surface effects whether
 the window is a toplevel window or can be embedded into other
 widgets.
 
@@ -81835,7 +82952,7 @@ window is realized.
 <parameter_description> a #GtkWidget.
 </parameter_description>
 </parameter>
-<parameter name="parent_window">
+<parameter name="parent_surface">
 <parameter_description> the new parent window.
 </parameter_description>
 </parameter>
@@ -81846,7 +82963,7 @@ window is realized.
 <function name="gtk_widget_set_realized">
 <description>
 Marks the widget as being realized. This function must only be 
-called after all #GdkWindows for the @widget have been created 
+called after all #GdkSurfaces for the @widget have been created 
 and registered.
 
 This function should only ever be called in a derived widget's
@@ -81999,8 +83116,8 @@ gtk_widget_is_sensitive() will make use of these.
 <description>
 Enables or disables multiple pointer awareness. If this setting is %TRUE,
 @widget will start receiving multiple, per device enter/leave events. Note
-that if custom #GdkWindows are created in #GtkWidget::realize,
-gdk_window_set_support_multidevice() will have to be called manually on them.
+that if custom #GdkSurfaces are created in #GtkWidget::realize,
+gdk_surface_set_support_multidevice() will have to be called manually on them.
 
 </description>
 <parameters>
@@ -82010,6 +83127,34 @@ gdk_window_set_support_multidevice() will have to be called manually on them.
 </parameter>
 <parameter name="support_multidevice">
 <parameter_description> %TRUE to support input from multiple devices.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_set_surface">
+<description>
+Sets a widget’s surface. This function should only be used in a
+widget’s #GtkWidget::realize implementation. The %surface passed is
+usually either new surface created with gdk_surface_new(), or the
+surface of its parent widget as returned by
+gtk_widget_get_parent_surface().
+
+Widgets must indicate whether they will create their own #GdkSurface
+by calling gtk_widget_set_has_surface(). This is usually done in the
+widget’s init() function.
+
+Note that this function does not add any reference to @surface.
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> a #GdkSurface
 </parameter_description>
 </parameter>
 </parameters>
@@ -82164,54 +83309,6 @@ some condition.
 </parameter>
 <parameter name="visible">
 <parameter_description> whether the widget should be shown or not
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_set_window">
-<description>
-Sets a widget’s window. This function should only be used in a
-widget’s #GtkWidget::realize implementation. The %window passed is
-usually either new window created with gdk_window_new(), or the
-window of its parent widget as returned by
-gtk_widget_get_parent_window().
-
-Widgets must indicate whether they will create their own #GdkWindow
-by calling gtk_widget_set_has_window(). This is usually done in the
-widget’s init() function.
-
-Note that this function does not add any reference to @window.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="window">
-<parameter_description> a #GdkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_shape_combine_region">
-<description>
-Sets a shape for this widget’s GDK window. This allows for
-transparent windows etc., see gdk_window_shape_combine_region()
-for more information.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> shape to be added, or %NULL to remove an existing shape
 </parameter_description>
 </parameter>
 </parameters>
@@ -82413,7 +83510,7 @@ from the parent.
 <description>
 This function is only useful in widget implementations.
 Causes a widget to be unrealized (frees all GDK resources
-associated with the widget, such as @widget-&gt;window).
+associated with the widget, such as @widget-&gt;surface).
 
 </description>
 <parameters>
@@ -82425,10 +83522,10 @@ associated with the widget, such as @widget-&gt;window).
 <return></return>
 </function>
 
-<function name="gtk_widget_unregister_window">
+<function name="gtk_widget_unregister_surface">
 <description>
-Unregisters a #GdkWindow from the widget that was previously set up with
-gtk_widget_register_window(). You need to call this when the window is
+Unregisters a #GdkSurface from the widget that was previously set up with
+gtk_widget_register_surface(). You need to call this when the surface is
 no longer used by the widget, such as when you destroy it.
 
 </description>
@@ -82437,8 +83534,8 @@ no longer used by the widget, such as when you destroy it.
 <parameter_description> a #GtkWidget
 </parameter_description>
 </parameter>
-<parameter name="window">
-<parameter_description> a #GdkWindow
+<parameter name="surface">
+<parameter_description> a #GdkSurface
 </parameter_description>
 </parameter>
 </parameters>
@@ -82665,7 +83762,7 @@ afterward, because other entities (e.g. the user or
 [window manager][gtk-X11-arch])) could iconify it
 again before your code which assumes deiconification gets to run.
 
-You can track iconification via the #GdkWindow::state property.
+You can track iconification via the #GdkSurface::state property.
 
 </description>
 <parameters>
@@ -82687,7 +83784,7 @@ again, and not all window managers honor requests to fullscreen
 windows. But normally the window will end up fullscreen. Just
 don’t write code that crashes if not.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 </description>
 <parameters>
@@ -82704,7 +83801,7 @@ You can track iconification via the #GdkWindow::state property
 Asks to place @window in the fullscreen state. Note that you shouldn't assume
 the window is definitely full screen afterward.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 </description>
 <parameters>
@@ -83566,7 +84663,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be iconified before it ever appears
 onscreen.
 
-You can track iconification via the #GdkWindow::state property.
+You can track iconification via the #GdkSurface::state property.
 
 </description>
 <parameters>
@@ -83651,7 +84748,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be maximized when it appears onscreen
 initially.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 or by listening to notifications on the #GtkWindow:is-maximized property.
 
 </description>
@@ -84574,7 +85671,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be kept above when it appears onscreen
 initially.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 Note that, according to the
 [Extended Window Manager Hints Specification](http://www.freedesktop.org/Standards/wm-spec),
@@ -84610,7 +85707,7 @@ It’s permitted to call this function before showing a window,
 in which case the window will be kept below when it appears onscreen
 initially.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 Note that, according to the
 [Extended Window Manager Hints Specification](http://www.freedesktop.org/Standards/wm-spec),
@@ -84809,7 +85906,7 @@ the window in the task bar. This function sets this hint.
 Startup notification identifiers are used by desktop environment to 
 track application startup, to provide user feedback and other 
 features. This function changes the corresponding property on the
-underlying GdkWindow. Normally, startup identifier is managed 
+underlying GdkSurface. Normally, startup identifier is managed 
 automatically and you should only use this function in special cases
 like transferring focus from other processes. You should use this
 function before calling gtk_window_present() or any equivalent
@@ -84899,7 +85996,7 @@ Passing %NULL for @parent unsets the current transient window.
 On Wayland, this function can also be used to attach a new
 #GTK_WINDOW_POPUP to a #GTK_WINDOW_TOPLEVEL parent already mapped
 on screen so that the #GTK_WINDOW_POPUP will be created as a
-subsurface-based window #GDK_WINDOW_SUBSURFACE which can be
+subsurface-based window #GDK_SURFACE_SUBSURFACE which can be
 positioned at will relatively to the #GTK_WINDOW_TOPLEVEL surface.
 
 On Windows, this function puts the child window on top of the parent,
@@ -84976,7 +86073,7 @@ write code that crashes if not.
 
 It’s permitted to call this function before showing a window.
 
-You can track iconification via the #GdkWindow::state property.
+You can track iconification via the #GdkSurface::state property.
 
 </description>
 <parameters>
@@ -84998,7 +86095,7 @@ again, and not all window managers honor requests to unfullscreen
 windows. But normally the window will end up restored to its normal
 state. Just don’t write code that crashes if not.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 </description>
 <parameters>
@@ -85019,7 +86116,7 @@ could maximize it again, and not all window
 managers honor requests to unmaximize. But normally the window will
 end up unmaximized. Just don’t write code that crashes if not.
 
-You can track iconification via the #GdkWindow::state property
+You can track iconification via the #GdkSurface::state property
 
 </description>
 <parameters>
@@ -85040,7 +86137,7 @@ window is definitely unstuck afterward, because other entities
 stick it again. But normally the window will
 end up stuck. Just don’t write code that crashes if not.
 
-You can track iconification via the #GdkWindow::state property.
+You can track iconification via the #GdkSurface::state property.
 
 </description>
 <parameters>

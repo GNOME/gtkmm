@@ -2077,14 +2077,16 @@
   )
 )
 
-(define-enum FontChooserLevel
+(define-flags FontChooserLevel
   (in-module "Gtk")
   (c-name "GtkFontChooserLevel")
   (gtype-id "GTK_TYPE_FONT_CHOOSER_LEVEL")
   (values
-    '("font" "GTK_FONT_CHOOSER_LEVEL_FONT")
-    '("face" "GTK_FONT_CHOOSER_LEVEL_FACE")
     '("family" "GTK_FONT_CHOOSER_LEVEL_FAMILY")
+    '("style" "GTK_FONT_CHOOSER_LEVEL_STYLE")
+    '("size" "GTK_FONT_CHOOSER_LEVEL_SIZE")
+    '("variation" "GTK_FONT_CHOOSER_LEVEL_VARIATION")
+    '("features" "GTK_FONT_CHOOSER_LEVEL_FEATURES")
   )
 )
 
@@ -2154,8 +2156,7 @@
     '("empty" "GTK_IMAGE_EMPTY")
     '("icon-name" "GTK_IMAGE_ICON_NAME")
     '("gicon" "GTK_IMAGE_GICON")
-    '("surface" "GTK_IMAGE_SURFACE")
-    '("texture" "GTK_IMAGE_TEXTURE")
+    '("paintable" "GTK_IMAGE_PAINTABLE")
   )
 )
 
@@ -2615,16 +2616,6 @@
   (return-type "GType")
 )
 
-(define-function gsk_pango_show_layout
-  (c-name "gsk_pango_show_layout")
-  (return-type "none")
-  (parameters
-    '("GtkSnapshot*" "snapshot")
-    '("const-GdkRGBA*" "fg_color")
-    '("PangoLayout*" "layout")
-  )
-)
-
 
 
 ;; From gtk-a11y.h
@@ -2867,7 +2858,7 @@
 (define-method get_logo
   (of-object "GtkAboutDialog")
   (c-name "gtk_about_dialog_get_logo")
-  (return-type "GdkTexture*")
+  (return-type "GdkPaintable*")
 )
 
 (define-method set_logo
@@ -2875,7 +2866,7 @@
   (c-name "gtk_about_dialog_set_logo")
   (return-type "none")
   (parameters
-    '("GdkTexture*" "logo")
+    '("GdkPaintable*" "logo")
   )
 )
 
@@ -8125,21 +8116,12 @@
   )
 )
 
-(define-function gtk_drag_set_icon_surface
-  (c-name "gtk_drag_set_icon_surface")
+(define-function gtk_drag_set_icon_paintable
+  (c-name "gtk_drag_set_icon_paintable")
   (return-type "none")
   (parameters
     '("GdkDragContext*" "context")
-    '("cairo_surface_t*" "surface")
-  )
-)
-
-(define-function gtk_drag_set_icon_texture
-  (c-name "gtk_drag_set_icon_texture")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "paintable")
     '("int" "hot_x")
     '("int" "hot_y")
   )
@@ -8342,15 +8324,6 @@
   )
 )
 
-(define-function gtk_drag_source_set_icon_surface
-  (c-name "gtk_drag_source_set_icon_surface")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("cairo_surface_t*" "surface")
-  )
-)
-
 (define-function gtk_drag_source_set_icon_name
   (c-name "gtk_drag_source_set_icon_name")
   (return-type "none")
@@ -8366,6 +8339,15 @@
   (parameters
     '("GtkWidget*" "widget")
     '("GIcon*" "icon")
+  )
+)
+
+(define-function gtk_drag_source_set_icon_paintable
+  (c-name "gtk_drag_source_set_icon_paintable")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("GdkPaintable*" "paintable")
   )
 )
 
@@ -9174,13 +9156,13 @@
   )
 )
 
-(define-method set_icon_from_texture
+(define-method set_icon_from_paintable
   (of-object "GtkEntry")
-  (c-name "gtk_entry_set_icon_from_texture")
+  (c-name "gtk_entry_set_icon_from_paintable")
   (return-type "none")
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "paintable")
   )
 )
 
@@ -9213,10 +9195,10 @@
   )
 )
 
-(define-method get_icon_texture
+(define-method get_icon_paintable
   (of-object "GtkEntry")
-  (c-name "gtk_entry_get_icon_texture")
-  (return-type "GdkTexture*")
+  (c-name "gtk_entry_get_icon_paintable")
+  (return-type "GdkPaintable*")
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
   )
@@ -11040,18 +11022,13 @@
   (return-type "none")
   (parameters
     '("gfloat" "xalign")
-    '("gfloat" "yalign")
   )
 )
 
 (define-method get_label_align
   (of-object "GtkFrame")
   (c-name "gtk_frame_get_label_align")
-  (return-type "none")
-  (parameters
-    '("gfloat*" "xalign")
-    '("gfloat*" "yalign")
-  )
+  (return-type "gfloat")
 )
 
 (define-method set_shadow_type
@@ -12121,20 +12098,6 @@
   )
 )
 
-(define-method load_surface
-  (of-object "GtkIconTheme")
-  (c-name "gtk_icon_theme_load_surface")
-  (return-type "cairo_surface_t*")
-  (parameters
-    '("const-gchar*" "icon_name")
-    '("gint" "size")
-    '("gint" "scale")
-    '("GdkWindow*" "for_window")
-    '("GtkIconLookupFlags" "flags")
-    '("GError**" "error")
-  )
-)
-
 (define-method lookup_by_gicon
   (of-object "GtkIconTheme")
   (c-name "gtk_icon_theme_lookup_by_gicon")
@@ -12228,16 +12191,6 @@
   (c-name "gtk_icon_info_load_icon")
   (return-type "GdkPixbuf*")
   (parameters
-    '("GError**" "error")
-  )
-)
-
-(define-method load_surface
-  (of-object "GtkIconInfo")
-  (c-name "gtk_icon_info_load_surface")
-  (return-type "cairo_surface_t*")
-  (parameters
-    '("GdkWindow*" "for_window")
     '("GError**" "error")
   )
 )
@@ -12814,7 +12767,7 @@
 (define-method create_drag_icon
   (of-object "GtkIconView")
   (c-name "gtk_icon_view_create_drag_icon")
-  (return-type "cairo_surface_t*")
+  (return-type "GdkPaintable*")
   (parameters
     '("GtkTreePath*" "path")
   )
@@ -12920,11 +12873,11 @@
   )
 )
 
-(define-function gtk_image_new_from_texture
-  (c-name "gtk_image_new_from_texture")
+(define-function gtk_image_new_from_paintable
+  (c-name "gtk_image_new_from_paintable")
   (return-type "GtkWidget*")
   (parameters
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "paintable")
   )
 )
 
@@ -12941,14 +12894,6 @@
   (return-type "GtkWidget*")
   (parameters
     '("GIcon*" "icon")
-  )
-)
-
-(define-function gtk_image_new_from_surface
-  (c-name "gtk_image_new_from_surface")
-  (return-type "GtkWidget*")
-  (parameters
-    '("cairo_surface_t*" "surface")
   )
 )
 
@@ -12985,12 +12930,12 @@
   )
 )
 
-(define-method set_from_texture
+(define-method set_from_paintable
   (of-object "GtkImage")
-  (c-name "gtk_image_set_from_texture")
+  (c-name "gtk_image_set_from_paintable")
   (return-type "none")
   (parameters
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "paintable")
   )
 )
 
@@ -13012,15 +12957,6 @@
   )
 )
 
-(define-method set_from_surface
-  (of-object "GtkImage")
-  (c-name "gtk_image_set_from_surface")
-  (return-type "none")
-  (parameters
-    '("cairo_surface_t*" "surface")
-  )
-)
-
 (define-method set_pixel_size
   (of-object "GtkImage")
   (c-name "gtk_image_set_pixel_size")
@@ -13039,22 +12975,34 @@
   )
 )
 
+(define-method set_keep_aspect_ratio
+  (of-object "GtkImage")
+  (c-name "gtk_image_set_keep_aspect_ratio")
+  (return-type "none")
+  (parameters
+    '("gboolean" "keep_aspect_ratio")
+  )
+)
+
+(define-method set_can_shrink
+  (of-object "GtkImage")
+  (c-name "gtk_image_set_can_shrink")
+  (return-type "none")
+  (parameters
+    '("gboolean" "can_shrink")
+  )
+)
+
 (define-method get_storage_type
   (of-object "GtkImage")
   (c-name "gtk_image_get_storage_type")
   (return-type "GtkImageType")
 )
 
-(define-method get_surface
+(define-method get_paintable
   (of-object "GtkImage")
-  (c-name "gtk_image_get_surface")
-  (return-type "cairo_surface_t*")
-)
-
-(define-method get_texture
-  (of-object "GtkImage")
-  (c-name "gtk_image_get_texture")
-  (return-type "GdkTexture*")
+  (c-name "gtk_image_get_paintable")
+  (return-type "GdkPaintable*")
 )
 
 (define-method get_icon_name
@@ -13079,6 +13027,18 @@
   (of-object "GtkImage")
   (c-name "gtk_image_get_icon_size")
   (return-type "GtkIconSize")
+)
+
+(define-method get_keep_aspect_ratio
+  (of-object "GtkImage")
+  (c-name "gtk_image_get_keep_aspect_ratio")
+  (return-type "gboolean")
+)
+
+(define-method get_can_shrink
+  (of-object "GtkImage")
+  (c-name "gtk_image_get_can_shrink")
+  (return-type "gboolean")
 )
 
 
@@ -13198,6 +13158,11 @@
 
 
 ;; From gtkimcontextime.h
+
+(define-function gtk_im_context_ime_get_type
+  (c-name "gtk_im_context_ime_get_type")
+  (return-type "GType")
+)
 
 (define-function gtk_im_context_ime_register_type
   (c-name "gtk_im_context_ime_register_type")
@@ -13507,41 +13472,6 @@
 
 
 ;; From gtkkeyhash.h
-
-
-
-;; From gtkkineticscrolling.h
-
-(define-function gtk_kinetic_scrolling_new
-  (c-name "gtk_kinetic_scrolling_new")
-  (is-constructor-of "GtkKineticScrolling")
-  (return-type "GtkKineticScrolling*")
-  (parameters
-    '("gdouble" "lower")
-    '("gdouble" "upper")
-    '("gdouble" "overshoot_width")
-    '("gdouble" "decel_friction")
-    '("gdouble" "overshoot_friction")
-    '("gdouble" "initial_position")
-    '("gdouble" "initial_velocity")
-  )
-)
-
-(define-method free
-  (of-object "GtkKineticScrolling")
-  (c-name "gtk_kinetic_scrolling_free")
-  (return-type "none")
-)
-
-(define-method tick
-  (of-object "GtkKineticScrolling")
-  (c-name "gtk_kinetic_scrolling_tick")
-  (return-type "gboolean")
-  (parameters
-    '("gdouble" "time_delta")
-    '("gdouble*" "position")
-  )
-)
 
 
 
@@ -14952,6 +14882,365 @@
 
 
 
+;; From gtkmediacontrols.h
+
+(define-function gtk_media_controls_new
+  (c-name "gtk_media_controls_new")
+  (is-constructor-of "GtkMediaControls")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GtkMediaStream*" "stream")
+  )
+)
+
+(define-method get_media_stream
+  (of-object "GtkMediaControls")
+  (c-name "gtk_media_controls_get_media_stream")
+  (return-type "GtkMediaStream*")
+)
+
+(define-method set_media_stream
+  (of-object "GtkMediaControls")
+  (c-name "gtk_media_controls_set_media_stream")
+  (return-type "none")
+  (parameters
+    '("GtkMediaStream*" "stream")
+  )
+)
+
+
+
+;; From gtkmediafile.h
+
+(define-function gtk_media_file_new
+  (c-name "gtk_media_file_new")
+  (is-constructor-of "GtkMediaFile")
+  (return-type "GtkMediaStream*")
+)
+
+(define-function gtk_media_file_new_for_filename
+  (c-name "gtk_media_file_new_for_filename")
+  (return-type "GtkMediaStream*")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-function gtk_media_file_new_for_resource
+  (c-name "gtk_media_file_new_for_resource")
+  (return-type "GtkMediaStream*")
+  (parameters
+    '("const-char*" "resource_path")
+  )
+)
+
+(define-function gtk_media_file_new_for_file
+  (c-name "gtk_media_file_new_for_file")
+  (return-type "GtkMediaStream*")
+  (parameters
+    '("GFile*" "file")
+  )
+)
+
+(define-function gtk_media_file_new_for_input_stream
+  (c-name "gtk_media_file_new_for_input_stream")
+  (return-type "GtkMediaStream*")
+  (parameters
+    '("GInputStream*" "stream")
+  )
+)
+
+(define-method clear
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_clear")
+  (return-type "none")
+)
+
+(define-method set_filename
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_set_filename")
+  (return-type "none")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-method set_resource
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_set_resource")
+  (return-type "none")
+  (parameters
+    '("const-char*" "resource_path")
+  )
+)
+
+(define-method set_file
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_set_file")
+  (return-type "none")
+  (parameters
+    '("GFile*" "file")
+  )
+)
+
+(define-method get_file
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_get_file")
+  (return-type "GFile*")
+)
+
+(define-method set_input_stream
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_set_input_stream")
+  (return-type "none")
+  (parameters
+    '("GInputStream*" "stream")
+  )
+)
+
+(define-method get_input_stream
+  (of-object "GtkMediaFile")
+  (c-name "gtk_media_file_get_input_stream")
+  (return-type "GInputStream*")
+)
+
+
+
+;; From gtkmediastream.h
+
+(define-method is_prepared
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_is_prepared")
+  (return-type "gboolean")
+)
+
+(define-method get_error
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_error")
+  (return-type "const-GError*")
+)
+
+(define-method has_audio
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_has_audio")
+  (return-type "gboolean")
+)
+
+(define-method has_video
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_has_video")
+  (return-type "gboolean")
+)
+
+(define-method play
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_play")
+  (return-type "none")
+)
+
+(define-method pause
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_pause")
+  (return-type "none")
+)
+
+(define-method get_playing
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_playing")
+  (return-type "gboolean")
+)
+
+(define-method set_playing
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_set_playing")
+  (return-type "none")
+  (parameters
+    '("gboolean" "playing")
+  )
+)
+
+(define-method get_ended
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_ended")
+  (return-type "gboolean")
+)
+
+(define-method get_timestamp
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_timestamp")
+  (return-type "gint64")
+)
+
+(define-method get_duration
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_duration")
+  (return-type "gint64")
+)
+
+(define-method is_seekable
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_is_seekable")
+  (return-type "gboolean")
+)
+
+(define-method is_seeking
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_is_seeking")
+  (return-type "gboolean")
+)
+
+(define-method seek
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_seek")
+  (return-type "none")
+  (parameters
+    '("gint64" "timestamp")
+  )
+)
+
+(define-method get_loop
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_loop")
+  (return-type "gboolean")
+)
+
+(define-method set_loop
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_set_loop")
+  (return-type "none")
+  (parameters
+    '("gboolean" "loop")
+  )
+)
+
+(define-method get_muted
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_muted")
+  (return-type "gboolean")
+)
+
+(define-method set_muted
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_set_muted")
+  (return-type "none")
+  (parameters
+    '("gboolean" "muted")
+  )
+)
+
+(define-method get_volume
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_get_volume")
+  (return-type "double")
+)
+
+(define-method set_volume
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_set_volume")
+  (return-type "none")
+  (parameters
+    '("double" "volume")
+  )
+)
+
+(define-method realize
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_realize")
+  (return-type "none")
+  (parameters
+    '("GdkSurface*" "surface")
+  )
+)
+
+(define-method unrealize
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_unrealize")
+  (return-type "none")
+  (parameters
+    '("GdkSurface*" "surface")
+  )
+)
+
+(define-method prepared
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_prepared")
+  (return-type "none")
+  (parameters
+    '("gboolean" "has_audio")
+    '("gboolean" "has_video")
+    '("gboolean" "seekable")
+    '("gint64" "duration")
+  )
+)
+
+(define-method unprepared
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_unprepared")
+  (return-type "none")
+)
+
+(define-method update
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_update")
+  (return-type "none")
+  (parameters
+    '("gint64" "timestamp")
+  )
+)
+
+(define-method ended
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_ended")
+  (return-type "none")
+)
+
+(define-method seek_success
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_seek_success")
+  (return-type "none")
+)
+
+(define-method seek_failed
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_seek_failed")
+  (return-type "none")
+)
+
+(define-method gerror
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_gerror")
+  (return-type "none")
+  (parameters
+    '("GError*" "error")
+  )
+)
+
+(define-method error
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_error")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-method error_valist
+  (of-object "GtkMediaStream")
+  (c-name "gtk_media_stream_error_valist")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-gchar*" "format")
+    '("va_list" "args")
+  )
+)
+
+
+
 ;; From gtkmenubar.h
 
 (define-function gtk_menu_bar_get_type
@@ -15166,7 +15455,7 @@
   (c-name "gtk_menu_popup_at_rect")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "rect_window")
+    '("GdkSurface*" "rect_surface")
     '("const-GdkRectangle*" "rect")
     '("GdkGravity" "rect_anchor")
     '("GdkGravity" "menu_anchor")
@@ -21433,21 +21722,6 @@
   )
 )
 
-(define-method get_surface
-  (of-object "GtkSelectionData")
-  (c-name "gtk_selection_data_get_surface")
-  (return-type "cairo_surface_t*")
-)
-
-(define-method set_surface
-  (of-object "GtkSelectionData")
-  (c-name "gtk_selection_data_set_surface")
-  (return-type "gboolean")
-  (parameters
-    '("cairo_surface_t*" "surface")
-  )
-)
-
 (define-method get_pixbuf
   (of-object "GtkSelectionData")
   (c-name "gtk_selection_data_get_pixbuf")
@@ -21878,6 +22152,48 @@
 
 ;; From gtksnapshot.h
 
+(define-function gtk_snapshot_new
+  (c-name "gtk_snapshot_new")
+  (is-constructor-of "GtkSnapshot")
+  (return-type "GtkSnapshot*")
+  (parameters
+    '("gboolean" "record_names")
+    '("const-cairo_region_t*" "clip")
+    '("const-char*" "name")
+  )
+  (varargs #t)
+)
+
+(define-method free_to_node
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_free_to_node")
+  (return-type "GskRenderNode*")
+)
+
+(define-method free_to_paintable
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_free_to_paintable")
+  (return-type "GdkPaintable*")
+)
+
+(define-method to_node
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_to_node")
+  (return-type "GskRenderNode*")
+)
+
+(define-method to_paintable
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_to_paintable")
+  (return-type "GdkPaintable*")
+)
+
+(define-method get_record_names
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_get_record_names")
+  (return-type "gboolean")
+)
+
 (define-method push
   (of-object "GtkSnapshot")
   (c-name "gtk_snapshot_push")
@@ -22067,6 +22383,18 @@
   (parameters
     '("const-GdkRGBA*" "color")
     '("const-graphene_rect_t*" "bounds")
+    '("const-char*" "name")
+  )
+  (varargs #t)
+)
+
+(define-method append_layout
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_append_layout")
+  (return-type "none")
+  (parameters
+    '("PangoLayout*" "layout")
+    '("const-GdkRGBA*" "color")
     '("const-char*" "name")
   )
   (varargs #t)
@@ -24722,6 +25050,27 @@
 
 ;; From gtktextutil.h
 
+(define-function gtk_text_util_create_drag_icon
+  (c-name "gtk_text_util_create_drag_icon")
+  (return-type "GdkPaintable*")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("gchar*" "text")
+    '("gsize" "len")
+  )
+)
+
+(define-function gtk_text_util_create_rich_drag_icon
+  (c-name "gtk_text_util_create_rich_drag_icon")
+  (return-type "GdkPaintable*")
+  (parameters
+    '("GtkWidget*" "widget")
+    '("GtkTextBuffer*" "buffer")
+    '("GtkTextIter*" "start")
+    '("GtkTextIter*" "end")
+  )
+)
+
 
 
 ;; From gtktextview.h
@@ -24906,9 +25255,9 @@
   )
 )
 
-(define-method buffer_to_window_coords
+(define-method buffer_to_surface_coords
   (of-object "GtkTextView")
-  (c-name "gtk_text_view_buffer_to_window_coords")
+  (c-name "gtk_text_view_buffer_to_surface_coords")
   (return-type "none")
   (parameters
     '("GtkTextWindowType" "win")
@@ -25854,7 +26203,7 @@
   (c-name "gtk_tooltip_set_icon")
   (return-type "none")
   (parameters
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "paintable")
   )
 )
 
@@ -28091,7 +28440,7 @@
 (define-method create_row_drag_icon
   (of-object "GtkTreeView")
   (c-name "gtk_tree_view_create_row_drag_icon")
-  (return-type "cairo_surface_t*")
+  (return-type "GdkPaintable*")
   (parameters
     '("GtkTreePath*" "path")
   )
@@ -28453,6 +28802,96 @@
 
 
 ;; From gtkunixprint.h
+
+
+
+;; From gtkvideo.h
+
+(define-function gtk_video_new
+  (c-name "gtk_video_new")
+  (is-constructor-of "GtkVideo")
+  (return-type "GtkWidget*")
+)
+
+(define-function gtk_video_new_for_media_stream
+  (c-name "gtk_video_new_for_media_stream")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GtkMediaStream*" "stream")
+  )
+)
+
+(define-function gtk_video_new_for_file
+  (c-name "gtk_video_new_for_file")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GFile*" "file")
+  )
+)
+
+(define-function gtk_video_new_for_filename
+  (c-name "gtk_video_new_for_filename")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-function gtk_video_new_for_resource
+  (c-name "gtk_video_new_for_resource")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-char*" "resource_path")
+  )
+)
+
+(define-method get_media_stream
+  (of-object "GtkVideo")
+  (c-name "gtk_video_get_media_stream")
+  (return-type "GtkMediaStream*")
+)
+
+(define-method set_media_stream
+  (of-object "GtkVideo")
+  (c-name "gtk_video_set_media_stream")
+  (return-type "none")
+  (parameters
+    '("GtkMediaStream*" "stream")
+  )
+)
+
+(define-method get_file
+  (of-object "GtkVideo")
+  (c-name "gtk_video_get_file")
+  (return-type "GFile*")
+)
+
+(define-method set_file
+  (of-object "GtkVideo")
+  (c-name "gtk_video_set_file")
+  (return-type "none")
+  (parameters
+    '("GFile*" "file")
+  )
+)
+
+(define-method set_filename
+  (of-object "GtkVideo")
+  (c-name "gtk_video_set_filename")
+  (return-type "none")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-method set_resource
+  (of-object "GtkVideo")
+  (c-name "gtk_video_set_resource")
+  (return-type "none")
+  (parameters
+    '("const-char*" "resource_path")
+  )
+)
 
 
 
@@ -28987,18 +29426,18 @@
   (return-type "gboolean")
 )
 
-(define-method set_has_window
+(define-method set_has_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_set_has_window")
+  (c-name "gtk_widget_set_has_surface")
   (return-type "none")
   (parameters
-    '("gboolean" "has_window")
+    '("gboolean" "has_surface")
   )
 )
 
-(define-method get_has_window
+(define-method get_has_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_get_has_window")
+  (c-name "gtk_widget_get_has_surface")
   (return-type "gboolean")
 )
 
@@ -29050,19 +29489,19 @@
   (return-type "GtkWidget*")
 )
 
-(define-method set_parent_window
+(define-method set_parent_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_set_parent_window")
+  (c-name "gtk_widget_set_parent_surface")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "parent_window")
+    '("GdkSurface*" "parent_surface")
   )
 )
 
-(define-method get_parent_window
+(define-method get_parent_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_get_parent_window")
-  (return-type "GdkWindow*")
+  (c-name "gtk_widget_get_parent_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method set_child_visible
@@ -29080,36 +29519,36 @@
   (return-type "gboolean")
 )
 
-(define-method set_window
+(define-method set_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_set_window")
+  (c-name "gtk_widget_set_surface")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
   )
 )
 
-(define-method get_window
+(define-method get_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_get_window")
-  (return-type "GdkWindow*")
+  (c-name "gtk_widget_get_surface")
+  (return-type "GdkSurface*")
 )
 
-(define-method register_window
+(define-method register_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_register_window")
+  (c-name "gtk_widget_register_surface")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
   )
 )
 
-(define-method unregister_window
+(define-method unregister_surface
   (of-object "GtkWidget")
-  (c-name "gtk_widget_unregister_window")
+  (c-name "gtk_widget_unregister_surface")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
   )
 )
 
@@ -29589,15 +30028,6 @@
 (define-function gtk_widget_get_default_direction
   (c-name "gtk_widget_get_default_direction")
   (return-type "GtkTextDirection")
-)
-
-(define-method shape_combine_region
-  (of-object "GtkWidget")
-  (c-name "gtk_widget_shape_combine_region")
-  (return-type "none")
-  (parameters
-    '("cairo_region_t*" "region")
-  )
 )
 
 (define-method input_shape_combine_region
@@ -30476,14 +30906,14 @@
   (c-name "gtk_window_set_type_hint")
   (return-type "none")
   (parameters
-    '("GdkWindowTypeHint" "hint")
+    '("GdkSurfaceTypeHint" "hint")
   )
 )
 
 (define-method get_type_hint
   (of-object "GtkWindow")
   (c-name "gtk_window_get_type_hint")
-  (return-type "GdkWindowTypeHint")
+  (return-type "GdkSurfaceTypeHint")
 )
 
 (define-method set_skip_taskbar_hint
@@ -30995,7 +31425,7 @@
   (c-name "gtk_window_begin_resize_drag")
   (return-type "none")
   (parameters
-    '("GdkWindowEdge" "edge")
+    '("GdkSurfaceEdge" "edge")
     '("gint" "button")
     '("gint" "root_x")
     '("gint" "root_y")

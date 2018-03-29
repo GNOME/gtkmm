@@ -7,18 +7,11 @@
   (gtype-id "GDK_TYPE_CONTENT_PROVIDER")
 )
 
-(define-object FrameClockIdle
-  (in-module "Gdk")
-  (parent "GdkFrameClock")
-  (c-name "GdkFrameClockIdle")
-  (gtype-id "GDK_TYPE_FRAME_CLOCK_IDLE")
-)
-
-(define-object WindowImpl
+(define-object SurfaceImpl
   (in-module "Gdk")
   (parent "GObject")
-  (c-name "GdkWindowImpl")
-  (gtype-id "GDK_TYPE_WINDOW_IMPL")
+  (c-name "GdkSurfaceImpl")
+  (gtype-id "GDK_TYPE_SURFACE_IMPL")
 )
 
 ;; Enumerations and flags ...
@@ -47,7 +40,7 @@
   (values
     '("disabled" "GDK_MODE_DISABLED")
     '("screen" "GDK_MODE_SCREEN")
-    '("window" "GDK_MODE_WINDOW")
+    '("surface" "GDK_MODE_SURFACE")
   )
 )
 
@@ -229,6 +222,23 @@
   )
 )
 
+(define-enum MemoryFormat
+  (in-module "Gdk")
+  (c-name "GdkMemoryFormat")
+  (gtype-id "GDK_TYPE_MEMORY_FORMAT")
+  (values
+    '("b8g8r8a8-premultiplied" "GDK_MEMORY_B8G8R8A8_PREMULTIPLIED")
+    '("a8r8g8b8-premultiplied" "GDK_MEMORY_A8R8G8B8_PREMULTIPLIED")
+    '("b8g8r8a8" "GDK_MEMORY_B8G8R8A8")
+    '("a8r8g8b8" "GDK_MEMORY_A8R8G8B8")
+    '("r8g8b8a8" "GDK_MEMORY_R8G8B8A8")
+    '("a8b8g8r8" "GDK_MEMORY_A8B8G8R8")
+    '("r8g8b8" "GDK_MEMORY_R8G8B8")
+    '("b8g8r8" "GDK_MEMORY_B8G8R8")
+    '("n-formats" "GDK_MEMORY_N_FORMATS")
+  )
+)
+
 (define-enum SubpixelLayout
   (in-module "Gdk")
   (c-name "GdkSubpixelLayout")
@@ -240,6 +250,16 @@
     '("horizontal-bgr" "GDK_SUBPIXEL_LAYOUT_HORIZONTAL_BGR")
     '("vertical-rgb" "GDK_SUBPIXEL_LAYOUT_VERTICAL_RGB")
     '("vertical-bgr" "GDK_SUBPIXEL_LAYOUT_VERTICAL_BGR")
+  )
+)
+
+(define-flags PaintableFlags
+  (in-module "Gdk")
+  (c-name "GdkPaintableFlags")
+  (gtype-id "GDK_TYPE_PAINTABLE_FLAGS")
+  (values
+    '("size" "GDK_PAINTABLE_STATIC_SIZE")
+    '("contents" "GDK_PAINTABLE_STATIC_CONTENTS")
   )
 )
 
@@ -256,6 +276,151 @@
     '("tablet-pad" "GDK_SEAT_CAPABILITY_TABLET_PAD")
     '("all-pointing" "GDK_SEAT_CAPABILITY_ALL_POINTING")
     '("all" "GDK_SEAT_CAPABILITY_ALL")
+  )
+)
+
+(define-enum SurfaceType
+  (in-module "Gdk")
+  (c-name "GdkSurfaceType")
+  (gtype-id "GDK_TYPE_SURFACE_TYPE")
+  (values
+    '("toplevel" "GDK_SURFACE_TOPLEVEL")
+    '("child" "GDK_SURFACE_CHILD")
+    '("temp" "GDK_SURFACE_TEMP")
+    '("foreign" "GDK_SURFACE_FOREIGN")
+    '("subsurface" "GDK_SURFACE_SUBSURFACE")
+  )
+)
+
+(define-flags SurfaceHints
+  (in-module "Gdk")
+  (c-name "GdkSurfaceHints")
+  (gtype-id "GDK_TYPE_SURFACE_HINTS")
+  (values
+    '("pos" "GDK_HINT_POS")
+    '("min-size" "GDK_HINT_MIN_SIZE")
+    '("max-size" "GDK_HINT_MAX_SIZE")
+    '("base-size" "GDK_HINT_BASE_SIZE")
+    '("aspect" "GDK_HINT_ASPECT")
+    '("resize-inc" "GDK_HINT_RESIZE_INC")
+    '("win-gravity" "GDK_HINT_WIN_GRAVITY")
+    '("user-pos" "GDK_HINT_USER_POS")
+    '("user-size" "GDK_HINT_USER_SIZE")
+  )
+)
+
+(define-flags WMDecoration
+  (in-module "Gdk")
+  (c-name "GdkWMDecoration")
+  (gtype-id "GDK_TYPE_WM_DECORATION")
+  (values
+    '("all" "GDK_DECOR_ALL")
+    '("border" "GDK_DECOR_BORDER")
+    '("resizeh" "GDK_DECOR_RESIZEH")
+    '("title" "GDK_DECOR_TITLE")
+    '("menu" "GDK_DECOR_MENU")
+    '("minimize" "GDK_DECOR_MINIMIZE")
+    '("maximize" "GDK_DECOR_MAXIMIZE")
+  )
+)
+
+(define-flags WMFunction
+  (in-module "Gdk")
+  (c-name "GdkWMFunction")
+  (gtype-id "GDK_TYPE_WM_FUNCTION")
+  (values
+    '("all" "GDK_FUNC_ALL")
+    '("resize" "GDK_FUNC_RESIZE")
+    '("move" "GDK_FUNC_MOVE")
+    '("minimize" "GDK_FUNC_MINIMIZE")
+    '("maximize" "GDK_FUNC_MAXIMIZE")
+    '("close" "GDK_FUNC_CLOSE")
+  )
+)
+
+(define-enum Gravity
+  (in-module "Gdk")
+  (c-name "GdkGravity")
+  (gtype-id "GDK_TYPE_GRAVITY")
+  (values
+    '("north-west" "GDK_GRAVITY_NORTH_WEST")
+    '("north" "GDK_GRAVITY_NORTH")
+    '("north-east" "GDK_GRAVITY_NORTH_EAST")
+    '("west" "GDK_GRAVITY_WEST")
+    '("center" "GDK_GRAVITY_CENTER")
+    '("east" "GDK_GRAVITY_EAST")
+    '("south-west" "GDK_GRAVITY_SOUTH_WEST")
+    '("south" "GDK_GRAVITY_SOUTH")
+    '("south-east" "GDK_GRAVITY_SOUTH_EAST")
+    '("static" "GDK_GRAVITY_STATIC")
+  )
+)
+
+(define-flags AnchorHints
+  (in-module "Gdk")
+  (c-name "GdkAnchorHints")
+  (gtype-id "GDK_TYPE_ANCHOR_HINTS")
+  (values
+    '("flip-x" "GDK_ANCHOR_FLIP_X")
+    '("flip-y" "GDK_ANCHOR_FLIP_Y")
+    '("slide-x" "GDK_ANCHOR_SLIDE_X")
+    '("slide-y" "GDK_ANCHOR_SLIDE_Y")
+    '("resize-x" "GDK_ANCHOR_RESIZE_X")
+    '("resize-y" "GDK_ANCHOR_RESIZE_Y")
+    '("flip" "GDK_ANCHOR_FLIP")
+    '("slide" "GDK_ANCHOR_SLIDE")
+    '("resize" "GDK_ANCHOR_RESIZE")
+  )
+)
+
+(define-enum SurfaceEdge
+  (in-module "Gdk")
+  (c-name "GdkSurfaceEdge")
+  (gtype-id "GDK_TYPE_SURFACE_EDGE")
+  (values
+    '("north-west" "GDK_SURFACE_EDGE_NORTH_WEST")
+    '("north" "GDK_SURFACE_EDGE_NORTH")
+    '("north-east" "GDK_SURFACE_EDGE_NORTH_EAST")
+    '("west" "GDK_SURFACE_EDGE_WEST")
+    '("east" "GDK_SURFACE_EDGE_EAST")
+    '("south-west" "GDK_SURFACE_EDGE_SOUTH_WEST")
+    '("south" "GDK_SURFACE_EDGE_SOUTH")
+    '("south-east" "GDK_SURFACE_EDGE_SOUTH_EAST")
+  )
+)
+
+(define-enum FullscreenMode
+  (in-module "Gdk")
+  (c-name "GdkFullscreenMode")
+  (gtype-id "GDK_TYPE_FULLSCREEN_MODE")
+  (values
+    '("current-monitor" "GDK_FULLSCREEN_ON_CURRENT_MONITOR")
+    '("all-monitors" "GDK_FULLSCREEN_ON_ALL_MONITORS")
+  )
+)
+
+(define-flags SurfaceState
+  (in-module "Gdk")
+  (c-name "GdkSurfaceState")
+  (gtype-id "GDK_TYPE_SURFACE_STATE")
+  (values
+    '("withdrawn" "GDK_SURFACE_STATE_WITHDRAWN")
+    '("iconified" "GDK_SURFACE_STATE_ICONIFIED")
+    '("maximized" "GDK_SURFACE_STATE_MAXIMIZED")
+    '("sticky" "GDK_SURFACE_STATE_STICKY")
+    '("fullscreen" "GDK_SURFACE_STATE_FULLSCREEN")
+    '("above" "GDK_SURFACE_STATE_ABOVE")
+    '("below" "GDK_SURFACE_STATE_BELOW")
+    '("focused" "GDK_SURFACE_STATE_FOCUSED")
+    '("tiled" "GDK_SURFACE_STATE_TILED")
+    '("top-tiled" "GDK_SURFACE_STATE_TOP_TILED")
+    '("top-resizable" "GDK_SURFACE_STATE_TOP_RESIZABLE")
+    '("right-tiled" "GDK_SURFACE_STATE_RIGHT_TILED")
+    '("right-resizable" "GDK_SURFACE_STATE_RIGHT_RESIZABLE")
+    '("bottom-tiled" "GDK_SURFACE_STATE_BOTTOM_TILED")
+    '("bottom-resizable" "GDK_SURFACE_STATE_BOTTOM_RESIZABLE")
+    '("left-tiled" "GDK_SURFACE_STATE_LEFT_TILED")
+    '("left-resizable" "GDK_SURFACE_STATE_LEFT_RESIZABLE")
   )
 )
 
@@ -344,7 +509,7 @@
   (gtype-id "GDK_TYPE_GRAB_OWNERSHIP")
   (values
     '("none" "GDK_OWNERSHIP_NONE")
-    '("window" "GDK_OWNERSHIP_WINDOW")
+    '("surface" "GDK_OWNERSHIP_SURFACE")
     '("application" "GDK_OWNERSHIP_APPLICATION")
   )
 )
@@ -404,25 +569,25 @@
   )
 )
 
-(define-enum WindowTypeHint
+(define-enum SurfaceTypeHint
   (in-module "Gdk")
-  (c-name "GdkWindowTypeHint")
-  (gtype-id "GDK_TYPE_WINDOW_TYPE_HINT")
+  (c-name "GdkSurfaceTypeHint")
+  (gtype-id "GDK_TYPE_SURFACE_TYPE_HINT")
   (values
-    '("normal" "GDK_WINDOW_TYPE_HINT_NORMAL")
-    '("dialog" "GDK_WINDOW_TYPE_HINT_DIALOG")
-    '("menu" "GDK_WINDOW_TYPE_HINT_MENU")
-    '("toolbar" "GDK_WINDOW_TYPE_HINT_TOOLBAR")
-    '("splashscreen" "GDK_WINDOW_TYPE_HINT_SPLASHSCREEN")
-    '("utility" "GDK_WINDOW_TYPE_HINT_UTILITY")
-    '("dock" "GDK_WINDOW_TYPE_HINT_DOCK")
-    '("desktop" "GDK_WINDOW_TYPE_HINT_DESKTOP")
-    '("dropdown-menu" "GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU")
-    '("popup-menu" "GDK_WINDOW_TYPE_HINT_POPUP_MENU")
-    '("tooltip" "GDK_WINDOW_TYPE_HINT_TOOLTIP")
-    '("notification" "GDK_WINDOW_TYPE_HINT_NOTIFICATION")
-    '("combo" "GDK_WINDOW_TYPE_HINT_COMBO")
-    '("dnd" "GDK_WINDOW_TYPE_HINT_DND")
+    '("normal" "GDK_SURFACE_TYPE_HINT_NORMAL")
+    '("dialog" "GDK_SURFACE_TYPE_HINT_DIALOG")
+    '("menu" "GDK_SURFACE_TYPE_HINT_MENU")
+    '("toolbar" "GDK_SURFACE_TYPE_HINT_TOOLBAR")
+    '("splashscreen" "GDK_SURFACE_TYPE_HINT_SPLASHSCREEN")
+    '("utility" "GDK_SURFACE_TYPE_HINT_UTILITY")
+    '("dock" "GDK_SURFACE_TYPE_HINT_DOCK")
+    '("desktop" "GDK_SURFACE_TYPE_HINT_DESKTOP")
+    '("dropdown-menu" "GDK_SURFACE_TYPE_HINT_DROPDOWN_MENU")
+    '("popup-menu" "GDK_SURFACE_TYPE_HINT_POPUP_MENU")
+    '("tooltip" "GDK_SURFACE_TYPE_HINT_TOOLTIP")
+    '("notification" "GDK_SURFACE_TYPE_HINT_NOTIFICATION")
+    '("combo" "GDK_SURFACE_TYPE_HINT_COMBO")
+    '("dnd" "GDK_SURFACE_TYPE_HINT_DND")
   )
 )
 
@@ -459,152 +624,6 @@
     '("distance" "GDK_AXIS_FLAG_DISTANCE")
     '("rotation" "GDK_AXIS_FLAG_ROTATION")
     '("slider" "GDK_AXIS_FLAG_SLIDER")
-  )
-)
-
-(define-enum WindowType
-  (in-module "Gdk")
-  (c-name "GdkWindowType")
-  (gtype-id "GDK_TYPE_WINDOW_TYPE")
-  (values
-    '("root" "GDK_WINDOW_ROOT")
-    '("toplevel" "GDK_WINDOW_TOPLEVEL")
-    '("child" "GDK_WINDOW_CHILD")
-    '("temp" "GDK_WINDOW_TEMP")
-    '("foreign" "GDK_WINDOW_FOREIGN")
-    '("subsurface" "GDK_WINDOW_SUBSURFACE")
-  )
-)
-
-(define-flags WindowHints
-  (in-module "Gdk")
-  (c-name "GdkWindowHints")
-  (gtype-id "GDK_TYPE_WINDOW_HINTS")
-  (values
-    '("pos" "GDK_HINT_POS")
-    '("min-size" "GDK_HINT_MIN_SIZE")
-    '("max-size" "GDK_HINT_MAX_SIZE")
-    '("base-size" "GDK_HINT_BASE_SIZE")
-    '("aspect" "GDK_HINT_ASPECT")
-    '("resize-inc" "GDK_HINT_RESIZE_INC")
-    '("win-gravity" "GDK_HINT_WIN_GRAVITY")
-    '("user-pos" "GDK_HINT_USER_POS")
-    '("user-size" "GDK_HINT_USER_SIZE")
-  )
-)
-
-(define-flags WMDecoration
-  (in-module "Gdk")
-  (c-name "GdkWMDecoration")
-  (gtype-id "GDK_TYPE_WM_DECORATION")
-  (values
-    '("all" "GDK_DECOR_ALL")
-    '("border" "GDK_DECOR_BORDER")
-    '("resizeh" "GDK_DECOR_RESIZEH")
-    '("title" "GDK_DECOR_TITLE")
-    '("menu" "GDK_DECOR_MENU")
-    '("minimize" "GDK_DECOR_MINIMIZE")
-    '("maximize" "GDK_DECOR_MAXIMIZE")
-  )
-)
-
-(define-flags WMFunction
-  (in-module "Gdk")
-  (c-name "GdkWMFunction")
-  (gtype-id "GDK_TYPE_WM_FUNCTION")
-  (values
-    '("all" "GDK_FUNC_ALL")
-    '("resize" "GDK_FUNC_RESIZE")
-    '("move" "GDK_FUNC_MOVE")
-    '("minimize" "GDK_FUNC_MINIMIZE")
-    '("maximize" "GDK_FUNC_MAXIMIZE")
-    '("close" "GDK_FUNC_CLOSE")
-  )
-)
-
-(define-enum Gravity
-  (in-module "Gdk")
-  (c-name "GdkGravity")
-  (gtype-id "GDK_TYPE_GRAVITY")
-  (values
-    '("north-west" "GDK_GRAVITY_NORTH_WEST")
-    '("north" "GDK_GRAVITY_NORTH")
-    '("north-east" "GDK_GRAVITY_NORTH_EAST")
-    '("west" "GDK_GRAVITY_WEST")
-    '("center" "GDK_GRAVITY_CENTER")
-    '("east" "GDK_GRAVITY_EAST")
-    '("south-west" "GDK_GRAVITY_SOUTH_WEST")
-    '("south" "GDK_GRAVITY_SOUTH")
-    '("south-east" "GDK_GRAVITY_SOUTH_EAST")
-    '("static" "GDK_GRAVITY_STATIC")
-  )
-)
-
-(define-flags AnchorHints
-  (in-module "Gdk")
-  (c-name "GdkAnchorHints")
-  (gtype-id "GDK_TYPE_ANCHOR_HINTS")
-  (values
-    '("flip-x" "GDK_ANCHOR_FLIP_X")
-    '("flip-y" "GDK_ANCHOR_FLIP_Y")
-    '("slide-x" "GDK_ANCHOR_SLIDE_X")
-    '("slide-y" "GDK_ANCHOR_SLIDE_Y")
-    '("resize-x" "GDK_ANCHOR_RESIZE_X")
-    '("resize-y" "GDK_ANCHOR_RESIZE_Y")
-    '("flip" "GDK_ANCHOR_FLIP")
-    '("slide" "GDK_ANCHOR_SLIDE")
-    '("resize" "GDK_ANCHOR_RESIZE")
-  )
-)
-
-(define-enum WindowEdge
-  (in-module "Gdk")
-  (c-name "GdkWindowEdge")
-  (gtype-id "GDK_TYPE_WINDOW_EDGE")
-  (values
-    '("north-west" "GDK_WINDOW_EDGE_NORTH_WEST")
-    '("north" "GDK_WINDOW_EDGE_NORTH")
-    '("north-east" "GDK_WINDOW_EDGE_NORTH_EAST")
-    '("west" "GDK_WINDOW_EDGE_WEST")
-    '("east" "GDK_WINDOW_EDGE_EAST")
-    '("south-west" "GDK_WINDOW_EDGE_SOUTH_WEST")
-    '("south" "GDK_WINDOW_EDGE_SOUTH")
-    '("south-east" "GDK_WINDOW_EDGE_SOUTH_EAST")
-  )
-)
-
-(define-enum FullscreenMode
-  (in-module "Gdk")
-  (c-name "GdkFullscreenMode")
-  (gtype-id "GDK_TYPE_FULLSCREEN_MODE")
-  (values
-    '("current-monitor" "GDK_FULLSCREEN_ON_CURRENT_MONITOR")
-    '("all-monitors" "GDK_FULLSCREEN_ON_ALL_MONITORS")
-  )
-)
-
-(define-flags WindowState
-  (in-module "Gdk")
-  (c-name "GdkWindowState")
-  (gtype-id "GDK_TYPE_WINDOW_STATE")
-  (values
-    '("withdrawn" "GDK_WINDOW_STATE_WITHDRAWN")
-    '("iconified" "GDK_WINDOW_STATE_ICONIFIED")
-    '("maximized" "GDK_WINDOW_STATE_MAXIMIZED")
-    '("sticky" "GDK_WINDOW_STATE_STICKY")
-    '("fullscreen" "GDK_WINDOW_STATE_FULLSCREEN")
-    '("above" "GDK_WINDOW_STATE_ABOVE")
-    '("below" "GDK_WINDOW_STATE_BELOW")
-    '("focused" "GDK_WINDOW_STATE_FOCUSED")
-    '("tiled" "GDK_WINDOW_STATE_TILED")
-    '("top-tiled" "GDK_WINDOW_STATE_TOP_TILED")
-    '("top-resizable" "GDK_WINDOW_STATE_TOP_RESIZABLE")
-    '("right-tiled" "GDK_WINDOW_STATE_RIGHT_TILED")
-    '("right-resizable" "GDK_WINDOW_STATE_RIGHT_RESIZABLE")
-    '("bottom-tiled" "GDK_WINDOW_STATE_BOTTOM_TILED")
-    '("bottom-resizable" "GDK_WINDOW_STATE_BOTTOM_RESIZABLE")
-    '("left-tiled" "GDK_WINDOW_STATE_LEFT_TILED")
-    '("left-resizable" "GDK_WINDOW_STATE_LEFT_RESIZABLE")
   )
 )
 
@@ -716,7 +735,7 @@
   (parameters
     '("const-GdkPixbuf*" "pixbuf")
     '("int" "scale")
-    '("GdkWindow*" "for_window")
+    '("GdkSurface*" "for_surface")
   )
 )
 
@@ -725,7 +744,7 @@
   (return-type "none")
   (parameters
     '("cairo_t*" "cr")
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("int" "source")
     '("int" "source_type")
     '("int" "buffer_scale")
@@ -1651,7 +1670,7 @@
   (c-name "gdk_device_get_state")
   (return-type "none")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("gdouble*" "axes")
     '("GdkModifierType*" "mask")
   )
@@ -1667,10 +1686,10 @@
   )
 )
 
-(define-method get_window_at_position
+(define-method get_surface_at_position
   (of-object "GdkDevice")
-  (c-name "gdk_device_get_window_at_position")
-  (return-type "GdkWindow*")
+  (c-name "gdk_device_get_surface_at_position")
+  (return-type "GdkSurface*")
   (parameters
     '("gint*" "win_x")
     '("gint*" "win_y")
@@ -1687,10 +1706,10 @@
   )
 )
 
-(define-method get_window_at_position_double
+(define-method get_surface_at_position_double
   (of-object "GdkDevice")
-  (c-name "gdk_device_get_window_at_position_double")
-  (return-type "GdkWindow*")
+  (c-name "gdk_device_get_surface_at_position_double")
+  (return-type "GdkSurface*")
   (parameters
     '("gdouble*" "win_x")
     '("gdouble*" "win_y")
@@ -1702,7 +1721,7 @@
   (c-name "gdk_device_get_history")
   (return-type "gboolean")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("guint32" "start")
     '("guint32" "stop")
     '("GdkTimeCoord***" "events")
@@ -1782,7 +1801,7 @@
   (c-name "gdk_device_grab")
   (return-type "GdkGrabStatus")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("GdkGrabOwnership" "grab_ownership")
     '("gboolean" "owner_events")
     '("GdkEventMask" "event_mask")
@@ -1810,10 +1829,10 @@
   )
 )
 
-(define-method get_last_event_window
+(define-method get_last_event_surface
   (of-object "GdkDevice")
-  (c-name "gdk_device_get_last_event_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_device_get_last_event_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method get_vendor_id
@@ -2019,7 +2038,7 @@
 (define-method get_default_group
   (of-object "GdkDisplay")
   (c-name "gdk_display_get_default_group")
-  (return-type "GdkWindow*")
+  (return-type "GdkSurface*")
 )
 
 (define-method get_clipboard
@@ -2104,12 +2123,12 @@
   )
 )
 
-(define-method get_monitor_at_window
+(define-method get_monitor_at_surface
   (of-object "GdkDisplay")
-  (c-name "gdk_display_get_monitor_at_window")
+  (c-name "gdk_display_get_monitor_at_surface")
   (return-type "GdkMonitor*")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
   )
 )
 
@@ -2226,16 +2245,16 @@
   (return-type "GdkDragAction")
 )
 
-(define-method get_source_window
+(define-method get_source_surface
   (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_source_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_drag_context_get_source_surface")
+  (return-type "GdkSurface*")
 )
 
-(define-method get_dest_window
+(define-method get_dest_surface
   (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_dest_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_drag_context_get_dest_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-function gdk_drag_status
@@ -2296,7 +2315,7 @@
   (c-name "gdk_drag_begin")
   (return-type "GdkDragContext*")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("GdkDevice*" "device")
     '("GdkContentProvider*" "content")
     '("GdkDragAction" "actions")
@@ -2322,10 +2341,10 @@
   )
 )
 
-(define-method get_drag_window
+(define-method get_drag_surface
   (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_drag_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_drag_context_get_drag_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method set_hotspot
@@ -2353,10 +2372,10 @@
   (return-type "GdkDisplay*")
 )
 
-(define-method get_window
+(define-method get_surface
   (of-object "GdkDrawContext")
-  (c-name "gdk_draw_context_get_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_draw_context_get_surface")
+  (return-type "GdkSurface*")
 )
 
 
@@ -2368,10 +2387,10 @@
   (return-type "GType")
 )
 
-(define-method get_window
+(define-method get_surface
   (of-object "GdkDrawingContext")
-  (c-name "gdk_drawing_context_get_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_drawing_context_get_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method get_paint_context
@@ -2433,10 +2452,10 @@
   (return-type "none")
 )
 
-(define-method get_window
+(define-method get_surface
   (of-object "GdkEvent")
-  (c-name "gdk_event_get_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_event_get_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method get_time
@@ -2838,12 +2857,12 @@
   )
 )
 
-(define-method get_grab_window
+(define-method get_grab_surface
   (of-object "GdkEvent")
-  (c-name "gdk_event_get_grab_window")
+  (c-name "gdk_event_get_grab_surface")
   (return-type "gboolean")
   (parameters
-    '("GdkWindow**" "window")
+    '("GdkSurface**" "surface")
   )
 )
 
@@ -2977,15 +2996,6 @@
 
 
 
-;; From gdkframeclockidle.h
-
-(define-function gdk_frame_clock_idle_get_type
-  (c-name "gdk_frame_clock_idle_get_type")
-  (return-type "GType")
-)
-
-
-
 ;; From gdkframetimings.h
 
 (define-function gdk_frame_timings_get_type
@@ -3061,10 +3071,10 @@
   (return-type "GdkDisplay*")
 )
 
-(define-method get_window
+(define-method get_surface
   (of-object "GdkGLContext")
-  (c-name "gdk_gl_context_get_window")
-  (return-type "GdkWindow*")
+  (c-name "gdk_gl_context_get_surface")
+  (return-type "GdkSurface*")
 )
 
 (define-method get_shared_context
@@ -3203,12 +3213,10 @@
   )
 )
 
-(define-function gdk_gl_texture_release
+(define-method release
+  (of-object "GdkGLTexture")
   (c-name "gdk_gl_texture_release")
   (return-type "none")
-  (parameters
-    '("GdkTexture*" "texture")
-  )
 )
 
 
@@ -3424,6 +3432,23 @@
 
 
 
+;; From gdkmemorytexture.h
+
+(define-function gdk_memory_texture_new
+  (c-name "gdk_memory_texture_new")
+  (is-constructor-of "GdkMemoryTexture")
+  (return-type "GdkTexture*")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+    '("GdkMemoryFormat" "format")
+    '("GBytes*" "bytes")
+    '("gsize" "stride")
+  )
+)
+
+
+
 ;; From gdkmonitor.h
 
 (define-function gdk_monitor_get_type
@@ -3507,6 +3532,77 @@
   (of-object "GdkMonitor")
   (c-name "gdk_monitor_is_valid")
   (return-type "gboolean")
+)
+
+
+
+;; From gdkpaintable.h
+
+(define-method snapshot
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_snapshot")
+  (return-type "none")
+  (parameters
+    '("GdkSnapshot*" "snapshot")
+    '("double" "width")
+    '("double" "height")
+  )
+)
+
+(define-method get_current_image
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_get_current_image")
+  (return-type "GdkPaintable*")
+)
+
+(define-method get_flags
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_get_flags")
+  (return-type "GdkPaintableFlags")
+)
+
+(define-method get_intrinsic_width
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_get_intrinsic_width")
+  (return-type "int")
+)
+
+(define-method get_intrinsic_height
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_get_intrinsic_height")
+  (return-type "int")
+)
+
+(define-method get_intrinsic_aspect_ratio
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_get_intrinsic_aspect_ratio")
+  (return-type "double")
+)
+
+(define-method compute_concrete_size
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_compute_concrete_size")
+  (return-type "none")
+  (parameters
+    '("double" "specified_width")
+    '("double" "specified_height")
+    '("double" "default_width")
+    '("double" "default_height")
+    '("double*" "concrete_width")
+    '("double*" "concrete_height")
+  )
+)
+
+(define-method invalidate_contents
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_invalidate_contents")
+  (return-type "none")
+)
+
+(define-method invalidate_size
+  (of-object "GdkPaintable")
+  (c-name "gdk_paintable_invalidate_size")
+  (return-type "none")
 )
 
 
@@ -3705,7 +3801,7 @@
   (c-name "gdk_seat_grab")
   (return-type "GdkGrabStatus")
   (parameters
-    '("GdkWindow*" "window")
+    '("GdkSurface*" "surface")
     '("GdkSeatCapabilities" "capabilities")
     '("gboolean" "owner_events")
     '("GdkCursor*" "cursor")
@@ -3765,18 +3861,1002 @@
 
 
 
-;; From gdktexture.h
+;; From gdksnapshot.h
 
-(define-function gdk_texture_new_for_data
-  (c-name "gdk_texture_new_for_data")
-  (return-type "GdkTexture*")
+
+
+;; From gdksurface.h
+
+(define-function gdk_surface_get_type
+  (c-name "gdk_surface_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_surface_new_toplevel
+  (c-name "gdk_surface_new_toplevel")
+  (return-type "GdkSurface*")
   (parameters
-    '("const-guchar*" "data")
+    '("GdkDisplay*" "display")
     '("int" "width")
     '("int" "height")
-    '("int" "stride")
   )
 )
+
+(define-function gdk_surface_new_popup
+  (c-name "gdk_surface_new_popup")
+  (return-type "GdkSurface*")
+  (parameters
+    '("GdkDisplay*" "display")
+    '("const-GdkRectangle*" "position")
+  )
+)
+
+(define-function gdk_surface_new_temp
+  (c-name "gdk_surface_new_temp")
+  (return-type "GdkSurface*")
+  (parameters
+    '("GdkDisplay*" "display")
+  )
+)
+
+(define-method new_child
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_new_child")
+  (return-type "GdkSurface*")
+  (parameters
+    '("const-GdkRectangle*" "position")
+  )
+)
+
+(define-method destroy
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_destroy")
+  (return-type "none")
+)
+
+(define-method get_surface_type
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_surface_type")
+  (return-type "GdkSurfaceType")
+)
+
+(define-method is_destroyed
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_is_destroyed")
+  (return-type "gboolean")
+)
+
+(define-method get_display
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_display")
+  (return-type "GdkDisplay*")
+)
+
+(define-method show
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_show")
+  (return-type "none")
+)
+
+(define-method hide
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_hide")
+  (return-type "none")
+)
+
+(define-method withdraw
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_withdraw")
+  (return-type "none")
+)
+
+(define-method show_unraised
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_show_unraised")
+  (return-type "none")
+)
+
+(define-method move
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_move")
+  (return-type "none")
+  (parameters
+    '("gint" "x")
+    '("gint" "y")
+  )
+)
+
+(define-method resize
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_resize")
+  (return-type "none")
+  (parameters
+    '("gint" "width")
+    '("gint" "height")
+  )
+)
+
+(define-method move_resize
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_move_resize")
+  (return-type "none")
+  (parameters
+    '("gint" "x")
+    '("gint" "y")
+    '("gint" "width")
+    '("gint" "height")
+  )
+)
+
+(define-method raise
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_raise")
+  (return-type "none")
+)
+
+(define-method lower
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_lower")
+  (return-type "none")
+)
+
+(define-method restack
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_restack")
+  (return-type "none")
+  (parameters
+    '("GdkSurface*" "sibling")
+    '("gboolean" "above")
+  )
+)
+
+(define-method focus
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_focus")
+  (return-type "none")
+  (parameters
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method set_user_data
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_user_data")
+  (return-type "none")
+  (parameters
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_accept_focus
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_accept_focus")
+  (return-type "gboolean")
+)
+
+(define-method set_accept_focus
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_accept_focus")
+  (return-type "none")
+  (parameters
+    '("gboolean" "accept_focus")
+  )
+)
+
+(define-method get_focus_on_map
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_focus_on_map")
+  (return-type "gboolean")
+)
+
+(define-method set_focus_on_map
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_focus_on_map")
+  (return-type "none")
+  (parameters
+    '("gboolean" "focus_on_map")
+  )
+)
+
+(define-method input_shape_combine_region
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_input_shape_combine_region")
+  (return-type "none")
+  (parameters
+    '("const-cairo_region_t*" "shape_region")
+    '("gint" "offset_x")
+    '("gint" "offset_y")
+  )
+)
+
+(define-method set_child_input_shapes
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_child_input_shapes")
+  (return-type "none")
+)
+
+(define-method merge_child_input_shapes
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_merge_child_input_shapes")
+  (return-type "none")
+)
+
+(define-method set_pass_through
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_pass_through")
+  (return-type "none")
+  (parameters
+    '("gboolean" "pass_through")
+  )
+)
+
+(define-method get_pass_through
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_pass_through")
+  (return-type "gboolean")
+)
+
+(define-method is_visible
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_is_visible")
+  (return-type "gboolean")
+)
+
+(define-method is_viewable
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_is_viewable")
+  (return-type "gboolean")
+)
+
+(define-method is_input_only
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_is_input_only")
+  (return-type "gboolean")
+)
+
+(define-method get_state
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_state")
+  (return-type "GdkSurfaceState")
+)
+
+(define-method has_native
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_has_native")
+  (return-type "gboolean")
+)
+
+(define-method set_type_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_type_hint")
+  (return-type "none")
+  (parameters
+    '("GdkSurfaceTypeHint" "hint")
+  )
+)
+
+(define-method get_type_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_type_hint")
+  (return-type "GdkSurfaceTypeHint")
+)
+
+(define-method get_modal_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_modal_hint")
+  (return-type "gboolean")
+)
+
+(define-method set_modal_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_modal_hint")
+  (return-type "none")
+  (parameters
+    '("gboolean" "modal")
+  )
+)
+
+(define-method set_skip_taskbar_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_skip_taskbar_hint")
+  (return-type "none")
+  (parameters
+    '("gboolean" "skips_taskbar")
+  )
+)
+
+(define-method set_skip_pager_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_skip_pager_hint")
+  (return-type "none")
+  (parameters
+    '("gboolean" "skips_pager")
+  )
+)
+
+(define-method set_urgency_hint
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_urgency_hint")
+  (return-type "none")
+  (parameters
+    '("gboolean" "urgent")
+  )
+)
+
+(define-method set_geometry_hints
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_geometry_hints")
+  (return-type "none")
+  (parameters
+    '("const-GdkGeometry*" "geometry")
+    '("GdkSurfaceHints" "geom_mask")
+  )
+)
+
+(define-method begin_draw_frame
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_begin_draw_frame")
+  (return-type "GdkDrawingContext*")
+  (parameters
+    '("GdkDrawContext*" "context")
+    '("const-cairo_region_t*" "region")
+  )
+)
+
+(define-method end_draw_frame
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_end_draw_frame")
+  (return-type "none")
+  (parameters
+    '("GdkDrawingContext*" "context")
+  )
+)
+
+(define-method set_title
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_title")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "title")
+  )
+)
+
+(define-method set_role
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_role")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "role")
+  )
+)
+
+(define-method set_startup_id
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_startup_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "startup_id")
+  )
+)
+
+(define-method set_transient_for
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_transient_for")
+  (return-type "none")
+  (parameters
+    '("GdkSurface*" "parent")
+  )
+)
+
+(define-method set_cursor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_cursor")
+  (return-type "none")
+  (parameters
+    '("GdkCursor*" "cursor")
+  )
+)
+
+(define-method get_cursor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_cursor")
+  (return-type "GdkCursor*")
+)
+
+(define-method set_device_cursor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_device_cursor")
+  (return-type "none")
+  (parameters
+    '("GdkDevice*" "device")
+    '("GdkCursor*" "cursor")
+  )
+)
+
+(define-method get_device_cursor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_device_cursor")
+  (return-type "GdkCursor*")
+  (parameters
+    '("GdkDevice*" "device")
+  )
+)
+
+(define-method get_user_data
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_user_data")
+  (return-type "none")
+  (parameters
+    '("gpointer*" "data")
+  )
+)
+
+(define-method get_geometry
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_geometry")
+  (return-type "none")
+  (parameters
+    '("gint*" "x")
+    '("gint*" "y")
+    '("gint*" "width")
+    '("gint*" "height")
+  )
+)
+
+(define-method get_width
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_width")
+  (return-type "int")
+)
+
+(define-method get_height
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_height")
+  (return-type "int")
+)
+
+(define-method get_position
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_position")
+  (return-type "none")
+  (parameters
+    '("gint*" "x")
+    '("gint*" "y")
+  )
+)
+
+(define-method get_origin
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_origin")
+  (return-type "gint")
+  (parameters
+    '("gint*" "x")
+    '("gint*" "y")
+  )
+)
+
+(define-method get_root_coords
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_root_coords")
+  (return-type "none")
+  (parameters
+    '("gint" "x")
+    '("gint" "y")
+    '("gint*" "root_x")
+    '("gint*" "root_y")
+  )
+)
+
+(define-method coords_to_parent
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_coords_to_parent")
+  (return-type "none")
+  (parameters
+    '("gdouble" "x")
+    '("gdouble" "y")
+    '("gdouble*" "parent_x")
+    '("gdouble*" "parent_y")
+  )
+)
+
+(define-method coords_from_parent
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_coords_from_parent")
+  (return-type "none")
+  (parameters
+    '("gdouble" "parent_x")
+    '("gdouble" "parent_y")
+    '("gdouble*" "x")
+    '("gdouble*" "y")
+  )
+)
+
+(define-method get_root_origin
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_root_origin")
+  (return-type "none")
+  (parameters
+    '("gint*" "x")
+    '("gint*" "y")
+  )
+)
+
+(define-method get_frame_extents
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_frame_extents")
+  (return-type "none")
+  (parameters
+    '("GdkRectangle*" "rect")
+  )
+)
+
+(define-method get_scale_factor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_scale_factor")
+  (return-type "gint")
+)
+
+(define-method get_device_position
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_device_position")
+  (return-type "GdkSurface*")
+  (parameters
+    '("GdkDevice*" "device")
+    '("gint*" "x")
+    '("gint*" "y")
+    '("GdkModifierType*" "mask")
+  )
+)
+
+(define-method get_device_position_double
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_device_position_double")
+  (return-type "GdkSurface*")
+  (parameters
+    '("GdkDevice*" "device")
+    '("gdouble*" "x")
+    '("gdouble*" "y")
+    '("GdkModifierType*" "mask")
+  )
+)
+
+(define-method get_parent
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_parent")
+  (return-type "GdkSurface*")
+)
+
+(define-method get_toplevel
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_toplevel")
+  (return-type "GdkSurface*")
+)
+
+(define-method get_children
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_children")
+  (return-type "GList*")
+)
+
+(define-method peek_children
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_peek_children")
+  (return-type "GList*")
+)
+
+(define-method get_children_with_user_data
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_children_with_user_data")
+  (return-type "GList*")
+  (parameters
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_events
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_events")
+  (return-type "GdkEventMask")
+)
+
+(define-method set_events
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_events")
+  (return-type "none")
+  (parameters
+    '("GdkEventMask" "event_mask")
+  )
+)
+
+(define-method set_device_events
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_device_events")
+  (return-type "none")
+  (parameters
+    '("GdkDevice*" "device")
+    '("GdkEventMask" "event_mask")
+  )
+)
+
+(define-method get_device_events
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_device_events")
+  (return-type "GdkEventMask")
+  (parameters
+    '("GdkDevice*" "device")
+  )
+)
+
+(define-method set_icon_list
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_icon_list")
+  (return-type "none")
+  (parameters
+    '("GList*" "surfaces")
+  )
+)
+
+(define-method set_icon_name
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_icon_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method set_group
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_group")
+  (return-type "none")
+  (parameters
+    '("GdkSurface*" "leader")
+  )
+)
+
+(define-method get_group
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_group")
+  (return-type "GdkSurface*")
+)
+
+(define-method set_decorations
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_decorations")
+  (return-type "none")
+  (parameters
+    '("GdkWMDecoration" "decorations")
+  )
+)
+
+(define-method get_decorations
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_decorations")
+  (return-type "gboolean")
+  (parameters
+    '("GdkWMDecoration*" "decorations")
+  )
+)
+
+(define-method set_functions
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_functions")
+  (return-type "none")
+  (parameters
+    '("GdkWMFunction" "functions")
+  )
+)
+
+(define-method create_similar_surface
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_create_similar_surface")
+  (return-type "cairo_surface_t*")
+  (parameters
+    '("cairo_content_t" "content")
+    '("int" "width")
+    '("int" "height")
+  )
+)
+
+(define-method create_similar_image_surface
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_create_similar_image_surface")
+  (return-type "cairo_surface_t*")
+  (parameters
+    '("cairo_format_t" "format")
+    '("int" "width")
+    '("int" "height")
+    '("int" "scale")
+  )
+)
+
+(define-method beep
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_beep")
+  (return-type "none")
+)
+
+(define-method iconify
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_iconify")
+  (return-type "none")
+)
+
+(define-method deiconify
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_deiconify")
+  (return-type "none")
+)
+
+(define-method stick
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_stick")
+  (return-type "none")
+)
+
+(define-method unstick
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_unstick")
+  (return-type "none")
+)
+
+(define-method maximize
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_maximize")
+  (return-type "none")
+)
+
+(define-method unmaximize
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_unmaximize")
+  (return-type "none")
+)
+
+(define-method fullscreen
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_fullscreen")
+  (return-type "none")
+)
+
+(define-method fullscreen_on_monitor
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_fullscreen_on_monitor")
+  (return-type "none")
+  (parameters
+    '("GdkMonitor*" "monitor")
+  )
+)
+
+(define-method set_fullscreen_mode
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_fullscreen_mode")
+  (return-type "none")
+  (parameters
+    '("GdkFullscreenMode" "mode")
+  )
+)
+
+(define-method get_fullscreen_mode
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_fullscreen_mode")
+  (return-type "GdkFullscreenMode")
+)
+
+(define-method unfullscreen
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_unfullscreen")
+  (return-type "none")
+)
+
+(define-method set_keep_above
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_keep_above")
+  (return-type "none")
+  (parameters
+    '("gboolean" "setting")
+  )
+)
+
+(define-method set_keep_below
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_keep_below")
+  (return-type "none")
+  (parameters
+    '("gboolean" "setting")
+  )
+)
+
+(define-method set_opacity
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_opacity")
+  (return-type "none")
+  (parameters
+    '("gdouble" "opacity")
+  )
+)
+
+(define-method register_dnd
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_register_dnd")
+  (return-type "none")
+)
+
+(define-method begin_resize_drag
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_begin_resize_drag")
+  (return-type "none")
+  (parameters
+    '("GdkSurfaceEdge" "edge")
+    '("gint" "button")
+    '("gint" "root_x")
+    '("gint" "root_y")
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method begin_resize_drag_for_device
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_begin_resize_drag_for_device")
+  (return-type "none")
+  (parameters
+    '("GdkSurfaceEdge" "edge")
+    '("GdkDevice*" "device")
+    '("gint" "button")
+    '("gint" "root_x")
+    '("gint" "root_y")
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method begin_move_drag
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_begin_move_drag")
+  (return-type "none")
+  (parameters
+    '("gint" "button")
+    '("gint" "root_x")
+    '("gint" "root_y")
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method begin_move_drag_for_device
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_begin_move_drag_for_device")
+  (return-type "none")
+  (parameters
+    '("GdkDevice*" "device")
+    '("gint" "button")
+    '("gint" "root_x")
+    '("gint" "root_y")
+    '("guint32" "timestamp")
+  )
+)
+
+(define-method invalidate_rect
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_invalidate_rect")
+  (return-type "none")
+  (parameters
+    '("const-GdkRectangle*" "rect")
+  )
+)
+
+(define-method invalidate_region
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_invalidate_region")
+  (return-type "none")
+  (parameters
+    '("const-cairo_region_t*" "region")
+  )
+)
+
+(define-method freeze_updates
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_freeze_updates")
+  (return-type "none")
+)
+
+(define-method thaw_updates
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_thaw_updates")
+  (return-type "none")
+)
+
+(define-function gdk_surface_constrain_size
+  (c-name "gdk_surface_constrain_size")
+  (return-type "none")
+  (parameters
+    '("GdkGeometry*" "geometry")
+    '("GdkSurfaceHints" "flags")
+    '("gint" "width")
+    '("gint" "height")
+    '("gint*" "new_width")
+    '("gint*" "new_height")
+  )
+)
+
+(define-method set_support_multidevice
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_support_multidevice")
+  (return-type "none")
+  (parameters
+    '("gboolean" "support_multidevice")
+  )
+)
+
+(define-method get_support_multidevice
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_support_multidevice")
+  (return-type "gboolean")
+)
+
+(define-method get_frame_clock
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_get_frame_clock")
+  (return-type "GdkFrameClock*")
+)
+
+(define-method set_opaque_region
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_opaque_region")
+  (return-type "none")
+  (parameters
+    '("cairo_region_t*" "region")
+  )
+)
+
+(define-method set_shadow_width
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_set_shadow_width")
+  (return-type "none")
+  (parameters
+    '("gint" "left")
+    '("gint" "right")
+    '("gint" "top")
+    '("gint" "bottom")
+  )
+)
+
+(define-method show_window_menu
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_show_window_menu")
+  (return-type "gboolean")
+  (parameters
+    '("GdkEvent*" "event")
+  )
+)
+
+(define-method create_gl_context
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_create_gl_context")
+  (return-type "GdkGLContext*")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method create_vulkan_context
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_create_vulkan_context")
+  (return-type "GdkVulkanContext*")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdksurfaceimpl.h
+
+(define-function gdk_surface_impl_get_type
+  (c-name "gdk_surface_impl_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gdktexture.h
 
 (define-function gdk_texture_new_for_pixbuf
   (c-name "gdk_texture_new_for_pixbuf")
@@ -3916,1078 +4996,6 @@
 
 
 
-;; From gdkwindow.h
-
-(define-function gdk_window_get_type
-  (c-name "gdk_window_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_window_new_toplevel
-  (c-name "gdk_window_new_toplevel")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("int" "width")
-    '("int" "height")
-  )
-)
-
-(define-function gdk_window_new_popup
-  (c-name "gdk_window_new_popup")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDisplay*" "display")
-    '("const-GdkRectangle*" "position")
-  )
-)
-
-(define-function gdk_window_new_temp
-  (c-name "gdk_window_new_temp")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDisplay*" "display")
-  )
-)
-
-(define-method new_child
-  (of-object "GdkWindow")
-  (c-name "gdk_window_new_child")
-  (return-type "GdkWindow*")
-  (parameters
-    '("const-GdkRectangle*" "position")
-  )
-)
-
-(define-method destroy
-  (of-object "GdkWindow")
-  (c-name "gdk_window_destroy")
-  (return-type "none")
-)
-
-(define-method get_window_type
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_window_type")
-  (return-type "GdkWindowType")
-)
-
-(define-method is_destroyed
-  (of-object "GdkWindow")
-  (c-name "gdk_window_is_destroyed")
-  (return-type "gboolean")
-)
-
-(define-method get_display
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_display")
-  (return-type "GdkDisplay*")
-)
-
-(define-method show
-  (of-object "GdkWindow")
-  (c-name "gdk_window_show")
-  (return-type "none")
-)
-
-(define-method hide
-  (of-object "GdkWindow")
-  (c-name "gdk_window_hide")
-  (return-type "none")
-)
-
-(define-method withdraw
-  (of-object "GdkWindow")
-  (c-name "gdk_window_withdraw")
-  (return-type "none")
-)
-
-(define-method show_unraised
-  (of-object "GdkWindow")
-  (c-name "gdk_window_show_unraised")
-  (return-type "none")
-)
-
-(define-method move
-  (of-object "GdkWindow")
-  (c-name "gdk_window_move")
-  (return-type "none")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-  )
-)
-
-(define-method resize
-  (of-object "GdkWindow")
-  (c-name "gdk_window_resize")
-  (return-type "none")
-  (parameters
-    '("gint" "width")
-    '("gint" "height")
-  )
-)
-
-(define-method move_resize
-  (of-object "GdkWindow")
-  (c-name "gdk_window_move_resize")
-  (return-type "none")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-    '("gint" "width")
-    '("gint" "height")
-  )
-)
-
-(define-method raise
-  (of-object "GdkWindow")
-  (c-name "gdk_window_raise")
-  (return-type "none")
-)
-
-(define-method lower
-  (of-object "GdkWindow")
-  (c-name "gdk_window_lower")
-  (return-type "none")
-)
-
-(define-method restack
-  (of-object "GdkWindow")
-  (c-name "gdk_window_restack")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "sibling")
-    '("gboolean" "above")
-  )
-)
-
-(define-method focus
-  (of-object "GdkWindow")
-  (c-name "gdk_window_focus")
-  (return-type "none")
-  (parameters
-    '("guint32" "timestamp")
-  )
-)
-
-(define-method set_user_data
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_user_data")
-  (return-type "none")
-  (parameters
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method get_accept_focus
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_accept_focus")
-  (return-type "gboolean")
-)
-
-(define-method set_accept_focus
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_accept_focus")
-  (return-type "none")
-  (parameters
-    '("gboolean" "accept_focus")
-  )
-)
-
-(define-method get_focus_on_map
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_focus_on_map")
-  (return-type "gboolean")
-)
-
-(define-method set_focus_on_map
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_focus_on_map")
-  (return-type "none")
-  (parameters
-    '("gboolean" "focus_on_map")
-  )
-)
-
-(define-method scroll
-  (of-object "GdkWindow")
-  (c-name "gdk_window_scroll")
-  (return-type "none")
-  (parameters
-    '("gint" "dx")
-    '("gint" "dy")
-  )
-)
-
-(define-method move_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_move_region")
-  (return-type "none")
-  (parameters
-    '("const-cairo_region_t*" "region")
-    '("gint" "dx")
-    '("gint" "dy")
-  )
-)
-
-(define-method shape_combine_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_shape_combine_region")
-  (return-type "none")
-  (parameters
-    '("const-cairo_region_t*" "shape_region")
-    '("gint" "offset_x")
-    '("gint" "offset_y")
-  )
-)
-
-(define-method set_child_shapes
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_child_shapes")
-  (return-type "none")
-)
-
-(define-method merge_child_shapes
-  (of-object "GdkWindow")
-  (c-name "gdk_window_merge_child_shapes")
-  (return-type "none")
-)
-
-(define-method input_shape_combine_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_input_shape_combine_region")
-  (return-type "none")
-  (parameters
-    '("const-cairo_region_t*" "shape_region")
-    '("gint" "offset_x")
-    '("gint" "offset_y")
-  )
-)
-
-(define-method set_child_input_shapes
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_child_input_shapes")
-  (return-type "none")
-)
-
-(define-method merge_child_input_shapes
-  (of-object "GdkWindow")
-  (c-name "gdk_window_merge_child_input_shapes")
-  (return-type "none")
-)
-
-(define-method set_pass_through
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_pass_through")
-  (return-type "none")
-  (parameters
-    '("gboolean" "pass_through")
-  )
-)
-
-(define-method get_pass_through
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_pass_through")
-  (return-type "gboolean")
-)
-
-(define-method is_visible
-  (of-object "GdkWindow")
-  (c-name "gdk_window_is_visible")
-  (return-type "gboolean")
-)
-
-(define-method is_viewable
-  (of-object "GdkWindow")
-  (c-name "gdk_window_is_viewable")
-  (return-type "gboolean")
-)
-
-(define-method is_input_only
-  (of-object "GdkWindow")
-  (c-name "gdk_window_is_input_only")
-  (return-type "gboolean")
-)
-
-(define-method is_shaped
-  (of-object "GdkWindow")
-  (c-name "gdk_window_is_shaped")
-  (return-type "gboolean")
-)
-
-(define-method get_state
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_state")
-  (return-type "GdkWindowState")
-)
-
-(define-method has_native
-  (of-object "GdkWindow")
-  (c-name "gdk_window_has_native")
-  (return-type "gboolean")
-)
-
-(define-method set_type_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_type_hint")
-  (return-type "none")
-  (parameters
-    '("GdkWindowTypeHint" "hint")
-  )
-)
-
-(define-method get_type_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_type_hint")
-  (return-type "GdkWindowTypeHint")
-)
-
-(define-method get_modal_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_modal_hint")
-  (return-type "gboolean")
-)
-
-(define-method set_modal_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_modal_hint")
-  (return-type "none")
-  (parameters
-    '("gboolean" "modal")
-  )
-)
-
-(define-method set_skip_taskbar_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_skip_taskbar_hint")
-  (return-type "none")
-  (parameters
-    '("gboolean" "skips_taskbar")
-  )
-)
-
-(define-method set_skip_pager_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_skip_pager_hint")
-  (return-type "none")
-  (parameters
-    '("gboolean" "skips_pager")
-  )
-)
-
-(define-method set_urgency_hint
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_urgency_hint")
-  (return-type "none")
-  (parameters
-    '("gboolean" "urgent")
-  )
-)
-
-(define-method set_geometry_hints
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_geometry_hints")
-  (return-type "none")
-  (parameters
-    '("const-GdkGeometry*" "geometry")
-    '("GdkWindowHints" "geom_mask")
-  )
-)
-
-(define-method get_clip_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_clip_region")
-  (return-type "cairo_region_t*")
-)
-
-(define-method get_visible_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_visible_region")
-  (return-type "cairo_region_t*")
-)
-
-(define-method begin_draw_frame
-  (of-object "GdkWindow")
-  (c-name "gdk_window_begin_draw_frame")
-  (return-type "GdkDrawingContext*")
-  (parameters
-    '("GdkDrawContext*" "context")
-    '("const-cairo_region_t*" "region")
-  )
-)
-
-(define-method end_draw_frame
-  (of-object "GdkWindow")
-  (c-name "gdk_window_end_draw_frame")
-  (return-type "none")
-  (parameters
-    '("GdkDrawingContext*" "context")
-  )
-)
-
-(define-method set_title
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_title")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "title")
-  )
-)
-
-(define-method set_role
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_role")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "role")
-  )
-)
-
-(define-method set_startup_id
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_startup_id")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "startup_id")
-  )
-)
-
-(define-method set_transient_for
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_transient_for")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "parent")
-  )
-)
-
-(define-method set_cursor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_cursor")
-  (return-type "none")
-  (parameters
-    '("GdkCursor*" "cursor")
-  )
-)
-
-(define-method get_cursor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_cursor")
-  (return-type "GdkCursor*")
-)
-
-(define-method set_device_cursor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_device_cursor")
-  (return-type "none")
-  (parameters
-    '("GdkDevice*" "device")
-    '("GdkCursor*" "cursor")
-  )
-)
-
-(define-method get_device_cursor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_device_cursor")
-  (return-type "GdkCursor*")
-  (parameters
-    '("GdkDevice*" "device")
-  )
-)
-
-(define-method get_user_data
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_user_data")
-  (return-type "none")
-  (parameters
-    '("gpointer*" "data")
-  )
-)
-
-(define-method get_geometry
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_geometry")
-  (return-type "none")
-  (parameters
-    '("gint*" "x")
-    '("gint*" "y")
-    '("gint*" "width")
-    '("gint*" "height")
-  )
-)
-
-(define-method get_width
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_width")
-  (return-type "int")
-)
-
-(define-method get_height
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_height")
-  (return-type "int")
-)
-
-(define-method get_position
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_position")
-  (return-type "none")
-  (parameters
-    '("gint*" "x")
-    '("gint*" "y")
-  )
-)
-
-(define-method get_origin
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_origin")
-  (return-type "gint")
-  (parameters
-    '("gint*" "x")
-    '("gint*" "y")
-  )
-)
-
-(define-method get_root_coords
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_root_coords")
-  (return-type "none")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-    '("gint*" "root_x")
-    '("gint*" "root_y")
-  )
-)
-
-(define-method coords_to_parent
-  (of-object "GdkWindow")
-  (c-name "gdk_window_coords_to_parent")
-  (return-type "none")
-  (parameters
-    '("gdouble" "x")
-    '("gdouble" "y")
-    '("gdouble*" "parent_x")
-    '("gdouble*" "parent_y")
-  )
-)
-
-(define-method coords_from_parent
-  (of-object "GdkWindow")
-  (c-name "gdk_window_coords_from_parent")
-  (return-type "none")
-  (parameters
-    '("gdouble" "parent_x")
-    '("gdouble" "parent_y")
-    '("gdouble*" "x")
-    '("gdouble*" "y")
-  )
-)
-
-(define-method get_root_origin
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_root_origin")
-  (return-type "none")
-  (parameters
-    '("gint*" "x")
-    '("gint*" "y")
-  )
-)
-
-(define-method get_frame_extents
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_frame_extents")
-  (return-type "none")
-  (parameters
-    '("GdkRectangle*" "rect")
-  )
-)
-
-(define-method get_scale_factor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_scale_factor")
-  (return-type "gint")
-)
-
-(define-method get_device_position
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_device_position")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDevice*" "device")
-    '("gint*" "x")
-    '("gint*" "y")
-    '("GdkModifierType*" "mask")
-  )
-)
-
-(define-method get_device_position_double
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_device_position_double")
-  (return-type "GdkWindow*")
-  (parameters
-    '("GdkDevice*" "device")
-    '("gdouble*" "x")
-    '("gdouble*" "y")
-    '("GdkModifierType*" "mask")
-  )
-)
-
-(define-method get_parent
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_parent")
-  (return-type "GdkWindow*")
-)
-
-(define-method get_toplevel
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_toplevel")
-  (return-type "GdkWindow*")
-)
-
-(define-method get_children
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_children")
-  (return-type "GList*")
-)
-
-(define-method peek_children
-  (of-object "GdkWindow")
-  (c-name "gdk_window_peek_children")
-  (return-type "GList*")
-)
-
-(define-method get_children_with_user_data
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_children_with_user_data")
-  (return-type "GList*")
-  (parameters
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method get_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_events")
-  (return-type "GdkEventMask")
-)
-
-(define-method set_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_events")
-  (return-type "none")
-  (parameters
-    '("GdkEventMask" "event_mask")
-  )
-)
-
-(define-method set_device_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_device_events")
-  (return-type "none")
-  (parameters
-    '("GdkDevice*" "device")
-    '("GdkEventMask" "event_mask")
-  )
-)
-
-(define-method get_device_events
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_device_events")
-  (return-type "GdkEventMask")
-  (parameters
-    '("GdkDevice*" "device")
-  )
-)
-
-(define-method set_icon_list
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_icon_list")
-  (return-type "none")
-  (parameters
-    '("GList*" "surfaces")
-  )
-)
-
-(define-method set_icon_name
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_icon_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "name")
-  )
-)
-
-(define-method set_group
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_group")
-  (return-type "none")
-  (parameters
-    '("GdkWindow*" "leader")
-  )
-)
-
-(define-method get_group
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_group")
-  (return-type "GdkWindow*")
-)
-
-(define-method set_decorations
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_decorations")
-  (return-type "none")
-  (parameters
-    '("GdkWMDecoration" "decorations")
-  )
-)
-
-(define-method get_decorations
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_decorations")
-  (return-type "gboolean")
-  (parameters
-    '("GdkWMDecoration*" "decorations")
-  )
-)
-
-(define-method set_functions
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_functions")
-  (return-type "none")
-  (parameters
-    '("GdkWMFunction" "functions")
-  )
-)
-
-(define-method create_similar_surface
-  (of-object "GdkWindow")
-  (c-name "gdk_window_create_similar_surface")
-  (return-type "cairo_surface_t*")
-  (parameters
-    '("cairo_content_t" "content")
-    '("int" "width")
-    '("int" "height")
-  )
-)
-
-(define-method create_similar_image_surface
-  (of-object "GdkWindow")
-  (c-name "gdk_window_create_similar_image_surface")
-  (return-type "cairo_surface_t*")
-  (parameters
-    '("cairo_format_t" "format")
-    '("int" "width")
-    '("int" "height")
-    '("int" "scale")
-  )
-)
-
-(define-method beep
-  (of-object "GdkWindow")
-  (c-name "gdk_window_beep")
-  (return-type "none")
-)
-
-(define-method iconify
-  (of-object "GdkWindow")
-  (c-name "gdk_window_iconify")
-  (return-type "none")
-)
-
-(define-method deiconify
-  (of-object "GdkWindow")
-  (c-name "gdk_window_deiconify")
-  (return-type "none")
-)
-
-(define-method stick
-  (of-object "GdkWindow")
-  (c-name "gdk_window_stick")
-  (return-type "none")
-)
-
-(define-method unstick
-  (of-object "GdkWindow")
-  (c-name "gdk_window_unstick")
-  (return-type "none")
-)
-
-(define-method maximize
-  (of-object "GdkWindow")
-  (c-name "gdk_window_maximize")
-  (return-type "none")
-)
-
-(define-method unmaximize
-  (of-object "GdkWindow")
-  (c-name "gdk_window_unmaximize")
-  (return-type "none")
-)
-
-(define-method fullscreen
-  (of-object "GdkWindow")
-  (c-name "gdk_window_fullscreen")
-  (return-type "none")
-)
-
-(define-method fullscreen_on_monitor
-  (of-object "GdkWindow")
-  (c-name "gdk_window_fullscreen_on_monitor")
-  (return-type "none")
-  (parameters
-    '("GdkMonitor*" "monitor")
-  )
-)
-
-(define-method set_fullscreen_mode
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_fullscreen_mode")
-  (return-type "none")
-  (parameters
-    '("GdkFullscreenMode" "mode")
-  )
-)
-
-(define-method get_fullscreen_mode
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_fullscreen_mode")
-  (return-type "GdkFullscreenMode")
-)
-
-(define-method unfullscreen
-  (of-object "GdkWindow")
-  (c-name "gdk_window_unfullscreen")
-  (return-type "none")
-)
-
-(define-method set_keep_above
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_keep_above")
-  (return-type "none")
-  (parameters
-    '("gboolean" "setting")
-  )
-)
-
-(define-method set_keep_below
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_keep_below")
-  (return-type "none")
-  (parameters
-    '("gboolean" "setting")
-  )
-)
-
-(define-method set_opacity
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_opacity")
-  (return-type "none")
-  (parameters
-    '("gdouble" "opacity")
-  )
-)
-
-(define-method register_dnd
-  (of-object "GdkWindow")
-  (c-name "gdk_window_register_dnd")
-  (return-type "none")
-)
-
-(define-method begin_resize_drag
-  (of-object "GdkWindow")
-  (c-name "gdk_window_begin_resize_drag")
-  (return-type "none")
-  (parameters
-    '("GdkWindowEdge" "edge")
-    '("gint" "button")
-    '("gint" "root_x")
-    '("gint" "root_y")
-    '("guint32" "timestamp")
-  )
-)
-
-(define-method begin_resize_drag_for_device
-  (of-object "GdkWindow")
-  (c-name "gdk_window_begin_resize_drag_for_device")
-  (return-type "none")
-  (parameters
-    '("GdkWindowEdge" "edge")
-    '("GdkDevice*" "device")
-    '("gint" "button")
-    '("gint" "root_x")
-    '("gint" "root_y")
-    '("guint32" "timestamp")
-  )
-)
-
-(define-method begin_move_drag
-  (of-object "GdkWindow")
-  (c-name "gdk_window_begin_move_drag")
-  (return-type "none")
-  (parameters
-    '("gint" "button")
-    '("gint" "root_x")
-    '("gint" "root_y")
-    '("guint32" "timestamp")
-  )
-)
-
-(define-method begin_move_drag_for_device
-  (of-object "GdkWindow")
-  (c-name "gdk_window_begin_move_drag_for_device")
-  (return-type "none")
-  (parameters
-    '("GdkDevice*" "device")
-    '("gint" "button")
-    '("gint" "root_x")
-    '("gint" "root_y")
-    '("guint32" "timestamp")
-  )
-)
-
-(define-method invalidate_rect
-  (of-object "GdkWindow")
-  (c-name "gdk_window_invalidate_rect")
-  (return-type "none")
-  (parameters
-    '("const-GdkRectangle*" "rect")
-    '("gboolean" "invalidate_children")
-  )
-)
-
-(define-method invalidate_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_invalidate_region")
-  (return-type "none")
-  (parameters
-    '("const-cairo_region_t*" "region")
-    '("gboolean" "invalidate_children")
-  )
-)
-
-(define-method invalidate_maybe_recurse
-  (of-object "GdkWindow")
-  (c-name "gdk_window_invalidate_maybe_recurse")
-  (return-type "none")
-  (parameters
-    '("const-cairo_region_t*" "region")
-    '("GdkWindowChildFunc" "child_func")
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method get_update_area
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_update_area")
-  (return-type "cairo_region_t*")
-)
-
-(define-method freeze_updates
-  (of-object "GdkWindow")
-  (c-name "gdk_window_freeze_updates")
-  (return-type "none")
-)
-
-(define-method thaw_updates
-  (of-object "GdkWindow")
-  (c-name "gdk_window_thaw_updates")
-  (return-type "none")
-)
-
-(define-function gdk_window_constrain_size
-  (c-name "gdk_window_constrain_size")
-  (return-type "none")
-  (parameters
-    '("GdkGeometry*" "geometry")
-    '("GdkWindowHints" "flags")
-    '("gint" "width")
-    '("gint" "height")
-    '("gint*" "new_width")
-    '("gint*" "new_height")
-  )
-)
-
-(define-method set_support_multidevice
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_support_multidevice")
-  (return-type "none")
-  (parameters
-    '("gboolean" "support_multidevice")
-  )
-)
-
-(define-method get_support_multidevice
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_support_multidevice")
-  (return-type "gboolean")
-)
-
-(define-method get_frame_clock
-  (of-object "GdkWindow")
-  (c-name "gdk_window_get_frame_clock")
-  (return-type "GdkFrameClock*")
-)
-
-(define-method set_opaque_region
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_opaque_region")
-  (return-type "none")
-  (parameters
-    '("cairo_region_t*" "region")
-  )
-)
-
-(define-method set_shadow_width
-  (of-object "GdkWindow")
-  (c-name "gdk_window_set_shadow_width")
-  (return-type "none")
-  (parameters
-    '("gint" "left")
-    '("gint" "right")
-    '("gint" "top")
-    '("gint" "bottom")
-  )
-)
-
-(define-method show_window_menu
-  (of-object "GdkWindow")
-  (c-name "gdk_window_show_window_menu")
-  (return-type "gboolean")
-  (parameters
-    '("GdkEvent*" "event")
-  )
-)
-
-(define-method create_gl_context
-  (of-object "GdkWindow")
-  (c-name "gdk_window_create_gl_context")
-  (return-type "GdkGLContext*")
-  (parameters
-    '("GError**" "error")
-  )
-)
-
-(define-method create_vulkan_context
-  (of-object "GdkWindow")
-  (c-name "gdk_window_create_vulkan_context")
-  (return-type "GdkVulkanContext*")
-  (parameters
-    '("GError**" "error")
-  )
-)
-
-
-
-;; From gdkwindowimpl.h
-
-(define-function gdk_window_impl_get_type
-  (c-name "gdk_window_impl_get_type")
-  (return-type "GType")
-)
-
-
-
 ;; From keyname-table.h
 
 
@@ -5063,13 +5071,68 @@
   (return-type "GType")
 )
 
+(define-function gdk_memory_format_get_type
+  (c-name "gdk_memory_format_get_type")
+  (return-type "GType")
+)
+
 (define-function gdk_subpixel_layout_get_type
   (c-name "gdk_subpixel_layout_get_type")
   (return-type "GType")
 )
 
+(define-function gdk_paintable_flags_get_type
+  (c-name "gdk_paintable_flags_get_type")
+  (return-type "GType")
+)
+
 (define-function gdk_seat_capabilities_get_type
   (c-name "gdk_seat_capabilities_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_surface_type_get_type
+  (c-name "gdk_surface_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_surface_hints_get_type
+  (c-name "gdk_surface_hints_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_wm_decoration_get_type
+  (c-name "gdk_wm_decoration_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_wm_function_get_type
+  (c-name "gdk_wm_function_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_gravity_get_type
+  (c-name "gdk_gravity_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_anchor_hints_get_type
+  (c-name "gdk_anchor_hints_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_surface_edge_get_type
+  (c-name "gdk_surface_edge_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_fullscreen_mode_get_type
+  (c-name "gdk_fullscreen_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_surface_state_get_type
+  (c-name "gdk_surface_state_get_type")
   (return-type "GType")
 )
 
@@ -5113,8 +5176,8 @@
   (return-type "GType")
 )
 
-(define-function gdk_window_type_hint_get_type
-  (c-name "gdk_window_type_hint_get_type")
+(define-function gdk_surface_type_hint_get_type
+  (c-name "gdk_surface_type_hint_get_type")
   (return-type "GType")
 )
 
@@ -5125,51 +5188,6 @@
 
 (define-function gdk_axis_flags_get_type
   (c-name "gdk_axis_flags_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_window_type_get_type
-  (c-name "gdk_window_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_window_hints_get_type
-  (c-name "gdk_window_hints_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_wm_decoration_get_type
-  (c-name "gdk_wm_decoration_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_wm_function_get_type
-  (c-name "gdk_wm_function_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_gravity_get_type
-  (c-name "gdk_gravity_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_anchor_hints_get_type
-  (c-name "gdk_anchor_hints_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_window_edge_get_type
-  (c-name "gdk_window_edge_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_fullscreen_mode_get_type
-  (c-name "gdk_fullscreen_mode_get_type")
-  (return-type "GType")
-)
-
-(define-function gdk_window_state_get_type
-  (c-name "gdk_window_state_get_type")
   (return-type "GType")
 )
 
