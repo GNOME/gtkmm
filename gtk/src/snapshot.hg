@@ -14,9 +14,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <gdkmm/snapshot.h>
+#include <gdkmm/rectangle.h>
 #include <gtkmm/stylecontext.h>
 
 _DEFS(gtkmm,gtk)
+_PINCLUDE(gdkmm/private/snapshot_p.h)
 
 typedef struct _graphene_rect_t graphene_rect_t;
 
@@ -38,14 +41,19 @@ namespace Gtk
  * The node at the top of the stack is the the one that append_node()
  * operates on. Use the push() and pop() functions to change the current node.
  *
- * The only way to obtain a %Snapshot object is as an argument to
- * Gtk::WidgetCustomSnapshot::snapshot_vfunc().
+ * The typical way to obtain a %Snapshot object is as an argument to
+ * Gtk::WidgetCustomSnapshot::snapshot_vfunc(). If you need to create your own
+ *  %Snapshot, use create().
  *
  * @newin{3,90}
  */
-class Snapshot final
+class Snapshot : public Gdk::Snapshot
 {
-  _CLASS_GENERIC(Snapshot, GtkSnapshot)
+  _CLASS_GOBJECT(Snapshot, GtkSnapshot, GTK_SNAPSHOT, Gdk::Snapshot, GdkSnapshot)
+  // GtkSnapshot is typedefed as GdkSnapshot.
+  // GtkSnapshot's wrap function can't be called wrap(). It would be ambiguous
+  // when there is a wrap(GdkSnapshot*, bool)
+  _NO_WRAP_FUNCTION
 
 public:
   //TODO: Add more methods. What shall be done with methods that take Gsk or graphene classes?
@@ -139,34 +147,21 @@ public:
   _WRAP_METHOD(void render_insertion_cursor(const Glib::RefPtr<StyleContext>& context,
     double x, double y, const Glib::RefPtr<Pango::Layout>& layout, int index,
     Pango::Direction direction), gtk_snapshot_render_insertion_cursor)
-
-  ///Provides access to the underlying C instance.
-  GtkSnapshot* gobj();
-
-  ///Provides access to the underlying C instance.
-  const GtkSnapshot* gobj() const;
-
-  Snapshot() = delete;
-
-  // noncopyable
-  Snapshot(const Snapshot&) = delete;
-  Snapshot& operator=(const Snapshot&) = delete;
 };
 
 } // namespace Gtk
 
 namespace Glib
 {
-/** A C++ wrapper for the C object.
- *
- * @param gobject The C instance.
- * @return The C++ wrapper.
- *
- * @relates Gtk::Snapshot
- *
- * @newin{3,90}
- */
-Gtk::Snapshot* wrap(GtkSnapshot* gobject);
-
-} // namespace Glib
-
+  /** A Glib::wrap() method for this object.
+   *
+   * It's not called %wrap() because GtkSnapshot is a typedef of GdkSnapshot.
+   *
+   * @param object The C instance.
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   *
+   * @relates Gtk::Snapshot
+   */
+  Glib::RefPtr<Gtk::Snapshot> wrap_gtk_snapshot(GtkSnapshot* object, bool take_copy = false);
+}

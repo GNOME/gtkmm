@@ -1,0 +1,62 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gdkmm/texture.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(gdkmm/private/texture_p.h)
+
+namespace Gdk
+{
+class GLContext;
+
+/** Pixel data.
+ *
+ * %Gdk::GLTexture is the basic element used to refer to pixel data.
+ * It is primarily meant for pixel data that will not change over
+ * multiple frames, and will be used for a long time.
+ *
+ * You cannot get your pixel data back once you've uploaded it.
+ *
+ * %Gdk::GLTexture is an immutable object: That means you cannot change
+ * anything about it.
+ *
+ * @newin{3,94}
+ */
+class GLTexture : public Gdk::Texture
+{
+  _CLASS_GOBJECT(GLTexture, GdkGLTexture, GDK_GL_TEXTURE, Gdk::Texture, GdkTexture)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  /** For instance,
+   * void on_gl_resources_released();
+   */
+  using SlotGLReleased = sigc::slot<void()>;
+
+  // gdk_gl_texture_new() does more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<Texture> create(const Glib::RefPtr<GLContext>& context,
+    guint id, int width, int height, const SlotGLReleased& slot{destroy} = {}),
+    gdk_gl_texture_new, slot_name slot, slot_callback GLTexture_destroy_callback)
+
+  _WRAP_METHOD(void release(), gdk_gl_texture_release)
+
+  // There are no public signals, properties or vfuncs.
+};
+
+} // namespace Gdk

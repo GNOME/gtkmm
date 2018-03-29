@@ -424,8 +424,7 @@ _CONVERSION(`GtkShortcutsWindow*',`ShortcutsWindow*',__RP2P)
 _CONVERSION(`GtkShortcutsWindow*',`const ShortcutsWindow*',__RP2P)
 _CONVERSION(`ShortcutsWindow&',`GtkShortcutsWindow*',__FR2P)
 
-_CONVERSION(`Snapshot&',`GtkSnapshot*',__FR2P)
-_CONVERSION(`Gtk::Snapshot&',`GtkSnapshot*',__FR2P)
+_CONVERSION(`const Glib::RefPtr<Gtk::Snapshot>&', `GtkSnapshot*', __CONVERT_REFPTR_TO_P)
 
 #FlowBoxChild
 _CONVERSION(`GtkFlowBoxChild*',`FlowBoxChild*',__RP2P)

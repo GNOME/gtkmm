@@ -22,7 +22,7 @@
 #define _GDKMM_GDKMM_H_
 
 #include <gdkmm/types.h>
-#include <gdkmm/window.h>
+#include <gdkmm/surface.h>
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/pixbufanimation.h>
 #include <gdkmm/pixbufformat.h>
@@ -34,6 +34,7 @@
 #include <gdkmm/events.h>
 #include <gdkmm/frameclock.h>
 #include <gdkmm/glcontext.h>
+#include <gdkmm/gltexture.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/devicetool.h>
 #include <gdkmm/display.h>
@@ -43,5 +44,7 @@
 #include <gdkmm/monitor.h>
 #include <gdkmm/general.h>
 #include <gdkmm/contentformatsbuilder.h>
+#include <gdkmm/paintable.h>
+#include <gdkmm/snapshot.h>
 
 #endif /* _GDKMM_GDKMM_H_ */

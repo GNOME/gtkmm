@@ -15,6 +15,7 @@
  */
 
 #include <glibmm/object.h>
+#include <gdkmm/paintable.h>
 
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -26,7 +27,6 @@ class File;
 
 namespace Gdk
 {
-class GLContext;
 class Pixbuf;
 
 /** Pixel data.
@@ -42,34 +42,22 @@ class Pixbuf;
  *
  * @newin{3,94}
  */
-class Texture : public Glib::Object
+class Texture : public Glib::Object, public Paintable
 {
   _CLASS_GOBJECT(Texture, GdkTexture, GDK_TEXTURE, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Paintable)
 
 protected:
   _CTOR_DEFAULT()
 
 public:
   // All gdk_texture_new_*() functions do more than call g_object_new().
-  _WRAP_METHOD(static Glib::RefPtr<Texture> create_for_data(
-    const guchar* data, int width, int height, int stride), gdk_texture_new_for_data)
   _WRAP_METHOD(static Glib::RefPtr<Texture> create_for_pixbuf(
     const Glib::RefPtr<Pixbuf>& pixbuf), gdk_texture_new_for_pixbuf)
   _WRAP_METHOD(static Glib::RefPtr<Texture> create_from_resource(
     const std::string& resource_path), gdk_texture_new_from_resource)
   _WRAP_METHOD(static Glib::RefPtr<Texture> create_from_file(
     const Glib::RefPtr<Gio::File>& file), gdk_texture_new_from_file, errthrow)
-
-  /** For instance,
-   * void on_gl_resources_released();
-   */
-  using SlotGLReleased = sigc::slot<void()>;
-
-  _WRAP_METHOD(static Glib::RefPtr<Texture> create_for_gl(
-    const Glib::RefPtr<GLContext>& context,
-    guint id, int width, int height, const SlotGLReleased& slot{destroy} = {}),
-    gdk_gl_texture_new, slot_name slot, slot_callback Texture_GL_destroy_callback)
-  _WRAP_METHOD(void release_gl(), gdk_gl_texture_release)
 
   _WRAP_METHOD(int get_width() const, gdk_texture_get_width)
   _WRAP_METHOD(int get_height() const, gdk_texture_get_height)

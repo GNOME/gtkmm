@@ -17,20 +17,6 @@
 #include <gtk/gtk.h>
 #include <gdkmm/cairoutils.h>
 
-/* Why reinterpret_cast<Snapshot*>(gobject) is needed:
- *
- * A Snapshot instance is in fact always a GtkSnapshot instance.
- * Unfortunately, GtkSnapshot cannot be a member of Snapshot,
- * because it is an opaque struct. Also, the C interface does not provide
- * any hooks to install a destroy notification handler, thus we cannot
- * wrap it dynamically either.
- *
- * The cast works because Snapshot does not have any member data, and
- * it is impossible to derive from it. This is ensured by using final on the
- * class and by using = delete on the default constructor.
- * This trick is used also in classes declared as _CLASS_OPAQUE_REFCOUNTED.
- */
-
 namespace Gtk
 {
 
@@ -72,24 +58,15 @@ Cairo::RefPtr<Cairo::Context> Snapshot::append_cairo(
   return append_cairo(&rect, name);
 }
 
-GtkSnapshot* Snapshot::gobj()
-{
-  return reinterpret_cast<GtkSnapshot*>(this);
-}
-
-const GtkSnapshot* Snapshot::gobj() const
-{
-  return reinterpret_cast<const GtkSnapshot*>(this);
-}
-
 } //namespace Gtk
 
 namespace Glib
 {
 
-Gtk::Snapshot* wrap(GtkSnapshot* gobject)
+Glib::RefPtr<Gtk::Snapshot> wrap_gtk_snapshot(GtkSnapshot* object, bool take_copy)
 {
-  return reinterpret_cast<Gtk::Snapshot*>(gobject);
+  return Glib::make_refptr_for_instance<Gtk::Snapshot>( dynamic_cast<Gtk::Snapshot*> (Glib::wrap_auto((GObject*)(object), take_copy)) );
+  //We use dynamic_cast<> in case of multiple inheritance.
 }
 
-} //namespace Glib
+} /* namespace Glib */

@@ -1,0 +1,308 @@
+/* Copyright(C) 1998-2010 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License or(at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+_CONFIGINCLUDE(gdkmmconfig.h)
+
+#include <glibmm/object.h>
+#include <gdkmm/dragcontext.h>
+#include <gdkmm/types.h>
+#include <cairomm/region.h>
+#include <cairomm/pattern.h>
+#include <gdkmm/device.h>
+#include <gdkmm/event.h>
+#include <gdkmm/rectangle.h>
+#include <gdkmm/rgba.h>
+#include <cairomm/context.h>
+#include <gdk/gdk.h>
+
+_DEFS(gdkmm,gdk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gdk
+{
+
+_WRAP_ENUM(WMDecoration, GdkWMDecoration)
+_WRAP_ENUM(WMFunction, GdkWMFunction)
+_WRAP_ENUM(SurfaceEdge, GdkSurfaceEdge)
+_WRAP_ENUM(Gravity, GdkGravity)
+_WRAP_ENUM(AnchorHints, GdkAnchorHints)
+_WRAP_ENUM(FullscreenMode, GdkFullscreenMode,
+  s#^CURRENT_MONITOR$#ON_CURRENT_MONITOR#,
+  s#^ALL_MONITORS$#ON_ALL_MONITORS#)
+
+class ContentProvider;
+class Cursor;
+class GLContext;
+class DrawContext;
+class DrawingContext;
+class FrameClock;
+class Monitor;
+
+/** A Gdk::Surface is a rectangular region on the screen. It's a low-level object, used to implement high-level objects such
+ * as Gtk::Widget and Gtk::Window on the GTK+ level. A Gtk::Window is a toplevel window, the thing a user might think of as
+ * a "window" with a titlebar and so on; a Gtk::Window may contain many Gdk::Surfaces. For example, each Gtk::Button has a
+ * Gdk::Surface associated with it.
+ */
+class Surface : public Glib::Object
+{
+  _CLASS_GOBJECT(Surface, GdkSurface, GDK_SURFACE, Glib::Object, GObject)
+  _STRUCT_NOT_HIDDEN
+  _IGNORE(gdk_surface_destroy, gdk_surface_is_destroyed)
+
+public:
+  _WRAP_ENUM(Type, GdkSurfaceType)
+  _WRAP_ENUM(State, GdkSurfaceState)
+  _WRAP_ENUM(Hints, GdkSurfaceHints)
+  _WRAP_ENUM(TypeHint, GdkSurfaceTypeHint)
+
+  // _WRAP_CREATE() would not be very useful here.
+  // The gdk_surface_new_*() functions do more than call g_object_new().
+  // And we can't make one hand-coded constructor for each gdk_surface_new_*()
+  // function, because some of them have identical prototypes.
+  _WRAP_METHOD(static Glib::RefPtr<Surface> create_toplevel(const Glib::RefPtr<Display>& display,
+    int width, int height), gdk_surface_new_toplevel)
+  _WRAP_METHOD(static Glib::RefPtr<Surface> create_popup(const Glib::RefPtr<Display>& display,
+    const Rectangle& position), gdk_surface_new_popup)
+  //TODO: Wrap or ignore? The documentation says: You most likely do not want to use this function.
+  //_WRAP_METHOD(static Glib::RefPtr<Surface> create_temp(const Glib::RefPtr<Display>& display), gdk_surface_new_temp)
+  _WRAP_METHOD(static Glib::RefPtr<Surface> create_child(const Glib::RefPtr<Surface>& parent,
+    const Rectangle& position), gdk_surface_new_child)
+
+  _WRAP_METHOD(Type get_surface_type() const, gdk_surface_get_surface_type)
+
+  _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_surface_get_display, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_surface_get_display, refreturn, constversion)
+
+  _WRAP_METHOD(void show(), gdk_surface_show)
+  _WRAP_METHOD(void hide(), gdk_surface_hide)
+  _WRAP_METHOD(void withdraw(), gdk_surface_withdraw)
+  _WRAP_METHOD(void show_unraised(), gdk_surface_show_unraised)
+  _WRAP_METHOD(void move(int x, int y), gdk_surface_move)
+  _WRAP_METHOD(void resize(int width, int height), gdk_surface_resize)
+  _WRAP_METHOD(void move_resize(int x, int y, int width, int height), gdk_surface_move_resize)
+  _WRAP_METHOD(void raise(), gdk_surface_raise)
+  _WRAP_METHOD(void lower(), gdk_surface_lower)
+
+  _WRAP_METHOD(void restack(const Glib::RefPtr<Surface>& sibling, bool above), gdk_surface_restack)
+
+  /** Changes the position of this surface in the Z-order (stacking order). This
+   * either raises (if @a above is true) or lowers the surface.
+   *
+   * If this is a toplevel, the window manager may choose to deny the
+   * request to move the surface in the Z-order. restack() only
+   * requests the restack but does not guarantee it.
+   *
+   * @param above Whether to raise or lower the surface.
+   *
+   * @newin{2,18}
+   */
+  void restack(bool above);
+
+  _WRAP_METHOD(void focus(guint32 timestamp), gdk_surface_focus)
+  _WRAP_METHOD(void set_user_data(gpointer user_data), gdk_surface_set_user_data)
+
+  _WRAP_METHOD(void input_shape_combine_region(const ::Cairo::RefPtr< ::Cairo::Region>& shape_region, int offset_x, int offset_y), gdk_surface_input_shape_combine_region)
+  _WRAP_METHOD(void set_child_input_shapes(), gdk_surface_set_child_input_shapes)
+  _WRAP_METHOD(void merge_child_input_shapes(), gdk_surface_merge_child_input_shapes)
+
+  _WRAP_METHOD(void set_pass_through(bool pass_through = true), gdk_surface_set_pass_through)
+  _WRAP_METHOD(bool get_pass_through() const, gdk_surface_get_pass_through)
+
+  _WRAP_METHOD(bool is_visible() const, gdk_surface_is_visible)
+  _WRAP_METHOD(bool is_viewable() const, gdk_surface_is_viewable)
+  _WRAP_METHOD(bool is_input_only() const, gdk_surface_is_input_only)
+  _WRAP_METHOD(State get_state() const, gdk_surface_get_state)
+  _WRAP_METHOD(bool has_native() const, gdk_surface_has_native)
+  _WRAP_METHOD(void set_type_hint(TypeHint hint), gdk_surface_set_type_hint)
+  _WRAP_METHOD(TypeHint get_type_hint(), gdk_surface_get_type_hint)
+  _WRAP_METHOD(bool get_modal_hint() const, gdk_surface_get_modal_hint)
+  _WRAP_METHOD(void set_modal_hint(bool modal = true), gdk_surface_set_modal_hint)
+  _WRAP_METHOD(void set_geometry_hints(const Geometry& geometry, Hints geom_mask), gdk_surface_set_geometry_hints)
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), gdk_surface_set_title)
+  _WRAP_METHOD(void set_role(const Glib::ustring& role), gdk_surface_set_role)
+  _WRAP_METHOD(void set_startup_id(const Glib::ustring& startup_id), gdk_surface_set_startup_id)
+  _WRAP_METHOD(void set_transient_for(const Glib::RefPtr<Surface>& parent), gdk_surface_set_transient_for)
+
+  _WRAP_METHOD(void set_cursor(const Glib::RefPtr<Cursor>& cursor), gdk_surface_set_cursor)
+
+  /** Use the parent surface's cursor.
+   * For top-level windows this means that it will use the default cursor for the ROOT window.
+   */
+  void set_cursor();
+
+  _WRAP_METHOD(void set_device_cursor(const Glib::RefPtr<Device>& device, const Glib::RefPtr<Cursor>& cursor), gdk_surface_set_device_cursor)
+
+  _WRAP_METHOD(Glib::RefPtr<Cursor> get_device_cursor(const Glib::RefPtr<Device>& device), gdk_surface_get_device_cursor, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Cursor> get_device_cursor(const Glib::RefPtr<const Device>& device) const, gdk_surface_get_device_cursor, refreturn)
+
+
+  _WRAP_METHOD(Glib::RefPtr<Cursor> get_cursor(), gdk_surface_get_cursor, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Cursor> get_cursor() const, gdk_surface_get_cursor, refreturn, constversion)
+
+  _WRAP_METHOD(void get_user_data(gpointer* data), gdk_surface_get_user_data)
+  _WRAP_METHOD(void get_geometry(int& x, int& y, int& width, int& height) const, gdk_surface_get_geometry)
+  _WRAP_METHOD(int get_width() const, gdk_surface_get_width)
+  _WRAP_METHOD(int get_height() const, gdk_surface_get_height)
+
+  _WRAP_METHOD(void get_position(int& x, int& y) const, gdk_surface_get_position)
+  _WRAP_METHOD(int get_origin(int& x, int& y) const, gdk_surface_get_origin)
+  _WRAP_METHOD(void get_root_coords(int x, int y, int& root_x, int& root_y), gdk_surface_get_root_coords)
+  _WRAP_METHOD(void coords_to_parent(double x,  double y, double& parent_x, double& parent_y), gdk_surface_coords_to_parent)
+  _WRAP_METHOD(void coords_from_parent(double parent_x, double parent_y, double& x, double& y), gdk_surface_coords_from_parent)
+
+  _WRAP_METHOD(void get_root_origin(int& x, int& y) const, gdk_surface_get_root_origin)
+
+  _WRAP_METHOD(void get_frame_extents(Rectangle& rect) const, gdk_surface_get_frame_extents)
+
+  _WRAP_METHOD(int get_scale_factor() const, gdk_surface_get_scale_factor)
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_parent(), gdk_surface_get_parent, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_parent() const, gdk_surface_get_parent, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_toplevel(), gdk_surface_get_toplevel, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_toplevel() const, gdk_surface_get_toplevel, refreturn, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_device_position(const Glib::RefPtr<const Device>& device, int& x, int& y, ModifierType& mask) const, gdk_surface_get_device_position, refreturn)
+
+    _WRAP_METHOD(Glib::RefPtr<Surface> get_device_position(const Glib::RefPtr<const Device>& device, double& x, double& y, ModifierType& mask) const, gdk_surface_get_device_position_double, refreturn)
+
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Surface> >',`Glib::ListHandler<Glib::RefPtr<Surface> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Surface> > get_children(), gdk_surface_get_children)
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<const Surface> >',`Glib::ListHandler<Glib::RefPtr<const Surface> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const Surface> > get_children() const, gdk_surface_get_children)
+  _IGNORE(gdk_surface_peek_children) //gdk_surface_peek_children() is the same as gdk_surface_get_children() with different memory mangement of the list.
+
+  _WRAP_METHOD(EventMask get_events() const, gdk_surface_get_events)
+  _WRAP_METHOD(void set_events(EventMask event_mask), gdk_surface_set_events)
+
+  _WRAP_METHOD(EventMask get_device_events(const Glib::RefPtr<const Device>& device) const, gdk_surface_get_device_events)
+  _WRAP_METHOD(void set_device_events(const Glib::RefPtr<Device>& device, EventMask event_mask), gdk_surface_set_device_events)
+
+#m4 _CONVERSION(`const std::vector<Glib::RefPtr<Texture>>&',`GList*',`Glib::ListHandler<Glib::RefPtr<Texture>>::vector_to_list($3).data()')
+  _WRAP_METHOD(void set_icon_list(const std::vector<Glib::RefPtr<Texture>>& textures), gdk_surface_set_icon_list)
+  void unset_icon();
+  _WRAP_METHOD(void set_icon_name(const Glib::ustring& name), gdk_surface_set_icon_name)
+
+  _WRAP_METHOD(void set_group(const Glib::RefPtr<Surface>& leader), gdk_surface_set_group)
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_group(), gdk_surface_get_group)
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_group() const, gdk_surface_get_group, constversion)
+
+  _WRAP_METHOD(void set_decorations(WMDecoration decorations), gdk_surface_set_decorations)
+  _WRAP_METHOD(bool get_decorations(WMDecoration& decorations) const, gdk_surface_get_decorations)
+  _WRAP_METHOD(void set_functions(WMFunction functions), gdk_surface_set_functions)
+
+  #m4 _CONVERSION(`::Cairo::Content',`cairo_content_t',`(cairo_content_t)($3)')
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Surface> create_similar_surface(::Cairo::Content content, int width,  int height), gdk_surface_create_similar_surface )
+
+  #m4 _CONVERSION(`::Cairo::Surface::Format',`cairo_format_t',`(cairo_format_t)($3)')
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::ImageSurface> create_similar_image_surface(::Cairo::Surface::Format format, int width, int height, int scale), gdk_surface_create_similar_image_surface)
+
+  _WRAP_METHOD(void beep(), gdk_surface_beep)
+
+  _WRAP_METHOD(void iconify(), gdk_surface_iconify)
+  _WRAP_METHOD(void deiconify(), gdk_surface_deiconify)
+  _WRAP_METHOD(void stick(), gdk_surface_stick)
+  _WRAP_METHOD(void unstick(), gdk_surface_unstick)
+  _WRAP_METHOD(void maximize(), gdk_surface_maximize)
+  _WRAP_METHOD(void unmaximize(), gdk_surface_unmaximize)
+  _WRAP_METHOD(void register_dnd(), gdk_surface_register_dnd)
+
+  _WRAP_METHOD(void begin_resize_drag(SurfaceEdge edge, int button, int root_x, int root_y, guint32 timestamp), gdk_surface_begin_resize_drag)
+
+  _WRAP_METHOD(void resize_drag(SurfaceEdge edge, const Glib::RefPtr<Device>& device, int button, int root_x, int root_y, guint32 timestamp), gdk_surface_begin_resize_drag_for_device)
+
+  _WRAP_METHOD(void begin_move_drag(int button, int root_x, int root_y, guint32 timestamp), gdk_surface_begin_move_drag)
+
+  _WRAP_METHOD(void begin_move_drag(const Glib::RefPtr<Device>& device, int button, int root_x, int root_y, guint32 timestamp), gdk_surface_begin_move_drag_for_device)
+
+  _WRAP_METHOD(Glib::RefPtr<DragContext> drag_begin_from_point(const Glib::RefPtr<Device>& device,
+    const Glib::RefPtr<ContentProvider>& content, DragAction actions, int dx, int dy), gdk_drag_begin)
+
+  _WRAP_METHOD(void invalidate_rect(const Rectangle& rect), gdk_surface_invalidate_rect)
+
+  /** A convenience wrapper around invalidate_region() which
+   * invalidates the whole region. See invalidate_region() for details.
+   */
+  void invalidate();
+
+  _WRAP_METHOD(void invalidate_region(const ::Cairo::RefPtr< ::Cairo::Region>& region), gdk_surface_invalidate_region)
+
+  _WRAP_METHOD(void freeze_updates(), gdk_surface_freeze_updates)
+  _WRAP_METHOD(void thaw_updates(), gdk_surface_thaw_updates)
+
+  _WRAP_METHOD(static void constrain_size(const Geometry& geometry, Hints flags,
+    int width, int height, int& new_width, int& new_height), gdk_surface_constrain_size)
+
+  _WRAP_METHOD(void set_skip_taskbar_hint(bool skips_taskbar = true), gdk_surface_set_skip_taskbar_hint)
+  _WRAP_METHOD(void set_skip_pager_hint(bool skips_pager = true), gdk_surface_set_skip_pager_hint)
+
+  _WRAP_METHOD(void set_urgency_hint(bool urgent = true), gdk_surface_set_urgency_hint)
+
+  _WRAP_METHOD(void fullscreen(), gdk_surface_fullscreen)
+  _WRAP_METHOD(void fullscreen_on_monitor(const Glib::RefPtr<Monitor>& monitor), gdk_surface_fullscreen_on_monitor)
+  _WRAP_METHOD(void set_fullscreen_mode(FullscreenMode mode), gdk_surface_set_fullscreen_mode)
+  _WRAP_METHOD(FullscreenMode get_fullscreen_mode() const, gdk_surface_get_fullscreen_mode)
+  _WRAP_METHOD(void unfullscreen(), gdk_surface_unfullscreen)
+
+  _WRAP_METHOD(void set_keep_above(bool setting = true), gdk_surface_set_keep_above)
+  _WRAP_METHOD(void set_keep_below(bool setting = true), gdk_surface_set_keep_below)
+
+  _WRAP_METHOD(void set_opacity(double opacity), gdk_surface_set_opacity)
+
+  _WRAP_METHOD(bool get_accept_focus() const, gdk_surface_get_accept_focus)
+  _WRAP_METHOD(void set_accept_focus(bool accept_focus = true), gdk_surface_set_accept_focus)
+
+  _WRAP_METHOD(bool get_focus_on_map() const, gdk_surface_get_focus_on_map)
+  _WRAP_METHOD(void set_focus_on_map(bool focus_on_map), gdk_surface_set_focus_on_map)
+
+  _WRAP_METHOD(void set_support_multidevice(bool support_multidevice = true), gdk_surface_set_support_multidevice)
+  _WRAP_METHOD(bool get_support_multidevice(), gdk_surface_get_support_multidevice)
+
+  _WRAP_METHOD(Glib::RefPtr<FrameClock> get_frame_clock(), gdk_surface_get_frame_clock, refreturn, newin "3,94")
+  _WRAP_METHOD(Glib::RefPtr<const FrameClock> get_frame_clock() const, gdk_surface_get_frame_clock, refreturn, constversion, newin "3,94")
+
+  _WRAP_METHOD(void set_opaque_region(const ::Cairo::RefPtr<const ::Cairo::Region>& region), gdk_surface_set_opaque_region)
+
+  _WRAP_METHOD(void set_shadow_width(int left, int right, int top, int bottom), gdk_surface_set_shadow_width)
+
+  _WRAP_METHOD(bool show_window_menu(const Glib::RefPtr<const Event>& event), gdk_surface_show_window_menu)
+
+  /** Creates a new GLContext matching the framebuffer format to the visual of the
+   * Surface. The context is disconnected from any particular surface.
+   *
+   * If the creation of the GLContext failed an error will be thrown.
+   *
+   * Before using the returned GLContext, you will need to call
+   * GLContext::make_current() or GLContext::realize().
+   *
+   * @newin{3,18}
+   *
+   * @return GLContext The newly created context.
+   *
+   * @throws GLError On missing GL implementation or extension required for context creation.
+   */
+  _WRAP_METHOD(Glib::RefPtr<Gdk::GLContext> create_gl_context(), gdk_surface_create_gl_context, errthrow)
+
+  _WRAP_METHOD(Glib::RefPtr<DrawingContext> begin_draw_frame(const Glib::RefPtr<DrawContext>& context{?}, const ::Cairo::RefPtr<const ::Cairo::Region>& region), gdk_surface_begin_draw_frame, refreturn)
+  _WRAP_METHOD(void end_draw_frame(const Glib::RefPtr<DrawingContext>& context), gdk_surface_end_draw_frame)
+
+  _IGNORE_SIGNAL("moved-to-rect")dnl// Private
+
+  _WRAP_PROPERTY("cursor", Glib::RefPtr<Cursor>)
+  _WRAP_PROPERTY("display", Glib::RefPtr<Display>)
+  _WRAP_PROPERTY("state", State)
+};
+
+} // namespace Gdk

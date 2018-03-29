@@ -294,7 +294,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(
   Gtk::Window* toplevel = nullptr;
   auto seat = device->get_seat();
 
-  if (seat && seat->grab(pPopup->get_window(), Gdk::Seat::Capabilities::ALL_POINTING,
+  if (seat && seat->grab(pPopup->get_surface(), Gdk::Seat::Capabilities::ALL_POINTING,
       false, cursor) == Gdk::GrabStatus::SUCCESS)
   {
     m_popup_clicked = false;
@@ -324,7 +324,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   if (!device)
     return nullptr;
 
-  auto refPointerWindow = device->get_window_at_position();
+  auto refPointerWindow = device->get_surface_at_position();
   if (refPointerWindow)
   {
     // The user data field of a GdkWindow is used to store a pointer

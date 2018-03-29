@@ -22,7 +22,7 @@
 #include <gdkmm/rectangle.h>
 #include <gdkmm/rgba.h>
 #include <gdkmm/glcontext.h>
-#include <gdkmm/window.h>
+#include <gdkmm/surface.h>
 #include <cairomm/context.h>
 #include <cairomm/region.h>
 #include <cairomm/surface.h>
@@ -111,15 +111,15 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
 /** Creates an image surface with the same contents as the pixbuf.
  *
  * @param pixbuf A Gdk::Pixbuf.
- * @param scale The scale of the new surface, or 0 to use same as @a for_window.
- * @param for_window The window this will be drawn to, or an empty
- *        Glib::RefPtr<Gdk::Window> if none.
+ * @param scale The scale of the new surface, or 0 to use same as @a for_surface.
+ * @param for_surface The surface this will be drawn to, or an empty
+ *        Glib::RefPtr<Gdk::Surface> if none.
  * @returns A new cairo surface.
  *
  * @newin{3,92}
  */
 ::Cairo::RefPtr< ::Cairo::Surface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
-  int scale, const Glib::RefPtr<Gdk::Window>& for_window = {});
+  int scale, const Glib::RefPtr<Gdk::Surface>& for_surface = {});
 
 /** This is the main way to draw GL content in gtkmm.
  * It takes a render buffer ID (@a source_type == GL_RENDERBUFFER) or a texture id
@@ -128,9 +128,9 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  * @a x, @a y, @a width and @a height will be drawn at the current (0,0) position
  * of the cairo context.
  *
- * This will work for *all* cairo contexts, as long as @a window is realized, but the
+ * This will work for *all* cairo contexts, as long as @a surface is realized, but the
  * fallback implementation that reads back the pixels from the buffer may be
- * used in the general case. In the case of direct drawing to a window with
+ * used in the general case. In the case of direct drawing to a surface with
  * no special effects applied to @a context it will however use a more efficient
  * approach.
  *
@@ -140,7 +140,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  * Calling this may change the current GL context.
  *
  * @param context A cairo context.
- * @param window The window we're rendering for (not necessarily into).
+ * @param surface The surface we're rendering for (not necessarily into).
  * @param source The GL ID of the source buffer.
  * @param source_type The type of the @a source.
  * @param buffer_scale The scale-factor that the @a source buffer is allocated for.
@@ -152,7 +152,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  * @newin{3,92}
  */
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
-  const Glib::RefPtr<Gdk::Window>& window, int source, int source_type,
+  const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height);
 
 /** Uploads the contents of a %Cairo surface to a GL texture target.

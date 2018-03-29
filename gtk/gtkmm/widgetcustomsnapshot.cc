@@ -30,14 +30,14 @@ Glib::ExtraClassInit(class_init_function)
 {
 }
 
-void WidgetCustomSnapshot::snapshot_vfunc(Snapshot& snapshot)
+void WidgetCustomSnapshot::snapshot_vfunc(const Glib::RefPtr<Snapshot>& snapshot)
 {
   const auto base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
   if (base && base->snapshot)
-    (*base->snapshot)((BaseObjectType*)gobject_, snapshot.gobj());
+    (*base->snapshot)((BaseObjectType*)gobject_, snapshot->gobj());
 }
 
 // static
@@ -59,7 +59,7 @@ void WidgetCustomSnapshot::snapshot_vfunc_callback(GtkWidget* self, GtkSnapshot*
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes must override.
-        obj->snapshot_vfunc(*Glib::wrap(snapshot));
+        obj->snapshot_vfunc(Glib::wrap_gtk_snapshot(snapshot, true));
         return;
       }
       catch (...)

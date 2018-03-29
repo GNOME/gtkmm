@@ -21,7 +21,7 @@
 #include <gtkmm/snapshot.h>
 
 using GtkWidget = struct _GtkWidget;
-using GtkSnapshot = struct _GtkSnapshot;
+//using GtkSnapshot = struct _GtkSnapshot;
 
 namespace Gtk
 {
@@ -76,7 +76,7 @@ public:
 
 protected:
   /// Called when a widget is supposed to create a snapshot of itself.
-  virtual void snapshot_vfunc(Snapshot& snapshot);
+  virtual void snapshot_vfunc(const Glib::RefPtr<Snapshot>& snapshot);
 
 private:
   static void snapshot_vfunc_callback(GtkWidget* self, GtkSnapshot* snapshot);

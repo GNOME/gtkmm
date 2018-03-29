@@ -63,17 +63,17 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context)
 }
 
 ::Cairo::RefPtr< ::Cairo::Surface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
-  int scale, const Glib::RefPtr<Gdk::Window>& for_window)
+  int scale, const Glib::RefPtr<Gdk::Surface>& for_surface)
 {
   return Gdk::Cairo::wrap(gdk_cairo_surface_create_from_pixbuf(
-    pixbuf->gobj(), scale, for_window ? for_window->gobj() : nullptr), true);
+    pixbuf->gobj(), scale, for_surface ? for_surface->gobj() : nullptr), true);
 }
 
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
-  const Glib::RefPtr<Gdk::Window>& window, int source, int source_type,
+  const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height)
 {
-  gdk_cairo_draw_from_gl(context->cobj(), window->gobj(), source, source_type,
+  gdk_cairo_draw_from_gl(context->cobj(), surface->gobj(), source, source_type,
     buffer_scale, x, y, width, height);
 }
 
