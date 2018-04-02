@@ -18,11 +18,12 @@
 
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gdk/gdk.h)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C"
 {
-typedef struct _GtkPaintableInterface GtkPaintableInterface;
+typedef struct _GdkPaintableInterface GdkPaintableInterface;
 }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -32,15 +33,53 @@ class Snapshot;
 
 /** An interface for a paintable region.
  *
+ * %Gdk::Paintable is a simple interface used by GDK and GTK to represent
+ * objects that can be painted anywhere at any size without requiring any
+ * sort of layout. The interface is inspired by similar concepts elsewhere,
+ * such as ClutterContent,
+ * <a href="https://www.w3.org/TR/css-images-4/#paint-source">HTML/CSS Paint Sources</a>
+ * or <a href="https://www.w3.org/TR/SVG2/pservers.html">SVG Paint Servers</a>.
+ *
+ * A %Paintable can be snapshot at any time and size using
+ * snapshot(). How the paintable interprets that size and if it
+ * scales or centers itself into the given rectangle is implementation defined,
+ * though if you are implementing a %Paintable and don't know what to do, it
+ * is suggested that you scale your paintable ignoring any potential aspect ratio.
+ *
+ * The contents that a %Paintable produces may depend on the %Snapshot passed
+ * to it. For example, paintables may decide to use more detailed images on higher
+ * resolution screens or when OpenGL is available. A %Paintable will however
+ * always produce the same output for the same snapshot.
+ *
+ * A %Paintable may change its contents, meaning that it will now produce a
+ * different output with the same snpashot. Once that happens, it will call
+ * invalidate_contents() which will emit the signal_invalidate_contents() signal.  
+ * If a paintable is known to never change its contents, it will set the
+ * Flags::STATIC_CONTENTS flag. If a consumer cannot deal with changing
+ * contents, it may call get_current_image() which will return a
+ * static paintable and use that.
+ *
+ * A paintable can report an intrinsic (or preferred) size or aspect ratio it
+ * wishes to be rendered at, though it doesn't have to. Consumers of the interface
+ * can use this information to layout the paintable appropriately.
+ * Just like the contents, the size of a paintable can change. A paintable will
+ * indicate this by calling invalidate_size() which will emit the
+ * signal_invalidate_size() signal.
+ * And just like for contents, if a paintable is known to never change its size,
+ * it will set the Flags::STATIC_SIZE flag.
+ *
+ * @see Gtk::Image, Gdk::Texture, Gtk::Snapshot
  *
  * @newin{3,94}
  */
 class Paintable : public Glib::Interface
 {
-  _CLASS_INTERFACE(Paintable, GdkPaintable, GDK_PAINTABLE, GtkPaintableInterface)
+  _CLASS_INTERFACE(Paintable, GdkPaintable, GDK_PAINTABLE, GdkPaintableInterface)
 
 public:
-  _WRAP_ENUM(Flags, GdkPaintableFlags)
+  _WRAP_ENUM(Flags, GdkPaintableFlags,
+    s#^CONTENTS$#STATIC_CONTENTS#,
+    s#^SIZE$#STATIC_SIZE#)
 
   _WRAP_METHOD(void snapshot(const Glib::RefPtr<Gdk::Snapshot>& snapshot, double width, double height), gdk_paintable_snapshot)
   _WRAP_METHOD(Glib::RefPtr<const Paintable> get_current_image() const, gdk_paintable_get_current_image)
@@ -58,7 +97,14 @@ public:
   _WRAP_SIGNAL(void invalidate_contents(), "invalidate-contents", no_default_handler)
   _WRAP_SIGNAL(void invalidate_size(), "invalidate-size", no_default_handler)
 
-  //TODO: Add vfuncs
+#m4 _CONVERSION(`GdkSnapshot*',`const Glib::RefPtr<Gdk::Snapshot>&', `Glib::wrap($3, true)')
+  _WRAP_VFUNC(void snapshot(const Glib::RefPtr<Gdk::Snapshot>& snapshot, double width, double height), snapshot)
+#m4 _CONVERSION(`Glib::RefPtr<Paintable>',`GdkPaintable*',__CONVERT_REFPTR_TO_P)
+  _WRAP_VFUNC(Glib::RefPtr<Paintable> get_current_image() const, get_current_image, refreturn)
+  _WRAP_VFUNC(Flags get_flags() const, get_flags)
+  _WRAP_VFUNC(int get_intrinsic_width() const, get_intrinsic_width)
+  _WRAP_VFUNC(int get_intrinsic_height() const, get_intrinsic_height)
+  _WRAP_VFUNC(double get_intrinsic_aspect_ratio() const, get_intrinsic_aspect_ratio)
 
   // There are no properties.
 };
