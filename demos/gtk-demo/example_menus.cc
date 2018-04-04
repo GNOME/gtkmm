@@ -11,8 +11,7 @@
  * There are several kinds of menu item, including plain Gtk::MenuItem,
  * Gtk::CheckMenuItem which can be checked/unchecked, Gtk::RadioMenuItem
  * which is a check menu item that's in a mutually exclusive group,
- * Gtk::SeparatorMenuItem which is a separator bar, and Gtk::ImageMenuItem which
- * can place a Gtk::Image or other widget next to the menu text.
+ * and Gtk::SeparatorMenuItem which is a separator bar.
  *
  * A Gtk::MenuItem can have a submenu, which is simply a Gtk::Menu to pop
  * up when the menu item is selected. Typically, all menu items in a menu bar
@@ -24,7 +23,7 @@
  */
 
 #include <gtkmm.h>
-#include <stdio.h>
+#include <iostream>
 
 class Example_Menus : public Gtk::Window
 {
@@ -34,12 +33,12 @@ public:
 
 protected:
   //signal handlers:
-  virtual void on_button_clicked();
+  void on_button_clicked();
+  void on_item_activated(const Glib::ustring& item);
 
-  virtual Gtk::Menu* create_menu(gint depth);
+  Gtk::Menu* create_menu(gint depth);
 
   //Member widgets:
-  Gtk::Frame m_Frame_Horizontal, m_Frame_Vertical;
   Gtk::Box m_VBox1, m_VBox_Sub1, m_VBox_Sub2;
   Gtk::MenuBar m_MenuBar;
   Gtk::Separator m_Separator;
@@ -96,24 +95,37 @@ Example_Menus::Example_Menus()
     pMenu->append(*pMenuItem);
     pMenuItem->show();
 
+    pMenuItem = Gtk::manage(new Gtk::MenuItem("accel"));
+    pMenuItem->set_submenu(*pMenu);
+    m_MenuBar.append(*pMenuItem);
+    pMenuItem->show();
+
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerate Me"));
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE );
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1,
+      Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     pMenu->append(*pMenuItem);
     pMenuItem->show();
+    pMenuItem->signal_activate().connect(
+      sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F1"));
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Locked"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2,
+      Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
     pMenuItem->show();
+    pMenuItem->signal_activate().connect(
+      sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F2"));
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Frozen"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2, Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
+    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F3,
+      Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     pMenuItem->show();
+    pMenuItem->signal_activate().connect(
+      sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F3"));
   }
 
   m_VBox1.pack_start(m_Separator, Gtk::PACK_SHRINK);
-
 
   m_VBox_Sub2.set_border_width(10);
   m_VBox1.pack_start(m_VBox_Sub2, Gtk::PACK_SHRINK);
@@ -121,7 +133,7 @@ Example_Menus::Example_Menus()
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));
 
   m_VBox_Sub2.pack_start(m_Button);
-  m_Button.property_can_default() = true;
+  m_Button.set_can_default(true);
   m_Button.grab_default();
 
   show_all();
@@ -160,6 +172,11 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
   }
 
   return pMenu;
+}
+
+void Example_Menus::on_item_activated(const Glib::ustring& item)
+{
+  std::cout << "Item " << item << " was activated" << std::endl;
 }
 
 void Example_Menus::on_button_clicked()
