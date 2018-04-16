@@ -16,6 +16,19 @@
 
 #include <gtk/gtk.h>
 #include <gdkmm/cairoutils.h>
+#include <memory>
+
+namespace
+{
+std::unique_ptr<graphene_rect_t>
+gdk_rect_to_graphene_rect(const Gdk::Rectangle& gdk_rect)
+{
+  graphene_rect_t* graphene_rect = new graphene_rect_t;
+  graphene_rect_init(graphene_rect, gdk_rect.get_x(), gdk_rect.get_y(),
+    gdk_rect.get_width(), gdk_rect.get_height());
+  return std::unique_ptr<graphene_rect_t>(graphene_rect);
+}
+} // anonymous namespace
 
 namespace Gtk
 {
@@ -51,11 +64,7 @@ Cairo::RefPtr<Cairo::Context> Snapshot::append_cairo(
 Cairo::RefPtr<Cairo::Context> Snapshot::append_cairo(
   const Gdk::Rectangle& bounds, const Glib::ustring& name)
 {
-  graphene_rect_t rect;
-  graphene_rect_init(&rect, bounds.get_x(), bounds.get_y(),
-    bounds.get_width(), bounds.get_height());
-
-  return append_cairo(&rect, name);
+  return append_cairo(gdk_rect_to_graphene_rect(bounds).get(), name);
 }
 
 } //namespace Gtk

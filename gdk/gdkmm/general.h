@@ -108,19 +108,6 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  */
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface);
 
-/** Creates an image surface with the same contents as the pixbuf.
- *
- * @param pixbuf A Gdk::Pixbuf.
- * @param scale The scale of the new surface, or 0 to use same as @a for_surface.
- * @param for_surface The surface this will be drawn to, or an empty
- *        Glib::RefPtr<Gdk::Surface> if none.
- * @returns A new cairo surface.
- *
- * @newin{3,92}
- */
-::Cairo::RefPtr< ::Cairo::Surface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
-  int scale, const Glib::RefPtr<Gdk::Surface>& for_surface = {});
-
 /** This is the main way to draw GL content in gtkmm.
  * It takes a render buffer ID (@a source_type == GL_RENDERBUFFER) or a texture id
  * (@a source_type == GL_TEXTURE) and draws it onto @a context with an OVER operation,

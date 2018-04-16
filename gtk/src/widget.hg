@@ -113,12 +113,10 @@ public:
 /* QUEUE DRAWS */
 
   _WRAP_METHOD(void queue_draw(), gtk_widget_queue_draw)
-  _WRAP_METHOD(void queue_draw_area(int x, int y, int width, int height), gtk_widget_queue_draw_area)
-  _WRAP_METHOD(void queue_draw_region(const Cairo::RefPtr<const Cairo::Region>& region), gtk_widget_queue_draw_region)
   _WRAP_METHOD(void queue_resize(), gtk_widget_queue_resize)
   _WRAP_METHOD(void queue_allocate(), gtk_widget_queue_allocate)
 
-  _WRAP_METHOD(void size_allocate(const Allocation& allocation, int baseline, Allocation& out_clip), gtk_widget_size_allocate)
+  _WRAP_METHOD(void size_allocate(const Allocation& allocation, int baseline), gtk_widget_size_allocate)
 
   _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_widget_get_request_mode)
   _WRAP_METHOD(void measure(Orientation orientation, int for_size, int& minimum, int& natural,
@@ -251,19 +249,6 @@ public:
 
   _WRAP_METHOD(int get_width() const, gtk_widget_get_width)
   _WRAP_METHOD(int get_height() const, gtk_widget_get_height)
-
-  /** Retrieves the widget’s clip area.
-   *
-   * The clip area is the area in which all of the widget's drawing will
-   * happen. Other toolkits call it the bounding box.
-   *
-   * Historically, in GTK+ the clip area has been equal to the allocation
-   * retrieved via get_allocation().
-   *
-   * @newin{3,14}
-   */
-  Allocation get_clip() const;
-  _IGNORE(gtk_widget_get_clip)
 
   _WRAP_METHOD(Container* get_parent(), gtk_widget_get_parent)
   _WRAP_METHOD(const Container* get_parent() const, gtk_widget_get_parent, constversion)
@@ -610,7 +595,7 @@ public:
 #m4 _CONVERSION(`const GdkRectangle*',`const Allocation&',`Glib::wrap($3)')
 #m4 _CONVERSION(`Allocation&',`GdkRectangle*',`($3.gobj())')
 #m4 _CONVERSION(`GdkRectangle*',`Allocation&',`Glib::wrap($3)')
-  _WRAP_SIGNAL(void size_allocate(const Allocation& allocation, int baseline, Allocation& out_clip), "size_allocate")
+  _WRAP_SIGNAL(void size_allocate(const Allocation& allocation, int baseline), "size_allocate")
 
   _WRAP_SIGNAL(void state_flags_changed(Gtk::StateFlags previous_state_flags), "state-flags-changed")
 
@@ -641,14 +626,6 @@ dnl
     static void dispose_vfunc_callback(GObject* self);
   _POP()
 #m4end
-
-  // The draw signal must not be wrapped here. It would interfere with the way
-  // gtk+ selects either the snapshot vfunc or the draw signal for rendering widgets.
-  // Custom widgets that need the draw signal must use a custom rendering widget
-  // that wraps the draw signal.
-  // https://bugzilla.gnome.org/show_bug.cgi?id=774778
-  //_WRAP_SIGNAL(bool draw(const Cairo::RefPtr<Cairo::Context>& cr), "draw")
-  _IGNORE_SIGNAL(draw)
 
 #m4 _CONVERSION(`GdkEventKey*',`const Glib::RefPtr<Gdk::EventKey>&',`Glib::wrap($3, true)')
   /// Event triggered by a key press will widget has focus.
@@ -751,10 +728,6 @@ protected:
 
   _WRAP_METHOD(void realize(), gtk_widget_realize)
   _WRAP_METHOD(void unrealize(), gtk_widget_unrealize)
-
-  _WRAP_METHOD(void draw(const Cairo::RefPtr<Cairo::Context>& cr), gtk_widget_draw)
-
-  _WRAP_METHOD(void set_realized(bool realized = true), gtk_widget_set_realized)
 
   _WRAP_METHOD(void set_has_surface(bool has_surface = true), gtk_widget_set_has_surface)
 
