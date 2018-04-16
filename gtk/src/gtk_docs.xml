@@ -3144,11 +3144,6 @@ should point after the newly inserted text.
 The ::activate signal is emitted when the user hits
 the Enter key.
 
-While this signal is used as a
-[keybinding signal][GtkBindingSignal],
-it is also commonly used by applications to intercept
-activation of entries.
-
 The default bindings for this signal are all forms of the Enter key.
 
 </description>
@@ -5258,7 +5253,7 @@ ignore unknown values.
 <parameter_description> Allow selecting a specific font size
 </parameter_description>
 </parameter>
-<parameter name="GTK_FONT_CHOOSER_LEVEL_VARIATION">
+<parameter name="GTK_FONT_CHOOSER_LEVEL_VARIATIONS">
 <parameter_description> Allow changing OpenType font variation axes
 </parameter_description>
 </parameter>
@@ -8050,7 +8045,7 @@ The state of the button. This is reflecting the state of the associated
 
 <property name="GtkModelButton:centered">
 <description>
-Wether to render the button contents centered instead of left-aligned.
+Whether to render the button contents centered instead of left-aligned.
 This property should be set for title-like items.
 
 </description>
@@ -14088,9 +14083,23 @@ See also gtk_print_settings_set_paper_width().
 </parameters>
 </enum>
 
+<property name="GtkVideo:autoplay">
+<description>
+If the video should automatically begin playing.
+
+</description>
+</property>
+
 <property name="GtkVideo:file">
 <description>
 The file played by this video if the video is playing a file.
+
+</description>
+</property>
+
+<property name="GtkVideo:loop">
+<description>
+If new media files should be set to loop.
 
 </description>
 </property>
@@ -14637,43 +14646,6 @@ else
 </return>
 </signal>
 
-<signal name="GtkWidget::draw">
-<description>
-This signal is emitted when a widget is supposed to render itself.
-The @widget's top left corner must be painted at the origin of
-the passed in context and be sized to the values returned by
-gtk_widget_get_allocated_width() and
-gtk_widget_get_allocated_height().
-
-Signal handlers connected to this signal can modify the cairo
-context passed as @cr in any way they like and don't need to
-restore it. The signal emission takes care of calling cairo_save()
-before and cairo_restore() after invoking the handler.
-
-The signal handler will get a @cr with a clip region already set to the
-widget's dirty region, i.e. to the area that needs repainting.  Complicated
-widgets that want to avoid redrawing themselves completely can get the full
-extents of the clip region with gdk_cairo_get_clip_rectangle(), or they can
-get a finer-grained representation of the dirty region with
-cairo_copy_clip_rectangle_list().
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="cr">
-<parameter_description> the cairo context to draw to
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE to stop other handlers from being invoked for the event.
-%FALSE to propagate the event further.
-</return>
-</signal>
-
 <signal name="GtkWidget::event">
 <description>
 The GTK+ main loop will emit three signals for each GDK event delivered
@@ -15049,10 +15021,6 @@ allocated to the widget.
 <parameter_description> the baseline
 </parameter_description>
 </parameter>
-<parameter name="out_clip">
-<parameter_description> Return address for the widget's clip
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </signal>
@@ -15322,6 +15290,13 @@ Whether to expand vertically. See gtk_widget_set_vexpand().
 <property name="GtkWidget:vexpand-set">
 <description>
 Whether to use the #GtkWidget:vexpand property. See gtk_widget_get_vexpand_set().
+
+</description>
+</property>
+
+<property name="GtkWidgetPaintable:widget">
+<description>
+The observed widget or %NULL if none.
 
 </description>
 </property>
@@ -30710,8 +30685,6 @@ If the entry is not realized or has no icon at the given position,
 @icon_area is filled with zeros. Otherwise, @icon_area will be filled
 with the icon's allocation, relative to @entry's allocation.
 
-See also gtk_entry_get_text_area()
-
 </description>
 <parameters>
 <parameter name="entry">
@@ -30746,11 +30719,11 @@ signal handler.
 </parameter_description>
 </parameter>
 <parameter name="x">
-<parameter_description> the x coordinate of the position to find
+<parameter_description> the x coordinate of the position to find, relative to @entry
 </parameter_description>
 </parameter>
 <parameter name="y">
-<parameter_description> the y coordinate of the position to find
+<parameter_description> the y coordinate of the position to find, relative to @entry
 </parameter_description>
 </parameter>
 </parameters>
@@ -32107,6 +32080,24 @@ and the controller actions triggered.
 </parameters>
 <return> %TRUE if the event was potentially useful to trigger the
 controller action
+</return>
+</function>
+
+<function name="gtk_event_controller_key_get_im_context">
+<description>
+Gets the IM context of a key controller.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> the IM context
+
 </return>
 </function>
 
@@ -35601,7 +35592,7 @@ or -1 if no font size is selected.
 
 <function name="gtk_font_chooser_get_language">
 <description>
-Gets the currently-selected language for font features.
+Gets the language that is used for font features.
 
 
 </description>
@@ -35763,6 +35754,24 @@ pango_context_set_font_map (context, fontmap);
 </parameter>
 <parameter name="fontmap">
 <parameter_description> a #PangoFontMap
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_font_chooser_set_language">
+<description>
+Sets the language to use for font features.
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+<parameter name="language">
+<parameter_description> a language
 </parameter_description>
 </parameter>
 </parameters>
@@ -36785,6 +36794,133 @@ mouse events will be handled too.
 <return></return>
 </function>
 
+<function name="gtk_gesture_stylus_get_axes">
+<description>
+Returns the current values for the requested @axes. This function
+must be called from either the #GtkGestureStylus:down,
+#GtkGestureStylus:motion, #GtkGestureStylus:up or #GtkGestureStylus:proximity
+signals.
+
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a GtkGestureStylus
+</parameter_description>
+</parameter>
+<parameter name="axes">
+<parameter_description> array of requested axes, terminated with #GDK_AXIS_IGNORE
+</parameter_description>
+</parameter>
+<parameter name="values">
+<parameter_description> return location for the axis values
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if there is a current value for the axes
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_get_axis">
+<description>
+Returns the current value for the requested @axis. This function
+must be called from either the #GtkGestureStylus:down,
+#GtkGestureStylus:motion, #GtkGestureStylus:up or #GtkGestureStylus:proximity
+signals.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a #GtkGestureStylus
+</parameter_description>
+</parameter>
+<parameter name="axis">
+<parameter_description> requested device axis
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> return location for the axis value
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if there is a current value for the axis
+
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_get_backlog">
+<description>
+By default, GTK+ will limit rate of input events. On stylus input where
+accuracy of strokes is paramount, this function returns the accumulated
+coordinate/timing state before the emission of the current
+#GtkGestureStylus:motion signal.
+
+This function may only be called within a #GtkGestureStylus::motion
+signal handler, the state given in this signal and obtainable through
+gtk_gesture_stylus_get_axis() call express the latest (most up-to-date)
+state in motion history.
+
+@backlog is provided in chronological order.
+
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a #GtkGestureStylus
+</parameter_description>
+</parameter>
+<parameter name="backlog">
+<parameter_description> coordinates and times for the backlog events
+</parameter_description>
+</parameter>
+<parameter name="n_elems">
+<parameter_description> return location for the number of elements
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if there is a backlog to unfold in the current state.
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_get_device_tool">
+<description>
+Returns the #GdkDeviceTool currently driving input through this gesture.
+This function must be called from either the #GtkGestureStylus:down,
+#GtkGestureStylus:motion, #GtkGestureStylus:up or #GtkGestureStylus:proximity
+signals.
+
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a #GtkGestureStylus
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current stylus tool
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_new">
+<description>
+Creates a new #GtkGestureStylus.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly created stylus gesture
+
+</return>
+</function>
+
 <function name="gtk_gesture_swipe_get_velocity">
 <description>
 If the gesture is recognized, this function returns %TRUE and fill in
@@ -37318,7 +37454,7 @@ Creates a new #GtkGLArea widget.
 </description>
 <parameters>
 </parameters>
-<return> the newly created #GtkGLArea
+<return> a new #GtkGLArea
 </return>
 </function>
 
@@ -55629,7 +55765,7 @@ text (even if the actual text is blank), set #GtkProgressBar:show-text to
 </parameter_description>
 </parameter>
 <parameter name="show_text">
-<parameter_description> whether to show superimposed text
+<parameter_description> whether to show text
 </parameter_description>
 </parameter>
 </parameters>
@@ -58071,8 +58207,6 @@ This function will render the icon in @texture at exactly its size,
 regardless of scaling factors, which may not be appropriate when
 drawing on displays with high pixel densities.
 
-You probably want to use gtk_render_icon_surface() instead, if you
-already have a Cairo surface.
 
 </description>
 <parameters>
@@ -58094,36 +58228,6 @@ already have a Cairo surface.
 </parameter>
 <parameter name="y">
 <parameter_description> Y position for the @texture 
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_render_icon_surface">
-<description>
-Renders the icon in @surface at the specified @x and @y coordinates.
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GtkStyleContext
-</parameter_description>
-</parameter>
-<parameter name="cr">
-<parameter_description> a #cairo_t
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> a #cairo_surface_t containing the icon to draw
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> X position for the @icon
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> Y position for the @incon
 </parameter_description>
 </parameter>
 </parameters>
@@ -59885,6 +59989,24 @@ search bar (as in our main example).
 <return></return>
 </function>
 
+<function name="gtk_search_bar_get_key_capture_widget">
+<description>
+Gets the widget that @bar is capturing key events from.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="bar">
+<parameter_description> a #GtkSearchBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> The key capture widget.
+
+</return>
+</function>
+
 <function name="gtk_search_bar_get_search_mode">
 <description>
 Returns whether the search mode is on or off.
@@ -59990,6 +60112,29 @@ gtk_search_bar_connect_entry().
 </return>
 </function>
 
+<function name="gtk_search_bar_set_key_capture_widget">
+<description>
+Sets @widget as the widget that @bar will capture key events from.
+
+If key events are handled by the search bar, the bar will
+be shown, and the entry populated with the entered text.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="bar">
+<parameter_description> a #GtkSearchBar
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_search_bar_set_search_mode">
 <description>
 Switches the search mode on or off.
@@ -60027,6 +60172,24 @@ toggle button.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_search_entry_get_key_capture_widget">
+<description>
+Gets the widget that @entry is capturing key events from.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkSearchEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return> The key capture widget.
+
+</return>
 </function>
 
 <function name="gtk_search_entry_handle_event">
@@ -60072,6 +60235,33 @@ empty, and a clear icon when it isn't.
 </parameters>
 <return> a new #GtkSearchEntry
 </return>
+</function>
+
+<function name="gtk_search_entry_set_key_capture_widget">
+<description>
+Sets @widget as the widget that @entry will capture key events from.
+
+Key events are consumed by the search entry to start or
+continue a search.
+
+If the entry is part of a #GtkSearchBar, it is preferable
+to call gtk_search_bar_set_key_capture_widget() instead, which
+will reveal the entry in addition to triggering the search entry.
+
+Since: 3.94
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkSearchEntry
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_selection_data_copy">
@@ -61122,6 +61312,11 @@ constructed by @snapshot and frees @snapshot.
 <parameter_description> a #GtkSnapshot
 </parameter_description>
 </parameter>
+<parameter name="size">
+<parameter_description> The size of the resulting paintable
+or %NULL to use the bounds of the snapshot
+</parameter_description>
+</parameter>
 </parameters>
 <return> a newly-created #GdkPaintable
 </return>
@@ -61184,10 +61379,6 @@ Creates a new #GtkSnapshot.
 <parameters>
 <parameter name="record_names">
 <parameter_description> whether to keep node names (for debugging purposes)
-</parameter_description>
-</parameter>
-<parameter name="clip">
-<parameter_description> the clip region to use, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="name">
@@ -61545,6 +61736,11 @@ called after this is gtk_snapshot_unref().
 <parameters>
 <parameter name="snapshot">
 <parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> The size of the resulting paintable
+or %NULL to use the bounds of the snapshot
 </parameter_description>
 </parameter>
 </parameters>
@@ -63873,9 +64069,8 @@ This function is used to initialize a GTK+ test program.
 
 It will in turn call g_test_init() and gtk_init() to properly
 initialize the testing framework and graphical toolkit. It’ll 
-also set the program’s locale to “C” and prevent loading of rc 
-files and Gtk+ modules. This is done to make tets program
-environments as deterministic as possible.
+also set the program’s locale to “C”. This is done to make test
+program environments as deterministic as possible.
 
 Like gtk_init() and g_test_init(), any known arguments will be
 processed and stripped from @argc and @argv.
@@ -78081,6 +78276,22 @@ gtk_tree_view_enable_model_drag_source(). Calling this method sets
 <return></return>
 </function>
 
+<function name="gtk_video_get_autoplay">
+<description>
+Returns %TRUE if videos have been set to loop via gtk_video_set_loop().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if streams should autoplay
+</return>
+</function>
+
 <function name="gtk_video_get_file">
 <description>
 Gets the file played by @self or %NULL if not playing back
@@ -78095,6 +78306,22 @@ a file.
 </parameter>
 </parameters>
 <return> The file played by @self
+</return>
+</function>
+
+<function name="gtk_video_get_loop">
+<description>
+Returns %TRUE if videos have been set to loop via gtk_video_set_loop().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if streams should loop
 </return>
 </function>
 
@@ -78195,6 +78422,25 @@ This is a utility function that calls gtk_video_new_for_file(),
 </return>
 </function>
 
+<function name="gtk_video_set_autoplay">
+<description>
+Sets whether @self automatically starts playback when it becomes visible
+or when a new file gets loaded.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="autoplay">
+<parameter_description> whether media streams should autoplay
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_video_set_file">
 <description>
 Makes @self play the given @file.
@@ -78227,6 +78473,24 @@ This is a utility function that calls gtk_video_set_file(),
 </parameter>
 <parameter name="filename">
 <parameter_description> the filename to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_video_set_loop">
+<description>
+Sets whether new files loaded by @self should be set to loop.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkVideo
+</parameter_description>
+</parameter>
+<parameter name="loop">
+<parameter_description> whether media streams should loop
 </parameter_description>
 </parameter>
 </parameters>
@@ -78441,7 +78705,7 @@ not automatically imply a relayout or repaint. If you want a
 repaint or relayout, and aren’t changing widget properties that
 would trigger that (for example, changing the text of a #GtkLabel),
 then you will have to call gtk_widget_queue_resize() or
-gtk_widget_queue_draw_area() yourself.
+gtk_widget_queue_draw() yourself.
 
 gdk_frame_clock_get_frame_time() should generally be used for timing
 continuous animations and
@@ -78969,6 +79233,38 @@ share a common ancestor.
 </return>
 </function>
 
+<function name="gtk_widget_compute_bounds">
+<description>
+Computes the bounds for @widget in the coordinate space of @target.
+FIXME: Explain what &quot;bounds&quot; are.
+
+If the operation is successful, %TRUE is returned. If @widget has no
+bounds or the bounds cannot be expressed in @target's coordinate space
+(for example if both widgets are in different windows), %FALSE is
+returned and @bounds is set to the zero rectangle.
+
+It is valid for @widget and @target to be the same widget.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> the #GtkWidget to query
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="out_bounds">
+<parameter_description> the rectangle taking the bounds
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the bounds could be computed
+</return>
+</function>
+
 <function name="gtk_widget_compute_expand">
 <description>
 Computes whether a container should give this widget extra space
@@ -79171,41 +79467,6 @@ by another #GtkWidget than @widget.
 </return>
 </function>
 
-<function name="gtk_widget_draw">
-<description>
-Draws @widget to @cr. The top left corner of the widget will be
-drawn to the currently set origin point of @cr.
-
-You should pass a cairo context as @cr argument that is in an
-original state. Otherwise the resulting drawing is undefined. For
-example changing the operator using cairo_set_operator() or the
-line width using cairo_set_line_width() might have unwanted side
-effects.
-You may however change the context’s transform matrix - like with
-cairo_scale(), cairo_translate() or cairo_set_matrix() and clip
-region with cairo_clip() prior to calling this function. Also, it
-is fine to modify the context with cairo_save() and
-cairo_push_group() prior to calling this function.
-
-Note that special-purpose widgets may contain special code for
-rendering to the screen and might appear differently on screen
-and when rendered using gtk_widget_draw().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the widget to draw. It must be drawable (see
-gtk_widget_is_drawable()) and a size must have been allocated.
-</parameter_description>
-</parameter>
-<parameter name="cr">
-<parameter_description> a cairo context to draw to
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_widget_error_bell">
 <description>
 Notifies the user about an input-related error on this widget.
@@ -79233,9 +79494,7 @@ the event signals on a widget (those signals should never
 be emitted without using this function to do so).
 If you want to synthesize an event though, don’t use this function;
 instead, use gtk_main_do_event() so the event will behave as if
-it were in the event queue. Don’t synthesize expose events; instead,
-use gtk_widget_queue_draw_region() to invalidate a region of the
-window.
+it were in the event queue.
 
 
 </description>
@@ -79327,7 +79586,7 @@ If no action group was found matching @prefix, then %NULL is returned.
 <description>
 Returns the baseline that has currently been allocated to @widget.
 This function is intended to be used when implementing handlers
-for the #GtkWidget::draw function, and when allocating child
+for the #GtkWidget::snapshot function, and when allocating child
 widgets in #GtkWidget::size_allocate.
 
 
@@ -79345,8 +79604,6 @@ widgets in #GtkWidget::size_allocate.
 <function name="gtk_widget_get_allocated_height">
 <description>
 Returns the height that has currently been allocated to @widget.
-This function is intended to be used when implementing handlers
-for the #GtkWidget::draw function.
 
 
 </description>
@@ -79393,8 +79650,6 @@ If a widget is not visible, its allocated size is 0.
 <function name="gtk_widget_get_allocated_width">
 <description>
 Returns the width that has currently been allocated to @widget.
-This function is intended to be used when implementing handlers
-for the #GtkWidget::draw function.
 
 
 </description>
@@ -79519,30 +79774,6 @@ never should be called by an application.
 </parameters>
 <return> %TRUE if the widget is mapped with the parent.
 </return>
-</function>
-
-<function name="gtk_widget_get_clip">
-<description>
-Retrieves the widget’s clip area.
-
-The clip area is the area in which all of @widget's drawing will
-happen. Other toolkits call it the bounding box.
-
-Historically, in GTK+ the clip area has been equal to the allocation
-retrieved via gtk_widget_get_allocation().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="clip">
-<parameter_description> a pointer to a #GtkAllocation to copy to
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_widget_get_clipboard">
@@ -80960,7 +81191,7 @@ grandchild, great grandchild, etc.
 <function name="gtk_widget_is_drawable">
 <description>
 Determines whether @widget can be drawn to. A widget can be drawn
-to if it is mapped and visible.
+if it is mapped and visible.
 
 
 </description>
@@ -81066,9 +81297,9 @@ When %FALSE is returned, the caller should continue with keyboard
 navigation outside the widget, e.g. by calling
 gtk_widget_child_focus() on the widget’s toplevel.
 
-The default ::keynav-failed handler returns %TRUE for
+The default ::keynav-failed handler returns %FALSE for
 %GTK_DIR_TAB_FORWARD and %GTK_DIR_TAB_BACKWARD. For the other
-values of #GtkDirectionType it returns %FALSE.
+values of #GtkDirectionType it returns %TRUE.
 
 Whenever the default handler returns %TRUE, it also calls
 gtk_widget_error_bell() to notify the user of the failed keyboard
@@ -81277,6 +81508,57 @@ cast the object yourself.
 </parameters>
 <return> a new #GtkWidget of type @widget_type
 </return>
+</function>
+
+<function name="gtk_widget_paintable_get_widget">
+<description>
+Returns the widget that is observed or %NULL
+if none.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkWidgetPaintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the observed widget.
+</return>
+</function>
+
+<function name="gtk_widget_paintable_new">
+<description>
+Creates a new widget paintable observing the given widget.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkWidgetPaintable
+</return>
+</function>
+
+<function name="gtk_widget_paintable_set_widget">
+<description>
+Sets the widget that should be observed.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkWidgetPaintable
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the widget to observe or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_widget_path_append_for_widget">
@@ -82051,73 +82333,14 @@ See gtk_widget_compute_expand().
 
 <function name="gtk_widget_queue_draw">
 <description>
-Equivalent to calling gtk_widget_queue_draw_area() for the
-entire area of a widget.
+Schedules this widget to be redrawn in paint phase of the
+current or the next frame. This means @widget's GtkWidgetClass.snapshot()
+implementation will be called.
 
 </description>
 <parameters>
 <parameter name="widget">
 <parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_queue_draw_area">
-<description>
-Convenience function that calls gtk_widget_queue_draw_region() on
-the region created from the given coordinates.
-
-The region here is specified in widget coordinates of @widget.
-
-@width or @height may be 0, in this case this function does
-nothing. Negative values for @width and @height are not allowed.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> x coordinate of upper-left corner of rectangle to redraw
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> y coordinate of upper-left corner of rectangle to redraw
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width of region to draw
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height of region to draw
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_queue_draw_region">
-<description>
-Invalidates the area of @widget defined by @region. Makes sure
-that the compositor updates the speicifed region of the toplevel
-window.
-
-Normally you would only use this function in widget
-implementations. You might also use it to schedule a redraw of a
-#GtkDrawingArea or some portion thereof.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> region to draw, in @widget's coordinates
 </parameter_description>
 </parameter>
 </parameters>
@@ -82180,8 +82403,7 @@ This function is primarily used in widget implementations, and
 isn’t very useful otherwise. Many times when you think you might
 need it, a better approach is to connect to a signal that will be
 called after the widget is realized automatically, such as
-#GtkWidget::draw. Or simply g_signal_connect () to the
-#GtkWidget::realize signal.
+#GtkWidget::realize.
 
 </description>
 <parameters>
@@ -82456,31 +82678,6 @@ never should be called by an application.
 </parameter>
 <parameter name="is_visible">
 <parameter_description> if %TRUE, @widget should be mapped along with its parent.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_set_clip">
-<description>
-Sets the widget’s clip.  This must not be used directly,
-but from within a widget’s size_allocate method.
-
-The clip set should be the area that @widget draws on. If @widget is a
-#GtkContainer, the area must contain all children's clips.
-
-If this function is not called by @widget during a ::size-allocate handler,
-the clip will be set to @widget's allocation.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="clip">
-<parameter_description> a pointer to a #GtkAllocation to copy from
 </parameter_description>
 </parameter>
 </parameters>
@@ -82960,29 +83157,6 @@ window is realized.
 <return></return>
 </function>
 
-<function name="gtk_widget_set_realized">
-<description>
-Marks the widget as being realized. This function must only be 
-called after all #GdkSurfaces for the @widget have been created 
-and registered.
-
-This function should only ever be called in a derived widget's
-“realize” or “unrealize” implementation.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="realized">
-<parameter_description> %TRUE to mark the widget as realized
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_widget_set_receives_default">
 <description>
 Specifies whether @widget will be treated as the default widget
@@ -83358,11 +83532,6 @@ as well as at least 0×0 in size.
 </parameter>
 <parameter name="baseline">
 <parameter_description> The baseline of the child, or -1
-</parameter_description>
-</parameter>
-<parameter name="out_clip">
-<parameter_description> Return location for @widget's clip region. The returned clip
-will be in the coordinate system of @widget's parent, just like @allocation.
 </parameter_description>
 </parameter>
 </parameters>
@@ -84345,8 +84514,7 @@ inside a handler for the #GtkWidget::configure-event signal:
 static void
 on_size_allocate (GtkWidget *widget,
 const GtkAllocation *allocation,
-int baseline,
-GtkAllocation *out_clip)
+int baseline)
 {
 int new_width, new_height;
 

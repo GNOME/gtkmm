@@ -3264,23 +3264,6 @@ clipped and all drawing can be skipped
 </return>
 </function>
 
-<function name="gdk_cairo_get_drawing_context">
-<description>
-Retrieves the #GdkDrawingContext that created the Cairo
-context @cr.
-
-
-</description>
-<parameters>
-<parameter name="cr">
-<parameter_description> a Cairo context
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkDrawingContext, if any is set
-</return>
-</function>
-
 <function name="gdk_cairo_rectangle">
 <description>
 Adds the given rectangle to the current path of @cr.
@@ -3382,31 +3365,6 @@ Sets the specified #GdkRGBA as the source color of @cr.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_cairo_surface_create_from_pixbuf">
-<description>
-Creates an image surface with the same contents as
-the pixbuf.
-
-
-</description>
-<parameters>
-<parameter name="pixbuf">
-<parameter_description> a #GdkPixbuf
-</parameter_description>
-</parameter>
-<parameter name="scale">
-<parameter_description> the scale of the new surface, or 0 to use same as @surface
-</parameter_description>
-</parameter>
-<parameter name="for_surface">
-<parameter_description> The surface this will be drawn to, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new cairo surface, must be freed with cairo_surface_destroy()
-</return>
 </function>
 
 <function name="gdk_cairo_surface_upload_to_gl">
@@ -7463,38 +7421,6 @@ Retrieves the paint context used to draw with.
 </return>
 </function>
 
-<function name="gdk_drawing_context_get_surface">
-<description>
-Retrieves the surface that created the drawing @context.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDrawingContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkSurface
-</return>
-</function>
-
-<function name="gdk_drawing_context_is_valid">
-<description>
-Checks whether the given #GdkDrawingContext is valid.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDrawingContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the context is valid
-</return>
-</function>
-
 <function name="gdk_drop_finish">
 <description>
 Ends the drag operation after a drop.
@@ -10511,6 +10437,29 @@ it must not call this function.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_paintable_new_empty">
+<description>
+Returns a paintable that has the given intrinsic size and draws nothing.
+This is often useful for implementing the GdkPaintableClass:get_current_image()
+virtual function when the paintable is in an incomplete state (like a
+#GtkMediaStream before receiving the first frame).
+
+
+</description>
+<parameters>
+<parameter name="intrinsic_width">
+<parameter_description> The intrinsic width to report. Can be 0 for no width.
+</parameter_description>
+</parameter>
+<parameter name="intrinsic_height">
+<parameter_description> The intrinsic height to report. Can be 0 for no height.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkPaintable
+</return>
 </function>
 
 <function name="gdk_paintable_snapshot">
@@ -15444,72 +15393,6 @@ call gdk_gl_context_make_current() or gdk_gl_context_realize().
 </return>
 </function>
 
-<function name="gdk_surface_create_similar_image_surface">
-<description>
-Create a new image surface that is efficient to draw on the
-given @surface.
-
-Initially the surface contents are all 0 (transparent if contents
-have transparency, black otherwise.)
-
-The @width and @height of the new surface are not affected by
-the scaling factor of the @surface, or by the @scale argument; they
-are the size of the surface in device pixels. If you wish to create
-an image surface capable of holding the contents of @surface you can
-use:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-int scale = gdk_surface_get_scale_factor (surface);
-int width = gdk_surface_get_width (surface) * scale;
-int height = gdk_surface_get_height (surface) * scale;
-
-// format is set elsewhere
-cairo_surface_t *surface =
-gdk_surface_create_similar_image_surface (surface,
-format,
-width, height,
-scale);
-]|
-
-Note that unlike cairo_surface_create_similar_image(), the new
-surface's device scale is set to @scale, or to the scale factor of
-@surface if @scale is 0.
-
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> surface to make new surface similar to, or
-%NULL if none
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> the format for the new surface
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width of the new surface
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height of the new surface
-</parameter_description>
-</parameter>
-<parameter name="scale">
-<parameter_description> the scale of the new surface, or 0 to use same as @surface
-</parameter_description>
-</parameter>
-</parameters>
-<return> a pointer to the newly allocated surface. The caller
-owns the surface and should call cairo_surface_destroy() when done
-with it.
-
-This function always returns a valid pointer, but it will return a
-pointer to a “nil” surface if @other is already in an error state
-or any other error occurs.
-</return>
-</function>
-
 <function name="gdk_surface_create_similar_surface">
 <description>
 Create a new surface that is as compatible as possible with the
@@ -16966,6 +16849,26 @@ a reference to the list of child surfaces in @surface
 </return>
 </function>
 
+<function name="gdk_surface_queue_expose">
+<description>
+Forces an expose event for @surface to be scheduled.
+
+If the invalid area of @surface is empty, an expose event will
+still be emitted. Its invalid region will be empty.
+
+This function is useful for implementations that track invalid
+regions on their own.
+
+</description>
+<parameters>
+<parameter name="surface">
+<parameter_description> a #GdkSurface
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_surface_raise">
 <description>
 Raises @surface to the top of the Z-order (stacking order), so that
@@ -18259,6 +18162,31 @@ gdk_texture_new_from_file() to load it.
 </parameter>
 </parameters>
 <return> A newly-created texture
+</return>
+</function>
+
+<function name="gdk_texture_save_to_png">
+<description>
+Store the given @texture to the @filename as a PNG file.
+
+This is a utility function intended for debugging and testing.
+If you want more control over formats, proper error handling or
+want to store to a #GFile or other location, you might want to
+look into using the gdk-pixbuf library.
+
+
+</description>
+<parameters>
+<parameter name="texture">
+<parameter_description> a #GdkTexture
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> the filename to store to
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if saving succeeded, %FALSE on failure.
 </return>
 </function>
 
