@@ -238,6 +238,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/shortcutsshortcut.h>
 #include <gtkmm/shortcutswindow.h>
 #include <gtkmm/sizegroup.h>
+#include <gtkmm/snapshot.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/spinner.h>
 #include <gtkmm/stack.h>
