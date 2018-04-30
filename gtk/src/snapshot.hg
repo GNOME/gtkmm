@@ -25,7 +25,8 @@ typedef struct _graphene_rect_t graphene_rect_t;
 
 namespace Gdk
 {
-class Pixbuf;
+class RGBA;
+class Texture;
 }
 
 namespace Gtk
@@ -42,8 +43,7 @@ namespace Gtk
  * operates on. Use the push() and pop() functions to change the current node.
  *
  * The typical way to obtain a %Snapshot object is as an argument to
- * Gtk::WidgetCustomSnapshot::snapshot_vfunc(). If you need to create your own
- *  %Snapshot, use create().
+ * Gtk::Widget::snapshot_vfunc(). If you need to create your own %Snapshot, use create().
  *
  * @newin{3,90}
  */
@@ -58,17 +58,18 @@ class Snapshot : public Gdk::Snapshot
 public:
   //TODO: Add more methods. What shall be done with methods that take Gsk or graphene classes?
 
-  /** Creates a new render node, appends it to the current render
-   * node of the snapshot, and makes it the new current render node.
+#m4 _CONVERSION(`GtkSnapshot*',`Glib::RefPtr<Snapshot>', `Glib::wrap_gtk_snapshot($3)')
+  // gtk_snapshot_new() does more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<Snapshot> create(), gtk_snapshot_new)
+
+  /** Creates a new debug node.
    *
-   * @newin{3,90}
+   * @newin{3,94}
    *
-   * @param keep_coordinates If <tt>true</tt>, the current offset and clip will be kept.
-   *   Otherwise, the clip will be unset and the offset will be reset to (0, 0).
    * @param name The name for the new node, or an empty string for no name.
    */
-  void push(bool keep_coordinates, const Glib::ustring& name);
-  _IGNORE(gtk_snapshot_push)
+  void push_debug(const Glib::ustring& name);
+  _IGNORE(gtk_snapshot_push_debug)
 
   //TODO: These gtk_snapshot_push_*() functions have no documentation.
   //TODO: Wrap gtk_snapshot_push_transform()?
@@ -80,22 +81,7 @@ public:
   //TODO: Wrap gtk_snapshot_push_shadow()?
   //TODO: Wrap gtk_snapshot_push_blend()? Has documentation.
 
-  /** Snapshots a cross-fade operation between two images with the
-   * given @a progress.
-   *
-   * Until the first call to pop(), the start image
-   * will be the snapshot. After that call, the end image will be recorded
-   * until the second call to pop().
-   *
-   * Calling this function requires 2 calls to pop().
-   *
-   * @newin{3,90}
-   *
-   * @param progress Progress between 0.0 and 1.0.
-   * @param name The name of the pushed node, or an empty string for no name.
-   */
-  void push_cross_fade(double progress, const Glib::ustring& name);
-  _IGNORE(gtk_snapshot_push_cross_fade)
+  _WRAP_METHOD(void push_cross_fade(double progress), gtk_snapshot_push_cross_fade)
 
   _WRAP_METHOD(void pop(), gtk_snapshot_pop)
 
@@ -104,38 +90,19 @@ public:
 
   //TODO: Wrap gtk_snapshot_append_node()?
 
-  /** Creates a new render node and appends it to the current render
-   * node of the snapshot, without changing the current node.
-   *
-   * @newin{3,90}
-   *
-   * @param bounds The bounds for the new node.
-   * @param name The name for the new node, or an empty string for no name.
-   * @return A Cairo::Context suitable for drawing the contents of the newly
-   * created render node.
-   */
-  Cairo::RefPtr<Cairo::Context> append_cairo(const graphene_rect_t* bounds,
-    const Glib::ustring& name);
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const graphene_rect_t* bounds), gtk_snapshot_append_cairo)
+#m4 _CONVERSION(`const Gdk::Rectangle&',`const graphene_rect_t*', `gdk_rect_to_graphene_rect($3).get()')
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const Gdk::Rectangle& bounds), gtk_snapshot_append_cairo)
 
-  /** Creates a new render node and appends it to the current render
-   * node of the snapshot, without changing the current node.
-   *
-   * @newin{3,90}
-   *
-   * @param bounds The bounds for the new node.
-   * @param name The name for the new node, or an empty string for no name.
-   * @return A Cairo::Context suitable for drawing the contents of the newly
-   * created render node.
-   */
-  Cairo::RefPtr<Cairo::Context> append_cairo(const Gdk::Rectangle& bounds,
-    const Glib::ustring& name);
-  _IGNORE(gtk_snapshot_append_cairo)
-  //TODO: Wrap gtk_snapshot_append_texture()?
-  //TODO: Wrap gtk_snapshot_append_color()?
+  _WRAP_METHOD(void append_texture(const Glib::RefPtr<Gdk::Texture>& texture,
+    const graphene_rect_t* bounds), gtk_snapshot_append_texture)
+  _WRAP_METHOD(void append_texture(const Glib::RefPtr<Gdk::Texture>& texture,
+    const Gdk::Rectangle& bounds), gtk_snapshot_append_texture)
 
-  _WRAP_METHOD(bool clips_rect(const graphene_rect_t* bounds) const, gtk_snapshot_clips_rect)
-#m4 _CONVERSION(`const Gdk::Rectangle&', `const graphene_rect_t*', `gdk_rect_to_graphene_rect($3).get()')
-  _WRAP_METHOD(bool clips_rect(const Gdk::Rectangle& bounds) const, gtk_snapshot_clips_rect)
+  _WRAP_METHOD(void append_color(const Gdk::RGBA& color, const graphene_rect_t* bounds),
+    gtk_snapshot_append_color)
+  _WRAP_METHOD(void append_color(const Gdk::RGBA& color, const Gdk::Rectangle& bounds),
+    gtk_snapshot_append_color)
 
   _WRAP_METHOD(void render_backgrount(const Glib::RefPtr<StyleContext>& context,
     double x, double y, double width, double height), gtk_snapshot_render_background)
