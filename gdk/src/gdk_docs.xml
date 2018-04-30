@@ -861,27 +861,6 @@ The #GdkSurface the gl context is bound to.
 </description>
 </property>
 
-<property name="GdkDrawingContext:clip">
-<description>
-The clip region applied to the drawing context.
-
-</description>
-</property>
-
-<property name="GdkDrawingContext:paint-context">
-<description>
-The #GdkDrawContext used to draw or %NULL if Cairo is used.
-
-</description>
-</property>
-
-<property name="GdkDrawingContext:surface">
-<description>
-The #GdkSurface that created the drawing context.
-
-</description>
-</property>
-
 <enum name="GdkEventMask">
 <description>
 A set of bit-flags to indicate which events a surface is to receive.
@@ -1674,6 +1653,64 @@ See gdk_keymap_get_caps_lock_state().
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GdkMemoryFormat">
+<description>
+#GdkMemoryFormat describes a format that bytes can have in memory.
+
+It describes formats by listing the contents of the memory passed to it.
+So GDK_MEMORY_A8R8G8B8 will be 1 byte (8 bits) of alpha, followed by a
+byte each of red, green and blue. It is not endian-dependent, so
+CAIRO_FORMAT_ARGB32 is represented by different #GdkMemoryFormats on
+architectures with different endiannesses.
+
+Its naming is modelled after VkFormat (see
+https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkFormat
+for details).
+
+</description>
+<parameters>
+<parameter name="GDK_MEMORY_B8G8R8A8_PREMULTIPLIED">
+<parameter_description> 4 bytes; for blue, green, red, alpha.
+The color values are premultiplied with the alpha value.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_A8R8G8B8_PREMULTIPLIED">
+<parameter_description> 4 bytes; for alpha, red, green, blue.
+The color values are premultiplied with the alpha value.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_B8G8R8A8">
+<parameter_description> 4 bytes; for blue, green, red, alpha.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_A8R8G8B8">
+<parameter_description> 4 bytes; for alpha, red, green, blue.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_R8G8B8A8">
+<parameter_description> 4 bytes; for red, green, blue, alpha.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_A8B8G8R8">
+<parameter_description> 4 bytes; for alpha, blue, green, red.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_R8G8B8">
+<parameter_description> 3 bytes; for red, green, blue. The data is opaque.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_B8G8R8">
+<parameter_description> 3 bytes; for blue, green, red. The data is opaque.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_N_FORMATS">
+<parameter_description> The number of formats. This value will change as
+more formats get added, so do not rely on its concrete integer.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GdkModifierIntent">
 <description>
@@ -3178,6 +3215,29 @@ prevention'.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gdk_cairo_context_cairo_create">
+<description>
+Retrieves a Cairo context to be used to draw on the #GdkSurface
+of @context. A call to gdk_draw_context_begin_frame() with this
+@context must have been done or this function will return %NULL.
+
+The returned context is guaranteed to be valid until
+gdk_draw_context_end_frame() is called.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkCairoContext that is currently drawing
+</parameter_description>
+</parameter>
+</parameters>
+<return> a Cairo context to be used
+to draw the contents of the #GdkSurface. %NULL is returned
+when @contet is not drawing.
+</return>
 </function>
 
 <function name="gdk_cairo_draw_from_gl">
@@ -7215,25 +7275,6 @@ Determines the suggested drag action of the context.
 </return>
 </function>
 
-<function name="gdk_drag_context_set_device">
-<description>
-Associates a #GdkDevice to @context, so all Drag and Drop events
-for @context are emitted as if they came from this device.
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDragContext
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_drag_context_set_hotspot">
 <description>
 Sets the position of the drag surface that will be kept
@@ -7330,6 +7371,66 @@ or 0 to indicate that a drop will not be accepted
 <return></return>
 </function>
 
+<function name="gdk_draw_context_begin_frame">
+<description>
+Indicates that you are beginning the process of redrawing @region
+on the @context's surface.
+
+Calling this function begins a drawing operation using @context on the
+surface that @context was created from. The actual requirements and
+guarantees for the drawing operation vary for different implementations
+of drawing, so a #GdkCairoContext and a #GdkGLContext need to be treated
+differently.
+
+A call to this function is a requirement for drawing and must be followed
+by a call to gdk_draw_context_end_frame(), which will complete the
+drawing operation and ensure the contents become visible on screen.
+
+Note that the @region passed to this function is the minimum region that
+needs to be drawn and depending on implementation, windowing system and
+hardware in use, it might be necessary to draw a larger region. Drawing
+implementation must use gdk_draw_context_get_frame_region() to query the
+region that must be drawn.
+
+When using GTK+, the widget system automatically places calls to
+gdk_draw_context_begin_frame() and gdk_draw_context_end_frame() via the
+use of #GskRenderers, so application code does not need to call these
+functions explicitly.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> the context used to draw the frame
+</parameter_description>
+</parameter>
+<parameter name="region">
+<parameter_description> minimum region that should be drawn
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_end_frame">
+<description>
+Ends a drawing operation started with gdk_draw_context_begin_frame()
+and makes the drawing available on screen. See that function for more
+details about drawing.
+
+When using a #GdkGLContext, this function may call `glFlush()`
+implicitly before returning; it is not recommended to call `glFlush()`
+explicitly before calling this function.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_draw_context_get_display">
 <description>
 Retrieves the #GdkDisplay the @context is created for
@@ -7343,6 +7444,30 @@ Retrieves the #GdkDisplay the @context is created for
 </parameter>
 </parameters>
 <return> a #GdkDisplay or %NULL
+</return>
+</function>
+
+<function name="gdk_draw_context_get_frame_region">
+<description>
+Retrieves the region that is currently in the process of being repainted.
+
+After a call to gdk_draw_context_begin_frame() this function will return
+a union of the region passed to that function and the area of the surface
+that the @context determined needs to be repainted.
+
+If @context is not inbetween calls to gdk_draw_context_begin_frame() and
+gdk_draw_context_end_frame(), %NULL will be returned.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GdkDrawContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> a Cairo region or %NULL if not drawing
+a frame.
 </return>
 </function>
 
@@ -7362,62 +7487,23 @@ Retrieves the #GdkSurface used by the @context.
 </return>
 </function>
 
-<function name="gdk_drawing_context_get_cairo_context">
+<function name="gdk_draw_context_is_in_frame">
 <description>
-Retrieves a Cairo context to be used to draw on the #GdkSurface
-that created the #GdkDrawingContext. The @context must have been
-created without a #GdkDrawContext for this function to work. If
-gdk_drawing_context_get_paint_context() does not return %NULL,
-then this function will.
-
-The returned context is guaranteed to be valid as long as the
-#GdkDrawingContext is valid, that is between a call to
-gdk_surface_begin_draw_frame() and gdk_surface_end_draw_frame().
+Returns %TRUE if @context is in the process of drawing to its surface
+after a call to gdk_draw_context_begin_frame() and not yet having called
+gdk_draw_context_end_frame().
+In this situation, drawing commands may be effecting the contents of a
+@context's surface.
 
 
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GdkDrawingContext created with a %NULL paint context
+<parameter_description> a #GdkDrawContext
 </parameter_description>
 </parameter>
 </parameters>
-<return> a Cairo context to be used to draw
-the contents of the #GdkSurface. The context is owned by the
-#GdkDrawingContext and should not be destroyed. %NULL is
-returned when a paint context is in used.
-</return>
-</function>
-
-<function name="gdk_drawing_context_get_clip">
-<description>
-Retrieves a copy of the clip region used when creating the @context.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDrawingContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> a Cairo region
-</return>
-</function>
-
-<function name="gdk_drawing_context_get_paint_context">
-<description>
-Retrieves the paint context used to draw with.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkDrawingContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkDrawContext or %NULL
+<return> %TRUE if the context is between begin_frame() and end_frame() calls.
 </return>
 </function>
 
@@ -9045,24 +9131,6 @@ Retrieves the current #GdkGLContext.
 </return>
 </function>
 
-<function name="gdk_gl_context_get_damage">
-<description>
-Returns the part of the backbuffer that is known to be damaged and would
-need to be redrawn. This is the area that needs to be respected in addition
-to areas invalidated by GTK or the windowing system itself.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a #GdkGLContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> The damage to the backbuffer
-</return>
-</function>
-
 <function name="gdk_gl_context_get_debug_enabled">
 <description>
 Retrieves the value set using gdk_gl_context_set_debug_enabled().
@@ -10002,6 +10070,40 @@ Converts a key value to upper case, if applicable.
 </parameters>
 <return> the upper case form of @keyval, or @keyval itself if it is already
 in upper case or it is not subject to case conversion.
+</return>
+</function>
+
+<function name="gdk_memory_texture_new">
+<description>
+Creates a new texture for a blob of image data.
+The #GBytes must contain @stride x @height pixels
+in the given format.
+
+
+</description>
+<parameters>
+<parameter name="width">
+<parameter_description> the width of the texture
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the height of the texture
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the data
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> the #GBytes containing the pixel data
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> rowstride for the data
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly-created #GdkTexture
 </return>
 </function>
 
@@ -15053,58 +15155,6 @@ the display just as gdk_display_beep().
 <return></return>
 </function>
 
-<function name="gdk_surface_begin_draw_frame">
-<description>
-Indicates that you are beginning the process of redrawing @region
-on @surface, and provides you with a #GdkDrawingContext.
-
-If @surface is a top level #GdkSurface, backed by a native surface
-implementation, a backing store (offscreen buffer) large enough to
-contain @region will be created. The backing store will be initialized
-with the background color or background surface for @surface. Then, all
-drawing operations performed on @surface will be diverted to the
-backing store. When you call gdk_surface_end_frame(), the contents of
-the backing store will be copied to @surface, making it visible
-on screen. Only the part of @surface contained in @region will be
-modified; that is, drawing operations are clipped to @region.
-
-The net result of all this is to remove flicker, because the user
-sees the finished product appear all at once when you call
-gdk_surface_end_draw_frame(). If you draw to @surface directly without
-calling gdk_surface_begin_draw_frame(), the user may see flicker
-as individual drawing operations are performed in sequence.
-
-When using GTK+, the widget system automatically places calls to
-gdk_surface_begin_draw_frame() and gdk_surface_end_draw_frame() around
-emissions of the `GtkWidget::draw` signal. That is, if you’re
-drawing the contents of the widget yourself, you can assume that the
-widget has a cleared background, is already set as the clip region,
-and already has a backing store. Therefore in most cases, application
-code in GTK does not need to call gdk_surface_begin_draw_frame()
-explicitly.
-
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the context used to draw the frame
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> a Cairo region
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkDrawingContext context that should be
-used to draw the contents of the surface; the returned context is owned
-by GDK.
-</return>
-</function>
-
 <function name="gdk_surface_begin_move_drag">
 <description>
 Begins a surface move operation (for a toplevel surface).
@@ -15365,6 +15415,22 @@ in parent’s coordinate system, or %NULL
 <return></return>
 </function>
 
+<function name="gdk_surface_create_cairo_context">
+<description>
+Creates a new #GdkCairoContext for rendering on @surface.
+
+
+</description>
+<parameters>
+<parameter name="surface">
+<parameter_description> a #GdkSurface
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #GdkCairoContext
+</return>
+</function>
+
 <function name="gdk_surface_create_gl_context">
 <description>
 Creates a new #GdkGLContext matching the
@@ -15491,30 +15557,6 @@ reaches zero. You must call this function yourself before that happens.
 <parameters>
 <parameter name="surface">
 <parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_end_draw_frame">
-<description>
-Indicates that the drawing of the contents of @surface started with
-gdk_surface_begin_frame() has been completed.
-
-This function will take care of destroying the #GdkDrawingContext.
-
-It is an error to call this function without a matching
-gdk_surface_begin_frame() first.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the #GdkDrawingContext created by gdk_surface_begin_draw_frame()
 </parameter_description>
 </parameter>
 </parameters>
@@ -18250,9 +18292,8 @@ Gets the Vulkan device that this context is using.
 <description>
 Gets the index of the image that is currently being drawn.
 
-This function can only be used between gdk_surface_begin_draw_frame() and
-gdk_surface_end_draw_frame() calls for the toplevel surface that the
-@context is associated with.
+This function can only be used between gdk_cairo_context_begin_frame() and
+gdk_draw_context_end_frame() calls.
 
 
 </description>
@@ -18271,9 +18312,8 @@ gdk_surface_end_draw_frame() calls for the toplevel surface that the
 Gets the Vulkan semaphore that protects access to the image that is
 currently being drawn.
 
-This function can only be used between gdk_surface_begin_draw_frame() and
-gdk_surface_end_draw_frame() calls for the toplevel surface that the
-@context is associated with.
+This function can only be used between gdk_cairo_context_begin_frame() and
+gdk_draw_context_end_frame() calls.
 
 
 </description>
