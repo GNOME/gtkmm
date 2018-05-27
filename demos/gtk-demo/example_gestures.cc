@@ -55,24 +55,28 @@ Example_Gestures::Example_Gestures()
   m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.
-  m_GestureSwipe = Gtk::GestureSwipe::create(m_DrawingArea);
+  m_GestureSwipe = Gtk::GestureSwipe::create();
   m_GestureSwipe->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureSwipe->signal_swipe().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_swipe_swipe));
   m_GestureSwipe->set_touch_only(false);
+  m_DrawingArea.add_controller(m_GestureSwipe);
 
-  m_GestureLongPress = Gtk::GestureLongPress::create(m_DrawingArea);
+  m_GestureLongPress = Gtk::GestureLongPress::create();
   m_GestureLongPress->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureLongPress->signal_pressed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_pressed));
   m_GestureLongPress->signal_end().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_end));
   m_GestureLongPress->set_touch_only(false);
+  m_DrawingArea.add_controller(m_GestureLongPress);
 
-  m_GestureRotate = Gtk::GestureRotate::create(m_DrawingArea);
+  m_GestureRotate = Gtk::GestureRotate::create();
   m_GestureRotate->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureRotate->signal_angle_changed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_rotate_angle_changed));
+  m_DrawingArea.add_controller(m_GestureRotate);
 
-  m_GestureZoom = Gtk::GestureZoom::create(m_DrawingArea);
+  m_GestureZoom = Gtk::GestureZoom::create();
   m_GestureZoom->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
   m_GestureZoom->signal_scale_changed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_zoom_scale_changed));
+  m_DrawingArea.add_controller(m_GestureZoom);
 }
 
 Example_Gestures::~Example_Gestures()

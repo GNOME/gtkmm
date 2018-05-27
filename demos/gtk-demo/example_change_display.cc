@@ -298,7 +298,8 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(
       false, cursor) == Gdk::GrabStatus::SUCCESS)
   {
     m_popup_clicked = false;
-    auto refGesture = Gtk::GestureMultiPress::create(*pPopup);
+    auto refGesture = Gtk::GestureMultiPress::create();
+    pPopup->add_controller(refGesture);
     refGesture->set_button(0); // Any button
     refGesture->signal_released().connect(
       sigc::mem_fun(*this, &Example_ChangeDisplay::on_popup_button_released));

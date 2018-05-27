@@ -88,8 +88,9 @@ Example_DrawingArea::Example_DrawingArea()
   m_Frame_Scribble.set_shadow_type(Gtk::ShadowType::IN);
   m_VBox.pack_start(m_Frame_Scribble, Gtk::PackOptions::EXPAND_WIDGET);
 
-  m_drag = Gtk::GestureDrag::create(m_DrawingArea_Scribble);
+  m_drag = Gtk::GestureDrag::create();
   m_drag->set_button(GDK_BUTTON_PRIMARY);
+  m_DrawingArea_Scribble.add_controller(m_drag);
 
   /* set a minimum size */
   m_DrawingArea_Scribble.set_content_width(100);

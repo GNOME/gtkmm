@@ -45,6 +45,7 @@ _CONV_ENUM(Gtk,CurveType)
 _CONV_ENUM(Gtk,DeleteType)
 _CONV_ENUM(Gtk,DestDefaults)
 _CONV_ENUM(Gtk,DirectionType)
+_CONV_INCLASS_ENUM(Gtk,EventControllerScroll,Flags)
 _CONV_ENUM(Gtk,EventSequenceState)
 _CONV_INCLASS_ENUM(Gtk,FontChooser,Level)
 _CONV_INCLASS_ENUM(Gtk,Image,Type)
@@ -342,6 +343,8 @@ _CONVERSION(`GtkSizeGroup*',`Glib::RefPtr<const SizeGroup>',`Glib::wrap($3)')
 _CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<EntryBuffer>',`Glib::wrap($3)')
 _CONVERSION(`GtkEntryBuffer*',`Glib::RefPtr<const EntryBuffer>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<EntryBuffer>&',`GtkEntryBuffer*',__CONVERT_REFPTR_TO_P)
+
+_CONVERSION(`const Glib::RefPtr<EventController>&',`GtkEventController*',__CONVERT_REFPTR_TO_P)
 
 # Tree:
 _CONVERSION(`const iterator&',`const GtkTreeIter*',__FR2P)
