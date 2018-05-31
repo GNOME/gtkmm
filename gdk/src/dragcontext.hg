@@ -21,7 +21,6 @@
 #include <gdkmm/pixbuf.h>
 #include <gdkmm/device.h>
 #include <glibmm/object.h>
-#include <cairomm/surface.h>
 #include <gdk/gdk.h>
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -29,8 +28,12 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gdk
 {
 class ContentFormats;
+class ContentProvider;
+class Display;
+class Surface;
 
 _WRAP_ENUM(DragAction, GdkDragAction)
+_WRAP_ENUM(DragCancelReason, GdkDragCancelReason)
 
 /** A Gdk::DragContext holds information about a drag in progress. It is used on both source and destination sides.
  */
@@ -59,8 +62,9 @@ public:
    * @param time The timestamp from the "drag_data_drop" signal.
    */
   _WRAP_METHOD(void drag_finish(bool success, guint32 time), gtk_drag_finish)
-  //Gtk::Widget* get_source_widget() - see Gtk::Widget::drag_get_source_widget()
+  _WRAP_METHOD(void drag_drop_done(bool success), gdk_drag_drop_done)
 
+  //Gtk::Widget* get_source_widget() - see Gtk::Widget::drag_get_source_widget()
   // void set_icon(Gtk::Widget* widget, int hot_x, int hot_y) - see Gtk::Widget::set_as_icon().
 
   _WRAP_METHOD(void set_icon_name(const Glib::ustring& name, int hot_x, int hot_y), gtk_drag_set_icon_name)
@@ -70,6 +74,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Surface> get_source_surface() const, gdk_drag_context_get_source_surface, refreturn, constversion)
   _WRAP_METHOD(Glib::RefPtr<Surface> get_dest_surface(), gdk_drag_context_get_dest_surface, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Surface> get_dest_surface() const, gdk_drag_context_get_dest_surface, refreturn, constversion)
+  // No unconst version of get_drag_surface(). The surface is owned by the DragContext, and shall not be changed by the caller.
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_drag_surface() const, gdk_drag_context_get_drag_surface, refreturn)
+
+  _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_drag_context_get_display, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_drag_context_get_display, refreturn, constversion)
 
   _WRAP_METHOD(Glib::RefPtr<Device> get_device(), gdk_drag_context_get_device, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Device> get_device() const, gdk_drag_context_get_device, refreturn, constversion)
@@ -80,6 +89,19 @@ public:
   _WRAP_METHOD(DragAction get_actions() const, gdk_drag_context_get_actions)
   _WRAP_METHOD(DragAction get_suggested_action() const, gdk_drag_context_get_suggested_action)
   _WRAP_METHOD(DragAction get_selected_action() const, gdk_drag_context_get_selected_action)
+
+  _WRAP_METHOD(void set_hot_spot(int hot_x, int hot_y), gdk_drag_context_set_hotspot)
+
+  _WRAP_PROPERTY("content", Glib::RefPtr<ContentProvider>)
+  _WRAP_PROPERTY("device", Glib::RefPtr<Device>)
+  _WRAP_PROPERTY("display", Glib::RefPtr<Display>)
+  _WRAP_PROPERTY("formats", Glib::RefPtr<ContentFormats>)
+
+  // no_default_handler because GdkDragContextClass is private.
+  _WRAP_SIGNAL(void cancel(DragCancelReason reason), "cancel", no_default_handler)
+  _WRAP_SIGNAL(void drop_performed(int time), "drop-performed", no_default_handler)
+  _WRAP_SIGNAL(void dnd_finished(), "dnd-finished", no_default_handler)
+  _WRAP_SIGNAL(void action_changed(DragAction action), "action-changed", no_default_handler)
 };
 
 } // namespace Gdk
