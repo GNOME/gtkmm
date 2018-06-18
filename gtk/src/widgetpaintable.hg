@@ -1,0 +1,76 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <gdkmm/paintable.h>
+#include <gtkmm/widget.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+/** Drawing a widget elsewhere.
+ *
+ * %Gtk::WidgetPaintable is an implementation of the Gdk::Paintable interface 
+ * that allows displaying the contents of a Gtk::Widget.
+ *
+ * %WidgetPaintable will also take care of the widget not being in a
+ * state where it can be drawn (like when it isn't shown) and just draw
+ * nothing or where it does not have a size (like when it is hidden) and
+ * report no size in that case.
+ *
+ * Of course, %WidgetPaintable allows you to monitor widgets for size
+ * changes by emitting Gdk::Paintable::signal_invalidate_size() whenever
+ * the size of the widget changes as well as for visual changes by
+ * emitting Gdk::Paintable::signal_invalidate_contents() whenever the
+ * widget changes.
+ *
+ * You can of course use a %Gtk::WidgetPaintable everywhere a
+ * Gdk::Paintable is allowed, including using it on a Gtk::Picture (or one
+ * of its parents) that it was set on itself via Gtk::Picture::set_paintable().
+ * The paintable will take care of recursion when this happens. If you do
+ * this however, ensure Gtk::Picture::property_can_shrink() is set to
+ * <tt>true</tt> or you might end up with an infinitely growing widget.
+ *
+ * @newin{3,94}
+ */
+class WidgetPaintable : public Glib::Object, public Gdk::Paintable
+{
+  _CLASS_GOBJECT(WidgetPaintable, GtkWidgetPaintable, GTK_WIDGET_PAINTABLE, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Gdk::Paintable)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT()
+  _WRAP_CTOR(WidgetPaintable(Widget& widget), gtk_widget_paintable_new)
+
+public:
+  _WRAP_CREATE()
+  _WRAP_CREATE(Widget& widget)
+
+  _WRAP_METHOD(Widget* get_widget(), gtk_widget_paintable_get_widget)
+  _WRAP_METHOD(const Widget* get_widget() const, gtk_widget_paintable_get_widget, constversion)
+  _WRAP_METHOD(void set_widget(Widget& widget), gtk_widget_paintable_set_widget)
+  void unset_widget();
+
+  _WRAP_PROPERTY("widget", Widget*)
+
+  // There are no public signals or vfuncs.
+};
+
+} // namespace Gtk

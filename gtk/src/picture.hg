@@ -1,0 +1,136 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/widget.h>
+#include <giomm/file.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/widget_p.h)
+
+namespace Gtk
+{
+
+_CC_INCLUDE(gtk/gtk.h)
+
+/** A widget displaying a Gdk::Paintable.
+ *
+ * The %Gtk::Picture widget displays a Gdk::Paintable. Many convenience functions
+ * are provided to make pictures simple to use. For example, if you want to load
+ * an image from a file, and then display that, there’s a convenience method
+ * to do this: set_filename() or the constructor taking a filename parameter.
+ *
+ * If the file isn’t loaded successfully, the picture will contain a
+ * “broken image” icon similar to that used in many web browsers.
+ * If you want to handle errors in loading the file yourself,
+ * for example by displaying an error message, then load the file with
+ * Gdk::Texture::create_from_file(), then create the %Gtk::Picture from the texture.
+ *
+ * Sometimes an application will want to avoid depending on external data
+ * files, such as image files. See the documentation of Gio::Resource for details.
+ * In this case, set_resource() should be used.
+ *
+ * @newin{3,94}
+ *
+ * @ingroup Widgets
+ */
+class Picture : public Widget
+{
+  _CLASS_GTKOBJECT(Picture, GtkPicture, GTK_PICTURE, Gtk::Widget, GtkWidget)
+  _STRUCT_NOT_HIDDEN
+
+public:
+  _CTOR_DEFAULT
+
+  /** Creates a new %Picture displaying @a paintable.
+   *
+   * The %Picture will track changes to the @a paintable and update
+   * its size and contents in response to it.
+   *
+   * @param paintable A Gdk::Paintable or an empty Glib::RefPtr.
+   */
+  _WRAP_CTOR(Picture(const Glib::RefPtr<Gdk::Paintable>& paintable), gtk_picture_new_for_paintable)
+
+  // gtk_picture_new_for_pixbuf() does more than just call g_object_new().
+  // GtkPicture has no "pixbuf" property.
+  /** Creates a new %Picture widget displaying @a pixbuf.
+   *
+   * This constructor calls Picture(const Glib::RefPtr<Gdk::Paintable>& paintable).
+   * See that constructor for details.
+   *
+   * The pixbuf must not be modified after passing it to this constructor.
+   *
+   * @param pixbuf A Gdk::Pixbuf or an empty Glib::RefPtr.
+   */
+  explicit Picture(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf);
+  _IGNORE(gtk_picture_new_for_pixbuf)
+
+  /** Creates a new %Picture displaying the given @a file.
+   *
+   * If the file isn’t found or can’t be loaded, the resulting %Picture will be empty.
+   *
+   * If you need to detect failures in loading the file, use
+   * Gdk::Texture::create_from_file() to load the file yourself, then create
+   * the %Gtk::Picture from the texture.
+   *
+   * @param file A Gio::File or an empty Glib::RefPtr.
+   */
+  _WRAP_CTOR(Picture(const Glib::RefPtr<Gio::File>& file), gtk_picture_new_for_file)
+
+  // gtk_picture_new_for_filename() does more than just call g_object_new().
+  // GtkPicture has no "filename" property.
+  /** Creates a new %Picture displaying the file @a filename.
+   *
+   * This constructor calls Picture(const Glib::RefPtr<Gio::File>& file).
+   * See that constructor for details.
+   *
+   * @param filename A filename or an empty string.
+   */
+  explicit Picture(const std::string& filename);
+  _IGNORE(gtk_picture_new_for_filename)
+
+  // We don't wrap gtk_picture_new_for_resource() to avoid a clash with
+  // the for_filename constructor. But we do wrap gtk_picture_set_resource().
+  _IGNORE(gtk_picture_new_for_resource)
+
+  _WRAP_METHOD(void set_paintable(const Glib::RefPtr<Gdk::Paintable>& paintable), gtk_picture_set_paintable)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Paintable> get_paintable(), gtk_picture_get_paintable, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Paintable> get_paintable() const, gtk_picture_get_paintable, refreturn, constversion)
+
+  _WRAP_METHOD(void set_file(const Glib::RefPtr<const Gio::File>& file), gtk_picture_set_file)
+  _WRAP_METHOD(Glib::RefPtr<Gio::File> get_file(), gtk_picture_get_file, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::File> get_file() const, gtk_picture_get_file, refreturn, constversion)
+
+  _WRAP_METHOD(void set_filename(const std::string& filename), gtk_picture_set_filename)
+  _WRAP_METHOD(void set_resource(const std::string& resource_path), gtk_picture_set_resource)
+  _WRAP_METHOD(void set_pixbuf(const Glib::RefPtr<Gdk::Pixbuf>& pixbuf), gtk_picture_set_pixbuf)
+
+  _WRAP_METHOD(void set_keep_aspect_ratio(bool keep_aspect_ratio = true), gtk_picture_set_keep_aspect_ratio)
+  _WRAP_METHOD(bool get_keep_aspect_ratio() const, gtk_picture_get_keep_aspect_ratio)
+
+  _WRAP_METHOD(void set_can_shrink(bool can_shrink = true), gtk_picture_set_can_shrink)
+  _WRAP_METHOD(bool get_can_shrink() const, gtk_picture_get_can_shrink)
+
+  _WRAP_METHOD(void set_alternative_text(const Glib::ustring& alternative_text{NULL}), gtk_picture_set_alternative_text)
+  _WRAP_METHOD(Glib::ustring get_alternative_text() const, gtk_picture_get_alternative_text)
+
+  _WRAP_PROPERTY("paintable", Glib::RefPtr<Gdk::Paintable>)
+  _WRAP_PROPERTY("file", Glib::RefPtr<Gio::File>)
+  _WRAP_PROPERTY("alternative-text", Glib::ustring)
+  _WRAP_PROPERTY("keep-aspect-ratio", bool)
+  _WRAP_PROPERTY("can-shrink", bool)
+};
+
+} //namespace Gtk
