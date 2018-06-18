@@ -5124,7 +5124,7 @@ it can be used by applications for their own purposes.
 <signal name="GtkFontButton::font-set">
 <description>
 The ::font-set signal is emitted when the user selects a font. 
-When handling this signal, use gtk_font_button_get_font_name() 
+When handling this signal, use gtk_font_chooser_get_font()
 to find out which font was just selected.
 
 Note that this signal is only emitted when the user
@@ -6486,13 +6486,6 @@ An enum for determining where a dropped item goes.
 </parameters>
 </enum>
 
-<property name="GtkImage:can-shrink">
-<description>
-If the #GtkImage can be made smaller than the image it contains.
-
-</description>
-</property>
-
 <property name="GtkImage:gicon">
 <description>
 The GIcon displayed in the GtkImage. For themed icons,
@@ -6506,14 +6499,6 @@ automatically.
 <description>
 The name of the icon in the icon theme. If the icon theme is
 changed, the image will be updated automatically.
-
-</description>
-</property>
-
-<property name="GtkImage:keep-aspect-ratio">
-<description>
-Whether the GtkImage will render its contents trying to preserve the aspect
-ratio of the contents.
 
 </description>
 </property>
@@ -8452,6 +8437,13 @@ Blur the content behind this child with a Gaussian blur of this radius.
 </description>
 </property>
 
+<property name="GtkOverlay:clip-overlay">
+<description>
+Clip the overlay child widget so as to fit the parent
+
+</description>
+</property>
+
 <property name="GtkOverlay:index">
 <description>
 The index of the overlay in the parent, -1 for the main child.
@@ -8774,6 +8766,42 @@ smaller than its requisition.
 Setting this property to %TRUE indicates that the paned needs
 to provide stronger visual separation (e.g. because it separates
 between two notebooks, whose tab rows would otherwise merge visually).
+
+</description>
+</property>
+
+<property name="GtkPicture:alternative-text">
+<description>
+The alternative textual description for the picture.
+
+</description>
+</property>
+
+<property name="GtkPicture:can-shrink">
+<description>
+If the #GtkPicture can be made smaller than the self it contains.
+
+</description>
+</property>
+
+<property name="GtkPicture:file">
+<description>
+The #GFile that is displayed or %NULL if none.
+
+</description>
+</property>
+
+<property name="GtkPicture:keep-aspect-ratio">
+<description>
+Whether the GtkPicture will render its contents trying to preserve the aspect
+ratio of the contents.
+
+</description>
+</property>
+
+<property name="GtkPicture:paintable">
+<description>
+The #GdkPaintable to be displayed by this #GtkPicture.
 
 </description>
 </property>
@@ -36521,7 +36549,7 @@ first_gesture_begin_cb (GtkGesture       *first_gesture,
 GdkEventSequence *sequence,
 gpointer          user_data)
 {
-gtk_gesture_set_sequence_state (first_gesture, sequence, GTK_EVENT_SEQUENCE_ACCEPTED);
+gtk_gesture_set_sequence_state (first_gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
 gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
 }
 
@@ -36530,7 +36558,7 @@ second_gesture_begin_cb (GtkGesture       *second_gesture,
 GdkEventSequence *sequence,
 gpointer          user_data)
 {
-if (gtk_gesture_get_sequence_state (first_gesture, sequence) == GTK_EVENT_SEQUENCE_ACCEPTED)
+if (gtk_gesture_get_sequence_state (first_gesture, sequence) == GTK_EVENT_SEQUENCE_CLAIMED)
 gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
 }
 ]|
@@ -37153,6 +37181,18 @@ gtk_widget_set_default_direction (direction);
 <parameters>
 </parameters>
 <return> the #GtkTextDirection of the current locale
+</return>
+</function>
+
+<function name="gtk_get_main_thread">
+<description>
+Get the thread from which GTK+ was initialized.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The #GThread initialized for GTK+, must not be freed
 </return>
 </function>
 
@@ -41307,22 +41347,6 @@ Resets the image to be empty.
 <return></return>
 </function>
 
-<function name="gtk_image_get_can_shrink">
-<description>
-Gets the value set via gtk_image_set_can_shrink().
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the image can be made smaller than its contents
-</return>
-</function>
-
 <function name="gtk_image_get_gicon">
 <description>
 Gets the #GIcon and size being displayed by the #GtkImage.
@@ -41384,22 +41408,6 @@ Gets the icon size used by the @image when rendering icons.
 </parameter>
 </parameters>
 <return> the image size used by icons
-</return>
-</function>
-
-<function name="gtk_image_get_keep_aspect_ratio">
-<description>
-Gets the value set via gtk_image_set_keep_aspect_ratio().
-
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the image tries to keep the contents' aspect ratio
 </return>
 </function>
 
@@ -41618,32 +41626,6 @@ displaying the file.
 </return>
 </function>
 
-<function name="gtk_image_set_can_shrink">
-<description>
-If set to %TRUE, the @image can be made smaller than its contents.
-The contents will be scaled down when rendering.
-
-If you want to still force a minimum size manually, consider using
-gtk_widget_set_size_request().
-
-Also of note is that a similar function for growing does not exist
-because the grow behavior can be controlled via
-gtk_widget_set_halign() and gtk_widget_set_valign().
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-<parameter name="can_shrink">
-<parameter_description> if the @image can be made smaller than its contents
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_image_set_from_file">
 <description>
 See gtk_image_new_from_file() for details.
@@ -41775,29 +41757,6 @@ Suggests an icon size to the theme for named icons.
 </parameter>
 <parameter name="icon_size">
 <parameter_description> the new icon size
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_image_set_keep_aspect_ratio">
-<description>
-If set to %TRUE, the @image will render its contents according to
-their aspect ratio. That means that empty space may show up at the
-top/bottom or left/right of @image.
-
-If set to %FALSE or if the contents provide no aspect ratio, the
-contents will be stretched over the image's whole area.
-
-</description>
-<parameters>
-<parameter name="image">
-<parameter_description> a #GtkImage
-</parameter_description>
-</parameter>
-<parameter name="keep_aspect_ratio">
-<parameter_description> whether to keep aspect ratio
 </parameter_description>
 </parameter>
 </parameters>
@@ -42254,6 +42213,19 @@ Sets the #GdkDisplay where the #GtkInvisible object will be displayed.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_is_initialized">
+<description>
+Use this function to check if GTK+ has been initialized with gtk_init()
+or gtk_init_check().
+
+
+</description>
+<parameters>
+</parameters>
+<return> the initialization status
+</return>
 </function>
 
 <function name="gtk_key_hash_free">
@@ -49740,6 +49712,27 @@ Gets whether @widget's size is included in the measurement of
 </return>
 </function>
 
+<function name="gtk_overlay_get_overlay_clip_overlay">
+<description>
+Convenience function to get the value of the #GtkOverlay:clip-overlay
+child property for @widget.
+
+
+</description>
+<parameters>
+<parameter name="overlay">
+<parameter_description> a #GtkOverlay
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> an overlay child of #GtkOverlay
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the widget is clipped within the parent.
+</return>
+</function>
+
 <function name="gtk_overlay_get_overlay_pass_through">
 <description>
 Convenience function to get the value of the #GtkOverlay:pass-through
@@ -49797,6 +49790,29 @@ the bottom. It also affects the default focus chain order.
 <parameter_description> the new index for @child in the list of overlay children
 of @overlay, starting from 0. If negative, indicates the end of
 the list
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_overlay_set_clip_overlay">
+<description>
+Convenience function to set the value of the #GtkOverlay:clip-overlay
+child property for @widget.
+
+</description>
+<parameters>
+<parameter name="overlay">
+<parameter_description> a #GtkOverlay
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> an overlay child of #GtkOverlay
+</parameter_description>
+</parameter>
+<parameter name="clip_overlay">
+<parameter_description> whether the child should be clipped
 </parameter_description>
 </parameter>
 </parameters>
@@ -51320,6 +51336,376 @@ This function adds the paper size from @size to @key_file.
 </parameter>
 <parameter name="group_name">
 <parameter_description> the group to add the settings to in @key_file
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_get_alternative_text">
+<description>
+Gets the alternative textual description of the picture or returns %NULL if
+the picture cannot be described textually.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+</parameters>
+<return> the alternative textual description
+of @self.
+</return>
+</function>
+
+<function name="gtk_picture_get_can_shrink">
+<description>
+Gets the value set via gtk_picture_set_can_shrink().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the self can be made smaller than its contents
+</return>
+</function>
+
+<function name="gtk_picture_get_file">
+<description>
+Gets the #GFile currently displayed if @self is displaying a file.
+If @self is not displaying a file, for example when gtk_picture_set_paintable()
+was used, then %NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GFile displayed by @self.
+</return>
+</function>
+
+<function name="gtk_picture_get_keep_aspect_ratio">
+<description>
+Gets the value set via gtk_picture_set_keep_aspect_ratio().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the self tries to keep the contents' aspect ratio
+</return>
+</function>
+
+<function name="gtk_picture_get_paintable">
+<description>
+Gets the #GdkPaintable being displayed by the #GtkPicture.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+</parameters>
+<return> the displayed paintable, or %NULL if
+the picture is empty
+</return>
+</function>
+
+<function name="gtk_picture_new">
+<description>
+Creates a new empty #GtkPicture widget.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a newly created #GtkPicture widget. 
+</return>
+</function>
+
+<function name="gtk_picture_new_for_file">
+<description>
+Creates a new #GtkPicture displaying the given @file. If the file
+isn’t found or can’t be loaded, the resulting #GtkPicture be empty.
+
+If you need to detect failures to load the file, use
+gdk_texture_new_for_file() to load the file yourself, then create
+the #GtkPicture from the texture.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPicture
+</return>
+</function>
+
+<function name="gtk_picture_new_for_filename">
+<description>
+Creates a new #GtkPicture displaying the file @filename. 
+
+This is a utility function that calls gtk_picture_new_for_file().
+See that function for details.
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> a filename
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPicture
+</return>
+</function>
+
+<function name="gtk_picture_new_for_paintable">
+<description>
+Creates a new #GtkPicture displaying @paintable.
+
+The #GtkPicture will track changes to the @paintable and update
+its size and contents in response to it.
+
+
+</description>
+<parameters>
+<parameter name="paintable">
+<parameter_description> a #GdkPaintable, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPicture
+</return>
+</function>
+
+<function name="gtk_picture_new_for_pixbuf">
+<description>
+Creates a new #GtkPicture displaying @pixbuf.
+
+This is a utility function that calls gtk_picture_new_for_paintable(),
+See that function for details.
+
+The pixbuf must not be modified after passing it to this function.
+
+
+</description>
+<parameters>
+<parameter name="pixbuf">
+<parameter_description> a #GdkPixbuf, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPicture
+</return>
+</function>
+
+<function name="gtk_picture_new_for_resource">
+<description>
+Creates a new #GtkPicture displaying the file @filename. 
+
+This is a utility function that calls gtk_picture_new_for_file(),
+See that function for details.
+
+
+</description>
+<parameters>
+<parameter name="resource_path">
+<parameter_description> resource path to play back
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkPicture
+</return>
+</function>
+
+<function name="gtk_picture_set_alternative_text">
+<description>
+Sets an alternative textual description for the picture contents.
+It is equivalent to the &quot;alt&quot; attribute for images on websites.
+
+This text will be made available to accessibility tools.
+
+If the picture cannot be described textually, set this proeprty to %NULL.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="alternative_text">
+<parameter_description> a textual description of the contents
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_can_shrink">
+<description>
+If set to %TRUE, the @self can be made smaller than its contents.
+The contents will then be scaled down when rendering.
+
+If you want to still force a minimum size manually, consider using
+gtk_widget_set_size_request().
+
+Also of note is that a similar function for growing does not exist
+because the grow behavior can be controlled via
+gtk_widget_set_halign() and gtk_widget_set_valign().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="can_shrink">
+<parameter_description> if @self can be made smaller than its contents
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_file">
+<description>
+Makes @self load and display @file.
+
+See gtk_picture_new_for_file() for details.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="file">
+<parameter_description> a %GFile or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_filename">
+<description>
+Makes @self load and display the given @filename.
+
+This is a utility function that calls gtk_picture_set_file(),
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> the filename to play
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_keep_aspect_ratio">
+<description>
+If set to %TRUE, the @self will render its contents according to
+their aspect ratio. That means that empty space may show up at the
+top/bottom or left/right of @self.
+
+If set to %FALSE or if the contents provide no aspect ratio, the
+contents will be stretched over the picture's whole area.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="keep_aspect_ratio">
+<parameter_description> whether to keep aspect ratio
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_paintable">
+<description>
+Makes @self display the given @paintable. If @paintable is %NULL,
+nothing will be displayed.
+
+See gtk_picture_new_for_paintable() for details.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="paintable">
+<parameter_description> a #GdkPaintable or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_pixbuf">
+<description>
+See gtk_picture_new_for_pixbuf() for details.
+
+This is a utility function that calls gtk_picture_set_paintable(),
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="pixbuf">
+<parameter_description> a #GdkPixbuf or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_picture_set_resource">
+<description>
+Makes @self load and display the resource at the given
+@resource_path.
+
+This is a utility function that calls gtk_picture_set_file(),
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkPicture
+</parameter_description>
+</parameter>
+<parameter name="resource_path">
+<parameter_description> the resource to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -78448,6 +78834,7 @@ Creates a #GtkVideo to play back the given @file.
 Creates a #GtkVideo to play back the given @filename.
 
 This is a utility function that calls gtk_video_new_for_file(),
+See that function for details.
 
 
 </description>
@@ -79973,6 +80360,23 @@ free those resources when the widget is unrealized.
 </parameter>
 </parameters>
 <return> The widget's first child
+</return>
+</function>
+
+<function name="gtk_widget_get_focus_child">
+<description>
+Returns the current focus child of @widget.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current focus child of @widget,
+or %NULL in case the focus child is unset.
 </return>
 </function>
 
@@ -82889,6 +83293,30 @@ set by gtk_widget_set_default_direction() will be used.
 </parameter>
 <parameter name="dir">
 <parameter_description>    the new direction
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_set_focus_child">
+<description>
+Set @child as the current focus child of @widget. The previous
+focus child will be unset.
+
+This function is only suitable for widget implementations.
+If you want a certain widget to get the input focus, call
+gtk_widget_grab_focus() on it.
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a direct child widget of @widget or %NULL
+to unset the focus child of @widget
 </parameter_description>
 </parameter>
 </parameters>
