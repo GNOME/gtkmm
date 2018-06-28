@@ -38,8 +38,9 @@ Example_ColorSel::Example_ColorSel()
   m_Button("_Change the above color", true)
 {
   set_title("Color Chooser");
+  set_resizable(false);
 
-  m_VBox.property_margin() = 12;
+  m_VBox.set_margin(12);
   add(m_VBox);
 
   // Create the color swatch area
@@ -79,6 +80,7 @@ void Example_ColorSel::on_button_clicked()
   if(response == Gtk::ResponseType::OK)
   {
     m_Color = dialog.get_rgba();
+    m_DrawingArea.queue_draw();
   }
 }
 
