@@ -82,20 +82,6 @@
   )
 )
 
-(define-flags DragAction
-  (in-module "Gdk")
-  (c-name "GdkDragAction")
-  (gtype-id "GDK_TYPE_DRAG_ACTION")
-  (values
-    '("default" "GDK_ACTION_DEFAULT")
-    '("copy" "GDK_ACTION_COPY")
-    '("move" "GDK_ACTION_MOVE")
-    '("link" "GDK_ACTION_LINK")
-    '("private" "GDK_ACTION_PRIVATE")
-    '("ask" "GDK_ACTION_ASK")
-  )
-)
-
 (define-enum DragCancelReason
   (in-module "Gdk")
   (c-name "GdkDragCancelReason")
@@ -287,7 +273,6 @@
     '("toplevel" "GDK_SURFACE_TOPLEVEL")
     '("child" "GDK_SURFACE_CHILD")
     '("temp" "GDK_SURFACE_TEMP")
-    '("foreign" "GDK_SURFACE_FOREIGN")
     '("subsurface" "GDK_SURFACE_SUBSURFACE")
   )
 )
@@ -624,6 +609,18 @@
     '("distance" "GDK_AXIS_FLAG_DISTANCE")
     '("rotation" "GDK_AXIS_FLAG_ROTATION")
     '("slider" "GDK_AXIS_FLAG_SLIDER")
+  )
+)
+
+(define-flags DragAction
+  (in-module "Gdk")
+  (c-name "GdkDragAction")
+  (gtype-id "GDK_TYPE_DRAG_ACTION")
+  (values
+    '("copy" "GDK_ACTION_COPY")
+    '("move" "GDK_ACTION_MOVE")
+    '("link" "GDK_ACTION_LINK")
+    '("ask" "GDK_ACTION_ASK")
   )
 )
 
@@ -2071,6 +2068,12 @@
   )
 )
 
+(define-method get_startup_notification_id
+  (of-object "GdkDisplay")
+  (c-name "gdk_display_get_startup_notification_id")
+  (return-type "const-gchar*")
+)
+
 (define-method get_app_launch_context
   (of-object "GdkDisplay")
   (c-name "gdk_display_get_app_launch_context")
@@ -2242,59 +2245,12 @@
   (return-type "GdkDragAction")
 )
 
-(define-method get_source_surface
-  (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_source_surface")
-  (return-type "GdkSurface*")
-)
-
-(define-method get_dest_surface
-  (of-object "GdkDragContext")
-  (c-name "gdk_drag_context_get_dest_surface")
-  (return-type "GdkSurface*")
-)
-
-(define-function gdk_drag_status
-  (c-name "gdk_drag_status")
-  (return-type "none")
+; h2def.py thinks that this is a method and that GdkDragAction is an object.
+(define-function gdk_drag_action_is_unique
+  (c-name "gdk_drag_action_is_unique")
+  (return-type "gboolean")
   (parameters
-    '("GdkDragContext*" "context")
     '("GdkDragAction" "action")
-    '("guint32" "time_")
-  )
-)
-
-(define-function gdk_drop_finish
-  (c-name "gdk_drop_finish")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("gboolean" "success")
-    '("guint32" "time_")
-  )
-)
-
-(define-function gdk_drop_read_async
-  (c-name "gdk_drop_read_async")
-  (return-type "none")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("const-char**" "mime_types")
-    '("int" "io_priority")
-    '("GCancellable*" "cancellable")
-    '("GAsyncReadyCallback" "callback")
-    '("gpointer" "user_data")
-  )
-)
-
-(define-function gdk_drop_read_finish
-  (c-name "gdk_drop_read_finish")
-  (return-type "GInputStream*")
-  (parameters
-    '("GdkDragContext*" "context")
-    '("const-char**" "out_mime_type")
-    '("GAsyncResult*" "result")
-    '("GError**" "error")
   )
 )
 
@@ -2386,6 +2342,132 @@
 
 
 
+;; From gdkdrop.h
+
+(define-method get_display
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_display")
+  (return-type "GdkDisplay*")
+)
+
+(define-method get_device
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_device")
+  (return-type "GdkDevice*")
+)
+
+(define-method get_surface
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_surface")
+  (return-type "GdkSurface*")
+)
+
+(define-method get_formats
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method get_actions
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_actions")
+  (return-type "GdkDragAction")
+)
+
+(define-method get_drag
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_get_drag")
+  (return-type "GdkDragContext*")
+)
+
+(define-method status
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_status")
+  (return-type "none")
+  (parameters
+    '("GdkDragAction" "actions")
+  )
+)
+
+(define-method finish
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_finish")
+  (return-type "none")
+  (parameters
+    '("GdkDragAction" "action")
+  )
+)
+
+(define-method read_async
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_async")
+  (return-type "none")
+  (parameters
+    '("const-char**" "mime_types")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_finish
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_finish")
+  (return-type "GInputStream*")
+  (parameters
+    '("const-char**" "out_mime_type")
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_value_async
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_value_async")
+  (return-type "none")
+  (parameters
+    '("GType" "type")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_value_finish
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_value_finish")
+  (return-type "const-GValue*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_text_async
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_text_async")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_text_finish
+  (of-object "GdkDrop")
+  (c-name "gdk_drop_read_text_finish")
+  (return-type "char*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From gdkevents.h
 
 (define-function gdk_event_get_type
@@ -2411,12 +2493,6 @@
   (of-object "GdkEvent")
   (c-name "gdk_event_copy")
   (return-type "GdkEvent*")
-)
-
-(define-method free
-  (of-object "GdkEvent")
-  (c-name "gdk_event_free")
-  (return-type "none")
 )
 
 (define-method get_surface
@@ -2742,13 +2818,10 @@
   (return-type "gboolean")
 )
 
-(define-method get_drag_context
+(define-method get_drop
   (of-object "GdkEvent")
-  (c-name "gdk_event_get_drag_context")
-  (return-type "gboolean")
-  (parameters
-    '("GdkDragContext**" "context")
-  )
+  (c-name "gdk_event_get_drop")
+  (return-type "GdkDrop*")
 )
 
 (define-method get_crossing_mode
@@ -3958,6 +4031,20 @@
   )
 )
 
+(define-method move_to_rect
+  (of-object "GdkSurface")
+  (c-name "gdk_surface_move_to_rect")
+  (return-type "none")
+  (parameters
+    '("const-GdkRectangle*" "rect")
+    '("GdkGravity" "rect_anchor")
+    '("GdkGravity" "surface_anchor")
+    '("GdkAnchorHints" "anchor_hints")
+    '("gint" "rect_anchor_dx")
+    '("gint" "rect_anchor_dy")
+  )
+)
+
 (define-method raise
   (of-object "GdkSurface")
   (c-name "gdk_surface_raise")
@@ -4401,40 +4488,6 @@
   (return-type "GList*")
   (parameters
     '("gpointer" "user_data")
-  )
-)
-
-(define-method get_events
-  (of-object "GdkSurface")
-  (c-name "gdk_surface_get_events")
-  (return-type "GdkEventMask")
-)
-
-(define-method set_events
-  (of-object "GdkSurface")
-  (c-name "gdk_surface_set_events")
-  (return-type "none")
-  (parameters
-    '("GdkEventMask" "event_mask")
-  )
-)
-
-(define-method set_device_events
-  (of-object "GdkSurface")
-  (c-name "gdk_surface_set_device_events")
-  (return-type "none")
-  (parameters
-    '("GdkDevice*" "device")
-    '("GdkEventMask" "event_mask")
-  )
-)
-
-(define-method get_device_events
-  (of-object "GdkSurface")
-  (c-name "gdk_surface_get_device_events")
-  (return-type "GdkEventMask")
-  (parameters
-    '("GdkDevice*" "device")
   )
 )
 
@@ -4991,11 +5044,6 @@
   (return-type "GType")
 )
 
-(define-function gdk_drag_action_get_type
-  (c-name "gdk_drag_action_get_type")
-  (return-type "GType")
-)
-
 (define-function gdk_drag_cancel_reason_get_type
   (c-name "gdk_drag_cancel_reason_get_type")
   (return-type "GType")
@@ -5148,6 +5196,11 @@
 
 (define-function gdk_axis_flags_get_type
   (c-name "gdk_axis_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gdk_drag_action_get_type
+  (c-name "gdk_drag_action_get_type")
   (return-type "GType")
 )
 
