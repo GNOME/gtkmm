@@ -33,6 +33,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gdkmm/types.h>
 #include <gdkmm/surface.h>
 #include <gdkmm/dragcontext.h>
+#include <gdkmm/drop.h>
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
 #include <gdkmm/clipboard.h>
@@ -391,7 +392,7 @@ public:
  _WRAP_METHOD(void remove_mnemonic_label(Widget& label), gtk_widget_remove_mnemonic_label)
 
   //TODO: Should drag_get_data() be const?
-  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::DragContext>& context, const Glib::ustring& target, guint32 time), gtk_drag_get_data)
+  _WRAP_METHOD(void drag_get_data(const Glib::RefPtr<Gdk::Drop>& drop, const Glib::ustring& target), gtk_drag_get_data)
 
   _WRAP_METHOD(void drag_highlight(), gtk_drag_highlight)
   _WRAP_METHOD(void drag_unhighlight(), gtk_drag_unhighlight)
@@ -417,9 +418,9 @@ public:
     Gdk::DragAction actions{.} = Gdk::DragAction::COPY), gtk_drag_dest_set)
 
   _WRAP_METHOD(void drag_dest_unset(), gtk_drag_dest_unset)
-  _WRAP_METHOD(Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context,
+  _WRAP_METHOD(Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::Drop>& drop,
     const Glib::RefPtr<Gdk::ContentFormats>& target_list) const, gtk_drag_dest_find_target)
-  Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::DragContext>& context) const;
+  Glib::ustring drag_dest_find_target(const Glib::RefPtr<Gdk::Drop>& drop) const;
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::ContentFormats> drag_dest_get_target_list(), gtk_drag_dest_get_target_list, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentFormats> drag_dest_get_target_list() const, gtk_drag_dest_get_target_list, refreturn, constversion)
@@ -633,17 +634,18 @@ dnl
 #m4end
 
 #m4 _CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
+#m4 _CONVERSION(`GdkDrop*',`const Glib::RefPtr<Gdk::Drop>&',Glib::wrap($3, true))
   _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::DragContext>& context), "drag_begin")
   _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::DragContext>& context), "drag_end")
   //We use the optional custom_c_callback parameter with _WRAP_SIGNAL(),
   //so that we can write special code to wrap the non-const SelectionData& output parameter:
-  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data, guint time), "drag_data_get", custom_c_callback)
+  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data), "drag_data_get", custom_c_callback)
   _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
   _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context, DragResult result), "drag_failed")
-  _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::DragContext>& context, guint time), "drag_leave")
-  _WRAP_SIGNAL(bool drag_motion(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_motion")
-  _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, guint time), "drag_drop")
-  _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, const SelectionData& selection_data, guint time), "drag_data_received")
+  _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::Drop>& drop), "drag_leave")
+  _WRAP_SIGNAL(bool drag_motion(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag_motion")
+  _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag_drop")
+  _WRAP_SIGNAL(void drag_data_received(const Glib::RefPtr<Gdk::Drop>& context, const SelectionData& selection_data), "drag_data_received")
 
   // The accel_closures_changed signal can't have a default handler because the wrapped C signal has no default handler.
   _WRAP_SIGNAL(void accel_closures_changed(), "accel_closures_changed", no_default_handler)

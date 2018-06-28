@@ -93,7 +93,7 @@ public:
 protected:
   // Signal handler:
   void on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context,
-    Gtk::SelectionData& selection_data, guint time, int size_index);
+    Gtk::SelectionData& selection_data, int size_index);
 
   Glib::RefPtr<const Gdk::Pixbuf> get_icon(int size_index);
 
@@ -958,7 +958,7 @@ void DetailDialog::set_image(
 }
 
 void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::DragContext>& /* context */,
-  Gtk::SelectionData& selection_data, guint /* time */, int size_index)
+  Gtk::SelectionData& selection_data, int size_index)
 {
   selection_data.set_pixbuf(get_icon(size_index));
 }

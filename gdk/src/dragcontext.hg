@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <vector>
-
-#include <gdkmm/pixbuf.h>
-#include <gdkmm/device.h>
+#include <gdkmm/enums.h>
 #include <glibmm/object.h>
 #include <gdk/gdk.h>
+
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
 
@@ -29,10 +27,10 @@ namespace Gdk
 {
 class ContentFormats;
 class ContentProvider;
+class Device;
 class Display;
 class Surface;
 
-_WRAP_ENUM(DragAction, GdkDragAction)
 _WRAP_ENUM(DragCancelReason, GdkDragCancelReason)
 
 /** A Gdk::DragContext holds information about a drag in progress. It is used on both source and destination sides.
@@ -40,42 +38,13 @@ _WRAP_ENUM(DragCancelReason, GdkDragCancelReason)
 class DragContext : public Glib::Object
 {
   _CLASS_GOBJECT(DragContext, GdkDragContext, GDK_DRAG_CONTEXT, Glib::Object,GObject)
-protected:
 
 public:
-
-  _WRAP_METHOD(void drag_status(DragAction action, guint32 time), gdk_drag_status)
-
-  /** Indicate that a drop will not be accepted.
-   * This function may be called by the drag destination in response to gdk_drag_motion() called by the drag source.
-   * Alternatively, call drag_status() to indicate which drag action will be accepted.
-   *
-   * @param time The timestamp for this operation.
-   */
-  void drag_refuse(guint32 time);
-
-  _WRAP_METHOD(void drop_finish(bool success, guint32 time), gdk_drop_finish)
-
-  // This description is in gtk_docs.xml, not in gdk_docs.xml file.
-  /** Informs the drag source that the drop is finished, and that the data of the drag will no longer be required.
-   * @param success A flag indicating whether the drop was successful.
-   * @param time The timestamp from the "drag_data_drop" signal.
-   */
-  _WRAP_METHOD(void drag_finish(bool success, guint32 time), gtk_drag_finish)
-  _WRAP_METHOD(void drag_drop_done(bool success), gdk_drag_drop_done)
-
   //Gtk::Widget* get_source_widget() - see Gtk::Widget::drag_get_source_widget()
   // void set_icon(Gtk::Widget* widget, int hot_x, int hot_y) - see Gtk::Widget::set_as_icon().
 
   _WRAP_METHOD(void set_icon_name(const Glib::ustring& name, int hot_x, int hot_y), gtk_drag_set_icon_name)
   _WRAP_METHOD(void set_icon(), gtk_drag_set_icon_default)
-
-  _WRAP_METHOD(Glib::RefPtr<Surface> get_source_surface(), gdk_drag_context_get_source_surface, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Surface> get_source_surface() const, gdk_drag_context_get_source_surface, refreturn, constversion)
-  _WRAP_METHOD(Glib::RefPtr<Surface> get_dest_surface(), gdk_drag_context_get_dest_surface, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Surface> get_dest_surface() const, gdk_drag_context_get_dest_surface, refreturn, constversion)
-  // No unconst version of get_drag_surface(). The surface is owned by the DragContext, and shall not be changed by the caller.
-  _WRAP_METHOD(Glib::RefPtr<const Surface> get_drag_surface() const, gdk_drag_context_get_drag_surface, refreturn)
 
   _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_drag_context_get_display, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_drag_context_get_display, refreturn, constversion)
@@ -89,8 +58,16 @@ public:
   _WRAP_METHOD(DragAction get_actions() const, gdk_drag_context_get_actions)
   _WRAP_METHOD(DragAction get_suggested_action() const, gdk_drag_context_get_suggested_action)
   _WRAP_METHOD(DragAction get_selected_action() const, gdk_drag_context_get_selected_action)
+  _WRAP_METHOD(static bool action_is_unique(DragAction action), gdk_drag_action_is_unique)
 
-  _WRAP_METHOD(void set_hot_spot(int hot_x, int hot_y), gdk_drag_context_set_hotspot)
+  // Source side
+
+  _WRAP_METHOD(void drag_drop_done(bool success), gdk_drag_drop_done)
+
+  // No unconst version of get_drag_surface(). The surface is owned by the DragContext, and shall not be changed by the caller.
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_drag_surface() const, gdk_drag_context_get_drag_surface, refreturn)
+
+  _WRAP_METHOD(void set_hotspot(int hot_x, int hot_y), gdk_drag_context_set_hotspot)
 
   _WRAP_PROPERTY("content", Glib::RefPtr<ContentProvider>)
   _WRAP_PROPERTY("device", Glib::RefPtr<Device>)
@@ -99,7 +76,7 @@ public:
 
   // no_default_handler because GdkDragContextClass is private.
   _WRAP_SIGNAL(void cancel(DragCancelReason reason), "cancel", no_default_handler)
-  _WRAP_SIGNAL(void drop_performed(int time), "drop-performed", no_default_handler)
+  _WRAP_SIGNAL(void drop_performed(), "drop-performed", no_default_handler)
   _WRAP_SIGNAL(void dnd_finished(), "dnd-finished", no_default_handler)
   _WRAP_SIGNAL(void action_changed(DragAction action), "action-changed", no_default_handler)
 };
