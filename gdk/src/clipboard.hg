@@ -26,6 +26,7 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 class Cancellable;
+class InputStream;
 }
 
 namespace Gdk
@@ -65,13 +66,26 @@ public:
   _WRAP_METHOD(Glib::RefPtr<ContentProvider> get_content(), gdk_clipboard_get_content, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const ContentProvider> get_content() const, gdk_clipboard_get_content, refreturn, constversion)
 
+  //TODO: Wrap or ignore gdk_clipboard_store_async() and gdk_clipboard_store_finish()?
+  // From the documentation of gdk_clipboard_store_async():
+  // "This function is called automatically when gtk_main() or #GtkApplication
+  // exit, so you likely don't need to call it."
+
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char**',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
+  _WRAP_METHOD(void read_async(const std::vector<Glib::ustring>& mime_types, int io_priority,
+    const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gdk_clipboard_read_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+#m4 _INITIALIZATION(`Glib::ustring&',`const char*',`$3 = Glib::convert_const_gchar_ptr_to_ustring($4)')
+  _WRAP_METHOD(Glib::RefPtr<Gio::InputStream> read_finish(Glib::ustring& out_mime_type{>>},
+    const Glib::RefPtr<Gio::AsyncResult>& result), gdk_clipboard_read_finish, errthrow)
+
   _WRAP_METHOD(void read_texture_async(const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
-    gdk_clipboard_read_texture_async, slot_name slot, slot_callback SignalProxy_async_callback)
+    gdk_clipboard_read_texture_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
   _WRAP_METHOD(Glib::RefPtr<Texture> read_texture_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
     gdk_clipboard_read_texture_finish, errthrow)
 
   _WRAP_METHOD(void read_text_async(const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
-    gdk_clipboard_read_text_async, slot_name slot, slot_callback SignalProxy_async_callback)
+    gdk_clipboard_read_text_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
   _WRAP_METHOD(Glib::ustring read_text_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
     gdk_clipboard_read_text_finish, errthrow)
 
@@ -92,7 +106,8 @@ public:
   _WRAP_PROPERTY("local", bool)
   _WRAP_PROPERTY("content", Glib::RefPtr<ContentProvider>)
 
-  // There are no public signals or vfuncs.
+  // no_default_handler because GdkClipbaordClass is private.
+  _WRAP_SIGNAL(void changed(), "changed", no_default_handler)
 };
 
 } // namespace Gdk

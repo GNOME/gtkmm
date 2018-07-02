@@ -15,10 +15,17 @@
  */
 
 #include <glibmm/object.h>
+#include <giomm/asyncresult.h>
 #include <gdkmm/enums.h>
 
 _DEFS(gdkmm,gdk)
 _PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+class Cancellable;
+class InputStream;
+}
 
 namespace Gdk
 {
@@ -68,6 +75,19 @@ public:
    * Alternatively, call finish() to indicate which drag action was performed.
    */ 
   void failed();
+
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char**',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
+  _WRAP_METHOD(void read_async(const std::vector<Glib::ustring>& mime_types, int io_priority,
+    const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gdk_drop_read_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+#m4 _INITIALIZATION(`Glib::ustring&',`const char*',`$3 = Glib::convert_const_gchar_ptr_to_ustring($4)')
+  _WRAP_METHOD(Glib::RefPtr<Gio::InputStream> read_finish(Glib::ustring& out_mime_type{>>},
+    const Glib::RefPtr<Gio::AsyncResult>& result), gdk_drop_read_finish, errthrow)
+
+  _WRAP_METHOD(void read_text_async(const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gdk_drop_read_text_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::ustring read_text_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gdk_drop_read_text_finish, errthrow)
 
   _WRAP_PROPERTY("actions", DragAction)
   _WRAP_PROPERTY("device", Glib::RefPtr<Device>)
