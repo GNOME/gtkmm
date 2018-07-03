@@ -32,7 +32,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gdkmm/events.h>
 #include <gdkmm/types.h>
 #include <gdkmm/surface.h>
-#include <gdkmm/dragcontext.h>
+#include <gdkmm/drag.h>
 #include <gdkmm/drop.h>
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
@@ -446,14 +446,14 @@ public:
   _WRAP_METHOD(void drag_source_add_uri_targets(), gtk_drag_source_add_uri_targets)
   _WRAP_METHOD(void drag_source_add_image_targets(), gtk_drag_source_add_image_targets)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::DragContext> drag_begin(const Glib::RefPtr<Gdk::Device>& device,
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Drag> drag_begin(const Glib::RefPtr<Gdk::Device>& device,
     const Glib::RefPtr<Gdk::ContentFormats>& targets, Gdk::DragAction actions, int x, int y),
     gtk_drag_begin_with_coordinates, refreturn)
   _WRAP_METHOD(bool drag_check_threshold(int start_x, int start_y, int current_x, int current_y), gtk_drag_check_threshold)
 
-  //These should be a method of Gdk::DragContext, but gdkmm can't depend on gtkmm.
-  static Widget* drag_get_source_widget(const Glib::RefPtr<Gdk::DragContext>& context);
-  void drag_set_as_icon(const Glib::RefPtr<Gdk::DragContext>& context, int hot_x, int hot_y);
+  //These should be a method of Gdk::Drag, but gdkmm can't depend on gtkmm.
+  static Widget* drag_get_source_widget(const Glib::RefPtr<Gdk::Drag>& drag);
+  void drag_set_as_icon(const Glib::RefPtr<Gdk::Drag>& drag, int hot_x, int hot_y);
 
   _WRAP_METHOD(void queue_resize_no_redraw(), gtk_widget_queue_resize_no_redraw)
 
@@ -633,15 +633,15 @@ dnl
   _POP()
 #m4end
 
-#m4 _CONVERSION(`GdkDragContext*',`const Glib::RefPtr<Gdk::DragContext>&',Glib::wrap($3, true))
+#m4 _CONVERSION(`GdkDrag*',`const Glib::RefPtr<Gdk::Drag>&',Glib::wrap($3, true))
 #m4 _CONVERSION(`GdkDrop*',`const Glib::RefPtr<Gdk::Drop>&',Glib::wrap($3, true))
-  _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::DragContext>& context), "drag_begin")
-  _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::DragContext>& context), "drag_end")
+  _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::Drag>& drag), "drag_begin")
+  _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::Drag>& drag), "drag_end")
   //We use the optional custom_c_callback parameter with _WRAP_SIGNAL(),
   //so that we can write special code to wrap the non-const SelectionData& output parameter:
-  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::DragContext>& context, SelectionData& selection_data), "drag_data_get", custom_c_callback)
-  _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::DragContext>& context), "drag_data_delete")
-  _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::DragContext>& context, DragResult result), "drag_failed")
+  _WRAP_SIGNAL(void drag_data_get(const Glib::RefPtr<Gdk::Drag>& context, SelectionData& selection_data), "drag_data_get", custom_c_callback)
+  _WRAP_SIGNAL(void drag_data_delete(const Glib::RefPtr<Gdk::Drag>& drag), "drag_data_delete")
+  _WRAP_SIGNAL(bool drag_failed(const Glib::RefPtr<Gdk::Drag>& drag, DragResult result), "drag_failed")
   _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::Drop>& drop), "drag_leave")
   _WRAP_SIGNAL(bool drag_motion(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag_motion")
   _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag_drop")

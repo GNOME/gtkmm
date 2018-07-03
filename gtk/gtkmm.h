@@ -87,8 +87,6 @@ extern const int gtkmm_micro_version;
 #include <glibmm.h>
 #include <giomm.h>
 
-#include <gdkmm/dragcontext.h> //TODO: Remove this. It works around a strange compilation problem with Cairo::Surface in the tests.
-
 #include <gdkmm.h>
 
 #include <gtkmm/object.h>

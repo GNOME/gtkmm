@@ -62,10 +62,10 @@ void Widget_signal_hide_callback(GObject* self, void* data)
 
 //These signal callbacks are custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDragContext* p0,GtkSelectionData* p1,void* data)
+static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDrag* p0,GtkSelectionData* p1,void* data)
 {
   using namespace Gtk;
-  typedef sigc::slot<void(const Glib::RefPtr<Gdk::DragContext>&,SelectionData&)> SlotType;
+  typedef sigc::slot<void(const Glib::RefPtr<Gdk::Drag>&,SelectionData&)> SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -154,7 +154,7 @@ void Widget_Class::hide_callback(GtkWidget* self)
 
 //This default handler callback is custom implemented, so that we can create a temporary SelectionData instance.
 //To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDragContext* p0, GtkSelectionData* p1)
+void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDrag* p0, GtkSelectionData* p1)
 {
   const auto obj = dynamic_cast<CppObjectType*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -368,14 +368,14 @@ void Widget::drag_dest_set(DestDefaults flags, Gdk::DragAction actions)
   gtk_drag_dest_set(gobj(), (GtkDestDefaults)flags, nullptr, (GdkDragAction)actions);
 }
 
-Widget* Widget::drag_get_source_widget(const Glib::RefPtr<Gdk::DragContext>& context) //static
+Widget* Widget::drag_get_source_widget(const Glib::RefPtr<Gdk::Drag>& drag) //static
 {
-  return Glib::wrap( gtk_drag_get_source_widget(Glib::unwrap(context)) );
+  return Glib::wrap( gtk_drag_get_source_widget(Glib::unwrap(drag)) );
 }
 
-void Widget::drag_set_as_icon(const Glib::RefPtr<Gdk::DragContext>& context, int hot_x, int hot_y)
+void Widget::drag_set_as_icon(const Glib::RefPtr<Gdk::Drag>& drag, int hot_x, int hot_y)
 {
-  gtk_drag_set_icon_widget(Glib::unwrap(context), gobj(), hot_x, hot_y);
+  gtk_drag_set_icon_widget(Glib::unwrap(drag), gobj(), hot_x, hot_y);
 }
 
 void Widget_Class::hierarchy_changed_callback_custom(GtkWidget* self, GtkWidget* p0)

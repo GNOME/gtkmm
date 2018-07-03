@@ -138,7 +138,7 @@ _CONVERSION(`const Glib::RefPtr<Gdk::Pixbuf>&',`GdkPixbuf*',__CONVERT_REFPTR_TO_
 _CONVERSION(`Glib::RefPtr<Gdk::Pixbuf>',`GdkPixbuf*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::PixbufAnimation>&',`GdkPixbufAnimation*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::PixbufAnimationIter>&',`GdkPixbufAnimationIter*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<Gdk::DragContext>&',`GdkDragContext*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gdk::Drag>&',`GdkDrag*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Drop>&',`GdkDrop*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Display>&',`GdkDisplay*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Display>&',`GdkDisplay*',__CONVERT_REFPTR_TO_P)
@@ -292,6 +292,6 @@ _CONVERSION(`const Glib::RefPtr<Gdk::EventKey>&',`GdkEventKey*',__CONVERT_REFPTR
 _CONVERSION(`Gdk::EventSequence*',`GdkEventSequence*',`reinterpret_cast<$2>($3)')
 _CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)')
 
-_CONVERSION(`GdkDragContext*',`Glib::RefPtr<DragContext>',Glib::wrap($3))
-_CONVERSION(`GdkDragContext*',`Glib::RefPtr<Gdk::DragContext>',Glib::wrap($3))
+_CONVERSION(`GdkDrag*',`Glib::RefPtr<Drag>',Glib::wrap($3))
+_CONVERSION(`GdkDrag*',`Glib::RefPtr<Gdk::Drag>',Glib::wrap($3))
 
