@@ -394,6 +394,9 @@ _CONVERSION(`GtkFileFilter*',`Glib::RefPtr<FileFilter>',`Glib::wrap($3)')
 _CONVERSION(`GtkFileFilter*',`Glib::RefPtr<const FileFilter>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<FileFilter>&',`GtkFileFilter*',__CONVERT_CONST_REFPTR_TO_P)
 
+_CONVERSION(`GtkMediaStream*',`Glib::RefPtr<MediaStream>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<MediaStream>&',`GtkMediaStream*',__CONVERT_REFPTR_TO_P)
+
 _CONVERSION(`GdkPixbufFormat*',`PixbufFormat',`PixbufFormat($3)')
 
 _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)

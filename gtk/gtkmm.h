@@ -186,6 +186,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/listviewtext.h>
 #include <gtkmm/linkbutton.h>
 #include <gtkmm/main.h>
+#include <gtkmm/mediacontrols.h>
+#include <gtkmm/mediafile.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/menubar.h>
 #include <gtkmm/menubutton.h>
@@ -272,6 +274,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/video.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/volumebutton.h>
 #include <gtkmm/widget.h>
