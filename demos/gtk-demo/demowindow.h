@@ -36,6 +36,9 @@ public:
   DemoWindow();
   ~DemoWindow() override;
 
+  // The Images demo can show a DemoWindow.
+  static DemoWindow* get_demo_window();
+
 protected:
   void run_example(Gtk::TreeModel::Row& row);
   void configure_header_bar();
@@ -70,6 +73,8 @@ protected:
   Gtk::Window* m_pWindow_Example;
 
   std::string m_current_filename;
+
+  static DemoWindow* m_pDemoWindow;
 };
 
 #endif //_DEMOWINDOW_H

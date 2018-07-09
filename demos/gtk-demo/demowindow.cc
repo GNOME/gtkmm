@@ -29,6 +29,7 @@
 #include <giomm/resource.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/video.h>
 
 #include <cstddef>
 #include <cstring>
@@ -59,6 +60,8 @@ const auto& demo_columns()
 
 } // anonymous namespace
 
+//static
+DemoWindow* DemoWindow::m_pDemoWindow = nullptr;
 
 DemoWindow::DemoWindow()
 : m_RunButton("Run"),
@@ -67,6 +70,7 @@ DemoWindow::DemoWindow()
   m_TextWidget_Source(true)
 {
   m_pWindow_Example = nullptr;
+  m_pDemoWindow = this;
 
   configure_header_bar();
 
@@ -87,6 +91,7 @@ DemoWindow::DemoWindow()
   //SideBar
   m_SideBar.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_SideBar.get_style_context()->add_class("sidebar");
+  m_SideBar.set_hexpand(false);
   m_SideBar.add(m_TreeView);
   m_HBox.pack_start(m_SideBar, Gtk::PackOptions::SHRINK);
 
@@ -103,6 +108,12 @@ DemoWindow::DemoWindow()
   set_default_size (800, 600);
 
   load_file (testgtk_demos[0].filename);
+}
+
+//static
+DemoWindow* DemoWindow::get_demo_window()
+{
+  return m_pDemoWindow;
 }
 
 void DemoWindow::configure_header_bar()
@@ -395,19 +406,36 @@ void DemoWindow::add_data_tabs(const std::string& filename)
   for (std::size_t i = 0; i < resources.size(); ++i)
   {
     const auto resource_name = resource_dir + "/" + resources[i];
+    std::string suffix;
+    auto suffix_pos = resources[i].find_last_of('.');
+    if (suffix_pos != std::string::npos)
+      suffix = resources[i].substr(suffix_pos);
+
     Gtk::Widget* widget = nullptr;
-    auto image = new Gtk::Image();
-    image->set_from_resource(resource_name);
-    if (image->get_paintable())
+    if (suffix == ".gif" || suffix == ".jpg" || suffix == ".png")
     {
-      widget = image;
+      // It's an image.
+      auto image = new Gtk::Image();
+      image->set_from_resource(resource_name);
+      if (image->get_paintable())
+        widget = image;
+      else
+        delete image;
     }
-    else
+    else if (suffix == ".webm")
+    {
+      // It's a video.
+      auto video = new Gtk::Video();
+      video->set_resource(resource_name);
+      if (video->get_file())
+        widget = video;
+      else
+        delete video;
+    }
+    if (!widget)
     {
       // So we've used the best API available to figure out it's
-      // not an image. Let's try something else then.
-      delete image;
-      image = nullptr;
+      // not an image or a video. Let's try something else then.
 
       Glib::RefPtr<const Glib::Bytes> bytes;
       try

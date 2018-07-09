@@ -1,10 +1,15 @@
 /* Images
  *
- * Gtk::Image is used to display an image; the image can be in a number of formats.
- * Typically, you load an image into a Gdk::Pixbuf, then display the pixbuf.
+ * Gtk::Image and Gtk::Picture are used to display an image; the image can be
+ * in a number of formats.
+ *
+ * Gtk::Image is the widget used to display icons or images that should be
+ * sized and styled like an icon, while Gtk::Picture is used for images
+ * that should be displayed as-is.
  *
  * This demo code shows some of the more obscure cases. In the simple
- * case a call to 'new Gtk::Image(filename)' is all you need.
+ * case a call to 'new Gtk::Picture(filename)' or
+ * Gtk::Image::set_from_icon_name() is all you need.
  *
  * If you want to put image data in your program as a resource,
  * use the glib-compile-resources program that comes with GLib.
@@ -13,6 +18,7 @@
  */
 
 #include <gtkmm.h>
+#include "demowindow.h"
 
 class Example_Images : public Gtk::Window
 {
@@ -23,18 +29,30 @@ public:
 protected:
   void start_progressive_loading();
 
-  //signal handler:
+  //Signal handlers:
   bool on_timeout();
   void on_loader_area_prepared();
   void on_loader_area_updated(int x, int y, int width, int height);
+  void on_toggle_sensitivity();
 
   //Member widgets:
-  Gtk::Box m_VBox;
-  Gtk::Label m_Label_Image, m_Label_Animation, m_Label_ThemedIcon, m_Label_Progressive;
-  Gtk::Frame m_Frame_Image, m_Frame_Animation, m_Frame_ThemedIcon, m_Frame_Progressive;
-  Gtk::Image m_Image_Progressive;
-  Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
+  Gtk::Box m_BaseVBox;
+  Gtk::Box m_HBox;
+  Gtk::Label m_Label_Image;
+  Gtk::Frame m_Frame_Image;
+  Gtk::Label m_Label_Animation;
+  Gtk::Frame m_Frame_Animation;
+  Gtk::Label m_Label_ThemedIcon;
+  Gtk::Frame m_Frame_ThemedIcon;
+  Gtk::Label m_Label_Progressive;
+  Gtk::Frame m_Frame_Progressive;
+  Gtk::Picture m_Picture_Progressive;
+  Gtk::Label m_Label_Video;
+  Gtk::Frame m_Frame_Video;
+  Gtk::Label m_Label_Paintable;
+  Gtk::ToggleButton m_ToggleButton;
 
+  Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
   Glib::RefPtr<Gio::InputStream> m_image_stream;
 };
 
@@ -46,76 +64,121 @@ Gtk::Window* do_images()
 
 Example_Images::Example_Images()
 :
-  m_VBox(Gtk::Orientation::VERTICAL, 8),
+  m_BaseVBox(Gtk::Orientation::VERTICAL, 8),
+  m_HBox(Gtk::Orientation::HORIZONTAL, 16),
+  m_ToggleButton("_Insensitive", true),
   m_image_stream()
 {
   set_title("Images");
 
-  m_VBox.property_margin() = 16;
-  add(m_VBox);
+  m_BaseVBox.set_margin(16);
+  add(m_BaseVBox);
+  m_BaseVBox.pack_start(m_HBox);
 
   /* Image */
 
+  auto pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
-  m_VBox.pack_start(m_Label_Image, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Label_Image, Gtk::PackOptions::SHRINK);
 
   m_Frame_Image.set_shadow_type(Gtk::ShadowType::IN);
-
   m_Frame_Image.set_halign(Gtk::Align::CENTER);
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
-  m_VBox.pack_start(m_Frame_Image, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Frame_Image, Gtk::PackOptions::SHRINK);
 
   auto pImage = Gtk::manage(new Gtk::Image());
-  pImage->set_from_resource("/images/gtk-logo-rgb.gif");
+  pImage->set_from_icon_name("gtk3-demo");
+  pImage->set_icon_size(Gtk::IconSize::LARGE);
   m_Frame_Image.add(*pImage);
 
   /* Animation */
 
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
-  m_VBox.pack_start(m_Label_Animation, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Label_Animation, Gtk::PackOptions::SHRINK);
 
   m_Frame_Animation.set_shadow_type(Gtk::ShadowType::IN);
-
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
-  m_VBox.pack_start(m_Frame_Animation, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Frame_Animation, Gtk::PackOptions::SHRINK);
 
-  pImage = Gtk::manage(new Gtk::Image());
-  pImage->set_from_resource("/images/floppybuddy.gif");
-  m_Frame_Animation.add(*pImage);
+  auto pPicture = Gtk::manage(new Gtk::Picture());
+  pPicture->set_resource("/images/floppybuddy.gif");
+  m_Frame_Animation.add(*pPicture);
 
   /* Symbolic themed icon */
 
   m_Label_ThemedIcon.set_markup("<u>Symbolic themed icon</u>");
-  m_VBox.pack_start(m_Label_ThemedIcon, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Label_ThemedIcon, Gtk::PackOptions::SHRINK);
 
   m_Frame_ThemedIcon.set_shadow_type(Gtk::ShadowType::IN);
-
   m_Frame_ThemedIcon.set_halign(Gtk::Align::CENTER);
   m_Frame_ThemedIcon.set_valign(Gtk::Align::CENTER);
-  m_VBox.pack_start(m_Frame_ThemedIcon, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Frame_ThemedIcon, Gtk::PackOptions::SHRINK);
 
   auto icon = Gio::ThemedIcon::create("battery-caution-charging-symbolic", true);
-  pImage = Gtk::manage(new Gtk::Image());
-  pImage->set(icon);
+  pImage = Gtk::manage(new Gtk::Image(icon));
   pImage->set_icon_size(Gtk::IconSize::LARGE);
   m_Frame_ThemedIcon.add(*pImage);
 
   /* Progressive */
 
+  pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
-  m_VBox.pack_start(m_Label_Progressive, Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(m_Label_Progressive, Gtk::PackOptions::SHRINK);
 
   m_Frame_Progressive.set_shadow_type(Gtk::ShadowType::IN);
-
-  m_VBox.pack_start(m_Frame_Progressive, Gtk::PackOptions::SHRINK);
+  m_Frame_Progressive.set_halign(Gtk::Align::CENTER);
+  m_Frame_Progressive.set_valign(Gtk::Align::CENTER);
+  pVBox->pack_start(m_Frame_Progressive, Gtk::PackOptions::SHRINK);
 
   /* Create an empty image for now; the progressive loader
    * will create the pixbuf and fill it in.
    */
-  m_Frame_Progressive.add(m_Image_Progressive);
+  m_Frame_Progressive.add(m_Picture_Progressive);
 
   start_progressive_loading();
+
+  /* Video */
+
+  m_Label_Video.set_markup("<u>Displaying video</u>");
+  pVBox->pack_start(m_Label_Video, Gtk::PackOptions::SHRINK);
+
+  m_Frame_Video.set_shadow_type(Gtk::ShadowType::IN);
+  m_Frame_Video.set_halign(Gtk::Align::CENTER);
+  m_Frame_Video.set_valign(Gtk::Align::CENTER);
+  pVBox->pack_start(m_Frame_Video, Gtk::PackOptions::SHRINK);
+
+  auto video = Gtk::manage(new Gtk::Video());
+  video->set_resource("/images/gtk-logo.webm");
+  video->get_media_stream()->set_loop();
+  m_Frame_Video.add(*video);
+
+  /* Widget paintable */
+
+  pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+
+  m_Label_Paintable.set_markup("<u>Gtk::WidgetPaintable</u>");
+  pVBox->pack_start(m_Label_Paintable, Gtk::PackOptions::SHRINK);
+
+  pPicture = Gtk::manage(new Gtk::Picture());
+  auto demo_window = DemoWindow::get_demo_window();
+  if (demo_window)
+  {
+    auto paintable = Gtk::WidgetPaintable::create(*demo_window);
+    pPicture->set_paintable(paintable);
+  }
+  pPicture->set_size_request(100, 100);
+  pPicture->set_valign(Gtk::Align::START);
+  pVBox->pack_start(*pPicture, Gtk::PackOptions::SHRINK);
+
+  /* Sensitivity control */
+  m_BaseVBox.pack_start(m_ToggleButton, Gtk::PackOptions::SHRINK);
+  m_ToggleButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_Images::on_toggle_sensitivity));
 }
 
 Example_Images::~Example_Images()
@@ -256,12 +319,16 @@ void Example_Images::on_loader_area_prepared()
    * isn't filled in yet.
    */
   refPixbuf->fill(0xaaaaaaff);
-  m_Image_Progressive.set(refPixbuf);
+  m_Picture_Progressive.set_pixbuf(refPixbuf);
 }
 
 void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, int/*height*/)
 {
   const auto refPixbuf = m_refPixbufLoader->get_pixbuf();
-  m_Image_Progressive.set(refPixbuf);
+  m_Picture_Progressive.set_pixbuf(refPixbuf);
 }
 
+void Example_Images::on_toggle_sensitivity()
+{
+  m_HBox.set_sensitive(!m_ToggleButton.get_active());
+}
