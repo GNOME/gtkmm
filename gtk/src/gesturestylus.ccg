@@ -1,0 +1,71 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gdkmm/devicetool.h>
+#include <gtk/gtk.h>
+#include <memory>
+
+namespace Gtk
+{
+
+std::optional<double> GestureStylus::get_axis(Gdk::AxisUse axis) const
+{
+  gdouble g_value = gdouble();
+  auto retvalue = gtk_gesture_stylus_get_axis(
+    const_cast<GtkGestureStylus*>(gobj()), static_cast<GdkAxisUse>(axis), &g_value);
+
+  if (retvalue)
+    return g_value;
+  else
+    return {};
+}
+
+std::vector<double> GestureStylus::get_axes(const std::vector<Gdk::AxisUse>& axes) const
+{
+  // Glib::ArrayHandler is not used for axes.
+  // Glib::ArrayHandler::vector_to_array() creates a 0-terminated array,
+  // but it might be risky to rely on GDK_AXIS_IGNORE being 0.
+  auto g_axes = std::make_unique<GdkAxisUse[]>(axes.size() + 1);
+  for (std::size_t i = 0; i < axes.size(); ++i)
+    g_axes[i] = static_cast<GdkAxisUse>(axes[i]);
+  g_axes[axes.size()] = GDK_AXIS_IGNORE;
+
+  gdouble* g_values = nullptr;
+  const bool result = gtk_gesture_stylus_get_axes(
+    const_cast<GtkGestureStylus*>(gobj()), g_axes.get(), &g_values);
+
+  if (result)
+    return Glib::ArrayHandler<double>::array_to_vector(
+      g_values, axes.size(), Glib::OWNERSHIP_DEEP);
+  else
+    return {};
+}
+
+std::vector<Gdk::TimeCoord> GestureStylus::get_backlog() const
+{
+  GdkTimeCoord* g_backlog = nullptr;
+  guint n_elems = 0;
+  const bool result = gtk_gesture_stylus_get_backlog(
+    const_cast<GtkGestureStylus*>(gobj()), &g_backlog, &n_elems);
+
+  if (result)
+    return Glib::ArrayHandler<Gdk::TimeCoord, Gdk::TimeCoordTraits>::array_to_vector(
+      g_backlog, n_elems, Glib::OWNERSHIP_DEEP);
+  else
+    return {};
+}
+
+} // namespace Gtk

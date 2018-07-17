@@ -166,6 +166,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gesturepan.h>
 #include <gtkmm/gesturerotate.h>
 #include <gtkmm/gesturesingle.h>
+#include <gtkmm/gesturestylus.h>
 #include <gtkmm/gestureswipe.h>
 #include <gtkmm/gesturezoom.h>
 #include <gtkmm/glarea.h>

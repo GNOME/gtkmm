@@ -1,0 +1,119 @@
+/* Copyright (C) 2018 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/gesturesingle.h>
+#include <gdkmm/enums.h>
+#include <gdkmm/timecoord.h>
+#include <optional>
+#include <vector>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/gesturesingle_p.h)
+
+namespace Gdk
+{
+class DeviceTool;
+}
+
+namespace Gtk
+{
+/** Gesture for stylus input.
+ *
+ * %Gtk::GestureStylus is a Gtk::Gesture implementation specific to stylus
+ * input. The provided signals just provide the basic information.
+ *
+ * @newin{3,94}
+ *
+ * @ingroup Gestures
+ */
+class GestureStylus : public GestureSingle
+{
+  _CLASS_GOBJECT(GestureStylus, GtkGestureStylus, GTK_GESTURE_STYLUS, GestureSingle, GtkGestureSingle)
+
+protected:
+  /** Constructs a %GestureStylus.
+   */
+  _CTOR_DEFAULT
+
+public:
+  /** Creates a %GestureStylus.
+   *
+   * @return A RefPtr to a new %GestureStylus.
+   */
+  _WRAP_CREATE()
+
+  /** Returns the current value for the requested @a axis.
+   * This function must be called from either the signal_down(),
+   * signal_motion(), signal_up() or signal_proximity() signal handlers.
+   *
+   * @param axis Requested device axis.
+   * @return The current value for the axis, if any.
+   */
+  std::optional<double> get_axis(Gdk::AxisUse axis) const;
+  _IGNORE(gtk_gesture_stylus_get_axis)
+
+  /** Returns the current values for the requested @a axes.
+   * This function must be called from either the signal_down(),
+   * signal_motion(), signal_up() or signal_proximity() signal handlers.
+   *
+   * @param axes Vector of requested axes.
+   *        Don't include Gdk::AxisUse::IGNORE in the vector. The underlying
+   *        GTK+ function would interpret it as an end-of-array mark.
+   * @return The current values for the axes.
+   *         If there are no values, an empty vector is returned.
+   */
+  std::vector<double> get_axes(const std::vector<Gdk::AxisUse>& axes) const;
+
+  /** By default, GTK+ will limit rate of input events. On stylus input where
+   * accuracy of strokes is paramount, this function returns the accumulated
+   * coordinate/timing state before the emission of the current signal_motion() signal.
+   *
+   * This function may only be called within a signal_motion()
+   * signal handler, the state given in this signal and obtainable through
+   * get_axis() call expresses the latest (most up-to-date) state in motion history.
+   *
+   * @return Coordinates and times for the backlog events in chronological order.
+   *         If there is no backlog to unfold in the current state, an empty
+   *         vector is returned.
+   */
+  std::vector<Gdk::TimeCoord> get_backlog() const;
+  _IGNORE(gtk_gesture_stylus_get_axes, gtk_gesture_stylus_get_backlog)
+
+  /** Returns the Gdk::DeviceTool currently driving input through this gesture.
+   * This function must be called from either the signal_down(),
+   * signal_motion(), signal_up() or signal_proximity() signal handlers.
+   *
+   * @return The current stylus tool.
+   */
+  _WRAP_METHOD(Glib::RefPtr<Gdk::DeviceTool> get_device_tool(), gtk_gesture_stylus_get_device_tool, refreturn)
+  /** Returns the Gdk::DeviceTool currently driving input through this gesture.
+   * This function must be called from either the signal_down(),
+   * signal_motion(), signal_up() or signal_proximity() signal handlers.
+   *
+   * @return The current stylus tool.
+   */
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::DeviceTool> get_device_tool() const, gtk_gesture_stylus_get_device_tool, refreturn, constversion)
+
+  // no_default_handler because GtkGestureStylusClass is private.
+  _WRAP_SIGNAL(void proximity(double x, double y), "proximity", no_default_handler)
+  _WRAP_SIGNAL(void down(double x, double y), "down", no_default_handler)
+  _WRAP_SIGNAL(void motion(double x, double y), "motion", no_default_handler)
+  _WRAP_SIGNAL(void up(double x, double y), "up", no_default_handler)
+
+  // GestureStylus has no properties
+};
+
+} // namespace Gtk
