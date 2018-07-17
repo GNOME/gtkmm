@@ -89,11 +89,14 @@ public:
 
   _WRAP_METHOD(void show(), gdk_surface_show)
   _WRAP_METHOD(void hide(), gdk_surface_hide)
-  _WRAP_METHOD(void withdraw(), gdk_surface_withdraw)
   _WRAP_METHOD(void show_unraised(), gdk_surface_show_unraised)
   _WRAP_METHOD(void move(int x, int y), gdk_surface_move)
   _WRAP_METHOD(void resize(int width, int height), gdk_surface_resize)
   _WRAP_METHOD(void move_resize(int x, int y, int width, int height), gdk_surface_move_resize)
+  _WRAP_METHOD(void move_to_rect(const Rectangle& rect, Gravity rect_anchor,
+    Gravity surface_anchor, AnchorHints anchor_hints, int rect_anchor_dx, int rect_anchor_dy),
+    gdk_surface_move_to_rect)
+
   _WRAP_METHOD(void raise(), gdk_surface_raise)
   _WRAP_METHOD(void lower(), gdk_surface_lower)
 
@@ -289,11 +292,19 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::CairoContext> create_cairo_context(), gdk_surface_create_cairo_context)
 
-  _IGNORE_SIGNAL("moved-to-rect")dnl// Private
+  // no_default_handler because the wrapped C signals have no default handlers.
+#m4 _CONVERSION(`gpointer',`const Gdk::Rectangle&',`Glib::wrap((GdkRectangle*)$3)')
+  _WRAP_SIGNAL(void moved_to_rect(const Gdk::Rectangle& flipped_rect, const Gdk::Rectangle& final_rect,
+    bool flipped_x, bool flipped_y), "moved-to-rect", no_default_handler)
+  _WRAP_SIGNAL(void size_changed(int width, int height), "size-changed", no_default_handler)
+#m4 _CONVERSION(`CairoRegion*',`const ::Cairo::RefPtr<const ::Cairo::Region>&',`Gdk::Cairo::wrap($3)')
+  _WRAP_SIGNAL(bool render(const ::Cairo::RefPtr<const ::Cairo::Region>& expose_region),
+    "render", no_default_handler)
 
   _WRAP_PROPERTY("cursor", Glib::RefPtr<Cursor>)
   _WRAP_PROPERTY("display", Glib::RefPtr<Display>)
   _WRAP_PROPERTY("state", State)
+  _WRAP_PROPERTY("mapped", bool)
 };
 
 } // namespace Gdk
