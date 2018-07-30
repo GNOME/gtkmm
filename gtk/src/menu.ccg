@@ -18,37 +18,6 @@
 #include <gtk/gtk.h>
 #include <gtkmm/accelgroup.h>
 
-
-static void SignalProxy_PopupPosition_gtk_callback(GtkMenu*, int* x, int* y, gboolean* push_in, void* data)
-{
-  auto the_slot = static_cast<Gtk::Menu::SlotPositionCalc*>(data);
-
-  int  temp_x = (x) ? *x : 0;
-  int  temp_y = (y) ? *y : 0;
-  bool temp_push_in = (push_in) ? bool(*push_in) : false;
-
-  try
-  {
-    (*the_slot)(temp_x, temp_y, temp_push_in);
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-
-  if(x) *x = temp_x;
-  if(y) *y = temp_y;
-  if(push_in) *push_in = temp_push_in;
-}
-
-static void SignalProxy_PopupPosition_gtk_callback_destroy(void* data)
-{
-  auto the_slot = static_cast<Gtk::Menu::SlotPositionCalc*>(data);
-  delete the_slot;
-}
-
-
-
 namespace Gtk
 {
 
@@ -59,42 +28,6 @@ Menu::Menu(const Glib::RefPtr<Gio::MenuModel>& model)
   //g_return_val_if_fail (G_IS_MENU_MODEL (model), NULL);
 
   bind_model(model, true);
-}
-
-void Menu::popup(const SlotPositionCalc& position_calc_slot, guint button, guint32 activate_time, const Glib::RefPtr<Gdk::Device>& device)
-{
-  // Tell GTK+ to call the static function with the slot's address as the extra
-  // data, so that the static function can then call the sigc::slot:
-  if(!device)
-    gtk_menu_popup(gobj(), nullptr, nullptr, &SignalProxy_PopupPosition_gtk_callback, const_cast<SlotPositionCalc*>(&position_calc_slot), button, activate_time);
-  else
-  {
-    auto slot_copy = new SlotPositionCalc(position_calc_slot); //Deleted in the destroy callback.
-
-    gtk_menu_popup_for_device(gobj(), device->gobj(), nullptr, nullptr, &SignalProxy_PopupPosition_gtk_callback, slot_copy, &SignalProxy_PopupPosition_gtk_callback_destroy, button, activate_time);
-  }
-}
-
-void Menu::popup(MenuShell& parent_menu_shell, MenuItem& parent_menu_item, const SlotPositionCalc& position_calc_slot, guint button, guint32 activate_time, const Glib::RefPtr<Gdk::Device>& device)
-{
-  // Tell GTK+ to call the static function with the slot's address as the extra
-  // data, so that the static function can then call the sigc::slot:
-  if(!device)
-    gtk_menu_popup(gobj(), parent_menu_shell.Gtk::Widget::gobj(), parent_menu_item.Gtk::Widget::gobj(), &SignalProxy_PopupPosition_gtk_callback, const_cast<SlotPositionCalc*>(&position_calc_slot), button, activate_time);
-  else
-  {
-    auto slot_copy = new SlotPositionCalc(position_calc_slot); //Deleted in the destroy callback.
-
-    gtk_menu_popup_for_device(gobj(), device->gobj(), parent_menu_shell.Gtk::Widget::gobj(), parent_menu_item.Gtk::Widget::gobj(), &SignalProxy_PopupPosition_gtk_callback, slot_copy, &SignalProxy_PopupPosition_gtk_callback_destroy, button, activate_time);
-  }
-}
-
-void Menu::popup(guint button, guint32 activate_time, const Glib::RefPtr<Gdk::Device>& device)
-{
-  if(!device)
-    gtk_menu_popup(gobj(), nullptr, nullptr, nullptr, nullptr, button, activate_time);
-  else
-    gtk_menu_popup_for_device(gobj(), device->gobj(), nullptr, nullptr, nullptr, nullptr, nullptr, button, activate_time);
 }
 
 void Menu::reorder_child(const MenuItem& child, int position)
@@ -114,6 +47,5 @@ void Menu::attach_to_widget(Widget& attach_widget)
 {
   gtk_menu_attach_to_widget(gobj(), (attach_widget).gobj(), nullptr /* allowed by the C docs. */);
 }
-
 
 } // namespace Gtk
