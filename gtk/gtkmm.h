@@ -136,6 +136,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/dnd_ns.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/editable.h>
 #include <gtkmm/entry.h>
