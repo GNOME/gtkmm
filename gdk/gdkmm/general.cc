@@ -74,7 +74,6 @@ void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const
   gdk_cairo_set_source_pixbuf(context->cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
 }
 
-
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle)
 {
   gdk_cairo_rectangle(context->cobj(), const_cast<GdkRectangle*>(rectangle.gobj()));
@@ -83,6 +82,36 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region)
 {
   gdk_cairo_region(context->cobj(), (region ? region->cobj() : nullptr));
+}
+
+bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk::Rectangle& rectangle)
+{
+  return gdk_cairo_get_clip_rectangle(context->cobj(), rectangle.gobj());
+}
+
+bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context)
+{
+  return gdk_cairo_get_clip_rectangle(context->cobj(), nullptr);
+}
+
+::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface)
+{
+  return ::Cairo::RefPtr< ::Cairo::Region>(new ::Cairo::Region(gdk_cairo_region_create_from_surface(surface->cobj()), true));
+}
+
+::Cairo::RefPtr< ::Cairo::ImageSurface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
+  int scale, const Glib::RefPtr<Gdk::Window>& for_window)
+{
+  return ::Cairo::RefPtr< ::Cairo::ImageSurface>(new ::Cairo::ImageSurface(gdk_cairo_surface_create_from_pixbuf(
+    pixbuf->gobj(), scale, for_window ? for_window->gobj() : nullptr), true));
+}
+
+void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
+  const Glib::RefPtr<Gdk::Window>& window, int source, int source_type,
+  int buffer_scale, int x, int y, int width, int height)
+{
+  gdk_cairo_draw_from_gl(context->cobj(), window->gobj(), source, source_type,
+    buffer_scale, x, y, width, height);
 }
 
 } //namespace Cairo
