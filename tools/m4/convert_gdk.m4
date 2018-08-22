@@ -40,6 +40,7 @@ _CONV_ENUM(Gdk,EventType)
 _CONV_ENUM(Gdk,ExtensionMode)
 _CONV_ENUM(Gdk,Fill)
 _CONV_ENUM(Gdk,FillRule)
+_CONV_ENUM(Gdk,FrameClockPhase)
 _CONV_ENUM(Gdk,FullscreenMode)
 _CONV_ENUM(Gdk,Function)
 _CONV_ENUM(Gdk,GCValuesMask)
@@ -270,8 +271,11 @@ _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<Display> >',`$2($3, Glib:
 _CONVERSION(`GSList*',`Glib::SListHandle< Glib::RefPtr<const Display> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`$2($3)')
 
-
-
+# FrameClock, FrameTimings
+_CONVERSION(`GdkFrameClock*',`Glib::RefPtr<FrameClock>',`Glib::wrap($3)')
+_CONVERSION(`GdkFrameClock*',`Glib::RefPtr<Gdk::FrameClock>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gdk::FrameClock>&',`GdkFrameClock*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GdkFrameTimings*',`Glib::RefPtr<FrameTimings>',`Glib::wrap($3)')
 
 # XPM data
 _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$3')
