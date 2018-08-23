@@ -15,10 +15,10 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-include $(top_srcdir)/gdk/src/filelist.am
-include $(top_srcdir)/gdk/gdkmm/filelist.am
-include $(top_srcdir)/gtk/src/filelist.am
-include $(top_srcdir)/gtk/gtkmm/filelist.am
+include $(top_srcdir)/gdk/src/filelist.gmake.am
+include $(top_srcdir)/gdk/gdkmm/filelist.gmake.am
+include $(top_srcdir)/gtk/src/filelist.gmake.am
+include $(top_srcdir)/gtk/gtkmm/filelist.gmake.am
 
 gdkmm_files_h = $(gdkmm_files_built_h) $(filter-out wrap_init.h,$(gdkmm_files_extra_h))
 gtkmm_files_h = $(gtkmm_files_built_h) $(filter-out wrap_init.h,$(gtkmm_files_extra_h))

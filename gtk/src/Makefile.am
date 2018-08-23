@@ -19,7 +19,7 @@ binding_name    = gtkmm
 wrap_init_flags = --namespace=Gtk --parent_dir=gtkmm
 codegen_srcdir  = $(top_srcdir)/tools
 
-include $(srcdir)/filelist.am
+include $(srcdir)/filelist.gmake.am
 include $(top_srcdir)/tools/m4/filelist.am
 
 files_defs = $(gtkmm_files_defs)
