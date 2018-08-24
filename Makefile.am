@@ -47,7 +47,7 @@ include $(srcdir)/MSVC_NMake/filelist.am
 include $(srcdir)/win32_installer/filelist.am
 
 text_files = COPYING.tools PORTING README.SUN README.win32
-msvc_files = $(addprefix MSVC_NMake/,$(msvc_net2017_data))
+msvc_files = $(addprefix MSVC_NMake/,$(msvc_nmake_data))
 winstall_files = $(addprefix win32_installer/,$(windows_installer_files))
 
 dist_noinst_DATA = $(text_files) $(msvc_files) $(winstall_files)
