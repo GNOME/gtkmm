@@ -19,6 +19,7 @@
 #include <gtk/gtk.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/window.h>
+#include <gtkmm/accelgroup.h>
 #include <gtkmm/accelmap.h>
 
 namespace Gtk
@@ -58,9 +59,20 @@ void MenuItem::accelerate(Window& window)
 {
   if(!accel_key_.is_null())
   {
+    Glib::RefPtr<AccelGroup> accel_group;
+    auto accel_groups = window.get_accel_groups();
+    if (accel_groups.empty())
+    {
+      // Create an AccelGroup for window, if there is none.
+      accel_group = AccelGroup::create();
+      window.add_accel_group(accel_group);
+    }
+    else
+      accel_group = accel_groups[0];
+
     if(accel_key_.get_path().empty())
     {
-      add_accelerator("activate", window.get_accel_group(),
+      add_accelerator("activate", accel_group,
                       accel_key_.get_key(), accel_key_.get_mod(), AccelFlags::VISIBLE);
     }
     else
@@ -69,7 +81,7 @@ void MenuItem::accelerate(Window& window)
                           accel_key_.get_key(),
                           accel_key_.get_mod());
 
-      Bin::set_accel_path(accel_key_.get_path(), window.get_accel_group());
+      Bin::set_accel_path(accel_key_.get_path(), accel_group);
     }
   }
 
