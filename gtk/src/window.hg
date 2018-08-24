@@ -269,8 +269,7 @@ dnl
   _WRAP_METHOD(void set_icon(const Glib::RefPtr<Gdk::Pixbuf>& icon),
                gtk_window_set_icon)
 
-  //TODO: Correct the since tag.
-  _WRAP_METHOD(void set_icon_name(const Glib::ustring& name), gtk_window_set_icon_name)
+  _WRAP_METHOD(void set_icon_name(const Glib::ustring& name), gtk_window_set_icon_name, newin "2,18")
   _WRAP_METHOD(bool set_icon_from_file(const std::string& filename), gtk_window_set_icon_from_file, errthrow)
 
   _WRAP_METHOD(Glib::RefPtr<Gdk::Pixbuf> get_icon(), gtk_window_get_icon, refreturn)
@@ -397,11 +396,25 @@ dnl
 
   _WRAP_METHOD(bool is_maximized() const, gtk_window_is_maximized)
 
-  /** Returns a default accel group for this window
-   * This is a gtkmm-specific function.  This accel group can not
-   * be removed.
+_DEPRECATE_IFDEF_START
+  /** Returns a default accel group for this window.
+   * This is a gtkmm-specific function.
+   *
+   * @deprecated This returns a group specific to this window, created on the
+   * first call. That’s no use if you need groups that were added by other
+   * sources, e.g. by Gtk::Builder. Use get_accel_groups(), which correctly
+   * returns all groups that have been added to the window regardless of origin.
+   * If you just used get_accel_group() as a shortcut to create and add a group,
+   * you should instead create it yourself and add it with add_accel_group().
    */
   Glib::RefPtr<AccelGroup> get_accel_group();
+_DEPRECATE_IFDEF_END
+
+  /** Gets a vector containing each Gtk::AccelGroup associated with the window.
+   * @newin{3,24}
+   * @return A vector of Gtk::AccelGroup.
+   */
+  std::vector< Glib::RefPtr<AccelGroup> > get_accel_groups();
 
   //TODO: Remove the virtual from this when we can break ABI.
   /** Brings the window to the front.
@@ -419,9 +432,6 @@ protected:
   void _release_c_instance();
 
 private:
-
-  //We'll create an accel_group if it's requested, and remember it.
-  //Otherwise, you'd have to create it, add it to the window, then remember it somewhere else while you add it to other widgets.
   Glib::RefPtr<AccelGroup> accel_group_;
 };
 
