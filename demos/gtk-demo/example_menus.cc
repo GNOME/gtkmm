@@ -88,8 +88,10 @@ Example_Menus::Example_Menus()
   m_VBox1.pack_start(m_VBox_Sub1);
 
   {
-    Gtk::Menu* pMenu = create_menu(1);
-    pMenu->set_accel_group(get_accel_group());
+    auto accel_group = Gtk::AccelGroup::create();
+    add_accel_group(accel_group);
+    auto pMenu = create_menu(1);
+    pMenu->set_accel_group(accel_group);
 
     Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::SeparatorMenuItem());
     pMenu->append(*pMenuItem);
@@ -101,7 +103,7 @@ Example_Menus::Example_Menus()
     pMenuItem->show();
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerate Me"));
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F1,
+    pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F1,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     pMenu->append(*pMenuItem);
     pMenuItem->show();
@@ -110,7 +112,7 @@ Example_Menus::Example_Menus()
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Locked"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F2,
+    pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F2,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
     pMenuItem->show();
     pMenuItem->signal_activate().connect(
@@ -118,7 +120,7 @@ Example_Menus::Example_Menus()
 
     pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Frozen"));
     pMenu->append(*pMenuItem);
-    pMenuItem->add_accelerator("activate", get_accel_group(), GDK_KEY_F3,
+    pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F3,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     pMenuItem->show();
     pMenuItem->signal_activate().connect(
