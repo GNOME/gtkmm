@@ -76,12 +76,24 @@ int main(int argc,char** argv)
 			  while(*e != ' ' && *e != '\t' && *e != '\0' && *e!= '\n') e++;
 			  *e = '\0';
 
-			if(strchr(s,'?')==0 && s[0]=='_' && strchr(s,'@') == 0 )//this is a C export type: _fct -> fct
-				  def_file << "    " << (s+1) << endl;
-			else
-			if(strchr(s,'?')!=0 && strncmp(s,"??_G",4)!=0 && strncmp(s,"??_E",4)!=0) {
-				  def_file << "    " << s << endl;
+#if (_MSC_VER >= 1900)
+			  /* Filter out these symbols as they are done inline in the
+			   * compiler-shipped headers, so that things can link properly on
+			   * later Visual Studio versions.  Unfortunately we can't just
+			   * link to legacy_stdio_definitions.lib, so this list below may
+			   * continue to grow.
+			   */
+			  if (_stricmp(s, "__local_stdio_printf_options") != 0 &&
+			      _stricmp(s, "_vsnprintf_l") != 0 &&
+			      _stricmp(s, "_vsprintf_l") != 0) {
+#endif
+				if(strchr(s,'?')==0 && s[0]=='_' && strchr(s,'@') == 0 )//this is a C export type: _fct -> fct
+				    def_file << "    " << (s+1) << endl;
+				else if(strchr(s,'?')!=0 && strncmp(s,"??_G",4)!=0 && strncmp(s,"??_E",4)!=0)
+				    def_file << "    " << s << endl;
+#if (_MSC_VER >= 1900)
 			  }
+#endif
 		  }
 	  }
   }
