@@ -19,7 +19,7 @@ binding_name    = gdkmm
 wrap_init_flags = --namespace=Gdk --parent_dir=gdkmm
 codegen_srcdir  = $(top_srcdir)/tools
 
-include $(srcdir)/filelist.am
+include $(srcdir)/filelist.gmake.am
 include $(top_srcdir)/tools/m4/filelist.am
 
 files_defs = $(gdkmm_files_defs)
