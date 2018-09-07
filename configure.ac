@@ -158,15 +158,15 @@ AC_CONFIG_FILES([Makefile
                  demos/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_Net2017/gdkmm/gdkmm.rc
-                 MSVC_Net2017/gtkmm/gtkmm.rc
+                 MSVC_NMake/gdkmm/gdkmm.rc
+                 MSVC_NMake/gtkmm/gtkmm.rc
                  win32_installer/gtkmm-installer.nsi])
 
 # Copy the generated configuration headers into the MSVC project directories.
-AC_CONFIG_COMMANDS([MSVC_Net2017/gdkmm/gdkmmconfig.h],
-                   [cp -f gdk/gdkmmconfig.h MSVC_Net2017/gdkmm/gdkmmconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2017/gtkmm/gtkmmconfig.h],
-                   [cp -f gtk/gtkmmconfig.h MSVC_Net2017/gtkmm/gtkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_NMake/gdkmm/gdkmmconfig.h],
+                   [cp -f gdk/gdkmmconfig.h MSVC_NMake/gdkmm/gdkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_NMake/gtkmm/gtkmmconfig.h],
+                   [cp -f gtk/gtkmmconfig.h MSVC_NMake/gtkmm/gtkmmconfig.h])
 AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],
                    [cp -f COPYING win32_installer/lgpl.txt])
 AC_OUTPUT
