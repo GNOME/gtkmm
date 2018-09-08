@@ -3,7 +3,7 @@
 <description>
 The signal which gets emitted to activate a URI.
 Applications may connect to it to override the default behaviour,
-which is to call gtk_show_uri().
+which is to call gtk_show_uri_on_window().
 
 Since: 2.24
 
@@ -1177,6 +1177,19 @@ Since: 3.2
 Set this property to %TRUE to register with the session manager.
 
 Since: 3.4
+
+</description>
+</property>
+
+<property name="GtkApplication:screensaver-active">
+<description>
+This property is %TRUE if GTK+ believes that the screensaver is
+currently active. GTK+ only tracks session state (including this)
+when #GtkApplication::register-session is set to %TRUE.
+
+Tracking the screensaver state is supported on Linux.
+
+Since: 3.24
 
 </description>
 </property>
@@ -2602,7 +2615,9 @@ value from the @cell_editable.
 
 Implementations of #GtkCellEditable are responsible for
 emitting this signal when they are done editing, e.g.
-#GtkEntry is emitting it when the user presses Enter.
+#GtkEntry emits this signal when the user presses Enter. Typical things to
+do in a handler for ::editing-done are to capture the edited value,
+disconnect the @cell_editable from signals on the #GtkCellRenderer, etc.
 
 gtk_cell_editable_editing_done() is a convenience method
 for emitting #GtkCellEditable::editing-done.
@@ -2620,7 +2635,8 @@ for emitting #GtkCellEditable::editing-done.
 <signal name="GtkCellEditable::remove-widget">
 <description>
 This signal is meant to indicate that the cell is finished
-editing, and the widget may now be destroyed.
+editing, and the @cell_editable widget is being removed and may
+subsequently be destroyed.
 
 Implementations of #GtkCellEditable are responsible for
 emitting this signal when they are done editing. It must
@@ -2676,6 +2692,9 @@ This signal gets emitted when a cell starts to be edited.
 The intended use of this signal is to do special setup
 on @editable, e.g. adding a #GtkEntryCompletion or setting
 up additional columns in a #GtkComboBox.
+
+See gtk_cell_editable_start_editing() for information on the lifecycle of
+the @editable and a way to do setup that doesn’t depend on the @renderer.
 
 Note that GTK+ doesn't guarantee that cell renderers will
 continue to use the same kind of widget for editing in future
@@ -2983,7 +3002,18 @@ Since: 2.8
 
 <property name="GtkCellRendererPixbuf:stock-id">
 <description>
+Since: 2.2
+
 Deprecated: 3.10: Use #GtkCellRendererPixbuf:icon-name instead.
+
+</description>
+</property>
+
+<property name="GtkCellRendererPixbuf:stock-size">
+<description>
+The #GtkIconSize value that specifies the size of the rendered icon.
+
+Since: 2.2
 
 </description>
 </property>
@@ -3441,20 +3471,15 @@ radio nodes; the value of this style property is ignored.
 
 <signal name="GtkClipboard::owner-change">
 <description>
-The ::owner-change signal is emitted when GTK+ receives an
-event that indicates that the ownership of the selection
-associated with @clipboard has changed.
-
-Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> the #GtkClipboard on which the signal is emitted
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="event">
-<parameter_description> the @GdkEventOwnerChange event
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -3669,7 +3694,7 @@ entry is displayed.
 
 Connect a signal handler which returns an allocated string representing
 @path. That string will then be used to set the text in the combo box's entry.
-The default signal handler uses the text from the GtkComboBox::entry-text-column 
+The default signal handler uses the text from the GtkComboBox::entry-text-column
 model column.
 
 Here's an example signal handler which fetches data from the model and
@@ -3687,7 +3712,7 @@ gdouble      value;
 model = gtk_combo_box_get_model (combo);
 
 gtk_tree_model_get_iter_from_string (model, &amp;iter, path);
-gtk_tree_model_get (model, &amp;iter, 
+gtk_tree_model_get (model, &amp;iter,
 THE_DOUBLE_VALUE_COLUMN, &amp;value,
 -1);
 
@@ -3708,7 +3733,7 @@ Since: 3.4
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string representing @path 
+<return> a newly allocated string representing @path
 for the current GtkComboBox model.
 
 </return>
@@ -3852,7 +3877,7 @@ Since: 2.14
 <description>
 The #GtkCellArea used to layout cell renderers for this combo box.
 
-If no area is specified when creating the combo box with gtk_combo_box_new_with_area() 
+If no area is specified when creating the combo box with gtk_combo_box_new_with_area()
 a horizontally oriented #GtkCellAreaBox will be used.
 
 Since: 3.0
@@ -3863,10 +3888,10 @@ Since: 3.0
 <property name="GtkComboBox:column-span-column">
 <description>
 If this is set to a non-negative value, it must be the index of a column
-of type %G_TYPE_INT in the model.
-
-The values of that column are used to determine how many columns a value
-in the list will span.
+of type %G_TYPE_INT in the model. The value in that column for each item
+will determine how many columns that item will span in the popup.
+Therefore, values in this column must be greater than zero, and the sum of
+an item’s column position + span should not exceed #GtkComboBox:wrap-width.
 
 Since: 2.4
 
@@ -3946,11 +3971,9 @@ Since: 2.10
 <property name="GtkComboBox:row-span-column">
 <description>
 If this is set to a non-negative value, it must be the index of a column
-of type %G_TYPE_INT in the model.
-
-The values of that column are used to determine how many rows a value in
-the list will span. Therefore, the values in the model column pointed to
-by this property must be greater than zero and not larger than wrap-width.
+of type %G_TYPE_INT in the model. The value in that column for each item
+will determine how many rows that item will span in the popup. Therefore,
+values in this column must be greater than zero.
 
 Since: 2.4
 
@@ -3983,9 +4006,8 @@ Deprecated: 3.10
 
 <property name="GtkComboBox:wrap-width">
 <description>
-If wrap-width is set to a positive value, the list will be
-displayed in multiple columns, the number of columns is
-determined by wrap-width.
+If wrap-width is set to a positive value, items in the popup will be laid
+out along multiple columns, starting a new row on reaching the wrap width.
 
 Since: 2.4
 
@@ -4678,6 +4700,26 @@ This signal has no default bindings.
 <return></return>
 </signal>
 
+<signal name="GtkEntry::insert-emoji">
+<description>
+The ::insert-emoji signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to present the Emoji chooser for the @entry.
+
+The default bindings for this signal are Ctrl-. and Ctrl-;
+
+Since: 3.22.27
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkEntry::move-cursor">
 <description>
 The ::move-cursor signal is a
@@ -4761,7 +4803,7 @@ type of @widget.
 <parameter_description> The entry on which the signal is emitted
 </parameter_description>
 </parameter>
-<parameter name="popup">
+<parameter name="widget">
 <parameter_description> the container that is being populated
 </parameter_description>
 </parameter>
@@ -4787,6 +4829,19 @@ Since: 2.20
 <parameter_description> the current preedit string
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEntry::show-emoji-icon">
+<description>
+When this is %TRUE, the entry will show an emoji icon in the secondary
+icon position that brings up the Emoji chooser when clicked.
+
+Since: 3.22.19
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </signal>
@@ -4826,6 +4881,9 @@ The default bindings for this signal is Insert.
 A list of Pango attributes to apply to the text of the entry.
 
 This is mainly useful to change the size or weight of the text.
+
+The #PangoAttribute's @start_index and @end_index must refer to the
+#GtkEntryBuffer text, i.e. without the preedit string.
 
 Since: 3.6
 
@@ -5600,6 +5658,187 @@ Since: 3.14
 
 </description>
 </property>
+
+<signal name="GtkEventControllerMotion::enter">
+<description>
+Signals that the pointer has entered the widget.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerMotion::leave">
+<description>
+Signals that pointer has left the widget.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerMotion::motion">
+<description>
+Emitted when the pointer moves inside the widget.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::decelerate">
+<description>
+Emitted after scroll is finished if the #GTK_EVENT_CONTROLLER_SCROLL_KINETIC
+flag is set. @vel_x and @vel_y express the initial velocity that was
+imprinted by the scroll events. @vel_x and @vel_y are expressed in
+pixels/ms.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="vel_x">
+<parameter_description> X velocity
+</parameter_description>
+</parameter>
+<parameter name="vel_y">
+<parameter_description> Y velocity
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll">
+<description>
+Signals that the widget should scroll by the
+amount specified by @dx and @dy.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description> X delta
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description> Y delta
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll-begin">
+<description>
+Signals that a new scrolling operation has begun. It will
+only be emitted on devices capable of it.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkEventControllerScroll::scroll-end">
+<description>
+Signals that a new scrolling operation has finished. It will
+only be emitted on devices capable of it.
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> The object that received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkEventControllerScroll:flags">
+<description>
+The flags affecting event controller behavior
+
+Since: 3.24
+
+</description>
+</property>
+
+<enum name="GtkEventControllerScrollFlags">
+<description>
+Describes the behavior of a #GtkEventControllerScroll.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_NONE">
+<parameter_description> Don't emit scroll.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_VERTICAL">
+<parameter_description> Emit scroll with vertical deltas.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_HORIZONTAL">
+<parameter_description> Emit scroll with horizontal deltas.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_DISCRETE">
+<parameter_description> Only emit deltas that are multiples of 1.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_KINETIC">
+<parameter_description> Emit #GtkEventControllerScroll::decelerate
+after continuous scroll finishes.
+</parameter_description>
+</parameter>
+<parameter name="GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES">
+<parameter_description> Emit scroll on both axes.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GtkEventSequenceState">
 <description>
@@ -6562,12 +6801,12 @@ it can be used by applications for their own purposes.
 <signal name="GtkFontButton::font-set">
 <description>
 The ::font-set signal is emitted when the user selects a font. 
-When handling this signal, use gtk_font_button_get_font_name() 
+When handling this signal, use gtk_font_chooser_get_font()
 to find out which font was just selected.
 
 Note that this signal is only emitted when the user
 changes the font. If you need to react to programmatic font changes
-as well, use the notify::font-name signal.
+as well, use the notify::font signal.
 
 Since: 2.4
 
@@ -6586,6 +6825,8 @@ Since: 2.4
 The name of the currently selected font.
 
 Since: 2.4
+
+Deprecated: 3.22: Use the #GtkFontChooser::font property instead
 
 </description>
 </property>
@@ -6676,6 +6917,36 @@ The font description as a #PangoFontDescription.
 </description>
 </property>
 
+<property name="GtkFontChooser:font-features">
+<description>
+The selected font features, in a format that is compatible with
+CSS and with Pango attributes.
+
+Since: 3.22.30
+
+</description>
+</property>
+
+<property name="GtkFontChooser:language">
+<description>
+The language for which the #GtkFontChooser:font-features were
+selected, in a format that is compatible with CSS and with Pango
+attributes.
+
+Since: 3.22.30
+
+</description>
+</property>
+
+<property name="GtkFontChooser:level">
+<description>
+The level of granularity to offer for selecting fonts.
+
+Since: 3.22.30
+
+</description>
+</property>
+
 <property name="GtkFontChooser:preview-text">
 <description>
 The string with which to preview the font.
@@ -6686,6 +6957,51 @@ The string with which to preview the font.
 <property name="GtkFontChooser:show-preview-entry">
 <description>
 Whether to show an entry to change the preview text.
+
+</description>
+</property>
+
+<enum name="GtkFontChooserLevel">
+<description>
+This enumeration specifies the granularity of font selection
+that is desired in a font chooser.
+
+This enumeration may be extended in the future; applications should
+ignore unknown values.
+
+</description>
+<parameters>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FAMILY">
+<parameter_description> Allow selecting a font family
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_STYLE">
+<parameter_description> Allow selecting a specific font face
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_SIZE">
+<parameter_description> Allow selecting a specific font size
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_VARIATION">
+<parameter_description> Allow changing OpenType font variation axes
+</parameter_description>
+</parameter>
+<parameter name="GTK_FONT_CHOOSER_LEVEL_FEATURES">
+<parameter_description> Allow selecting specific OpenType font features
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<property name="GtkFontChooserWidget:tweak-action">
+<description>
+A toggle action that can be used to switch to the tweak page
+of the font chooser widget, which lets the user tweak the
+OpenType features and variation axes of the selected font.
+
+The action will be enabled or disabled depending on whether
+the selected font has any features or axes.
 
 </description>
 </property>
@@ -8429,6 +8745,14 @@ first word of each sentence
 <parameter_description> The text is vertical. Since 3.18
 </parameter_description>
 </parameter>
+<parameter name="GTK_INPUT_HINT_EMOJI">
+<parameter_description> Suggest offering Emoji support. Since 3.22.20
+</parameter_description>
+</parameter>
+<parameter name="GTK_INPUT_HINT_NO_EMOJI">
+<parameter_description> Suggest not offering Emoji support. Since 3.22.20
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -8597,7 +8921,7 @@ Since: 2.18
 <description>
 The signal which gets emitted to activate a URI.
 Applications may connect to it to override the default behaviour,
-which is to call gtk_show_uri().
+which is to call gtk_show_uri_on_window().
 
 Since: 2.18
 
@@ -9042,6 +9366,10 @@ developer
 <parameter_description> The GNU Affero General Public License, version 3.0 or later. Since: 3.22.
 </parameter_description>
 </parameter>
+<parameter name="GTK_LICENSE_AGPL_3_0_ONLY">
+<parameter_description> The GNU Affero General Public License, version 3.0 only. Since: 3.22.27.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -9050,7 +9378,7 @@ developer
 The ::activate-link signal is emitted each time the #GtkLinkButton
 has been clicked.
 
-The default handler will call gtk_show_uri() with the URI stored inside
+The default handler will call gtk_show_uri_on_window() with the URI stored inside
 the #GtkLinkButton:uri property.
 
 To override the default behavior, you can connect to the ::activate-link
@@ -9188,6 +9516,21 @@ Since: 3.14
 <return></return>
 </signal>
 
+<signal name="GtkListBoxRow::activate">
+<description>
+This is a keybinding signal, which will cause this row to be activated.
+
+If you want to be notified when the user activates a row (by key or not),
+use the #GtkListBox::row-activated signal on the row’s parent #GtkListBox.
+
+Since: 3.10
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
 <property name="GtkListBoxRow:activatable">
 <description>
 The property determines whether the #GtkListBox::row-activated
@@ -9250,7 +9593,6 @@ gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
 #GtkMenu:menu-type-hint.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 <parameters>
@@ -9326,7 +9668,6 @@ gtk_menu_popup_at_pointer (), #GtkMenu:rect-anchor-dx,
 #GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 </property>
@@ -9394,7 +9735,6 @@ gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
 #GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and #GtkMenu::popped-up.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 </property>
@@ -9418,7 +9758,6 @@ gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
 #GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 </property>
@@ -9432,7 +9771,6 @@ gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
 #GtkMenu:rect-anchor-dx, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 </property>
@@ -10091,7 +10429,7 @@ Since: 3.16
 
 <property name="GtkModelButton:centered">
 <description>
-Wether to render the button contents centered instead of left-aligned.
+Whether to render the button contents centered instead of left-aligned.
 This property should be set for title-like items.
 
 Since: 3.16
@@ -10157,6 +10495,17 @@ Since: 3.16
 The label for the button.
 
 Since: 3.16
+
+</description>
+</property>
+
+<property name="GtkModelButton:use-markup">
+<description>
+If %TRUE, XML tags in the text of the button are interpreted as by
+pango_parse_markup() to format the enclosed spans of text. If %FALSE, the
+text will be displayed verbatim.
+
+Since: 3.24
 
 </description>
 </property>
@@ -10627,6 +10976,24 @@ location for the allocation
 <return> %TRUE if the @allocation has been filled
 </return>
 </signal>
+
+<property name="GtkOverlay:index">
+<description>
+The index of the overlay in the parent, -1 for the main child.
+
+Since: 3.18
+
+</description>
+</property>
+
+<property name="GtkOverlay:pass-through">
+<description>
+Pass through input, does not affect main child.
+
+Since: 3.18
+
+</description>
+</property>
 
 <enum name="GtkPackDirection">
 <description>
@@ -11256,11 +11623,13 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="selected_item">
-<parameter_description> #GFile with the item to which the popup should refer, or #NULL in the case of a @selected_volume.
+<parameter_description> #GFile with the item to which
+the popup should refer, or %NULL in the case of a @selected_volume.
 </parameter_description>
 </parameter>
 <parameter name="selected_volume">
-<parameter_description> #GVolume if the selected item is a volume, or #NULL if it is a file.
+<parameter_description> #GVolume if the selected
+item is a volume, or %NULL if it is a file.
 </parameter_description>
 </parameter>
 </parameters>
@@ -11376,6 +11745,30 @@ Since: 3.20
 </parameter>
 <parameter name="open_flags">
 <parameter_description> a single value from #GtkPlacesOpenFlags specifying how it should be opened.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkPlacesSidebar::show-starred-location">
+<description>
+The places sidebar emits this signal when it needs the calling
+application to present a way to show the starred files. In GNOME,
+starred files are implemented by setting the nao:predefined-tag-favorite
+tag in the tracker database.
+
+Since: 3.22.26
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+<parameter name="open_flags">
+<parameter_description> a single value from #GtkPlacesOpenFlags specifying how the
+starred file should be opened.
 </parameter_description>
 </parameter>
 </parameters>
@@ -11584,6 +11977,10 @@ Since: 3.12
 Whether show/hide transitions are enabled for this popover.
 
 Since: 3.16
+
+Deprecated: 3.22: You can show or hide the popover without transitions
+using gtk_widget_show() and gtk_widget_hide() while gtk_popover_popup()
+and gtk_popover_popdown() will use transitions.
 
 </description>
 </property>
@@ -12666,7 +13063,7 @@ The minimum vertical width of the progress bar.
 
 Since: 2.14
 
-Deprecated: 3.20: Use the standard CSS proeprty min-width.
+Deprecated: 3.20: Use the standard CSS property min-width.
 
 </description>
 </property>
@@ -12886,9 +13283,6 @@ The value parameter is unrounded.  An application that overrides
 the GtkRange::change-value signal is responsible for clamping the
 value to the desired number of decimal digits; the default GTK+
 handler clamps the value based on #GtkRange:round-digits.
-
-It is not possible to use delayed update policies in an overridden
-#GtkRange::change-value handler.
 
 Since: 2.6
 
@@ -13674,7 +14068,7 @@ Indicated the relief to be drawn around a #GtkButton.
 <enum name="GtkResponseType">
 <description>
 Predefined values for use as response ids in gtk_dialog_add_button().
-All predefined values are negative, GTK+ leaves positive values for
+All predefined values are negative; GTK+ leaves values of 0 or greater for
 application-defined response ids.
 
 </description>
@@ -13766,6 +14160,9 @@ when the child of a #GtkRevealer widget is shown or hidden.
 Signal which allows you to change how the scale value is displayed.
 Connect a signal handler which returns an allocated string representing 
 @value. That string will then be used to display the scale's value.
+
+If no user-provided handlers are installed, the value will be displayed on
+its own, rounded according to the value of the #GtkScale:digits property.
 
 Here's an example signal handler which displays a value 1.0 as
 with &quot;--&gt;1.0&lt;--&quot;.
@@ -14089,7 +14486,7 @@ element instead. The value of this style property is ignored.
 <signal name="GtkScrolledWindow::edge-overshot">
 <description>
 The ::edge-overshot signal is emitted whenever user initiated scrolling
-makes the scrolledwindow firmly surpass (ie. with some edge resistance)
+makes the scrolled window firmly surpass (i.e. with some edge resistance)
 the lower or upper limits defined by the adjustment in that orientation.
 
 A similar behavior without edge resistance is provided by the
@@ -14117,7 +14514,7 @@ Since: 3.16
 <signal name="GtkScrolledWindow::edge-reached">
 <description>
 The ::edge-reached signal is emitted whenever user-initiated scrolling
-makes the scrolledwindow exactly reaches the lower or upper limits
+makes the scrolled window exactly reach the lower or upper limits
 defined by the adjustment in that orientation.
 
 A similar behavior with edge resistance is provided by the
@@ -14148,9 +14545,9 @@ The ::move-focus-out signal is a
 [keybinding signal][GtkBindingSignal] which gets
 emitted when focus is moved away from the scrolled window by a
 keybinding. The #GtkWidget::move-focus signal is emitted with
-@direction_type on this scrolled windows toplevel parent in the
+@direction_type on this scrolled window’s toplevel parent in the
 container hierarchy. The default bindings for this signal are
-`Tab + Ctrl` and `Tab + Ctrl + Shift`.
+`Ctrl + Tab` to move forward and `Ctrl + Shift + Tab` to move backward.
 
 </description>
 <parameters>
@@ -14173,7 +14570,7 @@ The ::scroll-child signal is a
 [keybinding signal][GtkBindingSignal]
 which gets emitted when a keybinding that scrolls is pressed.
 The horizontal or vertical adjustment is updated which triggers a
-signal that the scrolled windows child may listen to and scroll itself.
+signal that the scrolled window’s child may listen to and scroll itself.
 
 </description>
 <parameters>
@@ -14255,7 +14652,7 @@ Since: 3.16
 <property name="GtkScrolledWindow:propagate-natural-height">
 <description>
 Whether the natural height of the child should be calculated and propagated
-through the scrolled windows requested natural height.
+through the scrolled window’s requested natural height.
 
 This is useful in cases where an attempt should be made to allocate exactly
 enough space for the natural size of the child.
@@ -14268,7 +14665,7 @@ Since: 3.22
 <property name="GtkScrolledWindow:propagate-natural-width">
 <description>
 Whether the natural width of the child should be calculated and propagated
-through the scrolled windows requested natural width.
+through the scrolled window’s requested natural width.
 
 This is useful in cases where an attempt should be made to allocate exactly
 enough space for the natural size of the child.
@@ -14896,8 +15293,14 @@ Deprecated: 3.10: This setting is ignored.
 
 <property name="GtkSettings:gtk-primary-button-warps-slider">
 <description>
-Whether a click in a #GtkRange trough should scroll to the click position or
-scroll by a single page in the respective direction.
+If the value of this setting is %TRUE, clicking the primary button in a
+#GtkRange trough will move the slider, and hence set the range’s value, to
+the point that you clicked. If it is %FALSE, a primary click will cause the
+slider/value to move by the range’s page-size towards the point clicked.
+
+Whichever action you choose for the primary button, the other action will
+be available by holding Shift and primary-clicking, or (since GTK+ 3.22.25)
+clicking the middle mouse button.
 
 Since: 3.6
 
@@ -15227,32 +15630,32 @@ property will be used.
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_PINCH">
 <parameter_description>
-The shortcut is a pinch gesture. GTK+ provides and icon and subtitle.
+The shortcut is a pinch gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_STRETCH">
 <parameter_description>
-The shortcut is a stretch gesture. GTK+ provides and icon and subtitle.
+The shortcut is a stretch gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_ROTATE_CLOCKWISE">
 <parameter_description>
-The shortcut is a clockwise rotation gesture. GTK+ provides and icon and subtitle.
+The shortcut is a clockwise rotation gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_ROTATE_COUNTERCLOCKWISE">
 <parameter_description>
-The shortcut is a counterclockwise rotation gesture. GTK+ provides and icon and subtitle.
+The shortcut is a counterclockwise rotation gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_LEFT">
 <parameter_description>
-The shortcut is a two-finger swipe gesture. GTK+ provides and icon and subtitle.
+The shortcut is a two-finger swipe gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE_TWO_FINGER_SWIPE_RIGHT">
 <parameter_description>
-The shortcut is a two-finger swipe gesture. GTK+ provides and icon and subtitle.
+The shortcut is a two-finger swipe gesture. GTK+ provides an icon and subtitle.
 </parameter_description>
 </parameter>
 <parameter name="GTK_SHORTCUT_GESTURE">
@@ -15752,7 +16155,7 @@ Since: 2.10
 
 <property name="GtkSpinButton:shadow-type">
 <description>
-Style of bevel around the sping button.
+Style of bevel around the spin button.
 
 Deprecated: 3.20: Use CSS to determine the style of the border;
 the value of this style property is ignored.
@@ -17596,6 +17999,26 @@ This signal has no default bindings.
 <return></return>
 </signal>
 
+<signal name="GtkTextView::insert-emoji">
+<description>
+The ::insert-emoji signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to present the Emoji chooser for the @text_view.
+
+The default bindings for this signal are Ctrl-. and Ctrl-;
+
+Since: 3.22.27
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkTextView::move-cursor">
 <description>
 The ::move-cursor signal is a 
@@ -17961,6 +18384,10 @@ Used to reference the parts of #GtkTextView.
 
 </description>
 <parameters>
+<parameter name="GTK_TEXT_WINDOW_PRIVATE">
+<parameter_description> Invalid value, used as a marker
+</parameter_description>
+</parameter>
 <parameter name="GTK_TEXT_WINDOW_WIDGET">
 <parameter_description> Window that floats over scrolling areas.
 </parameter_description>
@@ -19406,6 +19833,8 @@ The ::composited-changed signal is emitted when the composited
 status of @widgets screen changes.
 See gdk_screen_is_composited().
 
+Deprecated: 3.22: Use GdkScreen::composited-changed instead.
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -20421,6 +20850,9 @@ automatically for all new windows.
 
 <signal name="GtkWidget::mnemonic-activate">
 <description>
+The default handler for this signal activates @widget if @group_cycling
+is %FALSE, or just makes @widget grab focus if @group_cycling is %TRUE.
+
 
 </description>
 <parameters>
@@ -20428,8 +20860,8 @@ automatically for all new windows.
 <parameter_description> the object which received the signal.
 </parameter_description>
 </parameter>
-<parameter name="arg1">
-<parameter_description>
+<parameter name="group_cycling">
+<parameter_description> %TRUE if there are other widgets with the same mnemonic
 </parameter_description>
 </parameter>
 </parameters>
@@ -22465,7 +22897,8 @@ of the language which is currently used in the user interface.
 Using gettext(), a simple way to achieve that is to mark the
 string for translation:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gtk_about_dialog_set_translator_credits (about,
+GtkWidget *about = gtk_about_dialog_new ();
+gtk_about_dialog_set_translator_credits (GTK_ABOUT_DIALOG (about),
 _(&quot;translator-credits&quot;));
 ]|
 It is a good idea to use the customary msgid “translator-credits” for this
@@ -23063,6 +23496,8 @@ Since: 3.6
 <description>
 Sets the closure to be monitored by this accelerator label. The closure
 must be connected to an accelerator group; see gtk_accel_group_connect().
+Passing %NULL for @accel_closure will dissociate @accel_label from its
+current closure, if any.
 
 </description>
 <parameters>
@@ -23071,7 +23506,8 @@ must be connected to an accelerator group; see gtk_accel_group_connect().
 </parameter_description>
 </parameter>
 <parameter name="accel_closure">
-<parameter_description> the closure to monitor for accelerator changes.
+<parameter_description> the closure to monitor for accelerator changes,
+or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -23080,7 +23516,8 @@ must be connected to an accelerator group; see gtk_accel_group_connect().
 
 <function name="gtk_accel_label_set_accel_widget">
 <description>
-Sets the widget to be monitored by this accelerator label.
+Sets the widget to be monitored by this accelerator label. Passing %NULL for
+@accel_widget will dissociate @accel_label from its current widget, if any.
 
 </description>
 <parameters>
@@ -23089,7 +23526,7 @@ Sets the widget to be monitored by this accelerator label.
 </parameter_description>
 </parameter>
 <parameter name="accel_widget">
-<parameter_description> the widget to be monitored.
+<parameter_description> the widget to be monitored, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -25605,14 +26042,14 @@ Since: 3.4
 Sets the action-name and associated string target value of an
 actionable widget.
 
-This allows for the effect of both gtk_actionable_set_action_name()
-and gtk_actionable_set_action_target_value() in the common case that
-the target is string-valued.
+@detailed_action_name is a string in the format accepted by
+g_action_parse_detailed_name().
 
-@detailed_action_name is a string of the form
-`&quot;action::target&quot;` where `action`
-is the action name and `target` is the string to use
-as the target.
+(Note that prior to version 3.22.25,
+this function is only usable for actions with a simple &quot;s&quot; target, and
+@detailed_action_name must be of the form `&quot;action::target&quot;` where
+`action` is the action name and `target` is the string to use
+as the target.)
 
 Since: 3.4
 
@@ -27177,7 +27614,8 @@ Since: 3.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> the active window
+<return> the active window, or %NULL if
+there isn't one.
 
 </return>
 </function>
@@ -27356,6 +27794,9 @@ inhibiting or the request failed for some reason, 0 is returned.
 <description>
 Determines if any of the actions specified in @flags are
 currently inhibited (possibly by another application).
+
+Note that this information may not be available (for example
+when the application is running in a sandbox).
 
 Since: 3.4
 
@@ -27755,6 +28196,8 @@ Since: 3.4
 Associates a shortcuts window with the application window, and
 sets up an action with the name win.show-help-overlay to present
 it.
+
+@window takes resposibility for destroying @help_overlay.
 
 Since: 3.20
 
@@ -28588,7 +29031,8 @@ added, so you do not need to unref it.
 </parameter_description>
 </parameter>
 </parameters>
-<return> pointer to child of the #GtkBin
+<return> the child of @bin, or %NULL if it does
+not have a child.
 </return>
 </function>
 
@@ -28606,9 +29050,14 @@ be of the given type). There must be @n_args pairs in total.
 ## Adding a Key Binding
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gtk_binding_entry_add_signal (binding_set, keyval, modmask,
-&quot;move-cursor&quot;, 3,
-G_TYPE_ENUM, step,
+GtkBindingSet *binding_set;
+GdkModifierType modmask = GDK_CONTROL_MASK;
+int count = 1;
+gtk_binding_entry_add_signal (binding_set,
+GDK_KEY_space,
+modmask,
+&quot;move-cursor&quot;, 2,
+GTK_TYPE_MOVEMENT_STEP, GTK_MOVEMENT_PAGES,
 G_TYPE_INT, count,
 G_TYPE_BOOLEAN, FALSE);
 ]|
@@ -30880,7 +31329,7 @@ Since: 3.10
 </description>
 <parameters>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -30895,14 +31344,16 @@ Since: 3.10
 
 <function name="gtk_button_new_from_stock">
 <description>
-Creates a new #GtkButton containing the image and text from a stock item.
+Creates a new #GtkButton containing the image and text from a
+[stock item][gtkstock].
 Some stock ids have preprocessor macros like #GTK_STOCK_OK and
 #GTK_STOCK_APPLY.
 
 If @stock_id is unknown, then it will be treated as a mnemonic
 label (as for gtk_button_new_with_mnemonic()).
 
-Deprecated: 3.10: Use gtk_button_new_with_label() instead.
+Deprecated: 3.10: Stock items are deprecated. Use gtk_button_new_with_label()
+instead.
 
 </description>
 <parameters>
@@ -31082,7 +31533,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="image">
-<parameter_description> a widget to set as the image for the button
+<parameter_description> a widget to set as the image for the button, or %NULL to unset
 </parameter_description>
 </parameter>
 </parameters>
@@ -33437,9 +33888,16 @@ Emits the #GtkCellEditable::remove-widget signal.
 
 <function name="gtk_cell_editable_start_editing">
 <description>
-Begins editing on a @cell_editable. @event is the #GdkEvent that began 
-the editing process. It may be %NULL, in the instance that editing was 
-initiated through programatic means.
+Begins editing on a @cell_editable.
+
+The #GtkCellRenderer for the cell creates and returns a #GtkCellEditable from
+gtk_cell_renderer_start_editing(), configured for the #GtkCellRenderer type.
+
+gtk_cell_editable_start_editing() can then set up @cell_editable suitably for
+editing a cell, e.g. making the Esc key emit #GtkCellEditable::editing-done.
+
+Note that the @cell_editable is created on-demand for the current edit; its
+lifetime is temporary and does not persist across other edits and/or cells.
 
 </description>
 <parameters>
@@ -33448,7 +33906,8 @@ initiated through programatic means.
 </parameter_description>
 </parameter>
 <parameter name="event">
-<parameter_description> A #GdkEvent, or %NULL
+<parameter_description> The #GdkEvent that began the editing process, or
+%NULL if editing was initiated programmatically
 </parameter_description>
 </parameter>
 </parameters>
@@ -34435,7 +34894,8 @@ Since: 2.20
 
 <function name="gtk_cell_renderer_start_editing">
 <description>
-Passes an activate event to the cell renderer for possible processing.
+Starts editing the contents of this @cell, through a new #GtkCellEditable
+widget created by the #GtkCellRendererClass.start_editing virtual function.
 
 
 </description>
@@ -34470,7 +34930,8 @@ e.g. for #GtkTreeView, a string representation of #GtkTreePath
 </parameter_description>
 </parameter>
 </parameters>
-<return> A new #GtkCellEditable, or %NULL
+<return> A new #GtkCellEditable for editing this
+@cell, or %NULL if editing is not possible
 </return>
 </function>
 
@@ -35341,21 +35802,15 @@ clipboard may be owned by someone else.
 
 <function name="gtk_clipboard_get">
 <description>
-Returns the clipboard object for the given selection.
-See gtk_clipboard_get_for_display() for complete details.
-
 
 </description>
 <parameters>
 <parameter name="selection">
-<parameter_description> a #GdkAtom which identifies the clipboard to use
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the appropriate clipboard object. If no clipboard
-already exists, a new one will be created. Once a clipboard
-object has been created, it is persistent and, since it is
-owned by GTK+, must not be freed or unreffed.
+<return>
 </return>
 </function>
 
@@ -35380,135 +35835,83 @@ Since: 3.16
 
 <function name="gtk_clipboard_get_display">
 <description>
-Gets the #GdkDisplay associated with @clipboard
-
-Since: 2.2
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GdkDisplay associated with @clipboard
-
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_get_for_display">
 <description>
-Returns the clipboard object for the given selection.
-Cut/copy/paste menu items and keyboard shortcuts should use
-the default clipboard, returned by passing %GDK_SELECTION_CLIPBOARD for @selection.
-(%GDK_NONE is supported as a synonym for GDK_SELECTION_CLIPBOARD
-for backwards compatibility reasons.)
-The currently-selected object or text should be provided on the clipboard
-identified by #GDK_SELECTION_PRIMARY. Cut/copy/paste menu items
-conceptually copy the contents of the #GDK_SELECTION_PRIMARY clipboard
-to the default clipboard, i.e. they copy the selection to what the
-user sees as the clipboard.
-
-(Passing #GDK_NONE is the same as using `gdk_atom_intern
-(&quot;CLIPBOARD&quot;, FALSE)`.
-
-See the
-[FreeDesktop Clipboard Specification](http://www.freedesktop.org/Standards/clipboards-spec)
-for a detailed discussion of the “CLIPBOARD” vs. “PRIMARY”
-selections under the X window system. On Win32 the
-#GDK_SELECTION_PRIMARY clipboard is essentially ignored.)
-
-It’s possible to have arbitrary named clipboards; if you do invent
-new clipboards, you should prefix the selection name with an
-underscore (because the ICCCM requires that nonstandard atoms are
-underscore-prefixed), and namespace it as well. For example,
-if your application called “Foo” has a special-purpose
-clipboard, you might call it “_FOO_SPECIAL_CLIPBOARD”.
-
-Since: 2.2
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description> the #GdkDisplay for which the clipboard is to be retrieved or created.
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="selection">
-<parameter_description> a #GdkAtom which identifies the clipboard to use.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the appropriate clipboard object. If no
-clipboard already exists, a new one will be created. Once a clipboard
-object has been created, it is persistent and, since it is owned by
-GTK+, must not be freed or unrefd.
-
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_get_owner">
 <description>
-If the clipboard contents callbacks were set with
-gtk_clipboard_set_with_owner(), and the gtk_clipboard_set_with_data() or
-gtk_clipboard_clear() has not subsequently called, returns the owner set
-by gtk_clipboard_set_with_owner().
-
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the owner of the clipboard, if any;
-otherwise %NULL.
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_get_selection">
 <description>
-Gets the selection that this clipboard is for.
-
 Since: 3.22
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> the selection
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_clipboard_request_contents">
 <description>
-Requests the contents of clipboard as the given target.
-When the results of the result are later received the supplied callback
-will be called.
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description> an atom representing the form into which the clipboard
-owner should convert the selection.
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> A function to call when the results are received
-(or the retrieval fails). If the retrieval fails the length field of
-@selection_data will be negative.
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35517,31 +35920,19 @@ owner should convert the selection.
 
 <function name="gtk_clipboard_request_image">
 <description>
-Requests the contents of the clipboard as image. When the image is
-later received, it will be converted to a #GdkPixbuf, and
-@callback will be called.
-
-The @pixbuf parameter to @callback will contain the resulting
-#GdkPixbuf if the request succeeded, or %NULL if it failed. This
-could happen for various reasons, in particular if the clipboard
-was empty or if the contents of the clipboard could not be
-converted into an image.
-
-Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a function to call when the image is received,
-or the retrieval fails. (It will always be called one way or the other.)
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35550,34 +35941,23 @@ or the retrieval fails. (It will always be called one way or the other.)
 
 <function name="gtk_clipboard_request_rich_text">
 <description>
-Requests the contents of the clipboard as rich text. When the rich
-text is later received, @callback will be called.
-
-The @text parameter to @callback will contain the resulting rich
-text if the request succeeded, or %NULL if it failed. The @length
-parameter will contain @text’s length. This function can fail for
-various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into rich text form.
-
-Since: 2.10
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a function to call when the text is received,
-or the retrieval fails. (It will always be called one way or the other.)
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35586,28 +35966,19 @@ or the retrieval fails. (It will always be called one way or the other.)
 
 <function name="gtk_clipboard_request_targets">
 <description>
-Requests the contents of the clipboard as list of supported targets.
-When the list is later received, @callback will be called.
-
-The @targets parameter to @callback will contain the resulting targets if
-the request succeeded, or %NULL if it failed.
-
-Since: 2.4
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a function to call when the targets are
-received, or the retrieval fails. (It will always be called
-one way or the other.)
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35616,28 +35987,19 @@ one way or the other.)
 
 <function name="gtk_clipboard_request_text">
 <description>
-Requests the contents of the clipboard as text. When the text is
-later received, it will be converted to UTF-8 if necessary, and
-@callback will be called.
-
-The @text parameter to @callback will contain the resulting text if
-the request succeeded, or %NULL if it failed. This could happen for
-various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into text form.
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a function to call when the text is received,
-or the retrieval fails. (It will always be called one way or the other.)
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35646,29 +36008,19 @@ or the retrieval fails. (It will always be called one way or the other.)
 
 <function name="gtk_clipboard_request_uris">
 <description>
-Requests the contents of the clipboard as URIs. When the URIs are
-later received @callback will be called.
-
-The @uris parameter to @callback will contain the resulting array of
-URIs if the request succeeded, or %NULL if it failed. This could happen
-for various reasons, in particular if the clipboard was empty or if the
-contents of the clipboard could not be converted into URI form.
-
-Since: 2.14
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a function to call when the URIs are received,
-or the retrieval fails. (It will always be called one way or the other.)
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35677,29 +36029,19 @@ or the retrieval fails. (It will always be called one way or the other.)
 
 <function name="gtk_clipboard_set_can_store">
 <description>
-Hints that the clipboard data should be stored somewhere when the
-application exits or when gtk_clipboard_store () is called.
-
-This value is reset when the clipboard owner changes.
-Where the clipboard data is stored is platform dependent,
-see gdk_display_store_clipboard () for more information.
-
-Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing
-information about which forms should be stored or %NULL
-to indicate that all forms should be stored.
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description> number of elements in @targets
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
@@ -35757,93 +36099,64 @@ the length will be determined with strlen().
 
 <function name="gtk_clipboard_set_with_data">
 <description>
-Virtually sets the contents of the specified clipboard by providing
-a list of supported formats for the clipboard data and a function
-to call to get the actual data when it is requested.
-
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing information
-about the available forms for the clipboard data
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description> number of elements in @targets
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="get_func">
-<parameter_description> function to call to get the actual clipboard data
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="clear_func">
-<parameter_description> when the clipboard contents are set again,
-this function will be called, and @get_func will not be subsequently
-called.
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @get_func and @clear_func.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the clipboard data succeeded.
-If setting the clipboard data failed the provided callback
-functions will be ignored.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_clipboard_set_with_owner">
 <description>
-Virtually sets the contents of the specified clipboard by providing
-a list of supported formats for the clipboard data and a function
-to call to get the actual data when it is requested.
-
-The difference between this function and gtk_clipboard_set_with_data()
-is that instead of an generic @user_data pointer, a #GObject is passed
-in.
-
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> array containing information
-about the available forms for the clipboard data
-</parameter_description>
-</parameter>
-<parameter name="n_targets">
-<parameter_description> number of elements in @targets
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="get_func">
-<parameter_description> function to call to get the actual clipboard data
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="clear_func">
-<parameter_description> when the clipboard contents are set again,
-this function will be called, and @get_func will not be subsequently
-called
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="owner">
-<parameter_description> an object that “owns” the data. This object will be passed
-to the callbacks when called
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if setting the clipboard data succeeded.
-If setting the clipboard data failed the provided callback
-functions will be ignored.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_clipboard_store">
@@ -35865,173 +36178,112 @@ Since: 2.6
 
 <function name="gtk_clipboard_wait_for_contents">
 <description>
-Requests the contents of the clipboard using the given target.
-This function waits for the data to be received using the main 
-loop, so events, timeouts, etc, may be dispatched during the wait.
-
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description> an atom representing the form into which the clipboard
-owner should convert the selection.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GtkSelectionData object or %NULL
-if retrieving the given target failed. If non-%NULL,
-this value must be freed with gtk_selection_data_free() 
-when you are finished with it.
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_image">
 <description>
-Requests the contents of the clipboard as image and converts
-the result to a #GdkPixbuf. This function waits for
-the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated #GdkPixbuf
-object which must be disposed with g_object_unref(), or
-%NULL if retrieving the selection data failed. (This could
-happen for various reasons, in particular if the clipboard
-was empty or if the contents of the clipboard could not be
-converted into an image.)
-
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_rich_text">
 <description>
-Requests the contents of the clipboard as rich text.  This function
-waits for the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.10
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a #GtkTextBuffer
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> return location for the format of the returned data
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> return location for the length of the returned data
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> a
-newly-allocated binary block of data which must be
-freed with g_free(), or %NULL if retrieving the
-selection data failed. (This could happen for various
-reasons, in particular if the clipboard was empty or
-if the contents of the clipboard could not be
-converted into text form.)
-
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_targets">
 <description>
-Returns a list of targets that are present on the clipboard, or %NULL
-if there aren’t any targets available. The returned list must be
-freed with g_free().
-This function waits for the data to be received using the main
-loop, so events, timeouts, etc, may be dispatched during the wait.
-
-Since: 2.4
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> location
-to store an array of targets. The result stored here must
-be freed with g_free().
+<parameter_description>
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description> location to store number of items in @targets.
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if any targets are present on the clipboard,
-otherwise %FALSE.
-
-</return>
+<return></return>
 </function>
 
 <function name="gtk_clipboard_wait_for_text">
 <description>
-Requests the contents of the clipboard as text and converts
-the result to UTF-8 if necessary. This function waits for
-the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated UTF-8 string which must
-be freed with g_free(), or %NULL if retrieving
-the selection data failed. (This could happen
-for various reasons, in particular if the
-clipboard was empty or if the contents of the
-clipboard could not be converted into text form.)
+<return>
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_uris">
 <description>
-Requests the contents of the clipboard as URIs. This function waits
-for the data to be received using the main loop, so events,
-timeouts, etc, may be dispatched during the wait.
-
-Since: 2.14
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description> a #GtkClipboard
+<parameter_description>
 </parameter_description>
 </parameter>
 </parameters>
 <return>
-a newly-allocated %NULL-terminated array of strings which must
-be freed with g_strfreev(), or %NULL if retrieving the
-selection data failed. (This could happen for various reasons,
-in particular if the clipboard was empty or if the contents of
-the clipboard could not be converted into URI form.)
-
 </return>
 </function>
 
@@ -37126,7 +37378,8 @@ Since: 3.0
 
 <function name="gtk_combo_box_get_active_iter">
 <description>
-Sets @iter to point to the current active item, if it exists.
+Sets @iter to point to the currently active item, if any item is active.
+Otherwise, @iter is left unchanged.
 
 Since: 2.4
 
@@ -37137,11 +37390,11 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="iter">
-<parameter_description> The uninitialized #GtkTreeIter
+<parameter_description> A #GtkTreeIter
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE, if @iter was set
+<return> %TRUE if @iter was set, %FALSE otherwise
 
 </return>
 </function>
@@ -37545,6 +37798,8 @@ Pops up the menu or dropdown list of @combo_box.
 
 This function is mostly intended for use by accessibility technologies;
 applications should have little use for it.
+
+Before calling this, @combo_box must be mapped, or nothing will happen.
 
 Since: 2.4
 
@@ -38733,6 +38988,8 @@ set, GTK+ computes the focus chain based on the positions
 of the children. In that case, GTK+ stores %NULL in
 @focusable_widgets and returns %FALSE.
 
+Deprecated: 3.24: For overriding focus behavior, use the
+GtkWidgetClass::focus signal.
 
 </description>
 <parameters>
@@ -38752,6 +39009,7 @@ individual widgets in the focus chain.
 </parameters>
 <return> %TRUE if the focus chain of the container
 has been set explicitly.
+
 </return>
 </function>
 
@@ -38970,6 +39228,9 @@ to set the focus chain before you pack the widgets, or have a widget
 in the chain that isn’t always packed. The necessary checks are done
 when the focus chain is actually traversed.
 
+Deprecated: 3.24: For overriding focus behavior, use the
+GtkWidgetClass::focus signal.
+
 </description>
 <parameters>
 <parameter name="container">
@@ -39116,6 +39377,9 @@ used.
 <function name="gtk_container_unset_focus_chain">
 <description>
 Removes a focus chain explicitly set with gtk_container_set_focus_chain().
+
+Deprecated: 3.24: For overriding focus behavior, use the
+GtkWidgetClass::focus signal.
 
 </description>
 <parameters>
@@ -39620,12 +39884,14 @@ Creates a new CSS node.
 Returns the provider containing the style settings used as a
 fallback for all widgets.
 
+Deprecated: 3.24: Use gtk_css_provider_new() instead.
 
 </description>
 <parameters>
 </parameters>
 <return> The provider used for fallback styling.
 This memory is owned by GTK+, and you must not free it.
+
 </return>
 </function>
 
@@ -40285,6 +40551,7 @@ so the first button in the list will be the leftmost button in the dialog.
 
 Here’s a simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt;
+GtkWidget *main_app_window; // Window the dialog should show up on
 GtkWidget *dialog;
 GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
 dialog = gtk_dialog_new_with_buttons (&quot;My dialog&quot;,
@@ -40372,14 +40639,17 @@ destroying the dialog if you wish to do so.
 
 Typical usage of this function might be:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+GtkWidget *dialog = gtk_dialog_new ();
+// Set up dialog...
+
+int result = gtk_dialog_run (GTK_DIALOG (dialog));
 switch (result)
 {
 case GTK_RESPONSE_ACCEPT:
-do_application_specific_something ();
+// do_application_specific_something ();
 break;
 default:
-do_nothing_since_dialog_was_cancelled ();
+// do_nothing_since_dialog_was_cancelled ();
 break;
 }
 gtk_widget_destroy (dialog);
@@ -40702,6 +40972,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_image_targets">
 <description>
+Add the image targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_image_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40715,6 +40992,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_text_targets">
 <description>
+Add the text targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_text_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40728,6 +41012,13 @@ source can provide the data.
 
 <function name="gtk_drag_dest_add_uri_targets">
 <description>
+Add the URI targets supported by #GtkSelectionData to
+the target list of the drag destination. The targets
+are added with @info = 0. If you need another value,
+use gtk_target_list_add_uri_targets() and
+gtk_drag_dest_set_target_list().
+
+Since: 2.6
 
 </description>
 <parameters>
@@ -40741,6 +41032,14 @@ source can provide the data.
 
 <function name="gtk_drag_dest_find_target">
 <description>
+Looks for a match between the supported targets of @context and the
+@dest_target_list, returning the first matching target, otherwise
+returning %GDK_NONE. @dest_target_list should usually be the return
+value from gtk_drag_dest_get_target_list(), but some widgets may
+have different valid targets for different parts of the widget; in
+that case, they will have to implement a drag_motion handler that
+passes the correct target list to this function.
+
 
 </description>
 <parameters>
@@ -40758,12 +41057,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> first target that the source offers
+and the dest can accept, or %GDK_NONE
 </return>
 </function>
 
 <function name="gtk_drag_dest_get_target_list">
 <description>
+Returns the list of targets this widget can accept from
+drag-and-drop.
+
 
 </description>
 <parameters>
@@ -40772,11 +41075,16 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkTargetList, or %NULL if none
+</return>
 </function>
 
 <function name="gtk_drag_dest_get_track_motion">
 <description>
+Returns whether the widget has been configured to always
+emit #GtkWidget::drag-motion signals.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -40785,11 +41093,53 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the widget always emits
+#GtkWidget::drag-motion events
+
+</return>
 </function>
 
 <function name="gtk_drag_dest_set">
 <description>
+Sets a widget as a potential drop destination, and adds default behaviors.
+
+The default behaviors listed in @flags have an effect similar
+to installing default handlers for the widget’s drag-and-drop signals
+(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
+for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
+sufficient to connect to the widget’s #GtkWidget::drag-data-received
+signal to get primitive, but consistent drag-and-drop support.
+
+Things become more complicated when you try to preview the dragged data,
+as described in the documentation for #GtkWidget::drag-motion. The default
+behaviors described by @flags make some assumptions, that can conflict
+with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
+invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
+and invokations of gtk_drag_finish() in #GtkWidget::drag-data-received.
+Especially the later is dramatic, when your own #GtkWidget::drag-motion
+handler calls gtk_drag_get_data() to inspect the dragged data.
+
+There’s no way to set a default action here, you can use the
+#GtkWidget::drag-motion callback for that. Here’s an example which selects
+the action to use depending on whether the control key is pressed or not:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+drag_motion (GtkWidget *widget,
+GdkDragContext *context,
+gint x,
+gint y,
+guint time)
+{
+GdkModifierType mask;
+
+gdk_window_get_pointer (gtk_widget_get_window (widget),
+NULL, NULL, &amp;mask);
+if (mask &amp; GDK_CONTROL_MASK)
+gdk_drag_status (context, GDK_ACTION_COPY, time);
+else
+gdk_drag_status (context, GDK_ACTION_MOVE, time);
+}
+]|
 
 </description>
 <parameters>
@@ -40802,10 +41152,10 @@ gtk_drag_dest_get_target_list (@widget).
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description> a pointer to an array of #GtkTargetEntrys
-indicating the drop types that this @widget will accept, or %NULL.
-Later you can access the list with gtk_drag_dest_get_target_list()
-and gtk_drag_dest_find_target().
+<parameter_description> a pointer to an array of
+#GtkTargetEntrys indicating the drop types that this @widget will
+accept, or %NULL. Later you can access the list with
+gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
@@ -40822,6 +41172,9 @@ and gtk_drag_dest_find_target().
 
 <function name="gtk_drag_dest_set_proxy">
 <description>
+Sets this widget as a proxy for drops to another window.
+
+Deprecated: 3.22
 
 </description>
 <parameters>
@@ -40850,6 +41203,9 @@ subwindow.
 
 <function name="gtk_drag_dest_set_target_list">
 <description>
+Sets the target types that this widget can accept from drag-and-drop.
+The widget must first be made into a drag destination with
+gtk_drag_dest_set().
 
 </description>
 <parameters>
@@ -40867,6 +41223,14 @@ subwindow.
 
 <function name="gtk_drag_dest_set_track_motion">
 <description>
+Tells the widget to emit #GtkWidget::drag-motion and
+#GtkWidget::drag-leave events regardless of the targets and the
+%GTK_DEST_DEFAULT_MOTION flag.
+
+This may be used when a widget wants to do generic
+actions regardless of the targets that the source offers.
+
+Since: 2.10
 
 </description>
 <parameters>
@@ -40884,6 +41248,9 @@ subwindow.
 
 <function name="gtk_drag_dest_unset">
 <description>
+Clears information about a drop destination set with
+gtk_drag_dest_set(). The widget will no longer receive
+notification of drags.
 
 </description>
 <parameters>
@@ -42774,7 +43141,8 @@ This function is useful when drawing something to the
 entry in a draw callback.
 
 If the entry is not realized or has no icon at the given position,
-@icon_area is filled with zeros.
+@icon_area is filled with zeros. Otherwise, @icon_area will be filled
+with the icon’s allocation, relative to @entry’s allocation.
 
 See also gtk_entry_get_text_area()
 
@@ -43170,13 +43538,8 @@ indices in the layout to byte indices in the entry contents.
 Retrieves the maximum allowed length of the text in
 @entry. See gtk_entry_set_max_length().
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_max_length (buffer);
-]|
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_max_length() on it.
 
 
 </description>
@@ -43308,13 +43671,8 @@ Since: 3.10
 Retrieves the contents of the entry widget.
 See also gtk_editable_get_chars().
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_text (buffer);
-]|
+This is equivalent to getting @entry's #GtkEntryBuffer and calling
+gtk_entry_buffer_get_text() on it.
 
 
 </description>
@@ -43361,13 +43719,9 @@ Since: 3.0
 Retrieves the current length of the text in
 @entry. 
 
-This is equivalent to:
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_length() on it.
 
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_get_length (buffer);
-]|
 
 Since: 2.14
 
@@ -43472,10 +43826,9 @@ Since: 2.22
 
 <function name="gtk_entry_layout_index_to_text_index">
 <description>
-Converts from a position in the entry contents (returned
-by gtk_entry_get_text()) to a position in the
-entry’s #PangoLayout (returned by gtk_entry_get_layout(),
-with text retrieved via pango_layout_get_text()).
+Converts from a position in the entry’s #PangoLayout (returned by
+gtk_entry_get_layout()) to a position in the entry contents
+(returned by gtk_entry_get_text()).
 
 
 </description>
@@ -43965,6 +44318,12 @@ Use %NULL for @tooltip to remove an existing tooltip.
 See also gtk_widget_set_tooltip_text() and 
 gtk_entry_set_icon_tooltip_markup().
 
+If you unset the widget tooltip via gtk_widget_set_tooltip_text() or
+gtk_widget_set_tooltip_markup(), this sets GtkWidget:has-tooltip to %FALSE,
+which suppresses icon tooltips too. You can resolve this by then calling
+gtk_widget_set_has_tooltip() to set GtkWidget:has-tooltip back to %TRUE, or
+setting at least one non-empty tooltip on any icon achieves the same result.
+
 Since: 2.16
 
 </description>
@@ -44089,12 +44448,8 @@ Sets the maximum allowed length of the contents of the widget. If
 the current contents are longer than the given length, then they
 will be truncated to fit.
 
-This is equivalent to:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkEntryBuffer *buffer;
-buffer = gtk_entry_get_buffer (entry);
-gtk_entry_buffer_set_max_length (buffer, max);
+This is equivalent to getting @entry's #GtkEntryBuffer and
+calling gtk_entry_buffer_set_max_length() on it.
 ]|
 
 </description>
@@ -44321,9 +44676,10 @@ size reverts to the default entry size.
 
 <function name="gtk_entry_text_index_to_layout_index">
 <description>
-Converts from a position in the entry’s #PangoLayout (returned by
-gtk_entry_get_layout()) to a position in the entry contents
-(returned by gtk_entry_get_text()).
+Converts from a position in the entry contents (returned
+by gtk_entry_get_text()) to a position in the
+entry’s #PangoLayout (returned by gtk_entry_get_layout(),
+with text retrieved via pango_layout_get_text()).
 
 
 </description>
@@ -44579,6 +44935,43 @@ controller action
 </return>
 </function>
 
+<function name="gtk_event_controller_key_get_im_context">
+<description>
+Gets the IM context of a key controller.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> the IM context
+
+</return>
+</function>
+
+<function name="gtk_event_controller_motion_new">
+<description>
+Creates a new event controller that will handle motion events
+for the given @widget.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkEventControllerMotion
+
+</return>
+</function>
+
 <function name="gtk_event_controller_reset">
 <description>
 Resets the @controller to a clean state. Every interaction
@@ -44591,6 +44984,67 @@ Since: 3.14
 <parameters>
 <parameter name="controller">
 <parameter_description> a #GtkEventController
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_event_controller_scroll_get_flags">
+<description>
+Gets the flags conditioning the scroll controller behavior.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="scroll">
+<parameter_description> a #GtkEventControllerScroll
+</parameter_description>
+</parameter>
+</parameters>
+<return> the controller flags.
+
+</return>
+</function>
+
+<function name="gtk_event_controller_scroll_new">
+<description>
+Creates a new event controller that will handle scroll events
+for the given @widget.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> behavior flags
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkEventControllerScroll
+
+</return>
+</function>
+
+<function name="gtk_event_controller_scroll_set_flags">
+<description>
+Sets the flags conditioning scroll controller behavior.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="scroll">
+<parameter_description> a #GtkEventControllerScroll
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> behavior flags
 </parameter_description>
 </parameter>
 </parameters>
@@ -45581,7 +46035,7 @@ Since: 2.8
 
 <function name="gtk_file_chooser_get_extra_widget">
 <description>
-Gets the current preview widget; see
+Gets the current extra widget; see
 gtk_file_chooser_set_extra_widget().
 
 Since: 2.4
@@ -47484,6 +47938,34 @@ with the given index exists.
 </return>
 </function>
 
+<function name="gtk_flow_box_get_child_at_pos">
+<description>
+Gets the child in the (@x, @y) position.
+
+Since: 3.22.6
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #GtkFlowBox
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the child
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the child
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child widget, which will
+always be a #GtkFlowBoxChild or %NULL in case no child widget
+exists for the given x and y coordinates.
+
+</return>
+</function>
+
 <function name="gtk_flow_box_get_column_spacing">
 <description>
 Gets the horizontal spacing.
@@ -48102,6 +48584,7 @@ style, size, weight) just query these properties from the
 #PangoFontDescription object.
 
 Since: 2.4
+Deprecated: 3.22: Use gtk_font_chooser_get_font() instead
 
 </description>
 <parameters>
@@ -48242,6 +48725,7 @@ Since: 2.4
 Sets or updates the currently-displayed font in font picker dialog.
 
 Since: 2.4
+Deprecated: 3.22: Use gtk_font_chooser_set_font() instead
 
 </description>
 <parameters>
@@ -48484,6 +48968,24 @@ and must not be modified or freed.
 </return>
 </function>
 
+<function name="gtk_font_chooser_get_font_features">
+<description>
+Gets the currently-selected font features.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the currently selected font features
+
+</return>
+</function>
+
 <function name="gtk_font_chooser_get_font_map">
 <description>
 Gets the custom font map of this font chooser widget,
@@ -48518,6 +49020,42 @@ Since: 3.2
 </parameters>
 <return> A n integer representing the selected font size,
 or -1 if no font size is selected.
+
+</return>
+</function>
+
+<function name="gtk_font_chooser_get_language">
+<description>
+Gets the language that is used for font features.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the currently selected language
+
+</return>
+</function>
+
+<function name="gtk_font_chooser_get_level">
+<description>
+Returns the current level of granularity for selecting fonts.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current granularity level
 
 </return>
 </function>
@@ -48666,6 +49204,46 @@ Since: 3.18
 </parameter>
 <parameter name="fontmap">
 <parameter_description> a #PangoFontMap
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_font_chooser_set_language">
+<description>
+Sets the language to use for font features.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+<parameter name="language">
+<parameter_description> a language
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_font_chooser_set_level">
+<description>
+Sets the desired level of granularity for selecting fonts.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="fontchooser">
+<parameter_description> a #GtkFontChooser
+</parameter_description>
+</parameter>
+<parameter name="level">
+<parameter_description> the desired level of granularity
 </parameter_description>
 </parameter>
 </parameters>
@@ -49276,8 +49854,8 @@ If @label is %NULL, the label is omitted.
 
 <function name="gtk_frame_set_label">
 <description>
-Sets the text of the label. If @label is %NULL,
-the current label is removed.
+Removes the current #GtkFrame:label-widget. If @label is not %NULL, creates a
+new #GtkLabel with that text and adds it as the #GtkFrame:label-widget.
 
 </description>
 <parameters>
@@ -49323,9 +49901,8 @@ will be completely above or below the frame.
 
 <function name="gtk_frame_set_label_widget">
 <description>
-Sets the label widget for the frame. This is the widget that
-will appear embedded in the top edge of the frame as a
-title.
+Sets the #GtkFrame:label-widget for the frame. This is the widget that
+will appear embedded in the top edge of the frame as a title.
 
 </description>
 <parameters>
@@ -49343,7 +49920,10 @@ title.
 
 <function name="gtk_frame_set_shadow_type">
 <description>
-Sets the shadow type for @frame.
+Sets the #GtkFrame:shadow-type for @frame, i.e. whether it is drawn without
+(%GTK_SHADOW_NONE) or with (other values) a visible border. Values other than
+%GTK_SHADOW_NONE are treated identically by GtkFrame. The chosen type is
+applied by removing or adding the .flat class to the CSS node named border.
 
 </description>
 <parameters>
@@ -49714,11 +50294,11 @@ Since: 3.14
 </parameter_description>
 </parameter>
 <parameter name="sequence">
-<parameter_description> a #GdkEventSequence
+<parameter_description> a #GdkEventSequence or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @gesture is handling @sequence
+<return> %TRUE if @gesture is handling @sequence, %FALSE otherwise
 
 </return>
 </function>
@@ -49853,7 +50433,7 @@ Since: 3.14
 If @rect is non-%NULL, the press area will be checked to be
 confined within the rectangle, otherwise the button count
 will be reset so the press is seen as being the first one.
-If @rect is #NULL, the area will be reset to an unrestricted
+If @rect is %NULL, the area will be reset to an unrestricted
 state.
 
 Note: The rectangle is only used to determine whether any
@@ -49865,7 +50445,7 @@ Since: 3.14
 </description>
 <parameters>
 <parameter name="gesture">
-<parameter_description> a #GtkGesture
+<parameter_description> a #GtkGestureMultiPress
 </parameter_description>
 </parameter>
 <parameter name="rect">
@@ -50001,7 +50581,7 @@ first_gesture_begin_cb (GtkGesture       *first_gesture,
 GdkEventSequence *sequence,
 gpointer          user_data)
 {
-gtk_gesture_set_sequence_state (first_gesture, sequence, GTK_EVENT_SEQUENCE_ACCEPTED);
+gtk_gesture_set_sequence_state (first_gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
 gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
 }
 
@@ -50010,7 +50590,7 @@ second_gesture_begin_cb (GtkGesture       *second_gesture,
 GdkEventSequence *sequence,
 gpointer          user_data)
 {
-if (gtk_gesture_get_sequence_state (first_gesture, sequence) == GTK_EVENT_SEQUENCE_ACCEPTED)
+if (gtk_gesture_get_sequence_state (first_gesture, sequence) == GTK_EVENT_SEQUENCE_CLAIMED)
 gtk_gesture_set_sequence_state (second_gesture, sequence, GTK_EVENT_SEQUENCE_DENIED);
 }
 ]|
@@ -50249,6 +50829,103 @@ Since: 3.14
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_gesture_stylus_get_axes">
+<description>
+Returns the current values for the requested @axes. This function
+must be called from either the #GtkGestureStylus:down,
+#GtkGestureStylus:motion, #GtkGestureStylus:up or #GtkGestureStylus:proximity
+signals.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a GtkGestureStylus
+</parameter_description>
+</parameter>
+<parameter name="axes">
+<parameter_description> array of requested axes, terminated with #GDK_AXIS_IGNORE
+</parameter_description>
+</parameter>
+<parameter name="values">
+<parameter_description> return location for the axis values
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if there is a current value for the axes
+
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_get_axis">
+<description>
+Returns the current value for the requested @axis. This function
+must be called from either the #GtkGestureStylus:down,
+#GtkGestureStylus:motion, #GtkGestureStylus:up or #GtkGestureStylus:proximity
+signals.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a #GtkGestureStylus
+</parameter_description>
+</parameter>
+<parameter name="axis">
+<parameter_description> requested device axis
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> return location for the axis value
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if there is a current value for the axis
+
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_get_device_tool">
+<description>
+Returns the #GdkDeviceTool currently driving input through this gesture.
+This function must be called from either the #GtkGestureStylus::down,
+#GtkGestureStylus::motion, #GtkGestureStylus::up or #GtkGestureStylus::proximity
+signal handlers.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> a #GtkGestureStylus
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current stylus tool
+
+</return>
+</function>
+
+<function name="gtk_gesture_stylus_new">
+<description>
+Creates a new #GtkGestureStylus.
+
+Since: 3.24
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly created stylus gesture
+
+</return>
 </function>
 
 <function name="gtk_gesture_swipe_get_velocity">
@@ -50827,7 +51504,7 @@ Since: 3.16
 </description>
 <parameters>
 </parameters>
-<return> the newly created #GtkGLArea
+<return> a new #GtkGLArea
 
 </return>
 </function>
@@ -52222,7 +52899,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="setting">
-<parameter_description> %TRUE to show standard widow decorations
+<parameter_description> %TRUE to show standard window decorations
 </parameter_description>
 </parameter>
 </parameters>
@@ -57714,7 +58391,7 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -57937,7 +58614,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="icon_name">
-<parameter_description> an icon name
+<parameter_description> an icon name or %NULL
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -58045,7 +58722,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="surface">
-<parameter_description> a cairo_surface_t
+<parameter_description> a cairo_surface_t or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -58214,6 +58891,22 @@ Since: 2.18
 </return>
 </function>
 
+<function name="gtk_info_bar_get_revealed">
+<description>
+Since: 3.22.29
+
+</description>
+<parameters>
+<parameter name="info_bar">
+<parameter_description> a #GtkInfoBar
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current value of the GtkInfoBar:revealed property.
+
+</return>
+</function>
+
 <function name="gtk_info_bar_get_show_close_button">
 <description>
 Returns whether the widget will display a standard close button.
@@ -58366,6 +59059,30 @@ Since: 2.18
 <return></return>
 </function>
 
+<function name="gtk_info_bar_set_revealed">
+<description>
+Sets the GtkInfoBar:revealed property to @revealed. This will cause
+@info_bar to show up with a slide-in transition.
+
+Note that this property does not automatically show @info_bar and thus won’t
+have any effect if it is invisible.
+
+Since: 3.22.29
+
+</description>
+<parameters>
+<parameter name="info_bar">
+<parameter_description> a #GtkInfoBar
+</parameter_description>
+</parameter>
+<parameter name="revealed">
+<parameter_description> The new value of the property
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_info_bar_set_show_close_button">
 <description>
 If true, a standard close button is shown. When clicked it emits
@@ -58443,8 +59160,9 @@ understood by GTK+ are stripped before return.
 <function name="gtk_init_check">
 <description>
 This function does the same work as gtk_init() with only a single
-change: It does not terminate the program if the windowing system
-can’t be initialized. Instead it returns %FALSE on failure.
+change: It does not terminate the program if the commandline
+arguments couldn’t be parsed or the windowing system can’t be
+initialized. Instead it returns %FALSE on failure.
 
 This way the application can fall back to some other means of
 communication with the user - for example a curses or command line
@@ -58466,8 +59184,9 @@ understood by GTK+ are stripped before return.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the windowing system has been successfully
-initialized, %FALSE otherwise
+<return> %TRUE if the commandline arguments (if any) were valid and
+the windowing system has been successfully initialized, %FALSE
+otherwise
 </return>
 </function>
 
@@ -58517,8 +59236,9 @@ and the @parameter_string with gettext(), or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the windowing system has been successfully
-initialized, %FALSE otherwise
+<return> %TRUE if the commandline arguments (if any) were valid and
+if the windowing system has been successfully initialized,
+%FALSE otherwise
 
 </return>
 </function>
@@ -59410,6 +60130,8 @@ If the @str is external data, you may need to escape it with
 g_markup_escape_text() or g_markup_printf_escaped():
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
+GtkWidget *label = gtk_label_new (NULL);
+const char *str = &quot;some text&quot;;
 const char *format = &quot;&lt;span style=\&quot;italic\&quot;&gt;\%s&lt;/span&gt;&quot;;
 char *markup;
 
@@ -59511,7 +60233,7 @@ and toggle focus between the colliding widgets otherwise.
 </parameter_description>
 </parameter>
 <parameter name="widget">
-<parameter_description> the target #GtkWidget
+<parameter_description> the target #GtkWidget, or %NULL to unset
 </parameter_description>
 </parameter>
 </parameters>
@@ -61406,8 +62128,17 @@ Calling
 `gtk_list_store_insert_with_values (list_store, iter, position...)`
 has the same effect as calling
 |[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+insert_value (GtkListStore *list_store,
+GtkTreeIter  *iter,
+int           position)
+{
 gtk_list_store_insert (list_store, iter, position);
-gtk_list_store_set (list_store, iter, ...);
+gtk_list_store_set (list_store,
+iter
+// ...
+);
+}
 ]|
 with the difference that the former will only emit a row_inserted signal,
 while the latter will emit row_inserted, row_changed and, if the list store
@@ -62391,15 +63122,16 @@ Since: 3.6
 <function name="gtk_menu_button_set_menu_model">
 <description>
 Sets the #GMenuModel from which the popup will be constructed,
-or %NULL to disable the button.
+or %NULL to dissociate any existing menu model and disable the button.
 
 Depending on the value of #GtkMenuButton:use-popover, either a
 #GtkMenu will be created with gtk_menu_new_from_model(), or a
 #GtkPopover with gtk_popover_new_from_model(). In either case,
 actions will be connected as documented for these functions.
 
-If #GtkMenuButton:popup or #GtkMenuButton:popover are already set,
-their content will be lost and replaced by the newly created popup.
+If #GtkMenuButton:popup or #GtkMenuButton:popover are already set, those
+widgets are dissociated from the @menu_button, and those properties are set
+to %NULL.
 
 Since: 3.6
 
@@ -62410,7 +63142,8 @@ Since: 3.6
 </parameter_description>
 </parameter>
 <parameter name="menu_model">
-<parameter_description> a #GMenuModel
+<parameter_description> a #GMenuModel, or %NULL to unset and disable the
+button
 </parameter_description>
 </parameter>
 </parameters>
@@ -62419,9 +63152,11 @@ Since: 3.6
 
 <function name="gtk_menu_button_set_popover">
 <description>
-Sets the #GtkPopover that will be popped up when the button is
-clicked, or %NULL to disable the button. If #GtkMenuButton:menu-model
-or #GtkMenuButton:popup are set, they will be set to %NULL.
+Sets the #GtkPopover that will be popped up when the @menu_button is clicked,
+or %NULL to dissociate any existing popover and disable the button.
+
+If #GtkMenuButton:menu-model or #GtkMenuButton:popup are set, those objects
+are dissociated from the @menu_button, and those properties are set to %NULL.
 
 Since: 3.12
 
@@ -62432,7 +63167,7 @@ Since: 3.12
 </parameter_description>
 </parameter>
 <parameter name="popover">
-<parameter_description> a #GtkPopover
+<parameter_description> a #GtkPopover, or %NULL to unset and disable the button
 </parameter_description>
 </parameter>
 </parameters>
@@ -62441,9 +63176,11 @@ Since: 3.12
 
 <function name="gtk_menu_button_set_popup">
 <description>
-Sets the #GtkMenu that will be popped up when the button is clicked,
-or %NULL to disable the button. If #GtkMenuButton:menu-model or
-#GtkMenuButton:popover are set, they will be set to %NULL.
+Sets the #GtkMenu that will be popped up when the @menu_button is clicked, or
+%NULL to dissociate any existing menu and disable the button.
+
+If #GtkMenuButton:menu-model or #GtkMenuButton:popover are set, those objects
+are dissociated from the @menu_button, and those properties are set to %NULL.
 
 Since: 3.6
 
@@ -62454,7 +63191,7 @@ Since: 3.6
 </parameter_description>
 </parameter>
 <parameter name="menu">
-<parameter_description> a #GtkMenu
+<parameter_description> a #GtkMenu, or %NULL to unset and disable the button
 </parameter_description>
 </parameter>
 </parameters>
@@ -63097,6 +63834,26 @@ Since: 3.4
 </return>
 </function>
 
+<function name="gtk_menu_place_on_monitor">
+<description>
+Places @menu on the given monitor.
+
+Since: 3.22
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> a #GtkMenu
+</parameter_description>
+</parameter>
+<parameter name="monitor">
+<parameter_description> the monitor to place the menu on
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_menu_popdown">
 <description>
 Removes the menu from the screen.
@@ -63132,6 +63889,14 @@ properly, this needs to be the timestamp of the user event (such as
 a mouse click or key press) that caused the initiation of the popup.
 Only if no such event is available, gtk_get_current_event_time() can
 be used instead.
+
+Note that this function does not work very well on GDK backends that
+do not have global coordinates, such as Wayland or Mir. You should
+probably use one of the gtk_menu_popup_at_ variants, which do not
+have this problem.
+
+Deprecated: 3.22: Please use gtk_menu_popup_at_widget(),
+gtk_menu_popup_at_pointer(). or gtk_menu_popup_at_rect() instead
 
 </description>
 <parameters>
@@ -63186,7 +63951,6 @@ Properties that influence the behaviour of this function are
 out how it was actually positioned.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 <parameters>
@@ -63225,7 +63989,6 @@ Other properties that influence the behaviour of this function are
 #GtkMenu::popped-up signal to find out how it was actually positioned.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 <parameters>
@@ -63282,7 +64045,6 @@ Other properties that influence the behaviour of this function are
 #GtkMenu::popped-up signal to find out how it was actually positioned.
 
 Since: 3.22
-Stability: Unstable
 
 </description>
 <parameters>
@@ -63333,7 +64095,15 @@ a mouse click or key press) that caused the initiation of the popup.
 Only if no such event is available, gtk_get_current_event_time() can
 be used instead.
 
+Note that this function does not work very well on GDK backends that
+do not have global coordinates, such as Wayland or Mir. You should
+probably use one of the gtk_menu_popup_at_ variants, which do not
+have this problem.
+
 Since: 3.0
+
+Deprecated: 3.22: Please use gtk_menu_popup_at_widget(),
+gtk_menu_popup_at_pointer(). or gtk_menu_popup_at_rect() instead
 
 </description>
 <parameters>
@@ -63472,7 +64242,7 @@ it first with g_intern_static_string().
 </parameter_description>
 </parameter>
 <parameter name="accel_path">
-<parameter_description> a valid accelerator path
+<parameter_description> a valid accelerator path, or %NULL to unset the path
 </parameter_description>
 </parameter>
 </parameters>
@@ -63611,7 +64381,8 @@ Deprecated: 3.10
 </parameter_description>
 </parameter>
 <parameter name="title">
-<parameter_description> a string containing the title for the menu
+<parameter_description> a string containing the title for the menu, or %NULL to
+inherit the title of the parent menu item, if any
 </parameter_description>
 </parameter>
 </parameters>
@@ -65823,7 +66594,8 @@ GtkWidget **child;
 notebook = gtk_drag_get_source_widget (context);
 child = (void*) gtk_selection_data_get_data (data);
 
-process_widget (*child);
+// process_widget (*child);
+
 gtk_notebook_detach_tab (GTK_NOTEBOOK (notebook), *child);
 }
 ]|
@@ -66407,6 +67179,8 @@ added to @overlay.
 A widget’s index in the @overlay children list determines which order
 the children are drawn if they overlap. The first child is drawn at
 the bottom. It also affects the default focus chain order.
+
+Since: 3.18
 
 </description>
 <parameters>
@@ -68206,7 +68980,8 @@ Deprecated:3.0: Use gtk_render_slider() instead
 <description>
 Draws a spinner on @window using the given parameters.
 
-Deprecated:3.0: Use gtk_render_activity() instead
+Deprecated: 3.0: Use gtk_render_icon() and the #GtkStyleContext
+you are drawing instead
 
 </description>
 <parameters>
@@ -69234,7 +70009,7 @@ Since: 3.12
 
 <function name="gtk_places_sidebar_get_location">
 <description>
-Gets the currently-selected location in the @sidebar.  This can be #NULL when
+Gets the currently selected location in the @sidebar. This can be %NULL when
 nothing is selected, for example, when gtk_places_sidebar_set_location() has
 been called with a location that is not among the sidebar’s list of places to
 show.
@@ -69253,7 +70028,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> a GFile with the selected location, or
+<return> a #GFile with the selected location, or
 %NULL if nothing is visually selected.
 
 </return>
@@ -69390,6 +70165,24 @@ Since: 3.18
 </parameter>
 </parameters>
 <return> %TRUE if the sidebar will display a builtin shortcut for recent files
+
+</return>
+</function>
+
+<function name="gtk_places_sidebar_get_show_starred_location">
+<description>
+Returns the value previously set with gtk_places_sidebar_set_show_starred_location()
+
+Since: 3.22.26
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a places sidebar
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the sidebar will display a Starred item.
 
 </return>
 </function>
@@ -69546,7 +70339,7 @@ Since: 3.10
 </parameter_description>
 </parameter>
 <parameter name="location">
-<parameter_description> location to select, or #NULL for no current path
+<parameter_description> location to select, or %NULL for no current path
 </parameter_description>
 </parameter>
 </parameters>
@@ -69707,6 +70500,27 @@ Since: 3.18
 </parameter>
 <parameter name="show_recent">
 <parameter_description> whether to show an item for recent files
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_places_sidebar_set_show_starred_location">
+<description>
+If you enable this, you should connect to the
+#GtkPlacesSidebar::show-starred-location signal.
+
+Since: 3.22.26
+
+</description>
+<parameters>
+<parameter name="sidebar">
+<parameter_description> a places sidebar
+</parameter_description>
+</parameter>
+<parameter name="show_starred_location">
+<parameter_description> whether to show an item for Starred files
 </parameter_description>
 </parameter>
 </parameters>
@@ -75091,7 +75905,7 @@ Since: 3.0
 </parameter_description>
 </parameter>
 <parameter name="show_text">
-<parameter_description> whether to show superimposed text
+<parameter_description> whether to show text
 </parameter_description>
 </parameter>
 </parameters>
@@ -75570,9 +76384,9 @@ A common way to set up a group of radio buttons is the following:
 GtkRadioButton *radio_button;
 GtkRadioButton *last_button;
 
-while ( ...more buttons to add... )
+while (some_condition)
 {
-radio_button = gtk_radio_button_new (...);
+radio_button = gtk_radio_button_new (NULL);
 
 gtk_radio_button_join_group (radio_button, last_button);
 last_button = radio_button;
@@ -79789,6 +80603,9 @@ Typical rendering of a frame with a gap:
 
 Since: 3.0
 
+Deprecated: 3.24: Use gtk_render_frame() instead. Themes can create gaps
+by omitting borders via CSS.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -80218,7 +81035,7 @@ be freed with gtk_requisition_free().
 
 <function name="gtk_revealer_get_child_revealed">
 <description>
-Returns whether the child is fully revealed, ie wether
+Returns whether the child is fully revealed, in other words whether
 the transition to the revealed state is completed.
 
 Since: 3.10
@@ -80847,9 +81664,11 @@ Since: 3.0
 
 <function name="gtk_scale_set_digits">
 <description>
-Sets the number of decimal places that are displayed in the value.
-Also causes the value of the adjustment to be rounded off to this
-number of digits, so the retrieved value matches the value the user saw.
+Sets the number of decimal places that are displayed in the value. Also
+causes the value of the adjustment to be rounded to this number of digits,
+so the retrieved value matches the displayed one, if #GtkScale:draw-value is
+%TRUE when the value changes. If you want to enforce rounding the value when
+#GtkScale:draw-value is %FALSE, you can set #GtkRange:round-digits instead.
 
 Note that rounding to a small number of digits can interfere with
 the smooth autoscrolling that is built into #GtkScale. As an alternative,
@@ -80892,9 +81711,8 @@ to the slider.
 
 <function name="gtk_scale_set_has_origin">
 <description>
-If @has_origin is set to %TRUE (the default),
-the scale will highlight the part of the scale
-between the origin (bottom or left side) of the scale
+If #GtkScale:has-origin is set to %TRUE (the default), the scale will
+highlight the part of the trough between the origin (bottom or left side)
 and the current value.
 
 Since: 3.4
@@ -81382,7 +82200,7 @@ for the vertical scrollbar, or %NULL
 <function name="gtk_scrolled_window_get_propagate_natural_height">
 <description>
 Reports whether the natural height of the child will be calculated and propagated
-through the scrolled windows requested natural height.
+through the scrolled window’s requested natural height.
 
 Since: 3.22
 
@@ -81401,7 +82219,7 @@ Since: 3.22
 <function name="gtk_scrolled_window_get_propagate_natural_width">
 <description>
 Reports whether the natural width of the child will be calculated and propagated
-through the scrolled windows requested natural width.
+through the scrolled window’s requested natural width.
 
 Since: 3.22
 
@@ -81496,7 +82314,7 @@ will cause the scrolled window to create them for you.
 
 <function name="gtk_scrolled_window_set_capture_button_press">
 <description>
-Changes the behaviour of @scrolled_window wrt. to the initial
+Changes the behaviour of @scrolled_window with regard to the initial
 event that possibly starts kinetic scrolling. When @capture_button_press
 is set to %TRUE, the event is captured by the scrolled window, and
 then later replayed if it is meant to go to the child widget.
@@ -81567,7 +82385,7 @@ Since: 3.4
 <function name="gtk_scrolled_window_set_max_content_height">
 <description>
 Sets the maximum height that @scrolled_window should keep visible. The
-@scrolled_window will grow up to this width before it starts scrolling
+@scrolled_window will grow up to this height before it starts scrolling
 the content.
 
 It is a programming error to set the maximum content height to a value
@@ -81621,7 +82439,7 @@ Note that this can and (usually will) be smaller than the minimum
 size of the content.
 
 It is a programming error to set the minimum content height to a
-value smaller than #GtkScrolledWindow:max-content-height.
+value greater than #GtkScrolledWindow:max-content-height.
 
 Since: 3.0
 
@@ -81646,7 +82464,7 @@ Note that this can and (usually will) be smaller than the minimum
 size of the content.
 
 It is a programming error to set the minimum content width to a
-value smaller than #GtkScrolledWindow:max-content-width.
+value greater than #GtkScrolledWindow:max-content-width.
 
 Since: 3.0
 
@@ -81743,7 +82561,7 @@ than the trough — the display is larger than the page size).
 <function name="gtk_scrolled_window_set_propagate_natural_height">
 <description>
 Sets whether the natural height of the child should be calculated and propagated
-through the scrolled windows requested natural height.
+through the scrolled window’s requested natural height.
 
 Since: 3.22
 
@@ -81764,7 +82582,7 @@ Since: 3.22
 <function name="gtk_scrolled_window_set_propagate_natural_width">
 <description>
 Sets whether the natural width of the child should be calculated and propagated
-through the scrolled windows requested natural width.
+through the scrolled window’s requested natural width.
 
 Since: 3.22
 
@@ -81925,10 +82743,19 @@ GtkSearchBar *bar = GTK_SEARCH_BAR (user_data);
 return gtk_search_bar_handle_event (bar, event);
 }
 
+static void
+create_toplevel (void)
+{
+GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+GtkWindow *search_bar = gtk_search_bar_new ();
+
+// Add more widgets to the window...
+
 g_signal_connect (window,
 &quot;key-press-event&quot;,
 G_CALLBACK (on_key_press_event),
 search_bar);
+}
 ]|
 
 Since: 3.10
@@ -83117,18 +83944,13 @@ Since: 2.6
 
 <function name="gtk_show_uri">
 <description>
-This is a convenience function for launching the default application
-to show the uri. The uri must be of a form understood by GIO (i.e. you
-need to install gvfs to get support for uri schemes such as http://
-or ftp://, as only local files are handled by GIO itself).
-Typical examples are
-- `file:///home/gnome/pict.jpg`
-- `http://www.gnome.org`
-- `mailto:me@gnome.org`
+A convenience function for launching the default application
+to show the uri. Like gtk_show_uri_on_window(), but takes a screen
+as transient parent instead of a window.
 
-Ideally the timestamp is taken from the event triggering
-the gtk_show_uri() call. If timestamp is not known you can take
-%GDK_CURRENT_TIME.
+Note that this function is deprecated as it does not pass the necessary
+information for helpers to parent their dialog properly, when run from
+sandboxed applications for example.
 
 Since: 2.14
 
@@ -83159,9 +83981,21 @@ or %NULL for the default screen
 
 <function name="gtk_show_uri_on_window">
 <description>
-A convenience function for launching the default application
-to show the uri. Like gtk_show_uri(), but takes a window
-as transient parent instead of a screen.
+This is a convenience function for launching the default application
+to show the uri. The uri must be of a form understood by GIO (i.e. you
+need to install gvfs to get support for uri schemes such as http://
+or ftp://, as only local files are handled by GIO itself).
+Typical examples are
+- `file:///home/gnome/pict.jpg`
+- `http://www.gnome.org`
+- `mailto:me@gnome.org`
+
+Ideally the timestamp is taken from the event triggering
+the gtk_show_uri() call. If timestamp is not known you can take
+%GDK_CURRENT_TIME.
+
+This is the recommended call to be used as it passes information
+necessary for sandbox helpers to parent their dialogs properly.
 
 Since: 3.22
 
@@ -83593,8 +84427,7 @@ Called from the GtkSocket backend when the plug has been unmapped ???
 <function name="gtk_spin_button_configure">
 <description>
 Changes the properties of an existing spin button. The adjustment,
-climb rate, and number of decimal places are all changed accordingly,
-after this function call.
+climb rate, and number of decimal places are updated accordingly.
 
 </description>
 <parameters>
@@ -83603,7 +84436,8 @@ after this function call.
 </parameter_description>
 </parameter>
 <parameter name="adjustment">
-<parameter_description>  a #GtkAdjustment
+<parameter_description> a #GtkAdjustment to replace the spin button’s
+existing adjustment, or %NULL to leave its current adjustment unchanged
 </parameter_description>
 </parameter>
 <parameter name="climb_rate">
@@ -83810,8 +84644,8 @@ button should use, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="climb_rate">
-<parameter_description> specifies how much the spin button changes when an arrow
-is clicked on
+<parameter_description> specifies by how much the rate of change in the value will
+accelerate if you continue to hold down an up/down button or arrow key
 </parameter_description>
 </parameter>
 <parameter name="digits">
@@ -84743,7 +85577,10 @@ gtk_status_icon_is_embedded().
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as the platform is responsible for the
+presentation of notifications
 
 </description>
 <parameters>
@@ -84787,7 +85624,9 @@ If this function fails, @icon is left unchanged;
 
 Since: 2.14
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -84808,7 +85647,9 @@ See #GtkStatusIcon:has-tooltip for more information.
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -84832,7 +85673,9 @@ be freed or modified.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -84856,7 +85699,9 @@ returned pixbuf.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -84877,7 +85722,9 @@ Returns the #GdkScreen associated with @status_icon.
 
 Since: 2.12
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as notifications are managed by the platform
 
 </description>
 <parameters>
@@ -84904,7 +85751,10 @@ status icon is embedded (see gtk_status_icon_is_embedded()).
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as the representation of a notification
+is left to the platform
 
 </description>
 <parameters>
@@ -84951,7 +85801,10 @@ the return value will be %GTK_IMAGE_EMPTY.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, and #GNotification only supports #GIcon
+instances
 
 </description>
 <parameters>
@@ -84971,7 +85824,9 @@ Gets the title of this tray icon. See gtk_status_icon_set_title().
 
 Since: 2.18
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -84991,7 +85846,9 @@ Gets the contents of the tooltip for @status_icon.
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85012,7 +85869,9 @@ Gets the contents of the tooltip for @status_icon.
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85036,7 +85895,9 @@ gtk_status_icon_is_embedded().
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85053,6 +85914,7 @@ Deprecated: 3.14: Use notifications
 <function name="gtk_status_icon_get_x11_window_id">
 <description>
 This function is only useful on the X11/freedesktop.org platform.
+
 It returns a window ID for the widget in the underlying
 status icon implementation.  This is useful for the Galago 
 notification service, which can send a window ID in the protocol 
@@ -85065,7 +85927,9 @@ as gtk_status_icon_position_menu().
 
 Since: 2.14
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85087,7 +85951,9 @@ area.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85108,7 +85974,8 @@ Creates an empty status icon object.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85127,7 +85994,8 @@ space in the notification area, if necessary.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85148,7 +86016,8 @@ themed icon, it will be updated when the theme changes.
 
 Since: 2.14
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85170,7 +86039,8 @@ appropriately.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85193,7 +86063,8 @@ space in the notification area, if necessary.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85216,7 +86087,8 @@ gtk_icon_factory_add().
 
 Since: 2.10
 
-Deprecated: 3.10: Use gtk_status_icon_new_from_icon_name() instead.
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications
 
 </description>
 <parameters>
@@ -85237,7 +86109,9 @@ to position @menu aligned to the status icon @user_data.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; notifications do not have menus,
+but can have buttons, and actions associated with each button
 
 </description>
 <parameters>
@@ -85274,7 +86148,9 @@ See gtk_status_icon_new_from_file() for details.
 
 Since: 2.10 
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; you can use g_notification_set_icon()
+to associate a #GIcon with a notification
 
 </description>
 <parameters>
@@ -85297,7 +86173,9 @@ See gtk_status_icon_new_from_gicon() for details.
 
 Since: 2.14
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; you can use g_notification_set_icon()
+to associate a #GIcon with a notification
 
 </description>
 <parameters>
@@ -85321,7 +86199,9 @@ See gtk_status_icon_new_from_icon_name() for details.
 
 Since: 2.10 
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; you can use g_notification_set_icon()
+to associate a #GIcon with a notification
 
 </description>
 <parameters>
@@ -85344,7 +86224,9 @@ See gtk_status_icon_new_from_pixbuf() for details.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; you can use g_notification_set_icon()
+to associate a #GIcon with a notification
 
 </description>
 <parameters>
@@ -85390,7 +86272,10 @@ See #GtkStatusIcon:has-tooltip for more information.
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, but notifications can display an arbitrary
+amount of text using g_notification_set_body()
 
 </description>
 <parameters>
@@ -85415,7 +86300,10 @@ the user.
 
 Since: 2.20
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as notifications are associated with a
+unique application identifier by #GApplication
 
 </description>
 <parameters>
@@ -85439,7 +86327,10 @@ then remapped on the new screen.
 
 Since: 2.12
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as GTK typically only has one #GdkScreen
+and notifications are managed by the platform
 
 </description>
 <parameters>
@@ -85464,7 +86355,9 @@ readers to render the tray icon.
 
 Since: 2.18
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; you should use g_notification_set_title()
+and g_notification_set_body() to present text inside your notification
 
 </description>
 <parameters>
@@ -85493,7 +86386,9 @@ gtk_tooltip_set_markup().
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85522,7 +86417,9 @@ gtk_tooltip_set_text().
 
 Since: 2.16
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function
 
 </description>
 <parameters>
@@ -85544,7 +86441,9 @@ Shows or hides a status icon.
 
 Since: 2.10
 
-Deprecated: 3.14: Use notifications
+Deprecated: 3.14: Use #GNotification and #GtkApplication to
+provide status notifications; there is no direct replacement
+for this function, as notifications are managed by the platform
 
 </description>
 <parameters>
@@ -85975,13 +86874,13 @@ functions will make use of this new class for styling.
 In the CSS file format, a #GtkEntry defining a “search”
 class, would be matched by:
 
-|[
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
 entry.search { ... }
 ]|
 
 While any widget defining a “search” class would be
 matched by:
-|[
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
 .search { ... }
 ]|
 
@@ -86082,15 +86981,15 @@ functions will make use of this new region for styling.
 In the CSS file format, a #GtkTreeView defining a “row”
 region, would be matched by:
 
-|[
-GtkTreeView row { ... }
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
+treeview row { ... }
 ]|
 
 Pseudo-classes are used for matching @flags, so the two
 following rules:
-|[
-GtkTreeView row:nth-child(even) { ... }
-GtkTreeView row:nth-child(odd) { ... }
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
+treeview row:nth-child(even) { ... }
+treeview row:nth-child(odd) { ... }
 ]|
 
 would apply to even and odd rows, respectively.
@@ -86873,7 +87772,7 @@ Deprecated: 3.10: Use gtk_icon_theme_lookup_icon() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The looked  up %GtkIconSet, or %NULL
+<return> The looked up %GtkIconSet, or %NULL
 
 </return>
 </function>
@@ -86913,7 +87812,7 @@ affected by this state transition.
 
 As a practical example, a #GtkButton notifying a state transition on
 the prelight state:
-|[&lt;!-- language=&quot;C&quot; --&gt;
+|[ &lt;!-- language=&quot;C&quot; --&gt;
 gtk_style_context_notify_state_change (context,
 gtk_widget_get_window (widget),
 NULL,
@@ -86922,12 +87821,12 @@ button-&gt;in_button);
 ]|
 
 Can be handled in the CSS file like this:
-|[
-GtkButton {
+|[ &lt;!-- language=&quot;CSS&quot; --&gt;
+button {
 background-color: #f00
 }
 
-GtkButton:hover {
+button:hover {
 background-color: #fff;
 transition: 200ms linear
 }
@@ -87382,7 +88281,7 @@ Since: 3.10
 Attaches @context to the given screen.
 
 The screen is used to add style information from “global” style
-providers, such as the screens #GtkSettings instance.
+providers, such as the screen’s #GtkSettings instance.
 
 If you are using a #GtkStyleContext returned from
 gtk_widget_get_style_context(), you do not need to
@@ -91584,7 +92483,7 @@ Creates a new text buffer.
 
 <function name="gtk_text_buffer_paste_clipboard">
 <description>
-Pastes the contents of a clipboard. If @override_location is %NULL, the
+Pastes the contents of a clipboard. If @override_location is %NULL, the
 pasted text will be inserted at the cursor position, or the buffer selection
 will be replaced if the selection is non-empty.
 
@@ -94287,11 +95186,11 @@ direction of the paragraph are inserted.
 </parameter_description>
 </parameter>
 <parameter name="strong_pos">
-<parameter_description> location to store the strong cursor position (may be %NULL)
+<parameter_description> location to store the strong cursor position, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="weak_pos">
-<parameter_description> location to store the weak cursor position (may be %NULL)
+<parameter_description> location to store the weak cursor position, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -95195,7 +96094,7 @@ gtk_text_view_set_border_window_size()).
 </parameter_description>
 </parameter>
 <parameter name="win">
-<parameter_description> a #GtkTextWindowType except #GTK_TEXT_WINDOW_PRIVATE
+<parameter_description> a #GtkTextWindowType, except %GTK_TEXT_WINDOW_PRIVATE
 </parameter_description>
 </parameter>
 <parameter name="buffer_x">
@@ -95930,9 +96829,9 @@ realized.
 <function name="gtk_text_view_get_window_type">
 <description>
 Usually used to find out which window an event corresponds to.
+
 If you connect to an event signal on @text_view, this function
-should be called on `event-&gt;window` to
-see which window it was.
+should be called on `event-&gt;window` to see which window it was.
 
 
 </description>
@@ -95983,9 +96882,13 @@ static gboolean
 gtk_foo_bar_key_press_event (GtkWidget   *widget,
 GdkEventKey *event)
 {
-if ((key-&gt;keyval == GDK_KEY_Return || key-&gt;keyval == GDK_KEY_KP_Enter))
+guint keyval;
+
+gdk_event_get_keyval ((GdkEvent*)event, &amp;keyval);
+
+if (keyval == GDK_KEY_Return || keyval == GDK_KEY_KP_Enter)
 {
-if (gtk_text_view_im_context_filter_keypress (GTK_TEXT_VIEW (view), event))
+if (gtk_text_view_im_context_filter_keypress (GTK_TEXT_VIEW (widget), event))
 return TRUE;
 }
 
@@ -96330,9 +97233,9 @@ Sets the width of %GTK_TEXT_WINDOW_LEFT or %GTK_TEXT_WINDOW_RIGHT,
 or the height of %GTK_TEXT_WINDOW_TOP or %GTK_TEXT_WINDOW_BOTTOM.
 Automatically destroys the corresponding window if the size is set
 to 0, and creates the window if the size is set to non-zero.  This
-function can only be used for the “border windows,” it doesn’t work
-with #GTK_TEXT_WINDOW_WIDGET, #GTK_TEXT_WINDOW_TEXT, or
-#GTK_TEXT_WINDOW_PRIVATE.
+function can only be used for the “border windows”, and it won’t
+work with %GTK_TEXT_WINDOW_WIDGET, %GTK_TEXT_WINDOW_TEXT, or
+%GTK_TEXT_WINDOW_PRIVATE.
 
 </description>
 <parameters>
@@ -96764,7 +97667,7 @@ gtk_text_view_set_border_window_size()).
 </parameter_description>
 </parameter>
 <parameter name="win">
-<parameter_description> a #GtkTextWindowType except #GTK_TEXT_WINDOW_PRIVATE
+<parameter_description> a #GtkTextWindowType except %GTK_TEXT_WINDOW_PRIVATE
 </parameter_description>
 </parameter>
 <parameter name="window_x">
@@ -98950,6 +99853,8 @@ Sets the #GtkMenuItem used in the toolbar overflow menu. The
 @menu_item_id is used to identify the caller of this function and
 should also be used with gtk_tool_item_get_proxy_menu_item().
 
+See also #GtkToolItem::create-menu-proxy.
+
 Since: 2.4
 
 </description>
@@ -98963,7 +99868,7 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="menu_item">
-<parameter_description> a #GtkMenuItem to be used in the overflow menu
+<parameter_description> a #GtkMenuItem to use in the overflow menu, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -100015,10 +100920,12 @@ size of icons.
 
 <function name="gtk_toolbar_set_show_arrow">
 <description>
-Sets whether to show an overflow menu when
-@toolbar doesn’t have room for all items on it. If %TRUE,
-items that there are not room are available through an
-overflow menu.
+Sets whether to show an overflow menu when @toolbar isn’t allocated enough
+size to show all of its items. If %TRUE, items which can’t fit in @toolbar,
+and which have a proxy menu item set by gtk_tool_item_set_proxy_menu_item()
+or #GtkToolItem::create-menu-proxy, will be available in an overflow menu,
+which can be opened by an added arrow button. If %FALSE, @toolbar will
+request enough size to fit all of its child items without any overflow.
 
 Since: 2.4
 
@@ -104281,7 +105188,7 @@ gtk_tree_view_column_set_attributes() on the newly created #GtkTreeViewColumn.
 Here’s a simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt;
 enum { TEXT_COLUMN, COLOR_COLUMN, N_COLUMNS };
-...
+// ...
 {
 GtkTreeViewColumn *column;
 GtkCellRenderer   *renderer = gtk_cell_renderer_text_new ();
@@ -106122,19 +107029,23 @@ Since: 3.0
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pointer to a #GtkTreePath pointer to be filled in, or %NULL
+<parameter_description> A pointer to a #GtkTreePath pointer to
+be filled in, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="column">
-<parameter_description> A pointer to a #GtkTreeViewColumn pointer to be filled in, or %NULL
+<parameter_description> A pointer to a
+#GtkTreeViewColumn pointer to be filled in, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="cell_x">
-<parameter_description> A pointer where the X coordinate relative to the cell can be placed, or %NULL
+<parameter_description> A pointer where the X coordinate relative to the
+cell can be placed, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="cell_y">
-<parameter_description> A pointer where the Y coordinate relative to the cell can be placed, or %NULL
+<parameter_description> A pointer where the Y coordinate relative to the
+cell can be placed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -109858,7 +110769,7 @@ Since: 3.8
 </parameter>
 </parameters>
 <return> a #GdkFrameClock,
-or #NULL if widget is unrealized
+or %NULL if widget is unrealized
 
 </return>
 </function>
@@ -110260,7 +111171,7 @@ Returns the parent container of @widget.
 
 <function name="gtk_widget_get_parent_window">
 <description>
-Gets @widget’s parent window.
+Gets @widget’s parent window, or %NULL if it does not have one.
 
 
 </description>
@@ -110270,7 +111181,8 @@ Gets @widget’s parent window.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the parent window of @widget.
+<return> the parent window of @widget, or %NULL
+if it does not have a parent window.
 </return>
 </function>
 
@@ -110981,13 +111893,20 @@ seem unlikely, it actually happens when a #GtkPlug is embedded
 inside a #GtkSocket within the same application.
 
 To reliably find the toplevel #GtkWindow, use
-gtk_widget_get_toplevel() and call gtk_widget_is_toplevel()
-on the result.
+gtk_widget_get_toplevel() and call GTK_IS_WINDOW()
+on the result. For instance, to get the title of a widget's toplevel
+window, one might use:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-GtkWidget *toplevel = gtk_widget_get_toplevel (widget);
-if (gtk_widget_is_toplevel (toplevel))
+static const char *
+get_widget_toplevel_title (GtkWidget *widget)
 {
-// Perform action on toplevel.
+GtkWidget *toplevel = gtk_widget_get_toplevel (widget);
+if (GTK_IS_WINDOW (toplevel))
+{
+return gtk_window_get_title (GTK_WINDOW (toplevel));
+}
+
+return NULL;
 }
 ]|
 
@@ -111474,7 +112393,8 @@ interested in whether there was an intersection.
 </parameter_description>
 </parameter>
 <parameter name="intersection">
-<parameter_description> rectangle to store intersection of @widget and @area
+<parameter_description> rectangle to store
+intersection of @widget and @area
 </parameter_description>
 </parameter>
 </parameters>
@@ -111515,6 +112435,8 @@ in the future if used on a widget that has a composited
 window in its hierarchy (as set by gdk_window_set_composited()).
 
 Since: 2.10
+
+Deprecated: 3.22: Use gdk_screen_is_composited() instead.
 
 </description>
 <parameters>
@@ -111647,9 +112569,9 @@ When %FALSE is returned, the caller should continue with keyboard
 navigation outside the widget, e.g. by calling
 gtk_widget_child_focus() on the widget’s toplevel.
 
-The default ::keynav-failed handler returns %TRUE for
+The default ::keynav-failed handler returns %FALSE for
 %GTK_DIR_TAB_FORWARD and %GTK_DIR_TAB_BACKWARD. For the other
-values of #GtkDirectionType it returns %FALSE.
+values of #GtkDirectionType it returns %TRUE.
 
 Whenever the default handler returns %TRUE, it also calls
 gtk_widget_error_bell() to notify the user of the failed keyboard
@@ -111770,10 +112692,6 @@ a widget to be mapped if it isn’t already.
 <description>
 Emits the #GtkWidget::mnemonic-activate signal.
 
-The default handler for this signal activates the @widget if
-@group_cycling is %FALSE, and just grabs the focus if @group_cycling
-is %TRUE.
-
 
 </description>
 <parameters>
@@ -111782,7 +112700,7 @@ is %TRUE.
 </parameter_description>
 </parameter>
 <parameter name="group_cycling">
-<parameter_description>  %TRUE if there are other widgets with the same mnemonic
+<parameter_description> %TRUE if there are other widgets with the same mnemonic
 </parameter_description>
 </parameter>
 </parameters>
@@ -114432,7 +115350,7 @@ for completeness and consistency.
 
 <function name="gtk_widget_set_mapped">
 <description>
-Marks the widget as being realized.
+Marks the widget as being mapped.
 
 This function should only ever be called in a derived widget's
 “map” or “unmap” implementation.
@@ -115027,14 +115945,11 @@ Since: 2.12
 
 <function name="gtk_widget_set_tooltip_window">
 <description>
-Replaces the default, usually yellow, window used for displaying
+Replaces the default window used for displaying
 tooltips with @custom_window. GTK+ will take care of showing and
 hiding @custom_window at the right moment, to behave likewise as
 the default tooltip window. If @custom_window is %NULL, the default
 tooltip window will be used.
-
-If the custom window should have the default theming it needs to
-have the name “gtk-tooltip”, see gtk_widget_set_name().
 
 Since: 2.12
 
@@ -116239,7 +117154,7 @@ the icon list).
 </parameter_description>
 </parameter>
 </parameters>
-<return> icon for window
+<return> icon for window or %NULL if none
 </return>
 </function>
 
@@ -116494,59 +117409,78 @@ Since: 2.2
 
 <function name="gtk_window_get_size">
 <description>
-Obtains the current size of @window. If @window is not onscreen,
-it returns the size GTK+ will suggest to the
-[window manager][gtk-X11-arch]
-for the initial window
-size (but this is not reliably the same as the size the window
-manager will actually select). The size obtained by
-gtk_window_get_size() is the last size received in a
-#GdkEventConfigure, that is, GTK+ uses its locally-stored size,
-rather than querying the X server for the size. As a result, if you
-call gtk_window_resize() then immediately call
-gtk_window_get_size(), the size won’t have taken effect yet. After
-the window manager processes the resize request, GTK+ receives
-notification that the size has changed via a configure event, and
-the size of the window gets updated.
+Obtains the current size of @window.
 
-Note 1: Nearly any use of this function creates a race condition,
-because the size of the window may change between the time that you
-get the size and the time that you perform some action assuming
-that size is the current size. To avoid race conditions, connect to
-“configure-event” on the window and adjust your size-dependent
-state to match the size delivered in the #GdkEventConfigure.
+If @window is not visible on screen, this function return the size GTK+
+will suggest to the [window manager][gtk-X11-arch] for the initial window
+size (but this is not reliably the same as the size the window manager
+will actually select). See: gtk_window_set_default_size().
 
-Note 2: The returned size does not include the
-size of the window manager decorations (aka the window frame or
-border). Those are not drawn by GTK+ and GTK+ has no reliable
-method of determining their size.
+Depending on the windowing system and the window manager constraints,
+the size returned by this function may not match the size set using
+gtk_window_resize(); additionally, since gtk_window_resize() may be
+implemented as an asynchronous operation, GTK+ cannot guarantee in any
+way that this code:
 
-Note 3: If you are getting a window size in order to position
-the window onscreen, there may be a better way. The preferred
-way is to simply set the window’s semantic type with
-gtk_window_set_type_hint(), which allows the window manager to
-e.g. center dialogs. Also, if you set the transient parent of
-dialogs with gtk_window_set_transient_for() window managers
-will often center the dialog over its parent window. It's
-much preferred to let the window manager handle these
-things rather than doing it yourself, because all apps will
-behave consistently and according to user prefs if the window
-manager handles it. Also, the window manager can take the size
-of the window decorations/border into account, while your
-application cannot.
+|[&lt;!-- language=&quot;C&quot; --&gt;
+// width and height are set elsewhere
+gtk_window_resize (window, width, height);
 
-Note 4: When using client side decorations, GTK+ will do its best to
-adjust the returned values to match the logical size of the window
-excluding the widgets added for client side decorations, but there
-is no garantee that the result will be totally accurate because
-these widgets depend on the theme and may not be realized or
-visible at the time gtk_window_get_size() is invoked.
+int new_width, new_height;
+gtk_window_get_size (window, &amp;new_width, &amp;new_height);
+]|
 
-In any case, if you insist on application-specified window
-positioning, there’s still a better way than
-doing it yourself - gtk_window_set_position() will frequently
-handle the details for you.
+will result in `new_width` and `new_height` matching `width` and
+`height`, respectively.
 
+This function will return the logical size of the #GtkWindow,
+excluding the widgets used in client side decorations; there is,
+however, no guarantee that the result will be completely accurate
+because client side decoration may include widgets that depend on
+the user preferences and that may not be visibile at the time you
+call this function.
+
+The dimensions returned by this function are suitable for being
+stored across sessions; use gtk_window_set_default_size() to
+restore them when before showing the window.
+
+To avoid potential race conditions, you should only call this
+function in response to a size change notification, for instance
+inside a handler for the #GtkWidget::size-allocate signal, or
+inside a handler for the #GtkWidget::configure-event signal:
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+on_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
+{
+int new_width, new_height;
+
+gtk_window_get_size (GTK_WINDOW (widget), &amp;new_width, &amp;new_height);
+
+...
+}
+]|
+
+Note that, if you connect to the #GtkWidget::size-allocate signal,
+you should not use the dimensions of the #GtkAllocation passed to
+the signal handler, as the allocation may contain client side
+decorations added by GTK+, depending on the windowing system in
+use.
+
+If you are getting a window size in order to position the window
+on the screen, you should, instead, simply set the window’s semantic
+type with gtk_window_set_type_hint(), which allows the window manager
+to e.g. center dialogs. Also, if you set the transient parent of
+dialogs with gtk_window_set_transient_for() window managers will
+often center the dialog over its parent window. It's much preferred
+to let the window manager handle these cases rather than doing it
+yourself, because all apps will behave consistently and according to
+user or system preferences, if the window manager handles it. Also,
+the window manager can take into account the size of the window
+decorations and border that it may add, and of which GTK+ has no
+knowledge. Additionally, positioning windows in global screen coordinates
+may not be allowed by the windowing system. For more information,
+see: gtk_window_set_position().
 
 </description>
 <parameters>
@@ -117338,16 +118272,17 @@ Windows may not be resized smaller than 1 by 1 pixels.
 When using client side decorations, GTK+ will do its best to adjust
 the given size so that the resulting window size matches the
 requested size without the title bar, borders and shadows added for
-the client side decorations, but there is no garantee that the
+the client side decorations, but there is no guarantee that the
 result will be totally accurate because these widgets added for
 client side decorations depend on the theme and may not be realized
 or visible at the time gtk_window_resize() is issued.
 
-Typically, gtk_window_resize() will compensate for the GtkHeaderBar
-height only if it's known at the time the resulting GtkWindow
-configuration is issued.
+If the GtkWindow has a titlebar widget (see gtk_window_set_titlebar()), then
+typically, gtk_window_resize() will compensate for the height of the titlebar
+widget only if the height is known when the resulting GtkWindow configuration
+is issued.
 For example, if new widgets are added after the GtkWindow configuration
-and cause the GtkHeaderBar to grow in height, this will result in a
+and cause the titlebar widget to grow in height, this will result in a
 window content smaller that specified by gtk_window_resize() and not
 a larger window.
 
@@ -117444,8 +118379,16 @@ Since: 2.4
 <description>
 Sets or unsets the #GtkApplication associated with the window.
 
-The application will be kept alive for at least as long as the window
-is open.
+The application will be kept alive for at least as long as it has any windows
+associated with it (see g_application_hold() for a way to keep it alive
+without windows).
+
+Normally, the connection between the application and the window will remain
+until the window is destroyed, but you can explicitly remove it by setting
+the @application to %NULL.
+
+This is equivalent to calling gtk_application_remove_window() and/or
+gtk_application_add_window() on the old/new applications as relevant.
 
 Since: 3.0
 
@@ -117456,7 +118399,7 @@ Since: 3.0
 </parameter_description>
 </parameter>
 <parameter name="application">
-<parameter_description> a #GtkApplication, or %NULL
+<parameter_description> a #GtkApplication, or %NULL to unset
 </parameter_description>
 </parameter>
 </parameters>
@@ -118505,6 +119448,9 @@ document filename, for example.
 <description>
 Sets a custom titlebar for @window.
 
+A typical widget used here is #GtkHeaderBar, as it provides various features
+expected of a titlebar while allowing the addition of child widgets to it.
+
 If you set a custom titlebar, GTK+ will do its best to convince
 the window manager not to put its own titlebar on the window.
 Depending on the system, this function may not work for a window
@@ -118620,6 +119566,7 @@ gtk_window_set_role() on each window in your application, for the
 benefit of the session manager. Setting the role allows the window
 manager to restore window positions when loading a saved session.
 
+Deprecated: 3.22
 
 </description>
 <parameters>
