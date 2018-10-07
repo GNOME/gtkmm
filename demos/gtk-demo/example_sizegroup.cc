@@ -131,7 +131,7 @@ void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
                                 const Glib::ustring& label_text,
                                 const std::list<Glib::ustring>& options)
 {
-  auto pLabel = Gtk::manage(new Gtk::Label(label_text, Gtk::Align::START, Gtk::Align::END, true));
+  auto pLabel = Gtk::make_managed<Gtk::Label>(label_text, Gtk::Align::START, Gtk::Align::END, true);
 
   grid.attach(*pLabel, 0, row, 1, 1);
   pLabel->set_hexpand();
@@ -147,7 +147,7 @@ void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
  */
 Gtk::ComboBoxText* Example_SizeGroup::create_combobox(const std::list<Glib::ustring>& strings)
 {
-  auto pCombo = Gtk::manage( new Gtk::ComboBoxText() );
+  auto pCombo = Gtk::make_managed<Gtk::ComboBoxText>();
 
   for(const auto& str : strings)
   {
