@@ -62,7 +62,7 @@ Example_Panes::Example_Panes()
   pHPaned->add1(*Gtk::manage(pFrame1));
   pFrame1->set_shadow_type(Gtk::ShadowType::IN);
   pFrame1->set_size_request(60, 60);
-  pFrame1->add(*Gtk::manage(new Gtk::Button("_Hi there", true)));
+  pFrame1->add(*Gtk::make_managed<Gtk::Button>("_Hi there", true));
 
   Gtk::Frame *const pFrame2 = new Gtk::Frame();
   pHPaned->add2(*Gtk::manage(pFrame2));
@@ -75,8 +75,8 @@ Example_Panes::Example_Panes()
   pFrame3->set_size_request(60, 80);
 
   // Now create check buttons to control sizing
-  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pHPaned, "Horizontal", "Left", "Right")), Gtk::PackOptions::SHRINK);
-  pVBox->pack_start(*Gtk::manage(new PaneOptions(*pVPaned, "Vertical", "Top", "Bottom")),   Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(*Gtk::make_managed<PaneOptions>(*pHPaned, "Horizontal", "Left", "Right"), Gtk::PackOptions::SHRINK);
+  pVBox->pack_start(*Gtk::make_managed<PaneOptions>(*pVPaned, "Vertical", "Top", "Bottom"),   Gtk::PackOptions::SHRINK);
 }
 
 Example_Panes::~Example_Panes()
@@ -97,8 +97,8 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
   pGrid->property_margin() = 4;
   add(*Gtk::manage(pGrid));
 
-  pGrid->attach(*Gtk::manage(new Gtk::Label(label1)), 0, 0, 1, 1);
-  pGrid->attach(*Gtk::manage(new Gtk::Label(label2)), 1, 0, 1, 1);
+  pGrid->attach(*Gtk::make_managed<Gtk::Label>(label1), 0, 0, 1, 1);
+  pGrid->attach(*Gtk::make_managed<Gtk::Label>(label2), 1, 0, 1, 1);
 
   pGrid->attach(m_CheckButton_resize1, 0, 1, 1, 1);
   pGrid->attach(m_CheckButton_shrink1, 0, 2, 1, 1);

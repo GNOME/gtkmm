@@ -834,7 +834,7 @@ void Example_IconBrowser::populate()
 void Example_IconBrowser::add_context(const Glib::ustring& id,
   const Glib::ustring& name, const Glib::ustring& description)
 {
-  IconContextLabel* row = Gtk::manage(new IconContextLabel(id, name));
+  IconContextLabel* row = Gtk::make_managed<IconContextLabel>(id, name);
   row->show();
   row->property_margin() = 10;
   m_context_list.append(*row);
