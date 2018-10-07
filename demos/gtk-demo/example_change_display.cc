@@ -147,11 +147,11 @@ Example_ChangeDisplay::~Example_ChangeDisplay()
 
 void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treeview, Gtk::Box& buttonbox)
 {
-  Gtk::Box* pHBox = Gtk::manage( new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL, 8) );
+  Gtk::Box* pHBox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, 8);
   pHBox->set_border_width(8);
   frame.add(*pHBox);
 
-  Gtk::ScrolledWindow* pScrolledWindow = Gtk::manage( new Gtk::ScrolledWindow() );
+  Gtk::ScrolledWindow* pScrolledWindow = Gtk::make_managed<Gtk::ScrolledWindow>();
   pScrolledWindow->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
   pScrolledWindow->set_shadow_type(Gtk::SHADOW_IN);
   pHBox->pack_start(*pScrolledWindow);
