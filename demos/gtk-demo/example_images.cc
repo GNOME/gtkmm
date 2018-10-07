@@ -77,7 +77,7 @@ Example_Images::Example_Images()
 
   /* Image */
 
-  auto pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  auto pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
   m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
 
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
@@ -88,7 +88,7 @@ Example_Images::Example_Images()
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
   pVBox->pack_start(m_Frame_Image, Gtk::PackOptions::SHRINK);
 
-  auto pImage = Gtk::manage(new Gtk::Image());
+  auto pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_icon_name("gtk3-demo");
   pImage->set_icon_size(Gtk::IconSize::LARGE);
   m_Frame_Image.add(*pImage);
@@ -103,7 +103,7 @@ Example_Images::Example_Images()
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
   pVBox->pack_start(m_Frame_Animation, Gtk::PackOptions::SHRINK);
 
-  auto pPicture = Gtk::manage(new Gtk::Picture());
+  auto pPicture = Gtk::make_managed<Gtk::Picture>();
   pPicture->set_resource("/images/floppybuddy.gif");
   m_Frame_Animation.add(*pPicture);
 
@@ -118,13 +118,13 @@ Example_Images::Example_Images()
   pVBox->pack_start(m_Frame_ThemedIcon, Gtk::PackOptions::SHRINK);
 
   auto icon = Gio::ThemedIcon::create("battery-caution-charging-symbolic", true);
-  pImage = Gtk::manage(new Gtk::Image(icon));
+  pImage = Gtk::make_managed<Gtk::Image>(icon);
   pImage->set_icon_size(Gtk::IconSize::LARGE);
   m_Frame_ThemedIcon.add(*pImage);
 
   /* Progressive */
 
-  pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
   m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
 
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
@@ -152,20 +152,20 @@ Example_Images::Example_Images()
   m_Frame_Video.set_valign(Gtk::Align::CENTER);
   pVBox->pack_start(m_Frame_Video, Gtk::PackOptions::SHRINK);
 
-  auto video = Gtk::manage(new Gtk::Video());
+  auto video = Gtk::make_managed<Gtk::Video>();
   video->set_resource("/images/gtk-logo.webm");
   video->get_media_stream()->set_loop();
   m_Frame_Video.add(*video);
 
   /* Widget paintable */
 
-  pVBox = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 8));
+  pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
   m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
 
   m_Label_Paintable.set_markup("<u>Gtk::WidgetPaintable</u>");
   pVBox->pack_start(m_Label_Paintable, Gtk::PackOptions::SHRINK);
 
-  pPicture = Gtk::manage(new Gtk::Picture());
+  pPicture = Gtk::make_managed<Gtk::Picture>();
   auto demo_window = DemoWindow::get_demo_window();
   if (demo_window)
   {

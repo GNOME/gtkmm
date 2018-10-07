@@ -81,7 +81,7 @@ Example_Dialog::Example_Dialog()
   m_VBox.pack_start(m_HBox, Gtk::PackOptions::SHRINK);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
   m_HBox.pack_start(m_Button_Message, Gtk::PackOptions::SHRINK);
-  m_VBox.pack_start(*(Gtk::manage(new Gtk::Separator(Gtk::Orientation::HORIZONTAL))), Gtk::PackOptions::SHRINK);
+  m_VBox.pack_start(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL), Gtk::PackOptions::SHRINK);
 
 
   /* Interactive dialog*/

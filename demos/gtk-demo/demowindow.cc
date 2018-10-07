@@ -154,7 +154,7 @@ void DemoWindow::fill_tree()
     }
   }
 
-  auto pCell = Gtk::manage(new Gtk::CellRendererText());
+  auto pCell = Gtk::make_managed<Gtk::CellRendererText>();
   pCell->property_style() = Pango::Style::ITALIC;
 
   auto pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);

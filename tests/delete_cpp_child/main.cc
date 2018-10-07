@@ -19,15 +19,13 @@ private:
 AppWindow::AppWindow()
     : m_label (nullptr)
 {
-    Gtk::Box* vbox = Gtk::manage(new Gtk::Box (Gtk::Orientation::VERTICAL, 5));
+    auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 5);
     add(*vbox);
 
-    Gtk::Button* button = Gtk::manage(new Gtk::Button("Delete Label"));
-
+    auto button = Gtk::make_managed<Gtk::Button>("Delete Label");
     vbox->pack_start(*button, Gtk::PackOptions::SHRINK);
 
-
-    //m_label = manage (new Gtk::Label ("test"));
+    //m_label = Gtk::make_managed<Gtk::Label>("test");
     m_label = new Gtk::Label("test");
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
     vbox->pack_start(*m_label, Gtk::PackOptions::SHRINK);
