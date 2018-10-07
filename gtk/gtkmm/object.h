@@ -22,6 +22,8 @@
 #include <gtkmm/base.h>
 #include <gtkmmconfig.h>
 
+#include <utility>
+
 namespace Gtk
 {
 
@@ -42,6 +44,25 @@ T* manage(T* obj)
 {
   obj->set_manage();
   return obj;
+}
+
+/** Create a Gtk::Object such as a widget and Gtk::manage() it in a single step.
+ * This matches standard functions like std::make_unique<T>(args) and avoids you
+ * manually invoking the new operator, which is discouraged in modern C++ style.
+ *
+ * For instance,
+ * @code
+ * Gtk::Button* button = Gtk::make_managed<Gtk::Button>("Hello");
+ * vbox.pack_start(*button); //vbox will delete button when vbox is deleted.
+ * @endcode
+ *
+ * @param args Arguments to pass to the constructor of the given template type.
+ * @result A new, managed object of that type, constructed with those arguments.
+ */
+template<class T, class... T_Args>
+T* make_managed(T_Args&&... args)
+{
+  return manage(new T(std::forward<T_Args>(args)...));
 }
 
 /** Gtk::Object is the base class for all widgets, and for a few non-widget objects such as

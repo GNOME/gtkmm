@@ -71,8 +71,8 @@ Example_FlowBox::~Example_FlowBox()
 
 Gtk::Button* Example_FlowBox::create_color_swatch(int swatch_i)
 {
-  Gtk::DrawingArea* drawing_area = Gtk::manage(new Gtk::DrawingArea());
-  Gtk::Button* color_swatch = Gtk::manage(new Gtk::Button());
+  Gtk::DrawingArea* drawing_area = Gtk::make_managed<Gtk::DrawingArea>();
+  Gtk::Button* color_swatch = Gtk::make_managed<Gtk::Button>();
 
   drawing_area->set_size_request(24, 24);
 

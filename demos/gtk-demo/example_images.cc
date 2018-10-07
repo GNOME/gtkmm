@@ -66,7 +66,7 @@ Example_Images::Example_Images()
   m_Frame_Image.set_valign(Gtk::ALIGN_CENTER);
   m_VBox.pack_start(m_Frame_Image, Gtk::PACK_SHRINK);
 
-  Gtk::Image* pImage = Gtk::manage(new Gtk::Image());
+  Gtk::Image* pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_resource("/images/gtk-logo-rgb.gif");
   m_Frame_Image.add(*pImage);
 
@@ -81,7 +81,7 @@ Example_Images::Example_Images()
   m_Frame_Animation.set_valign(Gtk::ALIGN_CENTER);
   m_VBox.pack_start(m_Frame_Animation, Gtk::PACK_SHRINK);
 
-  pImage = Gtk::manage(new Gtk::Image());
+  pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_resource("/images/floppybuddy.gif");
   m_Frame_Animation.add(*pImage);
 

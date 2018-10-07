@@ -69,13 +69,13 @@ Example_ButtonBox::~Example_ButtonBox()
 
 Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::ustring& title, gint  spacing, Gtk::ButtonBoxStyle layout)
 {
-  Gtk::Frame* pFrame = Gtk::manage(new Gtk::Frame(title));
+  Gtk::Frame* pFrame = Gtk::make_managed<Gtk::Frame>(title);
 
   Gtk::ButtonBox* pButtonBox = nullptr;
   if (horizontal)
-    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_HORIZONTAL));
+    pButtonBox = Gtk::make_managed<Gtk::ButtonBox>(Gtk::ORIENTATION_HORIZONTAL);
   else
-    pButtonBox = Gtk::manage(new Gtk::ButtonBox(Gtk::ORIENTATION_VERTICAL));
+    pButtonBox = Gtk::make_managed<Gtk::ButtonBox>(Gtk::ORIENTATION_VERTICAL);
 
   pButtonBox->set_border_width(5);
   pFrame->add(*pButtonBox);
@@ -83,14 +83,14 @@ Gtk::Frame* Example_ButtonBox::create_button_box(bool horizontal, const Glib::us
   pButtonBox->set_layout(layout);
   pButtonBox->set_spacing(spacing);
 
-  Gtk::Button* pButton = Gtk::manage(new Gtk::Button("_OK", true));
+  Gtk::Button* pButton = Gtk::make_managed<Gtk::Button>("_OK", true);
   pButtonBox->add(*pButton);
 
-  pButton = Gtk::manage(new Gtk::Button("_Cancel", true));
+  pButton = Gtk::make_managed<Gtk::Button>("_Cancel", true);
   pButtonBox->add(*pButton);
 
-  pButton = Gtk::manage(new Gtk::Button());
-  Gtk::Image* pImage = Gtk::manage(new Gtk::Image());
+  pButton = Gtk::make_managed<Gtk::Button>();
+  Gtk::Image* pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_icon_name("help-browser", Gtk::ICON_SIZE_BUTTON);
   pButton->add(*pImage);
   pButtonBox->add(*pButton);
