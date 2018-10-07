@@ -77,7 +77,7 @@ Example_TextView::Example_TextView()
    * a view widget.
    */
   Glib::RefPtr<Gtk::TextBuffer> refBuffer = m_View1.get_buffer();
-  m_pView2 = Gtk::manage( new Gtk::TextView(refBuffer) );
+  m_pView2 = Gtk::make_managed<Gtk::TextView>(refBuffer);
 
   m_ScrolledWindow1.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_VPaned.add1(m_ScrolledWindow1);
@@ -384,13 +384,13 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     Gtk::Widget* pWidget = nullptr;
     if (i == 0)
     {
-      Gtk::Button* pButton = Gtk::manage( new Gtk::Button("Click Me") );
+      Gtk::Button* pButton = Gtk::make_managed<Gtk::Button>("Click Me");
       pButton->signal_clicked().connect(sigc::mem_fun(*this, &Example_TextView::on_button_clicked));
       pWidget = pButton;
     }
     else if (i == 1)
     {
-      Gtk::ComboBoxText* pCombo = Gtk::manage( new Gtk::ComboBoxText() );
+      Gtk::ComboBoxText* pCombo = Gtk::make_managed<Gtk::ComboBoxText>();
       pCombo->append("Option 1");
       pCombo->append("Option 2");
       pCombo->append("Option 3");
@@ -399,7 +399,7 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 2)
     {
-      Gtk::Scale* pHScale = Gtk::manage( new Gtk::Scale(Gtk::ORIENTATION_HORIZONTAL) );
+      Gtk::Scale* pHScale = Gtk::make_managed<Gtk::Scale>(Gtk::ORIENTATION_HORIZONTAL);
       pHScale->set_range(0, 100);
       pHScale->set_size_request(70, -1);
 
@@ -407,13 +407,13 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 3)
       {
-        Gtk::Image* pImage = Gtk::manage( new Gtk::Image() );
+        Gtk::Image* pImage = Gtk::make_managed<Gtk::Image>();
         pImage->set_from_resource("/textview/floppybuddy.gif");
         pWidget = pImage;
       }
     else if (i == 4)
     {
-      pWidget = Gtk::manage( new Gtk::Entry() );
+      pWidget = Gtk::make_managed<Gtk::Entry>();
     }
     else
     {
@@ -447,7 +447,7 @@ Window_EasterEgg::Window_EasterEgg()
   Glib::RefPtr<Gtk::TextChildAnchor> refAnchor = refBuffer->create_child_anchor(iter);
   refBuffer->insert(refBuffer->end(), "\nDon't do this in real applications, please.\n");
 
-  m_pTextView = Gtk::manage( new Gtk::TextView(refBuffer) );
+  m_pTextView = Gtk::make_managed<Gtk::TextView>(refBuffer);
 
   recursive_attach_view(0, *m_pTextView, refAnchor);
 
@@ -465,10 +465,10 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
   if (depth > 4)
     return;
 
-  Gtk::TextView* pChildView = Gtk::manage( new Gtk::TextView(view.get_buffer()));
+  Gtk::TextView* pChildView = Gtk::make_managed<Gtk::TextView(view.get_buffer>());
 
   /* Frame is to add a black border around each child view */
-  Gtk::Frame* pFrame = Gtk::manage( new Gtk::Frame());
+  Gtk::Frame* pFrame = Gtk::make_managed<Gtk::Frame>();
 
   pFrame->add(*pChildView);
 
