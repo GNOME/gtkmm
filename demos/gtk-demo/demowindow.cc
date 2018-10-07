@@ -350,14 +350,12 @@ void DemoWindow::load_file(const std::string& filename)
       	  while (isspace (*p))
       	    p++;
 
-          if (*p)
-          {
-            p = lines[i];
-            state++;
-            /* Fall through */
-          }
-      	  else
-      	    break;
+          if (!*p)
+            break;
+
+          p = lines[i];
+          state++;
+          /* Fall through */
 
       	case 3:
       	  /* Reading program body */
