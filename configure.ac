@@ -16,7 +16,7 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_INIT([gtkmm], [3.93.0],
-        [http://bugzilla.gnome.org/enter_bug.cgi?product=gtkmm],
+        [https://gitlab.gnome.org/GNOME/gtkmm/issues/],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
 
