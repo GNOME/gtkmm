@@ -27,11 +27,11 @@ noinst_PROGRAMS = extra_defs_gen/generate_defs_gdk \
                   extra_defs_gen/generate_defs_gtk
 
 extra_defs_gen_generate_defs_gdk_SOURCES = extra_defs_gen/generate_defs_gdk.cc
-extra_defs_gen_generate_defs_gdk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.58
+extra_defs_gen_generate_defs_gdk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.60
 extra_defs_gen_generate_defs_gdk_LDFLAGS = -no-undefined -avoid-version
 
 extra_defs_gen_generate_defs_gtk_SOURCES = extra_defs_gen/generate_defs_gtk.cc
-extra_defs_gen_generate_defs_gtk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.58
+extra_defs_gen_generate_defs_gtk_LDADD   = $(GTKMM_LIBS) -lglibmm_generate_extra_defs-2.60
 extra_defs_gen_generate_defs_gtk_LDFLAGS = -no-undefined -avoid-version
 
 AM_CPPFLAGS = -I$(top_builddir) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
