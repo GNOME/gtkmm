@@ -465,7 +465,7 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
   if (depth > 4)
     return;
 
-  Gtk::TextView* pChildView = Gtk::make_managed<Gtk::TextView(view.get_buffer>());
+  Gtk::TextView* pChildView = Gtk::make_managed<Gtk::TextView>(view.get_buffer());
 
   /* Frame is to add a black border around each child view */
   Gtk::Frame* pFrame = Gtk::make_managed<Gtk::Frame>();
