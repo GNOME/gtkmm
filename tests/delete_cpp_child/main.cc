@@ -19,7 +19,7 @@ private:
 AppWindow::AppWindow()
     : m_label (nullptr)
 {
-    auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 5);
+    auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 5);
     add(*vbox);
 
     auto button = Gtk::make_managed<Gtk::Button>("Delete Label");
