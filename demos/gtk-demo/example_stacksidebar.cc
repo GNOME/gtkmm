@@ -64,14 +64,14 @@ Example_StackSidebar::Example_StackSidebar()
     Gtk::Widget* widget = nullptr;
     if (i == 0)
     {
-      Gtk::Image* image = Gtk::manage(new Gtk::Image());
+      Gtk::Image* image = Gtk::make_managed<Gtk::Image>();
       image->set_from_icon_name("help-about", Gtk::ICON_SIZE_MENU);
       image->set_pixel_size(256);
       widget = image;
     }
     else
     {
-      widget = Gtk::manage(new Gtk::Label(m_page_names[i]));
+      widget = Gtk::make_managed<Gtk::Label>(m_page_names[i]);
     }
     m_Stack.add(*widget, m_page_names[i], m_page_names[i]);
   }

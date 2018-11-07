@@ -143,7 +143,7 @@ void DemoWindow::fill_tree()
     }
   }
 
-  Gtk::CellRendererText* pCell = Gtk::manage(new Gtk::CellRendererText());
+  Gtk::CellRendererText* pCell = Gtk::make_managed<Gtk::CellRendererText>();
   pCell->property_style() = Pango::STYLE_ITALIC;
 
   Gtk::TreeViewColumn* pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
@@ -350,14 +350,12 @@ void DemoWindow::load_file(const std::string& filename)
       	  while (isspace (*p))
       	    p++;
 
-          if (*p)
-          {
-            p = lines[i];
-            state++;
-            /* Fall through */
-          }
-      	  else
-      	    break;
+          if (!*p)
+            break;
+
+          p = lines[i];
+          state++;
+          /* Fall through */
 
       	case 3:
       	  /* Reading program body */

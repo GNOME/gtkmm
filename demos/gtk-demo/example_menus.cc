@@ -67,17 +67,17 @@ Example_Menus::Example_Menus()
 
   {
     //Note:: It's generally easier to use the Gtk::Builder API.
-    Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::MenuItem("test\nline2"));
+    Gtk::MenuItem* pMenuItem = Gtk::make_managed<Gtk::MenuItem>("test\nline2");
     pMenuItem->set_submenu( *(create_menu(2)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
 
-    pMenuItem = Gtk::manage(new Gtk::MenuItem("foo"));
+    pMenuItem = Gtk::make_managed<Gtk::MenuItem>("foo");
     pMenuItem->set_submenu( *(create_menu(3)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
 
-    pMenuItem = Gtk::manage(new Gtk::MenuItem("bar"));
+    pMenuItem = Gtk::make_managed<Gtk::MenuItem>("bar");
     pMenuItem->set_submenu( *(create_menu(4)) );
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
@@ -93,16 +93,16 @@ Example_Menus::Example_Menus()
     auto pMenu = create_menu(1);
     pMenu->set_accel_group(accel_group);
 
-    Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::SeparatorMenuItem());
+    Gtk::MenuItem* pMenuItem = Gtk::make_managed<Gtk::SeparatorMenuItem>();
     pMenu->append(*pMenuItem);
     pMenuItem->show();
 
-    pMenuItem = Gtk::manage(new Gtk::MenuItem("accel"));
+    pMenuItem = Gtk::make_managed<Gtk::MenuItem>("accel");
     pMenuItem->set_submenu(*pMenu);
     m_MenuBar.append(*pMenuItem);
     pMenuItem->show();
 
-    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerate Me"));
+    pMenuItem = Gtk::make_managed<Gtk::CheckMenuItem>("Accelerate Me");
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F1,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
     pMenu->append(*pMenuItem);
@@ -110,7 +110,7 @@ Example_Menus::Example_Menus()
     pMenuItem->signal_activate().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F1"));
 
-    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Locked"));
+    pMenuItem = Gtk::make_managed<Gtk::CheckMenuItem>("Accelerator Locked");
     pMenu->append(*pMenuItem);
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F2,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE | Gtk::ACCEL_LOCKED);
@@ -118,7 +118,7 @@ Example_Menus::Example_Menus()
     pMenuItem->signal_activate().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F2"));
 
-    pMenuItem = Gtk::manage(new Gtk::CheckMenuItem("Accelerator Frozen"));
+    pMenuItem = Gtk::make_managed<Gtk::CheckMenuItem>("Accelerator Frozen");
     pMenu->append(*pMenuItem);
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F3,
       Gdk::ModifierType(0), Gtk::ACCEL_VISIBLE);
@@ -150,7 +150,7 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
   if (depth < 1)
     return nullptr;
 
-  Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
+  Gtk::Menu* pMenu = Gtk::make_managed<Gtk::Menu>();
 
   {
     Gtk::RadioMenuItem::Group radiogroup;
@@ -160,7 +160,7 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
       char buf[32];
       sprintf(buf, "item %2d - %d", depth, j);
 
-      Gtk::MenuItem* pMenuItem = Gtk::manage(new Gtk::RadioMenuItem(radiogroup, buf));
+      Gtk::MenuItem* pMenuItem = Gtk::make_managed<Gtk::RadioMenuItem>(radiogroup, buf);
       pMenu->append(*pMenuItem);
       pMenuItem->show();
 
