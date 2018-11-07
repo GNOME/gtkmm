@@ -154,7 +154,7 @@ void DemoWindow::fill_tree()
     }
   }
 
-  auto pCell = Gtk::manage(new Gtk::CellRendererText());
+  auto pCell = Gtk::make_managed<Gtk::CellRendererText>();
   pCell->property_style() = Pango::Style::ITALIC;
 
   auto pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
@@ -361,20 +361,12 @@ void DemoWindow::load_file(const std::string& filename)
       	  while (isspace (*p))
       	    p++;
 
-          if (*p)
-          {
-            p = lines[i];
-            state++;
-            /* Fall through */
-            // TODO: Replace with [[fallthrough]] annotation (to case 3)
-            // when we ue C++17.
-            /* Reading program body */
-            start = refBufferSource->insert(start, p);
-            start = refBufferSource->insert(start, "\n");
+          if (!*p)
             break;
-          }
-      	  else
-      	    break;
+
+          p = lines[i];
+          state++;
+          [[fallthrough]];
 
       	case 3:
       	  /* Reading program body */

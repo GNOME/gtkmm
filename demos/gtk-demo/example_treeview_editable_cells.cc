@@ -249,7 +249,7 @@ void Example_TreeView_EditableCells::add_columns()
 
   //And this is the way that works with the IRIX MipsPro compiler too:
   {
-    auto pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Number", m_columns.number));
+    auto pViewColumn = Gtk::make_managed<Gtk::TreeView::Column>("Number", m_columns.number);
 
     //connect signal handlers for auto-storing of edited cell data
     auto pCellRenderer = pViewColumn->get_first_cell();
@@ -267,7 +267,7 @@ void Example_TreeView_EditableCells::add_columns()
   }
 
   {
-    auto pViewColumn = Gtk::manage(new Gtk::TreeView::Column("Product", m_columns.product));
+    auto pViewColumn = Gtk::make_managed<Gtk::TreeView::Column>("Product", m_columns.product);
 
     //connect signal handlers for auto-storing of edited cell data
     auto pCellRenderer = pViewColumn->get_first_cell();
