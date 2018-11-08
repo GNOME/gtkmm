@@ -81,7 +81,7 @@ void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, cons
  * @returns <tt>true</tt> if a clip rectangle exists, <tt>false</tt> if all
  *          of @a context is clipped and all drawing can be skipped.
  *
- * @newin{3,92}
+ * @newin{3,24}
  */
 bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk::Rectangle& rectangle);
 
@@ -91,7 +91,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk:
  * @returns <tt>true</tt> if a clip rectangle exists, <tt>false</tt> if all
  *          of @a context is clipped and all drawing can be skipped.
  *
- * @newin{3,92}
+ * @newin{3,24}
  */
 bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
 
@@ -104,7 +104,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  * @param surface A cairo surface.
  * @returns A cairo region.
  *
- * @newin{3,92}
+ * @newin{3,24}
  */
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface);
 
@@ -136,7 +136,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  * @param width The width of the region to draw.
  * @param height The height of the region to draw.
  *
- * @newin{3,92}
+ * @newin{3,24}
  */
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
