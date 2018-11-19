@@ -27,7 +27,7 @@ protected:
   void on_drawingarea_scribble_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
 
   //signal handlers:
-  void on_drawingarea_scribble_size_allocate(const Gtk::Allocation& allocation, int baseline);
+  void on_drawingarea_scribble_size_allocate(int width, int height, int baseline);
   void on_drawingarea_scribble_drag_begin(double start_x, double start_y);
   void on_drawingarea_scribble_drag_update(double offset_x, double offset_y);
   void on_drawingarea_scribble_drag_end(double offset_x, double offset_y);
@@ -178,7 +178,7 @@ void Example_DrawingArea::scribble_create_surface()
 }
 
 void Example_DrawingArea::on_drawingarea_scribble_size_allocate(
-  const Gtk::Allocation& /* allocation */, int /* baseline */)
+  int /* width */, int /* height */, int /* baseline */)
 {
   scribble_create_surface();
 }
