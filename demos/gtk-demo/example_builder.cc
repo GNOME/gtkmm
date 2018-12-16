@@ -38,8 +38,7 @@ Gtk::Window* do_builder()
   }
 
   // Get the GtkBuilder-instantiated window:
-  Example_Builder* pWindow = nullptr;
-  Gtk::Builder::get_widget_derived(builder, "window1", pWindow);
+  auto pWindow = Gtk::Builder::get_widget_derived<Example_Builder>(builder, "window1");
   if (!pWindow)
   {
     std::cout << "Could not get 'window1' from the builder." << std::endl;
@@ -53,8 +52,7 @@ Example_Builder::Example_Builder(
 : Gtk::Window(cobject),
   m_builder(builder)
 {
-  Gtk::Toolbar* pToolbar = nullptr;
-  builder->get_widget("toolbar1", pToolbar);
+  auto pToolbar = builder->get_widget<Gtk::Toolbar>("toolbar1");
   if (pToolbar)
     pToolbar->get_style_context()->add_class("primary-toolbar");
 
@@ -67,48 +65,47 @@ Example_Builder::Example_Builder(
   auto refAccelGroup = Gtk::AccelGroup::create();
   add_accel_group(refAccelGroup);
 
-  Gtk::MenuItem* pMenuItem = nullptr;
-  builder->get_widget("new_item", pMenuItem);
+  auto pMenuItem = builder->get_widget<Gtk::MenuItem>("new_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_n, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("open_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("open_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_o, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("save_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("save_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("quit_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("quit_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_q, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("copy_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("copy_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("cut_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("cut_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_x, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("paste_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("paste_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("help_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("help_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_F1, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
 
-  builder->get_widget("about_item", pMenuItem);
+  pMenuItem = builder->get_widget<Gtk::MenuItem>("about_item");
   if (pMenuItem)
     pMenuItem->add_accelerator("activate", refAccelGroup,
       GDK_KEY_F7, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
@@ -125,8 +122,7 @@ void Example_Builder::on_file_quit()
 
 void Example_Builder::on_help_about()
 {
-  Gtk::AboutDialog* pDialog = nullptr;
-  m_builder->get_widget("aboutdialog1", pDialog);
+  auto pDialog = m_builder->get_widget<Gtk::AboutDialog>("aboutdialog1");
   if (pDialog)
   {
     pDialog->set_transient_for(*this);
