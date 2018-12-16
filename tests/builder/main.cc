@@ -140,11 +140,9 @@ int main(int argc, char* argv[])
 
   auto builder = Gtk::Builder::create_from_string(gladefile);
 
-  MainWindow* main_win = nullptr;
-  Gtk::Builder::get_widget_derived(builder, "main_window", main_win);
+  auto main_win = Gtk::Builder::get_widget_derived<MainWindow>(builder, "main_window");
 
-  Gtk::Button* orph_button = nullptr;
-  builder->get_widget("orphaned_button", orph_button);
+  auto orph_button = builder->get_widget<Gtk::Button>("orphaned_button");
   orph_button->add_destroy_notify_callback(nullptr, on_orphaned_button_deleted);
 
   const GObject* const window = (GObject*)main_win->gobj();
