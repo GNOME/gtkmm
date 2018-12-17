@@ -25,6 +25,7 @@ check_PROGRAMS =			\
 	delete_cpp_child/test		\
 	dialog/test			\
 	dialog_deletethis/test		\
+	gdk_rgba/test \
 	main_with_options/test		\
 	menu_destruction/test		\
 	object_move/test		\
@@ -34,6 +35,7 @@ check_PROGRAMS =			\
 	wrap_existing/test
 
 TESTS =	object_move/test \
+  gdk_rgba/test \
   test_validate_docs_xhtml.sh
 
 builder_test_SOURCES               = builder/main.cc
@@ -45,6 +47,7 @@ child_widget_managed_test_SOURCES  = child_widget_managed/main.cc
 delete_cpp_child_test_SOURCES      = delete_cpp_child/main.cc
 dialog_test_SOURCES                = dialog/main.cc
 dialog_deletethis_test_SOURCES     = dialog_deletethis/main.cc
+gdk_rgba_test_SOURCES              = gdk_rgba/main.cc
 main_with_options_test_SOURCES     = main_with_options/main.cc
 menu_destruction_test_SOURCES      = menu_destruction/main.cc
 object_move_test_SOURCES           = object_move/main.cc
