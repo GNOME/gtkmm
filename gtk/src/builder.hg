@@ -481,6 +481,37 @@ public:
     const_cast<Builder*>(this)->get_widget(name, widget);
   }
 
+  /** Gets a widget from the Builder file.
+   *
+   * For instance:
+   * @code
+   * auto pGrid = refBuilder->get_widget<Gtk::Grid>("mygrid");
+   * @endcode
+   *
+   * See get_widget().
+   *
+   * @param name The name of the widget.
+   * @return A pointer to the widget, or <tt>nullptr</tt> on failure.
+   *
+   * @newin{3,94}
+   */
+  template <class T_Widget> inline
+  T_Widget* get_widget(const Glib::ustring& name)
+  {
+    T_Widget* widget;
+    get_widget(name, widget);
+    return widget;
+  }
+
+  /** See the non-const version.
+   * @newin{3,94}
+   */
+  template <class T_Widget> inline
+  const T_Widget* get_widget(const Glib::ustring& name) const
+  {
+    return const_cast<Builder*>(this)->get_widget<const T_Widget>(name);
+  }
+
   /** Gets a widget whose details are specified in the GtkBuilder file,
    * but which is implemented by your own derived class.
    *
@@ -562,6 +593,41 @@ public:
   static void get_widget_derived(const Glib::RefPtr<const Gtk::Builder>& builder, const Glib::ustring& name, const T_Widget*& widget, Args&&... args)
   {
     get_widget_derived(std::const_pointer_cast<Gtk::Builder>(builder), name, widget, std::forward<Args>(args)...);
+  }
+
+  /** Gets a widget whose details are specified in the GtkBuilder file,
+   * but which is implemented by your own derived class.
+   *
+   * For instance:
+   * @code
+   * auto pDialog1 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog1");
+   * auto pDialog2 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog2", "A storm is imminent!", true);
+   * @endcode
+   *
+   * See get_widget_derived().
+   *
+   * @param builder The Gtk::Builder from which to get the widget.
+   * @param name The name of the widget.
+   * @param args Additional arguments to pass to the constructor of the derived class.
+   * @return widget A pointer to the widget, or <tt>nullptr</tt> on failure.
+   *
+   * @newin{3,94}
+   */
+  template <typename T_Widget, typename... Args> inline
+  static T_Widget* get_widget_derived(const Glib::RefPtr<Gtk::Builder>& builder, const Glib::ustring& name, Args&&... args)
+  {
+    T_Widget* widget;
+    get_widget_derived(builder, name, widget, std::forward<Args>(args)...);
+    return widget;
+  }
+
+  /** See the non-const version.
+   * @newin{3,94}
+   */
+  template <typename T_Widget, typename... Args> inline
+  static const T_Widget* get_widget_derived(const Glib::RefPtr<const Gtk::Builder>& builder, const Glib::ustring& name, Args&&... args)
+  {
+    return get_widget_derived<const T_Widget>(std::const_pointer_cast<Gtk::Builder>(builder), name, std::forward<Args>(args)...);
   }
 
 #m4 _CONVERSION(`GSList*',`std::vector<Glib::RefPtr<Glib::Object> >',`Glib::SListHandler<Glib::RefPtr<Glib::Object> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
