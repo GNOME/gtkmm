@@ -66,6 +66,13 @@ const char gladefile[] =
     "<property name='can_focus'>True</property>"
     "<property name='receives_default'>True</property>"
   "</object>"
+  "<object class='GtkAdjustment' id='adjustment'>"
+    "<property name='lower'>0</property>"
+    "<property name='upper'>100</property>"
+    "<property name='value'>50</property>"
+    "<property name='step-increment'>1</property>"
+    "<property name='page-increment'>10</property>"
+  "</object>"
 "</interface>";
 
 void on_managed_button_deleted(sigc::notifiable* /* data */)
@@ -76,6 +83,11 @@ void on_managed_button_deleted(sigc::notifiable* /* data */)
 void on_orphaned_button_deleted(sigc::notifiable* /* data */)
 {
   std::cout << "Orphaned Gtk::Button deleted" << std::endl;
+}
+
+void on_adjustment_deleted(sigc::notifiable* /* data */)
+{
+  std::cout << "Gtk::Adjustment deleted" << std::endl;
 }
 
 class DerivedButton : public Gtk::Button
@@ -143,24 +155,35 @@ int main(int argc, char* argv[])
   }
 
   auto app = Gtk::Application::create();
+  g_assert(app);
 
   auto builder = Gtk::Builder::create_from_string(gladefile);
+  g_assert(builder);
 
   auto main_win = Gtk::Builder::get_widget_derived<MainWindow>(builder, "main_window");
+  g_assert(main_win);
 
   auto orph_button = builder->get_widget<Gtk::Button>("orphaned_button");
+  g_assert(orph_button);
   orph_button->add_destroy_notify_callback(nullptr, on_orphaned_button_deleted);
+
+  auto adjustment = builder->get_object<Gtk::Adjustment>("adjustment");
+  g_assert(adjustment);
+  g_assert_cmpfloat(adjustment->get_value(), ==, 50);
+  adjustment->add_destroy_notify_callback(nullptr, on_adjustment_deleted);
 
   const GObject* const window = (GObject*)main_win->gobj();
   const GObject* const orphaned_button = (GObject*)orph_button->gobj();
   const GObject* const derived_button = (GObject*)main_win->get_derived_button()->gobj();
   const GObject* const standard_button = (GObject*)main_win->get_standard_button()->gobj();
+  const GObject* const adjustment_gobj = (GObject*)adjustment->gobj();
 
   std::cout << "Before app->run(*main_win, argc1, argv)" << std::endl
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
+    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+    << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
 
   const int result = app->run(*main_win, argc1, argv);
 
@@ -168,7 +191,8 @@ int main(int argc, char* argv[])
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
+    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+    << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
 
   delete main_win;
 
@@ -176,7 +200,8 @@ int main(int argc, char* argv[])
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
+    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+    << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
 
   builder.reset();
 
@@ -187,7 +212,8 @@ int main(int argc, char* argv[])
       << "  ref_count(MainWindow)=" << window->ref_count << std::endl
       << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
       << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-      << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl;
+      << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+      << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
   }
 
   return result;
