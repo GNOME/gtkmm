@@ -57,6 +57,7 @@ _WRAP_GERROR(BuilderError,GtkBuilderError,GTK_BUILDER_ERROR)
  * not have to worry about their lifecycle), or without a parent, in which
  * case they have to be added to some container before the builder is deleted
  * to make use of them.
+ *
  * Non-widget objects need to be fetched with get_object() or get_objects()
  * to keep them beyond the lifespan of the builder.
  *
@@ -424,6 +425,7 @@ public:
   //TODO: Custom-implement this and prevent it from being used with GTK_WIDGET-derived types?
   // A Builder can contain objects that don't derive from Buildable,
   // for instance if objects have been added with expose_object().
+
   /** Gets the object named @a name.
    *
    * @newin{2,12}
@@ -432,6 +434,7 @@ public:
    * @return The object named @a name or <tt>nullptr</tt> if it could not be found in the object tree.
    */
   _WRAP_METHOD(Glib::RefPtr<Glib::Object> get_object(const Glib::ustring& name), gtk_builder_get_object, refreturn)
+
   /** Gets the object named @a name.
    *
    * @newin{3,8}
@@ -440,6 +443,35 @@ public:
    * @return The object named @a name or <tt>nullptr</tt> if it could not be found in the object tree.
    */
   _WRAP_METHOD(Glib::RefPtr<const Glib::Object> get_object(const Glib::ustring& name) const, gtk_builder_get_object, refreturn, constversion)
+
+  /** Gets the object named @a name, cast to a specific derived type.
+   *
+   * For instance:
+   * @code
+   * auto adjustment = refBuilder->get_object<Gtk::Adjustment>("adjustment_id");
+   * adjustment->set_value(42);
+   * @endcode
+   *
+   * @newin{3,94}
+   *
+   * @param name Name of object to get.
+   * @return The object named @a name or <tt>nullptr</tt> if it could not be
+   *   found in the object tree or could not be cast to the specified type.
+   */
+  template <class T_Object> inline
+  Glib::RefPtr<T_Object> get_object(const Glib::ustring& name)
+  {
+    return std::dynamic_pointer_cast<T_Object>(get_object(name));
+  }
+
+  /** See the non-const version.
+   * @newin{3,94}
+   */
+  template <class T_Object> inline
+  Glib::RefPtr<const T_Object> get_object(const Glib::ustring& name) const
+  {
+    return const_cast<Builder*>(this)->get_object<const T_Object>(name);
+  }
 
   /** Gets a widget from the Builder file.
    * For instance:
