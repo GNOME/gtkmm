@@ -169,6 +169,8 @@ int main(int argc, char* argv[])
 
   auto adjustment = builder->get_object<Gtk::Adjustment>("adjustment");
   g_assert_nonnull(adjustment);
+  builder->get_object("adjustment"); // Test get same again/no-template overload
+  g_assert_nonnull(adjustment);
   g_assert_cmpfloat(adjustment->get_value(), ==, 50);
   adjustment->add_destroy_notify_callback(nullptr, on_adjustment_deleted);
 
