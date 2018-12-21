@@ -58,19 +58,48 @@ public:
   _WRAP_METHOD(void add_pattern(const Glib::ustring& pattern), gtk_file_filter_add_pattern)
   _WRAP_METHOD(void add_pixbuf_formats(), gtk_file_filter_add_pixbuf_formats)
 
+  /** Information available per file when implementing a custom filter rule via
+   * add_custom().
+   */
   class Info
   {
   public:
+    /// Flags indicating which of the following fields are filled. See add_custom().
     FileFilterFlags contains;
+
+    /// The filename of the file being tested.
     Glib::ustring filename;
+
+    /// The URI for the file being tested.
     Glib::ustring uri;
+
+    /// The string that will be used to display the file in the Gtk::FileChooser.
     Glib::ustring display_name;
+
+    /// The MIME type of the file.
     Glib::ustring mime_type;
   };
 
-  /// For instance, bool on_custom(const Gtk::FileFilter::Info& filter_info);
+  /** A slot provided to add_custom() that implements a custom filter rule. This
+   * will be called with the Info of each file that is available, and it must
+   * return a bool indicating whether or not that file should be displayed.
+   *
+   * For instance:
+   * @code
+   * bool on_custom(const Gtk::FileFilter::Info& filter_info);
+   * @endcode
+   */
   typedef sigc::slot<bool, const Info&> SlotCustom;
 
+  /**
+   * Adds a rule to a filter that allows files based on a SlotCustom function.
+   * The Gtk::FileFilterFlags passed in provide information about what sorts of
+   * information the filter function needs; this allows the toolkit to avoid
+   * retrieving expensive information when it isn’t needed by the custom filter.
+   *
+   * @param needed The FileFilterFlags identifying info needed by the @a slot.
+   * @param slot A SlotCustom to call for each file to perform the filtering.
+   */
   void add_custom(FileFilterFlags needed, const SlotCustom& slot);
   _IGNORE(gtk_file_filter_add_custom)
 
