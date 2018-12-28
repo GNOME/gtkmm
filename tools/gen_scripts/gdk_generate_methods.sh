@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes that it resides in the
-# tools/gen_scripts/ directory and the defs file will be placed in gdk/src.
+# The script assumes that it resides in the tools/gen_scripts/ directory and
+# the defs file will be placed in gdk/src.
 
 # To update the gdk_methods.defs file:
 # 1. ./gdk_generate_methods.sh
@@ -17,34 +16,28 @@
 # 3. ./gdk_generate_methods.sh --make-patch
 # 4. Like step 2 when updating only the gdk_methods.defs files.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
-fi
+source "$(dirname "$0")/init_generate.sh"
 
-PREFIX="$JHBUILD_SOURCES"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/gdk/src"
+out_dir="$root_dir/gdk/src"
 
 shopt -s extglob # Enable extended pattern matching
 shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
-  H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
   # Process files whose names end with .h, but not with private.h.
   # Exclude gtk+/gdk/gdkinternals.h.
-  $H2DEF_PY "$PREFIX"/gtk+/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+/gdk/deprecated/!(*private).h \
-            "$PREFIX"/gtk+/build/gdk/*.h > "$OUT_DIR"/gdk_methods.defs
-  $H2DEF_PY "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h \
-            "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf/*.h > "$OUT_DIR"/gdk_pixbuf_methods.defs
+  "$gen_methods" "$gtk_source_prefix"/gdk/!(*private|gdkinternals).h "$gtk_source_prefix"/gdk/deprecated/!(*private).h \
+                 "$gtk_build_prefix"/gdk/*.h > "$out_dir"/gdk_methods.defs
+  "$gen_methods" "$pixbuf_source_prefix"/gdk-pixbuf/gdk!(*private).h \
+                 "$pixbuf_build_prefix"/gdk-pixbuf/*.h > "$out_dir"/gdk_pixbuf_methods.defs
   # patch version 2.7.5 does not like directory names.
-  cd "$OUT_DIR"
-  PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS gdk_methods.defs gdk_methods.defs.patch
+  cd "$out_dir"
+  patch_options="--backup --version-control=simple --suffix=.orig"
+  patch $patch_options gdk_methods.defs gdk_methods.defs.patch
 elif [ "$1" = "--make-patch" ]
 then
-  OUT_DIR_FILE="$OUT_DIR"/gdk_methods.defs
-  diff --unified=5 "$OUT_DIR_FILE".orig "$OUT_DIR_FILE" > "$OUT_DIR_FILE".patch
+  out_dir_file="$out_dir"/gdk_methods.defs
+  diff --unified=5 "$out_dir_file".orig "$out_dir_file" > "$out_dir_file".patch
 else
   echo "Usage: $0 [--make-patch]"
   exit 1
