@@ -1,22 +1,19 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes that it resides in the
-# tools/gen_scripts/ directory and the defs file will be placed in gdk/src.
+# The script assumes that it resides in the tools/gen_scripts/ directory and
+# the defs file will be placed in gdk/src.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
-fi
+source "$(dirname "$0")/init_generate.sh"
 
-PREFIX="$JHBUILD_SOURCES"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/gdk/src"
+out_dir="$root_dir/gdk/src"
 
 shopt -s extglob # Enable extended pattern matching
-ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
+shopt -s nullglob # Skip a filename pattern that matches no file
 # Process files whose names end with .h, but not with private.h.
 # Exclude gtk+-3/gdk/gdkinternals.h.
-$ENUM_PL "$PREFIX"/gtk+-3/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+-3/gdk/deprecated/!(*private).h > "$OUT_DIR"/gdk_enums.defs
-$ENUM_PL "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h \
-         "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf/*.h > "$OUT_DIR"/gdk_pixbuf_enums.defs
+"$gen_enums" "$gtk_source_prefix"/gdk/!(*private|gdkinternals).h "$gtk_source_prefix"/gdk/deprecated/!(*private).h > "$out_dir"/gdk_enums.defs
+if [ "$gtk_build_prefix" != "$gtk_source_prefix" ]; then
+  "$gen_enums" "$gtk_build_prefix"/gdk/*.h >> "$out_dir"/gdk_enums.defs
+fi
+"$gen_enums" "$pixbuf_source_prefix"/gdk-pixbuf/gdk!(*private).h \
+             "$pixbuf_build_prefix"/gdk-pixbuf/*.h > "$out_dir"/gdk_pixbuf_enums.defs

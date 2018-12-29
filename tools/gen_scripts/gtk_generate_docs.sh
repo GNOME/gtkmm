@@ -1,22 +1,24 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes that it resides in the
-# tools/gen_scripts/ directory and the XML file will be placed in gtk/src.
+# The script assumes that it resides in the tools/gen_scripts/ directory and
+# the XML file will be placed in gtk/src.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
+source "$(dirname "$0")/init_generate.sh"
+
+out_dir="$root_dir/gtk/src"
+
+params="--with-properties --no-recursion"
+if [ "$gtk_build_prefix" != "$gtk_source_prefix" ]; then
+  gtk_build_dir="$gtk_build_prefix"/gtk
 fi
-
-PREFIX="$JHBUILD_SOURCES"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/gtk/src"
-
-PARAMS="--with-properties --no-recursion"
-for dir in "$PREFIX"/gtk+-3/{gtk,gtk/deprecated}; do
-  PARAMS="$PARAMS -s $dir"
+for dir in "$gtk_source_prefix"/{gtk,gtk/deprecated} "$gtk_build_dir"; do
+  if [ -d "$dir" ]; then
+    params="$params -s $dir"
+  fi
 done
 
-DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
-$DOCEXTRACT_TO_XML_PY $PARAMS > "$OUT_DIR/gtk_docs.xml"
+# Exclude gtkdnd-quartz.c. Function descriptions in gtkdnd-quartz.c can
+# replace better descriptions in gtkdnd.c, if gtkdnd-quartz.c is processed.
+params="$params -x $gtk_source_prefix/gtk/gtkdnd-quartz.c"
+
+"$gen_docs" $params > "$out_dir/gtk_docs.xml"

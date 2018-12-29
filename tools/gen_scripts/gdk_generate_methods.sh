@@ -1,22 +1,19 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes that it resides in the
-# tools/gen_scripts/ directory and the defs file will be placed in gdk/src.
+# The script assumes that it resides in the tools/gen_scripts/ directory and
+# the defs file will be placed in gdk/src.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
-fi
+source "$(dirname "$0")/init_generate.sh"
 
-PREFIX="$JHBUILD_SOURCES"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/gdk/src"
+out_dir="$root_dir/gdk/src"
 
 shopt -s extglob # Enable extended pattern matching
-H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
+shopt -s nullglob # Skip a filename pattern that matches no file
 # Process files whose names end with .h, but not with private.h.
 # Exclude gtk+-3/gdk/gdkinternals.h.
-$H2DEF_PY "$PREFIX"/gtk+-3/gdk/!(*private|gdkinternals).h "$PREFIX"/gtk+-3/gdk/deprecated/!(*private).h > "$OUT_DIR"/gdk_methods.defs
-$H2DEF_PY "$PREFIX"/gdk-pixbuf/gdk-pixbuf/gdk!(*private).h \
-          "$PREFIX"/gdk-pixbuf/build/gdk-pixbuf/*.h > "$OUT_DIR"/gdk_pixbuf_methods.defs
+"$gen_methods" "$gtk_source_prefix"/gdk/!(*private|gdkinternals).h "$gtk_source_prefix"/gdk/deprecated/!(*private).h > "$out_dir"/gdk_methods.defs
+if [ "$gtk_build_prefix" != "$gtk_source_prefix" ]; then
+  "$gen_methods" "$gtk_build_prefix"/gdk/*.h >> "$out_dir"/gdk_methods.defs
+fi
+"$gen_methods" "$pixbuf_source_prefix"/gdk-pixbuf/gdk!(*private).h \
+               "$pixbuf_build_prefix"/gdk-pixbuf/*.h > "$out_dir"/gdk_pixbuf_methods.defs

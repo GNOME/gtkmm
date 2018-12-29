@@ -3,6 +3,8 @@
 # Generate all docs.xml and .defs files, either for gdk or gtk or (default) both.
 # This script shall be executed from the tools/gen_scripts directory.
 
+cd "$(dirname "$0")"
+
 if [ $# -eq 0 ]
 then
   GENERATE_GDK_FILES="yes"

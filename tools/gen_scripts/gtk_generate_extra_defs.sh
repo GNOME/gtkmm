@@ -17,22 +17,22 @@
 # 3. ./gtk_generate_extra_defs.sh --make-patch
 # 4. Like step 2 when updating only the gtk_signals.defs file.
 
-ROOT_DIR="$(dirname "$0")/../.."
-GEN_DIR="$ROOT_DIR/tools/extra_defs_gen"
-OUT_DIR="$ROOT_DIR/gtk/src"
-OUT_DEFS_FILE="$OUT_DIR"/gtk_signals.defs
+source "$(dirname "$0")/init_generate.sh"
+
+out_dir="$root_dir/gtk/src"
+out_defs_file="$out_dir"/gtk_signals.defs
 
 if [ $# -eq 0 ]
 then
   # Without LC_ALL=C documentation (docs "xxx") may be translated in the .defs file.
-  LC_ALL=C "$GEN_DIR"/generate_defs_gtk > "$OUT_DEFS_FILE"
+  LC_ALL=C "$extra_defs_gen_dir"/generate_defs_gtk > "$out_defs_file"
   # patch version 2.7.5 does not like directory names.
-  cd "$(dirname "$OUT_DEFS_FILE")"
-  PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS "$(basename "$OUT_DEFS_FILE")" "$(basename "$OUT_DEFS_FILE").patch"
+  cd "$(dirname "$out_defs_file")"
+  patch_options="--backup --version-control=simple --suffix=.orig"
+  patch $patch_options "$(basename "$out_defs_file")" "$(basename "$out_defs_file").patch"
 elif [ "$1" = "--make-patch" ]
 then
-  diff --unified=10 "$OUT_DEFS_FILE".orig "$OUT_DEFS_FILE" > "$OUT_DEFS_FILE".patch
+  diff --unified=5 "$out_defs_file".orig "$out_defs_file" > "$out_defs_file".patch
 else
   echo "Usage: $0 [--make-patch]"
   exit 1
