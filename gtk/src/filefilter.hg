@@ -29,16 +29,16 @@ _WRAP_ENUM(FileFilterFlags, GtkFileFilterFlags)
  *
  * A Gtk::FileFilter can be used to restrict the files being shown in a Gtk::FileChooser.
  * Files can be filtered based on their name (with add_pattern()),
- * on their mime type (with add_mime_type()), or by a custom filter
+ * on their MIME type (with add_mime_type()), or by a custom filter
  * function (with add_custom()).
  *
- * Filtering by mime types handles aliasing and subclassing of mime types;
- * e.g. a filter for text/plain also matches a file with mime type application/rtf,
- * since application/rtf is a subclass of text/plain. Note that Gtk::FileFilter
- * allows wildcards for the subtype of a mime type, so you can e.g. filter for image/ *.
+ * Filtering by MIME types handles aliasing and subclassing of MIME types;
+ * e.g. a filter for <tt>text/plain</tt> also matches a file with MIME type
+ * <tt>application/rtf</tt>, since <tt>application/rtf</tt> is a subclass of
+ * <tt>text/plain</tt>. Note that Gtk::FileFilter allows wildcards for the
+ * subtype of a MIME type, so you can e.g. filter for <tt>image/*</tt>.
  *
- * Normally, filters are used by adding them to a Gtk::FileChooser. See Gtk::FileChooser::add_filter().
- * But it is also possible to manually use a filter on a file with filter().
+ * Filters are used by adding them to a Gtk::FileChooser. See Gtk::FileChooser::add_filter().
  */
 class FileFilter : public Glib::Object
 {
@@ -57,27 +57,56 @@ public:
   _WRAP_METHOD(void add_pattern(const Glib::ustring& pattern), gtk_file_filter_add_pattern)
   _WRAP_METHOD(void add_pixbuf_formats(), gtk_file_filter_add_pixbuf_formats)
 
+  /** Information available per file when implementing a custom filter rule via
+   * add_custom().
+   */
   class Info
   {
   public:
+    /// Flags indicating which of the following fields are filled. See add_custom().
     FileFilterFlags contains;
+
+    /// The filename of the file being tested.
     Glib::ustring filename;
+
+    /// The URI for the file being tested.
     Glib::ustring uri;
+
+    /// The string that will be used to display the file in the Gtk::FileChooser.
     Glib::ustring display_name;
+
+    /// The MIME type of the file.
     Glib::ustring mime_type;
   };
 
-  /// For instance, bool on_custom(const Gtk::FileFilter::Info& filter_info);
+  /** A slot provided to add_custom() that implements a custom filter rule. This
+   * will be called with the Info of each file that is available, and it must
+   * return a bool indicating whether or not that file should be displayed.
+   *
+   * For instance:
+   * @code
+   * bool on_custom(const Gtk::FileFilter::Info& filter_info);
+   * @endcode
+   */
   typedef sigc::slot<bool, const Info&> SlotCustom;
 
+  /**
+   * Adds a rule to a filter that allows files based on a SlotCustom function.
+   * The Gtk::FileFilterFlags passed in provide information about what sorts of
+   * information the filter function needs; this allows the toolkit to avoid
+   * retrieving expensive information when it isn’t needed by the custom filter.
+   *
+   * @param needed The FileFilterFlags identifying info needed by the @a slot.
+   * @param slot A SlotCustom to call for each file to perform the filtering.
+   */
   void add_custom(FileFilterFlags needed, const SlotCustom& slot);
   _IGNORE(gtk_file_filter_add_custom)
 
   _WRAP_METHOD(FileFilterFlags get_needed() const, gtk_file_filter_get_needed)
 
-  //TODO: This method is only used by FileChooser implementors, so we don't need to wrap it.
+  // This method is meant for implementors of FileChooser, so we don’t wrap it.
+  // (So is get_needed() really, but we had better not remove that in gtkmm-3.)
   _IGNORE(gtk_file_filter_filter)
-  //_WRAP_METHOD(bool filter(const GtkFileFilterInfo* filter_info), gtk_file_filter_filter)
 };
 
 } // namespace Gtk
