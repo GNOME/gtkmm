@@ -45,7 +45,7 @@ public:
   * @param accel_path For instance, "<MainWindow>/File/Open"
   */
   AccelKey(guint accel_key, Gdk::ModifierType accel_mods,
-           const Glib::ustring& accel_path = Glib::ustring());
+           const Glib::ustring& accel_path = {});
 
   /** AccelKey constructor.
    * @param accelerator For instance, &quot;&lt;control&gt;q&quot; - Use
@@ -54,7 +54,7 @@ public:
    * @param accel_path For instance, "<MainWindow>/File/Open"
    */
   AccelKey(const Glib::ustring& accelerator,
-           const Glib::ustring& accel_path = Glib::ustring());
+           const Glib::ustring& accel_path = {});
 
   AccelKey(const AccelKey& src);
 
