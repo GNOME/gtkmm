@@ -4,8 +4,8 @@ dnl  Code generation sections for GtkContainer child properties
 dnl
 dnl
 
-dnl                       $1         $2            $3          $4           $5        $6
-dnl _CHILD_PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix, deprecated, docs)
+dnl                       $1         $2            $3          $4           $5        $6       $7
+dnl _CHILD_PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix, deprecated, docs, check_type)
 dnl proxy_suffix could be "", "_WriteOnly" or "_ReadOnly"
 dnl The method will be const if the propertyproxy is _ReadOnly.
 dnl
@@ -24,6 +24,12 @@ ifelse($4,_ReadOnly,get,`ifelse($4,_WriteOnly,set,get or set)') the value of the
   __PROXY_TYPE__ child_property_$2`'(ifelse($4,_ReadOnly,const ,)Gtk::Widget& child) ifelse($4,_ReadOnly, const,);
 _PUSH(SECTION_CC_PROPERTYPROXIES)
 ifelse(`$5',,,`_DEPRECATE_IFDEF_START
+')dnl
+ifelse(`$7',,,`dnl
+static_assert(`$7'<_QUOTE($3)>::value,
+  "Type _QUOTE($3) cannot be used in _WRAP_CHILD_PROPERTY. "
+  "There is no suitable template specialization of Glib::Value<>.");
+
 ')dnl
 __PROXY_TYPE__ __CPPNAME__::child_property_$2`'(ifelse($4,_ReadOnly,const ,)Gtk::Widget& child) ifelse($4,_ReadOnly, const,)
 {
