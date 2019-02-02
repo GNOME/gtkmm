@@ -73,7 +73,7 @@ const Glib::ustring PrintSettings::Keys::OUTPUT_URI = GTK_PRINT_SETTINGS_OUTPUT_
 const Glib::ustring PrintSettings::Keys::WIN32_DRIVER_VERSION = GTK_PRINT_SETTINGS_WIN32_DRIVER_VERSION;
 const Glib::ustring PrintSettings::Keys::WIN32_DRIVER_EXTRA = GTK_PRINT_SETTINGS_WIN32_DRIVER_EXTRA;
 
-Glib::RefPtr<PrintSettings> PrintSettings::create_from_key_file(const Glib::KeyFile& key_file)
+Glib::RefPtr<PrintSettings> PrintSettings::create_from_key_file(const Glib::RefPtr<const Glib::KeyFile>& key_file)
 {
   auto result = PrintSettings::create();
 
@@ -82,7 +82,7 @@ Glib::RefPtr<PrintSettings> PrintSettings::create_from_key_file(const Glib::KeyF
   return result;
 }
 
-Glib::RefPtr<PrintSettings> PrintSettings::create_from_key_file(const Glib::KeyFile& key_file, const Glib::ustring& group_name)
+Glib::RefPtr<PrintSettings> PrintSettings::create_from_key_file(const Glib::RefPtr<const Glib::KeyFile>& key_file, const Glib::ustring& group_name)
 {
   auto result = PrintSettings::create();
 
@@ -138,19 +138,19 @@ void PrintSettings::set_page_ranges(const std::vector<PageRange>& page_ranges)
     page_ranges.size());
 }
 
-bool PrintSettings::load_from_key_file(const Glib::KeyFile& key_file)
+bool PrintSettings::load_from_key_file(const Glib::RefPtr<const Glib::KeyFile>& key_file)
 {
   GError* gerror = nullptr;
-  bool retvalue = gtk_print_settings_load_key_file(gobj(), const_cast<GKeyFile*>((key_file).gobj()), nullptr, &(gerror));
+  bool retvalue = gtk_print_settings_load_key_file(gobj(), const_cast<GKeyFile*>(Glib::unwrap(key_file)), nullptr, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-void PrintSettings::save_to_key_file(Glib::KeyFile& key_file) const
+void PrintSettings::save_to_key_file(const Glib::RefPtr<Glib::KeyFile>& key_file) const
 {
-  gtk_print_settings_to_key_file(const_cast<GtkPrintSettings*>(gobj()), (key_file).gobj(), nullptr);
+  gtk_print_settings_to_key_file(const_cast<GtkPrintSettings*>(gobj()), Glib::unwrap(key_file), nullptr);
 }
 
 } // namespace Gtk
