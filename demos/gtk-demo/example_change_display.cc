@@ -108,16 +108,17 @@ Example_ChangeDisplay::Example_ChangeDisplay()
 
   set_default_size(300, 400);
 
-  m_VBox.property_margin() = 8;
-  get_content_area()->pack_start(m_VBox, Gtk::PackOptions::EXPAND_WIDGET);
+  m_VBox.set_margin(8);
+  m_VBox.set_expand(true);
+  get_content_area()->add(m_VBox);
 
 
   //Display:
   {
     setup_frame(m_Frame_Display, m_TreeView_Display, m_ButtonBox_Display);
-    m_ButtonBox_Display.pack_start(m_Button_Display_Open, Gtk::PackOptions::SHRINK);
+    m_ButtonBox_Display.add(m_Button_Display_Open);
     m_Button_Display_Open.signal_clicked().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_button_display_open) );
-    m_ButtonBox_Display.pack_start(m_Button_Display_Close, Gtk::PackOptions::SHRINK);
+    m_ButtonBox_Display.add(m_Button_Display_Close);
     m_Button_Display_Close.signal_clicked().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_button_display_close) );
 
     //Setup TreeView:
@@ -129,7 +130,8 @@ Example_ChangeDisplay::Example_ChangeDisplay()
     auto refSelection = m_TreeView_Display.get_selection();
     refSelection->signal_changed().connect( sigc::mem_fun(*this, &Example_ChangeDisplay::on_treeview_display_selection_changed) );
 
-    m_VBox.pack_start(m_Frame_Display, Gtk::PackOptions::EXPAND_WIDGET);
+    m_Frame_Display.set_expand(true);
+    m_VBox.add(m_Frame_Display);
 
     m_refSizeGroup_Display = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL);
     m_refSizeGroup_Display->add_widget(m_ButtonBox_Display);
@@ -151,7 +153,8 @@ void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treevi
   auto pScrolledWindow = Gtk::make_managed<Gtk::ScrolledWindow>();
   pScrolledWindow->set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   pScrolledWindow->set_shadow_type(Gtk::ShadowType::IN);
-  pHBox->pack_start(*pScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
+  pScrolledWindow->set_expand(true);
+  pHBox->add(*pScrolledWindow);
 
   treeview.set_headers_visible(false);
   pScrolledWindow->add(treeview);
@@ -159,7 +162,7 @@ void Example_ChangeDisplay::setup_frame(Gtk::Frame& frame, Gtk::TreeView& treevi
   auto refSelection = treeview.get_selection();
   refSelection->set_mode(Gtk::SelectionMode::BROWSE);
 
-  pHBox->pack_start(buttonbox, Gtk::PackOptions::SHRINK);
+  pHBox->add(buttonbox);
 }
 
 void Example_ChangeDisplay::initialize_displays()

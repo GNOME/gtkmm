@@ -197,8 +197,10 @@ Example_IconBrowser::Example_IconBrowser()
   m_header.pack_end(m_search_button);
   m_search_button.set_image_from_icon_name("edit-find-symbolic");
   m_header.pack_end(m_header_radio_button_box);
-  m_header_radio_button_box.pack_start(m_normal_radio, Gtk::PackOptions::EXPAND_WIDGET);
-  m_header_radio_button_box.pack_start(m_symbolic_radio, Gtk::PackOptions::EXPAND_WIDGET);
+  m_normal_radio.set_expand();
+  m_header_radio_button_box.add(m_normal_radio);
+  m_symbolic_radio.set_expand();
+  m_header_radio_button_box.add(m_symbolic_radio);
   m_normal_radio.set_draw_indicator(false); // Make it look as a normal button
   m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
@@ -210,18 +212,20 @@ Example_IconBrowser::Example_IconBrowser()
 
   // Main part of the window.
   add(m_hbox);
-  m_hbox.pack_start(m_context_list, Gtk::PackOptions::SHRINK);
+  m_hbox.add(m_context_list);
   m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
-  m_hbox.pack_start(m_vseparator, Gtk::PackOptions::SHRINK);
-  m_hbox.pack_start(m_vcontent_box, Gtk::PackOptions::EXPAND_WIDGET);
-  m_vcontent_box.pack_start(m_search_bar, Gtk::PackOptions::SHRINK);
+  m_hbox.add(m_vseparator);
+  m_vcontent_box.set_expand();
+  m_hbox.add(m_vcontent_box);
+  m_vcontent_box.add(m_search_bar);
   m_search_bar.add(m_search_entry);
   // The search bar is shown when the search toggle button is pressed.
   m_binding_search_button_search_entry = Glib::Binding::bind_property(
     m_search_button.property_active(),
     m_search_bar.property_search_mode_enabled(),
     Glib::Binding::Flags::BIDIRECTIONAL);
-  m_vcontent_box.pack_start(m_scrolled_window, Gtk::PackOptions::EXPAND_WIDGET);
+  m_scrolled_window.set_expand();
+  m_vcontent_box.add(m_scrolled_window);
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.add(m_icon_view);
   m_icon_view.set_model(m_filter_model);
@@ -836,7 +840,7 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
 {
   IconContextLabel* row = Gtk::make_managed<IconContextLabel>(id, name);
   row->show();
-  row->property_margin() = 10;
+  row->set_margin(10);
   m_context_list.append(*row);
 
   // Set the tooltip on the list box row.
@@ -900,14 +904,15 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 {
   set_resizable(false);
   auto content_area = get_content_area();
-  content_area->pack_start(m_grid, Gtk::PackOptions::EXPAND_WIDGET);
-  m_grid.property_margin() = 10;
+  content_area->add(m_grid);
+  m_grid.set_expand();
+  m_grid.set_margin(10);
   m_grid.set_row_spacing(10);
   m_grid.set_column_spacing(10);
   for (int i = 0; i < n_icon_sizes; ++i)
   {
     m_grid.attach(m_image[i], i, 0);
-    m_image[i].property_margin() = 4;
+    m_image[i].set_margin(4);
     m_image[i].set_halign(Gtk::Align::CENTER);
     m_image[i].set_valign(Gtk::Align::END);
 
@@ -919,7 +924,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
 
     m_grid.attach(m_label[i], i, 1);
-    m_label[i].property_margin() = 4;
+    m_label[i].set_margin(4);
     m_label[i].set_halign(Gtk::Align::CENTER);
     m_label[i].set_valign(Gtk::Align::CENTER);
     std::ostringstream ostr;

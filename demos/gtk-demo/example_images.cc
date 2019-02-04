@@ -73,20 +73,20 @@ Example_Images::Example_Images()
 
   m_BaseVBox.set_margin(16);
   add(m_BaseVBox);
-  m_BaseVBox.pack_start(m_HBox);
+  m_BaseVBox.add(m_HBox);
 
   /* Image */
 
   auto pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+  m_HBox.add(*pVBox);
 
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
-  pVBox->pack_start(m_Label_Image, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_Image);
 
   m_Frame_Image.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Image.set_halign(Gtk::Align::CENTER);
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
-  pVBox->pack_start(m_Frame_Image, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Frame_Image);
 
   auto pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_icon_name("gtk3-demo");
@@ -96,12 +96,12 @@ Example_Images::Example_Images()
   /* Animation */
 
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
-  pVBox->pack_start(m_Label_Animation, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_Animation);
 
   m_Frame_Animation.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
-  pVBox->pack_start(m_Frame_Animation, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Frame_Animation);
 
   auto pPicture = Gtk::make_managed<Gtk::Picture>();
   pPicture->set_resource("/images/floppybuddy.gif");
@@ -110,12 +110,12 @@ Example_Images::Example_Images()
   /* Symbolic themed icon */
 
   m_Label_ThemedIcon.set_markup("<u>Symbolic themed icon</u>");
-  pVBox->pack_start(m_Label_ThemedIcon, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_ThemedIcon);
 
   m_Frame_ThemedIcon.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_ThemedIcon.set_halign(Gtk::Align::CENTER);
   m_Frame_ThemedIcon.set_valign(Gtk::Align::CENTER);
-  pVBox->pack_start(m_Frame_ThemedIcon, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Frame_ThemedIcon);
 
   auto icon = Gio::ThemedIcon::create("battery-caution-charging-symbolic", true);
   pImage = Gtk::make_managed<Gtk::Image>(icon);
@@ -125,15 +125,15 @@ Example_Images::Example_Images()
   /* Progressive */
 
   pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+  m_HBox.add(*pVBox);
 
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
-  pVBox->pack_start(m_Label_Progressive, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_Progressive);
 
   m_Frame_Progressive.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Progressive.set_halign(Gtk::Align::CENTER);
   m_Frame_Progressive.set_valign(Gtk::Align::CENTER);
-  pVBox->pack_start(m_Frame_Progressive, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Frame_Progressive);
 
   /* Create an empty image for now; the progressive loader
    * will create the pixbuf and fill it in.
@@ -145,12 +145,12 @@ Example_Images::Example_Images()
   /* Video */
 
   m_Label_Video.set_markup("<u>Displaying video</u>");
-  pVBox->pack_start(m_Label_Video, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_Video);
 
   m_Frame_Video.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Video.set_halign(Gtk::Align::CENTER);
   m_Frame_Video.set_valign(Gtk::Align::CENTER);
-  pVBox->pack_start(m_Frame_Video, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Frame_Video);
 
   auto video = Gtk::make_managed<Gtk::Video>();
   video->set_resource("/images/gtk-logo.webm");
@@ -160,10 +160,10 @@ Example_Images::Example_Images()
   /* Widget paintable */
 
   pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.pack_start(*pVBox, Gtk::PackOptions::SHRINK);
+  m_HBox.add(*pVBox);
 
   m_Label_Paintable.set_markup("<u>Gtk::WidgetPaintable</u>");
-  pVBox->pack_start(m_Label_Paintable, Gtk::PackOptions::SHRINK);
+  pVBox->add(m_Label_Paintable);
 
   pPicture = Gtk::make_managed<Gtk::Picture>();
   auto demo_window = DemoWindow::get_demo_window();
@@ -174,10 +174,10 @@ Example_Images::Example_Images()
   }
   pPicture->set_size_request(100, 100);
   pPicture->set_valign(Gtk::Align::START);
-  pVBox->pack_start(*pPicture, Gtk::PackOptions::SHRINK);
+  pVBox->add(*pPicture);
 
   /* Sensitivity control */
-  m_BaseVBox.pack_start(m_ToggleButton, Gtk::PackOptions::SHRINK);
+  m_BaseVBox.add(m_ToggleButton);
   m_ToggleButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_Images::on_toggle_sensitivity));
 }
 

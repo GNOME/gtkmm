@@ -45,7 +45,8 @@ Example_ColorSel::Example_ColorSel()
 
   // Create the color swatch area
   m_Frame.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Frame.set_expand(true);
+  m_VBox.add(m_Frame);
 
   // set a fixed size
   m_DrawingArea.set_content_width(200);
@@ -60,7 +61,7 @@ Example_ColorSel::Example_ColorSel()
   m_Button.set_halign(Gtk::Align::END);
   m_Button.set_valign(Gtk::Align::CENTER);
 
-  m_VBox.pack_start(m_Button, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Button);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_ColorSel::on_button_clicked));
 }

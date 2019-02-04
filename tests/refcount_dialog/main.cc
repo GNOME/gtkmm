@@ -31,7 +31,8 @@ MyWindow::MyWindow()
   set_size_request(200, 200);
 
   m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
-  m_Box.pack_start(m_Button, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Button.set_expand(true);
+  m_Box.add(m_Button);
   add(m_Box);
 }
 

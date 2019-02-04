@@ -37,32 +37,32 @@ Example_ButtonBox::Example_ButtonBox()
 {
   set_title("Button Boxes");
 
-  m_VBox_Main.property_margin() = 10;
+  m_VBox_Main.set_margin(10);
   add(m_VBox_Main);
 
   m_Frame_Horizontal.set_margin_top(10);
   m_Frame_Horizontal.set_margin_bottom(10);
-  m_VBox_Main.pack_start(m_Frame_Horizontal, Gtk::PackOptions::EXPAND_WIDGET);
-  m_Frame_Horizontal.set_margin_top(10);
-  m_Frame_Horizontal.set_margin_bottom(10);
+  m_Frame_Horizontal.set_expand(true);
+  m_VBox_Main.add(m_Frame_Horizontal);
 
-  m_VBox.property_margin() = 10;
+  m_VBox.set_margin(10);
   m_Frame_Horizontal.add(m_VBox);
 
-  m_VBox.pack_start( *(create_button_box(true, "Spread", 40, Gtk::ButtonBoxStyle::SPREAD)) );
-  m_VBox.pack_start( *(create_button_box(true, "Edge", 40, Gtk::ButtonBoxStyle::EDGE)) );
-  m_VBox.pack_start( *(create_button_box(true, "Start", 40, Gtk::ButtonBoxStyle::START)) );
-  m_VBox.pack_start( *(create_button_box(true, "End", 40, Gtk::ButtonBoxStyle::END)) );
+  m_VBox.add( *(create_button_box(true, "Spread", 40, Gtk::ButtonBoxStyle::SPREAD)) );
+  m_VBox.add( *(create_button_box(true, "Edge", 40, Gtk::ButtonBoxStyle::EDGE)) );
+  m_VBox.add( *(create_button_box(true, "Start", 40, Gtk::ButtonBoxStyle::START)) );
+  m_VBox.add( *(create_button_box(true, "End", 40, Gtk::ButtonBoxStyle::END)) );
 
-  m_VBox_Main.pack_start(m_Frame_Vertical, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Frame_Vertical.set_expand(true);
+  m_VBox_Main.add(m_Frame_Vertical);
 
-  m_HBox.property_margin() = 10;
+  m_HBox.set_margin(10);
   m_Frame_Vertical.add(m_HBox);
 
-  m_HBox.pack_start( *(create_button_box(false, "Spread", 30, Gtk::ButtonBoxStyle::SPREAD)) );
-  m_HBox.pack_start( *(create_button_box(false, "Edge", 30, Gtk::ButtonBoxStyle::EDGE)) );
-  m_HBox.pack_start( *(create_button_box(false, "Start", 30, Gtk::ButtonBoxStyle::START)) );
-  m_HBox.pack_start( *(create_button_box(false, "End", 30, Gtk::ButtonBoxStyle::END)) );
+  m_HBox.add( *(create_button_box(false, "Spread", 30, Gtk::ButtonBoxStyle::SPREAD)) );
+  m_HBox.add( *(create_button_box(false, "Edge", 30, Gtk::ButtonBoxStyle::EDGE)) );
+  m_HBox.add( *(create_button_box(false, "Start", 30, Gtk::ButtonBoxStyle::START)) );
+  m_HBox.add( *(create_button_box(false, "End", 30, Gtk::ButtonBoxStyle::END)) );
 }
 
 Example_ButtonBox::~Example_ButtonBox()

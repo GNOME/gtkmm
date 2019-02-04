@@ -93,7 +93,7 @@ DemoWindow::DemoWindow()
   m_SideBar.get_style_context()->add_class("sidebar");
   m_SideBar.set_hexpand(false);
   m_SideBar.add(m_TreeView);
-  m_HBox.pack_start(m_SideBar, Gtk::PackOptions::SHRINK);
+  m_HBox.add(m_SideBar);
 
   //Notebook:
   m_Notebook.popup_enable();
@@ -102,7 +102,8 @@ DemoWindow::DemoWindow()
   m_Notebook.append_page(m_TextWidget_Source, "_Source", true);  //true = use mnemonic.
   m_Notebook.child_property_tab_expand(m_TextWidget_Info) = true;
   m_Notebook.child_property_tab_expand(m_TextWidget_Source) = true;
-  m_HBox.pack_start(m_Notebook, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Notebook.set_expand(true);
+  m_HBox.add(m_Notebook);
   m_HBox.set_vexpand(true);
 
   set_default_size (800, 600);

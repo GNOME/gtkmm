@@ -105,13 +105,14 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
   set_title("Gtk::ListStore demo");
   set_default_size(280, 250);
 
-  m_VBox.property_margin() = 8;
+  m_VBox.set_margin(8);
   add(m_VBox);
-  m_VBox.pack_start(m_Label, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Label);
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
+  m_ScrolledWindow.set_expand();
+  m_VBox.add(m_ScrolledWindow);
 
   /* create model */
   create_model();

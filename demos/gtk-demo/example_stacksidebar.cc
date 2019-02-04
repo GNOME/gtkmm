@@ -50,9 +50,10 @@ Example_StackSidebar::Example_StackSidebar()
 
   add(m_Box);
 
-  m_Box.pack_start(m_StackSidebar, Gtk::PackOptions::SHRINK);
-  m_Box.pack_start(m_Separator, Gtk::PackOptions::SHRINK);
-  m_Box.pack_start(m_Stack, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Box.add(m_StackSidebar);
+  m_Box.add(m_Separator);
+  m_Box.add(m_Stack);
+  m_Stack.set_expand();
 
   m_Stack.set_transition_type(Gtk::StackTransitionType::SLIDE_UP_DOWN);
   m_StackSidebar.set_stack(m_Stack);

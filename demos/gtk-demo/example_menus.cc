@@ -62,7 +62,7 @@ Example_Menus::Example_Menus()
 
   add(m_VBox1);
 
-  m_VBox1.pack_start(m_MenuBar, Gtk::PackOptions::SHRINK);
+  m_VBox1.add(m_MenuBar);
 
   {
     //Note:: It's generally easier to use the Gtk::Builder API.
@@ -84,7 +84,8 @@ Example_Menus::Example_Menus()
 
 
   m_VBox_Sub1.set_margin(10);
-  m_VBox1.pack_start(m_VBox_Sub1, Gtk::PackOptions::EXPAND_WIDGET);
+  m_VBox_Sub1.set_expand();
+  m_VBox1.add(m_VBox_Sub1);
 
   {
     auto accel_group = Gtk::AccelGroup::create();
@@ -126,14 +127,15 @@ Example_Menus::Example_Menus()
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F3"));
   }
 
-  m_VBox1.pack_start(m_Separator, Gtk::PackOptions::SHRINK);
+  m_VBox1.add(m_Separator);
 
   m_VBox_Sub2.set_margin(10);
-  m_VBox1.pack_start(m_VBox_Sub2, Gtk::PackOptions::SHRINK);
+  m_VBox1.add(m_VBox_Sub2);
 
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Example_Menus::on_button_clicked));
+  m_Button.set_expand();
 
-  m_VBox_Sub2.pack_start(m_Button, Gtk::PackOptions::EXPAND_WIDGET);
+  m_VBox_Sub2.add(m_Button);
   m_VBox_Sub2.set_vexpand(false);
 
   m_Button.set_can_default(true);

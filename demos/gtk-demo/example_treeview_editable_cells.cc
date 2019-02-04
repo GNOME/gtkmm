@@ -106,13 +106,14 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   set_title("Shopping List");
   set_default_size(320, 200);
 
-  m_VBox.property_margin() = 5;
+  m_VBox.set_margin(5);
   add(m_VBox);
-  m_VBox.pack_start(m_Label, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Label);
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
+  m_ScrolledWindow.set_expand();
+  m_VBox.add(m_ScrolledWindow);
 
   /* create model */
   create_model();
@@ -126,15 +127,17 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   m_ScrolledWindow.add(m_TreeView);
 
   /* some buttons */
-  m_VBox.pack_start(m_HBox, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_HBox);
 
-  m_HBox.pack_start(m_Button_Add, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Button_Add.set_expand();
+  m_HBox.add(m_Button_Add);
   m_HBox.set_vexpand(false);
 
   m_Button_Add.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
 
-  m_HBox.pack_start(m_Button_Remove, Gtk::PackOptions::EXPAND_WIDGET);
+  m_HBox.add(m_Button_Remove);
+  m_Button_Remove.set_expand();
   m_Button_Remove.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
 }

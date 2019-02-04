@@ -59,17 +59,18 @@ Example_DrawingArea::Example_DrawingArea()
 {
   set_title("Drawing Area");
 
-  m_VBox.property_margin() = 16;
+  m_VBox.set_margin(16);
   add(m_VBox);
 
   /*
    * Create the checkerboard area
    */
   m_Label_Checkerboard.set_markup("<u>Checkerboard pattern</u>");
-  m_VBox.pack_start(m_Label_Checkerboard, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Label_Checkerboard);
 
   m_Frame_Checkerboard.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame_Checkerboard, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Frame_Checkerboard.set_expand(true);
+  m_VBox.add(m_Frame_Checkerboard);
 
   /* set a minimum size */
   m_DrawingArea_Checkerboard.set_content_width(100);
@@ -83,10 +84,11 @@ Example_DrawingArea::Example_DrawingArea()
    * Create the scribble area
    */
   m_Label_Scribble.set_markup("<u>Scribble area</u>");
-  m_VBox.pack_start(m_Label_Scribble, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Label_Scribble);
 
   m_Frame_Scribble.set_shadow_type(Gtk::ShadowType::IN);
-  m_VBox.pack_start(m_Frame_Scribble, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Frame_Scribble.set_expand(true);
+  m_VBox.add(m_Frame_Scribble);
 
   m_drag = Gtk::GestureDrag::create();
   m_drag->set_button(GDK_BUTTON_PRIMARY);

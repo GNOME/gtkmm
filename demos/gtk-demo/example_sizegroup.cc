@@ -58,16 +58,18 @@ Example_SizeGroup::Example_SizeGroup()
   set_resizable(false);
   add_button("_Close", Gtk::ResponseType::CLOSE);
 
-  get_content_area()->pack_start(m_VBox, Gtk::PackOptions::EXPAND_WIDGET);
-  m_VBox.property_margin() = 5;
+  get_content_area()->add(m_VBox);
+  m_VBox.set_margin(5);
+  m_VBox.set_expand();
 
   m_refSizeGroup = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL),
 
   /* Create one frame holding color options
    */
-  m_VBox.pack_start(m_Frame_Color, Gtk::PackOptions::EXPAND_WIDGET);
+  m_Frame_Color.set_expand();
+  m_VBox.add(m_Frame_Color);
 
-  m_Grid_Color.property_margin() = 5;
+  m_Grid_Color.set_margin(5);
   m_Grid_Color.set_row_spacing(5);
   m_Grid_Color.set_column_spacing(10);
   m_Frame_Color.add(m_Grid_Color);
@@ -82,9 +84,9 @@ Example_SizeGroup::Example_SizeGroup()
 
   /* And another frame holding line style options
    */
-  m_VBox.pack_start(m_Frame_Line, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Frame_Line);
 
-  m_Grid_Line.property_margin() = 5;
+  m_Grid_Line.set_margin(5);
   m_Grid_Line.set_row_spacing(5);
   m_Grid_Line.set_column_spacing(10);
   m_Frame_Line.add(m_Grid_Line);
@@ -105,7 +107,7 @@ Example_SizeGroup::Example_SizeGroup()
   add_row(m_Grid_Line, 1, m_refSizeGroup, "_Line ends", end_options);
 
   /* And a check button to turn grouping on and off */
-  m_VBox.pack_start(m_CheckButton, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_CheckButton);
   m_CheckButton.set_active();
   m_CheckButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_SizeGroup::on_checkbutton_toggled));
 }

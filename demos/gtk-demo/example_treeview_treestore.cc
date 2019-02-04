@@ -151,13 +151,14 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   set_title("Card planning sheet");
   set_default_size(650, 400);
 
-  m_VBox.property_margin() = 8;
+  m_VBox.set_margin(8);
   add(m_VBox);
-  m_VBox.pack_start(m_Label, Gtk::PackOptions::SHRINK);
+  m_VBox.add(m_Label);
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_VBox.pack_start(m_ScrolledWindow, Gtk::PackOptions::EXPAND_WIDGET);
+  m_ScrolledWindow.set_expand();
+  m_VBox.add(m_ScrolledWindow);
 
   /* create model */
   create_model();
