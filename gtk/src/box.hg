@@ -20,59 +20,32 @@ _PINCLUDE(gtkmm/private/container_p.h)
 
 #include <gtkmm/container.h>
 #include <gtkmm/orientable.h>
-#include <gtk/gtk.h>  /* For _GtkBoxChild */
-
 
 namespace Gtk
 {
 
-/** Packing options for adding child widgets to a Box with pack_start() and pack_end().
- * @ingroup gtkmmEnums
- */
-enum class PackOptions
-{
-  SHRINK, /**< Space is contracted to the child widget size. */
-  EXPAND_PADDING, /**< Space is expanded, with extra space filled with padding. */
-  EXPAND_WIDGET /**< Space is expanded, with extra space filled by increasing the child widget size. */
-};
-
-/** The Box widget organizes child widgets into a rectangular area.
+/** A container for packing widgets in a single row or column.
  *
- * The rectangular area of a Box is organized into either a single row
- * or a single column of child widgets depending upon the orientation.
- * Thus, all children of a Box are allocated one dimension in common,
- * which is the height of a row, or the width of a column.
+ * The %Gtk::Box widget arranges child widgets into a single row or column,
+ * depending upon the value of its Gtk::Orientable::property_orientation() property.
+ * Within the other dimension, all children are allocated the same size. Of course,
+ * Gtk::Widget::set_halign() and Gtk::Widget::set_valign() can be used on
+ * the children to influence their allocation.
  *
- * Gtk::Box uses a notion of packing. Packing refers to adding widgets with
- * reference to a particular position in a Gtk::Container. There are two
- * reference positions: the start and the end of the box. For a vertical Box, the start
- * is defined as the top of the box and the end is defined as the bottom.  For
- * a horizontal Box the start is defined as the left side and the end is defined as the
- * right side.  Use repeated calls to pack_start() to pack widgets into a
- * Gtk::Box from start to end. Use pack_end() to add widgets from end to start.
- * You may intersperse these calls and add widgets from both ends of the same
- * Gtk::Box. The last widget added with pack_start() will be placed just before
- * the last widget added with pack_end()
+ * Use repeated calls to Gtk::Container::add() to pack widgets into a
+ * %Gtk::Box from start to end. Use Gtk::Container::remove() to remove widgets
+ * from the %Gtk::Box. insert_child_after() and insert_child_at_start() can be used
+ * to add a child at a particular position.
  *
- * Because Gtk::Box is a Gtk::Container, you may also use Gtk::Container::add()
- * to insert widgets, and they will be packed as if with pack_start(). Use
- * Gtk::Container::remove() to remove widgets.
+ * Use set_homogeneous() to specify whether or not all children
+ * of the %Gtk::Box are forced to get the same amount of space.
  *
- * Use set_homogeneous() to specify whether or not all children of the Gtk::Box
- * occupy the same amount of space.
+ * Use set_spacing() to determine how much space will be
+ * minimally placed between all children in the %Gtk::Box. Note that
+ * spacing is added between the children.
  *
- * Use set_spacing() to determine the minimum
- * space placed between all children in the Gtk::Box. Note that
- * spacing is added between the children, while
- * padding added by pack_start() or pack_end() is added
- * on either side of the widget it belongs to.
- *
- * Use reorder_child() to
- * move a child widget to a different place in the box.
- *
- * Use
- * set_child_packing() to reset the pack options and padding attributes of any
- * Gtk::Box child. Use query_child_packing() to query these fields.
+ * Use reorder_child_after() and reorder_child_at_start() to move a child to
+ * a different place in the box.
  */
 class Box
   : public Container,
@@ -80,7 +53,6 @@ class Box
 {
   _CLASS_GTKOBJECT(Box,GtkBox,GTK_BOX,Gtk::Container,GtkContainer)
   _IMPLEMENTS_INTERFACE(Orientable)
-  _IGNORE(gtk_box_set_child_packing, gtk_box_query_child_packing)
 public:
 
   //Note that we try to use the same default parameter value as the default property value.
@@ -89,28 +61,6 @@ public:
    * @param spacing Determines the space in pixels between child widgets.
    */
   _WRAP_CTOR(Box(Orientation orientation = Orientation::HORIZONTAL, int spacing = 0), gtk_box_new)
-
-  // Note: GtkWidget's halign default is GTK_ALIGN_FILL, and its hexpand default is false
-  _WRAP_METHOD(void pack_start(Widget& child), gtk_box_pack_start)
-
-  // TODO: Remove this. Its current implementation is not a complete replacement for the behavior in gtkmm 3.
-  // It would be best for application code to port completely to use hexpand/vexpand/halign/valign.
-  /** Left side insert a widget to a box.
-   * @param child A Widget to be added to box.
-   * @param options Controls how the widget expands to fill space, and how the space around them is used.
-   */
-  void pack_start(Widget& child, PackOptions options);
-
-  // Note: GtkWidget's halign default is GTK_ALIGN_FILL, and its hexpand default is false
-  _WRAP_METHOD(void pack_end(Widget& child), gtk_box_pack_end)
-
-  // TODO: Remove this. Its current implementation is not a complete replacement for the behavior in gtkmm 3.
-  // It would be best for application code to port completely to use hexpand/vexpand/halign/valign.
-  /** Right side insert a widget to a box.
-   * @param child A Widget to be added to box.
-   * @param options Controls how the widget expands to fill space, and how the space around them is used.
-   */
-  void pack_end(Widget& child, PackOptions options);
 
   _WRAP_METHOD(void set_homogeneous(bool homogeneous = true), gtk_box_set_homogeneous)
   _WRAP_METHOD(bool get_homogeneous() const, gtk_box_get_homogeneous)
@@ -121,14 +71,35 @@ public:
   _WRAP_METHOD(void set_baseline_position(BaselinePosition position), gtk_box_set_baseline_position)
   _WRAP_METHOD(BaselinePosition get_baseline_position() const, gtk_box_get_baseline_position)
 
-  _WRAP_METHOD(void reorder_child(Widget& child, int position), gtk_box_reorder_child)
+  /** Inserts @a child in the position after @a sibling in the list of children.
+   *
+   * @param child The Gtk::Widget to insert.
+   * @param sibling The sibling to move @a child after.
+   */
+  _WRAP_METHOD(void insert_child_after(Widget& child, const Widget& sibling), gtk_box_insert_child_after)
+
+  /** Inserts @a child in the first position in the list of  children.
+   *
+   * @param child The Gtk::Widget to insert.
+   */
+  void insert_child_at_start(Widget& child);
+
+  /** Moves @a child to the position after @a sibling in the list of children.
+   *
+   * @param child The Gtk::Widget to move. Must be a child of the %Box.
+   * @param sibling The sibling to move @a child after.
+   */
+  _WRAP_METHOD(void reorder_child_after(Widget& child, const Widget& sibling), gtk_box_reorder_child_after)
+
+  /** Moves @a child to the first position in the list of children.
+   *
+   * @param child The Gtk::Widget to move. Must be a child of the %Box.
+   */
+  void reorder_child_at_start(Widget& child);
 
   _WRAP_PROPERTY("spacing", int)
   _WRAP_PROPERTY("homogeneous", bool)
   _WRAP_PROPERTY("baseline-position", BaselinePosition)
-
-  _WRAP_CHILD_PROPERTY("pack-type", PackType)
-  _WRAP_CHILD_PROPERTY("position", int)
 };
 
 } // namespace Gtk
