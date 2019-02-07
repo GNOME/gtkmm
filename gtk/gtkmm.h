@@ -110,7 +110,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/box.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
-#include <gtkmm/buttonbox.h>
 #include <gtkmm/cellarea.h>
 #include <gtkmm/cellareabox.h>
 #include <gtkmm/cellareacontext.h>
@@ -178,7 +177,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/image.h>
 #include <gtkmm/infobar.h>
 #include <gtkmm/calendar.h>
-#include <gtkmm/invisible.h>
 #include <gtkmm/label.h>
 #include <gtkmm/layout.h>
 #include <gtkmm/levelbar.h>
