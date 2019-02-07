@@ -13,10 +13,8 @@ struct Demo
   Demo* children;
 };
 
-
 Gtk::Window* do_appwindow();
 Gtk::Window* do_builder();
-Gtk::Window* do_buttonbox();
 Gtk::Window* do_change_display();
 Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
@@ -54,7 +52,6 @@ Demo testgtk_demos[] =
 {
   { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), nullptr },
   { "Builder", "example_builder.cc", sigc::ptr_fun(&do_builder), nullptr },
-  { "Button Boxes", "example_buttonbox.cc",  sigc::ptr_fun(&do_buttonbox), nullptr },
   { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), nullptr },
   { "Color Chooser", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), nullptr },

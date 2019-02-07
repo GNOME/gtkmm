@@ -38,7 +38,6 @@ dist_noinst_DATA = \
 GTK_DEMOS = \
   gtk-demo/example_appwindow.cc \
   gtk-demo/example_builder.cc \
-  gtk-demo/example_buttonbox.cc \
   gtk-demo/example_change_display.cc \
   gtk-demo/example_colorsel.cc \
   gtk-demo/example_dialog.cc \
