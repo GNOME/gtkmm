@@ -50,13 +50,13 @@ MM_AX_CXX_COMPILE_STDCXX([17], [noext],[mandatory])
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
 
-PKG_CHECK_MODULES([GTK], [gtk+-4.0])
+PKG_CHECK_MODULES([GTK], [gtk4])
 gdk_target_win32=no
 gdk_target_quartz=no
 gdk_target_x11=no
 gdk_target_wayland=no
 gdk_target_broadway=no
-backends=`$PKG_CONFIG --variable=targets gtk+-4.0`
+backends=`$PKG_CONFIG --variable=targets gtk4`
 m4_foreach([mytarget], [[win32], [quartz], [x11], [wayland], [broadway]], [
     AC_ARG_ENABLE(mytarget-backend,
                   AS_HELP_STRING([--enable-mytarget-backend@<:@=yes|no|check@:>@], [enable mytarget gdk target @<:@default=check@:>@]),
@@ -92,14 +92,14 @@ AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$gtkmm_host_windows" = xyes])
 AS_IF([test "x$enable_static" = xyes],
       [AC_DEFINE([GTKMM_STATIC_LIB], [1], [Define when building gtkmm as a static library])])
 
-# gdkmm really does need GTK+, because part of Gdk::DragContext is in GTK+.
-# The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk+-4.0 requires.
+# gdkmm really does need GTK, because part of Gdk::DragContext is in GTK.
+# The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk4 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.60 >= 2.59.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk+-4.0 >= 3.94.0 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.60 >= 2.59.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.94.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
-      [GTKMM_MODULES="$GDKMM_MODULES gtk+-unix-print-4.0"])
+      [GTKMM_MODULES="$GDKMM_MODULES gtk4-unix-print"])
 
 # Offer the ability to omit some API from the library, to reduce the code size.
 # Note that there are other options in glibmm, which affect gtkmm.
