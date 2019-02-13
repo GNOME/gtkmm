@@ -837,29 +837,6 @@ necessary before showing @page.
 <return></return>
 </signal>
 
-<property name="GtkAssistant:complete">
-<description>
-Setting the &quot;complete&quot; child property to %TRUE marks a page as
-complete (i.e.: all the required fields are filled out). GTK+ uses
-this information to control the sensitivity of the navigation buttons.
-
-</description>
-</property>
-
-<property name="GtkAssistant:page-type">
-<description>
-The type of the assistant page.
-
-</description>
-</property>
-
-<property name="GtkAssistant:title">
-<description>
-The title of the page.
-
-</description>
-</property>
-
 <property name="GtkAssistant:use-header-bar">
 <description>
 %TRUE if the assistant uses a #GtkHeaderBar for action buttons
@@ -867,6 +844,29 @@ instead of the action-area.
 
 For technical reasons, this property is declared as an integer
 property, but you should only set it to %TRUE or %FALSE.
+
+</description>
+</property>
+
+<property name="GtkAssistantPage:complete">
+<description>
+Setting the &quot;complete&quot; property to %TRUE marks a page as
+complete (i.e.: all the required fields are filled out). GTK+ uses
+this information to control the sensitivity of the navigation buttons.
+
+</description>
+</property>
+
+<property name="GtkAssistantPage:page-type">
+<description>
+The type of the assistant page.
+
+</description>
+</property>
+
+<property name="GtkAssistantPage:title">
+<description>
+The title of the page.
 
 </description>
 </property>
@@ -8544,6 +8544,27 @@ between horizontal and vertical orientation on the fly, like #GtkToolbar or
 </parameters>
 </enum>
 
+<enum name="GtkOverflow">
+<description>
+Defines how content overflowing a given area should be handled, such as
+with gtk_widget_set_overflow(). This property is modeled after the CSS overflow
+property, but implements it only partially.
+
+</description>
+<parameters>
+<parameter name="GTK_OVERFLOW_VISIBLE">
+<parameter_description> No change is applied. Content is drawn at the specified
+position.
+</parameter_description>
+</parameter>
+<parameter name="GTK_OVERFLOW_HIDDEN">
+<parameter_description> Content is clipped to the bounds of the area. Content
+outside the area is not drawn and cannot be interacted with.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GtkOverlay::get-child-position">
 <description>
 The ::get-child-position signal is emitted to determine
@@ -10991,6 +11012,34 @@ Some widgets may also allow Click-drag to select a range of elements.
 </parameters>
 </enum>
 
+<signal name="GtkSelectionModel::selection-changed">
+<description>
+Emitted when the selection state of some of the items in @model changes.
+
+Note that this signal does not specify the new selection state of the items,
+they need to be queried manually.  
+It is also not necessary for a model to change the selection state of any of
+the items in the selection model, though it would be rather useless to emit
+such a signal.
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> a #GtkSelectionModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> The first item that may have changed
+</parameter_description>
+</parameter>
+<parameter name="n_items">
+<parameter_description> number of items with changes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <enum name="GtkSensitivityType">
 <description>
 Determines how GTK+ handles the sensitivity of stepper arrows
@@ -11655,6 +11704,34 @@ This should correspond to the #GtkShortcutsGroup:view property of some of
 the #GtkShortcutsGroup objects that are inside this shortcuts window.
 
 Set this to %NULL to show all groups.
+
+</description>
+</property>
+
+<property name="GtkSingleSelection:autoselect">
+<description>
+If the selection will always select an item
+
+</description>
+</property>
+
+<property name="GtkSingleSelection:can-unselect">
+<description>
+If unselecting the selected item is allowed
+
+</description>
+</property>
+
+<property name="GtkSingleSelection:selected">
+<description>
+Position of the selected item
+
+</description>
+</property>
+
+<property name="GtkSingleSelection:selected-item">
+<description>
+The selected item
 
 </description>
 </property>
@@ -15434,6 +15511,13 @@ The requested opacity of the widget. See gtk_widget_set_opacity() for
 more details about window opacity.
 
 Before 3.8 this was only available in GtkWindow
+
+</description>
+</property>
+
+<property name="GtkWidget:overflow">
+<description>
+How content outside the widget's content area is treated.
 
 </description>
 </property>
@@ -19763,6 +19847,26 @@ if @page_num is out of bounds
 </return>
 </function>
 
+<function name="gtk_assistant_get_page">
+<description>
+Returns the #GtkAssistantPage object for @child.
+
+
+</description>
+<parameters>
+<parameter name="assistant">
+<parameter_description> a #GtkAssistant
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a child of @assistant
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkAssistantPage for @child
+</return>
+</function>
+
 <function name="gtk_assistant_get_page_complete">
 <description>
 Gets whether @page is complete.
@@ -19898,6 +20002,22 @@ This function is for use when creating pages of the
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_assistant_page_get_child">
+<description>
+Returns the child to which @page belongs.
+
+
+</description>
+<parameters>
+<parameter name="page">
+<parameter_description> a #GtkAssistantPage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child to which @page belongs
+</return>
 </function>
 
 <function name="gtk_assistant_prepend_page">
@@ -61105,6 +61225,53 @@ and a suitable target for URI lists is included, otherwise %FALSE.
 </return>
 </function>
 
+<function name="gtk_selection_model_is_selected">
+<description>
+Checks if the given item is selected.
+
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> a #GtkSelectionModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position of the item to query
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the item is selected
+</return>
+</function>
+
+<function name="gtk_selection_model_query_range">
+<description>
+This function allows to query the selection status of multiple elements at once.
+It is passed a position and returns a range of elements of uniform selection status.
+The returned range is guaranteed to include the passed-in position.
+The selection status is returned from this function.
+
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> a #GtkSelectionModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> specifies the position on input, and the first element of the range on output
+</parameter_description>
+</parameter>
+<parameter name="n_items">
+<parameter_description> returns the size of the range
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the elements in the returned range are selected, %FALSE otherwise
+</return>
+</function>
+
 <function name="gtk_separator_menu_item_new">
 <description>
 Creates a new #GtkSeparatorMenuItem.
@@ -61392,6 +61559,154 @@ necessary for sandbox helpers to parent their dialogs properly.
 </parameters>
 <return> %TRUE on success, %FALSE on error
 </return>
+</function>
+
+<function name="gtk_single_selection_get_autoselect">
+<description>
+Checks if autoselect has been enabled or disabled via
+gtk_single_selection_set_autoselect().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if autoselect is enabled
+</return>
+</function>
+
+<function name="gtk_single_selection_get_can_unselect">
+<description>
+If %TRUE, gtk_selection_model_unselect_item() is supported and allows
+unselecting the selected item.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE to support unselecting
+</return>
+</function>
+
+<function name="gtk_single_selection_get_selected">
+<description>
+Gets the position of the selected item. If no item is selected,
+#GTK_INVALID_LIST_POSITION is returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The position of the selected item
+</return>
+</function>
+
+<function name="gtk_single_selection_get_selected_item">
+<description>
+Gets the selected item. If no item is selected, %NULL is returned.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The selected item
+</return>
+</function>
+
+<function name="gtk_single_selection_new">
+<description>
+Creates a new selection to handle @model.
+
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> the #GListModel to manage
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkSingleSelection
+</return>
+</function>
+
+<function name="gtk_single_selection_set_autoselect">
+<description>
+If @autoselect is %TRUE, @self will enforce that an item is always
+selected. It will select a new item when the currently selected
+item is deleted and it will disallow unselecting the current item.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+<parameter name="autoselect">
+<parameter_description> %TRUE to always select an item
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_single_selection_set_can_unselect">
+<description>
+If %TRUE, unselecting the current item via
+gtk_selection_model_unselect_item() is supported.
+
+Note that setting GtkSingleSelection:autoselect will cause the
+unselecting to not work, so it practically makes no sense to set
+both at the same time the same time..
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+<parameter name="can_unselect">
+<parameter_description> %TRUE to allow unselecting
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_single_selection_set_selected">
+<description>
+Selects the item at the given position. If the list does not have an item at
+@position or #GTK_INVALID_LIST_POSITION is given, the behavior depends on the
+value of the GtkSingleSelection:autoselect property: If it is set, no change
+will occur and the old item will stay selected. If it is unset, the selection
+will be unset and no item will be selected.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkSingleSelection
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the item to select or #GTK_INVALID_LIST_POSITION
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_size_group_add_widget">
@@ -63138,6 +63453,45 @@ the sizes of children on page switch.
 </return>
 </function>
 
+<function name="gtk_stack_get_page">
+<description>
+Returns the #GtkStackPage object for @child.
+
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a child of @stack
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkStackPage for @child
+</return>
+</function>
+
+<function name="gtk_stack_get_pages">
+<description>
+Returns a #GListModel that contains the pages of the stack,
+and can be used to keep and up-to-date view. The model also
+implements #GtkSelectionModel and can be used to track and
+modify the visible page..
+
+
+</description>
+<parameters>
+<parameter name="stack">
+<parameter_description> a #GtkStack
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkSelectionModel for the stack's children
+</return>
+</function>
+
 <function name="gtk_stack_get_transition_duration">
 <description>
 Returns the amount of time (in milliseconds) that
@@ -63249,6 +63603,22 @@ Creates a new #GtkStack container.
 <parameters>
 </parameters>
 <return> a new #GtkStack
+</return>
+</function>
+
+<function name="gtk_stack_page_get_child">
+<description>
+Returns the stack child to which @page belongs.
+
+
+</description>
+<parameters>
+<parameter name="page">
+<parameter_description> a #GtkStackPage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child to which @page belongs
 </return>
 </function>
 
@@ -81263,6 +81633,22 @@ See gtk_widget_set_opacity().
 </return>
 </function>
 
+<function name="gtk_widget_get_overflow">
+<description>
+Returns the value set via gtk_widget_set_overflow().
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> The widget's overflow.
+</return>
+</function>
+
 <function name="gtk_widget_get_pango_context">
 <description>
 Gets a #PangoContext with the appropriate font map, font description,
@@ -84169,6 +84555,30 @@ For child widgets it doesn’t work if any affected widget has a native window.
 </parameter>
 <parameter name="opacity">
 <parameter_description> desired opacity, between 0 and 1
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_set_overflow">
+<description>
+Sets how @widget treats content that is drawn outside the widget's content area.
+See the definition of #GtkOverflow for details.
+
+This setting is provided for widget implementations and should not be used by
+application code.
+
+The default value is %GTK_OVERFLOW_VISIBLE.
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="overflow">
+<parameter_description> desired overflow
 </parameter_description>
 </parameter>
 </parameters>
