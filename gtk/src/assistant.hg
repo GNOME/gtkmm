@@ -17,6 +17,7 @@
  */
 
 #include <gtkmm/window.h>
+#include <gtkmm/assistantpage.h>
 #include <gdkmm/pixbuf.h>
 
 _DEFS(gtkmm,gtk)
@@ -31,6 +32,10 @@ namespace Gtk
  * operation split into several steps, guiding the user through its
  * pages and controlling the page flow to collect the necessary data.
  *
+ * %Gtk::Assistant maintains a Gtk::AssistantPage object for each added
+ * child, which holds additional per-child properties. You
+ * obtain the Gtk::AssistantPage for a child with get_page().
+ *
  * @newin{2,10}
  * @ingroup Dialogs
  */
@@ -39,8 +44,6 @@ class Assistant : public Window
   _CLASS_GTKOBJECT(Assistant, GtkAssistant, GTK_ASSISTANT, Gtk::Window, GtkWindow)
   _UNMANAGEABLE
 public:
-  _WRAP_ENUM(PageType, GtkAssistantPageType)
-
   _CTOR_DEFAULT()
 
   /** Constructor.
@@ -70,8 +73,8 @@ public:
   void set_forward_page_func(const SlotForwardPage& slot);
   _IGNORE(gtk_assistant_set_forward_page_func)
 
-  _WRAP_METHOD(void set_page_type(const Widget& page, PageType type), gtk_assistant_set_page_type)
-  _WRAP_METHOD(PageType  get_page_type(const Widget& page) const, gtk_assistant_get_page_type)
+  _WRAP_METHOD(void set_page_type(const Widget& page, AssistantPage::Type type), gtk_assistant_set_page_type)
+  _WRAP_METHOD(AssistantPage::Type  get_page_type(const Widget& page) const, gtk_assistant_get_page_type)
   _WRAP_METHOD(void set_page_title(const Widget& page, const Glib::ustring& title), gtk_assistant_set_page_title)
   _WRAP_METHOD(Glib::ustring get_page_title(const Widget& page) const, gtk_assistant_get_page_title)
 
@@ -85,6 +88,9 @@ public:
   _WRAP_METHOD(void set_page_has_padding(const Widget& page, bool has_padding = true), gtk_assistant_set_page_has_padding)
   _WRAP_METHOD(bool get_page_has_padding(const Widget& page) const, gtk_assistant_get_page_has_padding)
 
+  _WRAP_METHOD(Glib::RefPtr<AssistantPage> get_page(Widget& child), gtk_assistant_get_page, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const AssistantPage> get_page(const Widget& child) const, gtk_assistant_get_page, refreturn, constversion)
+
   _WRAP_SIGNAL(void prepare(Gtk::Widget* page), "prepare")
   _WRAP_SIGNAL(void apply(), "apply")
   _WRAP_SIGNAL(void close(), "close")
@@ -94,11 +100,6 @@ public:
   _IGNORE_SIGNAL("escape")
 
   _WRAP_PROPERTY("use-header-bar", bool)
-
-  _WRAP_CHILD_PROPERTY("page-type", PageType, newin "3,90")
-  _WRAP_CHILD_PROPERTY("title", Glib::ustring, newin "3,90")
-  _WRAP_CHILD_PROPERTY("complete", bool, newin "3,90")
-  _WRAP_CHILD_PROPERTY("has-padding", bool, newin "3,90")
 };
 
 } // namespace Gtk

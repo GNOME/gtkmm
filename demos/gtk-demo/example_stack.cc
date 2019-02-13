@@ -54,7 +54,7 @@ Example_Stack::Example_Stack()
   m_check_button.set_halign(Gtk::Align::CENTER);
 
   // Page 3
-  m_stack.child_property_icon_name(m_spinner) = "face-laugh-symbolic";
+  m_stack.get_page(m_spinner)->property_icon_name() = "face-laugh-symbolic";
   m_spinner.property_active() = true;
 
   // Stack transition
