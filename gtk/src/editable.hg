@@ -37,16 +37,15 @@ namespace Gtk
  * a large number of action signals used for key bindings, and several
  * signals that an application can connect to to modify the behavior of a
  * widget.
- *
  */
 class Editable : public Glib::Interface
 {
   _CLASS_INTERFACE(Editable,GtkEditable,GTK_EDITABLE,GtkEditableInterface)
 
 public:
-  _WRAP_METHOD(void cut_clipboard(), gtk_editable_cut_clipboard)
-  _WRAP_METHOD(void copy_clipboard(), gtk_editable_copy_clipboard)
-  _WRAP_METHOD(void paste_clipboard(), gtk_editable_paste_clipboard)
+  _WRAP_METHOD(Glib::ustring get_text() const, gtk_editable_get_text)
+  _WRAP_METHOD(void set_text(const Glib::ustring& text), gtk_editable_set_text)
+
   _WRAP_METHOD(void delete_selection(), gtk_editable_delete_selection)
   _WRAP_METHOD(void set_editable(bool is_editable = true), gtk_editable_set_editable)
   _WRAP_METHOD(bool get_editable() const, gtk_editable_get_editable)
@@ -62,15 +61,28 @@ public:
   _WRAP_METHOD(void set_position(int position), gtk_editable_set_position)
   _WRAP_METHOD(int get_position() const, gtk_editable_get_position)
 
+  _WRAP_METHOD(float get_alignment() const, gtk_editable_get_alignment)
+  _WRAP_METHOD(void set_alignment(float xalign), gtk_editable_set_alignment)
+
+  _WRAP_METHOD(int get_width_chars() const, gtk_editable_get_width_chars)
+  _WRAP_METHOD(void set_width_chars(int n_chars), gtk_editable_set_width_chars)
+
+  _WRAP_METHOD(int get_max_width_chars() const, gtk_editable_get_max_width_chars)
+  _WRAP_METHOD(void set_max_width_chars(int n_chars), gtk_editable_set_max_width_chars)
+
+  // Don't wrap API for implementations. Should it be wrapped?
+  _IGNORE(gtk_editable_install_properties, gtk_editable_init_delegate, gtk_editable_finish_delegate,
+    gtk_editable_delegate_set_property, gtk_editable_delegate_get_property)
+
   _IGNORE_SIGNAL(insert_text)
 
 #m4begin
 dnl // WRAP_SIGNAL "insert_text"
 dnl // C++ prototype: void insert_text(const Glib::ustring& text, int* position)
-dnl // C prototype: void insert_text(const gchar* text, gint length, gint* position)
+dnl // C prototype: void insert_text(const gchar* text, int length, int* position)
 
   _SIGNAL_PROXY(
-      insert_text, void, `const gchar* text, gint length, gint* position',
+      insert_text, void, `const gchar* text, int length, int* position',
       insert_text, void, `const Glib::ustring&, int*',dnl // C++ prototype
       `Glib::ustring(text, text + length), position',`dnl // C -> C++ conversion
       /**
@@ -80,7 +92,7 @@ dnl // C prototype: void insert_text(const gchar* text, gint length, gint* posit
        */')
 
   _SIGNAL_H(insert_text, void, `const Glib::ustring& text, int* position')
-  _SIGNAL_PH(insert_text, void, `GtkEditable* self, const gchar* text, gint length, gint* position')
+  _SIGNAL_PH(insert_text, void, `GtkEditable* self, const gchar* text, int length, int* position')
 
   _SIGNAL_CC(
       insert_text, insert_text, void, void,
@@ -89,7 +101,7 @@ dnl // C prototype: void insert_text(const gchar* text, gint length, gint* posit
 
   _SIGNAL_PCC(
       insert_text, insert_text, void, void,
-      `GtkEditable* self, const gchar* text, gint length, gint* position',dnl // C arguments
+      `GtkEditable* self, const gchar* text, int length, int* position',dnl // C arguments
       `self, text, length, position',dnl // C argument names
       `Glib::ustring(text, text + length), position',dnl // C -> C++ conversion
       self)
@@ -98,22 +110,30 @@ dnl // C prototype: void insert_text(const gchar* text, gint length, gint* posit
   _WRAP_SIGNAL(void delete_text(int start_pos, int end_pos), "delete_text")
   _WRAP_SIGNAL(void changed(), "changed")
 
+  _WRAP_PROPERTY("text", Glib::ustring)
+  _WRAP_PROPERTY("cursor-position", int)
+  _WRAP_PROPERTY("selection-bound", int)
+  _WRAP_PROPERTY("editable", bool)
+  _WRAP_PROPERTY("width-chars", int)
+  _WRAP_PROPERTY("max-width-chars", int)
+  _WRAP_PROPERTY("xalign", float)
+
 protected:
 
 #m4begin
 dnl // WRAP_VFUNC "do_insert_text"
 dnl // C++ prototype: void insert_text_vfunc(const Glib::ustring& text, int& position)
-dnl // C prototype: void do_insert_text(const gchar* text, gint length, gint* position)
+dnl // C prototype: void do_insert_text(const char* text, int length, int* position)
 
   _VFUNC_H(insert_text_vfunc, void, `const Glib::ustring& text, int& position')
-  _VFUNC_PH(do_insert_text, void, `GtkEditable* self, const gchar* text, gint length, gint* position')
+  _VFUNC_PH(do_insert_text, void, `GtkEditable* self, const char* text, int length, int* position')
   _VFUNC_CC(
       insert_text_vfunc, do_insert_text, void, void,
       `const Glib::ustring& text, int& position',dnl // C++ arguments
       `text.data(), text.bytes(), &position')dnl // C++ -> C conversion
   _VFUNC_PCC(
       insert_text_vfunc, do_insert_text, void, void,
-      `GtkEditable* self, const gchar* text, gint length, gint* position',dnl // C arguments
+      `GtkEditable* self, const char* text, int length, int* position',dnl // C arguments
       `self, text, length, position',dnl // C argument names
       `Glib::ustring(text, text + length), *position',dnl // C -> C++ conversion
       self)
@@ -121,18 +141,13 @@ dnl // C prototype: void do_insert_text(const gchar* text, gint length, gint* po
 
   _WRAP_VFUNC(void delete_text(int start_pos, int end_pos), do_delete_text)
 
-#m4begin
-dnl // This special conversion is not in convert_gtk.m4, because allocating a new
-dnl // string is rarely needed -- probably not a good idea to make this generic.
-  _CONVERSION(`Glib::ustring', `gchar*', `g_strdup(($3).c_str())')
-  _CONVERSION(`gchar*', `Glib::ustring', `Glib::convert_return_gchar_ptr_to_ustring($3)')
-#m4end
-  _WRAP_VFUNC(Glib::ustring get_chars(int start_pos, int end_pos) const, get_chars)
+#m4 _CONVERSION(`Glib::ustring', `const char*', `($3).c_str()')
+  _WRAP_VFUNC(Glib::ustring get_text() const, get_text, keep_return)
 
   _WRAP_VFUNC(void select_region(int start_pos, int end_pos), set_selection_bounds)
   _WRAP_VFUNC(bool get_selection_bounds(int& start_pos, int& end_pos) const, get_selection_bounds)
-  _WRAP_VFUNC(void set_position(int position), set_position)
-  _WRAP_VFUNC(int get_position() const, get_position)
+  // Don't wrap API for implementations. Should it be wrapped?
+  // _WRAP_VFUNC(Editable* get_delegate(), get_delegate)
 };
 
 } // namespace Gtk

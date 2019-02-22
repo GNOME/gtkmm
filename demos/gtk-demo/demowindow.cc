@@ -28,6 +28,7 @@
 #include <glibmm/convert.h>
 #include <giomm/resource.h>
 #include <gtkmm/cellrenderertext.h>
+#include <gtkmm/image.h>
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/video.h>
 
@@ -100,8 +101,8 @@ DemoWindow::DemoWindow()
   m_Notebook.set_scrollable();
   m_Notebook.append_page(m_TextWidget_Info, "_Info", true);  //true = use mnemonic.
   m_Notebook.append_page(m_TextWidget_Source, "_Source", true);  //true = use mnemonic.
-  m_Notebook.child_property_tab_expand(m_TextWidget_Info) = true;
-  m_Notebook.child_property_tab_expand(m_TextWidget_Source) = true;
+  m_Notebook.get_page(m_TextWidget_Info)->property_tab_expand() = true;
+  m_Notebook.get_page(m_TextWidget_Source)->property_tab_expand() = true;
   m_Notebook.set_expand(true);
   m_HBox.add(m_Notebook);
   m_HBox.set_vexpand(true);
@@ -457,7 +458,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
       }
     }
     m_Notebook.append_page(*Gtk::manage(widget), resources[i]);
-    m_Notebook.child_property_tab_expand(*widget) = true;
+    m_Notebook.get_page(*widget)->property_tab_expand() = true;
   }
 }
 

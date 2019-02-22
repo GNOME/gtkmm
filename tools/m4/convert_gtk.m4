@@ -186,7 +186,7 @@ _CONVERSION(`const Glib::RefPtr<AccelGroup>&',`GtkAccelGroup*',__CONVERT_REFPTR_
 _CONVERSION(`Gtk::Object&',`GObject*', `($3).Glib::Object::gobj()')
 
 _CONVERSION(`GtkAssistantPage*',`Glib::RefPtr<AssistantPage>',`Glib::wrap($3)')
-_CONVERSION(`GtkAssistantPage*',`Glib::RefPtr<const AssistantPage>',`Glib::wrap($3)')
+_CONVERSION(`GtkNotebookPage*',`Glib::RefPtr<NotebookPage>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkCellArea*',`Glib::RefPtr<CellArea>',`Glib::wrap($3)')
 _CONVERSION(`GtkCellArea*',`Glib::RefPtr<const CellArea>',`Glib::wrap($3)')
@@ -377,8 +377,14 @@ _CONVERSION(`const TreeModelColumnBase&',`int',`($3).index`'()')
 _CONVERSION(`GtkTreePath*',`TreePath', `Gtk::TreePath($3, false)')
 _CONVERSION(`GtkTreePath*',`Path', `Gtk::TreePath($3, false)')
 _CONVERSION(`GtkTreePath*',`TreeModel::Path', `Gtk::TreePath($3, false)')
+
 _CONVERSION(`GtkCellEditable*',`CellEditable*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
 _CONVERSION(`CellEditable*',`GtkCellEditable*',`Glib::unwrap($3)')
+
+_CONVERSION(`GtkEditable*',`Editable*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
+_CONVERSION(`Editable&',`GtkEditable*',__FR2P)
+
+_CONVERSION(`GtkRoot*',`Root*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
 
 _CONVERSION(`SelectionData',`GtkSelectionData*', `($3).gobj()')
 _CONVERSION(`const SelectionData&',`const GtkSelectionData*', __FR2P)
@@ -422,7 +428,6 @@ _CONVERSION(`Allocation',`GtkAllocation',`static_cast<$2>(*($3.gobj()))')
 _CONVERSION(`GtkEntry*',`Entry*',__RP2P)
 _CONVERSION(`GtkEntry*',`const Entry*',__RP2P)
 _CONVERSION(`Entry&',`GtkEntry*',__FR2P)
-
 
 _CONVERSION(`Gtk::Border&',`GtkBorder*',__FR2P)
 _CONVERSION(`GtkBorder*',`Gtk::Border&',`Glib::wrap($3)')
