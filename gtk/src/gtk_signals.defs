@@ -549,6 +549,12 @@
   )
 )
 
+(define-signal query-end
+  (of-object "GtkApplication")
+  (return-type "void")
+  (flags "Run First")
+)
+
 (define-property register-session
   (of-object "GtkApplication")
   (prop-type "GParamBoolean")
@@ -695,6 +701,15 @@
   (default-value "-1")
 )
 
+(define-property pages
+  (of-object "GtkAssistant")
+  (prop-type "GParamObject")
+  (docs "The pages of the assistant.")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
 ;; From GtkAssistantPage
 
 (define-property child
@@ -734,16 +749,6 @@
   (writable #t)
   (construct-only #f)
   (default-value "FALSE")
-)
-
-(define-property has-padding
-  (of-object "GtkAssistantPage")
-  (prop-type "GParamBoolean")
-  (docs "Whether the assistant adds padding around the page")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "TRUE")
 )
 
 ;; GtkBorder is neither a GObject nor a GInterface. Not checked for signals and properties.
@@ -2514,12 +2519,6 @@
   )
 )
 
-(define-signal check-resize
-  (of-object "GtkContainer")
-  (return-type "void")
-  (flags "Run Last")
-)
-
 (define-signal set-focus-child
   (of-object "GtkContainer")
   (return-type "void")
@@ -2668,78 +2667,79 @@
   )
 )
 
+(define-property cursor-position
+  (of-object "GtkEditable")
+  (prop-type "GParamInt")
+  (docs "The current position of the insertion cursor in chars")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+  (default-value "0")
+)
+
+(define-property editable
+  (of-object "GtkEditable")
+  (prop-type "GParamBoolean")
+  (docs "Whether the entry contents can be edited")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "TRUE")
+)
+
+(define-property max-width-chars
+  (of-object "GtkEditable")
+  (prop-type "GParamInt")
+  (docs "The desired maximum width of the entry, in characters")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "-1")
+)
+
+(define-property selection-bound
+  (of-object "GtkEditable")
+  (prop-type "GParamInt")
+  (docs "The position of the opposite end of the selection from the cursor in chars")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+  (default-value "0")
+)
+
+(define-property text
+  (of-object "GtkEditable")
+  (prop-type "GParamString")
+  (docs "The contents of the entry")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "")
+)
+
+(define-property width-chars
+  (of-object "GtkEditable")
+  (prop-type "GParamInt")
+  (docs "Number of characters to leave space for in the entry")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "-1")
+)
+
+(define-property xalign
+  (of-object "GtkEditable")
+  (prop-type "GParamFloat")
+  (docs "The horizontal alignment, from 0 (left) to 1 (right). Reversed for RTL layouts.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "0")
+)
+
 ;; From GtkEntry
 
-(define-signal populate-popup
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last")
-  (parameters
-    '("GtkWidget*" "p0")
-  )
-)
-
 (define-signal activate
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal move-cursor
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("GtkMovementStep" "p0")
-    '("gint" "p1")
-    '("gboolean" "p2")
-  )
-)
-
-(define-signal insert-at-cursor
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("const-gchar*" "p0")
-  )
-)
-
-(define-signal delete-from-cursor
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("GtkDeleteType" "p0")
-    '("gint" "p1")
-  )
-)
-
-(define-signal backspace
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal cut-clipboard
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal copy-clipboard
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal paste-clipboard
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal toggle-overwrite
   (of-object "GtkEntry")
   (return-type "void")
   (flags "Run Last, Action")
@@ -2763,21 +2763,6 @@
   )
 )
 
-(define-signal preedit-changed
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("const-gchar*" "p0")
-  )
-)
-
-(define-signal insert-emoji
-  (of-object "GtkEntry")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
 (define-property buffer
   (of-object "GtkEntry")
   (prop-type "GParamObject")
@@ -2785,36 +2770,6 @@
   (readable #t)
   (writable #t)
   (construct-only #f)
-)
-
-(define-property cursor-position
-  (of-object "GtkEntry")
-  (prop-type "GParamInt")
-  (docs "The current position of the insertion cursor in chars")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-property selection-bound
-  (of-object "GtkEntry")
-  (prop-type "GParamInt")
-  (docs "The position of the opposite end of the selection from the cursor in chars")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-property editable
-  (of-object "GtkEntry")
-  (prop-type "GParamBoolean")
-  (docs "Whether the entry contents can be edited")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "TRUE")
 )
 
 (define-property max-length
@@ -2867,52 +2822,12 @@
   (default-value "FALSE")
 )
 
-(define-property width-chars
-  (of-object "GtkEntry")
-  (prop-type "GParamInt")
-  (docs "Number of characters to leave space for in the entry")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "-1")
-)
-
-(define-property max-width-chars
-  (of-object "GtkEntry")
-  (prop-type "GParamInt")
-  (docs "The desired maximum width of the entry, in characters")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "-1")
-)
-
 (define-property scroll-offset
   (of-object "GtkEntry")
   (prop-type "GParamInt")
   (docs "Number of pixels of the entry scrolled off the screen to the left")
   (readable #t)
   (writable #f)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-property text
-  (of-object "GtkEntry")
-  (prop-type "GParamString")
-  (docs "The contents of the entry")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "")
-)
-
-(define-property xalign
-  (of-object "GtkEntry")
-  (prop-type "GParamFloat")
-  (docs "The horizontal alignment, from 0 (left) to 1 (right). Reversed for RTL layouts.")
-  (readable #t)
-  (writable #t)
   (construct-only #f)
   (default-value "0")
 )
@@ -2955,16 +2870,6 @@
   (writable #t)
   (construct-only #f)
   (default-value "FALSE")
-)
-
-(define-property caps-lock-warning
-  (of-object "GtkEntry")
-  (prop-type "GParamBoolean")
-  (docs "Whether password entries will show a warning when Caps Lock is on")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "TRUE")
 )
 
 (define-property progress-fraction
@@ -3944,16 +3849,6 @@
 
 ;; From GtkFlowBox
 
-(define-signal move-cursor
-  (of-object "GtkFlowBox")
-  (return-type "gboolean")
-  (flags "Run Last, Action")
-  (parameters
-    '("GtkMovementStep" "p0")
-    '("gint" "p1")
-  )
-)
-
 (define-signal child-activated
   (of-object "GtkFlowBox")
   (return-type "void")
@@ -3979,6 +3874,16 @@
   (of-object "GtkFlowBox")
   (return-type "void")
   (flags "Run Last, Action")
+)
+
+(define-signal move-cursor
+  (of-object "GtkFlowBox")
+  (return-type "gboolean")
+  (flags "Run Last, Action")
+  (parameters
+    '("GtkMovementStep" "p0")
+    '("gint" "p1")
+  )
 )
 
 (define-signal select-all
@@ -4900,6 +4805,12 @@
 
 ;; From GtkIconView
 
+(define-signal selection-changed
+  (of-object "GtkIconView")
+  (return-type "void")
+  (flags "Run First")
+)
+
 (define-signal move-cursor
   (of-object "GtkIconView")
   (return-type "gboolean")
@@ -4908,12 +4819,6 @@
     '("GtkMovementStep" "p0")
     '("gint" "p1")
   )
-)
-
-(define-signal selection-changed
-  (of-object "GtkIconView")
-  (return-type "void")
-  (flags "Run First")
 )
 
 (define-signal select-all
@@ -6585,6 +6490,114 @@
   (default-value "")
 )
 
+(define-property pages
+  (of-object "GtkNotebook")
+  (prop-type "GParamObject")
+  (docs "The pages of the notebook.")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+;; From GtkNotebookPage
+
+(define-property tab-label
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamString")
+  (docs "The text of the tab widget")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "")
+)
+
+(define-property menu-label
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamString")
+  (docs "The text of the menu widget")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "")
+)
+
+(define-property position
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamInt")
+  (docs "The index of the child in the parent")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "0")
+)
+
+(define-property tab-expand
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamBoolean")
+  (docs "Whether to expand the child’s tab")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
+)
+
+(define-property tab-fill
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamBoolean")
+  (docs "Whether the child’s tab should fill the allocated area")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "TRUE")
+)
+
+(define-property reorderable
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamBoolean")
+  (docs "Whether the tab is reorderable by user action")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
+)
+
+(define-property detachable
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamBoolean")
+  (docs "Whether the tab is detachable")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
+)
+
+(define-property child
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamObject")
+  (docs "The child for this page")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property tab
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamObject")
+  (docs "The tab widget for this page")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property menu
+  (of-object "GtkNotebookPage")
+  (prop-type "GParamObject")
+  (docs "The label widget displayed in the child’s menu entry")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 ;; From GtkOrientable
 
 (define-property orientation
@@ -8030,6 +8043,12 @@
 
 ;; From GtkSearchEntry
 
+(define-signal activate
+  (of-object "GtkSearchEntry")
+  (return-type "void")
+  (flags "Run Last, Action")
+)
+
 (define-signal search-changed
   (of-object "GtkSearchEntry")
   (return-type "void")
@@ -8052,6 +8071,26 @@
   (of-object "GtkSearchEntry")
   (return-type "void")
   (flags "Run Last, Action")
+)
+
+(define-property placeholder-text
+  (of-object "GtkSearchEntry")
+  (prop-type "GParamString")
+  (docs "Show text in the entry when it’s empty and unfocused")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "")
+)
+
+(define-property activates-default
+  (of-object "GtkSearchEntry")
+  (prop-type "GParamBoolean")
+  (docs "Whether to activate the default widget (such as the default button in a dialog) when Enter is pressed")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
 )
 
 ;; From GtkSeparator
@@ -8148,16 +8187,6 @@
   (writable #t)
   (construct-only #f)
   (default-value "Adwaita")
-)
-
-(define-property gtk-key-theme-name
-  (of-object "GtkSettings")
-  (prop-type "GParamString")
-  (docs "Name of key theme to load")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "")
 )
 
 (define-property gtk-dnd-drag-threshold
@@ -8957,36 +8986,6 @@
   (default-value "0")
 )
 
-(define-property width-chars
-  (of-object "GtkSpinButton")
-  (prop-type "GParamInt")
-  (docs "Number of characters to leave space for in the entry")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-property max-width-chars
-  (of-object "GtkSpinButton")
-  (prop-type "GParamInt")
-  (docs "The desired maximum width of the entry, in characters")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-property text
-  (of-object "GtkSpinButton")
-  (prop-type "GParamString")
-  (docs "The contents of the entry")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
 ;; From GtkStack
 
 (define-property homogeneous
@@ -9076,6 +9075,15 @@
   (writable #t)
   (construct-only #f)
   (default-value "FALSE")
+)
+
+(define-property pages
+  (of-object "GtkStack")
+  (prop-type "GParamObject")
+  (docs "A selection model with the stacks pages")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
 )
 
 ;; From GtkStackPage
@@ -10385,6 +10393,37 @@
   )
 )
 
+(define-signal select-all
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
+  (parameters
+    '("gboolean" "p0")
+  )
+)
+
+(define-signal copy-clipboard
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
+)
+
+(define-signal move-viewport
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
+  (parameters
+    '("GtkScrollStep" "p0")
+    '("gint" "p1")
+  )
+)
+
+(define-signal set-anchor
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
+)
+
 (define-signal insert-at-cursor
   (of-object "GtkTextView")
   (return-type "void")
@@ -10416,12 +10455,6 @@
   (flags "Run Last, Action")
 )
 
-(define-signal copy-clipboard
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
 (define-signal paste-clipboard
   (of-object "GtkTextView")
   (return-type "void")
@@ -10429,6 +10462,12 @@
 )
 
 (define-signal toggle-overwrite
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
+)
+
+(define-signal toggle-cursor-visible
   (of-object "GtkTextView")
   (return-type "void")
   (flags "Run Last, Action")
@@ -10443,43 +10482,6 @@
   )
 )
 
-(define-signal insert-emoji
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal select-all
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("gboolean" "p0")
-  )
-)
-
-(define-signal move-viewport
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-  (parameters
-    '("GtkScrollStep" "p0")
-    '("gint" "p1")
-  )
-)
-
-(define-signal set-anchor
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
-(define-signal toggle-cursor-visible
-  (of-object "GtkTextView")
-  (return-type "void")
-  (flags "Run Last, Action")
-)
-
 (define-signal extend-selection
   (of-object "GtkTextView")
   (return-type "gboolean")
@@ -10490,6 +10492,12 @@
     '("GtkTextIter*" "p2")
     '("GtkTextIter*" "p3")
   )
+)
+
+(define-signal insert-emoji
+  (of-object "GtkTextView")
+  (return-type "void")
+  (flags "Run Last, Action")
 )
 
 (define-property pixels-above-lines
@@ -11699,6 +11707,15 @@
   (construct-only #f)
 )
 
+(define-property root
+  (of-object "GtkWidget")
+  (prop-type "GParamObject")
+  (docs "The root widget in the widget tree.")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
 (define-property width-request
   (of-object "GtkWidget")
   (prop-type "GParamInt")
@@ -11763,6 +11780,16 @@
   (of-object "GtkWidget")
   (prop-type "GParamBoolean")
   (docs "Whether the widget is the focus widget within the toplevel")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
+)
+
+(define-property can-pick
+  (of-object "GtkWidget")
+  (prop-type "GParamBoolean")
+  (docs "Whether the widget can receive pointer events")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -12458,86 +12485,6 @@
   (default-value "0")
 )
 
-(define-child-property tab-label
-  (of-object "GtkNotebook")
-  (prop-type "GParamString")
-  (docs "The string displayed on the child’s tab label")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "")
-)
-
-(define-child-property menu-label
-  (of-object "GtkNotebook")
-  (prop-type "GParamString")
-  (docs "The string displayed in the child’s menu entry")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "")
-)
-
-(define-child-property position
-  (of-object "GtkNotebook")
-  (prop-type "GParamInt")
-  (docs "The index of the child in the parent")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-child-property tab-expand
-  (of-object "GtkNotebook")
-  (prop-type "GParamBoolean")
-  (docs "Whether to expand the child’s tab")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "FALSE")
-)
-
-(define-child-property tab-fill
-  (of-object "GtkNotebook")
-  (prop-type "GParamBoolean")
-  (docs "Whether the child’s tab should fill the allocated area")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "TRUE")
-)
-
-(define-child-property reorderable
-  (of-object "GtkNotebook")
-  (prop-type "GParamBoolean")
-  (docs "Whether the tab is reorderable by user action")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "FALSE")
-)
-
-(define-child-property detachable
-  (of-object "GtkNotebook")
-  (prop-type "GParamBoolean")
-  (docs "Whether the tab is detachable")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "FALSE")
-)
-
-(define-child-property pass-through
-  (of-object "GtkOverlay")
-  (prop-type "GParamBoolean")
-  (docs "Pass through input, does not affect main child")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "FALSE")
-)
-
 (define-child-property measure
   (of-object "GtkOverlay")
   (prop-type "GParamBoolean")
@@ -12546,26 +12493,6 @@
   (writable #t)
   (construct-only #f)
   (default-value "FALSE")
-)
-
-(define-child-property blur
-  (of-object "GtkOverlay")
-  (prop-type "GParamDouble")
-  (docs "Apply a blur to the content behind this child")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
-(define-child-property index
-  (of-object "GtkOverlay")
-  (prop-type "GParamInt")
-  (docs "The index of the overlay in the parent, -1 for the main child")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
 )
 
 (define-child-property clip-overlay

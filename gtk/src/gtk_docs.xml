@@ -609,6 +609,24 @@ among the other applications.
 </description>
 </property>
 
+<signal name="GtkApplication::query-end">
+<description>
+Emitted when the session manager is about to end the session, only
+if #GtkApplication::register-session is %TRUE. Applications can
+connect to this signal and call gtk_application_inhibit() with
+%GTK_APPLICATION_INHIBIT_LOGOUT to delay the end of the session
+until state has been saved.
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the #GtkApplication which emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkApplication::window-added">
 <description>
 Emitted when a #GtkWindow is added to @application through
@@ -2733,11 +2751,6 @@ might return %NULL.
 is a GTK extension to CSS.
 </parameter_description>
 </parameter>
-<parameter name="GTK_CSS_SECTION_BINDING_SET">
-<parameter_description> The section defines a binding set. This
-is a GTK extension to CSS.
-</parameter_description>
-</parameter>
 <parameter name="GTK_CSS_SECTION_RULESET">
 <parameter_description> The section defines a CSS ruleset.
 </parameter_description>
@@ -3070,11 +3083,11 @@ it from being inserted entirely.
 <parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
-<parameter name="new_text">
+<parameter name="text">
 <parameter_description> the new text to insert
 </parameter_description>
 </parameter>
-<parameter name="new_text_length">
+<parameter name="length">
 <parameter_description> the length of the new text, in bytes,
 or -1 if new_text is nul-terminated
 </parameter_description>
@@ -3084,112 +3097,6 @@ or -1 if new_text is nul-terminated
 at which to insert the new text. this is an in-out
 parameter.  After the signal emission is finished, it
 should point after the newly inserted text.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::activate">
-<description>
-The ::activate signal is emitted when the user hits
-the Enter key.
-
-The default bindings for this signal are all forms of the Enter key.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> The entry on which the signal is emitted
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::backspace">
-<description>
-The ::backspace signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted when the user asks for it.
-
-The default bindings for this signal are
-Backspace and Shift-Backspace.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::copy-clipboard">
-<description>
-The ::copy-clipboard signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted to copy the selection to the clipboard.
-
-The default bindings for this signal are
-Ctrl-c and Ctrl-Insert.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::cut-clipboard">
-<description>
-The ::cut-clipboard signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted to cut the selection to the clipboard.
-
-The default bindings for this signal are
-Ctrl-x and Shift-Delete.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::delete-from-cursor">
-<description>
-The ::delete-from-cursor signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted when the user initiates a text deletion.
-
-If the @type is %GTK_DELETE_CHARS, GTK+ deletes the selection
-if there is one, otherwise it deletes the requested number
-of characters.
-
-The default bindings for this signal are
-Delete for deleting a character and Ctrl-Delete for
-deleting a word.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> the granularity of the deletion, as a #GtkDeleteType
-</parameter_description>
-</parameter>
-<parameter name="count">
-<parameter_description> the number of @type units to delete
 </parameter_description>
 </parameter>
 </parameters>
@@ -3234,158 +3141,6 @@ mouse click over an activatable icon.
 <return></return>
 </signal>
 
-<signal name="GtkEntry::insert-at-cursor">
-<description>
-The ::insert-at-cursor signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted when the user initiates the insertion of a
-fixed string at the cursor.
-
-This signal has no default bindings.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="string">
-<parameter_description> the string to insert
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::insert-emoji">
-<description>
-The ::insert-emoji signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted to present the Emoji chooser for the @entry.
-
-The default bindings for this signal are Ctrl-. and Ctrl-;
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::move-cursor">
-<description>
-The ::move-cursor signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted when the user initiates a cursor movement.
-If the cursor is not visible in @entry, this signal causes
-the viewport to be moved instead.
-
-Applications should not connect to it, but may emit it with
-g_signal_emit_by_name() if they need to control the cursor
-programmatically.
-
-The default bindings for this signal come in two variants,
-the variant with the Shift modifier extends the selection,
-the variant without the Shift modifer does not.
-There are too many key combinations to list them all here.
-- Arrow keys move by individual characters/lines
-- Ctrl-arrow key combinations move by words/paragraphs
-- Home/End keys move to the ends of the buffer
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="step">
-<parameter_description> the granularity of the move, as a #GtkMovementStep
-</parameter_description>
-</parameter>
-<parameter name="count">
-<parameter_description> the number of @step units to move
-</parameter_description>
-</parameter>
-<parameter name="extend_selection">
-<parameter_description> %TRUE if the move should extend the selection
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::paste-clipboard">
-<description>
-The ::paste-clipboard signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted to paste the contents of the clipboard
-into the text view.
-
-The default bindings for this signal are
-Ctrl-v and Shift-Insert.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::populate-popup">
-<description>
-The ::populate-popup signal gets emitted before showing the
-context menu of the entry.
-
-If you need to add items to the context menu, connect
-to this signal and append your items to the @widget, which
-will be a #GtkMenu in this case.
-
-If #GtkEntry:populate-all is %TRUE, this signal will
-also be emitted to populate touch popups. In this case,
-@widget will be a different container, e.g. a #GtkToolbar.
-The signal handler should not make assumptions about the
-type of @widget.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> The entry on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> the container that is being populated
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkEntry::preedit-changed">
-<description>
-If an input method is used, the typed text will not immediately
-be committed to the buffer. So if you are interested in the text,
-connect to this signal.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="preedit">
-<parameter_description> the current preedit string
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <signal name="GtkEntry::show-emoji-icon">
 <description>
 When this is %TRUE, the entry will show an emoji icon in the secondary
@@ -3407,24 +3162,6 @@ A list of tabstops to apply to the text of the entry.
 <return></return>
 </signal>
 
-<signal name="GtkEntry::toggle-overwrite">
-<description>
-The ::toggle-overwrite signal is a
-[keybinding signal][GtkBindingSignal]
-which gets emitted to toggle the overwrite mode of the entry.
-
-The default bindings for this signal is Insert.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <property name="GtkEntry:attributes">
 <description>
 A list of Pango attributes to apply to the text of the entry.
@@ -3433,17 +3170,6 @@ This is mainly useful to change the size or weight of the text.
 
 The #PangoAttribute's @start_index and @end_index must refer to the
 #GtkEntryBuffer text, i.e. without the preedit string.
-
-</description>
-</property>
-
-<property name="GtkEntry:caps-lock-warning">
-<description>
-Whether password entries will show a warning when Caps Lock is on.
-
-Note that the warning is shown using a secondary icon, and thus
-does not work if you are using the secondary icon position for some
-other purpose.
 
 </description>
 </property>
@@ -3492,15 +3218,6 @@ Note that setting the purpose to %GTK_INPUT_PURPOSE_PASSWORD or
 <property name="GtkEntry:invisible-char-set">
 <description>
 Whether the invisible char has been set for the #GtkEntry.
-
-</description>
-</property>
-
-<property name="GtkEntry:max-width-chars">
-<description>
-The desired maximum width of the entry, in characters.
-If this property is set to -1, the width will be calculated
-automatically.
 
 </description>
 </property>
@@ -3701,14 +3418,6 @@ The length of the text in the #GtkEntry.
 <property name="GtkEntry:truncate-multiline">
 <description>
 When %TRUE, pasted multi-line text is truncated to the first line.
-
-</description>
-</property>
-
-<property name="GtkEntry:xalign">
-<description>
-The horizontal alignment, from 0 (left) to 1 (right).
-Reversed for RTL layouts.
 
 </description>
 </property>
@@ -8602,23 +8311,9 @@ location for the allocation
 </return>
 </signal>
 
-<property name="GtkOverlay:blur">
-<description>
-Blur the content behind this child with a Gaussian blur of this radius.
-
-</description>
-</property>
-
 <property name="GtkOverlay:clip-overlay">
 <description>
 Clip the overlay child widget so as to fit the parent
-
-</description>
-</property>
-
-<property name="GtkOverlay:index">
-<description>
-The index of the overlay in the parent, -1 for the main child.
 
 </description>
 </property>
@@ -8628,13 +8323,6 @@ The index of the overlay in the parent, -1 for the main child.
 Include this child in determining the child request.
 
 The main child will always be measured.
-
-</description>
-</property>
-
-<property name="GtkOverlay:pass-through">
-<description>
-Pass through input, does not affect main child.
 
 </description>
 </property>
@@ -12389,6 +12077,375 @@ See #GtkSwitch::state-set for details.
 </description>
 </property>
 
+<signal name="GtkText::activate">
+<description>
+The ::activate signal is emitted when the user hits
+the Enter key.
+
+The default bindings for this signal are all forms of the Enter key.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> The self on which the signal is emitted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::backspace">
+<description>
+The ::backspace signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted when the user asks for it.
+
+The default bindings for this signal are
+Backspace and Shift-Backspace.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::copy-clipboard">
+<description>
+The ::copy-clipboard signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to copy the selection to the clipboard.
+
+The default bindings for this signal are
+Ctrl-c and Ctrl-Insert.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::cut-clipboard">
+<description>
+The ::cut-clipboard signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to cut the selection to the clipboard.
+
+The default bindings for this signal are
+Ctrl-x and Shift-Delete.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::delete-from-cursor">
+<description>
+The ::delete-from-cursor signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted when the user initiates a text deletion.
+
+If the @type is %GTK_DELETE_CHARS, GTK deletes the selection
+if there is one, otherwise it deletes the requested number
+of characters.
+
+The default bindings for this signal are
+Delete for deleting a character and Ctrl-Delete for
+deleting a word.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the granularity of the deletion, as a #GtkDeleteType
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of @type units to delete
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::insert-at-cursor">
+<description>
+The ::insert-at-cursor signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted when the user initiates the insertion of a
+fixed string at the cursor.
+
+This signal has no default bindings.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="string">
+<parameter_description> the string to insert
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::insert-emoji">
+<description>
+The ::insert-emoji signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to present the Emoji chooser for the @self.
+
+The default bindings for this signal are Ctrl-. and Ctrl-;
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::move-cursor">
+<description>
+The ::move-cursor signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted when the user initiates a cursor movement.
+If the cursor is not visible in @self, this signal causes
+the viewport to be moved instead.
+
+Applications should not connect to it, but may emit it with
+g_signal_emit_by_name() if they need to control the cursor
+programmatically.
+
+The default bindings for this signal come in two variants,
+the variant with the Shift modifier extends the selection,
+the variant without the Shift modifer does not.
+There are too many key combinations to list them all here.
+- Arrow keys move by individual characters/lines
+- Ctrl-arrow key combinations move by words/paragraphs
+- Home/End keys move to the ends of the buffer
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="step">
+<parameter_description> the granularity of the move, as a #GtkMovementStep
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of @step units to move
+</parameter_description>
+</parameter>
+<parameter name="extend">
+<parameter_description> %TRUE if the move should extend the selection
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::paste-clipboard">
+<description>
+The ::paste-clipboard signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to paste the contents of the clipboard
+into the text view.
+
+The default bindings for this signal are
+Ctrl-v and Shift-Insert.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::populate-popup">
+<description>
+The ::populate-popup signal gets emitted before showing the
+context menu of the self.
+
+If you need to add items to the context menu, connect
+to this signal and append your items to the @widget, which
+will be a #GtkMenu in this case.
+
+If #GtkText:populate-all is %TRUE, this signal will
+also be emitted to populate touch popups. In this case,
+@widget will be a different container, e.g. a #GtkToolbar.
+The signal handler should not make assumptions about the
+type of @widget.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> The self on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the container that is being populated
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::preedit-changed">
+<description>
+If an input method is used, the typed text will not immediately
+be committed to the buffer. So if you are interested in the text,
+connect to this signal.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="preedit">
+<parameter_description> the current preedit string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::tabs">
+<description>
+A list of tabstops to apply to the text of the self.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkText::toggle-overwrite">
+<description>
+The ::toggle-overwrite signal is a
+[keybinding signal][GtkBindingSignal]
+which gets emitted to toggle the overwrite mode of the self.
+
+The default bindings for this signal is Insert.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkText:attributes">
+<description>
+A list of Pango attributes to apply to the text of the self.
+
+This is mainly useful to change the size or weight of the text.
+
+The #PangoAttribute's @start_index and @end_index must refer to the
+#GtkEntryBuffer text, i.e. without the preedit string.
+
+</description>
+</property>
+
+<property name="GtkText:im-module">
+<description>
+Which IM (input method) module should be used for this self.
+See #GtkIMContext.
+
+Setting this to a non-%NULL value overrides the
+system-wide IM module setting. See the GtkSettings
+#GtkSettings:gtk-im-module property.
+
+</description>
+</property>
+
+<property name="GtkText:input-hints">
+<description>
+Additional hints (beyond #GtkText:input-purpose) that
+allow input methods to fine-tune their behaviour.
+
+</description>
+</property>
+
+<property name="GtkText:input-purpose">
+<description>
+The purpose of this text field.
+
+This property can be used by on-screen keyboards and other input
+methods to adjust their behaviour.
+
+Note that setting the purpose to %GTK_INPUT_PURPOSE_PASSWORD or
+%GTK_INPUT_PURPOSE_PIN is independent from setting
+#GtkText:visibility.
+
+</description>
+</property>
+
+<property name="GtkText:invisible-char-set">
+<description>
+Whether the invisible char has been set for the #GtkText.
+
+</description>
+</property>
+
+<property name="GtkText:overwrite-mode">
+<description>
+If text is overwritten when typing in the #GtkText.
+
+</description>
+</property>
+
+<property name="GtkText:placeholder-text">
+<description>
+The text that will be displayed in the #GtkText when it is empty
+and unfocused.
+
+</description>
+</property>
+
+<property name="GtkText:populate-all">
+<description>
+If :populate-all is %TRUE, the #GtkText::populate-popup
+signal is also emitted for touch popups.
+
+</description>
+</property>
+
+<property name="GtkText:truncate-multiline">
+<description>
+When %TRUE, pasted multi-line text is truncated to the first line.
+
+</description>
+</property>
+
 <signal name="GtkTextBuffer::apply-tag">
 <description>
 The ::apply-tag signal is emitted to apply a tag to a
@@ -15518,6 +15575,14 @@ Before 3.8 this was only available in GtkWindow
 <property name="GtkWidget:overflow">
 <description>
 How content outside the widget's content area is treated.
+
+</description>
+</property>
+
+<property name="GtkWidget:root">
+<description>
+The #GtkRoot widget of the widget tree containing this widget or %NULL if
+the widget is not contained in a root widget.
 
 </description>
 </property>
@@ -19887,26 +19952,6 @@ Gets whether @page is complete.
 </return>
 </function>
 
-<function name="gtk_assistant_get_page_has_padding">
-<description>
-Gets whether page has padding.
-
-
-</description>
-<parameters>
-<parameter name="assistant">
-<parameter_description> a #GtkAssistant
-</parameter_description>
-</parameter>
-<parameter name="page">
-<parameter_description> a page of @assistant
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @page has padding
-</return>
-</function>
-
 <function name="gtk_assistant_get_page_title">
 <description>
 Gets the title for @page.
@@ -19944,6 +19989,22 @@ Gets the page type of @page.
 </parameter>
 </parameters>
 <return> the page type of @page
+</return>
+</function>
+
+<function name="gtk_assistant_get_pages">
+<description>
+Gets a list model of the assistant pages.
+
+
+</description>
+<parameters>
+<parameter name="assistant">
+<parameter_description> a #GtkAssistant
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list model of the pages.
 </return>
 </function>
 
@@ -20174,29 +20235,6 @@ to be able to continue the task.
 </parameter>
 <parameter name="complete">
 <parameter_description> the completeness status of the page
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_assistant_set_page_has_padding">
-<description>
-Sets whether the assistant is adding padding around
-the page.
-
-</description>
-<parameters>
-<parameter name="assistant">
-<parameter_description> a #GtkAssistant
-</parameter_description>
-</parameter>
-<parameter name="page">
-<parameter_description> a page of @assistant
-</parameter_description>
-</parameter>
-<parameter name="has_padding">
-<parameter_description> whether this page has padding
 </parameter_description>
 </parameter>
 </parameters>
@@ -29371,36 +29409,6 @@ the drawing area's contents
 <return></return>
 </function>
 
-<function name="gtk_editable_copy_clipboard">
-<description>
-Copies the contents of the currently selected content in the editable and
-puts it on the clipboard.
-
-</description>
-<parameters>
-<parameter name="editable">
-<parameter_description> a #GtkEditable
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_editable_cut_clipboard">
-<description>
-Removes the contents of the currently selected content in the editable and
-puts it on the clipboard.
-
-</description>
-<parameters>
-<parameter name="editable">
-<parameter_description> a #GtkEditable
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_editable_delete_selection">
 <description>
 Deletes the currently selected text of the editable.
@@ -29443,6 +29451,39 @@ Note that the positions are specified in characters, not bytes.
 <return></return>
 </function>
 
+<function name="gtk_editable_finish_delegate">
+<description>
+Undoes the setup done by gtk_editable_init_delegate().
+
+This is a helper function that should be called from dispose,
+before removing the delegate object.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_editable_get_alignment">
+<description>
+Gets the value set by gtk_editable_set_alignment().
+
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the alignment
+</return>
+</function>
+
 <function name="gtk_editable_get_chars">
 <description>
 Retrieves a sequence of characters. The characters that are retrieved 
@@ -29476,8 +29517,8 @@ implementation and should be freed by the caller.
 
 <function name="gtk_editable_get_editable">
 <description>
-Retrieves whether @editable is editable. See
-gtk_editable_set_editable().
+Retrieves whether @editable is editable.
+See gtk_editable_set_editable().
 
 
 </description>
@@ -29488,6 +29529,23 @@ gtk_editable_set_editable().
 </parameter>
 </parameters>
 <return> %TRUE if @editable is editable.
+</return>
+</function>
+
+<function name="gtk_editable_get_max_width_chars">
+<description>
+Retrieves the desired maximum width of @editable, in characters.
+See gtk_editable_set_max_width_chars().
+
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the maximum width of the entry, in characters
 </return>
 </function>
 
@@ -29510,11 +29568,44 @@ Note that this position is in characters, not in bytes.
 </return>
 </function>
 
+<function name="gtk_editable_get_property">
+<description>
+Gets a property of the #GtkEditable delegate for @object.
+
+This is helper function that should be called in get_property,
+before handling your own properties.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> a #GObject
+</parameter_description>
+</parameter>
+<parameter name="prop_id">
+<parameter_description> a property ID
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> value to set
+</parameter_description>
+</parameter>
+<parameter name="pspec">
+<parameter_description> the #GParamSpec for the property
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the property was found
+</return>
+</function>
+
 <function name="gtk_editable_get_selection_bounds">
 <description>
-Retrieves the selection bound of the editable. start_pos will be filled
-with the start of the selection and @end_pos with end. If no text was
-selected both will be identical and %FALSE will be returned.
+Retrieves the selection bound of the editable.
+
+@start_pos will be filled with the start of the selection and
+@end_pos with end. If no text was selected both will be identical
+and %FALSE will be returned.
 
 Note that positions are specified in characters, not bytes.
 
@@ -29534,13 +29625,65 @@ Note that positions are specified in characters, not bytes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if an area is selected, %FALSE otherwise
+<return> %TRUE if there is a non-empty selection, %FALSE otherwise
 </return>
+</function>
+
+<function name="gtk_editable_get_text">
+<description>
+Retrieves the contents of @editable. The returned string is
+owned by GTK and must not be modified or freed.
+
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the contents of the editable.
+</return>
+</function>
+
+<function name="gtk_editable_get_width_chars">
+<description>
+Gets the value set by gtk_editable_set_width_chars().
+
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return> number of chars to request space for, or negative if unset
+</return>
+</function>
+
+<function name="gtk_editable_init_delegate">
+<description>
+Sets up a delegate for #GtkEditable, assuming that the
+get_delegate vfunc in the #GtkEditable interface has been
+set up for the @editable's type.
+
+This is a helper function that should be called in instance init,
+after creating the delegate object.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_editable_insert_text">
 <description>
-Inserts @new_text_length bytes of @new_text into the contents of the
+Inserts @length bytes of @text into the contents of the
 widget, at position @position.
 
 Note that the position is in characters, not in bytes. 
@@ -29552,11 +29695,11 @@ The function updates @position to point after the newly inserted text.
 <parameter_description> a #GtkEditable
 </parameter_description>
 </parameter>
-<parameter name="new_text">
+<parameter name="text">
 <parameter_description> the text to append
 </parameter_description>
 </parameter>
-<parameter name="new_text_length">
+<parameter name="length">
 <parameter_description> the length of the text in bytes, or -1
 </parameter_description>
 </parameter>
@@ -29568,28 +29711,44 @@ The function updates @position to point after the newly inserted text.
 <return></return>
 </function>
 
-<function name="gtk_editable_paste_clipboard">
+<function name="gtk_editable_install_properties">
 <description>
-Pastes the content of the clipboard to the current position of the
-cursor in the editable.
+Installs the GtkEditable properties for @class.
+
+This is a helper function that should be called in class_init,
+after installing your own properties.
+
+To handle the properties in your set_property and get_property
+functions, you can either use gtk_editable_delegate_set_property()
+and gtk_editable_delegate_get_property() (if you are using a delegate),
+or remember the @first_prop offset and add it to the values in the
+#GtkEditableProperties enumeration to get the property IDs for these
+properties.
+
 
 </description>
 <parameters>
-<parameter name="editable">
-<parameter_description> a #GtkEditable
+<parameter name="object_class">
+<parameter_description> a #GObjectClass
+</parameter_description>
+</parameter>
+<parameter name="first_prop">
+<parameter_description> property ID to use for the first property
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the number of properties that were installed
+</return>
 </function>
 
 <function name="gtk_editable_select_region">
 <description>
-Selects a region of text. The characters that are selected are 
-those characters at positions from @start_pos up to, but not 
-including @end_pos. If @end_pos is negative, then the
-characters selected are those characters from @start_pos to 
-the end of the text.
+Selects a region of text.
+
+The characters that are selected are those characters at positions
+from @start_pos up to, but not including @end_pos. If @end_pos is
+negative, then the characters selected are those characters from
+@start_pos to  the end of the text.
 
 Note that positions are specified in characters, not bytes.
 
@@ -29611,10 +29770,32 @@ Note that positions are specified in characters, not bytes.
 <return></return>
 </function>
 
+<function name="gtk_editable_set_alignment">
+<description>
+Sets the alignment for the contents of the editable.
+
+This controls the horizontal positioning of the contents when
+the displayed text is shorter than the width of the editable.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+<parameter name="xalign">
+<parameter_description> The horizontal alignment, from 0 (left) to 1 (right).
+Reversed for RTL layouts
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_editable_set_editable">
 <description>
-Determines if the user can edit the text in the editable
-widget or not. 
+Determines if the user can edit the text
+in the editable widget or not. 
 
 </description>
 <parameters>
@@ -29625,6 +29806,24 @@ widget or not.
 <parameter name="is_editable">
 <parameter_description> %TRUE if the user is allowed to edit the text
 in the widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_editable_set_max_width_chars">
+<description>
+Sets the desired maximum width in characters of @editable.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+<parameter name="n_chars">
+<parameter_description> the new desired maximum width, in characters
 </parameter_description>
 </parameter>
 </parameters>
@@ -29649,6 +29848,75 @@ of the editable. Note that @position is in characters, not in bytes.
 </parameter>
 <parameter name="position">
 <parameter_description> the position of the cursor 
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_editable_set_property">
+<description>
+Sets a property on the #GtkEditable delegate for @object.
+
+This is a helper function that should be called in set_property,
+before handling your own properties.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> a #GObject
+</parameter_description>
+</parameter>
+<parameter name="prop_id">
+<parameter_description> a property ID
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> value to set
+</parameter_description>
+</parameter>
+<parameter name="pspec">
+<parameter_description> the #GParamSpec for the property
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the property was found
+</return>
+</function>
+
+<function name="gtk_editable_set_text">
+<description>
+Sets the text in the editable to the given value,
+replacing the current contents.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_editable_set_width_chars">
+<description>
+Changes the size request of the editable to be about the
+right size for @n_chars characters.
+
+Note that it changes the size request, the size can still
+be affected by how you pack the widget into containers.
+If @n_chars is -1, the size reverts to the default size.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+<parameter name="n_chars">
+<parameter_description> width in chars
 </parameter_description>
 </parameter>
 </parameters>
@@ -30826,71 +31094,6 @@ show invisible text at all.
 </return>
 </function>
 
-<function name="gtk_entry_get_layout">
-<description>
-Gets the #PangoLayout used to display the entry.
-The layout is useful to e.g. convert text positions to
-pixel positions, in combination with gtk_entry_get_layout_offsets().
-The returned layout is owned by the entry and must not be 
-modified or freed by the caller.
-
-Keep in mind that the layout text may contain a preedit string, so
-gtk_entry_layout_index_to_text_index() and
-gtk_entry_text_index_to_layout_index() are needed to convert byte
-indices in the layout to byte indices in the entry contents.
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #PangoLayout for this entry
-</return>
-</function>
-
-<function name="gtk_entry_get_layout_offsets">
-<description>
-Obtains the position of the #PangoLayout used to render text
-in the entry, in widget coordinates. Useful if you want to line
-up the text in an entry with some other text, e.g. when using the
-entry to implement editable cells in a sheet widget.
-
-Also useful to convert mouse events into coordinates inside the
-#PangoLayout, e.g. to take some action if some part of the entry text
-is clicked.
-
-Note that as the user scrolls around in the entry the offsets will
-change; you’ll need to connect to the “notify::scroll-offset”
-signal to track this. Remember when using the #PangoLayout
-functions you need to convert to and from pixels using
-PANGO_PIXELS() or #PANGO_SCALE.
-
-Keep in mind that the layout text may contain a preedit string, so
-gtk_entry_layout_index_to_text_index() and
-gtk_entry_text_index_to_layout_index() are needed to convert byte
-indices in the layout to byte indices in the entry contents.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> location to store X offset of layout, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> location to store Y offset of layout, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_entry_get_max_length">
 <description>
 Retrieves the maximum allowed length of the text in
@@ -31110,57 +31313,6 @@ such as search-as-you-type entries.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_entry_im_context_filter_keypress">
-<description>
-Allow the #GtkEntry input method to internally handle key press
-and release events. If this function returns %TRUE, then no further
-processing should be done for this key event. See
-gtk_im_context_filter_keypress().
-
-Note that you are expected to call this function from your handler
-when overriding key event handling. This is needed in the case when
-you need to insert your own key handling between the input method
-and the default key event handling of the #GtkEntry.
-See gtk_text_view_reset_im_context() for an example of use.
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> the key event
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the input method handled the key event.
-</return>
-</function>
-
-<function name="gtk_entry_layout_index_to_text_index">
-<description>
-Converts from a position in the entry’s #PangoLayout (returned by
-gtk_entry_get_layout()) to a position in the entry contents
-(returned by gtk_entry_get_text()).
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="layout_index">
-<parameter_description> byte index into the entry layout text
-</parameter_description>
-</parameter>
-</parameters>
-<return> byte index into the entry contents
-</return>
 </function>
 
 <function name="gtk_entry_new">
@@ -31850,29 +32002,6 @@ size reverts to the default entry size.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_entry_text_index_to_layout_index">
-<description>
-Converts from a position in the entry contents (returned
-by gtk_entry_get_text()) to a position in the
-entry’s #PangoLayout (returned by gtk_entry_get_layout(),
-with text retrieved via pango_layout_get_text()).
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="text_index">
-<parameter_description> byte index into the entry contents
-</parameter_description>
-</parameter>
-</parameters>
-<return> byte index into the entry layout text
-</return>
 </function>
 
 <function name="gtk_entry_unset_invisible_char">
@@ -34865,7 +34994,7 @@ with the given index exists.
 <function name="gtk_flow_box_get_child_at_pos">
 <description>
 Gets the child in the (@x, @y) position. Both @x and @y are
-assumed to be relative to the allocation of @box.
+assumed to be relative to the origin of @box.
 
 
 </description>
@@ -42290,22 +42419,6 @@ interface.
 </parameters>
 <return> %TRUE if the windowing system has been successfully
 initialized, %FALSE otherwise
-</return>
-</function>
-
-<function name="gtk_invisible_get_display">
-<description>
-Returns the #GdkDisplay object associated with @invisible
-
-
-</description>
-<parameters>
-<parameter name="invisible">
-<parameter_description> a #GtkInvisible.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the associated #GdkDisplay.
 </return>
 </function>
 
@@ -49833,27 +49946,6 @@ child property for @widget.
 </return>
 </function>
 
-<function name="gtk_overlay_get_overlay_pass_through">
-<description>
-Convenience function to get the value of the #GtkOverlay:pass-through
-child property for @widget.
-
-
-</description>
-<parameters>
-<parameter name="overlay">
-<parameter_description> a #GtkOverlay
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> an overlay child of #GtkOverlay
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether the widget is a pass through child.
-</return>
-</function>
-
 <function name="gtk_overlay_new">
 <description>
 Creates a new #GtkOverlay.
@@ -49864,36 +49956,6 @@ Creates a new #GtkOverlay.
 </parameters>
 <return> a new #GtkOverlay object.
 </return>
-</function>
-
-<function name="gtk_overlay_reorder_overlay">
-<description>
-Moves @child to a new @index in the list of @overlay children.
-The list contains overlays in the order that these were
-added to @overlay.
-
-A widget’s index in the @overlay children list determines which order
-the children are drawn if they overlap. The first child is drawn at
-the bottom. It also affects the focus order.
-
-</description>
-<parameters>
-<parameter name="overlay">
-<parameter_description> a #GtkOverlay
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> the overlaid #GtkWidget to move
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> the new index for @child in the list of overlay children
-of @overlay, starting from 0. If negative, indicates the end of
-the list
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_overlay_set_clip_overlay">
@@ -49939,29 +50001,6 @@ be drawn outside of @overlay's allocation if they are too large.
 </parameter>
 <parameter name="measure">
 <parameter_description> whether the child should be measured
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_overlay_set_overlay_pass_through">
-<description>
-Convenience function to set the value of the #GtkOverlay:pass-through
-child property for @widget.
-
-</description>
-<parameters>
-<parameter name="overlay">
-<parameter_description> a #GtkOverlay
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> an overlay child of #GtkOverlay
-</parameter_description>
-</parameter>
-<parameter name="pass_through">
-<parameter_description> whether the child should pass the input through
 </parameter_description>
 </parameter>
 </parameters>
@@ -51440,6 +51479,18 @@ This function adds the paper size from @size to @key_file.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_password_entry_new">
+<description>
+Creates a #GtkPasswordEntry.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkPasswordEntry
+</return>
 </function>
 
 <function name="gtk_picture_get_alternative_text">
@@ -60503,7 +60554,7 @@ search bar (as in our main example).
 </parameter_description>
 </parameter>
 <parameter name="entry">
-<parameter_description> a #GtkEntry
+<parameter_description> a #GtkEditable
 </parameter_description>
 </parameter>
 </parameters>
@@ -61249,9 +61300,17 @@ Checks if the given item is selected.
 <description>
 This function allows to query the selection status of multiple elements at once.
 It is passed a position and returns a range of elements of uniform selection status.
-The returned range is guaranteed to include the passed-in position.
-The selection status is returned from this function.
 
+If @position is greater than the number of items in @model, @n_items is set to 0.
+Otherwise the returned range is guaranteed to include the passed-in position, so
+@n_items will be &gt;= 1.
+
+Positions directly adjacent to the returned range may have the same selection
+status as the returned range.
+
+This is an optimization function to make iterating over a model faster when few
+items are selected. However, it is valid behavior for implementations to use a
+naive implementation that only ever returns a single element.
 
 </description>
 <parameters>
@@ -61260,16 +61319,23 @@ The selection status is returned from this function.
 </parameter_description>
 </parameter>
 <parameter name="position">
-<parameter_description> specifies the position on input, and the first element of the range on output
+<parameter_description> the position inside the range
+</parameter_description>
+</parameter>
+<parameter name="start_range">
+<parameter_description> returns the position of the first element of the range
 </parameter_description>
 </parameter>
 <parameter name="n_items">
 <parameter_description> returns the size of the range
 </parameter_description>
 </parameter>
+<parameter name="selected">
+<parameter_description> returns whether items in @range are selected
+</parameter_description>
+</parameter>
 </parameters>
-<return> %TRUE if the elements in the returned range are selected, %FALSE otherwise
-</return>
+<return></return>
 </function>
 
 <function name="gtk_separator_menu_item_new">
@@ -61977,6 +62043,35 @@ the model sliced from doesn't have enough items.
 <return></return>
 </function>
 
+<function name="gtk_snapshot_append_border">
+<description>
+Appends a stroked border rectangle inside the given @outline. The
+4 sides of the border can have different widths and colors.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="outline">
+<parameter_description> a #GskRoundedRect describing the outline of the border
+</parameter_description>
+</parameter>
+<parameter name="border_width">
+<parameter_description> the stroke width of the border on
+the top, right, bottom and left side respectively.
+</parameter_description>
+</parameter>
+<parameter name="border_color">
+<parameter_description> the color used on the top, right,
+bottom and left side.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_snapshot_append_cairo">
 <description>
 Creates a new render node and appends it to the current render
@@ -62018,6 +62113,44 @@ You should try to avoid calling this function if @color is transparent.
 </parameter>
 <parameter name="bounds">
 <parameter_description> the bounds for the new node
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_append_inset_shadow">
+<description>
+Appends an inset shadow into the box given by @outline.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="outline">
+<parameter_description> outline of the region surrounded by shadow
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> color of the shadow
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description> horizontal offset of shadow
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description> vertical offset of shadow
+</parameter_description>
+</parameter>
+<parameter name="spread">
+<parameter_description> how far the shadow spreads towards the inside
+</parameter_description>
+</parameter>
+<parameter name="blur_radius">
+<parameter_description> how much blur to apply to the shadow
 </parameter_description>
 </parameter>
 </parameters>
@@ -62097,6 +62230,44 @@ initial node.
 </parameter>
 <parameter name="node">
 <parameter_description> a #GskRenderNode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_append_outset_shadow">
+<description>
+Appends an outset shadow node around the box given by @outline.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="outline">
+<parameter_description> outline of the region surrounded by shadow
+</parameter_description>
+</parameter>
+<parameter name="color">
+<parameter_description> color of the shadow
+</parameter_description>
+</parameter>
+<parameter name="dx">
+<parameter_description> horizontal offset of shadow
+</parameter_description>
+</parameter>
+<parameter name="dy">
+<parameter_description> vertical offset of shadow
+</parameter_description>
+</parameter>
+<parameter name="spread">
+<parameter_description> how far the shadow spreads towards the outside
+</parameter_description>
+</parameter>
+<parameter name="blur_radius">
+<parameter_description> how much blur to apply to the shadow
 </parameter_description>
 </parameter>
 </parameters>
@@ -62199,37 +62370,6 @@ or %NULL to use the bounds of the snapshot
 </return>
 </function>
 
-<function name="gtk_snapshot_get_offset">
-<description>
-Queries the offset managed by @snapshot. This offset is the
-accumulated sum of calls to gtk_snapshot_offset().
-
-Use this offset to determine how to offset nodes that you
-manually add to the snapshot using
-gtk_snapshot_append().
-
-Note that other functions that add nodes for you, such as
-gtk_snapshot_append_cairo() will add this offset for
-you.
-
-</description>
-<parameters>
-<parameter name="snapshot">
-<parameter_description> a #GtkSnapshot
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> return location for x offset
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> return location for y offset
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_snapshot_new">
 <description>
 Creates a new #GtkSnapshot.
@@ -62240,28 +62380,6 @@ Creates a new #GtkSnapshot.
 </parameters>
 <return> a newly-allocated #GtkSnapshot
 </return>
-</function>
-
-<function name="gtk_snapshot_offset">
-<description>
-Appends a translation by (@x, @y) to the current transformation.
-
-</description>
-<parameters>
-<parameter name="snapshot">
-<parameter_description> a #GtkSnapshot
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> horizontal translation
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> vertical translation
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_snapshot_pop">
@@ -62506,6 +62624,96 @@ without changing the current node.
 <return></return>
 </function>
 
+<function name="gtk_snapshot_restore">
+<description>
+Restores @snapshot to the state saved by a preceding call to
+gtk_snapshot_save() and removes that state from the stack of
+saved states.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_save">
+<description>
+Makes a copy of the current state of @snapshot and saves it
+on an internal stack of saved states for @snapshot. When
+gtk_snapshot_restore() is called, @snapshot will be restored to
+the saved state. Multiple calls to gtk_snapshot_save() and
+gtk_snapshot_restore() can be nested; each call to
+gtk_snapshot_restore() restores the state from the matching paired
+gtk_snapshot_save().
+
+It is necessary to clear all saved states with corresponding calls
+to gtk_snapshot_restore().
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_scale">
+<description>
+Scales @@snapshot's coordinate system in 2-dimensional space by
+the given factors.
+
+Use gtk_snapshot_scale_3d() to scale in all 3 dimensions.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="factor_x">
+<parameter_description> scaling factor on the X axis
+</parameter_description>
+</parameter>
+<parameter name="factor_y">
+<parameter_description> scaling factor on the Y axis
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_scale_3d">
+<description>
+Scales @@snapshot's coordinate system by the given factors.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="factor_x">
+<parameter_description> scaling factor on the X axis
+</parameter_description>
+</parameter>
+<parameter name="factor_y">
+<parameter_description> scaling factor on the Y axis
+</parameter_description>
+</parameter>
+<parameter name="factor_z">
+<parameter_description> scaling factor on the Z axis
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_snapshot_to_node">
 <description>
 Returns the render node that was constructed
@@ -62549,6 +62757,121 @@ or %NULL to use the bounds of the snapshot
 </parameters>
 <return> a new #GdkPaintable
 </return>
+</function>
+
+<function name="gtk_snapshot_transform">
+<description>
+Transforms @snapshot's coordinate system with the given @transform.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="tranform">
+<parameter_description> the transform to apply
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_transform_matrix">
+<description>
+Transforms @snapshot's coordinate system with the given @matrix.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="matrix">
+<parameter_description> the matrix to multiply the transform with
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_transform_rotate">
+<description>
+Rotates @@snapshot's coordinate system by @angle degrees in 2D space -
+or in 3D speak, rotates around the z axis.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="angle">
+<parameter_description> the rotation angle, in degrees (clockwise)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_transform_rotate_3d">
+<description>
+Rotates @snapshot's coordinate system by @angle degrees around @axis.
+
+For a rotation in 2D space, use gtk_transform_rotate().
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="angle">
+<parameter_description> the rotation angle, in degrees (clockwise)
+</parameter_description>
+</parameter>
+<parameter name="axis">
+<parameter_description> The rotation axis
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_transform_translate">
+<description>
+Translates @snapshot's coordinate system by @point in 2-dimensional space.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the point to translate the snapshot by
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_transform_translate_3d">
+<description>
+Translates @snapshot's coordinate system by @point.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the point to translate the snapshot by
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_sort_list_model_get_model">
@@ -66870,6 +67193,236 @@ convenience function gtk_text_buffer_create_child_anchor().
 </return>
 </function>
 
+<function name="gtk_text_get_activates_default">
+<description>
+Retrieves the value set by gtk_text_set_activates_default().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the self will activate the default widget
+</return>
+</function>
+
+<function name="gtk_text_get_attributes">
+<description>
+Gets the attribute list that was set on the self using
+gtk_text_set_attributes(), if any.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> the attribute list, or %NULL
+if none was set.
+</return>
+</function>
+
+<function name="gtk_text_get_buffer">
+<description>
+Get the #GtkEntryBuffer object which holds the text for
+this self.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GtkEntryBuffer object.
+</return>
+</function>
+
+<function name="gtk_text_get_input_hints">
+<description>
+Gets the value of the #GtkText:input-hints property.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_get_input_purpose">
+<description>
+Gets the value of the #GtkText:input-purpose property.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_get_invisible_char">
+<description>
+Retrieves the character displayed in place of the real characters
+for entries with visibility set to false.
+See gtk_text_set_invisible_char().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current invisible char, or 0, if the self does not
+show invisible text at all. 
+</return>
+</function>
+
+<function name="gtk_text_get_max_length">
+<description>
+Retrieves the maximum allowed length of the text in
+@self. See gtk_text_set_max_length().
+
+This is equivalent to getting @self's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_max_length() on it.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> the maximum allowed number of characters
+in #GtkText, or 0 if there is no maximum.
+</return>
+</function>
+
+<function name="gtk_text_get_overwrite_mode">
+<description>
+Gets the value set by gtk_text_set_overwrite_mode().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the text is overwritten when typing.
+</return>
+</function>
+
+<function name="gtk_text_get_placeholder_text">
+<description>
+Retrieves the text that will be displayed when @self is empty and unfocused
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return>a pointer to the placeholder text as a string.
+This string points to internally allocated storage in the widget and must
+not be freed, modified or stored. If no placeholder text has been set,
+%NULL will be returned.
+</return>
+</function>
+
+<function name="gtk_text_get_tabs">
+<description>
+Gets the tabstops that were set on the self using gtk_text_set_tabs(), if
+any.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> the tabstops, or %NULL if none was set.
+</return>
+</function>
+
+<function name="gtk_text_get_text_length">
+<description>
+Retrieves the current length of the text in
+@self. 
+
+This is equivalent to getting @self's #GtkEntryBuffer and
+calling gtk_entry_buffer_get_length() on it.
+
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current number of characters
+in #GtkText, or 0 if there are none.
+</return>
+</function>
+
+<function name="gtk_text_get_visibility">
+<description>
+Retrieves whether the text in @self is visible.
+See gtk_text_set_visibility().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the text is currently visible
+</return>
+</function>
+
+<function name="gtk_text_grab_focus_without_selecting">
+<description>
+Causes @self to have keyboard focus.
+
+It behaves like gtk_widget_grab_focus(),
+except that it doesn't select the contents of the self.
+You only want to call this on some special entries
+which the user usually doesn't want to replace all text in,
+such as search-as-you-type entries.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_iter_assign">
 <description>
 Assigns the value of @other to @iter.  This function
@@ -69490,6 +70043,274 @@ Marks are not visible by default.
 <return></return>
 </function>
 
+<function name="gtk_text_new">
+<description>
+Creates a new self.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkText.
+</return>
+</function>
+
+<function name="gtk_text_new_with_buffer">
+<description>
+Creates a new self with the specified text buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> The buffer to use for the new #GtkText.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkText
+</return>
+</function>
+
+<function name="gtk_text_set_activates_default">
+<description>
+If @activates is %TRUE, pressing Enter in the @self will activate the default
+widget for the window containing the self. This usually means that
+the dialog box containing the self will be closed, since the default
+widget is usually one of the dialog buttons.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="activates">
+<parameter_description> %TRUE to activate window’s default widget on Enter keypress
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_attributes">
+<description>
+Sets a #PangoAttrList; the attributes in the list are applied to the
+self text.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="attrs">
+<parameter_description> a #PangoAttrList
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_buffer">
+<description>
+Set the #GtkEntryBuffer object which holds the text for
+this widget.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a #GtkEntryBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_input_hints">
+<description>
+Sets the #GtkText:input-hints property, which
+allows input methods to fine-tune their behaviour.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="hints">
+<parameter_description> the hints
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_input_purpose">
+<description>
+Sets the #GtkText:input-purpose property which
+can be used by on-screen keyboards and other input
+methods to adjust their behaviour.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="purpose">
+<parameter_description> the purpose
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_invisible_char">
+<description>
+Sets the character to use in place of the actual text when
+gtk_text_set_visibility() has been called to set text visibility
+to %FALSE. i.e. this is the character used in “password mode” to
+show the user how many characters have been typed.
+
+By default, GTK picks the best invisible char available in the
+current font. If you set the invisible char to 0, then the user
+will get no feedback at all; there will be no text on the screen
+as they type.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="ch">
+<parameter_description> a Unicode character
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_max_length">
+<description>
+Sets the maximum allowed length of the contents of the widget.
+
+If the current contents are longer than the given length, then
+they will be truncated to fit.
+
+This is equivalent to getting @self's #GtkEntryBuffer and
+calling gtk_entry_buffer_set_max_length() on it.
+]|
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the maximum length of the self, or 0 for no maximum.
+(other than the maximum length of entries.) The value passed in will
+be clamped to the range 0-65536.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_overwrite_mode">
+<description>
+Sets whether the text is overwritten when typing in the #GtkText.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="overwrite">
+<parameter_description> new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_placeholder_text">
+<description>
+Sets text to be displayed in @self when it is empty.
+
+This can be used to give a visual hint of the expected
+contents of the self.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="text">
+<parameter_description> a string to be displayed when @self is empty and unfocused, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_tabs">
+<description>
+Sets a #PangoTabArray; the tabstops in the array are applied to the self
+text.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="tabs">
+<parameter_description> a #PangoTabArray
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_set_visibility">
+<description>
+Sets whether the contents of the self are visible or not.
+When visibility is set to %FALSE, characters are displayed
+as the invisible char, and will also appear that way when
+the text in the self widget is copied to the clipboard.
+
+By default, GTK picks the best invisible character available
+in the current font, but it can be changed with
+gtk_text_set_invisible_char().
+
+Note that you probably want to set #GtkText:input-purpose
+to %GTK_INPUT_PURPOSE_PASSWORD or %GTK_INPUT_PURPOSE_PIN to
+inform input methods about the purpose of this self,
+in addition to setting visibility to %FALSE.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
+</parameter_description>
+</parameter>
+<parameter name="visible">
+<parameter_description> %TRUE if the contents of the self are displayed
+as plaintext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_tag_changed">
 <description>
 Emits the #GtkTextTagTable::tag-changed signal on the #GtkTextTagTable where
@@ -69686,6 +70507,22 @@ it.
 </parameter>
 <parameter name="tag">
 <parameter_description> a #GtkTextTag
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_unset_invisible_char">
+<description>
+Unsets the invisible char previously set with
+gtk_text_set_invisible_char(). So that the
+default invisible char is used again.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkText
 </parameter_description>
 </parameter>
 </parameters>
@@ -72659,6 +73496,352 @@ key press.
 <parameters>
 <parameter name="display">
 <parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_transform_equal">
+<description>
+Checks two matrices for equality. Note that matrices need to be literally
+identical in their operations, it is not enough that they return the
+same result in gtk_transform_to_matrix().
+
+
+</description>
+<parameters>
+<parameter name="first">
+<parameter_description> the first matrix
+</parameter_description>
+</parameter>
+<parameter name="second">
+<parameter_description> the second matrix
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two matrices can be proven to be equal
+</return>
+</function>
+
+<function name="gtk_transform_get_next">
+<description>
+Gets the rest of the matrix in the chain of operations.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+</parameters>
+<return> The next transform or
+%NULL if this was the last operation.
+</return>
+</function>
+
+<function name="gtk_transform_get_transform_type">
+<description>
+Returns the type of the @self.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+</parameters>
+<return> the type of the #GtkTransform
+</return>
+</function>
+
+<function name="gtk_transform_identity">
+<description>
+Adds an identity multiplication into the list of matrix operations.
+
+This operation is generally useless, but may be useful when interpolating
+matrices, because the identity matrix can be interpolated to and from
+everything, so an identity matrix can be used as a keyframe between two
+different types of matrices.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform operation or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_matrix">
+<description>
+Multiplies @next with the given @matrix.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="matrix">
+<parameter_description> the matrix to multiply @next with
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_print">
+<description>
+Converts @self into a string representation suitable for printing that
+can later be parsed with gtk_transform_parse().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+<parameter name="string">
+<parameter_description>  The string to print into
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_transform_ref">
+<description>
+Acquires a reference on the given #GtkTransform.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkTransform with an additional reference
+</return>
+</function>
+
+<function name="gtk_transform_rotate">
+<description>
+Rotates @next @angle degrees in 2D - or in 3Dspeak, around the z axis.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="angle">
+<parameter_description> the rotation angle, in degrees (clockwise)
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_rotate_3d">
+<description>
+Rotates @next @angle degrees around @axis.
+
+For a rotation in 2D space, use gtk_transform_rotate().
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="angle">
+<parameter_description> the rotation angle, in degrees (clockwise)
+</parameter_description>
+</parameter>
+<parameter name="axis">
+<parameter_description> The rotation axis
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_scale">
+<description>
+Scales @next in 2-dimensional space by the given factors.
+Use gtk_transform_scale_3d() to scale in all 3 dimensions.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="factor_x">
+<parameter_description> scaling factor on the X axis
+</parameter_description>
+</parameter>
+<parameter name="factor_y">
+<parameter_description> scaling factor on the Y axis
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_scale_3d">
+<description>
+Scales @next by the given factors.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="factor_x">
+<parameter_description> scaling factor on the X axis
+</parameter_description>
+</parameter>
+<parameter name="factor_y">
+<parameter_description> scaling factor on the Y axis
+</parameter_description>
+</parameter>
+<parameter name="factor_z">
+<parameter_description> scaling factor on the Z axis
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_to_matrix">
+<description>
+Computes the actual value of @self and stores it in @out_matrix.
+The previous value of @out_matrix will be ignored.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+<parameter name="out_matrix">
+<parameter_description> The matrix to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_transform_to_string">
+<description>
+Converts a matrix into a string that is suitable for
+printing and can later be parsed with gtk_transform_parse().
+
+This is a wrapper around gtk_transform_print(), see that function
+for details.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new string for @self
+</return>
+</function>
+
+<function name="gtk_transform_transform">
+<description>
+Applies all the operations from @other to @next. 
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> Transform to apply @other to
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description>  Transform to apply
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_translate">
+<description>
+Translates @next in 2dimensional space by @point.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the point to translate the matrix by
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_translate_3d">
+<description>
+Translates @next by @point.
+
+
+</description>
+<parameters>
+<parameter name="next">
+<parameter_description> the next transform
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the point to translate the matrix by
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new matrix
+</return>
+</function>
+
+<function name="gtk_transform_unref">
+<description>
+Releases a reference on the given #GtkTransform.
+
+If the reference was the last, the resources associated to the @self are
+freed.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkTransform
 </parameter_description>
 </parameter>
 </parameters>
@@ -80098,6 +81281,43 @@ gtk_widget_remove_tick_callback()
 </return>
 </function>
 
+<function name="gtk_widget_allocate">
+<description>
+This function is only used by #GtkWidget subclasses, to assign a size,
+position and (optionally) baseline to their child widgets.
+
+In this function, the allocation and baseline may be adjusted. The given
+allocation will be forced to be bigger than the widget's minimum size,
+as well as at least 0×0 in size.
+
+For a version that does not take a transform, see gtk_widget_size_allocate()
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> A #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> New width of @widget
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> New height of @widget
+</parameter_description>
+</parameter>
+<parameter name="baseline">
+<parameter_description> New baseline of @widget, or -1
+</parameter_description>
+</parameter>
+<parameter name="transform">
+<parameter_description> Transformation to be applied to @widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_can_activate_accel">
 <description>
 Determines whether an accelerator that activates the signal
@@ -80650,6 +81870,67 @@ the widget may expand if some of its children do.
 </return>
 </function>
 
+<function name="gtk_widget_compute_point">
+<description>
+Translates the given @point in @widget's coordinates to coordinates
+relative to @target’s coodinate system. In order to perform this
+operation, both widgets must share a common ancestor.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> the #GtkWidget to query
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the #GtkWidget to transform into
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> a point in @widget's coordinate system
+</parameter_description>
+</parameter>
+<parameter name="out_point">
+<parameter_description> Set to the corresponding coordinates in
+@target's coordinate system
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the point could be determined, %FALSE on failure.
+In this case, 0 is stored in @out_point.
+</return>
+</function>
+
+<function name="gtk_widget_compute_transform">
+<description>
+Computes a matrix suitable to describe a transformation from
+@widget's coordinate system into @target's coordinate system.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target widget that the matrix will transform to
+</parameter_description>
+</parameter>
+<parameter name="out_transform">
+<parameter_description> location to
+store the final transformation
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the transform could be computed, %FALSE otherwise.
+The transform can not be computed in certain cases, for example when
+@widget and @target do not share a common ancestor. In that
+case @out_transform gets set to the identity matrix.
+</return>
+</function>
+
 <function name="gtk_widget_contains">
 <description>
 Tests if the point at (@x, @y) is contained in @widget. Points
@@ -80661,7 +81942,7 @@ The coordinates for (@x, @y) must be in widget coordinates, so
 
 Pass-through widgets and insensitive widgets do never respond to
 input and will therefor always return %FALSE here. See
-gtk_widget_set_pass_through() and gtk_widget_set_sensitive() for
+gtk_widget_set_can_pick() and gtk_widget_set_sensitive() for
 details about those functions.
 
 
@@ -80970,36 +82251,6 @@ Returns the height that has currently been allocated to @widget.
 </parameters>
 <return> the height of the @widget
 </return>
-</function>
-
-<function name="gtk_widget_get_allocated_size">
-<description>
-Retrieves the widget’s allocated size.
-
-This function returns the last values passed to
-gtk_widget_size_allocate(). The value differs from
-the size returned in gtk_widget_get_allocation() in that functions
-like gtk_widget_set_halign() can adjust the allocation, but not
-the value returned by this function.
-
-If a widget is not visible, its allocated size is 0.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="allocation">
-<parameter_description> a pointer to a #GtkAllocation to copy to
-</parameter_description>
-</parameter>
-<parameter name="baseline">
-<parameter_description> a pointer to an integer to copy to
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_widget_get_allocated_width">
@@ -81848,6 +83099,25 @@ capabilities.
 </parameter>
 </parameters>
 <return> The #GtkSizeRequestMode preferred by @widget.
+</return>
+</function>
+
+<function name="gtk_widget_get_root">
+<description>
+Returns the #GtkRoot widget of @widget or %NULL if the widget is not contained
+inside a widget tree with a root widget.
+
+#GtkRoot widgets will return themselves here.
+
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the root widget of @widget, or %NULL
 </return>
 </function>
 
@@ -84989,12 +86259,8 @@ toplevel container is realized and mapped.
 
 <function name="gtk_widget_size_allocate">
 <description>
-This function is only used by #GtkWidget subclasses, to assign a size,
-position and (optionally) baseline to their child widgets.
-
-In this function, the allocation and baseline may be adjusted. The given
-allocation will be forced to be bigger than the widget's minimum size,
-as well as at least 0×0 in size.
+This is a simple form of gtk_widget_allocate() that takes the new position
+of @widget as part of @allocation.
 
 </description>
 <parameters>
@@ -85038,8 +86304,8 @@ gtk_widget_snapshot_child() takes care of translating the origin of
 </parameter>
 <parameter name="snapshot">
 <parameter_description> #GtkSnapshot as passed to the widget. In particular, no
-calls to gtk_snapshot_offset() should have been applied by the
-parent.
+calls to gtk_snapshot_translate() or other transform calls should
+have been made.
 </parameter_description>
 </parameter>
 </parameters>

@@ -464,6 +464,13 @@
   (gtype-id "GTK_TYPE_SEPARATOR")
 )
 
+(define-object SearchEntry
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkSearchEntry")
+  (gtype-id "GTK_TYPE_SEARCH_ENTRY")
+)
+
 (define-object Scrollbar
   (in-module "Gtk")
   (parent "GtkWidget")
@@ -490,6 +497,13 @@
   (parent "GtkWidget")
   (c-name "GtkProgressBar")
   (gtype-id "GTK_TYPE_PROGRESS_BAR")
+)
+
+(define-object PasswordEntry
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkPasswordEntry")
+  (gtype-id "GTK_TYPE_PASSWORD_ENTRY")
 )
 
 (define-object LevelBar
@@ -553,13 +567,6 @@
   (parent "GtkWidget")
   (c-name "GtkEntry")
   (gtype-id "GTK_TYPE_ENTRY")
-)
-
-(define-object SearchEntry
-  (in-module "Gtk")
-  (parent "GtkEntry")
-  (c-name "GtkSearchEntry")
-  (gtype-id "GTK_TYPE_SEARCH_ENTRY")
 )
 
 (define-object DrawingArea
@@ -1284,7 +1291,6 @@
     '("document" "GTK_CSS_SECTION_DOCUMENT")
     '("import" "GTK_CSS_SECTION_IMPORT")
     '("color-definition" "GTK_CSS_SECTION_COLOR_DEFINITION")
-    '("binding-set" "GTK_CSS_SECTION_BINDING_SET")
     '("ruleset" "GTK_CSS_SECTION_RULESET")
     '("selector" "GTK_CSS_SECTION_SELECTOR")
     '("declaration" "GTK_CSS_SECTION_DECLARATION")
@@ -1357,6 +1363,22 @@
     '("highlight" "GTK_DEST_DEFAULT_HIGHLIGHT")
     '("drop" "GTK_DEST_DEFAULT_DROP")
     '("all" "GTK_DEST_DEFAULT_ALL")
+  )
+)
+
+(define-enum EditableProperties
+  (in-module "Gtk")
+  (c-name "GtkEditableProperties")
+  (gtype-id "GTK_TYPE_EDITABLE_PROPERTIES")
+  (values
+    '("prop-text" "GTK_EDITABLE_PROP_TEXT")
+    '("prop-cursor-position" "GTK_EDITABLE_PROP_CURSOR_POSITION")
+    '("prop-selection-bound" "GTK_EDITABLE_PROP_SELECTION_BOUND")
+    '("prop-editable" "GTK_EDITABLE_PROP_EDITABLE")
+    '("prop-width-chars" "GTK_EDITABLE_PROP_WIDTH_CHARS")
+    '("prop-max-width-chars" "GTK_EDITABLE_PROP_MAX_WIDTH_CHARS")
+    '("prop-xalign" "GTK_EDITABLE_PROP_XALIGN")
+    '("num-properties" "GTK_EDITABLE_NUM_PROPERTIES")
   )
 )
 
@@ -2508,6 +2530,19 @@
   (values
     '("word" "GTK_TEXT_EXTEND_SELECTION_WORD")
     '("line" "GTK_TEXT_EXTEND_SELECTION_LINE")
+  )
+)
+
+(define-enum TransformType
+  (in-module "Gtk")
+  (c-name "GtkTransformType")
+  (gtype-id "GTK_TYPE_TRANSFORM_TYPE")
+  (values
+    '("identity" "GTK_TRANSFORM_TYPE_IDENTITY")
+    '("transform" "GTK_TRANSFORM_TYPE_TRANSFORM")
+    '("translate" "GTK_TRANSFORM_TYPE_TRANSLATE")
+    '("rotate" "GTK_TRANSFORM_TYPE_ROTATE")
+    '("scale" "GTK_TRANSFORM_TYPE_SCALE")
   )
 )
 
@@ -4424,25 +4459,6 @@
   (return-type "none")
 )
 
-(define-method set_page_has_padding
-  (of-object "GtkAssistant")
-  (c-name "gtk_assistant_set_page_has_padding")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "page")
-    '("gboolean" "has_padding")
-  )
-)
-
-(define-method get_page_has_padding
-  (of-object "GtkAssistant")
-  (c-name "gtk_assistant_get_page_has_padding")
-  (return-type "gboolean")
-  (parameters
-    '("GtkWidget*" "page")
-  )
-)
-
 (define-method get_page
   (of-object "GtkAssistant")
   (c-name "gtk_assistant_get_page")
@@ -4456,6 +4472,12 @@
   (of-object "GtkAssistantPage")
   (c-name "gtk_assistant_page_get_child")
   (return-type "GtkWidget*")
+)
+
+(define-method get_pages
+  (of-object "GtkAssistant")
+  (c-name "gtk_assistant_get_pages")
+  (return-type "GListModel*")
 )
 
 
@@ -7414,12 +7436,6 @@
   )
 )
 
-(define-method check_resize
-  (of-object "GtkContainer")
-  (c-name "gtk_container_check_resize")
-  (return-type "none")
-)
-
 (define-method foreach
   (of-object "GtkContainer")
   (c-name "gtk_container_foreach")
@@ -8278,23 +8294,28 @@
   (return-type "GType")
 )
 
-(define-method select_region
+(define-method get_text
   (of-object "GtkEditable")
-  (c-name "gtk_editable_select_region")
+  (c-name "gtk_editable_get_text")
+  (return-type "const-char*")
+)
+
+(define-method set_text
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_set_text")
   (return-type "none")
   (parameters
-    '("gint" "start_pos")
-    '("gint" "end_pos")
+    '("const-char*" "text")
   )
 )
 
-(define-method get_selection_bounds
+(define-method get_chars
   (of-object "GtkEditable")
-  (c-name "gtk_editable_get_selection_bounds")
-  (return-type "gboolean")
+  (c-name "gtk_editable_get_chars")
+  (return-type "char*")
   (parameters
-    '("gint*" "start_pos")
-    '("gint*" "end_pos")
+    '("int" "start_pos")
+    '("int" "end_pos")
   )
 )
 
@@ -8303,9 +8324,9 @@
   (c-name "gtk_editable_insert_text")
   (return-type "none")
   (parameters
-    '("const-gchar*" "new_text")
-    '("gint" "new_text_length")
-    '("gint*" "position")
+    '("const-char*" "text")
+    '("int" "length")
+    '("int*" "position")
   )
 )
 
@@ -8314,37 +8335,19 @@
   (c-name "gtk_editable_delete_text")
   (return-type "none")
   (parameters
-    '("gint" "start_pos")
-    '("gint" "end_pos")
+    '("int" "start_pos")
+    '("int" "end_pos")
   )
 )
 
-(define-method get_chars
+(define-method get_selection_bounds
   (of-object "GtkEditable")
-  (c-name "gtk_editable_get_chars")
-  (return-type "gchar*")
+  (c-name "gtk_editable_get_selection_bounds")
+  (return-type "gboolean")
   (parameters
-    '("gint" "start_pos")
-    '("gint" "end_pos")
+    '("int*" "start_pos")
+    '("int*" "end_pos")
   )
-)
-
-(define-method cut_clipboard
-  (of-object "GtkEditable")
-  (c-name "gtk_editable_cut_clipboard")
-  (return-type "none")
-)
-
-(define-method copy_clipboard
-  (of-object "GtkEditable")
-  (c-name "gtk_editable_copy_clipboard")
-  (return-type "none")
-)
-
-(define-method paste_clipboard
-  (of-object "GtkEditable")
-  (c-name "gtk_editable_paste_clipboard")
-  (return-type "none")
 )
 
 (define-method delete_selection
@@ -8353,19 +8356,35 @@
   (return-type "none")
 )
 
+(define-method select_region
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_select_region")
+  (return-type "none")
+  (parameters
+    '("int" "start_pos")
+    '("int" "end_pos")
+  )
+)
+
 (define-method set_position
   (of-object "GtkEditable")
   (c-name "gtk_editable_set_position")
   (return-type "none")
   (parameters
-    '("gint" "position")
+    '("int" "position")
   )
 )
 
 (define-method get_position
   (of-object "GtkEditable")
   (c-name "gtk_editable_get_position")
-  (return-type "gint")
+  (return-type "int")
+)
+
+(define-method get_editable
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_get_editable")
+  (return-type "gboolean")
 )
 
 (define-method set_editable
@@ -8377,10 +8396,92 @@
   )
 )
 
-(define-method get_editable
+(define-method get_alignment
   (of-object "GtkEditable")
-  (c-name "gtk_editable_get_editable")
+  (c-name "gtk_editable_get_alignment")
+  (return-type "float")
+)
+
+(define-method set_alignment
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_set_alignment")
+  (return-type "none")
+  (parameters
+    '("float" "xalign")
+  )
+)
+
+(define-method get_width_chars
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_get_width_chars")
+  (return-type "int")
+)
+
+(define-method set_width_chars
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_set_width_chars")
+  (return-type "none")
+  (parameters
+    '("int" "n_chars")
+  )
+)
+
+(define-method get_max_width_chars
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_get_max_width_chars")
+  (return-type "int")
+)
+
+(define-method set_max_width_chars
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_set_max_width_chars")
+  (return-type "none")
+  (parameters
+    '("int" "n_chars")
+  )
+)
+
+(define-function gtk_editable_install_properties
+  (c-name "gtk_editable_install_properties")
+  (return-type "guint")
+  (parameters
+    '("GObjectClass*" "object_class")
+    '("guint" "first_prop")
+  )
+)
+
+(define-method init_delegate
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_init_delegate")
+  (return-type "none")
+)
+
+(define-method finish_delegate
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_finish_delegate")
+  (return-type "none")
+)
+
+(define-function gtk_editable_delegate_set_property
+  (c-name "gtk_editable_delegate_set_property")
   (return-type "gboolean")
+  (parameters
+    '("GObject*" "object")
+    '("guint" "prop_id")
+    '("const-GValue*" "value")
+    '("GParamSpec*" "pspec")
+  )
+)
+
+(define-function gtk_editable_delegate_get_property
+  (c-name "gtk_editable_delegate_get_property")
+  (return-type "gboolean")
+  (parameters
+    '("GObject*" "object")
+    '("guint" "prop_id")
+    '("GValue*" "value")
+    '("GParamSpec*" "pspec")
+  )
 )
 
 
@@ -8412,7 +8513,7 @@
   (is-constructor-of "GtkEmojiCompletion")
   (return-type "GtkWidget*")
   (parameters
-    '("GtkEntry*" "entry")
+    '("GtkText*" "text")
   )
 )
 
@@ -8921,22 +9022,6 @@
   (return-type "const-gchar*")
 )
 
-(define-method get_layout
-  (of-object "GtkEntry")
-  (c-name "gtk_entry_get_layout")
-  (return-type "PangoLayout*")
-)
-
-(define-method get_layout_offsets
-  (of-object "GtkEntry")
-  (c-name "gtk_entry_get_layout_offsets")
-  (return-type "none")
-  (parameters
-    '("gint*" "x")
-    '("gint*" "y")
-  )
-)
-
 (define-method set_alignment
   (of-object "GtkEntry")
   (c-name "gtk_entry_set_alignment")
@@ -8965,24 +9050,6 @@
   (of-object "GtkEntry")
   (c-name "gtk_entry_get_completion")
   (return-type "GtkEntryCompletion*")
-)
-
-(define-method layout_index_to_text_index
-  (of-object "GtkEntry")
-  (c-name "gtk_entry_layout_index_to_text_index")
-  (return-type "gint")
-  (parameters
-    '("gint" "layout_index")
-  )
-)
-
-(define-method text_index_to_layout_index
-  (of-object "GtkEntry")
-  (c-name "gtk_entry_text_index_to_layout_index")
-  (return-type "gint")
-  (parameters
-    '("gint" "text_index")
-  )
 )
 
 (define-method set_progress_fraction
@@ -9212,15 +9279,6 @@
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
     '("GdkRectangle*" "icon_area")
-  )
-)
-
-(define-method im_context_filter_keypress
-  (of-object "GtkEntry")
-  (c-name "gtk_entry_im_context_filter_keypress")
-  (return-type "gboolean")
-  (parameters
-    '("GdkEventKey*" "event")
   )
 )
 
@@ -16768,6 +16826,32 @@
   )
 )
 
+(define-function gtk_notebook_page_get_type
+  (c-name "gtk_notebook_page_get_type")
+  (return-type "GType")
+)
+
+(define-method get_page
+  (of-object "GtkNotebook")
+  (c-name "gtk_notebook_get_page")
+  (return-type "GtkNotebookPage*")
+  (parameters
+    '("GtkWidget*" "child")
+  )
+)
+
+(define-method get_child
+  (of-object "GtkNotebookPage")
+  (c-name "gtk_notebook_page_get_child")
+  (return-type "GtkWidget*")
+)
+
+(define-method get_pages
+  (of-object "GtkNotebook")
+  (c-name "gtk_notebook_get_pages")
+  (return-type "GListModel*")
+)
+
 
 
 ;; From gtkorientable.h
@@ -16813,16 +16897,6 @@
   (return-type "none")
   (parameters
     '("GtkWidget*" "widget")
-  )
-)
-
-(define-method reorder_overlay
-  (of-object "GtkOverlay")
-  (c-name "gtk_overlay_reorder_overlay")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "child")
-    '("gint" "position")
   )
 )
 
@@ -17536,6 +17610,21 @@
   (of-object "GtkPaperSize")
   (c-name "gtk_paper_size_to_gvariant")
   (return-type "GVariant*")
+)
+
+
+
+;; From gtkpasswordentry.h
+
+(define-function gtk_password_entry_get_type
+  (c-name "gtk_password_entry_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_password_entry_new
+  (c-name "gtk_password_entry_new")
+  (is-constructor-of "GtkPasswordEntry")
+  (return-type "GtkWidget*")
 )
 
 
@@ -21103,6 +21192,10 @@
 
 
 
+;; From gtkroot.h
+
+
+
 ;; From gtkscalebutton.h
 
 (define-function gtk_scale_button_get_type
@@ -21686,7 +21779,7 @@
   (c-name "gtk_search_bar_connect_entry")
   (return-type "none")
   (parameters
-    '("GtkEntry*" "entry")
+    '("GtkEditable*" "entry")
   )
 )
 
@@ -22094,10 +22187,12 @@
 (define-method query_range
   (of-object "GtkSelectionModel")
   (c-name "gtk_selection_model_query_range")
-  (return-type "gboolean")
+  (return-type "none")
   (parameters
-    '("guint*" "position")
+    '("guint" "position")
+    '("guint*" "start_range")
     '("guint*" "n_items")
+    '("gboolean*" "selected")
   )
 )
 
@@ -22607,15 +22702,6 @@
   (varargs #t)
 )
 
-(define-method push_transform
-  (of-object "GtkSnapshot")
-  (c-name "gtk_snapshot_push_transform")
-  (return-type "none")
-  (parameters
-    '("const-graphene_matrix_t*" "transform")
-  )
-)
-
 (define-method push_opacity
   (of-object "GtkSnapshot")
   (c-name "gtk_snapshot_push_opacity")
@@ -22706,23 +22792,91 @@
   (return-type "none")
 )
 
-(define-method offset
+(define-method save
   (of-object "GtkSnapshot")
-  (c-name "gtk_snapshot_offset")
+  (c-name "gtk_snapshot_save")
+  (return-type "none")
+)
+
+(define-method restore
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_restore")
+  (return-type "none")
+)
+
+(define-method transform
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_transform")
   (return-type "none")
   (parameters
-    '("int" "x")
-    '("int" "y")
+    '("GtkTransform*" "transform")
   )
 )
 
-(define-method get_offset
+(define-method transform_matrix
   (of-object "GtkSnapshot")
-  (c-name "gtk_snapshot_get_offset")
+  (c-name "gtk_snapshot_transform_matrix")
   (return-type "none")
   (parameters
-    '("int*" "x")
-    '("int*" "y")
+    '("const-graphene_matrix_t*" "matrix")
+  )
+)
+
+(define-method translate
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_translate")
+  (return-type "none")
+  (parameters
+    '("const-graphene_point_t*" "point")
+  )
+)
+
+(define-method translate_3d
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_translate_3d")
+  (return-type "none")
+  (parameters
+    '("const-graphene_point3d_t*" "point")
+  )
+)
+
+(define-method rotate
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_rotate")
+  (return-type "none")
+  (parameters
+    '("float" "angle")
+  )
+)
+
+(define-method rotate_3d
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_rotate_3d")
+  (return-type "none")
+  (parameters
+    '("float" "angle")
+    '("const-graphene_vec3_t*" "axis")
+  )
+)
+
+(define-method scale
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_scale")
+  (return-type "none")
+  (parameters
+    '("float" "factor_x")
+    '("float" "factor_y")
+  )
+)
+
+(define-method scale_3d
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_scale_3d")
+  (return-type "none")
+  (parameters
+    '("float" "factor_x")
+    '("float" "factor_y")
+    '("float" "factor_z")
   )
 )
 
@@ -22787,6 +22941,45 @@
     '("const-graphene_point_t*" "end_point")
     '("const-GskColorStop*" "stops")
     '("gsize" "n_stops")
+  )
+)
+
+(define-method append_border
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_append_border")
+  (return-type "none")
+  (parameters
+    '("const-GskRoundedRect*" "outline")
+    '("const-float" "border_width[4]")
+    '("const-GdkRGBA" "border_color[4]")
+  )
+)
+
+(define-method append_inset_shadow
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_append_inset_shadow")
+  (return-type "none")
+  (parameters
+    '("const-GskRoundedRect*" "outline")
+    '("const-GdkRGBA*" "color")
+    '("float" "dx")
+    '("float" "dy")
+    '("float" "spread")
+    '("float" "blur_radius")
+  )
+)
+
+(define-method append_outset_shadow
+  (of-object "GtkSnapshot")
+  (c-name "gtk_snapshot_append_outset_shadow")
+  (return-type "none")
+  (parameters
+    '("const-GskRoundedRect*" "outline")
+    '("const-GdkRGBA*" "color")
+    '("float" "dx")
+    '("float" "dy")
+    '("float" "spread")
+    '("float" "blur_radius")
   )
 )
 
@@ -24597,6 +24790,212 @@
   (of-object "GtkTextChildAnchor")
   (c-name "gtk_text_child_anchor_get_deleted")
   (return-type "gboolean")
+)
+
+
+
+;; From gtktext.h
+
+(define-function gtk_text_get_type
+  (c-name "gtk_text_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_text_new
+  (c-name "gtk_text_new")
+  (is-constructor-of "GtkText")
+  (return-type "GtkWidget*")
+)
+
+(define-function gtk_text_new_with_buffer
+  (c-name "gtk_text_new_with_buffer")
+  (return-type "GtkWidget*")
+  (parameters
+    '("GtkEntryBuffer*" "buffer")
+  )
+)
+
+(define-method get_buffer
+  (of-object "GtkText")
+  (c-name "gtk_text_get_buffer")
+  (return-type "GtkEntryBuffer*")
+)
+
+(define-method set_buffer
+  (of-object "GtkText")
+  (c-name "gtk_text_set_buffer")
+  (return-type "none")
+  (parameters
+    '("GtkEntryBuffer*" "buffer")
+  )
+)
+
+(define-method set_visibility
+  (of-object "GtkText")
+  (c-name "gtk_text_set_visibility")
+  (return-type "none")
+  (parameters
+    '("gboolean" "visible")
+  )
+)
+
+(define-method get_visibility
+  (of-object "GtkText")
+  (c-name "gtk_text_get_visibility")
+  (return-type "gboolean")
+)
+
+(define-method set_invisible_char
+  (of-object "GtkText")
+  (c-name "gtk_text_set_invisible_char")
+  (return-type "none")
+  (parameters
+    '("gunichar" "ch")
+  )
+)
+
+(define-method get_invisible_char
+  (of-object "GtkText")
+  (c-name "gtk_text_get_invisible_char")
+  (return-type "gunichar")
+)
+
+(define-method unset_invisible_char
+  (of-object "GtkText")
+  (c-name "gtk_text_unset_invisible_char")
+  (return-type "none")
+)
+
+(define-method set_overwrite_mode
+  (of-object "GtkText")
+  (c-name "gtk_text_set_overwrite_mode")
+  (return-type "none")
+  (parameters
+    '("gboolean" "overwrite")
+  )
+)
+
+(define-method get_overwrite_mode
+  (of-object "GtkText")
+  (c-name "gtk_text_get_overwrite_mode")
+  (return-type "gboolean")
+)
+
+(define-method set_max_length
+  (of-object "GtkText")
+  (c-name "gtk_text_set_max_length")
+  (return-type "none")
+  (parameters
+    '("int" "length")
+  )
+)
+
+(define-method get_max_length
+  (of-object "GtkText")
+  (c-name "gtk_text_get_max_length")
+  (return-type "gint")
+)
+
+(define-method get_text_length
+  (of-object "GtkText")
+  (c-name "gtk_text_get_text_length")
+  (return-type "guint16")
+)
+
+(define-method set_activates_default
+  (of-object "GtkText")
+  (c-name "gtk_text_set_activates_default")
+  (return-type "none")
+  (parameters
+    '("gboolean" "activates")
+  )
+)
+
+(define-method get_activates_default
+  (of-object "GtkText")
+  (c-name "gtk_text_get_activates_default")
+  (return-type "gboolean")
+)
+
+(define-method get_placeholder_text
+  (of-object "GtkText")
+  (c-name "gtk_text_get_placeholder_text")
+  (return-type "const-char*")
+)
+
+(define-method set_placeholder_text
+  (of-object "GtkText")
+  (c-name "gtk_text_set_placeholder_text")
+  (return-type "none")
+  (parameters
+    '("const-char*" "text")
+  )
+)
+
+(define-method set_input_purpose
+  (of-object "GtkText")
+  (c-name "gtk_text_set_input_purpose")
+  (return-type "none")
+  (parameters
+    '("GtkInputPurpose" "purpose")
+  )
+)
+
+(define-method get_input_purpose
+  (of-object "GtkText")
+  (c-name "gtk_text_get_input_purpose")
+  (return-type "GtkInputPurpose")
+)
+
+(define-method set_input_hints
+  (of-object "GtkText")
+  (c-name "gtk_text_set_input_hints")
+  (return-type "none")
+  (parameters
+    '("GtkInputHints" "hints")
+  )
+)
+
+(define-method get_input_hints
+  (of-object "GtkText")
+  (c-name "gtk_text_get_input_hints")
+  (return-type "GtkInputHints")
+)
+
+(define-method set_attributes
+  (of-object "GtkText")
+  (c-name "gtk_text_set_attributes")
+  (return-type "none")
+  (parameters
+    '("PangoAttrList*" "attrs")
+  )
+)
+
+(define-method get_attributes
+  (of-object "GtkText")
+  (c-name "gtk_text_get_attributes")
+  (return-type "PangoAttrList*")
+)
+
+(define-method set_tabs
+  (of-object "GtkText")
+  (c-name "gtk_text_set_tabs")
+  (return-type "none")
+  (parameters
+    '("PangoTabArray*" "tabs")
+  )
+)
+
+(define-method get_tabs
+  (of-object "GtkText")
+  (c-name "gtk_text_get_tabs")
+  (return-type "PangoTabArray*")
+)
+
+(define-method grab_focus_without_selecting
+  (of-object "GtkText")
+  (c-name "gtk_text_grab_focus_without_selecting")
+  (return-type "none")
 )
 
 
@@ -26675,6 +27074,160 @@
   (parameters
     '("const-GdkRectangle*" "rect")
   )
+)
+
+
+
+;; From gtktransform.h
+
+(define-function gtk_transform_get_type
+  (c-name "gtk_transform_get_type")
+  (return-type "GType")
+)
+
+(define-method ref
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_ref")
+  (return-type "GtkTransform*")
+)
+
+(define-method unref
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_unref")
+  (return-type "none")
+)
+
+(define-method print
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_print")
+  (return-type "none")
+  (parameters
+    '("GString*" "string")
+  )
+)
+
+(define-method to_string
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_to_string")
+  (return-type "char*")
+)
+
+(define-method to_matrix
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_to_matrix")
+  (return-type "none")
+  (parameters
+    '("graphene_matrix_t*" "out_matrix")
+  )
+)
+
+(define-method equal
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_equal")
+  (return-type "gboolean")
+  (parameters
+    '("GtkTransform*" "second")
+  )
+)
+
+(define-function gtk_transform_new
+  (c-name "gtk_transform_new")
+  (is-constructor-of "GtkTransform")
+  (return-type "GtkTransform*")
+)
+
+(define-method identity
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_identity")
+  (return-type "GtkTransform*")
+)
+
+(define-method transform
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_transform")
+  (return-type "GtkTransform*")
+  (parameters
+    '("GtkTransform*" "other")
+  )
+)
+
+(define-method matrix
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_matrix")
+  (return-type "GtkTransform*")
+  (parameters
+    '("const-graphene_matrix_t*" "matrix")
+  )
+)
+
+(define-method translate
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_translate")
+  (return-type "GtkTransform*")
+  (parameters
+    '("const-graphene_point_t*" "point")
+  )
+)
+
+(define-method translate_3d
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_translate_3d")
+  (return-type "GtkTransform*")
+  (parameters
+    '("const-graphene_point3d_t*" "point")
+  )
+)
+
+(define-method rotate
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_rotate")
+  (return-type "GtkTransform*")
+  (parameters
+    '("float" "angle")
+  )
+)
+
+(define-method rotate_3d
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_rotate_3d")
+  (return-type "GtkTransform*")
+  (parameters
+    '("float" "angle")
+    '("const-graphene_vec3_t*" "axis")
+  )
+)
+
+(define-method scale
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_scale")
+  (return-type "GtkTransform*")
+  (parameters
+    '("float" "factor_x")
+    '("float" "factor_y")
+  )
+)
+
+(define-method scale_3d
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_scale_3d")
+  (return-type "GtkTransform*")
+  (parameters
+    '("float" "factor_x")
+    '("float" "factor_y")
+    '("float" "factor_z")
+  )
+)
+
+(define-method get_transform_type
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_get_transform_type")
+  (return-type "GtkTransformType")
+)
+
+(define-method get_next
+  (of-object "GtkTransform")
+  (c-name "gtk_transform_get_next")
+  (return-type "GtkTransform*")
 )
 
 
@@ -29045,7 +29598,7 @@
 (define-method get_search_entry
   (of-object "GtkTreeView")
   (c-name "gtk_tree_view_get_search_entry")
-  (return-type "GtkEntry*")
+  (return-type "GtkEditable*")
 )
 
 (define-method set_search_entry
@@ -29053,7 +29606,7 @@
   (c-name "gtk_tree_view_set_search_entry")
   (return-type "none")
   (parameters
-    '("GtkEntry*" "entry")
+    '("GtkEditable*" "entry")
   )
 )
 
@@ -29638,6 +30191,18 @@
   )
 )
 
+(define-method allocate
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_allocate")
+  (return-type "none")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+    '("int" "baseline")
+    '("GtkTransform*" "transform")
+  )
+)
+
 (define-method get_request_mode
   (of-object "GtkWidget")
   (c-name "gtk_widget_get_request_mode")
@@ -29822,6 +30387,21 @@
 (define-method get_focus_on_click
   (of-object "GtkWidget")
   (c-name "gtk_widget_get_focus_on_click")
+  (return-type "gboolean")
+)
+
+(define-method set_can_pick
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_can_pick")
+  (return-type "none")
+  (parameters
+    '("gboolean" "can_pick")
+  )
+)
+
+(define-method get_can_pick
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_can_pick")
   (return-type "gboolean")
 )
 
@@ -30018,6 +30598,12 @@
   (return-type "GtkWidget*")
 )
 
+(define-method get_root
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_get_root")
+  (return-type "GtkRoot*")
+)
+
 (define-method set_parent_surface
   (of-object "GtkWidget")
   (c-name "gtk_widget_set_parent_surface")
@@ -30099,22 +30685,22 @@
   (return-type "int")
 )
 
-(define-method get_allocated_size
-  (of-object "GtkWidget")
-  (c-name "gtk_widget_get_allocated_size")
-  (return-type "none")
-  (parameters
-    '("GtkAllocation*" "allocation")
-    '("int*" "baseline")
-  )
-)
-
 (define-method get_allocation
   (of-object "GtkWidget")
   (c-name "gtk_widget_get_allocation")
   (return-type "none")
   (parameters
     '("GtkAllocation*" "allocation")
+  )
+)
+
+(define-method compute_transform
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_compute_transform")
+  (return-type "gboolean")
+  (parameters
+    '("GtkWidget*" "target")
+    '("graphene_matrix_t*" "out_transform")
   )
 )
 
@@ -30125,6 +30711,17 @@
   (parameters
     '("GtkWidget*" "target")
     '("graphene_rect_t*" "out_bounds")
+  )
+)
+
+(define-method compute_point
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_compute_point")
+  (return-type "gboolean")
+  (parameters
+    '("GtkWidget*" "target")
+    '("const-graphene_point_t*" "point")
+    '("graphene_point_t*" "out_point")
   )
 )
 
@@ -32249,6 +32846,11 @@
   (return-type "GType")
 )
 
+(define-function gtk_editable_properties_get_type
+  (c-name "gtk_editable_properties_get_type")
+  (return-type "GType")
+)
+
 (define-function gtk_entry_icon_position_get_type
   (c-name "gtk_entry_icon_position_get_type")
   (return-type "GType")
@@ -32651,6 +33253,11 @@
 
 (define-function gtk_text_extend_selection_get_type
   (c-name "gtk_text_extend_selection_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_transform_type_get_type
+  (c-name "gtk_transform_type_get_type")
   (return-type "GType")
 )
 
