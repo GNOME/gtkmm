@@ -1,0 +1,83 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+
+// This vfunc callback and the corresponding vfunc are custom implemented because we want
+// an output argument of the C++ vfunc to be bool& (not gboolean* or gboolean&).
+void SelectionModel_Class::query_range_vfunc_callback(GtkSelectionModel* self, guint position, guint* start_range, guint* n_items, gboolean* selected)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+        // Assuming that none of start_range, n_items, selected is nullptr.
+        // gtk_selection_model_query_range() guarantees it,
+        // and gtk_single_selection_query_range() assumes it.
+        bool selected_cxx = *selected;
+        obj->query_range_vfunc(position, *start_range, *n_items, selected_cxx);
+        *selected = selected_cxx;
+        return;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  // Call the original underlying C function:
+  if(base && base->query_range)
+    (*base->query_range)(self, position, start_range, n_items, selected);
+}
+
+void Gtk::SelectionModel::query_range_vfunc(guint position, guint& start_range, guint& n_items, bool& selected) const
+{
+  const auto base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->query_range)
+  {
+    gboolean selected_c = selected;
+    (*base->query_range)(const_cast<GtkSelectionModel*>(gobj()), position, &start_range, &n_items, &selected_c);
+    selected = selected_c;
+  }
+}
+
+} // namespace Gtk
+

@@ -567,6 +567,8 @@ _CONVERSION(`GMenuModel*',`Glib::RefPtr<const Gio::MenuModel>',`Glib::wrap($3)')
 
 _CONVERSION(`GListModel*',`Glib::RefPtr<Gio::ListModel>',`Glib::wrap($3)')
 _CONVERSION(`GListModel*',`Glib::RefPtr<const Gio::ListModel>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::ListModel>&',`GListModel*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkSelectionModel*',`Glib::RefPtr<SelectionModel>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::ActionGroup))
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<Gio::ActionGroup>',`Glib::wrap($3)')

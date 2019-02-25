@@ -1,0 +1,101 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+typedef struct _GtkSelectionModelInterface GtkSelectionModelInterface;
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gtk
+{
+
+/** An extension of the list model interface that handles selections.
+ *
+ * %Gtk::SelectionModel is an interface that extends the Gio::ListModel interface by adding
+ * support for selections. This support is then used by widgets using list models to add
+ * the ability to select and unselect various items.
+ *
+ * GTK provides default implementations of the common selection modes such as
+ * Gtk::SingleSelection, so you will only need to implement this interface if you want
+ * detailed control about how selections should be handled.
+ *
+ * A %Gtk::SelectionModel supports a single boolean per row indicating if a row is selected
+ * or not. This can be queried via is_selected(). When the selected
+ * state of one or more rows changes, the model will emit
+ * signal_selection_changed() by calling the
+ * selection_changed() method. The positions given in that signal
+ * may have their selection state changed, though that is not a requirement.  
+ * If new items added to the model via Gio::ListModel::signal_items_changed() are selected
+ * or not is up to the implementation.
+ *
+ * Additionally, the interface can expose functionality to select and unselect items.
+ * If these functions are implemented, GTK's list widgets will allow users to select and
+ * unselect items. However, %Gtk::SelectionModels are free to only implement them
+ * partially or not at all. In that case the widgets will not support the unimplemented
+ * operations.
+ *
+ * When selecting or unselecting is supported by a model, the return values of the
+ * selection functions do NOT indicate if selection or unselection happened. They are
+ * only meant to indicate complete failure, like when this mode of selecting is not
+ * supported by the model.
+ * Selections may happen asynchronously, so the only reliable way to find out when an
+ * item was selected is to listen to the signals that indicate selection.
+ *
+ * @see Gio::ListModel, Gtk::SingleSelection
+ * @newin{3,96}
+ */
+class SelectionModel : public Glib::Interface
+{
+  _CLASS_INTERFACE(SelectionModel, GtkSelectionModel, GTK_SELECTION_MODEL, GtkSelectionModelInterface)
+
+public:
+  _WRAP_METHOD(bool is_slected(guint position) const, gtk_selection_model_is_selected)
+  _WRAP_METHOD(bool select_item(guint position, bool exclusive), gtk_selection_model_select_item)
+  _WRAP_METHOD(bool unselect_item(guint position), gtk_selection_model_unselect_item)
+  _WRAP_METHOD(bool select_range(guint position, guint n_items, bool exclusive), gtk_selection_model_select_range)
+  _WRAP_METHOD(bool unselect_range(guint position, guint n_items), gtk_selection_model_unselect_range)
+  _WRAP_METHOD(bool select_all(), gtk_selection_model_select_all)
+  _WRAP_METHOD(bool unselect_all(), gtk_selection_model_unselect_all)
+  _WRAP_METHOD(void query_range(guint position, guint& start_range, guint& n_items, bool& selected) const,
+    gtk_selection_model_query_range)
+
+  // no_default_handler because the wrapped C signal has no default handler.
+  _WRAP_SIGNAL(void selection_changed(guint position, guint n_items), "selection-changed", no_default_handler)
+
+protected:
+  // For implementations only
+  _WRAP_METHOD(void selection_changed(guint position, guint n_items), gtk_selection_model_selection_changed)
+
+  _WRAP_VFUNC(bool is_selected(guint position) const, is_selected)
+  _WRAP_VFUNC(bool select_item(guint position, bool exclusive), select_item)
+  _WRAP_VFUNC(bool unselect_item(guint position), unselect_item)
+  _WRAP_VFUNC(bool select_range(guint position, guint n_items, bool exclusive), select_range)
+  _WRAP_VFUNC(bool unselect_range(guint position, guint n_items), unselect_range)
+  _WRAP_VFUNC(bool select_all(), select_all)
+  _WRAP_VFUNC(bool unselect_all(), unselect_all)
+  _WRAP_VFUNC(void query_range(guint position, guint& start_range, guint& n_items, bool& selected) const,
+    query_range, custom_vfunc_callback, custom_vfunc)
+
+};
+
+} // namespace Gtk
