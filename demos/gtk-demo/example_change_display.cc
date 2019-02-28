@@ -328,21 +328,11 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   if (!device)
     return nullptr;
 
-  auto refPointerWindow = device->get_surface_at_position();
-  if (refPointerWindow)
-  {
-    // The user data field of a GdkWindow is used to store a pointer
-    // to the widget that created it.
-    gpointer user_data = nullptr;
-    refPointerWindow->get_user_data(&user_data);
-    GtkWidget* cWidget = static_cast<GtkWidget*>(user_data);
+  auto refPointerSurface = device->get_surface_at_position();
+  if (!refPointerSurface)
+    return nullptr;
 
-    auto pWidget = Glib::wrap(cWidget);
-    if(pWidget)
-      return pWidget->get_toplevel();
-  }
-
-  return nullptr;
+  return Gtk::Root::get_for_surface(refPointerSurface);
 }
 
 void Example_ChangeDisplay::on_popup_button_released(int /* n_press */, double /* x */, double /* y */)

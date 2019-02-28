@@ -668,8 +668,6 @@ public:
 
   _WRAP_SIGNAL(void state_flags_changed(Gtk::StateFlags previous_state_flags), "state-flags-changed")
 
-  _WRAP_SIGNAL(void hierarchy_changed(Widget* previous_toplevel), "hierarchy_changed")
-
   _WRAP_SIGNAL(void style_updated(), "style_updated")
 
   _WRAP_SIGNAL(void direction_changed(TextDirection direction), "direction_changed")
@@ -679,7 +677,6 @@ public:
   _WRAP_SIGNAL(void child_notify(GParamSpec* pspec), "child_notify", detail_name child_property_name)
 
   _WRAP_SIGNAL(bool mnemonic_activate(bool group_cycling), "mnemonic_activate")
-  _WRAP_SIGNAL(void grab_focus(), "grab_focus")
   _WRAP_SIGNAL(bool focus(DirectionType direction), "focus")
 
 #m4begin
@@ -769,9 +766,12 @@ protected:
   //comment in GTK+ header: "seldomly overidden"
   _WRAP_VFUNC(void dispatch_child_properties_changed(guint, GParamSpec**), "dispatch_child_properties_changed")
 
+  _WRAP_VFUNC(void root(), root)
+  _WRAP_VFUNC(void unroot(), unroot)
   _WRAP_VFUNC(SizeRequestMode get_request_mode() const, get_request_mode)
   _WRAP_VFUNC(void measure(Orientation orientation, int for_size, int& minimum, int& natural,
     int& minimum_baseline, int& natural_baseline) const, measure, custom_vfunc_callback)
+  _WRAP_VFUNC(void grab_focus(), grab_focus)
   _WRAP_VFUNC(Glib::RefPtr<Atk::Object> get_accessible(), "get_accessible", refreturn, ifdef GTKMM_ATKMM_ENABLED)
 
   _WRAP_VFUNC(void compute_expand(bool& hexpand_p, bool& vexpand_p), compute_expand,
@@ -811,17 +811,14 @@ protected:
 
   void realize_if_needed();
 
-#m4begin
-dnl// Hook in custom hierarchy_changed callback.
-dnl// It will use the generated callback.
-dnl
-  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-    klass->hierarchy_changed = &hierarchy_changed_callback_custom;
-  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-    static void hierarchy_changed_callback_custom(GtkWidget* self, GtkWidget* p0);
-  _POP()
-#m4end
-
+  _WRAP_METHOD(void set_focus_child(Widget& child), gtk_widget_set_focus_child)
+  /** Unsets the focus child of the widget.
+   *
+   * The previous focus child will be unset.
+   *
+   * This function is only suitable for widget implementations.
+   */
+  void unset_focus_child();
 };
 
 } // namespace Gtk
