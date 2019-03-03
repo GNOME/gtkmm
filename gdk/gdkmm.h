@@ -26,7 +26,9 @@
 #include <gdkmm/contentformatsbuilder.h>
 #include <gdkmm/clipboard.h>
 #include <gdkmm/cursor.h>
+#include <gdkmm/devicepad.h>
 #include <gdkmm/devicetool.h>
+#include <gdkmm/devicewithpad.h>
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/drop.h>

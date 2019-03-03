@@ -18,6 +18,7 @@
 #include <gdk/gdk.h>
 #include <gdkmm/cursor.h>
 #include <gdkmm/devicetool.h>
+#include <gdkmm/devicewithpad.h>
 #include <gdkmm/display.h>
 #include <gdkmm/seat.h>
 #include <gdkmm/surface.h>
@@ -67,5 +68,37 @@ std::vector<std::string> Device::list_axes() const
   return Glib::ListHandler<std::string, AtomStringTraits>::list_to_vector(glist, Glib::OWNERSHIP_SHALLOW);
 }
 
-} // namespace Gdk
+// Custom wrap_new() because we want to create a DeviceWithPad, if the underlying
+// C class implements the GdkDevicePad interface.
+Glib::ObjectBase* Device_Class::wrap_new(GObject* object)
+{
+  // GdkDevice is an abstract class. C functions that return a GdkDevice* usually
+  // (always?) return a pointer to a subclass of GdkDevice. Some subclasses, e.g.
+  // GdkWaylandDevicePad, implement the GdkDevicePad interface.
+  // Give C++ programmers a chance to access methods in that interface, although
+  // gtkmm does not wrap subclasses of GdkDevice.
 
+  if (GDK_IS_DEVICE_PAD(object))
+     return new DeviceWithPad((GdkDevice*)object);
+  return new Device((GdkDevice*)object);
+}
+
+bool Device::has_device_pad() const
+{
+  return dynamic_cast<const DeviceWithPad*>(this) != nullptr;
+}
+
+Glib::RefPtr<DeviceWithPad> Device::device_with_pad_cast()
+{
+  auto retvalue = Glib::make_refptr_for_instance<DeviceWithPad>(dynamic_cast<DeviceWithPad*>(this));
+  if (retvalue)
+    retvalue->reference();
+  return retvalue;
+}
+
+Glib::RefPtr<const DeviceWithPad> Device::device_with_pad_cast() const
+{
+  return const_cast<Device*>(this)->device_with_pad_cast();
+}
+
+} // namespace Gdk
