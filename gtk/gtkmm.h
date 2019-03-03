@@ -198,6 +198,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/notebook.h>
 #include <gtkmm/object.h>
 #include <gtkmm/overlay.h>
+#include <gtkmm/padcontroller.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/pagesetup.h>
 #ifndef G_OS_WIN32

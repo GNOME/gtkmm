@@ -1,0 +1,114 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <giomm/actiongroup.h>
+#include <gdkmm/device.h>
+#include <gtkmm/eventcontroller.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/eventcontroller_p.h)
+
+namespace Gtk
+{
+_WRAP_ENUM(PadActionType, GtkPadActionType)
+
+/** Event controller for drawing tablet pads.
+ *
+ * %Gtk::PadController is an event controller for the pads found in drawing
+ * tablets (The collection of buttons and tactile sensors often found around
+ * the stylus-sensitive area).
+ *
+ * These buttons and sensors have no implicit meaning, and by default they
+ * perform no action. This event controller is provided to map those to
+ * Gio::Action objects, thus letting the application give those a more semantic
+ * meaning.
+ *
+ * Buttons and sensors are not constrained to triggering a single action, some
+ * Gdk::InputSource::TABLET_PAD devices feature multiple "modes". All these input
+ * elements have one current mode, which may determine the final action
+ * being triggered. Pad devices often divide buttons and sensors into groups.
+ * All elements in a group share the same current mode, but different groups
+ * may have different modes. See Gdk::DevicePad::get_n_groups() and
+ * Gdk::DevicePad::get_group_n_modes().
+ *
+ * Each of the actions that a given button/strip/ring performs for a given
+ * mode is defined by a GtkPadActionEntry. It contains an action name that
+ * will be looked up in the given Gio::ActionGroup and activated whenever the
+ * specified input element and mode are triggered.
+ *
+ * A simple example of %Gtk::PadController usage, assigning button 1 in all
+ * modes and pad devices to an "invert-selection" action:
+ *
+ * @code
+ * auto action_group = Gio::SimpleActionGroup::create();
+ * auto action = action_group->add_action("pad-actions.invert-selection",
+ *   sigc::ptr_fun(on_invert_selection_activated));
+ * auto pad_controller = Gtk::PadController::create(action_group);
+ * pad_controller->set_action(Gtk::PadActionType::BUTTON, 1, -1,
+ *   "Invert selection", "pad-actions.invert-selection");
+ * @endcode
+ *
+ * The actions belonging to rings/strips will be activated with a parameter
+ * of type Glib::Variant<double> bearing the value of the given axis. It
+ * is required that those are made stateful and accepting this Glib::VariantType.
+ * 
+ * @see Gtk::EventController, Gdk::DevicePad
+ * @newin{3,96}
+ *
+ * @ingroup Gestures
+ */
+class PadController : public EventController
+{
+  _CLASS_GOBJECT(PadController, GtkPadController, GTK_PAD_CONTROLLER, EventController, GtkEventController)
+
+protected:
+  explicit PadController(const Glib::RefPtr<Gio::ActionGroup>& action_group,
+    const Glib::RefPtr<Gdk::Device>& pad = {});
+  _IGNORE(gtk_pad_controller_new)
+
+public:
+  /** Creates a new %Gtk::PadController that will associate events from @a pad to actions.
+   *
+   * An empty %Glib::RefPtr pad may be provided so the controller manages all pad devices
+   * generically. It is discouraged to mix %Gtk::PadController objects with empty
+   * and non-empty @a pad argument on the same toplevel window, as execution order
+   * is not guaranteed.
+   *
+   * The %Gtk::PadController is created with no mapped actions. In order to map pad
+   * events to actions, use set_action_entries() or set_action().
+   *
+   * Be aware that pad events will only be delivered to Gtk::Windows, so adding a pad
+   * controller to any other type of widget will not have an effect.
+   *
+   * @param group Gio::ActionGroup to trigger actions from.
+   * @param pad A Gdk::InputSource::TABLET_PAD device, or an empty %Glib::RefPtr to handle all pads.
+   * @return A newly created %Gtk::PadController.
+   */
+  _WRAP_CREATE(const Glib::RefPtr<Gio::ActionGroup>& action_group,
+    const Glib::RefPtr<Gdk::Device>& pad = {})
+
+//TODO: Wrap GtkPadActionEntry. Glib::OptionEntry may give some hints.
+//  _WRAP_METHOD(void set_action_entries(const std::vector<const PadActionEntry>& entries), gtk_pad_controller_set_action_entries)
+  _WRAP_METHOD(void set_action(PadActionType type, int index, int mode,
+    const Glib::ustring& label, const Glib::ustring& action_name), gtk_pad_controller_set_action)
+
+  _WRAP_PROPERTY("action-group", Glib::RefPtr<Gio::ActionGroup>)
+  _WRAP_PROPERTY("pad", Glib::RefPtr<Gdk::Device>)
+
+  // There are no signals or vfuncs.
+};
+
+} // namespace Gtk
