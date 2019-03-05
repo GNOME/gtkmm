@@ -1,0 +1,103 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+
+PadActionEntry::PadActionEntry()
+ : gobject_(g_new0(GtkPadActionEntry, 1))
+{
+}
+
+PadActionEntry::PadActionEntry(PadActionType type, int index, int mode,
+  const Glib::ustring& label, const Glib::ustring& action_name)
+ : gobject_(g_new(GtkPadActionEntry, 1))
+{
+  gobject_->type = static_cast<GtkPadActionType>(type);
+  gobject_->index = index;
+  gobject_->mode = mode;
+  gobject_->label = g_strdup(label.c_str());
+  gobject_->action_name = g_strdup(action_name.c_str());
+}
+
+PadActionEntry::~PadActionEntry()
+{
+  release_gobject();
+}
+
+void PadActionEntry::release_gobject() noexcept
+{
+  if (!gobject_)
+    return;
+
+  g_free(gobject_->label);
+  g_free(gobject_->action_name);
+  g_free(gobject_);
+  gobject_ = nullptr;
+}
+
+PadActionEntry::PadActionEntry(const PadActionEntry& src)
+ : gobject_(nullptr)
+{
+  operator=(src);
+}
+
+PadActionEntry& PadActionEntry::operator=(const PadActionEntry& src)
+{
+  if (this == &src)
+    return *this;
+
+  if (!src.gobject_)
+  {
+    release_gobject();
+    return *this;
+  }
+
+  if (!gobject_)
+    gobject_ = g_new(GtkPadActionEntry, 1);
+  else
+  {
+    g_free(gobject_->label);
+    g_free(gobject_->action_name);
+  }
+  
+  *gobject_ = *src.gobject_;
+
+  gobject_->label = g_strdup(src.gobject_->label);
+  gobject_->action_name = g_strdup(src.gobject_->action_name);
+
+  return *this;
+}
+
+PadActionEntry::PadActionEntry(PadActionEntry&& other) noexcept
+ : gobject_(std::move(other.gobject_))
+{
+  other.gobject_ = nullptr;
+}
+
+PadActionEntry& PadActionEntry::operator=(PadActionEntry&& other) noexcept
+{
+  release_gobject();
+
+  gobject_ = std::move(other.gobject_);
+  other.gobject_ = nullptr;
+
+  return *this;
+}
+
+} // namespace Gtk

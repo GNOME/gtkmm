@@ -17,14 +17,13 @@
 #include <giomm/actiongroup.h>
 #include <gdkmm/device.h>
 #include <gtkmm/eventcontroller.h>
+#include <gtkmm/padactionentry.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/eventcontroller_p.h)
 
 namespace Gtk
 {
-_WRAP_ENUM(PadActionType, GtkPadActionType)
-
 /** Event controller for drawing tablet pads.
  *
  * %Gtk::PadController is an event controller for the pads found in drawing
@@ -45,20 +44,25 @@ _WRAP_ENUM(PadActionType, GtkPadActionType)
  * Gdk::DevicePad::get_group_n_modes().
  *
  * Each of the actions that a given button/strip/ring performs for a given
- * mode is defined by a GtkPadActionEntry. It contains an action name that
+ * mode is defined by a Gtk::PadActionEntry. It contains an action name that
  * will be looked up in the given Gio::ActionGroup and activated whenever the
  * specified input element and mode are triggered.
  *
  * A simple example of %Gtk::PadController usage, assigning button 1 in all
- * modes and pad devices to an "invert-selection" action:
+ * modes and pad devices to a "black" action and button 2 to a "pink" action:
  *
  * @code
  * auto action_group = Gio::SimpleActionGroup::create();
- * auto action = action_group->add_action("pad-actions.invert-selection",
- *   sigc::ptr_fun(on_invert_selection_activated));
  * auto pad_controller = Gtk::PadController::create(action_group);
- * pad_controller->set_action(Gtk::PadActionType::BUTTON, 1, -1,
- *   "Invert selection", "pad-actions.invert-selection");
+ * std::vector<Gtk::PadActionEntry> entries = {
+ *   { Gtk::PadActionType::BUTTON, 1, -1, "Black", "pad.black" },
+ *   { Gtk::PadActionType::BUTTON, 2, -1, "Pink", "pad.pink" },
+ * };
+ * for (const auto& entry : entries)
+ *   action_group->add_action(entry.get_action_name(), sigc::mem_fun(*this, &MyWindow::on_pad_activated));
+ * pad_controller->set_action_entries(entries);
+ * // Assuming the code is in the MyWindow constructor.
+ * add_controller(pad_controller);
  * @endcode
  *
  * The actions belonging to rings/strips will be activated with a parameter
@@ -100,8 +104,15 @@ public:
   _WRAP_CREATE(const Glib::RefPtr<Gio::ActionGroup>& action_group,
     const Glib::RefPtr<Gdk::Device>& pad = {})
 
-//TODO: Wrap GtkPadActionEntry. Glib::OptionEntry may give some hints.
-//  _WRAP_METHOD(void set_action_entries(const std::vector<const PadActionEntry>& entries), gtk_pad_controller_set_action_entries)
+  /** This is a convenience function to add a group of action entries on the pad controller.
+   *
+   * See Gtk::PadActionEntry and set_action().
+   *
+   * @param entries The action entries to set on the controller.
+   */
+  void set_action_entries(const std::vector<PadActionEntry>& entries);
+  _IGNORE(gtk_pad_controller_set_action_entries)
+
   _WRAP_METHOD(void set_action(PadActionType type, int index, int mode,
     const Glib::ustring& label, const Glib::ustring& action_name), gtk_pad_controller_set_action)
 

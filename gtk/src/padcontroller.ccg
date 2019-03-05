@@ -15,6 +15,7 @@
  */
 
 #include <gtk/gtk.h>
+#include <memory>
 
 namespace Gtk
 {
@@ -25,6 +26,22 @@ PadController::PadController(const Glib::RefPtr<Gio::ActionGroup>& action_group,
   _CONSTRUCT("propagation-phase", GTK_PHASE_CAPTURE,
     "action-group", Glib::unwrap(action_group), "pad", Glib::unwrap(pad))
 {
+}
+
+void PadController::set_action_entries(const std::vector<PadActionEntry>& entries)
+{
+  if (entries.empty())
+    return;
+
+  auto c_entries = std::make_unique<GtkPadActionEntry[]>(entries.size());
+
+  // Copy the GtkPadActionEntry instances to an array without duplicating the
+  // strings. Those strings are owned by entries. They are not deleted
+  // when the array in c_entries is deleted.
+  for (std::size_t i = 0; i < entries.size(); ++i)
+    c_entries[i] = *entries[i].gobj();
+
+  gtk_pad_controller_set_action_entries(gobj(), c_entries.get(), entries.size());
 }
 
 } // namespace Gtk
