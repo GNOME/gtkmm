@@ -95,7 +95,7 @@ AS_IF([test "x$enable_static" = xyes],
 # gdkmm really does need GTK, because part of Gdk::DragContext is in GTK.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk4 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.60 >= 2.59.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.94.0 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.62 >= 2.61.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.94.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -117,7 +117,7 @@ PKG_CHECK_MODULES([GTKMM_DEMOS_EXTRA], [$GTKMM_DEMOS_EXTRA_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
-MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.60])
+MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.62])
 MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.44 atkmm-2.30])
 
 MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
@@ -125,7 +125,7 @@ MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-3.0.tag], [sigc++-3.0])
-MM_ARG_WITH_TAGFILE_DOC([glibmm-2.60.tag], [glibmm-2.60])
+MM_ARG_WITH_TAGFILE_DOC([glibmm-2.62.tag], [glibmm-2.62])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.16.tag], [cairomm-1.16])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-2.44.tag], [pangomm-2.44])
 MM_ARG_WITH_TAGFILE_DOC([atkmm-2.30.tag], [atkmm-2.30])
