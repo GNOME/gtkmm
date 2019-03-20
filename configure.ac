@@ -168,5 +168,5 @@ AC_CONFIG_COMMANDS([MSVC_NMake/gdkmm/gdkmmconfig.h],
 AC_CONFIG_COMMANDS([MSVC_NMake/gtkmm/gtkmmconfig.h],
                    [cp -f gtk/gtkmmconfig.h MSVC_NMake/gtkmm/gtkmmconfig.h])
 AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],
-                   [cp -f COPYING win32_installer/lgpl.txt])
+                   [cp -f "$srcdir/COPYING" win32_installer/lgpl.txt])
 AC_OUTPUT
