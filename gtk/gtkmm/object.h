@@ -19,7 +19,6 @@
 #define _GTKMM_OBJECT_H
 
 #include <glibmm/object.h>
-#include <gtkmm/base.h>
 #include <gtkmmconfig.h>
 
 #include <utility>

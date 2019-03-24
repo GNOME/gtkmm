@@ -104,7 +104,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
-#include <gtkmm/base.h>
 #include <gtkmm/bin.h>
 #include <gtkmm/border.h>
 #include <gtkmm/box.h>
@@ -277,6 +276,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeviewcolumn.h>
+#include <gtkmm/version.h>
 #include <gtkmm/video.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/volumebutton.h>
