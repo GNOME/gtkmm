@@ -3709,13 +3709,22 @@ The widget receiving the #GdkEvents that the controller will handle.
 
 <signal name="GtkEventControllerKey::focus-in">
 <description>
-This signal is emitted whenever the #GtkEventController:widget controlled
-by the @controller is given the keyboard focus.
+This signal is emitted whenever the widget controlled
+by the @controller or one of its descendants) is given
+the keyboard focus.
 
 </description>
 <parameters>
 <parameter name="controller">
 <parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> crossing mode indicating what caused this change
+</parameter_description>
+</parameter>
+<parameter name="detail">
+<parameter_description> detail indication where the focus is coming from
 </parameter_description>
 </parameter>
 </parameters>
@@ -3724,13 +3733,22 @@ by the @controller is given the keyboard focus.
 
 <signal name="GtkEventControllerKey::focus-out">
 <description>
-This signal is emitted whenever the #GtkEventController:widget controlled
-by the @controller loses the keyboard focus.
+This signal is emitted whenever the widget controlled
+by the @controller (or one of its descendants) loses
+the keyboard focus.
 
 </description>
 <parameters>
 <parameter name="controller">
 <parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> crossing mode indicating what caused this change
+</parameter_description>
+</parameter>
+<parameter name="detail">
+<parameter_description> detail indication where the focus is going
 </parameter_description>
 </parameter>
 </parameters>
@@ -3832,6 +3850,31 @@ pointer buttons. See #GdkModifierType.
 <return></return>
 </signal>
 
+<property name="GtkEventControllerKey:contains-focus">
+<description>
+Whether focus is in a descendant of the controllers widget.
+See #GtkEventControllerKey:is-focus.
+
+When handling focus events, this property is updated
+before #GtkEventControllerKey::focus-in or
+#GtkEventControllerKey::focus-out are emitted.
+
+</description>
+</property>
+
+<property name="GtkEventControllerKey:is-focus">
+<description>
+Whether focus is in the controllers widget itself,
+as opposed to in a descendent widget. See
+#GtkEventControllerKey:contains-focus.
+
+When handling focus events, this property is updated
+before #GtkEventControllerKey::focus-in or
+#GtkEventControllerKey::focus-out are emitted.
+
+</description>
+</property>
+
 <signal name="GtkEventControllerLegacy::event">
 <description>
 Emitted for each GDK event delivered to @controller.
@@ -3910,6 +3953,31 @@ Emitted when the pointer moves inside the widget.
 </parameters>
 <return></return>
 </signal>
+
+<property name="GtkEventControllerMotion:contains-pointer-focus">
+<description>
+Whether the pointer is in a descendant of the controllers widget.
+See #GtkEventControllerMotion:is-pointer-focus.
+
+When handling crossing events, this property is updated
+before #GtkEventControllerMotion::enter or
+#GtkEventControllerMotion::leave are emitted.
+
+</description>
+</property>
+
+<property name="GtkEventControllerMotion:is-pointer-focus">
+<description>
+Whether the pointer is in the controllers widget itself,
+as opposed to in a descendent widget. See
+#GtkEventControllerMotion:contains-pointer-focus.
+
+When handling crossing events, this property is updated
+before #GtkEventControllerMotion::enter or
+#GtkEventControllerMotion::leave are emitted.
+
+</description>
+</property>
 
 <signal name="GtkEventControllerScroll::decelerate">
 <description>
@@ -10118,6 +10186,22 @@ when the child of a #GtkRevealer widget is shown or hidden.
 <parameter_description> Slide in from the top
 </parameter_description>
 </parameter>
+<parameter name="GTK_REVEALER_TRANSITION_TYPE_SWING_RIGHT">
+<parameter_description> Floop in from the left
+</parameter_description>
+</parameter>
+<parameter name="GTK_REVEALER_TRANSITION_TYPE_SWING_LEFT">
+<parameter_description> Floop in from the right
+</parameter_description>
+</parameter>
+<parameter name="GTK_REVEALER_TRANSITION_TYPE_SWING_UP">
+<parameter_description> Floop in from the bottom
+</parameter_description>
+</parameter>
+<parameter name="GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN">
+<parameter_description> Floop in from the top
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -11409,6 +11493,13 @@ If unselecting the selected item is allowed
 </description>
 </property>
 
+<property name="GtkSingleSelection:model">
+<description>
+The model being managed
+
+</description>
+</property>
+
 <property name="GtkSingleSelection:selected">
 <description>
 Position of the selected item
@@ -11566,7 +11657,7 @@ The default bindings for this signal are Up/Down and PageUp and/PageDown.
 <description>
 The ::input signal can be used to influence the conversion of
 the users input into a double value. The signal handler is
-expected to use gtk_spin_button_get_text() to retrieve the text of
+expected to use gtk_editable_get_text() to retrieve the text of
 the spinbutton and set @new_value to the new value.
 
 The default conversion uses g_strtod().
@@ -15071,24 +15162,6 @@ else
 </return>
 </signal>
 
-<signal name="GtkWidget::focus">
-<description>
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-<parameter name="direction">
-<parameter_description>
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE to stop other handlers from being invoked for the event. %FALSE to propagate the event further.
-</return>
-</signal>
-
 <signal name="GtkWidget::grab-notify">
 <description>
 The ::grab-notify signal is emitted when a widget becomes
@@ -15808,14 +15881,6 @@ Whether mnemonics are currently visible in this window.
 
 This property is maintained by GTK+ based on user input,
 and should not be set by applications.
-
-</description>
-</property>
-
-<property name="GtkWindow:set-focus">
-<description>
-This signal is emitted whenever the currently focused widget in
-this window changes.
 
 </description>
 </property>
@@ -31085,23 +31150,6 @@ in #GtkEntry, or 0 if there is no maximum.
 </return>
 </function>
 
-<function name="gtk_entry_get_max_width_chars">
-<description>
-Retrieves the desired maximum width of @entry, in characters.
-See gtk_entry_set_max_width_chars().
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> the maximum width of the entry, in characters
-</return>
-</function>
-
 <function name="gtk_entry_get_overwrite_mode">
 <description>
 Gets the value set by gtk_entry_set_overwrite_mode().
@@ -31187,29 +31235,6 @@ any.
 </return>
 </function>
 
-<function name="gtk_entry_get_text">
-<description>
-Retrieves the contents of the entry widget.
-See also gtk_editable_get_chars().
-
-This is equivalent to getting @entry's #GtkEntryBuffer and calling
-gtk_entry_buffer_get_text() on it.
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> a pointer to the contents of the widget as a
-string. This string points to internally allocated
-storage in the widget and must not be freed, modified or
-stored.
-</return>
-</function>
-
 <function name="gtk_entry_get_text_length">
 <description>
 Retrieves the current length of the text in
@@ -31246,22 +31271,6 @@ gtk_entry_set_visibility().
 </parameter>
 </parameters>
 <return> %TRUE if the text is currently visible
-</return>
-</function>
-
-<function name="gtk_entry_get_width_chars">
-<description>
-Gets the value set by gtk_entry_set_width_chars().
-
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> number of chars to request space for, or negative if unset
 </return>
 </function>
 
@@ -31786,24 +31795,6 @@ be clamped to the range 0-65536.
 <return></return>
 </function>
 
-<function name="gtk_entry_set_max_width_chars">
-<description>
-Sets the desired maximum width in characters of @entry.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="n_chars">
-<parameter_description> the new desired maximum width, in characters
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_entry_set_overwrite_mode">
 <description>
 Sets whether the text is overwritten when typing in the #GtkEntry.
@@ -31900,27 +31891,6 @@ text.
 <return></return>
 </function>
 
-<function name="gtk_entry_set_text">
-<description>
-Sets the text in the widget to the given
-value, replacing the current contents.
-
-See gtk_entry_buffer_set_text().
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="text">
-<parameter_description> the new text
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_entry_set_visibility">
 <description>
 Sets whether the contents of the entry are visible or not.
@@ -31946,28 +31916,6 @@ in addition to setting visibility to %FALSE.
 <parameter name="visible">
 <parameter_description> %TRUE if the contents of the entry are displayed
 as plaintext
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_entry_set_width_chars">
-<description>
-Changes the size request of the entry to be about the right size
-for @n_chars characters. Note that it changes the size
-request, the size can still be affected by
-how you pack the widget into containers. If @n_chars is -1, the
-size reverts to the default entry size.
-
-</description>
-<parameters>
-<parameter name="entry">
-<parameter_description> a #GtkEntry
-</parameter_description>
-</parameter>
-<parameter name="n_chars">
-<parameter_description> width in chars
 </parameter_description>
 </parameter>
 </parameters>
@@ -32076,6 +32024,13 @@ controller action
 <description>
 Forwards the current event of this @controller to a @widget.
 
+This function can only be used in handlers for the
+#GtkEventControllerKey::key-pressed,
+#GtkEventControllerKey::key-released
+or
+#GtkEventControllerKey::modifiers
+signals.
+
 
 </description>
 <parameters>
@@ -32089,6 +32044,46 @@ Forwards the current event of this @controller to a @widget.
 </parameter>
 </parameters>
 <return> whether the @widget handled the event
+</return>
+</function>
+
+<function name="gtk_event_controller_key_get_focus_origin">
+<description>
+Returns the widget that was holding focus before.
+
+This function can only be used in handlers for the
+#GtkEventControllerKey::focus-in and
+#GtkEventControllerKey::focus-out signals.
+
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> the previous focus
+</return>
+</function>
+
+<function name="gtk_event_controller_key_get_focus_target">
+<description>
+Returns the widget that will be holding focus afterwards.
+
+This function can only be used in handlers for the
+#GtkEventControllerKey::focus-in and
+#GtkEventControllerKey::focus-out signals.
+
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> the next focus
 </return>
 </function>
 
@@ -32164,6 +32159,46 @@ Creates a new legacy event controller.
 <parameters>
 </parameters>
 <return> the newly created event controller.
+</return>
+</function>
+
+<function name="gtk_event_controller_motion_get_pointer_origin">
+<description>
+Returns the widget that contained the pointer before.
+
+This function can only be used in handlers for the
+#GtkEventControllerMotion::enter and
+#GtkEventControllerMotion::leave signals.
+
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerMotion
+</parameter_description>
+</parameter>
+</parameters>
+<return> the previous pointer focus
+</return>
+</function>
+
+<function name="gtk_event_controller_motion_get_pointer_target">
+<description>
+Returns the widget that will contain the pointer afterwards.
+
+This function can only be used in handlers for the
+#GtkEventControllerMotion::enter and
+#GtkEventControllerMotion::leave signals.
+
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a #GtkEventControllerMotion
+</parameter_description>
+</parameter>
+</parameters>
+<return> the next pointer focus
 </return>
 </function>
 
@@ -51489,6 +51524,23 @@ This function adds the paper size from @size to @key_file.
 <return></return>
 </function>
 
+<function name="gtk_password_entry_get_show_peek_icon">
+<description>
+Returns whether the entry is showing a clickable icon
+to reveal the contents of the entry in clear text.
+
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkPasswordEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if an icon is shown
+</return>
+</function>
+
 <function name="gtk_password_entry_new">
 <description>
 Creates a #GtkPasswordEntry.
@@ -51499,6 +51551,24 @@ Creates a #GtkPasswordEntry.
 </parameters>
 <return> a new #GtkPasswordEntry
 </return>
+</function>
+
+<function name="gtk_password_entry_set_show_peek_icon">
+<description>
+Sets whether the entry should have a clickable icon
+to show the contents of the entry in clear text.
+
+Setting this to %FALSE also hides the text again.
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a #GtkPasswordEntry
+show_peek_icon: whether to show the peek icon
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_picture_get_alternative_text">
@@ -59224,6 +59294,28 @@ output values will be in the same range.
 <return></return>
 </function>
 
+<function name="gtk_root_get_focus">
+<description>
+Retrieves the current focused widget within the root.
+
+Note that this is the widget that would have the focus
+if the root is active; if the root is not focused then
+`gtk_widget_has_focus (widget)` will be %FALSE for the
+widget.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkRoot
+</parameter_description>
+</parameter>
+</parameters>
+<return> the currently focused widget,
+or %NULL if there is none.
+</return>
+</function>
+
 <function name="gtk_root_get_for_surface">
 <description>
 Finds the GtkRoot associated with the surface.
@@ -59238,6 +59330,30 @@ Finds the GtkRoot associated with the surface.
 </parameters>
 <return> the #GtkRoot that is associated with @surface
 </return>
+</function>
+
+<function name="gtk_root_set_focus">
+<description>
+If @focus is not the current focus widget, and is focusable, sets
+it as the focus widget for the root. If @focus is %NULL, unsets
+the focus widget for the root.
+
+To set the focus to a particular widget in the root, it is usually
+more convenient to use gtk_widget_grab_focus() instead of this function.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkRoot
+</parameter_description>
+</parameter>
+<parameter name="focus">
+<parameter_description> widget to be the new focus widget, or %NULL
+to unset the focus widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_scale_add_mark">
@@ -62546,6 +62662,26 @@ Creates a new #GtkSnapshot.
 </return>
 </function>
 
+<function name="gtk_snapshot_perspective">
+<description>
+Applies a perspective projection transform.
+
+See gsk_transform_perspective() for a discussion on the details.
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="depth">
+<parameter_description> distance of the z=0 plane
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_snapshot_pop">
 <description>
 Removes the top element from the stack of render nodes,
@@ -62980,7 +63116,7 @@ or in 3D speak, rotates around the z axis.
 <description>
 Rotates @snapshot's coordinate system by @angle degrees around @axis.
 
-For a rotation in 2D space, use gtk_transform_rotate().
+For a rotation in 2D space, use gsk_transform_rotate().
 
 </description>
 <parameters>
@@ -63025,7 +63161,7 @@ to gtk_snapshot_restore().
 
 <function name="gtk_snapshot_scale">
 <description>
-Scales @@snapshot's coordinate system in 2-dimensional space by
+Scales @snapshot's coordinate system in 2-dimensional space by
 the given factors.
 
 Use gtk_snapshot_scale_3d() to scale in all 3 dimensions.
@@ -63050,7 +63186,7 @@ Use gtk_snapshot_scale_3d() to scale in all 3 dimensions.
 
 <function name="gtk_snapshot_scale_3d">
 <description>
-Scales @@snapshot's coordinate system by the given factors.
+Scales @snapshot's coordinate system by the given factors.
 
 </description>
 <parameters>
@@ -63417,26 +63553,6 @@ gtk_spin_button_set_increments().
 <return></return>
 </function>
 
-<function name="gtk_spin_button_get_max_width_chars">
-<description>
-Retrieves the desired maximum width of @spin_button, in characters.
-Note that this only applies to the entry area of @spin_button, not the
-spin button. This is especially important for horizontal spinbuttons.
-
-See also #GtkEntry:max-width-chars
-
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> the maximum width of the spin button, in characters
-</return>
-</function>
-
 <function name="gtk_spin_button_get_numeric">
 <description>
 Returns whether non-numeric text can be typed into the spin button.
@@ -63494,22 +63610,6 @@ See gtk_spin_button_set_snap_to_ticks().
 </return>
 </function>
 
-<function name="gtk_spin_button_get_text">
-<description>
-Returns the text shown in the entry.
-
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> The current text shown in the entry area of @spin_button.
-</return>
-</function>
-
 <function name="gtk_spin_button_get_update_policy">
 <description>
 Gets the update behavior of a spin button.
@@ -63556,24 +63656,6 @@ Get the value @spin_button represented as an integer.
 </parameter>
 </parameters>
 <return> the value of @spin_button
-</return>
-</function>
-
-<function name="gtk_spin_button_get_width_chars">
-<description>
-Get the value set by gtk_spin_button_set_width_chars(). Note that this
-value only applies to the entry area of @spin_button.
-
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> The number of characters to request space for in the entry
-area of @spin_button
 </return>
 </function>
 
@@ -63713,26 +63795,6 @@ quickly the value changes when the spin button’s arrows are activated.
 <return></return>
 </function>
 
-<function name="gtk_spin_button_set_max_width_chars">
-<description>
-Sets the desired maximum width of @spin_button, in characters.
-Note that this only applies to the entry area of @spin_button, not the
-spin button. This is especially important for horizontal spinbuttons.
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-<parameter name="max_width_chars">
-<parameter_description> new desired maximum width in chars
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_spin_button_set_numeric">
 <description>
 Sets the flag that determines if non-numeric text can be typed
@@ -63797,25 +63859,6 @@ providing an invalid value.
 <return></return>
 </function>
 
-<function name="gtk_spin_button_set_text">
-<description>
-Sets the current text of the spinbutton. Note that setting this will not change
-the value of the adjustment @spin_button.
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-<parameter name="text">
-<parameter_description> The text to set
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_spin_button_set_update_policy">
 <description>
 Sets the update behavior of a spin button.
@@ -63848,25 +63891,6 @@ Sets the value of @spin_button.
 </parameter>
 <parameter name="value">
 <parameter_description> the new value
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_spin_button_set_width_chars">
-<description>
-Changes the size request of the entry area of @spin_button
-to be about the right size for @width_chars characters.
-
-</description>
-<parameters>
-<parameter name="spin_button">
-<parameter_description> a #GtkSpinButton
-</parameter_description>
-</parameter>
-<parameter name="width_chars">
-<parameter_description> desired width in characters
 </parameter_description>
 </parameter>
 </parameters>
@@ -73821,352 +73845,6 @@ key press.
 <return></return>
 </function>
 
-<function name="gtk_transform_equal">
-<description>
-Checks two matrices for equality. Note that matrices need to be literally
-identical in their operations, it is not enough that they return the
-same result in gtk_transform_to_matrix().
-
-
-</description>
-<parameters>
-<parameter name="first">
-<parameter_description> the first matrix
-</parameter_description>
-</parameter>
-<parameter name="second">
-<parameter_description> the second matrix
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the two matrices can be proven to be equal
-</return>
-</function>
-
-<function name="gtk_transform_get_next">
-<description>
-Gets the rest of the matrix in the chain of operations.
-
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-</parameters>
-<return> The next transform or
-%NULL if this was the last operation.
-</return>
-</function>
-
-<function name="gtk_transform_get_transform_type">
-<description>
-Returns the type of the @self.
-
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-</parameters>
-<return> the type of the #GtkTransform
-</return>
-</function>
-
-<function name="gtk_transform_identity">
-<description>
-Adds an identity multiplication into the list of matrix operations.
-
-This operation is generally useless, but may be useful when interpolating
-matrices, because the identity matrix can be interpolated to and from
-everything, so an identity matrix can be used as a keyframe between two
-different types of matrices.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform operation or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_matrix">
-<description>
-Multiplies @next with the given @matrix.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="matrix">
-<parameter_description> the matrix to multiply @next with
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_print">
-<description>
-Converts @self into a string representation suitable for printing that
-can later be parsed with gtk_transform_parse().
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-<parameter name="string">
-<parameter_description>  The string to print into
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_transform_ref">
-<description>
-Acquires a reference on the given #GtkTransform.
-
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkTransform with an additional reference
-</return>
-</function>
-
-<function name="gtk_transform_rotate">
-<description>
-Rotates @next @angle degrees in 2D - or in 3Dspeak, around the z axis.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="angle">
-<parameter_description> the rotation angle, in degrees (clockwise)
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_rotate_3d">
-<description>
-Rotates @next @angle degrees around @axis.
-
-For a rotation in 2D space, use gtk_transform_rotate().
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="angle">
-<parameter_description> the rotation angle, in degrees (clockwise)
-</parameter_description>
-</parameter>
-<parameter name="axis">
-<parameter_description> The rotation axis
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_scale">
-<description>
-Scales @next in 2-dimensional space by the given factors.
-Use gtk_transform_scale_3d() to scale in all 3 dimensions.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="factor_x">
-<parameter_description> scaling factor on the X axis
-</parameter_description>
-</parameter>
-<parameter name="factor_y">
-<parameter_description> scaling factor on the Y axis
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_scale_3d">
-<description>
-Scales @next by the given factors.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="factor_x">
-<parameter_description> scaling factor on the X axis
-</parameter_description>
-</parameter>
-<parameter name="factor_y">
-<parameter_description> scaling factor on the Y axis
-</parameter_description>
-</parameter>
-<parameter name="factor_z">
-<parameter_description> scaling factor on the Z axis
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_to_matrix">
-<description>
-Computes the actual value of @self and stores it in @out_matrix.
-The previous value of @out_matrix will be ignored.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-<parameter name="out_matrix">
-<parameter_description> The matrix to set
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_transform_to_string">
-<description>
-Converts a matrix into a string that is suitable for
-printing and can later be parsed with gtk_transform_parse().
-
-This is a wrapper around gtk_transform_print(), see that function
-for details.
-
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-</parameters>
-<return> A new string for @self
-</return>
-</function>
-
-<function name="gtk_transform_transform">
-<description>
-Applies all the operations from @other to @next. 
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> Transform to apply @other to
-</parameter_description>
-</parameter>
-<parameter name="other">
-<parameter_description>  Transform to apply
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_translate">
-<description>
-Translates @next in 2dimensional space by @point.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="point">
-<parameter_description> the point to translate the matrix by
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_translate_3d">
-<description>
-Translates @next by @point.
-
-
-</description>
-<parameters>
-<parameter name="next">
-<parameter_description> the next transform
-</parameter_description>
-</parameter>
-<parameter name="point">
-<parameter_description> the point to translate the matrix by
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new matrix
-</return>
-</function>
-
-<function name="gtk_transform_unref">
-<description>
-Releases a reference on the given #GtkTransform.
-
-If the reference was the last, the resources associated to the @self are
-freed.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkTransform
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_tree_drag_dest_drag_data_received">
 <description>
 Asks the #GtkTreeDragDest to insert a row before the path @dest,
@@ -83865,16 +83543,11 @@ is pressed and the #GtkEntry is focused.
 
 <function name="gtk_widget_grab_focus">
 <description>
-Causes @widget to have the keyboard focus for the #GtkWindow it's
-inside. @widget must be a focusable widget, such as a #GtkEntry;
-something like #GtkFrame won’t work.
+Causes @widget (or one of its descendents) to have the keyboard focus
+for the #GtkWindow it's inside.
 
-More precisely, it must have the %GTK_CAN_FOCUS flag set. Use
-gtk_widget_set_can_focus() to modify that flag.
-
-The widget also needs to be realized and mapped. This is indicated by the
-related signals. Grabbing the focus immediately after creating the widget
-will likely fail and cause critical warnings.
+@widget must be focusable, or have a ::grab_focus implementation that
+transfers the focus to a descendant of @widget that is focusable.
 
 </description>
 <parameters>
@@ -85561,49 +85234,6 @@ style might apply to it. See also gtk_container_get_path_for_child().
 <return></return>
 </function>
 
-<function name="gtk_widget_send_focus_change">
-<description>
-Sends the focus change @event to @widget
-
-This function is not meant to be used by applications. The only time it
-should be used is when it is necessary for a #GtkWidget to assign focus
-to a widget that is semantically owned by the first widget even though
-it’s not a direct child - for instance, a search entry in a floating
-window similar to the quick search in #GtkTreeView.
-
-An example of its usage is:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GdkEvent *fevent = gdk_event_new (GDK_FOCUS_CHANGE);
-
-fevent-&gt;focus_change.type = GDK_FOCUS_CHANGE;
-fevent-&gt;focus_change.in = TRUE;
-fevent-&gt;focus_change.surface = _gtk_widget_get_surface (widget);
-if (fevent-&gt;focus_change.surface != NULL)
-g_object_ref (fevent-&gt;focus_change.surface);
-
-gtk_widget_send_focus_change (widget, fevent);
-
-g_object_unref (event);
-]|
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> a #GdkEvent of type GDK_FOCUS_CHANGE
-</parameter_description>
-</parameter>
-</parameters>
-<return> the return value from the event signal emission: %TRUE
-if the event was handled, and %FALSE otherwise
-</return>
-</function>
-
 <function name="gtk_widget_set_accel_path">
 <description>
 Given an accelerator group, @accel_group, and an accelerator path,
@@ -85666,9 +85296,15 @@ gtk_widget_grab_default() for details about the meaning of
 
 <function name="gtk_widget_set_can_focus">
 <description>
-Specifies whether @widget can own the input focus. See
-gtk_widget_grab_focus() for actually setting the input focus on a
-widget.
+Specifies whether @widget can own the input focus.
+
+Note that having @can_focus be %TRUE is only one of the
+necessary conditions for being focusable. A widget must
+also be sensitive and not have a ancestor that is marked
+as not child-focusable in order to receive input focus.
+
+See gtk_widget_grab_focus() for actually setting the input
+focus on a widget.
 
 </description>
 <parameters>
