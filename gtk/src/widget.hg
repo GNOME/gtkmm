@@ -149,9 +149,6 @@ public:
   //Probably not useful. Too C-specific: _WRAP_METHOD(bool can_activate_accel(guint signal_id) const, gtk_widget_can_activate_accel)
 
   _WRAP_METHOD(bool event(const Glib::RefPtr<const Gdk::Event>& gdk_event), gtk_widget_event)
-  // We use const Gdk::EventFocus& rather than Gdk::Event&. See GTK+ bug https://bugzilla.gnome.org/show_bug.cgi?id=709544
-#m4 _CONVERSION(`const Glib::RefPtr<const Gdk::EventFocus>&',`GdkEvent*',`const_cast<$2>(reinterpret_cast<const $2>(Glib::unwrap($3)))')
-  _WRAP_METHOD(bool send_focus_change(const Glib::RefPtr<const Gdk::EventFocus>& gdk_event), gtk_widget_send_focus_change)
   _WRAP_METHOD(bool activate(), gtk_widget_activate)
 
   // gtk_widget_reparent() has been removed, but we want to keep Gtk::Widget::reparent().
@@ -637,10 +634,6 @@ public:
    */
   void insert_at_end(Widget& parent);
 
-  //TODO: gtk_widget_set_focus_child() is not documented. Wrap or _IGNORE?
-  // 2017-06-06: The gtk+ API is not stable yet. See https://bugzilla.gnome.org/show_bug.cgi?id=783445#c2
-  //_WRAP_METHOD(void set_focus_child(Widget& child), gtk_widget_set_focus_child)
-  //void unset_focus_child();
   _WRAP_METHOD(void snapshot_child(Widget& child, const Glib::RefPtr<Gtk::Snapshot>& snapshot), gtk_widget_snapshot_child)
 
   _WRAP_SIGNAL(void show(),"show")
@@ -677,7 +670,6 @@ public:
   _WRAP_SIGNAL(void child_notify(GParamSpec* pspec), "child_notify", detail_name child_property_name)
 
   _WRAP_SIGNAL(bool mnemonic_activate(bool group_cycling), "mnemonic_activate")
-  _WRAP_SIGNAL(bool focus(DirectionType direction), "focus")
 
 #m4begin
 dnl// Hook in special code to catch explicit uses of gtk_object_destroy() by
@@ -819,6 +811,9 @@ protected:
    * This function is only suitable for widget implementations.
    */
   void unset_focus_child();
+
+  _WRAP_METHOD(Widget* get_focus_child(), gtk_widget_get_focus_child)
+  _WRAP_METHOD(const Widget* get_focus_child() const, gtk_widget_get_focus_child, constversion)
 };
 
 } // namespace Gtk
