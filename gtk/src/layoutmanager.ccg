@@ -1,0 +1,74 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/layoutchild.h>
+#include <gtkmm/widget.h>
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+// This vfunc callback is custom implemented because we want the output
+// arguments of the C++ vfunc to be int& (not int*), and the vfunc_callback
+// function may be called from gtk with NULL pointers.
+void LayoutManager_Class::measure_vfunc_callback(GtkLayoutManager* self,
+  GtkWidget* widget, GtkOrientation orientation, int for_size,
+  int* minimum, int* natural, int* minimum_baseline, int* natural_baseline)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if (obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if (obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+        int no_minimum = 0;
+        int no_natural = 0;
+        int no_minimum_baseline = 0;
+        int no_natural_baseline = 0;
+        obj->measure_vfunc(*Glib::wrap(widget),
+          static_cast<Orientation>(orientation), for_size,
+          (minimum ? *minimum : no_minimum),
+          (natural ? *natural : no_natural),
+          (minimum_baseline ? *minimum_baseline : no_minimum_baseline),
+          (natural_baseline ? *natural_baseline : no_natural_baseline));
+        return;
+      }
+      catch (...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->measure)
+    (*base->measure)(self, widget, orientation, for_size, minimum, natural, minimum_baseline, natural_baseline);
+}
+
+} // namespace Gtk

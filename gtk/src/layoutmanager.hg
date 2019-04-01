@@ -1,0 +1,107 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <gtkmm/enums.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+class LayoutChild;
+class Widget;
+
+/** Base class for layout manager.
+ *
+ * Layout managers are delegate classes that handle the preferred size
+ * and the allocation of a container widget.
+ *
+ * You typically subclass %Gtk::LayoutManager if you want to implement a
+ * layout policy for the children of a widget, or if you want to determine
+ * the size of a widget depending on its contents.
+ *
+ * Each Gtk::Widget can only have one %Gtk::LayoutManager instance associated to it
+ * at any given time; it is possible, though, to replace the layout manager
+ * instance using Gtk::Widget::set_layout_manager().
+ *
+ * ## Layout properties
+ *
+ * A layout manager can expose properties for controlling the layout of
+ * each child, by creating an object type derived from Gtk::LayoutChild
+ * and installing the properties on it as normal GObject properties.
+ *
+ * Each Gtk::LayoutChild instance storing the layout properties for a
+ * specific child is created through the get_layout_child()
+ * method; a %Gtk::LayoutManager controls the creation of its Gtk::LayoutChild
+ * instances by overriding the create_layout_child_vfunc() virtual function.
+ *
+ * The Gtk::LayoutChild::property_layout_manager() and Gtk::LayoutChild::property_child_widget()
+ * properties on the newly created Gtk::LayoutChild instance are mandatory. The
+ * %Gtk::LayoutManager will cache the newly created Gtk::LayoutChild instance until
+ * the widget is removed from its parent, or the parent removes the layout manager.
+ *
+ * Each %Gtk::LayoutManager instance creating a Gtk::LayoutChild should use
+ * get_layout_child() every time it needs to query the
+ * layout properties; each Gtk::LayoutChild instance should call
+ * layout_changed() every time a property is updated, in
+ * order to queue a new size measuring and allocation.
+ *
+ * @newin{3,96}
+ */
+class LayoutManager : public Glib::Object
+{
+  _CLASS_GOBJECT(LayoutManager, GtkLayoutManager, GTK_LAYOUT_MANAGER, Glib::Object, GObject)
+
+protected:
+  /** There is no create() method that corresponds to this constructor,
+   * because only derived classes shall be created.
+   */
+  _CTOR_DEFAULT
+
+public:
+  // No create() because only derived classes shall be instantiated.
+
+  _WRAP_METHOD(void measure(Widget& widget, Orientation orientation, int for_size,
+    int& minimum, int& natural, int& minimum_baseline, int& natural_baseline) const,
+    gtk_layout_manager_measure)
+  _WRAP_METHOD(void allocate(Widget& widget, int width, int height, int baseline),
+     gtk_layout_manager_allocate)
+  _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_layout_manager_get_request_mode)
+  _WRAP_METHOD(Widget* get_widget(), gtk_layout_manager_get_widget)
+  _WRAP_METHOD(const Widget* get_widget() const, gtk_layout_manager_get_widget, constversion)
+  _WRAP_METHOD(void layout_changed() const, gtk_layout_manager_layout_changed)
+  _WRAP_METHOD(Glib::RefPtr<LayoutChild> get_layout_child(Widget& child),
+    gtk_layout_manager_get_layout_child, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const LayoutChild> get_layout_child(Widget& child) const,
+    gtk_layout_manager_get_layout_child, refreturn, constversion)
+
+protected:
+  _WRAP_VFUNC(SizeRequestMode get_request_mode(const Widget& widget) const, get_request_mode)
+  _WRAP_VFUNC(void measure(const Widget& widget, Orientation orientation, int for_size,
+    int& minimum, int& natural, int& minimum_baseline, int& natural_baseline) const,
+    measure, custom_vfunc_callback)
+  _WRAP_VFUNC(void allocate(const Widget& widget, int width, int height, int baseline),
+    allocate)
+#m4 _CONVERSION(`Glib::RefPtr<LayoutChild>', `GtkLayoutChild*', __CONVERT_REFPTR_TO_P)
+  _WRAP_VFUNC(Glib::RefPtr<LayoutChild> create_layout_child(const Widget& widget,
+    const Widget& for_child), create_layout_child, refreturn)
+
+  // There are no signals or properties.
+};
+
+} // namespace Gtk

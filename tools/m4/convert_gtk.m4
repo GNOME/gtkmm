@@ -250,6 +250,7 @@ _CONVERSION(`RadioButton&',`GtkRadioButton*',`($3).gobj()')
 
 # Ptr (gtk+) -> Ref (Gtkmm)
 _CONVERSION(`GtkWidget*', `Widget&', `*Glib::wrap($3)')
+_CONVERSION(`GtkWidget*', `const Widget&', `*Glib::wrap($3)')
 
 # Ref (Gtkmm) -> GtkWidget* Ptr (gtk+)
 define(`__FR2PD',`($`'3).Gtk::Widget::gobj()')
@@ -580,6 +581,14 @@ _CONVERSION(`GtkDragResult',`DragResult',`static_cast<$2>($3)')
 _CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
 _CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
 _CONVERSION(`const WidgetPath&',`GtkWidgetPath*',`const_cast<WidgetPath&>($3).gobj()')
+
+# LayoutChild, LayoutManager
+_CONVERSION(`GtkLayoutManager*',`Glib::RefPtr<LayoutManager>',`Glib::wrap($3)')
+_CONVERSION(`GtkLayoutManager*',`Glib::RefPtr<const LayoutManager>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<LayoutManager>&',`GtkLayoutManager*',__CONVERT_REFPTR_TO_P)
+
+_CONVERSION(`GtkLayoutChild*',`Glib::RefPtr<LayoutChild>',`Glib::wrap($3)')
+_CONVERSION(`GtkLayoutChild*',`Glib::RefPtr<const LayoutChild>',`Glib::wrap($3)')
 
 # Used by LockButton
 _CONVERSION(`Glib::RefPtr<Gio::Permission>&',`GPermission*',__CONVERT_REFPTR_TO_P)
