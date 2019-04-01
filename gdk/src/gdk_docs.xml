@@ -2806,43 +2806,47 @@ the user
 <description>
 Specifies the state of a toplevel surface.
 
+On platforms that support information about individual edges, the %GDK_SURFACE_STATE_TILED
+state will be set whenever any of the individual tiled states is set. On platforms
+that lack that support, the tiled state will give an indication of tiledness without
+any of the per-edge states being set.
+
 </description>
 <parameters>
 <parameter name="GDK_SURFACE_STATE_WITHDRAWN">
-<parameter_description> the surface is not shown.
+<parameter_description> the surface is not shown
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_ICONIFIED">
-<parameter_description> the surface is minimized.
+<parameter_description> the surface is minimized
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_MAXIMIZED">
-<parameter_description> the surface is maximized.
+<parameter_description> the surface is maximized
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_STICKY">
-<parameter_description> the surface is sticky.
+<parameter_description> the surface is sticky
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_FULLSCREEN">
-<parameter_description> the surface is maximized without
-decorations.
+<parameter_description> the surface is maximized without decorations
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_ABOVE">
-<parameter_description> the surface is kept above other surfaces.
+<parameter_description> the surface is kept above other surfaces
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_BELOW">
-<parameter_description> the surface is kept below other surfaces.
+<parameter_description> the surface is kept below other surfaces
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_FOCUSED">
-<parameter_description> the surface is presented as focused (with active decorations).
+<parameter_description> the surface is presented as focused (with active decorations)
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_TILED">
-<parameter_description> the surface is in a tiled state. Deprecated
+<parameter_description> the surface is in a tiled state
 </parameter_description>
 </parameter>
 <parameter name="GDK_SURFACE_STATE_TOP_TILED">
@@ -5778,31 +5782,6 @@ Determines the name of the device.
 
 <function name="gdk_device_get_position">
 <description>
-Gets the current location of @device. As a slave device
-coordinates are those of its master pointer, This function
-may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
-unless there is an ongoing grab on them, see gdk_device_grab().
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> pointer device to query status about.
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> location to store root window X coordinate of @device, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> location to store root window Y coordinate of @device, or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_device_get_position_double">
-<description>
 Gets the current location of @device in double precision. As a slave device's
 coordinates are those of its master pointer, this function
 may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
@@ -5909,38 +5888,6 @@ the axes of @device in, or %NULL.
 
 <function name="gdk_device_get_surface_at_position">
 <description>
-Obtains the surface underneath @device, returning the location of the device in @win_x and @win_y. Returns
-%NULL if the surface tree under @device is not known to GDK (for example, belongs to another application).
-
-As a slave device coordinates are those of its master pointer, This
-function may not be called on devices of type %GDK_DEVICE_TYPE_SLAVE,
-unless there is an ongoing grab on them, see gdk_device_grab().
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> pointer #GdkDevice to query info to.
-</parameter_description>
-</parameter>
-<parameter name="win_x">
-<parameter_description> return location for the X coordinate of the device location,
-relative to the surface origin, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="win_y">
-<parameter_description> return location for the Y coordinate of the device location,
-relative to the surface origin, or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkSurface under the
-device position, or %NULL.
-</return>
-</function>
-
-<function name="gdk_device_get_surface_at_position_double">
-<description>
 Obtains the surface underneath @device, returning the location of the device in @win_x and @win_y in
 double precision. Returns %NULL if the surface tree under @device is not known to GDK (for example,
 belongs to another application).
@@ -6010,82 +5957,6 @@ return settings;
 </parameter>
 </parameters>
 <return> the vendor ID, or %NULL
-</return>
-</function>
-
-<function name="gdk_device_grab">
-<description>
-Grabs the device so that all events coming from this device are passed to
-this application until the device is ungrabbed with gdk_device_ungrab(),
-or the surface becomes unviewable. This overrides any previous grab on the device
-by this client.
-
-Note that @device and @surface need to be on the same display.
-
-Device grabs are used for operations which need complete control over the
-given device events (either pointer or keyboard). For example in GTK+ this
-is used for Drag and Drop operations, popup menus and such.
-
-Note that if the event mask of an X window has selected both button press
-and button release events, then a button press event will cause an automatic
-pointer grab until the button is released. X does this automatically since
-most applications expect to receive button press and release events in pairs.
-It is equivalent to a pointer grab on the surface with @owner_events set to
-%TRUE.
-
-If you set up anything at the time you take the grab that needs to be
-cleaned up when the grab ends, you should handle the #GdkEventGrabBroken
-events that are emitted when the grab ends unvoluntarily.
-
-Deprecated: Use gdk_seat_grab() instead.
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice. To get the device you can use gtk_get_current_event_device()
-or gdk_event_get_device() if the grab is in reaction to an event. Also, you can use
-gdk_seat_get_pointer() but only in code that isn’t triggered by a
-#GdkEvent and there aren’t other means to get a meaningful #GdkDevice to operate on.
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> the #GdkSurface which will own the grab (the grab surface)
-</parameter_description>
-</parameter>
-<parameter name="grab_ownership">
-<parameter_description> specifies the grab ownership.
-</parameter_description>
-</parameter>
-<parameter name="owner_events">
-<parameter_description> if %FALSE then all device events are reported with respect to
-@surface and are only reported if selected by @event_mask. If
-%TRUE then pointer events for this application are reported
-as normal, but pointer events outside this application are
-reported with respect to @surface and only if selected by
-@event_mask. In either mode, unreported events are discarded.
-</parameter_description>
-</parameter>
-<parameter name="event_mask">
-<parameter_description> specifies the event mask, which is used in accordance with
-@owner_events.
-</parameter_description>
-</parameter>
-<parameter name="cursor">
-<parameter_description> the cursor to display while the grab is active if the device is
-a pointer. If this is %NULL then the normal cursors are used for
-@surface and its descendants, and the cursor for @surface is used
-elsewhere.
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> the timestamp of the event which led to this pointer grab. This
-usually comes from the #GdkEvent struct, though %GDK_CURRENT_TIME
-can be used if the time isn’t known.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %GDK_GRAB_SUCCESS if the grab was successful.
-
 </return>
 </function>
 
@@ -6343,58 +6214,6 @@ Gets the #GdkDeviceToolType of the tool.
 <return> The physical type for this tool. This can be used to figure out what
 sort of pen is being used, such as an airbrush or a pencil.
 </return>
-</function>
-
-<function name="gdk_device_ungrab">
-<description>
-Release any grab on @device.
-
-Deprecated: 3.20. Use gdk_seat_ungrab() instead.
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-<parameter name="time_">
-<parameter_description> a timestap (e.g. %GDK_CURRENT_TIME).
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_device_warp">
-<description>
-Warps @device in @display to the point @x,@y,
-unless the device is confined to a surface by a grab,
-in which case it will be moved
-as far as allowed by the grab. Warping the pointer
-creates events as if the user had moved the mouse
-instantaneously to the destination.
-
-Note that the pointer should normally be under the
-control of the user. This function was added to cover
-some rare use cases like keyboard navigation support
-for the color picker in the #GtkColorSelectionDialog.
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> the device to warp.
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> the X coordinate of the destination.
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the Y coordinate of the destination.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_display_beep">
@@ -15330,12 +15149,12 @@ to begin a drag with a different device.
 <parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
-<parameter name="root_x">
-<parameter_description> root window X coordinate of mouse click that began the drag
+<parameter name="x">
+<parameter_description> surface X coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
-<parameter name="root_y">
-<parameter_description> root window Y coordinate of mouse click that began the drag
+<parameter name="y">
+<parameter_description> surface Y coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
 <parameter name="timestamp">
@@ -15349,10 +15168,6 @@ to begin a drag with a different device.
 <function name="gdk_surface_begin_move_drag_for_device">
 <description>
 Begins a surface move operation (for a toplevel surface).
-You might use this function to implement a “window move grip,” for
-example. The function works best with window managers that support the
-[Extended Window Manager Hints](http://www.freedesktop.org/Standards/wm-spec)
-but has a fallback implementation for other window managers.
 
 </description>
 <parameters>
@@ -15368,12 +15183,12 @@ but has a fallback implementation for other window managers.
 <parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
-<parameter name="root_x">
-<parameter_description> root window X coordinate of mouse click that began the drag
+<parameter name="x">
+<parameter_description> surface X coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
-<parameter name="root_y">
-<parameter_description> root window Y coordinate of mouse click that began the drag
+<parameter name="y">
+<parameter_description> surface Y coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
 <parameter name="timestamp">
@@ -15406,12 +15221,12 @@ to begin a drag with a different device.
 <parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
-<parameter name="root_x">
-<parameter_description> root window X coordinate of mouse click that began the drag
+<parameter name="x">
+<parameter_description> surface X coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
-<parameter name="root_y">
-<parameter_description> root window Y coordinate of mouse click that began the drag
+<parameter name="y">
+<parameter_description> surface Y coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
 <parameter name="timestamp">
@@ -15425,11 +15240,7 @@ to begin a drag with a different device.
 <function name="gdk_surface_begin_resize_drag_for_device">
 <description>
 Begins a surface resize operation (for a toplevel surface).
-You might use this function to implement a “window resize grip,” for
-example; in fact #GtkStatusbar uses it. The function works best
-with window managers that support the
-[Extended Window Manager Hints](http://www.freedesktop.org/Standards/wm-spec)
-but has a fallback implementation for other window managers.
+You might use this function to implement a “window resize grip,”
 
 </description>
 <parameters>
@@ -15449,12 +15260,12 @@ but has a fallback implementation for other window managers.
 <parameter_description> the button being used to drag, or 0 for a keyboard-initiated drag
 </parameter_description>
 </parameter>
-<parameter name="root_x">
-<parameter_description> root window X coordinate of mouse click that began the drag
+<parameter name="x">
+<parameter_description> surface X coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
-<parameter name="root_y">
-<parameter_description> root window Y coordinate of mouse click that began the drag
+<parameter name="y">
+<parameter_description> surface Y coordinate of mouse click that began the drag
 </parameter_description>
 </parameter>
 <parameter name="timestamp">
@@ -15915,44 +15726,6 @@ cursor of the surface
 </function>
 
 <function name="gdk_surface_get_device_position">
-<description>
-Obtains the current device position and modifier state.
-The position is given in coordinates relative to the upper left
-corner of @surface.
-
-Use gdk_surface_get_device_position_double() if you need subpixel precision.
-
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface.
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> pointer #GdkDevice to query to.
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> return location for the X coordinate of @device, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> return location for the Y coordinate of @device, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="mask">
-<parameter_description> return location for the modifier mask, or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return> The surface underneath @device
-(as with gdk_device_get_surface_at_position()), or %NULL if the
-surface is not known to GDK.
-</return>
-</function>
-
-<function name="gdk_surface_get_device_position_double">
 <description>
 Obtains the current device position in doubles and modifier state.
 The position is given in coordinates relative to the upper left
@@ -17580,36 +17353,6 @@ enter/leave events on its way to the destination surface.
 </parameter>
 <parameter name="pass_through">
 <parameter_description> a boolean
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_set_role">
-<description>
-When using GTK, typically you should use gtk_window_set_role() instead
-of this low-level function.
-
-The window manager and session manager use a surface’s role to
-distinguish it from other kinds of surface in the same application.
-When an application is restarted after being saved in a previous
-session, all surfaces with the same title and role are treated as
-interchangeable.  So if you have two surfaces with the same title
-that should be distinguished for session management purposes, you
-should set the role on those surfaces. It doesn’t matter what string
-you use for the role, as long as you have a different role for each
-non-interchangeable kind of surface.
-
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a toplevel #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="role">
-<parameter_description> a string indicating its role
 </parameter_description>
 </parameter>
 </parameters>
