@@ -105,8 +105,10 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
 #include <gtkmm/bin.h>
+#include <gtkmm/binlayout.h>
 #include <gtkmm/border.h>
 #include <gtkmm/box.h>
+#include <gtkmm/boxlayout.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
 #include <gtkmm/cellarea.h>
