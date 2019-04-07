@@ -119,7 +119,6 @@ public:
 
 protected:
   // Signal handlers:
-  bool on_window_key_pressed(guint keyval, guint keycode, Gdk::ModifierType state);
   void on_symbolic_radio_toggled();
   void on_context_list_selected_rows_changed();
   void on_icon_view_item_activated(const Gtk::TreeModel::Path& path);
@@ -247,11 +246,10 @@ Example_IconBrowser::Example_IconBrowser()
   m_filter_model->set_visible_func(
     sigc::mem_fun(*this, &Example_IconBrowser::is_icon_visible));
 
+  // Hook the search bar to key presses.
+  m_search_bar.set_key_capture_widget(*this);
+
   // Connect signal handlers.
-  auto controller = Gtk::EventControllerKey::create();
-  add_controller(controller);
-  controller->signal_key_pressed().connect(
-    sigc::mem_fun(*this, &Example_IconBrowser::on_window_key_pressed), false);
   m_symbolic_radio.signal_toggled().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_symbolic_radio_toggled));
   m_context_list.signal_selected_rows_changed().connect(
@@ -271,15 +269,6 @@ Example_IconBrowser::Example_IconBrowser()
 
 Example_IconBrowser::~Example_IconBrowser()
 {
-}
-
-bool Example_IconBrowser::on_window_key_pressed(guint, guint, Gdk::ModifierType)
-{
-  Glib::RefPtr<Gdk::Event> current_event = Glib::wrap(gtk_get_current_event());
-  if (current_event->get_event_type() == Gdk::Event::Type::KEY_PRESS)
-    return m_search_bar.handle_event(std::static_pointer_cast<Gdk::EventKey>(current_event));
-  else
-    return false;
 }
 
 void Example_IconBrowser::on_symbolic_radio_toggled()

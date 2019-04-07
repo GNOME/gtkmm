@@ -45,9 +45,10 @@ namespace Gtk
  * and signal_stop_search() signals can be uesd to implement
  * moving between search results and ending the search.
  *
- * Often, Gtk::SearchEntry will be fed events by means of being
+ * Often, %Gtk::SearchEntry will be fed events by means of being
  * placed inside a Gtk::SearchBar. If that is not the case,
- * you can use handle_event() to pass events.
+ * you can use set_key_capture_widget() to let it
+ * capture key input from another widget.
  *
  * @ingroup Widgets
  * @newin{3,6}
@@ -59,10 +60,6 @@ class SearchEntry
 public:
 
   _CTOR_DEFAULT
-
-  // We use Gdk::EventKey& rather than Gdk::Event&. See GTK+ bug https://bugzilla.gnome.org/show_bug.cgi?id=709544
-#m4 _CONVERSION(`const Glib::RefPtr<Gdk::EventKey>&',`GdkEvent*',`reinterpret_cast<$2>(Glib::unwrap($3))')
-  _WRAP_METHOD(bool handle_event(const Glib::RefPtr<Gdk::EventKey>& gdk_event), gtk_search_entry_handle_event)
 
   _WRAP_METHOD(void set_key_capture_widget(Widget& widget), gtk_search_entry_set_key_capture_widget)
   _WRAP_METHOD(Widget* get_key_capture_widget(), gtk_search_entry_get_key_capture_widget)
@@ -76,6 +73,8 @@ public:
   _WRAP_SIGNAL(void next_match(), "next-match")
   _WRAP_SIGNAL(void previous_match(), "previous-match")
   _WRAP_SIGNAL(void stop_search(), "stop-search")
+  // no_default_handler because the wrapped C signal has no default handler.
+  _WRAP_SIGNAL(void search_started(), "search-started", no_default_handler)
 
   _WRAP_PROPERTY("placeholder-text", Glib::ustring)
   _WRAP_PROPERTY("activates-default", bool)

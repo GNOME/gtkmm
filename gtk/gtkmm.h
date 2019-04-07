@@ -179,7 +179,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/infobar.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/label.h>
-#include <gtkmm/layout.h>
 #include <gtkmm/layoutchild.h>
 #include <gtkmm/layoutmanager.h>
 #include <gtkmm/levelbar.h>
