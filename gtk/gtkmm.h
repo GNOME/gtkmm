@@ -172,6 +172,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gesturezoom.h>
 #include <gtkmm/glarea.h>
 #include <gtkmm/grid.h>
+#include <gtkmm/gridlayout.h>
+#include <gtkmm/gridlayoutchild.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/icontheme.h>
 #include <gtkmm/iconview.h>
