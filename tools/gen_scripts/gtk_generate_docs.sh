@@ -8,7 +8,7 @@ source "$(dirname "$0")/init_generate.sh"
 out_dir="$root_dir/gtk/src"
 
 params="--with-properties --no-recursion"
-for dir in "$gtk_source_prefix"/{gtk,gtk/deprecated} "$gtk_build_prefix"/gtk; do
+for dir in "$gtk_source_prefix"/{gtk,gtk/css,gtk/deprecated} "$gtk_build_prefix"/{gtk,gtk/css}; do
   if [ -d "$dir" ]; then
     params="$params -s $dir"
   fi
