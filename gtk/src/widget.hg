@@ -181,10 +181,7 @@ public:
   _WRAP_METHOD(bool get_focus_on_click() const, gtk_widget_get_focus_on_click)
   _WRAP_METHOD(void set_can_target(bool can_target = true), gtk_widget_set_can_target)
   _WRAP_METHOD(bool get_can_target() const, gtk_widget_get_can_target)
-  _WRAP_METHOD(void set_can_default(bool can_default = true), gtk_widget_set_can_default)
-  _WRAP_METHOD(bool get_can_default() const, gtk_widget_get_can_default)
   _WRAP_METHOD(bool has_default() const, gtk_widget_has_default)
-  _WRAP_METHOD(void grab_default(), gtk_widget_grab_default)
   _WRAP_METHOD(void set_receives_default(bool receives_default = true), gtk_widget_set_receives_default)
   _WRAP_METHOD(bool get_receives_default() const, gtk_widget_get_receives_default)
   _WRAP_METHOD(bool has_grab() const, gtk_widget_has_grab)
@@ -573,6 +570,9 @@ public:
 #m4 _CONVERSION(`const gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(std::vector<Glib::ustring> list_action_prefixes() const, gtk_widget_list_action_prefixes)
 
+  _WRAP_METHOD(void activate_action(const Glib::ustring& name, const Glib::VariantBase& parameter), gtk_widget_activate_action)
+  _WRAP_METHOD(void activate_default(), gtk_widget_activate_default)
+
   _WRAP_METHOD(void set_font_map(const Glib::RefPtr<Pango::FontMap>& font_map), gtk_widget_set_font_map)
   _WRAP_METHOD(Glib::RefPtr<Pango::FontMap> get_font_map(), gtk_widget_get_font_map, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Pango::FontMap> get_font_map() const, gtk_widget_get_font_map, refreturn, constversion)
@@ -700,8 +700,6 @@ dnl
 
   // The accel_closures_changed signal can't have a default handler because the wrapped C signal has no default handler.
   _WRAP_SIGNAL(void accel_closures_changed(), "accel_closures_changed", no_default_handler)
-#m4 _CONVERSION(`GdkDisplay*',`const Glib::RefPtr<Gdk::Display>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(void display_changed(const Glib::RefPtr<Gdk::Display>& previous_display), "display_changed")
 
 //TODO: The signal_id is very C-like here:
   //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
@@ -728,7 +726,6 @@ dnl
   _WRAP_PROPERTY("is_focus", bool)
   _WRAP_PROPERTY("can_target", bool)
   _WRAP_PROPERTY("focus_on_click", bool)
-  _WRAP_PROPERTY("can_default", bool)
   _WRAP_PROPERTY("has_default", bool)
   _WRAP_PROPERTY("receives_default", bool)
   _WRAP_PROPERTY("cursor", Glib::RefPtr<Gdk::Cursor>)
@@ -781,9 +778,9 @@ protected:
   _WRAP_METHOD(void set_has_surface(bool has_surface = true), gtk_widget_set_has_surface)
 
   /** Sets a widget's surface. This function should only be used in a
-   * widget's Gtk::Widget::on_realize() implementation. The %surface passed is
+   * widget's Gtk::Widget::on_realize() implementation. The %a surface passed is
    * usually either a new surface created with Gdk::Surface::create(), or the
-   * surface of its parent widget as returned by get_parent_surface().
+   * surface of its parent widget as returned by get_parent()->get_surface().
    *
    * Widgets must indicate whether they will create their own Gdk::Surface
    * by calling set_has_surface(). This is usually done in the

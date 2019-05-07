@@ -69,19 +69,15 @@ Example_Menus::Example_Menus()
     auto pMenuItem = Gtk::make_managed<Gtk::MenuItem>("test\nline2");
     pMenuItem->set_submenu( *(create_menu(2)) );
     m_MenuBar.append(*pMenuItem);
-    pMenuItem->show();
 
     pMenuItem = Gtk::make_managed<Gtk::MenuItem>("foo");
     pMenuItem->set_submenu( *(create_menu(3)) );
     m_MenuBar.append(*pMenuItem);
-    pMenuItem->show();
 
     pMenuItem = Gtk::make_managed<Gtk::MenuItem>("bar");
     pMenuItem->set_submenu( *(create_menu(4)) );
     m_MenuBar.append(*pMenuItem);
-    pMenuItem->show();
   }
-
 
   m_VBox_Sub1.set_margin(10);
   m_VBox_Sub1.set_expand();
@@ -95,18 +91,15 @@ Example_Menus::Example_Menus()
 
     Gtk::MenuItem* pMenuItem = Gtk::make_managed<Gtk::SeparatorMenuItem>();
     pMenu->append(*pMenuItem);
-    pMenuItem->show();
 
     pMenuItem = Gtk::make_managed<Gtk::MenuItem>("accel");
     pMenuItem->set_submenu(*pMenu);
     m_MenuBar.append(*pMenuItem);
-    pMenuItem->show();
 
     pMenuItem = Gtk::make_managed<Gtk::CheckMenuItem>("Accelerate Me");
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F1,
       Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE);
     pMenu->append(*pMenuItem);
-    pMenuItem->show();
     pMenuItem->signal_activate().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F1"));
 
@@ -114,7 +107,6 @@ Example_Menus::Example_Menus()
     pMenu->append(*pMenuItem);
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F2,
       Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE | Gtk::AccelFlags::LOCKED);
-    pMenuItem->show();
     pMenuItem->signal_activate().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F2"));
 
@@ -122,7 +114,6 @@ Example_Menus::Example_Menus()
     pMenu->append(*pMenuItem);
     pMenuItem->add_accelerator("activate", accel_group, GDK_KEY_F3,
       Gdk::ModifierType(0), Gtk::AccelFlags::VISIBLE);
-    pMenuItem->show();
     pMenuItem->signal_activate().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_Menus::on_item_activated), "F3"));
   }
@@ -138,8 +129,7 @@ Example_Menus::Example_Menus()
   m_VBox_Sub2.add(m_Button);
   m_VBox_Sub2.set_vexpand(false);
 
-  m_Button.set_can_default(true);
-  m_Button.grab_default();
+  set_default_widget(m_Button);
 }
 
 Example_Menus::~Example_Menus()
@@ -163,7 +153,6 @@ Gtk::Menu* Example_Menus::create_menu(gint depth)
 
       auto pMenuItem = Gtk::make_managed<Gtk::RadioMenuItem>(radiogroup, buf);
       pMenu->append(*pMenuItem);
-      pMenuItem->show();
 
       if(i == 3)
         pMenuItem->set_sensitive(false);
