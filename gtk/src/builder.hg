@@ -472,6 +472,38 @@ public:
       g_critical("Gtk::Builder::get_widget(): dynamic_cast<> failed.");
   }
 
+  /** Gets a widget from the Builder file as a smart pointer.
+   * For instance:
+   * @code
+   * Glib::RefPtr<Gtk::Grid> mygrid = refBuilder->get_widget("mygrid");
+   * @endcode
+   * This method prints a warning message to the console if the widget
+   * doesn't exist or has the wrong type, so you don't need to check that
+   * manually.
+   *
+   * Note that you are responsible for deleting top-level widgets (windows and
+   * dialogs) instantiated by the Builder object. Other widgets are instantiated as
+   * managed so they will be deleted automatically if you add them to a
+   * container widget.
+   *
+   * @param name The name of the widget.
+   * @param[out] widget A pointer to the widget, or <tt>nullptr</tt> on failure.
+   */
+  template <class T_Widget> inline
+  Glib::RefPtr<T_Widget> get_widget(const Glib::ustring& name)
+  {
+    // Initialize output parameter:
+    T_Widget *widget = nullptr;
+
+    // The dynamic_cast<> should never fail if get_widget_checked() succeeded.
+    widget = dynamic_cast<T_Widget*>(this->get_widget_checked(name, T_Widget::get_base_type()));
+
+    if(!widget)
+      g_critical("Gtk::Builder::get_widget(): dynamic_cast<> failed.");
+
+    return Glib::RefPtr<T_Widget>(widget);
+  }
+
   /** See the non-const version.
    * @newin{3,8}
    */
