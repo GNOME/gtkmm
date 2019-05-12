@@ -109,6 +109,9 @@ AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
       [GTKMM_MODULES="atkmm-2.30 >= 2.29.1 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
+# gtkmm.pc.in can assume that GDKMM_MODULES is a subset of GTKMM_MODULES,
+# not listing GDKMM_MODULES as required modules.
+
 AC_SUBST([GTKMM_DEMOS_EXTRA_MODULES], ['epoxy >= 1.2'])
 
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
@@ -146,8 +149,6 @@ MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
-                 gdk/${GDKMM_MODULE_NAME}.pc:gdk/gdkmm.pc.in
-                 gdk/${GDKMM_MODULE_NAME}-uninstalled.pc:gdk/gdkmm-uninstalled.pc.in
                  gdk/src/Makefile
                  gdk/gdkmm/Makefile
                  gtk/${GTKMM_MODULE_NAME}.pc:gtk/gtkmm.pc.in

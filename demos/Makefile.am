@@ -93,7 +93,7 @@ gtk-demo/demo_resources.c: gtk-demo/demo.gresource.xml $(GTK_DEMO_RESOURCES) $(G
 	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(dir $<) --generate-source $<
 
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
-gdkmm_ldadd    = $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
+gdkmm_ldadd    =
 
 gtkmm_includes = -I$(top_builddir)/gtk $(if $(srcdir:.=),-I$(top_srcdir)/gtk)
 gtkmm_ldadd    = $(top_builddir)/gtk/gtkmm/libgtkmm-$(GTKMM_API_VERSION).la

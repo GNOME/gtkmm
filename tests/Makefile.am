@@ -57,7 +57,7 @@ tree_model_iterator_test_SOURCES   = tree_model_iterator/main.cc
 wrap_existing_test_SOURCES         = wrap_existing/main.cc
 
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
-gdkmm_ldadd    = $(top_builddir)/gdk/gdkmm/libgdkmm-$(GDKMM_API_VERSION).la
+gdkmm_ldadd    =
 
 gtkmm_includes = -I$(top_builddir)/gtk $(if $(srcdir:.=),-I$(top_srcdir)/gtk)
 gtkmm_ldadd    = $(top_builddir)/gtk/gtkmm/libgtkmm-$(GTKMM_API_VERSION).la

@@ -30,9 +30,9 @@ doc_subdirs =
 endif
 SUBDIRS = tools $(src_subdirs) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
 
-gdkmm_includedir = $(includedir)/$(GDKMM_MODULE_NAME)
+gdkmm_includedir = $(includedir)/$(GTKMM_MODULE_NAME)
 gdkmm_include_HEADERS = gdk/gdkmm.h
-gdkmm_libincludedir = $(libdir)/$(GDKMM_MODULE_NAME)/include
+gdkmm_libincludedir = $(libdir)/$(GTKMM_MODULE_NAME)/include
 nodist_gdkmm_libinclude_HEADERS = gdk/gdkmmconfig.h
 
 gtkmm_includedir = $(includedir)/$(GTKMM_MODULE_NAME)
@@ -41,7 +41,7 @@ gtkmm_libincludedir = $(libdir)/$(GTKMM_MODULE_NAME)/include
 nodist_gtkmm_libinclude_HEADERS = gtk/gtkmmconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
+pkgconfig_DATA = gtk/$(GTKMM_MODULE_NAME).pc
 
 include $(srcdir)/MSVC_NMake/filelist.am
 include $(srcdir)/win32_installer/filelist.am
