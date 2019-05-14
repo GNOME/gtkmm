@@ -258,6 +258,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/statusbar.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
+#include <gtkmm/text.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textiter.h>
