@@ -474,11 +474,12 @@ public:
   }
 
   /** Gets a widget from the Builder file.
+   *
    * For instance:
    * @code
-   * Gtk::Grid* pGrid = nullptr;
-   * refBuilder->get_widget("mygrid", pGrid);
+   * auto pGrid = refBuilder->get_widget<Gtk::Grid>("mygrid");
    * @endcode
+   *
    * This method prints a warning message to the console if the widget
    * doesn't exist or has the wrong type, so you don't need to check that
    * manually.
@@ -489,40 +490,6 @@ public:
    * container widget.
    *
    * @param name The name of the widget.
-   * @param[out] widget A pointer to the widget, or <tt>nullptr</tt> on failure.
-   */
-  template <class T_Widget> inline
-  void get_widget(const Glib::ustring& name, T_Widget*& widget)
-  {
-    // Initialize output parameter:
-    widget = nullptr;
-
-    // The dynamic_cast<> should never fail if get_widget_checked() succeeded.
-    widget = dynamic_cast<T_Widget*>(this->get_widget_checked(name, T_Widget::get_base_type()));
-
-    if(!widget)
-      g_critical("Gtk::Builder::get_widget(): dynamic_cast<> failed.");
-  }
-
-  /** See the non-const version.
-   * @newin{3,8}
-   */
-  template <class T_Widget> inline
-  void get_widget(const Glib::ustring& name, const T_Widget*& widget) const
-  {
-    const_cast<Builder*>(this)->get_widget(name, widget);
-  }
-
-  /** Gets a widget from the Builder file.
-   *
-   * For instance:
-   * @code
-   * auto pGrid = refBuilder->get_widget<Gtk::Grid>("mygrid");
-   * @endcode
-   *
-   * See get_widget().
-   *
-   * @param name The name of the widget.
    * @return A pointer to the widget, or <tt>nullptr</tt> on failure.
    *
    * @newin{3,96}
@@ -530,8 +497,14 @@ public:
   template <class T_Widget> inline
   T_Widget* get_widget(const Glib::ustring& name)
   {
-    T_Widget* widget;
-    get_widget(name, widget);
+    T_Widget* widget = nullptr;
+
+    // The dynamic_cast<> should never fail if get_widget_checked() succeeded.
+    widget = dynamic_cast<T_Widget*>(this->get_widget_checked(name, T_Widget::get_base_type()));
+
+    if(!widget)
+      g_critical("Gtk::Builder::get_widget(): dynamic_cast<> failed.");
+
     return widget;
   }
 
@@ -561,10 +534,8 @@ public:
    *
    * For instance:
    * @code
-   * MyDerivedDialog* pDialog1 = nullptr;
-   * MyDerivedDialog* pDialog2 = nullptr;
-   * Gtk::Builder::get_widget_derived(refBuilder, "mydialog1", pDialog1);
-   * Gtk::Builder::get_widget_derived(refBuilder, "mydialog2", pDialog2, "A storm is imminent!", true);
+   * auto pDialog1 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog1");
+   * auto pDialog2 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog2", "A storm is imminent!", true);
    * @endcode
    *
    * @note
@@ -576,21 +547,22 @@ public:
    * @param builder The Gtk::Builder from which to get the widget.
    * @param name The name of the widget.
    * @param args Additional arguments to pass to the constructor of the derived class.
-   * @param[out] widget A pointer to the widget, or <tt>nullptr</tt> on failure.
+   * @return A pointer to the widget, or <tt>nullptr</tt> on failure.
+   *
+   * @newin{3,94}
    */
   template <typename T_Widget, typename... Args> inline
-  static void get_widget_derived(const Glib::RefPtr<Gtk::Builder>& builder, const Glib::ustring& name, T_Widget*& widget, Args&&... args)
+  static T_Widget* get_widget_derived(const Glib::RefPtr<Gtk::Builder>& builder, const Glib::ustring& name, Args&&... args)
   {
-     // Initialize output parameter:
-     widget = nullptr;
-
      // Get the widget from the GtkBuilder file.
      using cwidget_type = typename T_Widget::BaseObjectType;
      auto pCWidget = (cwidget_type*)builder->get_cwidget(name);
 
      //The error was already reported by get_cwidget().
      if(!pCWidget)
-       return;
+       return nullptr;
+
+     T_Widget* widget = nullptr;
 
      //Check whether there is already a C++ wrapper instance associated with this C instance:
      Glib::ObjectBase* pObjectBase = ObjectBase::_get_current_wrapper((GObject*)pCWidget);
@@ -616,40 +588,7 @@ public:
        // Don't add reference to widget. That's done only in methods that return
        // a Glib::RefPtr<Something>.
      }
-  }
 
-  /** See the non-const version.
-   * @newin{3,8}
-   */
-  template <typename T_Widget, typename... Args> inline
-  static void get_widget_derived(const Glib::RefPtr<const Gtk::Builder>& builder, const Glib::ustring& name, const T_Widget*& widget, Args&&... args)
-  {
-    get_widget_derived(std::const_pointer_cast<Gtk::Builder>(builder), name, widget, std::forward<Args>(args)...);
-  }
-
-  /** Gets a widget whose details are specified in the GtkBuilder file,
-   * but which is implemented by your own derived class.
-   *
-   * For instance:
-   * @code
-   * auto pDialog1 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog1");
-   * auto pDialog2 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog2", "A storm is imminent!", true);
-   * @endcode
-   *
-   * See get_widget_derived().
-   *
-   * @param builder The Gtk::Builder from which to get the widget.
-   * @param name The name of the widget.
-   * @param args Additional arguments to pass to the constructor of the derived class.
-   * @return A pointer to the widget, or <tt>nullptr</tt> on failure.
-   *
-   * @newin{3,96}
-   */
-  template <typename T_Widget, typename... Args> inline
-  static T_Widget* get_widget_derived(const Glib::RefPtr<Gtk::Builder>& builder, const Glib::ustring& name, Args&&... args)
-  {
-    T_Widget* widget;
-    get_widget_derived(builder, name, widget, std::forward<Args>(args)...);
     return widget;
   }
 
