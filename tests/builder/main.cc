@@ -112,10 +112,10 @@ public:
     std::cout << "MainWindow::ctor" << std::endl;
 
     // Called twice just to see if two calls affect the ref count.
-    Gtk::Builder::get_widget_derived(refBuilder, "derived_button", m_pDerivedButton, "face-smile");
-    Gtk::Builder::get_widget_derived(refBuilder, "derived_button", m_pDerivedButton);
-    refBuilder->get_widget("standard_button", m_pStandardButton);
-    refBuilder->get_widget("standard_button", m_pStandardButton);
+    m_pDerivedButton = Gtk::Builder::get_widget_derived<DerivedButton>(refBuilder, "derived_button", "face-smile");
+    m_pDerivedButton = Gtk::Builder::get_widget_derived<DerivedButton>(refBuilder, "derived_button");
+    m_pStandardButton = refBuilder->get_widget<Gtk::Button>("standard_button");
+    m_pStandardButton = refBuilder->get_widget<Gtk::Button>("standard_button");
 
     m_pStandardButton->add_destroy_notify_callback(nullptr, on_managed_button_deleted);
   }

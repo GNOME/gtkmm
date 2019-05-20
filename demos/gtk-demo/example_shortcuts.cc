@@ -38,8 +38,7 @@ Gtk::Window* do_shortcuts()
   }
 
   // Get the GtkBuilder-instantiated window:
-  Example_Shortcuts* pWindow = nullptr;
-  Gtk::Builder::get_widget_derived(builder, "window1", pWindow);
+  auto pWindow = Gtk::Builder::get_widget_derived<Example_Shortcuts>(builder, "window1");
   if (!pWindow)
   {
     std::cout << "Could not get 'window1' from the builder." << std::endl;
@@ -53,44 +52,37 @@ Example_Shortcuts::Example_Shortcuts(
 : Gtk::Window(cobject),
   m_builder(builder)
 {
-  Gtk::Button* pButton = nullptr;
-  builder->get_widget("button_builder", pButton);
+  auto pButton = builder->get_widget<Gtk::Button>("button_builder");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_builder", ""));
 
-  pButton = nullptr;
-  builder->get_widget("button_gedit", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_gedit");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_gedit", ""));
 
-  pButton = nullptr;
-  builder->get_widget("button_clocks", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_clocks");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_clocks", ""));
 
-  pButton = nullptr;
-  builder->get_widget("button_clocks_stopwatch", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_clocks_stopwatch");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_clocks", "stopwatch"));
 
-  pButton = nullptr;
-  builder->get_widget("button_boxes", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_boxes");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_boxes", ""));
 
-  pButton = nullptr;
-  builder->get_widget("button_boxes_wizard", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_boxes_wizard");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_boxes", "wizard"));
 
-  pButton = nullptr;
-  builder->get_widget("button_boxes_display", pButton);
+  pButton = builder->get_widget<Gtk::Button>("button_boxes_display");
   if (pButton)
     pButton->signal_clicked().connect(sigc::bind(sigc::mem_fun(
       *this, &Example_Shortcuts::on_button_clicked), "shortcuts_boxes", "display"));
@@ -114,8 +106,7 @@ void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::u
   }
 
   // Get the GtkBuilder-instantiated shortcuts window:
-  Gtk::ShortcutsWindow* pOverlay = nullptr;
-  builder->get_widget(id, pOverlay);
+  auto pOverlay = builder->get_widget<Gtk::ShortcutsWindow>(id);
   if (!pOverlay)
   {
     std::cout << "Could not get '"<< id << "' from the builder." << std::endl;
