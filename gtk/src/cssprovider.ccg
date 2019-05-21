@@ -34,7 +34,7 @@ static void CssProvider_signal_parsing_error_callback(GtkCssProvider* self, GtkC
     }
     catch (const Glib::Error& ex)
     {
-      // ex can be (and usually is) an instance of a subclass ofGlib::Error.
+      // ex can be (and usually is) an instance of a subclass of Glib::Error.
       try
       {
         if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
@@ -56,51 +56,6 @@ namespace Gtk
 void CssProvider::load_from_data(const std::string& data)
 {
   gtk_css_provider_load_from_data(gobj(), data.c_str(), -1);
-}
-
-void CssProvider_Class::parsing_error_callback(GtkCssProvider* self, GtkCssSection* p0, const GError* p1)
-{
-  const auto obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj_base && obj_base->is_derived_())
-  {
-    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be NULL during destruction.
-    {
-      try
-      {
-        Glib::Error::throw_exception(g_error_copy(p1));
-      }
-      catch (const Glib::Error& ex)
-      {
-        // ex can be (and usually is) an instance of a subclass of Glib::Error.
-        try // Trap C++ exceptions which would normally be lost because this is a C callback.
-        {
-          // Call the virtual member method, which derived classes might override.
-          obj->on_parsing_error(Glib::wrap(p0, true), ex);
-          return;
-        }
-        catch(...)
-        {
-          Glib::exception_handlers_invoke();
-        }
-      }
-    }
-  }
-
-  const auto base = static_cast<BaseClassType*>(
-        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-    );
-
-  // Call the original underlying C function:
-  if(base && base->parsing_error)
-    (*base->parsing_error)(self, p0, p1);
 }
 
 } //namespace Gtk
