@@ -21,6 +21,7 @@
 #include <glibmm/object.h>
 #include <gdkmm/texture.h>
 #include <gtkmm/bin.h>
+#include <gtkmm/native.h>
 #include <gtkmm/root.h>
 #include <gtkmm/application.h>
 #include <gtkmm/windowgroup.h>
@@ -48,9 +49,10 @@ class WindowGroup;
  * Gtk::manage() has no effect on Windows because they have no parent Containers.
  * @ingroup Widgets
  */
-class Window : public Bin, public Root
+class Window : public Bin, public Native, public Root
 {
   _CLASS_GTKOBJECT(Window,GtkWindow,GTK_WINDOW,Gtk::Bin,GtkBin)
+  _IMPLEMENTS_INTERFACE(Native)
   _IMPLEMENTS_INTERFACE(Root)
   _UNMANAGEABLE
   _IGNORE(gtk_window_set_has_user_ref_count, gtk_window_set_destroy_with_parent)
@@ -58,6 +60,11 @@ class Window : public Bin, public Root
   //TODO: Use gtk_window_set_destroy_with_parent() to allow use of Gtk::manage() with top-level windows, using the transient-parent?
 
 public:
+  // Disambiguate calls to get_display(). Use Root::get_display(), not Widget::get_display().
+  // gtk_widget_get_display() calls gtk_root_get_display(). There is no reason
+  // to call gtk_widget_get_display() from a class that implements GtkRoot.
+  using Root::get_display;
+
   _WRAP_CTOR(Window(WindowType type = WindowType::TOPLEVEL), gtk_window_new)
 
   _WRAP_PROPERTY("type", WindowType)
@@ -65,7 +72,6 @@ public:
   _WRAP_PROPERTY("startup-id", Glib::ustring)
   _WRAP_PROPERTY("resizable", bool)
   _WRAP_PROPERTY("modal", bool)
-  _WRAP_PROPERTY("window_position", WindowPosition)
   _WRAP_PROPERTY("default_width", int)
   _WRAP_PROPERTY("default_height", int)
   _WRAP_PROPERTY("destroy_with_parent", bool)
@@ -121,9 +127,6 @@ dnl
 
   _WRAP_METHOD(void remove_accel_group(const Glib::RefPtr<AccelGroup>& accel_group),
                gtk_window_remove_accel_group)
-
-  _WRAP_METHOD(void set_position(WindowPosition position),
-               gtk_window_set_position)
 
   _WRAP_METHOD(void set_focus(Gtk::Widget& focus), gtk_window_set_focus)
   void unset_focus();

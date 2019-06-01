@@ -133,7 +133,8 @@ public:
   _WRAP_METHOD(void set_text_column(int column), gtk_entry_completion_set_text_column)
   _WRAP_METHOD(int get_text_column() const, gtk_entry_completion_get_text_column)
 
-  _WRAP_SIGNAL(void action_activated(int index), action_activated)
+  // no_default_handler because GtkEntryCompletionClass is private.
+  _WRAP_SIGNAL(void action_activated(int index), action_activated, no_default_handler)
 
   //We completely hand-code these signals because we want to change how the parameters are wrapped,
   //because we need both the iter and the model to make the C++ iter.
@@ -179,24 +180,9 @@ public:
    */
   Glib::SignalProxy<bool(const TreeModel::iterator&)> signal_cursor_on_match();
 
-
-  #m4begin
-dnl// Hook in custom callback.
-dnl// It will use the callback.
-dnl
-  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-    klass->match_selected = &match_selected_callback_custom;
-  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-    static gboolean match_selected_callback_custom(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter);
-  _POP()
-#m4end
-
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
-
-  _WRAP_SIGNAL(bool insert_prefix(const Glib::ustring& prefix), insert_prefix)
-
-  _WRAP_SIGNAL(void no_matches(), no_matches)
-
+  _WRAP_SIGNAL(bool insert_prefix(const Glib::ustring& prefix), insert_prefix, no_default_handler)
+  _WRAP_SIGNAL(void no_matches(), no_matches, no_default_handler)
 
   _WRAP_PROPERTY("model", Glib::RefPtr<Gtk::TreeModel>)
   _WRAP_PROPERTY("minimum_key_length", int)
@@ -207,12 +193,6 @@ dnl
   _WRAP_PROPERTY("popup_single_match", bool)
   _WRAP_PROPERTY("inline-selection", bool)
   _WRAP_PROPERTY("cell-area", Glib::RefPtr<CellArea>)
-
-protected:
-
-  //Default Signal Handler:
-  virtual bool on_match_selected(const TreeModel::iterator& iter);
-  //No default handler for on_cursor_on_match(), to preserve ABI. TODO: Add this when we can break ABI.
 };
 
 } // namespace Gtk

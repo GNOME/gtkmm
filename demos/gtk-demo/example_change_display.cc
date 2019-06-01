@@ -301,7 +301,7 @@ Gtk::Window* Example_ChangeDisplay::query_for_toplevel(
       false, cursor) == Gdk::GrabStatus::SUCCESS)
   {
     m_popup_clicked = false;
-    auto refGesture = Gtk::GestureMultiPress::create();
+    auto refGesture = Gtk::GestureClick::create();
     pPopup->add_controller(refGesture);
     refGesture->set_button(0); // Any button
     refGesture->signal_released().connect(
@@ -332,7 +332,7 @@ Gtk::Widget* Example_ChangeDisplay::find_toplevel_at_pointer(const Glib::RefPtr<
   if (!refPointerSurface)
     return nullptr;
 
-  return Gtk::Root::get_for_surface(refPointerSurface);
+  return Gtk::Native::get_for_surface(refPointerSurface);
 }
 
 void Example_ChangeDisplay::on_popup_button_released(int /* n_press */, double /* x */, double /* y */)
@@ -346,7 +346,6 @@ Popup::Popup(const Glib::RefPtr<Gdk::Display>& display, const Glib::ustring& pro
 {
   set_display(display);
   set_modal(true);
-  set_position(Gtk::WindowPosition::CENTER);
 
   m_Frame.set_shadow_type(Gtk::ShadowType::OUT);
   add(m_Frame);

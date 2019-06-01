@@ -218,7 +218,6 @@ static gboolean Widget_signal_cursor_on_match_notify_callback(GtkEntryCompletion
   return RType();
 }
 
-
 const Glib::SignalProxyInfo EntryCompletion_signal_cursor_on_match_info =
 {
   "cursor_on_match",
@@ -228,66 +227,10 @@ const Glib::SignalProxyInfo EntryCompletion_signal_cursor_on_match_info =
 
 } //anonymous namespace
 
-
 namespace Gtk
 {
 
 //Hand-coded signal wrapping:
-
-bool Gtk::EntryCompletion::on_match_selected(const TreeModel::iterator& iter)
-{
-  const auto base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && base->match_selected)
-    return (*base->match_selected)(gobj(), const_cast<GtkTreeModel*>(iter.get_model_gobject()), const_cast<GtkTreeIter*>(iter.gobj()));
-  else
-  {
-    typedef bool RType;
-    return RType(); //There should always be an implementation in the C object, so this will never happen.
-  }
-}
-
-gboolean EntryCompletion_Class::match_selected_callback_custom(GtkEntryCompletion* self, GtkTreeModel* c_model, GtkTreeIter* c_iter)
-{
-  const auto obj = dynamic_cast<CppObjectType*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj && obj->is_derived_())
-  {
-    try // Trap C++ exceptions which would normally be lost because this is a C callback.
-    {
-      // Call the virtual member method, which derived classes might override.
-
-      //This conversion is the custom-written part:
-      Gtk::TreeModel::iterator cppIter(c_model, c_iter);
-      return obj->on_match_selected(cppIter);
-    }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke();
-    }
-  }
-  else
-  {
-    const auto base = static_cast<BaseClassType*>(
-        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-    );
-
-    // Call the original underlying C function:
-    if(base && base->match_selected)
-      return (*base->match_selected)(self, c_model, c_iter);
-  }
-
-  typedef gboolean RType;
-  return RType();
-}
 
 Glib::SignalProxy<bool(const TreeModel::iterator&)> EntryCompletion::signal_match_selected()
 {

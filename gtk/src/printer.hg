@@ -45,13 +45,6 @@ class Printer : public Glib::Object
   _GTKMMPROC_WIN32_NO_WRAP
 
 public:
-  //TODO: _WRAP_CREATE() - probably not, it's only accessible through PrintUnixDialog + GtkPrintBackend should be ignored
-  //TODO: I think these are not needed as well, and that Printer should generally be read-only - marko.
-  _IGNORE(gtk_printer_is_new, gtk_printer_set_state_message, gtk_printer_set_is_default,
-          gtk_printer_set_is_accepting_jobs, gtk_printer_set_is_paused)
-  _IGNORE(gtk_printer_set_is_active, gtk_printer_set_has_details, gtk_printer_set_description)
-  _IGNORE(gtk_printer_set_icon_name, gtk_printer_set_job_count, gtk_printer_set_is_new, gtk_printer_set_location)
-
   bool equal(const Glib::RefPtr<Printer>& other) const;
 
   //GtkPrintBackend is in a "semi-private" header.
@@ -72,7 +65,6 @@ public:
   _WRAP_METHOD(bool is_default() const, gtk_printer_is_default)
   _WRAP_METHOD(bool accepts_pdf() const, gtk_printer_accepts_pdf)
   _WRAP_METHOD(bool accepts_ps() const, gtk_printer_accepts_ps)
-  _IGNORE(gtk_printer_set_accepts_pdf, gtk_printer_set_accepts_ps)
 
 #m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<PageSetup> >', `Glib::ListHandler< Glib::RefPtr<PageSetup> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector< Glib::RefPtr<PageSetup> > list_papers(), gtk_printer_list_papers)
@@ -92,7 +84,8 @@ public:
   _WRAP_METHOD(bool get_hard_margins(const PaperSize& paper_size, double& top, double& bottom, double& left, double& right) const,
     gtk_printer_get_hard_margins_for_paper_size)
 
-  _WRAP_SIGNAL(void details_acquired(bool success), "details_acquired")
+  // no_default_handler because GtkPrinterClass is private.
+  _WRAP_SIGNAL(void details_acquired(bool success), "details_acquired", no_default_handler)
 
   _WRAP_PROPERTY("name", Glib::ustring)
 

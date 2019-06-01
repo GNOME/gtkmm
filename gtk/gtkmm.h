@@ -161,9 +161,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontchooserwidget.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/gesture.h>
+#include <gtkmm/gestureclick.h>
 #include <gtkmm/gesturedrag.h>
 #include <gtkmm/gesturelongpress.h>
-#include <gtkmm/gesturemultipress.h>
 #include <gtkmm/gesturepan.h>
 #include <gtkmm/gesturerotate.h>
 #include <gtkmm/gesturesingle.h>
