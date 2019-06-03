@@ -388,6 +388,7 @@ _CONVERSION(`GtkEditable*',`Editable*',`dynamic_cast<$2>(Glib::wrap_auto((GObjec
 _CONVERSION(`Editable&',`GtkEditable*',__FR2P)
 
 _CONVERSION(`GtkRoot*',`Root*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
+_CONVERSION(`GtkNative*',`Native*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')
 
 _CONVERSION(`SelectionData',`GtkSelectionData*', `($3).gobj()')
 _CONVERSION(`const SelectionData&',`const GtkSelectionData*', __FR2P)
