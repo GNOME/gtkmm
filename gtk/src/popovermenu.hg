@@ -15,6 +15,7 @@
  */
 
 #include <gtkmm/popover.h>
+#include <giomm/menumodel.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/popover_p.h)
@@ -23,17 +24,20 @@ namespace Gtk
 {
 /** A Popover to use as a menu.
  *
- * PopoverMenu is a subclass of Popover that treats its
+ * %PopoverMenu is a subclass of Popover that treats its
  * childen like menus and allows switching between them. It is
  * meant to be used primarily together with ModelButton, but
  * any widget can be used, such as SpinButton or Scale.
- * In this respect, PopoverMenu is more flexible than popovers
+ * In this respect, %PopoverMenu is more flexible than popovers
  * that are created from a Gio::MenuModel.
  *
- * To add a child as a submenu, set the child_property_submenu()
- * to the name of the submenu. To let the user open
- * this submenu, add a ModelButton whose ModelButton::property_menu_name()
- * is set to the name you've given to the submenu.
+ * To add a child as a submenu, use add_submenu().
+ * To let the user open this submenu, add a ModelButton whose
+ * ModelButton::property_menu_name() is set to the name you've given
+ * to the submenu.
+ *
+ * To add a named submenu in a ui file, set Widget::property_name()
+ * of the widget that you are adding as a child of the popover menu.
  *
  * By convention, the first child of a submenu should be a ModelButton
  * to switch back to the parent menu. Such a button should use
@@ -53,7 +57,45 @@ class PopoverMenu : public Popover
   _CLASS_GTKOBJECT(PopoverMenu, GtkPopoverMenu, GTK_POPOVER_MENU, Gtk::Popover, GtkPopover)
 
 public:
-  _CTOR_DEFAULT
+  /** Creates a new popover menu to point to @a relative_to.
+   *
+   * @param relative_to The Gtk::Widget the popover menu is related to.
+   */
+  _WRAP_CTOR(PopoverMenu(const Widget& relative_to{?}), gtk_popover_menu_new)
+
+  //This is custom-implemented because the gtk_popover_menu_new_from_model() does more
+  //than just call g_object_new. MenuBar and Menu have both the same issue.
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=704671
+  /** Creates a %PopoverMenu and populates it according to @a model.
+   * The popover menu is pointed to the @a relative_to widget.
+   *
+   * The created buttons are connected to actions found in the
+   * ApplicationWindow to which the popover menu belongs - typically
+   * by means of being attached to a widget that is contained within
+   * the ApplicationWindow widget hierarchy.
+   *
+   * Actions can also be added using Widget::insert_action_group()
+   * on the menu's attached widget or on any of its parent widgets.
+   *
+   * @param relative_to Widget the popover menu is related to
+   * @param model A Gio::MenuModel
+   */
+  explicit PopoverMenu(const Widget& relative_to, const Glib::RefPtr<Gio::MenuModel>& model);
+
+  /** Creates a %PopoverMenu and populates it according to @a model.
+   *
+   * The created buttons are connected to actions found in the
+   * ApplicationWindow to which the popover menu belongs - typically
+   * by means of being attached to a widget that is contained within
+   * the ApplicationWindow widget hierarchy.
+   *
+   * Actions can also be added using Widget::insert_action_group()
+   * on the menu's attached widget or on any of its parent widgets.
+   *
+   * @param model A Gio::MenuModel
+   */
+  explicit PopoverMenu(const Glib::RefPtr<Gio::MenuModel>& model);
+  _IGNORE(gtk_popover_menu_new_from_model)
 
   _WRAP_METHOD(void add_submenu(Widget& submenu, const Glib::ustring& name), gtk_popover_menu_add_submenu)
   _WRAP_METHOD(void open_submenu(const Glib::ustring& name), gtk_popover_menu_open_submenu)
