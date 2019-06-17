@@ -159,7 +159,6 @@ AC_CONFIG_FILES([Makefile
                  demos/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_NMake/gdkmm/gdkmm.rc
                  MSVC_NMake/gtkmm/gtkmm.rc
                  win32_installer/gtkmm-installer.nsi])
 
