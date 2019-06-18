@@ -25,11 +25,8 @@ $(CFG)\$(PLAT)\gtkmm4-test-wrap_existing:
 	@-mkdir $@
 
 # Generate .def files
-$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) $(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
-	$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_LIBNAME) $(CFG)\$(PLAT)\gdkmm\*.obj
-
-$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) $(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
-	$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) $(CFG)\$(PLAT)\gtkmm\*.obj
+$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) $(CFG)\$(PLAT)\gdkmm $(CFG)\$(PLAT)\gtkmm $(gdkmm_OBJS) $(gtkmm_OBJS)
+	$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) $(CFG)\$(PLAT)\gdkmm\*.obj $(CFG)\$(PLAT)\gtkmm\*.obj
 
 # Generate demo GResource source file
 $(CFG)\$(PLAT)\gtkmm4-demo\demo_resources.c:	\

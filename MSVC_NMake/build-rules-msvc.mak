@@ -18,9 +18,6 @@
 $<
 <<
 
-{.\gdkmm\}.rc{$(CFG)\$(PLAT)\gdkmm\}.res:
-	rc /fo$@ $<
-
 {..\gtk\gtkmm\}.cc{$(CFG)\$(PLAT)\gtkmm\}.obj::
 	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
@@ -40,7 +37,6 @@ $<
 <<
 
 # Rules for building .lib files
-$(GDKMM_LIB): $(GDKMM_DLL)
 $(GTKMM_LIB): $(GTKMM_DLL)
 
 # Rules for linking DLLs
@@ -50,15 +46,10 @@ $(GTKMM_LIB): $(GTKMM_DLL)
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GDKMM_DLL): $(CFG)\$(PLAT)\gdkmm\gdkmm.def $(gdkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_DEP_LIBS) /implib:$(GDKMM_LIB) /def:$(CFG)\$(PLAT)\gdkmm\gdkmm.def -out:$@ @<<
-$(gdkmm_OBJS)
-<<
-	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
-$(GTKMM_DLL): $(GDKMM_LIB) $(CFG)\$(PLAT)\gtkmm\gtkmm.def $(gtkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_LIB) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) /def:$(CFG)\$(PLAT)\gtkmm\gtkmm.def -out:$@ @<<
-$(gtkmm_OBJS)
+$(GTKMM_DLL): $(CFG)\$(PLAT)\gtkmm\gtkmm.def $(gtkmm_OBJS) $(gdkmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) /def:$(CFG)\$(PLAT)\gtkmm\gtkmm.def -out:$@ @<<
+$(gtkmm_OBJS) $(gdkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
@@ -77,7 +68,7 @@ $(gtkmm_OBJS)
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 $(GTKMM4_DEMO): $(GTKMM_LIB) $(CFG)\$(PLAT)\gtkmm4-demo $(gtkmm_demo_OBJS)
-	link $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
+	link $(LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
 $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
@@ -114,7 +105,7 @@ $(CFG)\$(PLAT)\gtkmm4-test-wrap_existing.exe:
 	@if not exist $(GTKMM_LIB) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) $(GTKMM_LIB)
 	@if not exist $(CFG)\$(PLAT)\$(@B) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) $(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(CFG)\$(PLAT)\$(@B)\ $**	\
-	/link  $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
+	/link  $(LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 clean:
@@ -130,8 +121,6 @@ clean:
 	@-del /f /q $(CFG)\$(PLAT)\gtkmm\*.def
 	@-del /f /q $(CFG)\$(PLAT)\gtkmm\*.res
 	@-del /f /q $(CFG)\$(PLAT)\gtkmm\*.obj
-	@-del /f /q $(CFG)\$(PLAT)\gdkmm\*.def
-	@-del /f /q $(CFG)\$(PLAT)\gdkmm\*.res
 	@-del /f /q $(CFG)\$(PLAT)\gdkmm\*.obj
 	@-del /f /q $(CFG)\$(PLAT)\gendef\*.obj
 	@-for /f %d in ('dir /ad /b $(CFG)\$(PLAT)\gtkmm4-test-*') do @rd $(CFG)\$(PLAT)\%d

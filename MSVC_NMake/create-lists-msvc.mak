@@ -46,9 +46,6 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gdkmm\gdkmm.res]
-!endif
-
 !if [call create-lists.bat footer gtkmm.mak]
 !endif
 
