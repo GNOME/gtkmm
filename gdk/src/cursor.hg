@@ -53,7 +53,12 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const Glib::RefPtr<Pixbuf>& pixbuf, int x, int y), gdk_cursor_new_from_pixbuf)
 
 #m4 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::Surface>&',`cairo_surface_t*',`($3) ? const_cast<cairo_surface_t*>(($3)->cobj()) : nullptr')
-  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const ::Cairo::RefPtr< ::Cairo::Surface>& surface, double x, double y), gdk_cursor_new_from_surface)
+  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const ::Cairo::RefPtr< ::Cairo::Surface>& surface, double x, double y), gdk_cursor_new_from_surface,
+               deprecated "Use the version that takes the correct derived type, Cairo::ImageSurface.")
+
+#m4 _CONVERSION(`const ::Cairo::RefPtr< ::Cairo::ImageSurface>&',`cairo_surface_t*',`($3) ? const_cast<cairo_surface_t*>(($3)->cobj()) : nullptr')
+  _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const ::Cairo::RefPtr< ::Cairo::ImageSurface>& image_surface, double x, double y), gdk_cursor_new_from_surface,
+               newin "3.26")
 
   _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<Display>& display, const Glib::ustring& name), gdk_cursor_new_from_name)
 
@@ -66,8 +71,17 @@ public:
   //TODO: Should this always be const?
 #m4 _CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr< ::Cairo::Surface>',`::Cairo::RefPtr< ::Cairo::Surface>(new ::Cairo::Surface($3, true /* do not take ref */))')
 #m4 _CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr<const ::Cairo::Surface>',`::Cairo::RefPtr< ::Cairo::Surface>(new ::Cairo::Surface($3, true /* do not take ref */))')
-  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Surface> get_surface(double& x_hot, double& y_hot), gdk_cursor_get_surface)
-  _WRAP_METHOD(::Cairo::RefPtr<const ::Cairo::Surface> get_surface(double& x_hot, double& y_hot) const, gdk_cursor_get_surface, constversion)
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::Surface> get_surface(double& x_hot, double& y_hot), gdk_cursor_get_surface,
+               deprecated "Use get_image_surface(), which returns the correct derived type.")
+  _WRAP_METHOD(::Cairo::RefPtr<const ::Cairo::Surface> get_surface(double& x_hot, double& y_hot) const, gdk_cursor_get_surface, constversion,
+               deprecated "Use get_image_surface(), which returns the correct derived type.")
+
+#m4 _CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr< ::Cairo::ImageSurface>',`::Cairo::RefPtr< ::Cairo::ImageSurface>(new ::Cairo::ImageSurface($3, true /* do not take ref */))')
+#m4 _CONVERSION(`cairo_surface_t*',`::Cairo::RefPtr<const ::Cairo::ImageSurface>',`::Cairo::RefPtr< ::Cairo::ImageSurface>(new ::Cairo::ImageSurface($3, true /* do not take ref */))')
+  _WRAP_METHOD(::Cairo::RefPtr< ::Cairo::ImageSurface> get_image_surface(double& x_hot, double& y_hot), gdk_cursor_get_surface,
+               newin "3.26")
+  _WRAP_METHOD(::Cairo::RefPtr<const ::Cairo::ImageSurface> get_image_surface(double& x_hot, double& y_hot) const, gdk_cursor_get_surface, constversion,
+               newin "3.26")
 
   _WRAP_METHOD(CursorType get_cursor_type() const, gdk_cursor_get_cursor_type)
 };
