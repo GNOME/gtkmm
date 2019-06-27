@@ -37,10 +37,10 @@ _WRAP_GERROR(BuilderError,GtkBuilderError,GTK_BUILDER_ERROR)
  *
  * This object represents an `instantiation' of an UI definition description.
  * When one of these objects is created, the XML file is read, and the user interface
- * is created. The Gtk::Builder object then provides an interface for accessing the
+ * is created. The %Gtk::Builder object then provides an interface for accessing the
  * widgets in the user interface by the names assigned to them inside the UI description.
  *
- * A Gtk::Builder holds a reference to all objects that it has constructed
+ * A %Gtk::Builder holds a reference to all objects that it has constructed
  * and drops these references when it is deleted. This deletion can
  * cause the destruction of non-widget objects or widgets which are not
  * contained in a toplevel window. For toplevel windows constructed by a
@@ -60,6 +60,16 @@ _WRAP_GERROR(BuilderError,GtkBuilderError,GTK_BUILDER_ERROR)
  *
  * Non-widget objects need to be fetched with get_object() or get_objects()
  * to keep them beyond the lifespan of the builder.
+ *
+ * @par %Gtk::Builder and Glib::Property
+ * A derived widget that contains Glib::Property members must be registered with
+ * its own name in the GType system. It must be registered before any of the
+ * create_from_*() or add_from_*() methods are called, meaning that you may have
+ * to create an instance of your derived widget just to have its class registered.
+ * There is no reasonably easy way to combine %Gtk::Builder with non-widget objects
+ * containing Glib::Property members. Combining it with widgets containing
+ * Glib::Property members requires glibmm 2.62 or newer.
+ * See also get_widget_derived() and Glib::Property.
  *
  * @newin{2,12}
  */
@@ -543,6 +553,16 @@ public:
    * same @a name), only the first call will call the widget's constructor.
    * The following calls will return a pointer to the widget instance that
    * was constructed by the first call.
+   *
+   * @par %Gtk::Builder and Glib::Property
+   * If the widget contains Glib::Property members, your constructor must call
+   * the Glib::ObjectBase constructor with a new GType name:
+   * @code
+   * MyDerivedDialog::MyDerivedDialog(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refBuilder)
+   * : Glib::ObjectBase("MyDialog"), // The GType name will be gtkmm__CustomObject_MyDialog
+   *   Gtk::Dialog(cobject) // Calls the base class constructor
+   *   m_my_property(*this, "my-property")
+   * @endcode
    *
    * @param builder The Gtk::Builder from which to get the widget.
    * @param name The name of the widget.
