@@ -11326,7 +11326,7 @@ Set this to %NULL to make the group always visible.
 The maximum number of lines to allow per column. This property can
 be used to influence how the groups in this section are distributed
 across pages and columns. The default value of 15 should work in
-for most cases.
+most cases.
 
 </description>
 </property>
@@ -20375,38 +20375,6 @@ gtk_accelerator_parse().
 <return> %G_TOKEN_NONE if the signal was successfully parsed and added,
 the expected token otherwise
 </return>
-</function>
-
-<function name="gtk_binding_entry_add_signall">
-<description>
-Override or install a new key binding for @keyval with @modifiers on
-@binding_set.
-
-</description>
-<parameters>
-<parameter name="binding_set">
-<parameter_description>  a #GtkBindingSet to add a signal to
-</parameter_description>
-</parameter>
-<parameter name="keyval">
-<parameter_description>       key value
-</parameter_description>
-</parameter>
-<parameter name="modifiers">
-<parameter_description>    key modifier
-</parameter_description>
-</parameter>
-<parameter name="signal_name">
-<parameter_description>  signal name to be bound
-</parameter_description>
-</parameter>
-<parameter name="binding_args">
-<parameter_description>
-list of #GtkBindingArg signal arguments
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_binding_entry_remove">
@@ -32091,7 +32059,7 @@ Returns the #GtkWidget this controller relates to.
 
 <function name="gtk_event_controller_handle_event">
 <description>
-Feeds an events into @controller, so it can be interpreted
+Feeds an event into @controller, so it can be interpreted
 and the controller actions triggered.
 
 
@@ -52969,18 +52937,6 @@ widget coordinates.
 </parameter>
 </parameters>
 <return> %TRUE if a rectangle to point to was set.
-</return>
-</function>
-
-<function name="gtk_popover_get_popovers">
-<description>
-Returns the list of all existing #GtkPopover widgets.
-
-
-</description>
-<parameters>
-</parameters>
-<return> The list of existing popovers.
 </return>
 </function>
 
@@ -82040,6 +81996,29 @@ the functions from #GtkScaleButton.
 </return>
 </function>
 
+<function name="gtk_widget_action_set_enabled">
+<description>
+Enable or disable an action installed with
+gtk_widget_class_install_action().
+
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> action name, such as &quot;clipboard.paste&quot;
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> whether the action is now enabled
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_activate">
 <description>
 For widgets that can be “activated” (buttons, menu items, etc.)
@@ -82064,11 +82043,43 @@ activatable, the function returns %FALSE.
 Looks up the action in the action groups associated
 with @widget and its ancestors, and activates it.
 
-The action name is expected to be prefixed with the
-prefix that was used when adding the action group
-with gtk_widget_insert_action_group().
+This is a wrapper around gtk_widget_activate_action_variant()
+that constructs the @args variant according to @format_string.
 
-The @parameter must match the actions expected parameter
+</description>
+<parameters>
+<parameter name="widget">
+<parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> the name of the action to activate
+</parameter_description>
+</parameter>
+<parameter name="format_string">
+<parameter_description> GVariant format string for arguments or %NULL
+for no arguments
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments, as given by format string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_activate_action_variant">
+<description>
+Looks up the action in the action groups associated
+with @widget and its ancestors, and activates it.
+
+If the action is in an action group added with
+gtk_widget_insert_action_group(), the @name is
+expected to be prefixed with the prefix that was
+used when the group was inserted.
+
+The arguments must match the actions expected parameter
 type, as returned by g_action_get_parameter_type().
 
 </description>
@@ -82078,11 +82089,11 @@ type, as returned by g_action_get_parameter_type().
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> a prefixed action name
+<parameter_description> the name of the action to activate
 </parameter_description>
 </parameter>
-<parameter name="parameter">
-<parameter_description> parameters that required by the action
+<parameter name="args">
+<parameter_description> parameters to use, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -82612,6 +82623,49 @@ See also: gtk_widget_class_set_layout_manager_type()
 </parameter>
 </parameters>
 <return> a #GtkLayoutManager subclass, or %G_TYPE_INVALID
+</return>
+</function>
+
+<function name="gtk_widget_class_query_action">
+<description>
+Queries the actions that have been installed for
+a widget class using gtk_widget_class_install_action()
+during class initialization.
+
+Note that this function will also return actions defined
+by parent classes. You can identify those by looking
+at @owner.
+
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> a #GtkWidgetClass
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> position of the action to query
+</parameter_description>
+</parameter>
+<parameter name="owner">
+<parameter_description> the type where the action was defined
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> return location for the action name
+</parameter_description>
+</parameter>
+<parameter name="parameter_type">
+<parameter_description> return location for the parameter type
+</parameter_description>
+</parameter>
+<parameter name="property_name">
+<parameter_description> return location for the property name
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the action was found,
+%FALSE if @index_ is out of range
 </return>
 </function>
 
@@ -84580,11 +84634,15 @@ gdk_surface_input_shape_combine_region() for more information.
 <description>
 Inserts @group into @widget. Children of @widget that implement
 #GtkActionable can then be associated with actions in @group by
-setting their “action-name” to
-@prefix.`action-name`.
+setting their “action-name” to @prefix.`action-name`.
 
-If @group is %NULL, a previously inserted group for @name is removed
-from @widget.
+Note that inheritance is defined for individual actions. I.e.
+even if you insert a group with prefix @prefix, actions with
+the same prefix will still be inherited from the parent, unless
+the group contains an action with the same name.
+
+If @group is %NULL, a previously inserted group for @name is
+removed from @widget.
 
 </description>
 <parameters>
