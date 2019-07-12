@@ -1,0 +1,110 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/layoutmanager.h>
+#include <gtkmm/buildable.h>
+#include <gtkmm/constraint.h>
+#include <gtkmm/constraintguide.h>
+#include <giomm/listmodel.h>
+#include <vector>
+#include <map>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/layoutmanager_p.h)
+
+namespace Gtk
+{
+_WRAP_GERROR(ConstraintVflParserError, GtkConstraintVflParserError, GTK_CONSTRAINT_VFL_PARSER_ERROR)
+
+/** A layout manager using constraints.
+ *
+ * %ConstraintLayout is a layout manager that uses relations between
+ * widget attributes, expressed via Gtk::Constraint instances, to measure
+ * and allocate widgets.
+ *
+ * See the description of GtkConstraintLayout in GTK for a detailed description
+ * of how constraints work.
+ *
+ * @newin{3,96}
+ */
+class ConstraintLayout : public LayoutManager, public Buildable
+{
+  _CLASS_GOBJECT(ConstraintLayout, GtkConstraintLayout, GTK_CONSTRAINT_LAYOUT, LayoutManager, GtkLayoutManager)
+  _IMPLEMENTS_INTERFACE(Buildable)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD_DOCS_ONLY(gtk_constraint_layout_add_constraint)
+  void add_constraint(const Glib::RefPtr<Constraint>& constraint);
+  _WRAP_METHOD(void remove_constraint(const Glib::RefPtr<Constraint>& constraint),
+    gtk_constraint_layout_remove_constraint)
+  _WRAP_METHOD(void remove_all_constraints(), gtk_constraint_layout_remove_all_constraints)
+
+  _WRAP_METHOD_DOCS_ONLY(gtk_constraint_layout_add_guide)
+  void add_guide(const Glib::RefPtr<ConstraintGuide>& guide);
+  _WRAP_METHOD(void remove_guide(const Glib::RefPtr<ConstraintGuide>& guide),
+    gtk_constraint_layout_remove_guide)
+
+  /** A map type, used by add_constraints_from_description().
+   */
+  using VFLmap = std::map<Glib::ustring, Glib::RefPtr<ConstraintTarget>>;
+
+  /** Creates a list of constraints from a formal description using a compact
+   * description syntax called VFL, or "Visual Format Language".
+   *
+   * The Visual Format Language is based on Apple's AutoLayout
+   * <a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/VisualFormatLanguage.html">VFL</a>.
+   * See also the description of gtk_constraint_layout_add_constraints_from_descriptionv()
+   * in GTK.
+   *
+   * The @a views dictionary is used to match Gtk::ConstraintTargets to the symbolic
+   * view name inside the VFL.
+   *
+   * **Note**: The VFL grammar used by GTK is slightly different than the one
+   * defined by Apple, as it can use symbolic values for the constraint's
+   * strength instead of numeric values; additionally, GTK allows adding
+   * simple arithmetic operations inside predicates.
+   *
+   * @param lines A vector of Visual Format Language lines defining a set of constraints.
+   * @param hspacing Default horizontal spacing value, or -1 for the fallback value.
+   * @param vspacing Default vertical spacing value, or -1 for the fallback value.
+   * @param views A dictionary of [ name, target ] pairs; the `name` keys map
+   *   to the view names in the VFL lines, while the `target` values map to
+   *   children of the widget using a Gtk::ConstraintLayout, or guides.
+   * @return The vector of Gtk::Constraints that were added to the layout.
+   * @throws Gtk::ConstraintVflParserError
+   */
+  std::vector<Glib::RefPtr<Constraint>> add_constraints_from_description(
+    const std::vector<Glib::ustring>& lines, int hspacing, int vspacing, const VFLmap& views);
+  _IGNORE(gtk_constraint_layout_add_constraints_from_descriptionv,
+          gtk_constraint_layout_add_constraints_from_description)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::ListModel> observe_constraints(),
+    gtk_constraint_layout_observe_constraints)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> observe_constraints() const,
+    gtk_constraint_layout_observe_constraints, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Gio::ListModel> observe_guides(),
+    gtk_constraint_layout_observe_guides)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> observe_guides() const,
+    gtk_constraint_layout_observe_guides, constversion)
+};
+
+} // namespace Gtk

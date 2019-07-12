@@ -29,6 +29,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <gtkmm/object.h>
 #include <gtkmm/buildable.h>
+#include <gtkmm/constrainttarget.h>
 #include <gdkmm/events.h>
 #include <gdkmm/types.h>
 #include <gdkmm/drag.h>
@@ -102,20 +103,33 @@ typedef Gdk::Rectangle Allocation;
  */
 class Widget
 : public Object,
-  public Buildable
+  public Buildable,
+  public ConstraintTarget
 #ifdef GTKMM_ATKMM_ENABLED
   ,public Atk::Implementor
 #endif //GTKMM_ATKMM_ENABLED
 {
   _CLASS_GTKOBJECT(Widget,GtkWidget,GTK_WIDGET,Object,GObject)
   _IMPLEMENTS_INTERFACE(Buildable)
+  _IMPLEMENTS_INTERFACE(ConstraintTarget)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
+
   _IGNORE(gtk_widget_destroy, gtk_widget_destroyed, gtk_widget_list_accel_closures)
   _IGNORE(gtk_widget_paintable_new)
+
 public:
   friend class Main;
   _CUSTOM_DTOR
   _DOCUMENT_DTOR(Destroys the widget. The widget will be automatically removed from the parent container.)
+
+  /** Converts this widget to a reference counted Gtk::ConstraintTarget.
+   * Useful in calls to Gtk::Constraint::create().
+   */
+  Glib::RefPtr<ConstraintTarget> make_refptr_constrainttarget();
+
+  /** Converts this widget to a reference counted Gtk::ConstraintTarget.
+   */
+  Glib::RefPtr<const ConstraintTarget> make_refptr_constrainttarget() const;
 
   _WRAP_METHOD(void show(), gtk_widget_show)
   _WRAP_METHOD(void hide(), gtk_widget_hide)

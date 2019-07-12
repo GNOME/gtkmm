@@ -132,6 +132,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorchooserdialog.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
+#include <gtkmm/constraintlayout.h>
 #include <gtkmm/container.h>
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>

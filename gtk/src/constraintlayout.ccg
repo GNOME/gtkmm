@@ -1,0 +1,62 @@
+/* Copyright (C) 2019 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+
+void ConstraintLayout::add_constraint(const Glib::RefPtr<Constraint>& constraint)
+{
+  // gtk_constraint_layout_add_constraint() does not take a ref.
+  if (constraint)
+    constraint->reference();
+  gtk_constraint_layout_add_constraint(gobj(), Glib::unwrap(constraint));
+}
+
+void ConstraintLayout::add_guide(const Glib::RefPtr<ConstraintGuide>& guide)
+{
+  // gtk_constraint_layout_add_guide() does not take a ref.
+  if (guide)
+    guide->reference();
+  gtk_constraint_layout_add_guide(gobj(), Glib::unwrap(guide));
+}
+
+std::vector<Glib::RefPtr<Constraint>> ConstraintLayout::add_constraints_from_description(
+  const std::vector<Glib::ustring>& lines, int hspacing, int vspacing, const VFLmap& views)
+{
+  GHashTable* hash_table_views = g_hash_table_new(g_str_hash, g_str_equal);
+  for (const auto& it : views)
+    g_hash_table_insert(hash_table_views, const_cast<char*>(it.first.c_str()), it.second->gobj());
+
+  GError* gerror = nullptr;
+  GList* constraints = gtk_constraint_layout_add_constraints_from_descriptionv(
+    gobj(), Glib::ArrayHandler<Glib::ustring>::vector_to_array(lines).data(),
+    lines.size(), hspacing, vspacing, hash_table_views, &gerror);
+
+  g_hash_table_unref(hash_table_views);
+
+  if (gerror)
+  {
+    g_list_free(constraints);
+    ::Glib::Error::throw_exception(gerror);
+  }
+
+  return Glib::ListHandler<Glib::RefPtr<Constraint>>::list_to_vector(
+    constraints, Glib::OWNERSHIP_SHALLOW);
+}
+
+} // namespace Gtk
