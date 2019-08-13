@@ -10498,43 +10498,6 @@ when the child of a #GtkRevealer widget is shown or hidden.
 </parameters>
 </enum>
 
-<signal name="GtkScale::format-value">
-<description>
-Signal which allows you to change how the scale value is displayed.
-Connect a signal handler which returns an allocated string representing 
-@value. That string will then be used to display the scale's value.
-
-If no user-provided handlers are installed, the value will be displayed on
-its own, rounded according to the value of the #GtkScale:digits property.
-
-Here's an example signal handler which displays a value 1.0 as
-with &quot;--&gt;1.0&lt;--&quot;.
-|[&lt;!-- language=&quot;C&quot; --&gt;
-static gchar*
-format_value_callback (GtkScale *scale,
-gdouble   value)
-{
-return g_strdup_printf (&quot;--&gt;\%0.*g&lt;--&quot;,
-gtk_scale_get_digits (scale), value);
-}
-]|
-
-
-</description>
-<parameters>
-<parameter name="scale">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> the value to format
-</parameter_description>
-</parameter>
-</parameters>
-<return> allocated string representing @value
-</return>
-</signal>
-
 <signal name="GtkScaleButton::popdown">
 <description>
 The ::popdown signal is a
@@ -17232,6 +17195,24 @@ gtk_accel_label_set_accel().
 <return></return>
 </function>
 
+<function name="gtk_accel_label_get_accel_closure">
+<description>
+Fetches the closure monitored by this accelerator label. See
+gtk_accel_label_set_accel_closure().
+
+
+</description>
+<parameters>
+<parameter name="accel_label">
+<parameter_description> a #GtkAccelLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the closure monitored by @accel_label,
+or %NULL if it is not monitoring a closure.
+</return>
+</function>
+
 <function name="gtk_accel_label_get_accel_widget">
 <description>
 Fetches the widget monitored by this accelerator label. See
@@ -17245,7 +17226,8 @@ gtk_accel_label_set_accel_widget().
 </parameter_description>
 </parameter>
 </parameters>
-<return> the object monitored by the accelerator label, or %NULL.
+<return> the widget monitored by @accel_label,
+or %NULL if it is not monitoring a widget.
 </return>
 </function>
 
@@ -38033,6 +38015,20 @@ returned %TRUE for the sequences being currently interpreted.
 </return>
 </function>
 
+<function name="gtk_gesture_long_press_get_property">
+<description>
+Returns the delay factor as set by gtk_gesture_long_press_set_delay_factor().
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> A #GtkGestureLongPress
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_gesture_long_press_new">
 <description>
 Returns a newly created #GtkGesture that recognizes long presses.
@@ -38043,6 +38039,26 @@ Returns a newly created #GtkGesture that recognizes long presses.
 </parameters>
 <return> a newly created #GtkGestureLongPress
 </return>
+</function>
+
+<function name="gtk_gesture_long_press_set_property">
+<description>
+Applies the given delay factor. The default long press time will be
+multiplied by this value.
+Valid values are in the range [0.5..2.0].
+
+</description>
+<parameters>
+<parameter name="gesture">
+<parameter_description> A #GtkGestureLongPress
+</parameter_description>
+</parameter>
+<parameter name="delay_factor">
+<parameter_description> The delay factor to apply
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_gesture_pan_get_orientation">
@@ -53540,7 +53556,7 @@ Gets the menu model set with gtk_password_entry_set_extra_menu().
 
 </description>
 <parameters>
-<parameter name="self">
+<parameter name="entry">
 <parameter_description> a #GtkText
 </parameter_description>
 </parameter>
@@ -61784,7 +61800,7 @@ so the retrieved value matches the displayed one, if #GtkScale:draw-value is
 
 Note that rounding to a small number of digits can interfere with
 the smooth autoscrolling that is built into #GtkScale. As an alternative,
-you can use the #GtkScale::format-value signal to format the displayed
+you can use gtk_scale_set_format_value_func() to format the displayed
 value yourself.
 
 </description>
@@ -61815,6 +61831,33 @@ to the slider.
 </parameter>
 <parameter name="draw_value">
 <parameter_description> %TRUE to draw the value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scale_set_format_value_func">
+<description>
+@func allows you to change how the scale value is displayed. The given
+function will return an allocated string representing @value.
+That string will then be used to display the scale's value.
+
+If #NULL is passed as @func, the value will be displayed on
+its own, rounded according to the value of the #GtkScale:digits property.
+
+</description>
+<parameters>
+<parameter name="scale">
+<parameter_description> a #GtkScale
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> function that formats the value
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @func
 </parameter_description>
 </parameter>
 </parameters>
@@ -64805,7 +64848,8 @@ The child is recorded until the next call to gtk_snapshot_pop().
 </parameter_description>
 </parameter>
 <parameter name="child_bounds">
-<parameter_description> the bounds of the child
+<parameter_description> the bounds of the child or %NULL
+to use the full size of the collected child node
 </parameter_description>
 </parameter>
 </parameters>
