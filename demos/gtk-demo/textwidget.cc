@@ -41,20 +41,18 @@ TextWidget::TextWidget(bool is_source)
   {
     m_TextView.set_wrap_mode (Gtk::WRAP_NONE);
 
-    Glib::RefPtr<Gtk::TextBuffer::Tag> refTag = m_refTextBuffer->create_tag("source");
-    refTag->property_font() = "Courier 12";
+    auto refTag = m_refTextBuffer->create_tag("source");
+    refTag->property_font() = "monospace";
 
     refTag = m_refTextBuffer->create_tag("comment");
-    refTag->property_foreground() = "red";
+    refTag->property_foreground() = "DodgerBlue";
 
     refTag = m_refTextBuffer->create_tag("type");
     refTag->property_foreground() = "ForestGreen";
 
     refTag = m_refTextBuffer->create_tag("string");
-
     refTag->property_foreground() = "RosyBrown";
     refTag->property_weight() = Pango::WEIGHT_BOLD;
-
 
     refTag = m_refTextBuffer->create_tag("control");
     refTag->property_foreground() = "purple";
@@ -139,7 +137,8 @@ static const char* types[] =
   "guint32",
   "guchar",
   "glong",
-  "gboolean" ,
+  "gboolean",
+  "bool",
   "gshort",
   "gushort",
   "gulong",
@@ -147,12 +146,14 @@ static const char* types[] =
   "gldouble",
   "gpointer",
   "NULL",
+  "nullptr",
   "GList",
   "GSList",
   "FALSE",
+  "false",
   "TRUE",
+  "true",
   "FILE ",
-  "GtkObject ",
   "GtkColorSelection ",
   "GtkWidget ",
   "GtkButton ",
