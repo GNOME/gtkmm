@@ -21,15 +21,16 @@
 namespace Gdk
 {
 
-Glib::RefPtr<PixbufAnimation> PixbufAnimation::create_from_file(const Glib::ustring& filename)
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+Glib::RefPtr<PixbufAnimationIter> PixbufAnimation::get_iter(gint64 start_time)
 {
-  GError* gerror = nullptr;
-  return Glib::wrap(gdk_pixbuf_animation_new_from_file(filename.c_str(), &gerror));
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
+  // GTimeVal is deprecated, but gdk-pixbuf has no replacement for
+  // gdk_pixbuf_animation_get_iter() without GTimeVal.
+  GTimeVal tv;
+  tv.tv_sec = start_time / 1000000;
+  tv.tv_usec = start_time % 1000000;
+  return Glib::wrap(gdk_pixbuf_animation_get_iter(gobj(), &tv));
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 } //namespace Gdk
-
-

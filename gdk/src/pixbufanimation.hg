@@ -43,13 +43,51 @@ protected:
 
 public:
 
-  static Glib::RefPtr<PixbufAnimation> create_from_file(const Glib::ustring& filename);
+  _WRAP_METHOD(static Glib::RefPtr<PixbufAnimation> create_from_file(const std::string& filename),
+    gdk_pixbuf_animation_new_from_file, errthrow)
 
   _WRAP_METHOD(int get_width() const, gdk_pixbuf_animation_get_width)
   _WRAP_METHOD(int get_height() const, gdk_pixbuf_animation_get_height)
   _WRAP_METHOD(bool is_static_image() const, gdk_pixbuf_animation_is_static_image)
   _WRAP_METHOD(Glib::RefPtr<Pixbuf> get_static_image(), gdk_pixbuf_animation_get_static_image, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<PixbufAnimationIter> get_iter(const GTimeVal* start_time), gdk_pixbuf_animation_get_iter)
+
+  /** Get an iterator for displaying an animation.
+   * The iterator provides the frames that should be displayed at a given time.
+   *
+   * @a start_time would normally come from g_get_real_time(), and marks
+   * the beginning of animation playback. After creating an iterator, you
+   * should immediately display the pixbuf returned by
+   * Gdk::PixbufAnimationIter::get_pixbuf(). Then, you should install
+   * a timeout (with Glib::signal_timeout().connect()) or by some other mechanism
+   * ensure that you'll update the image after
+   * Gdk::PixbufAnimationIter::get_delay_time() milliseconds. Each time
+   * the image is updated, you should reinstall the timeout with the new,
+   * possibly-changed delay time.
+   *
+   * As a shortcut, the default value of @a start_time is g_get_real_time().
+   *
+   * To update the image (i.e. possibly change the result of
+   * Gdk::PixbufAnimationIter::get_pixbuf() to a new frame of the animation),
+   * call Gdk::PixbufAnimationIter::advance().
+   *
+   * If you're using Gdk::PixbufLoader, in addition to updating the image
+   * after the delay time, you should also update it whenever you
+   * receive the area_updated signal and
+   * Gdk::PixbufAnimationIter::on_currently_loading_frame() returns
+   * <tt>true</tt>. In this case, the frame currently being fed into the loader
+   * has received new data, so needs to be refreshed. The delay time for
+   * a frame may also be modified after an area_updated signal, for
+   * example if the delay time for a frame is encoded in the data after
+   * the frame itself. So your timeout should be reinstalled after any
+   * area_updated signal.
+   *
+   * A delay time of -1 is possible, indicating "infinite."
+   *
+   * @param start_time Time when the animation starts playing.
+   * @return An iterator to move over the animation.
+   */
+  Glib::RefPtr<PixbufAnimationIter> get_iter(gint64 start_time = g_get_real_time());
+  _IGNORE(gdk_pixbuf_animation_get_iter)
 };
 
 } // namespace Gdk

@@ -200,6 +200,7 @@ _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<Gdk::Pixbuf>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<const Gdk::Pixbuf>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbufAnimationIter*',`Glib::RefPtr<PixbufAnimationIter>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbuf*',`Glib::RefPtr<Gdk::Pixbuf>', Glib::wrap($3))
+_CONVERSION(`GdkPixbufAnimation*',`Glib::RefPtr<PixbufAnimation>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbufAnimation*',`Glib::RefPtr<Gdk::PixbufAnimation>', `Glib::wrap($3)')
 _CONVERSION(`GdkPixbufAnimation*',`Glib::RefPtr<const Gdk::PixbufAnimation>', `Glib::wrap($3)')
 
