@@ -25,6 +25,27 @@
 
 using std::strlen;
 
+namespace
+{
+
+char* SignalProxy_Scale_format_value_callback(GtkScale* /* scale */,
+  double value, gpointer user_data)
+{
+  auto the_slot = static_cast<Gtk::Scale::SlotFormatValue*>(user_data);
+
+  try
+  {
+    return g_strdup(((*the_slot)(value)).c_str());
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return g_strdup("?");
+}
+
+} // anonymous namespace
+
 namespace Gtk
 {
 
@@ -38,6 +59,23 @@ Scale::Scale(const Glib::RefPtr<Adjustment>& adjustment, Orientation orientation
 :
   _CONSTRUCT_SPECIFIC(Range, Scale, "adjustment", Glib::unwrap(adjustment), "orientation", (GtkOrientation)(orientation))
 {
+}
+
+void Scale::set_format_value_func(const SlotFormatValue& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when Glib::destroy_notify_delete<SlotFormatValue> is called.
+  auto slot_copy = new SlotFormatValue(slot);
+
+  gtk_scale_set_format_value_func(gobj(),
+    &SignalProxy_Scale_format_value_callback, slot_copy,
+    &Glib::destroy_notify_delete<SlotFormatValue>);
+}
+
+void Scale::unset_format_value_func()
+{
+  gtk_scale_set_format_value_func(gobj(), nullptr, nullptr, nullptr);
 }
 
 } // namespace Gtk
