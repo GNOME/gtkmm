@@ -95,7 +95,7 @@ protected:
   void on_image_drag_data_get(const Glib::RefPtr<Gdk::Drag>& drag,
     Gtk::SelectionData& selection_data, int size_index);
 
-  Glib::RefPtr<const Gdk::Pixbuf> get_icon(int size_index);
+  Glib::RefPtr<const Gdk::Texture> get_icon(int size_index);
 
   static const int n_icon_sizes = 5;
   static const int m_icon_size[n_icon_sizes];
@@ -921,7 +921,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
     m_label[i].set_text(ostr.str());
   }
   m_grid.attach(m_description, 0, 2, n_icon_sizes, 1);
-  m_description.set_line_wrap(true);
+  m_description.set_wrap(true);
   m_description.set_max_width_chars(60);
   m_description.set_halign(Gtk::Align::START);
   m_description.set_valign(Gtk::Align::START);
@@ -954,25 +954,28 @@ void DetailDialog::set_image(
 void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::Drag>& /* drag */,
   Gtk::SelectionData& selection_data, int size_index)
 {
-  selection_data.set_pixbuf(get_icon(size_index));
+  selection_data.set_texture(get_icon(size_index));
 }
 
-Glib::RefPtr<const Gdk::Pixbuf> DetailDialog::get_icon(int size_index)
+Glib::RefPtr<const Gdk::Texture> DetailDialog::get_icon(int size_index)
 {
   auto context = m_image[size_index].get_style_context();
   auto info = Gtk::IconTheme::get_default()->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
-  Glib::RefPtr<const Gdk::Pixbuf> pixbuf;
+  Glib::RefPtr<const Gdk::Texture> texture;
   try
   {
+    // Gtk::IconInfo::load_symbolic_for_context() returns a Glib::RefPtr<const Gdk::Paintable>
+    // which is actually a Glib::RefPtr<const Gdk::Texture>
     bool is_symbolic = false;
-    pixbuf = info->load_symbolic_for_context(context, is_symbolic);
+    texture = std::dynamic_pointer_cast<const Gdk::Texture>(
+      info->load_symbolic_for_context(context, is_symbolic));
   }
   catch (const Glib::Error& err)
   {
     std::cout << "Error in DetailDialog::get_icon(): " << err.what() << std::endl;
   }
-  return pixbuf;
+  return texture;
 }
 
 IconInfoStore::IconInfoStore()

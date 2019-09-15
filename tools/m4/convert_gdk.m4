@@ -222,6 +222,7 @@ _CONVERSION(`GdkDeviceTool*',`Glib::RefPtr<Gdk::DeviceTool>', `Glib::wrap($3)')
 _CONVERSION(`GdkPaintable*',`Glib::RefPtr<Paintable>', `Glib::wrap($3)')
 _CONVERSION(`GdkPaintable*',`Glib::RefPtr<const Paintable>', `Glib::wrap($3)')
 _CONVERSION(`GdkPaintable*',`Glib::RefPtr<Gdk::Paintable>', `Glib::wrap($3)')
+_CONVERSION(`GdkPaintable*',`Glib::RefPtr<const Gdk::Paintable>', `Glib::wrap($3)')
 
 _CONVERSION(`GdkSeat*',`Glib::RefPtr<Seat>', `Glib::wrap($3)')
 _CONVERSION(`GdkSeat*',`Glib::RefPtr<Gdk::Seat>', `Glib::wrap($3)')
