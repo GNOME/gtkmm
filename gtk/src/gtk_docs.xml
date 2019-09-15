@@ -6358,7 +6358,7 @@ icon theme.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> the icon theme
 </parameter_description>
 </parameter>
@@ -8311,8 +8311,7 @@ the model buttons in a menu.
 
 <property name="GtkModelButton:menu-name">
 <description>
-The name of a submenu to open when the button is activated.
-If this is set, the button should not have an action associated with it.
+The name of a submenu to open when the button is activated.  * If this is set, the button should not have an action associated with it.
 
 </description>
 </property>
@@ -9110,6 +9109,22 @@ items.
 
 </description>
 </property>
+
+<enum name="GtkPopoverMenuFlags">
+<description>
+Flags that affect how popover menus are created from
+a menu model.
+
+</description>
+<parameters>
+<parameter name="GTK_POPOVER_MENU_NESTED">
+<parameter_description> Create submenus as nested
+popovers. Without this flag, submenus are created as
+sliding pages that replace the main menu.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GtkPositionType">
 <description>
@@ -20904,7 +20919,7 @@ Gets the value set by gtk_box_set_spacing().
 <function name="gtk_box_insert_child_after">
 <description>
 Inserts @child in the position after @sibling in the list
-of @box children. If @sibling is %NULL, insert @child at 
+of @box children. If @sibling is %NULL, insert @child at
 the first position.
 
 </description>
@@ -21306,7 +21321,7 @@ to parser functions
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if a object has a custom implementation, %FALSE
+<return> %TRUE if an object has a custom implementation, %FALSE
 if it doesn't.
 </return>
 </function>
@@ -21353,6 +21368,155 @@ used to construct the @buildable.
 </parameters>
 <return> the name set with gtk_buildable_set_name()
 </return>
+</function>
+
+<function name="gtk_buildable_parse_context_get_element">
+<description>
+Retrieves the name of the currently open element.
+
+If called from the start_element or end_element handlers this will
+give the element_name as passed to those functions. For the parent
+elements, see gtk_buildable_parse_context_get_element_stack().
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GtkBuildablParseContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the name of the currently open element, or %NULL
+</return>
+</function>
+
+<function name="gtk_buildable_parse_context_get_element_stack">
+<description>
+Retrieves the element stack from the internal state of the parser.
+
+The returned #GPtrArray is an array of strings where the last item is
+the currently open tag (as would be returned by
+gtk_buildable_parse_context_get_element()) and the previous item is its
+immediate parent.
+
+This function is intended to be used in the start_element and
+end_element handlers where gtk_buildable_parse_context_get_element()
+would merely return the name of the element that is being
+processed.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GtkBuildableParseContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the element stack, which must not be modified
+</return>
+</function>
+
+<function name="gtk_buildable_parse_context_get_position">
+<description>
+Retrieves the current line number and the number of the character on
+that line. Intended for use in error messages; there are no strict
+semantics for what constitutes the &quot;current&quot; line number other than
+&quot;the best number we could come up with for error messages.&quot;
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GtkBuildableParseContext
+</parameter_description>
+</parameter>
+<parameter name="line_number">
+<parameter_description> return location for a line number, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="char_number">
+<parameter_description> return location for a char-on-line number, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_buildable_parse_context_pop">
+<description>
+Completes the process of a temporary sub-parser redirection.
+
+This function exists to collect the user_data allocated by a
+matching call to gtk_buildable_parse_context_push(). It must be called
+in the end_element handler corresponding to the start_element
+handler during which gtk_buildable_parse_context_push() was called.
+You must not call this function from the error callback -- the
+@user_data is provided directly to the callback in that case.
+
+This function is not intended to be directly called by users
+interested in invoking subparsers. Instead, it is intended to
+be used by the subparsers themselves to implement a higher-level
+interface.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GtkBuildableParseContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the user data passed to gtk_buildable_parse_context_push()
+</return>
+</function>
+
+<function name="gtk_buildable_parse_context_push">
+<description>
+Temporarily redirects markup data to a sub-parser.
+
+This function may only be called from the start_element handler of
+a #GtkBuildableParser. It must be matched with a corresponding call to
+gtk_buildable_parse_context_pop() in the matching end_element handler
+(except in the case that the parser aborts due to an error).
+
+All tags, text and other data between the matching tags is
+redirected to the subparser given by @parser. @user_data is used
+as the user_data for that parser. @user_data is also passed to the
+error callback in the event that an error occurs. This includes
+errors that occur in subparsers of the subparser.
+
+The end tag matching the start tag for which this call was made is
+handled by the previous parser (which is given its own user_data)
+which is why gtk_buildable_parse_context_pop() is provided to allow &quot;one
+last access&quot; to the @user_data provided to this function. In the
+case of error, the @user_data provided here is passed directly to
+the error callback of the subparser and gtk_buildable_parse_context_pop()
+should not be called. In either case, if @user_data was allocated
+then it ought to be freed from both of these locations.
+
+This function is not intended to be directly called by users
+interested in invoking subparsers. Instead, it is intended to be
+used by the subparsers themselves to implement a higher-level
+interface.
+
+For an example of how to use this, see g_markup_parse_context_push() which
+has the same kind of API.
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GtkBuildableParseContext
+</parameter_description>
+</parameter>
+<parameter name="parser">
+<parameter_description> a #GtkBuildableParser
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to #GtkBuildableParser functions
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_buildable_parser_finished">
@@ -22326,7 +22490,7 @@ with the image.
 </parameter_description>
 </parameter>
 <parameter name="icon_name">
-<parameter_description> A icon name
+<parameter_description> An icon name
 </parameter_description>
 </parameter>
 </parameters>
@@ -25984,6 +26148,178 @@ Sets the start widget. To remove the existing start widget, pass %NULL.
 </parameter>
 <parameter name="child">
 <parameter_description> the new start widget, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_center_layout_get_baseline_position">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current baseline position of @self.
+</return>
+</function>
+
+<function name="gtk_center_layout_get_center_widget">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current center widget of @self
+</return>
+</function>
+
+<function name="gtk_center_layout_get_end_widget">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current end widget of @self
+</return>
+</function>
+
+<function name="gtk_center_layout_get_orientation">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current orientation of @self
+</return>
+</function>
+
+<function name="gtk_center_layout_get_start_widget">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current start widget of @self
+</return>
+</function>
+
+<function name="gtk_center_layout_new">
+<description>
+Creates a new #GtkCenterLayout.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the newly created #GtkCenterLayout
+</return>
+</function>
+
+<function name="gtk_center_layout_set_baseline_position">
+<description>
+Sets the new baseline position of @self
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+<parameter name="baseline_position">
+<parameter_description> the new baseline position
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_center_layout_set_center_widget">
+<description>
+Sets the new center widget of @self
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the new center widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_center_layout_set_end_widget">
+<description>
+Sets the new end widget of @self
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the new end widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_center_layout_set_orientation">
+<description>
+Sets the orientation of @self.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+<parameter name="orientation">
+<parameter_description> the new orientation
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_center_layout_set_start_widget">
+<description>
+Sets the new start widget of @self.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkCenterLayout
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> the new start widget
 </parameter_description>
 </parameter>
 </parameters>
@@ -35921,11 +36257,12 @@ gtk_fixed_set_child_transform().
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GskTransform
+<return> a #GskTransform or %NULL
+in case no transform has been set on @widget
 </return>
 </function>
 
-<function name="gtk_fixed_layout_child_get_position">
+<function name="gtk_fixed_layout_child_get_transform">
 <description>
 Retrieves the transformation of the child of a #GtkFixedLayout.
 
@@ -35941,7 +36278,7 @@ Retrieves the transformation of the child of a #GtkFixedLayout.
 </return>
 </function>
 
-<function name="gtk_fixed_layout_child_set_position">
+<function name="gtk_fixed_layout_child_set_transform">
 <description>
 Sets the transformation of the child of a #GtkFixedLayout.
 
@@ -35951,7 +36288,7 @@ Sets the transformation of the child of a #GtkFixedLayout.
 <parameter_description> a #GtkFixedLayoutChild
 </parameter_description>
 </parameter>
-<parameter name="position">
+<parameter name="transform">
 <parameter_description> a #GskTransform
 </parameter_description>
 </parameter>
@@ -36042,7 +36379,7 @@ transformation to the given @x and @y coordinates to it.
 Sets the transformation for @widget.
 
 This is a convenience function that retrieves the #GtkFixedLayoutChild
-instance associated to @widget and calls gtk_fixed_layout_child_set_position().
+instance associated to @widget and calls gtk_fixed_layout_child_set_transform().
 
 </description>
 <parameters>
@@ -36055,7 +36392,8 @@ instance associated to @widget and calls gtk_fixed_layout_child_set_position().
 </parameter_description>
 </parameter>
 <parameter name="transform">
-<parameter_description> the transformation assigned to @widget
+<parameter_description> the transformation assigned to @widget or %NULL
+to reset @widget's transform
 </parameter_description>
 </parameter>
 </parameters>
@@ -40442,7 +40780,7 @@ a base scale of 2.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40467,7 +40805,7 @@ not include the base scale.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40487,7 +40825,7 @@ use gtk_icon_info_get_builtin_pixbuf().
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40508,7 +40846,7 @@ This behaviour may change in the future.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40534,7 +40872,7 @@ returned by this function will be scaled to the exact size.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40544,10 +40882,8 @@ or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the rendered icon; this may be a newly
-created icon or a new reference to an internal icon, so you must
-not modify the icon. Use g_object_unref() to release your reference
-to the icon.
+<return> the rendered icon.
+Use g_object_unref() to release your reference to the icon.
 </return>
 </function>
 
@@ -40561,7 +40897,7 @@ version of this call.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40589,7 +40925,7 @@ Finishes an async icon load, see gtk_icon_info_load_icon_async().
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40632,7 +40968,7 @@ for more information about symbolic icons.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40681,7 +41017,7 @@ version of this call.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40729,7 +41065,7 @@ Finishes an async icon load, see gtk_icon_info_load_symbolic_async().
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40749,9 +41085,8 @@ or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the rendered icon; this may be a newly
-created icon or a new reference to an internal icon, so you must
-not modify the icon. Use g_object_unref() to release your reference
+<return> the rendered icon;
+Use g_object_unref() to release your reference
 to the icon.
 </return>
 </function>
@@ -40772,7 +41107,7 @@ See gtk_icon_info_load_symbolic() for more details.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo
 </parameter_description>
 </parameter>
@@ -40793,6 +41128,7 @@ or %NULL.
 </parameter>
 </parameters>
 <return> a #GdkPixbuf representing the loaded icon
+or %NULL If the icon could not be loaded
 </return>
 </function>
 
@@ -40806,7 +41142,7 @@ which is the synchronous version of this call.
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40839,7 +41175,7 @@ Finishes an async icon load, see gtk_icon_info_load_symbolic_for_context_async()
 
 </description>
 <parameters>
-<parameter name="icon_info">
+<parameter name="self">
 <parameter_description> a #GtkIconInfo from gtk_icon_theme_lookup_icon()
 </parameter_description>
 </parameter>
@@ -40863,25 +41199,6 @@ or %NULL.
 created icon or a new reference to an internal icon, so you must
 not modify the icon. Use g_object_unref() to release your reference
 to the icon.
-</return>
-</function>
-
-<function name="gtk_icon_info_load_texture">
-<description>
-Returns a texture object that can be used to render the icon
-with GSK.
-
-
-</description>
-<parameters>
-<parameter name="icon_info">
-<parameter_description> a #GtkIconInfo
-</parameter_description>
-</parameter>
-</parameters>
-<return> the icon texture; this may be a newly
-created texture or a new reference to an exiting texture. Use
-g_object_unref() to release your reference.
 </return>
 </function>
 
@@ -40921,7 +41238,7 @@ of a subdirectory are also considered as ultimate fallback.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -40940,7 +41257,7 @@ See gtk_icon_theme_set_search_path().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -40967,7 +41284,7 @@ inherited icon themes.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41006,7 +41323,7 @@ inherited icon themes.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41059,7 +41376,7 @@ a list of themes to the user.)
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41105,7 +41422,7 @@ is zero-terminated.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41114,7 +41431,7 @@ is zero-terminated.
 </parameter_description>
 </parameter>
 </parameters>
-<return> An newly
+<return> A newly
 allocated array describing the sizes at which the icon is
 available. The array should be freed with g_free() when it is no
 longer needed.
@@ -41127,7 +41444,7 @@ Gets the current search path. See gtk_icon_theme_set_search_path().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41153,7 +41470,7 @@ for a particular name.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41162,7 +41479,7 @@ for a particular name.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @icon_theme includes an
+<return> %TRUE if @self includes an
 icon for @icon_name.
 </return>
 </function>
@@ -41176,7 +41493,7 @@ See gtk_icon_theme_list_icons() for details about contexts.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41203,7 +41520,7 @@ Also see gtk_icon_theme_list_contexts().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41238,7 +41555,7 @@ icon theme loaded, which would be a waste of memory.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41287,7 +41604,7 @@ icon theme loaded, which would be a waste of memory.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41336,7 +41653,7 @@ for a given scaling factor may be different.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41368,7 +41685,7 @@ a pixbuf using gtk_icon_info_load_icon().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41412,7 +41729,7 @@ for a given scaling factor may be different.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41446,7 +41763,7 @@ these two steps if all you need is the pixbuf.)
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41496,7 +41813,7 @@ See gtk_icon_theme_set_search_path().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41512,12 +41829,12 @@ See gtk_icon_theme_set_search_path().
 <description>
 Checks to see if the icon theme has changed; if it has, any
 currently cached information is discarded and will be reloaded
-next time @icon_theme is accessed.
+next time @self is accessed.
 
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41536,7 +41853,7 @@ and gtk_icon_theme_get_for_display().
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41557,7 +41874,7 @@ which might be different for different displays.
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -41588,7 +41905,7 @@ rather than directly on the icon path.)
 
 </description>
 <parameters>
-<parameter name="icon_theme">
+<parameter name="self">
 <parameter_description> a #GtkIconTheme
 </parameter_description>
 </parameter>
@@ -42223,7 +42540,7 @@ that row and the corresponding model.
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether or not the given tooltip context points to a item
+<return> whether or not the given tooltip context points to an item
 </return>
 </function>
 
@@ -44352,39 +44669,6 @@ and from pixels using PANGO_PIXELS() or #PANGO_SCALE.
 <return></return>
 </function>
 
-<function name="gtk_label_get_line_wrap">
-<description>
-Returns whether lines in the label are automatically wrapped. 
-See gtk_label_set_line_wrap().
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the lines of the label are automatically wrapped.
-</return>
-</function>
-
-<function name="gtk_label_get_line_wrap_mode">
-<description>
-Returns line wrap mode used by the label. See gtk_label_set_line_wrap_mode().
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the lines of the label are automatically wrapped.
-</return>
-</function>
-
 <function name="gtk_label_get_lines">
 <description>
 Gets the number of lines to which an ellipsized, wrapping
@@ -44448,7 +44732,7 @@ layout.
 
 <function name="gtk_label_get_mnemonic_keyval">
 <description>
-If the label has been set so that it has an mnemonic key this function
+If the label has been set so that it has a mnemonic key this function
 returns the keyval used for the mnemonic accelerator. If there is no
 mnemonic set up it returns #GDK_KEY_VoidSymbol.
 
@@ -44625,6 +44909,39 @@ gtk_label_set_width_chars().
 </parameter>
 </parameters>
 <return> the width of the label in characters.
+</return>
+</function>
+
+<function name="gtk_label_get_wrap">
+<description>
+Returns whether lines in the label are automatically wrapped.
+See gtk_label_set_wrap().
+
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the lines of the label are automatically wrapped.
+</return>
+</function>
+
+<function name="gtk_label_get_wrap_mode">
+<description>
+Returns line wrap mode used by the label. See gtk_label_set_wrap_mode().
+
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the lines of the label are automatically wrapped.
 </return>
 </function>
 
@@ -44840,52 +45157,6 @@ on the values of the #GtkLabel:use-underline and
 <return></return>
 </function>
 
-<function name="gtk_label_set_line_wrap">
-<description>
-Toggles line wrapping within the #GtkLabel widget. %TRUE makes it break
-lines if text exceeds the widget’s size. %FALSE lets the text get cut off
-by the edge of the widget if it exceeds the widget size.
-
-Note that setting line wrapping to %TRUE does not make the label
-wrap at its parent container’s width, because GTK+ widgets
-conceptually can’t make their requisition depend on the parent
-container’s size. For a label that wraps at a specific position,
-set the label’s width using gtk_widget_set_size_request().
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-<parameter name="wrap">
-<parameter_description> the setting
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_label_set_line_wrap_mode">
-<description>
-If line wrapping is on (see gtk_label_set_line_wrap()) this controls how
-the line wrapping is done. The default is %PANGO_WRAP_WORD which means
-wrap on word boundaries.
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> a #GtkLabel
-</parameter_description>
-</parameter>
-<parameter name="wrap_mode">
-<parameter_description> the line wrapping mode
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_label_set_lines">
 <description>
 Sets the number of lines to which an ellipsized, wrapping label
@@ -44996,7 +45267,7 @@ Sets the desired maximum width in characters of @label to @n_chars.
 
 <function name="gtk_label_set_mnemonic_widget">
 <description>
-If the label has been set so that it has an mnemonic key (using
+If the label has been set so that it has a mnemonic key (using
 i.e. gtk_label_set_markup_with_mnemonic(),
 gtk_label_set_text_with_mnemonic(), gtk_label_new_with_mnemonic()
 or the “use_underline” property) the label can be associated with a
@@ -45202,6 +45473,52 @@ Sets the desired width in characters of @label to @n_chars.
 </parameter>
 <parameter name="n_chars">
 <parameter_description> the new desired width, in characters.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_label_set_wrap">
+<description>
+Toggles line wrapping within the #GtkLabel widget. %TRUE makes it break
+lines if text exceeds the widget’s size. %FALSE lets the text get cut off
+by the edge of the widget if it exceeds the widget size.
+
+Note that setting line wrapping to %TRUE does not make the label
+wrap at its parent container’s width, because GTK+ widgets
+conceptually can’t make their requisition depend on the parent
+container’s size. For a label that wraps at a specific position,
+set the label’s width using gtk_widget_set_size_request().
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+<parameter name="wrap">
+<parameter_description> the setting
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_label_set_wrap_mode">
+<description>
+If line wrapping is on (see gtk_label_set_wrap()) this controls how
+the line wrapping is done. The default is %PANGO_WRAP_WORD which means
+wrap on word boundaries.
+
+</description>
+<parameters>
+<parameter name="label">
+<parameter_description> a #GtkLabel
+</parameter_description>
+</parameter>
+<parameter name="wrap_mode">
+<parameter_description> the line wrapping mode
 </parameter_description>
 </parameter>
 </parameters>
@@ -48689,6 +49006,45 @@ and not for popovers.
 </parameter>
 <parameter name="align_widget">
 <parameter_description> a #GtkWidget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_menu_button_set_create_popup_func">
+<description>
+Sets @func to be called when a popup is about to be shown.
+@func should use one of
+
+- gtk_menu_button_set_popup()
+- gtk_menu_button_set_popover()
+- gtk_menu_button_set_menu_model()
+
+to set a popoup for @menu_button.
+If @func is non-%NULL, @menu_button will always be sensitive.
+
+Using this function will NOT reset the menu widget attached to @menu_button.
+Instead, this can be done manually in @func.
+
+</description>
+<parameters>
+<parameter name="menu_button">
+<parameter_description> a #GtkMenuButton
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> function to call when a popuop is about to
+be shown, but none has been provided via other means, or %NULL
+to reset to default behavior.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @callback
+</parameter_description>
+</parameter>
+<parameter name="destroy_notify">
+<parameter_description> destroy notify for @user_data
 </parameter_description>
 </parameter>
 </parameters>
@@ -54197,6 +54553,10 @@ the #GtkApplicationWindows widget hierarchy.
 Actions can also be added using gtk_widget_insert_action_group()
 on the menus attach widget or on any of its parent widgets.
 
+This function creates menus with sliding submenus.
+See gtk_popover_menu_new_from_model_full() for a way
+to control this.
+
 
 </description>
 <parameters>
@@ -54206,6 +54566,43 @@ on the menus attach widget or on any of its parent widgets.
 </parameter>
 <parameter name="model">
 <parameter_description> a #GMenuModel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GtkPopoverMenu
+</return>
+</function>
+
+<function name="gtk_popover_menu_new_from_model_full">
+<description>
+Creates a #GtkPopoverMenu and populates it according to
+@model. The popover is pointed to the @relative_to widget.
+
+The created buttons are connected to actions found in the
+#GtkApplicationWindow to which the popover belongs - typically
+by means of being attached to a widget that is contained within
+the #GtkApplicationWindows widget hierarchy.
+
+Actions can also be added using gtk_widget_insert_action_group()
+on the menus attach widget or on any of its parent widgets.
+
+The only flag that is supported currently is
+#GTK_POPOVER_MENU_NESTED, which makes GTK create traditional,
+nested submenus instead of the default sliding submenus.
+
+
+</description>
+<parameters>
+<parameter name="relative_to">
+<parameter_description> #GtkWidget the popover is related to
+</parameter_description>
+</parameter>
+<parameter name="model">
+<parameter_description> a #GMenuModel
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags that affect how the menu is created
 </parameter_description>
 </parameter>
 </parameters>
@@ -67495,7 +67892,7 @@ Gets whether the #GtkSwitch is in its “on” or “off” state.
 
 </description>
 <parameters>
-<parameter name="sw">
+<parameter name="self">
 <parameter_description> a #GtkSwitch
 </parameter_description>
 </parameter>
@@ -67511,7 +67908,7 @@ Gets the underlying state of the #GtkSwitch.
 
 </description>
 <parameters>
-<parameter name="sw">
+<parameter name="self">
 <parameter_description> a #GtkSwitch
 </parameter_description>
 </parameter>
@@ -67534,16 +67931,16 @@ Creates a new #GtkSwitch widget.
 
 <function name="gtk_switch_set_active">
 <description>
-Changes the state of @sw to the desired one.
+Changes the state of @self to the desired one.
 
 </description>
 <parameters>
-<parameter name="sw">
+<parameter name="self">
 <parameter_description> a #GtkSwitch
 </parameter_description>
 </parameter>
 <parameter name="is_active">
-<parameter_description> %TRUE if @sw should be active, and %FALSE otherwise
+<parameter_description> %TRUE if @self should be active, and %FALSE otherwise
 </parameter_description>
 </parameter>
 </parameters>
@@ -67562,7 +67959,7 @@ See #GtkSwitch::state-set for details.
 
 </description>
 <parameters>
-<parameter name="sw">
+<parameter name="self">
 <parameter_description> a #GtkSwitch
 </parameter_description>
 </parameter>
@@ -83781,6 +84178,36 @@ See also: gtk_widget_class_set_layout_manager_type()
 </return>
 </function>
 
+<function name="gtk_widget_class_install_property_action">
+<description>
+Installs an action called @action_name on @widget_class and binds its
+state to the value of the @property_name property.
+
+This function will perform a few santity checks on the property selected via
+@property_name. Namely, the property must exist, must be readable, writable and
+must not be construct-only. There are also certain restrictions on the type of
+the given property. If any of these conditions are not met, a critical
+warning will be printed and no action will be added.
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> a #GtkWidgetClass
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> name of the action
+</parameter_description>
+</parameter>
+<parameter name="property_name">
+<parameter_description> name of the property in instances of @widget_class
+or any parent class.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_widget_class_query_action">
 <description>
 Queries the actions that have been installed for
@@ -83803,7 +84230,7 @@ at @owner.
 </parameter_description>
 </parameter>
 <parameter name="owner">
-<parameter_description> the type where the action was defined
+<parameter_description> return location for the type where the action was defined
 </parameter_description>
 </parameter>
 <parameter name="action_name">
@@ -85328,7 +85755,8 @@ Gets the settings object holding the settings used for this widget.
 
 Note that this function can only be called when the #GtkWidget
 is attached to a toplevel, since the settings object is specific
-to a particular #GdkDisplay.
+to a particular #GdkDisplay. If you want to monitor the widget for
+changes in its settings, connect to notify::display.
 
 
 </description>
@@ -87295,7 +87723,7 @@ Specifies whether @widget can own the input focus.
 
 Note that having @can_focus be %TRUE is only one of the
 necessary conditions for being focusable. A widget must
-also be sensitive and not have a ancestor that is marked
+also be sensitive and not have an ancestor that is marked
 as not child-focusable in order to receive input focus.
 
 See gtk_widget_grab_focus() for actually setting the input
