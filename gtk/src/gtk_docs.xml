@@ -4120,8 +4120,9 @@ pointer buttons. See #GdkModifierType.
 
 <property name="GtkEventControllerKey:contains-focus">
 <description>
-Whether focus is in a descendant of the controllers widget.
-See #GtkEventControllerKey:is-focus.
+Whether focus is contain in the controllers widget. See
+See #GtkEventControllerKey:is-focus for whether the focus is in the widget itself
+or inside a descendent.
 
 When handling focus events, this property is updated
 before #GtkEventControllerKey::focus-in or
@@ -4133,7 +4134,7 @@ before #GtkEventControllerKey::focus-in or
 <property name="GtkEventControllerKey:is-focus">
 <description>
 Whether focus is in the controllers widget itself,
-as opposed to in a descendent widget. See
+opposed to in a descendent widget. See also
 #GtkEventControllerKey:contains-focus.
 
 When handling focus events, this property is updated
@@ -13951,6 +13952,14 @@ Don't confuse this property with #GtkWidget:margin-top.
 </description>
 </property>
 
+<property name="GtkTextViewChild:window-type">
+<description>
+The &quot;window-type&quot; property is the #GtkTextWindowType of the
+#GtkTextView that the child is attached.
+
+</description>
+</property>
+
 <enum name="GtkTextViewLayer">
 <description>
 Used to reference the layers of #GtkTextView for the purpose of customized
@@ -13975,10 +13984,6 @@ Used to reference the parts of #GtkTextView.
 
 </description>
 <parameters>
-<parameter name="GTK_TEXT_WINDOW_PRIVATE">
-<parameter_description> Private value, used internally
-</parameter_description>
-</parameter>
 <parameter name="GTK_TEXT_WINDOW_WIDGET">
 <parameter_description> Window that floats over scrolling areas.
 </parameter_description>
@@ -32296,8 +32301,8 @@ Gets the menu model set with gtk_entry_set_extra_menu().
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> a #GtkText
+<parameter name="entry">
+<parameter_description> a #GtkEntry
 </parameter_description>
 </parameter>
 </parameters>
@@ -33504,6 +33509,22 @@ controller action
 </return>
 </function>
 
+<function name="gtk_event_controller_key_contains_focus">
+<description>
+Returns the value of the GtkEventControllerKey:contains-focus property.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if focus is within @self or one of its children
+</return>
+</function>
+
 <function name="gtk_event_controller_key_forward">
 <description>
 Forwards the current event of this @controller to a @widget.
@@ -33601,6 +33622,22 @@ Gets the input method context of the key @controller.
 </parameter>
 </parameters>
 <return> the #GtkIMContext
+</return>
+</function>
+
+<function name="gtk_event_controller_key_is_focus">
+<description>
+Returns the value of the GtkEventControllerKey:is-focus property.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if focus is within @self but not one of its children
 </return>
 </function>
 
@@ -73306,18 +73343,16 @@ Adds a child widget in the text buffer, at the given @anchor.
 <return></return>
 </function>
 
-<function name="gtk_text_view_add_child_in_window">
+<function name="gtk_text_view_add_overlay">
 <description>
-Adds a child at fixed coordinates in one of the text widget's
-windows.
+Adds @child at a fixed coordinate in the #GtkTextView's text window. The
+@xpos and @ypos must be in buffer coordinates (see
+gtk_text_view_get_iter_location() to conver to buffer coordinates).
 
-The window must have nonzero size (see
-gtk_text_view_set_border_window_size()). Note that the child
-coordinates are given relative to scrolling. When
-placing a child in #GTK_TEXT_WINDOW_WIDGET, scrolling is
-irrelevant, the child floats above all scrollable areas. But when
-placing a child in one of the scrollable windows (border windows or
-text window) it will move with the scrolling as needed.
+@child will scroll with the text view.
+
+If instead you want a widget that will not move with the #GtkTextView
+contents see #GtkOverlay.
 
 </description>
 <parameters>
@@ -73327,10 +73362,6 @@ text window) it will move with the scrolling as needed.
 </parameter>
 <parameter name="child">
 <parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="which_window">
-<parameter_description> which window the child should appear in
 </parameter_description>
 </parameter>
 <parameter name="xpos">
@@ -73399,7 +73430,7 @@ views, since they depend on the contents of the #GtkTextBuffer.
 </return>
 </function>
 
-<function name="gtk_text_view_buffer_to_surface_coords">
+<function name="gtk_text_view_buffer_to_window_coords">
 <description>
 Converts coordinate (@buffer_x, @buffer_y) to coordinates for the window
 @win, and stores the result in (@window_x, @window_y). 
@@ -73414,7 +73445,7 @@ gtk_text_view_set_border_window_size()).
 </parameter_description>
 </parameter>
 <parameter name="win">
-<parameter_description> a #GtkTextWindowType except #GTK_TEXT_WINDOW_PRIVATE
+<parameter_description> a #GtkTextWindowType
 </parameter_description>
 </parameter>
 <parameter name="buffer_x">
@@ -73509,27 +73540,6 @@ gtk_text_view_set_accepts_tab().
 </return>
 </function>
 
-<function name="gtk_text_view_get_border_window_size">
-<description>
-Gets the width of the specified border window. See
-gtk_text_view_set_border_window_size().
-
-
-</description>
-<parameters>
-<parameter name="text_view">
-<parameter_description> a #GtkTextView
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> window to return size from
-</parameter_description>
-</parameter>
-</parameters>
-<return> width of window
-</return>
-</function>
-
 <function name="gtk_text_view_get_bottom_margin">
 <description>
 Gets the bottom margin for text in the @text_view.
@@ -73583,7 +73593,7 @@ returned locations will be adjusted to account for the preedit
 cursor’s offset within the preedit sequence.
 
 The rectangle position is in buffer coordinates; use
-gtk_text_view_buffer_to_surface_coords() to convert these
+gtk_text_view_buffer_to_window_coords() to convert these
 coordinates to coordinates for one of the windows in the text view.
 
 </description>
@@ -73656,6 +73666,30 @@ Gets the menu model set with gtk_text_view_set_extra_menu().
 </parameter>
 </parameters>
 <return> the menu model
+</return>
+</function>
+
+<function name="gtk_text_view_get_gutter">
+<description>
+Gets a #GtkWidget that has previously been set with
+gtk_text_view_set_gutter().
+
+@win must be one of %GTK_TEXT_WINDOW_LEFT, %GTK_TEXT_WINDOW_RIGHT,
+%GTK_TEXT_WINDOW_TOP, or %GTK_TEXT_WINDOW_BOTTOM.
+
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="win">
+<parameter_description> a #GtkWindowType
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkWidget or %NULL
 </return>
 </function>
 
@@ -73785,7 +73819,7 @@ zero, or the number of characters in the grapheme.
 <description>
 Gets a rectangle which roughly contains the character at @iter.
 The rectangle position is in buffer coordinates; use
-gtk_text_view_buffer_to_surface_coords() to convert these
+gtk_text_view_buffer_to_window_coords() to convert these
 coordinates to coordinates for one of the windows in the text view.
 
 </description>
@@ -73874,7 +73908,7 @@ edge of the line.
 <description>
 Gets the y coordinate of the top of the line containing @iter,
 and the height of the line. The coordinate is a buffer coordinate;
-convert to window coordinates with gtk_text_view_buffer_to_surface_coords().
+convert to window coordinates with gtk_text_view_buffer_to_window_coords().
 
 </description>
 <parameters>
@@ -74040,7 +74074,7 @@ Gets the top margin for text in the @text_view.
 <description>
 Fills @visible_rect with the currently-visible
 region of the buffer, in buffer coordinates. Convert to window coordinates
-with gtk_text_view_buffer_to_surface_coords().
+with gtk_text_view_buffer_to_window_coords().
 
 </description>
 <parameters>
@@ -74121,32 +74155,6 @@ return GTK_WIDGET_CLASS (gtk_foo_bar_parent_class)-&gt;key_press_event (widget, 
 </return>
 </function>
 
-<function name="gtk_text_view_move_child">
-<description>
-Updates the position of a child, as for gtk_text_view_add_child_in_window().
-
-</description>
-<parameters>
-<parameter name="text_view">
-<parameter_description> a #GtkTextView
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> child widget already added to the text view
-</parameter_description>
-</parameter>
-<parameter name="xpos">
-<parameter_description> new X position in window coordinates
-</parameter_description>
-</parameter>
-<parameter name="ypos">
-<parameter_description> new Y position in window coordinates
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_text_view_move_mark_onscreen">
 <description>
 Moves a mark within the buffer so that it's
@@ -74166,6 +74174,32 @@ located within the currently-visible text area.
 </parameters>
 <return> %TRUE if the mark moved (wasn’t already onscreen)
 </return>
+</function>
+
+<function name="gtk_text_view_move_overlay">
+<description>
+Updates the position of a child, as for gtk_text_view_add_overlay().
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a widget already added with gtk_text_view_add_overlay()
+</parameter_description>
+</parameter>
+<parameter name="xpos">
+<parameter_description> new X position in buffer coordinates
+</parameter_description>
+</parameter>
+<parameter name="ypos">
+<parameter_description> new Y position in buffer coordinates
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_text_view_move_visually">
@@ -74426,34 +74460,6 @@ keyboard focus.
 <return></return>
 </function>
 
-<function name="gtk_text_view_set_border_window_size">
-<description>
-Sets the width of %GTK_TEXT_WINDOW_LEFT or %GTK_TEXT_WINDOW_RIGHT,
-or the height of %GTK_TEXT_WINDOW_TOP or %GTK_TEXT_WINDOW_BOTTOM.
-Automatically destroys the corresponding window if the size is set
-to 0, and creates the window if the size is set to non-zero.  This
-function can only be used for the “border windows,” it doesn’t work
-with #GTK_TEXT_WINDOW_WIDGET, #GTK_TEXT_WINDOW_TEXT, or
-#GTK_TEXT_WINDOW_PRIVATE.
-
-</description>
-<parameters>
-<parameter name="text_view">
-<parameter_description> a #GtkTextView
-</parameter_description>
-</parameter>
-<parameter name="type">
-<parameter_description> window to affect
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> width or height of the window
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_text_view_set_bottom_margin">
 <description>
 Sets the bottom margin for text in @text_view.
@@ -74553,6 +74559,31 @@ the context menu for @text_view.
 </parameter>
 <parameter name="model">
 <parameter_description> a #GMenuModel
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_view_set_gutter">
+<description>
+Places @widget into the gutter specified by @win.
+
+@win must be one of %GTK_TEXT_WINDOW_LEFT, %GTK_TEXT_WINDOW_RIGHT,
+%GTK_TEXT_WINDOW_TOP, or %GTK_TEXT_WINDOW_BOTTOM.
+
+</description>
+<parameters>
+<parameter name="text_view">
+<parameter_description> a #GtkTextView
+</parameter_description>
+</parameter>
+<parameter name="win">
+<parameter_description> a #GtkTextWindowType
+</parameter_description>
+</parameter>
+<parameter name="widget">
+<parameter_description> a #GtkWidget or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -74873,7 +74904,7 @@ gtk_text_view_set_border_window_size()).
 </parameter_description>
 </parameter>
 <parameter name="win">
-<parameter_description> a #GtkTextWindowType except #GTK_TEXT_WINDOW_PRIVATE
+<parameter_description> a #GtkTextWindowType
 </parameter_description>
 </parameter>
 <parameter name="window_x">
@@ -80002,10 +80033,6 @@ primarily by the #GtkTreeView.
 <parameters>
 <parameter name="tree_column">
 <parameter_description> A #GtkTreeViewColumn.
-</parameter_description>
-</parameter>
-<parameter name="cell_area">
-<parameter_description> The area a cell in the column will be allocated, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="x_offset">
