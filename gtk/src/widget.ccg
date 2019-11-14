@@ -113,9 +113,25 @@ namespace Gtk
 {
 
 // This default handler callback is custom implemented, so that we can refrain
-// from calling an on_hide() override, if the C++ wrapper is being deleted.
+// from calling an on_hide() override, if the C++ wrapper is being deleted,
+// and so that we can remove a hidden window from its application.
 void Widget_Class::hide_callback(GtkWidget* self)
 {
+  if (GTK_IS_WINDOW(self))
+  {
+    GtkWindow* window = GTK_WINDOW(self);
+    GtkApplication* appl = gtk_window_get_application(window);
+    if (appl)
+    {
+      // Tell GtkApplication to forget the window.
+      // This can cause Application::run() to return, if it is the last window.
+      // Otherwise, GtkApplication waits for the window to be _destroyed_,
+      // which is just not something that it should care about:
+      // See https://bugzilla.gnome.org/show_bug.cgi?id=639931
+      gtk_application_remove_window(appl, window);
+    }
+  }
+
   const auto obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
 
