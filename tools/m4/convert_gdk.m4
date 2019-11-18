@@ -277,10 +277,10 @@ _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 
 dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
 
-dnl Atom -> string and vice versa
-_CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomString::to_cpp_type($3)')
-_CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
-_CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomString::to_c_type($3)')
+dnl GdkAtom -> Glib::ustring and vice versa
+_CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomUstring::to_cpp_type($3)')
+_CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomUstring::to_c_type($3)')
+_CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomUstring::to_c_type($3)')
 
 dnl GdkEvent and GdkEventSequence
 _CONVERSION(`GdkEvent*',`Glib::RefPtr<Event>',`Glib::wrap($3)')

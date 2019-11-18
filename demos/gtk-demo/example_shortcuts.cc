@@ -97,7 +97,7 @@ void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::u
   auto builder = Gtk::Builder::create();
   try
   {
-    builder->add_from_resource("/shortcuts/example_" + id + ".ui");
+    builder->add_from_resource("/shortcuts/example_" + id.raw() + ".ui");
   }
   catch (const Glib::Error& error)
   {

@@ -457,7 +457,7 @@ void DemoWindow::add_data_tabs(const std::string& filename)
         continue;
       }
     }
-    m_Notebook.append_page(*Gtk::manage(widget), resources[i]);
+    m_Notebook.append_page(*Gtk::manage(widget), Glib::ustring(resources[i]));
     m_Notebook.get_page(*widget)->property_tab_expand() = true;
   }
 }

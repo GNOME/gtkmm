@@ -208,7 +208,7 @@ void Example_TreeView_EditableCells::on_column_number_edited(const Glib::ustring
       int new_value = 0;
       try
       {
-        new_value = std::stoi(new_text);
+        new_value = std::stoi(new_text.raw());
       }
       catch (const std::exception& err)
       {
