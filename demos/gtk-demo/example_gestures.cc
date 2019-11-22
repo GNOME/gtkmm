@@ -27,8 +27,6 @@ protected:
   Gtk::DrawingArea m_DrawingArea;
 
   // Gestures:
-  Glib::RefPtr<Gtk::GestureSwipe> m_GestureSwipe;
-  Glib::RefPtr<Gtk::GestureLongPress> m_GestureLongPress;
   Glib::RefPtr<Gtk::GestureRotate> m_GestureRotate;
   Glib::RefPtr<Gtk::GestureZoom> m_GestureZoom;
 
@@ -55,18 +53,18 @@ Example_Gestures::Example_Gestures()
   m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.
-  m_GestureSwipe = Gtk::GestureSwipe::create();
-  m_GestureSwipe->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
-  m_GestureSwipe->signal_swipe().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_swipe_swipe));
-  m_GestureSwipe->set_touch_only(false);
-  m_DrawingArea.add_controller(m_GestureSwipe);
+  auto swipe = Gtk::GestureSwipe::create();
+  swipe->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
+  swipe->signal_swipe().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_swipe_swipe));
+  swipe->set_touch_only(false);
+  m_DrawingArea.add_controller(swipe);
 
-  m_GestureLongPress = Gtk::GestureLongPress::create();
-  m_GestureLongPress->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
-  m_GestureLongPress->signal_pressed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_pressed));
-  m_GestureLongPress->signal_end().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_end));
-  m_GestureLongPress->set_touch_only(false);
-  m_DrawingArea.add_controller(m_GestureLongPress);
+  auto long_press = Gtk::GestureLongPress::create();
+  long_press->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
+  long_press->signal_pressed().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_pressed));
+  long_press->signal_end().connect(sigc::mem_fun(*this, &Example_Gestures::on_gesture_long_press_end));
+  long_press->set_touch_only(false);
+  m_DrawingArea.add_controller(long_press);
 
   m_GestureRotate = Gtk::GestureRotate::create();
   m_GestureRotate->set_propagation_phase(Gtk::PropagationPhase::BUBBLE);
