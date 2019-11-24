@@ -51,7 +51,7 @@ struct DemoColumns : public Gtk::TreeModelColumnRecord
 };
 
 // Singleton accessor function.
-const auto& demo_columns()
+const DemoColumns& demo_columns()
 {
   static DemoColumns column_record;
   return column_record;
