@@ -114,7 +114,7 @@ class MainWindow : public Gtk::Window
 {
 public:
   MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refBuilder)
-  : Gtk::Window(cobject), m_pDerivedButton(nullptr), m_pStandardButton(nullptr)
+  : Gtk::Window(cobject)
   {
     std::cout << "MainWindow::ctor" << std::endl;
 
@@ -136,8 +136,8 @@ public:
   const Gtk::Button* get_standard_button() const { return m_pStandardButton; }
 
 private:
-  DerivedButton* m_pDerivedButton;
-  Gtk::Button* m_pStandardButton;
+  DerivedButton* m_pDerivedButton = nullptr;
+  Gtk::Button* m_pStandardButton = nullptr;
 };
 
 } // end of anonymous namespace
