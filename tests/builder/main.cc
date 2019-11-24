@@ -92,7 +92,7 @@ class DerivedButton : public Gtk::Button
 {
 public:
   DerivedButton(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& /* refBuilder */,
-    const Glib::ustring icon_name = Glib::ustring())
+                const Glib::ustring& icon_name = {})
   : Gtk::Button(cobject)
   {
     std::cout << "DerivedButton::ctor" << std::endl;
