@@ -41,13 +41,6 @@
   (gtype-id "GTK_TYPE_BUILDABLE")
 )
 
-(define-object Builder
-  (in-module "Gtk")
-  (parent "GObject")
-  (c-name "GtkBuilder")
-  (gtype-id "GTK_TYPE_BUILDER")
-)
-
 (define-object CellArea
   (in-module "Gtk")
   (parent "GInitiallyUnowned")
@@ -633,6 +626,7 @@
     '("invalid-property" "GTK_BUILDER_ERROR_INVALID_PROPERTY")
     '("invalid-signal" "GTK_BUILDER_ERROR_INVALID_SIGNAL")
     '("invalid-id" "GTK_BUILDER_ERROR_INVALID_ID")
+    '("invalid-function" "GTK_BUILDER_ERROR_INVALID_FUNCTION")
   )
 )
 
@@ -765,6 +759,7 @@
     '("prop-width-chars" "GTK_EDITABLE_PROP_WIDTH_CHARS")
     '("prop-max-width-chars" "GTK_EDITABLE_PROP_MAX_WIDTH_CHARS")
     '("prop-xalign" "GTK_EDITABLE_PROP_XALIGN")
+    '("prop-enable-undo" "GTK_EDITABLE_PROP_ENABLE_UNDO")
     '("num-properties" "GTK_EDITABLE_NUM_PROPERTIES")
   )
 )
@@ -1627,18 +1622,6 @@
     '("cancel" "GTK_BUTTONS_CANCEL")
     '("yes-no" "GTK_BUTTONS_YES_NO")
     '("ok-cancel" "GTK_BUTTONS_OK_CANCEL")
-  )
-)
-
-(define-enum ButtonRole
-  (in-module "Gtk")
-  (c-name "GtkButtonRole")
-  (gtype-id "GTK_TYPE_BUTTON_ROLE")
-  (values
-    '("normal" "GTK_BUTTON_ROLE_NORMAL")
-    '("check" "GTK_BUTTON_ROLE_CHECK")
-    '("radio" "GTK_BUTTON_ROLE_RADIO")
-    '("title" "GTK_BUTTON_ROLE_TITLE")
   )
 )
 
@@ -4360,6 +4343,17 @@
   (return-type "GtkBuilder*")
 )
 
+(define-method set_closure_func
+  (of-object "GtkBuilder")
+  (c-name "gtk_builder_set_closure_func")
+  (return-type "none")
+  (parameters
+    '("GtkBuilderClosureFunc" "closure_func")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_destroy")
+  )
+)
+
 (define-method add_from_file
   (of-object "GtkBuilder")
   (c-name "gtk_builder_add_from_file")
@@ -4447,25 +4441,6 @@
   (parameters
     '("const-gchar*" "name")
     '("GObject*" "object")
-  )
-)
-
-(define-method connect_signals
-  (of-object "GtkBuilder")
-  (c-name "gtk_builder_connect_signals")
-  (return-type "none")
-  (parameters
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method connect_signals_full
-  (of-object "GtkBuilder")
-  (c-name "gtk_builder_connect_signals_full")
-  (return-type "none")
-  (parameters
-    '("GtkBuilderConnectFunc" "func")
-    '("gpointer" "user_data")
   )
 )
 
@@ -4572,19 +4547,28 @@
   )
 )
 
-(define-method set_application
+(define-method create_closure
   (of-object "GtkBuilder")
-  (c-name "gtk_builder_set_application")
-  (return-type "none")
+  (c-name "gtk_builder_create_closure")
+  (return-type "GClosure*")
   (parameters
-    '("GtkApplication*" "application")
+    '("const-char*" "function_name")
+    '("gboolean" "swapped")
+    '("GObject*" "object")
+    '("GError**" "error")
   )
 )
 
-(define-method get_application
+(define-method create_cclosure
   (of-object "GtkBuilder")
-  (c-name "gtk_builder_get_application")
-  (return-type "GtkApplication*")
+  (c-name "gtk_builder_create_cclosure")
+  (return-type "GClosure*")
+  (parameters
+    '("const-char*" "function_name")
+    '("gboolean" "swapped")
+    '("GObject*" "object")
+    '("GError**" "error")
+  )
 )
 
 (define-method extend_with_template
@@ -8108,6 +8092,21 @@
   (return-type "none")
   (parameters
     '("int" "n_chars")
+  )
+)
+
+(define-method get_enable_undo
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_get_enable_undo")
+  (return-type "gboolean")
+)
+
+(define-method set_enable_undo
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_set_enable_undo")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enable_undo")
   )
 )
 
@@ -16121,21 +16120,6 @@
 
 
 
-;; From gtkmodelbutton.h
-
-(define-function gtk_model_button_get_type
-  (c-name "gtk_model_button_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_model_button_new
-  (c-name "gtk_model_button_new")
-  (is-constructor-of "GtkModelButton")
-  (return-type "GtkWidget*")
-)
-
-
-
 ;; From gtkmountoperation.h
 
 (define-function gtk_mount_operation_get_type
@@ -17826,15 +17810,6 @@
   (return-type "GType")
 )
 
-(define-function gtk_popover_menu_new
-  (c-name "gtk_popover_menu_new")
-  (is-constructor-of "GtkPopoverMenu")
-  (return-type "GtkWidget*")
-  (parameters
-    '("GtkWidget*" "relative_to")
-  )
-)
-
 (define-function gtk_popover_menu_new_from_model
   (c-name "gtk_popover_menu_new_from_model")
   (return-type "GtkWidget*")
@@ -17854,23 +17829,19 @@
   )
 )
 
-(define-method add_submenu
+(define-method set_menu_model
   (of-object "GtkPopoverMenu")
-  (c-name "gtk_popover_menu_add_submenu")
+  (c-name "gtk_popover_menu_set_menu_model")
   (return-type "none")
   (parameters
-    '("GtkWidget*" "submenu")
-    '("const-char*" "name")
+    '("GMenuModel*" "model")
   )
 )
 
-(define-method open_submenu
+(define-method get_menu_model
   (of-object "GtkPopoverMenu")
-  (c-name "gtk_popover_menu_open_submenu")
-  (return-type "none")
-  (parameters
-    '("const-char*" "name")
-  )
+  (c-name "gtk_popover_menu_get_menu_model")
+  (return-type "GMenuModel*")
 )
 
 
@@ -21972,56 +21943,6 @@
   )
 )
 
-(define-function gtk_rc_property_parse_color
-  (c-name "gtk_rc_property_parse_color")
-  (return-type "gboolean")
-  (parameters
-    '("const-GParamSpec*" "pspec")
-    '("const-GString*" "gstring")
-    '("GValue*" "property_value")
-  )
-)
-
-(define-function gtk_rc_property_parse_enum
-  (c-name "gtk_rc_property_parse_enum")
-  (return-type "gboolean")
-  (parameters
-    '("const-GParamSpec*" "pspec")
-    '("const-GString*" "gstring")
-    '("GValue*" "property_value")
-  )
-)
-
-(define-function gtk_rc_property_parse_flags
-  (c-name "gtk_rc_property_parse_flags")
-  (return-type "gboolean")
-  (parameters
-    '("const-GParamSpec*" "pspec")
-    '("const-GString*" "gstring")
-    '("GValue*" "property_value")
-  )
-)
-
-(define-function gtk_rc_property_parse_requisition
-  (c-name "gtk_rc_property_parse_requisition")
-  (return-type "gboolean")
-  (parameters
-    '("const-GParamSpec*" "pspec")
-    '("const-GString*" "gstring")
-    '("GValue*" "property_value")
-  )
-)
-
-(define-function gtk_rc_property_parse_border
-  (c-name "gtk_rc_property_parse_border")
-  (return-type "gboolean")
-  (parameters
-    '("const-GParamSpec*" "pspec")
-    '("const-GString*" "gstring")
-    '("GValue*" "property_value")
-  )
-)
-
 (define-method reset_property
   (of-object "GtkSettings")
   (c-name "gtk_settings_reset_property")
@@ -23074,7 +22995,7 @@
 (define-method add_named
   (of-object "GtkStack")
   (c-name "gtk_stack_add_named")
-  (return-type "none")
+  (return-type "GtkStackPage*")
   (parameters
     '("GtkWidget*" "child")
     '("const-gchar*" "name")
@@ -23084,7 +23005,7 @@
 (define-method add_titled
   (of-object "GtkStack")
   (c-name "gtk_stack_add_titled")
-  (return-type "none")
+  (return-type "GtkStackPage*")
   (parameters
     '("GtkWidget*" "child")
     '("const-gchar*" "name")
@@ -24384,6 +24305,72 @@
     '("gboolean" "interactive")
     '("gboolean" "default_editable")
   )
+)
+
+(define-method get_can_undo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_can_undo")
+  (return-type "gboolean")
+)
+
+(define-method get_can_redo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_can_redo")
+  (return-type "gboolean")
+)
+
+(define-method get_enable_undo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_enable_undo")
+  (return-type "gboolean")
+)
+
+(define-method set_enable_undo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_set_enable_undo")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enable_undo")
+  )
+)
+
+(define-method get_max_undo_levels
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_max_undo_levels")
+  (return-type "guint")
+)
+
+(define-method set_max_undo_levels
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_set_max_undo_levels")
+  (return-type "none")
+  (parameters
+    '("guint" "max_undo_levels")
+  )
+)
+
+(define-method undo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_undo")
+  (return-type "none")
+)
+
+(define-method redo
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_redo")
+  (return-type "none")
+)
+
+(define-method begin_irreversible_action
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_begin_irreversible_action")
+  (return-type "none")
+)
+
+(define-method end_irreversible_action
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_end_irreversible_action")
+  (return-type "none")
 )
 
 (define-method begin_user_action
@@ -30848,14 +30835,14 @@
   )
 )
 
-(define-method set_connect_func
+(define-method set_closure_func
   (of-object "GtkWidgetClass")
-  (c-name "gtk_widget_class_set_connect_func")
+  (c-name "gtk_widget_class_set_closure_func")
   (return-type "none")
   (parameters
-    '("GtkBuilderConnectFunc" "connect_func")
-    '("gpointer" "connect_data")
-    '("GDestroyNotify" "connect_data_destroy")
+    '("GtkBuilderClosureFunc" "closure_func")
+    '("gpointer" "closure_data")
+    '("GDestroyNotify" "closure_destroy")
   )
 )
 
@@ -31849,15 +31836,15 @@
   )
 )
 
-(define-method iconify
+(define-method minimize
   (of-object "GtkWindow")
-  (c-name "gtk_window_iconify")
+  (c-name "gtk_window_minimize")
   (return-type "none")
 )
 
-(define-method deiconify
+(define-method unminimize
   (of-object "GtkWindow")
-  (c-name "gtk_window_deiconify")
+  (c-name "gtk_window_unminimize")
   (return-type "none")
 )
 
@@ -32609,11 +32596,6 @@
 
 (define-function gtk_buttons_type_get_type
   (c-name "gtk_buttons_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_button_role_get_type
-  (c-name "gtk_button_role_get_type")
   (return-type "GType")
 )
 

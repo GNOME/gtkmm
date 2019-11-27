@@ -1101,7 +1101,13 @@ derived from the type of the composite class being extended with builder XML.
 </parameter_description>
 </parameter>
 <parameter name="GTK_BUILDER_ERROR_INVALID_ID">
-<parameter_description> An object id is unknown
+<parameter_description> An object id is unknown.
+</parameter_description>
+</parameter>
+<parameter name="GTK_BUILDER_ERROR_INVALID_FUNCTION">
+<parameter_description> A function could not be found. This often happens
+when symbols are set to be kept private. Compiling code with -rdynamic or using the
+`gmodule-export-2.0` pkgconfig module can fix this problem.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3685,7 +3691,9 @@ When %TRUE, pasted multi-line text is truncated to the first line.
 
 <signal name="GtkEntryBuffer::deleted-text">
 <description>
-This signal is emitted after text is deleted from the buffer.
+The text is altered in the default handler for this signal. If you want
+access to the text after the text has been modified, use
+%G_CONNECT_AFTER.
 
 </description>
 <parameters>
@@ -13136,6 +13144,21 @@ See gtk_text_buffer_paste_clipboard() for more details.
 <return></return>
 </signal>
 
+<signal name="GtkTextBuffer::redo">
+<description>
+The &quot;redo&quot; signal is emitted when a request has been made to redo the
+previously undone operation.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkTextBuffer::remove-tag">
 <description>
 The ::remove-tag signal is emitted to remove all occurrences of @tag from
@@ -13170,6 +13193,37 @@ gtk_text_buffer_remove_tag().
 <return></return>
 </signal>
 
+<signal name="GtkTextBuffer::undo">
+<description>
+The &quot;undo&quot; signal is emitted when a request has been made to undo the
+previous operation or set of operations that have been grouped together.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkTextBuffer:can-redo">
+<description>
+The :can-redo property denotes that the buffer can reapply the
+last undone action.
+
+</description>
+</property>
+
+<property name="GtkTextBuffer:can-undo">
+<description>
+The :can-undo property denotes that the buffer can undo the last
+applied action.
+
+</description>
+</property>
+
 <property name="GtkTextBuffer:copy-target-list">
 <description>
 The list of targets this buffer supports for clipboard copying
@@ -13183,6 +13237,14 @@ and as DND source.
 The position of the insert mark (as offset from the beginning
 of the buffer). It is useful for getting notified when the
 cursor moves.
+
+</description>
+</property>
+
+<property name="GtkTextBuffer:enable-undo">
+<description>
+The :enable-undo property denotes if support for undoing and redoing
+changes to the buffer is allowed.
 
 </description>
 </property>
@@ -21671,7 +21733,7 @@ Sets the name of the @buildable object.
 <description>
 Adds the @callback_symbol to the scope of @builder under the given @callback_name.
 
-Using this function overrides the behavior of gtk_builder_connect_signals()
+Using this function overrides the behavior of gtk_builder_create_closure()
 for any callback symbols that are added. Using this method allows for better
 encapsulation as it does not require that callback symbols be declared in
 the global namespace.
@@ -21950,29 +22012,17 @@ its child (for instance a #GtkTreeView that depends on its
 </return>
 </function>
 
-<function name="gtk_builder_connect_signals">
+<function name="gtk_builder_create_cclosure">
 <description>
-This method is a simpler variation of gtk_builder_connect_signals_full().
-It uses symbols explicitly added to @builder with prior calls to
-gtk_builder_add_callback_symbol(). In the case that symbols are not
-explicitly added; it uses #GModule’s introspective features (by opening the module %NULL)
-to look at the application’s symbol table. From here it tries to match
-the signal handler names given in the interface description with
-symbols in the application and connects the signals. Note that this
-function can only be called once, subsequent calls will do nothing.
+This is the default function used by gtk_builder_set_closure_func(). Some bindings
+with C support may want to call this function as a fallback from their closure
+function.
 
-Note that unless gtk_builder_add_callback_symbol() is called for
-all signal callbacks which are referenced by the loaded XML, this
-function will require that #GModule be supported on the platform.
+This function has no purpose otherwise.
 
-If you rely on #GModule support to lookup callbacks in the symbol table,
-the following details should be noted:
+This function will prefer callbacks added via gtk_builder_add_callback_symbol()
+to looking up public symbols.
 
-When compiling applications for Windows, you must declare signal callbacks
-with #G_MODULE_EXPORT, or they will not be put in the symbol table.
-On Linux and Unices, this is not necessary; applications should instead
-be compiled with the -Wl,--export-dynamic CFLAGS, and linked against
-gmodule-export-2.0.
 
 </description>
 <parameters>
@@ -21980,19 +22030,38 @@ gmodule-export-2.0.
 <parameter_description> a #GtkBuilder
 </parameter_description>
 </parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass back with all signals
+<parameter name="function_name">
+<parameter_description> name of the function to look up
+</parameter_description>
+</parameter>
+<parameter name="swapped">
+<parameter_description> %TRUE to create a swapped closure
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> Object to create the closure with
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> A new closure for invoking @function_name
+</return>
 </function>
 
-<function name="gtk_builder_connect_signals_full">
+<function name="gtk_builder_create_closure">
 <description>
-This function can be thought of the interpreted language binding
-version of gtk_builder_connect_signals(), except that it does not
-require GModule to function correctly.
+Creates a closure to invoke the function called @function_name.
+
+If a closure function was set via gtk_builder_set_closure_func(),
+will be invoked.
+Otherwise, gtk_builder_create_cclosure() will be called.
+
+If no closure could be created, %NULL will be returned and @error will
+be set.
+
 
 </description>
 <parameters>
@@ -22000,16 +22069,25 @@ require GModule to function correctly.
 <parameter_description> a #GtkBuilder
 </parameter_description>
 </parameter>
-<parameter name="func">
-<parameter_description> the function used to connect the signals
+<parameter name="function_name">
+<parameter_description> name of the function to look up
 </parameter_description>
 </parameter>
-<parameter name="user_data">
-<parameter_description> arbitrary data that will be passed to the connection function
+<parameter name="swapped">
+<parameter_description> %TRUE to create a swapped closure
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> Object to create the closure with
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> A new closure for invoking @function_name
+</return>
 </function>
 
 <function name="gtk_builder_expose_object">
@@ -22072,30 +22150,6 @@ templates, applications have no need to call this function.
 </parameter>
 </parameters>
 <return> A positive value on success, 0 if an error occurred
-</return>
-</function>
-
-<function name="gtk_builder_get_application">
-<description>
-Gets the #GtkApplication associated with the builder.
-
-The #GtkApplication is used for creating action proxies as requested
-from XML that the builder is loading.
-
-By default, the builder uses the default application: the one from
-g_application_get_default(). If you want to use another application
-for constructing proxies, use gtk_builder_set_application().
-
-
-</description>
-<parameters>
-<parameter name="builder">
-<parameter_description> a #GtkBuilder
-</parameter_description>
-</parameter>
-</parameters>
-<return> the application being used by the builder,
-or %NULL
 </return>
 </function>
 
@@ -22188,8 +22242,8 @@ Fetches a symbol previously added to @builder
 with gtk_builder_add_callback_symbols()
 
 This function is intended for possible use in language bindings
-or for any case that one might be cusomizing signal connections
-using gtk_builder_connect_signals_full()
+or for any case that one might be customizing signal connections
+using gtk_builder_set_closure_func().
 
 
 </description>
@@ -22296,12 +22350,13 @@ from untrusted sources.
 </return>
 </function>
 
-<function name="gtk_builder_set_application">
+<function name="gtk_builder_set_closure_func">
 <description>
-Sets the application associated with @builder.
+Sets the function to call for creating closures.
+gtk_builder_create_closure() will use this function instead
+of gtk_builder_create_cclosure().
 
-You only need this function if there is more than one #GApplication
-in your process. @application cannot be %NULL.
+This is useful for bindings.
 
 </description>
 <parameters>
@@ -22309,8 +22364,17 @@ in your process. @application cannot be %NULL.
 <parameter_description> a #GtkBuilder
 </parameter_description>
 </parameter>
-<parameter name="application">
-<parameter_description> a #GtkApplication
+<parameter name="closure_func">
+<parameter_description> function to call when creating
+closures or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @closure_func
+</parameter_description>
+</parameter>
+<parameter name="user_destroy">
+<parameter_description> destroy function for user data
 </parameter_description>
 </parameter>
 </parameters>
@@ -31160,6 +31224,22 @@ See gtk_editable_set_editable().
 </return>
 </function>
 
+<function name="gtk_editable_get_enable_undo">
+<description>
+Gets if undo/redo actions are enabled for @editable
+
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if undo is enabled
+</return>
+</function>
+
 <function name="gtk_editable_get_max_width_chars">
 <description>
 Retrieves the desired maximum width of @editable, in characters.
@@ -31403,6 +31483,28 @@ in the editable widget or not.
 <parameter name="is_editable">
 <parameter_description> %TRUE if the user is allowed to edit the text
 in the widget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_editable_set_enable_undo">
+<description>
+If enabled, changes to @editable will be saved for undo/redo actions.
+
+This results in an additional copy of text changes and are not stored in
+secure memory. As such, undo is forcefully disabled when #GtkText:visibility
+is set to %FALSE.
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a #GtkEditable
+</parameter_description>
+</parameter>
+<parameter name="enable_undo">
+<parameter_description> if undo/redo should be enabled
 </parameter_description>
 </parameter>
 </parameters>
@@ -54538,28 +54640,6 @@ Returns the widget @popover is currently attached to
 </return>
 </function>
 
-<function name="gtk_popover_menu_add_submenu">
-<description>
-Adds a submenu to the popover menu.
-
-</description>
-<parameters>
-<parameter name="popover">
-<parameter_description> a #GtkPopoverMenu
-</parameter_description>
-</parameter>
-<parameter name="submenu">
-<parameter_description> a widget to add as submenu
-</parameter_description>
-</parameter>
-<parameter name="name">
-<parameter_description> the name for the submenu
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_popover_menu_bar_get_menu_model">
 <description>
 Returns the model from which the contents of @bar are taken.
@@ -54584,7 +54664,7 @@ Creates a #GtkPopoverMenuBar from a #GMenuModel.
 </description>
 <parameters>
 <parameter name="model">
-<parameter_description> a #GMenuModel
+<parameter_description> a #GMenuModel, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -54604,7 +54684,7 @@ its contents.
 </parameter_description>
 </parameter>
 <parameter name="model">
-<parameter_description> a #GMenuModel
+<parameter_description> a #GMenuModel, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -54652,7 +54732,7 @@ to control this.
 </parameter_description>
 </parameter>
 <parameter name="model">
-<parameter_description> a #GMenuModel
+<parameter_description> a #GMenuModel, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -60219,124 +60299,6 @@ value changes.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_rc_property_parse_border">
-<description>
-A #GtkRcPropertyParser for use with gtk_settings_install_property_parser()
-or gtk_widget_class_install_style_property_parser() which parses
-borders in the form
-`&quot;{ left, right, top, bottom }&quot;` for integers
-left, right, top and bottom.
-
-
-</description>
-<parameters>
-<parameter name="pspec">
-<parameter_description> a #GParamSpec
-</parameter_description>
-</parameter>
-<parameter name="gstring">
-<parameter_description> the #GString to be parsed
-</parameter_description>
-</parameter>
-<parameter name="property_value">
-<parameter_description> a #GValue which must hold boxed values.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @gstring could be parsed and @property_value
-has been set to the resulting #GtkBorder.
-</return>
-</function>
-
-<function name="gtk_rc_property_parse_enum">
-<description>
-A #GtkRcPropertyParser for use with gtk_settings_install_property_parser()
-or gtk_widget_class_install_style_property_parser() which parses a single
-enumeration value.
-
-The enumeration value can be specified by its name, its nickname or
-its numeric value. For consistency with flags parsing, the value
-may be surrounded by parentheses.
-
-
-</description>
-<parameters>
-<parameter name="pspec">
-<parameter_description> a #GParamSpec
-</parameter_description>
-</parameter>
-<parameter name="gstring">
-<parameter_description> the #GString to be parsed
-</parameter_description>
-</parameter>
-<parameter name="property_value">
-<parameter_description> a #GValue which must hold enum values.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @gstring could be parsed and @property_value
-has been set to the resulting #GEnumValue.
-</return>
-</function>
-
-<function name="gtk_rc_property_parse_flags">
-<description>
-A #GtkRcPropertyParser for use with gtk_settings_install_property_parser()
-or gtk_widget_class_install_style_property_parser() which parses flags.
-
-Flags can be specified by their name, their nickname or
-numerically. Multiple flags can be specified in the form
-`&quot;( flag1 | flag2 | ... )&quot;`.
-
-
-</description>
-<parameters>
-<parameter name="pspec">
-<parameter_description> a #GParamSpec
-</parameter_description>
-</parameter>
-<parameter name="gstring">
-<parameter_description> the #GString to be parsed
-</parameter_description>
-</parameter>
-<parameter name="property_value">
-<parameter_description> a #GValue which must hold flags values.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @gstring could be parsed and @property_value
-has been set to the resulting flags value.
-</return>
-</function>
-
-<function name="gtk_rc_property_parse_requisition">
-<description>
-A #GtkRcPropertyParser for use with gtk_settings_install_property_parser()
-or gtk_widget_class_install_style_property_parser() which parses a
-requisition in the form
-`&quot;{ width, height }&quot;` for integers %width and %height.
-
-
-</description>
-<parameters>
-<parameter name="pspec">
-<parameter_description> a #GParamSpec
-</parameter_description>
-</parameter>
-<parameter name="gstring">
-<parameter_description> the #GString to be parsed
-</parameter_description>
-</parameter>
-<parameter name="property_value">
-<parameter_description> a #GValue which must hold boxed values.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @gstring could be parsed and @property_value
-has been set to the resulting #GtkRequisition.
-</return>
 </function>
 
 <function name="gtk_recent_info_create_app_info">
@@ -66504,6 +66466,7 @@ Stops the animation of the spinner.
 Adds a child to @stack.
 The child is identified by the @name.
 
+
 </description>
 <parameters>
 <parameter name="stack">
@@ -66519,7 +66482,8 @@ The child is identified by the @name.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkStackPage for @child
+</return>
 </function>
 
 <function name="gtk_stack_add_titled">
@@ -66528,6 +66492,7 @@ Adds a child to @stack.
 The child is identified by the @name. The @title
 will be used by #GtkStackSwitcher to represent
 @child in a tab bar, so it should be short.
+
 
 </description>
 <parameters>
@@ -66548,7 +66513,8 @@ will be used by #GtkStackSwitcher to represent
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the #GtkStackPage for @child
+</return>
 </function>
 
 <function name="gtk_stack_get_child_by_name">
@@ -68450,6 +68416,28 @@ re-initialized to point to the location where text was deleted.
 </return>
 </function>
 
+<function name="gtk_text_buffer_begin_irreversible_action">
+<description>
+Denotes the beginning of an action that may not be undone. This will cause
+any previous operations in the undo/redo queue to be cleared.
+
+This should be paired with a call to
+gtk_text_buffer_end_irreversible_action() after the irreversible action
+has completed.
+
+You may nest calls to gtk_text_buffer_begin_irreversible_action() and
+gtk_text_buffer_end_irreversible_action() pairs.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #Gtktextbuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_buffer_begin_user_action">
 <description>
 Called to indicate that the buffer operations between here and a
@@ -68760,6 +68748,27 @@ uneditable text).
 </return>
 </function>
 
+<function name="gtk_text_buffer_end_irreversible_action">
+<description>
+Denotes the end of an action that may not be undone. This will cause
+any previous operations in the undo/redo queue to be cleared.
+
+This should be called after completing modifications to the text buffer
+after gtk_text_buffer_begin_irreversible_action() was called.
+
+You may nest calls to gtk_text_buffer_begin_irreversible_action() and
+gtk_text_buffer_end_irreversible_action() pairs.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #Gtktextbuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_buffer_end_user_action">
 <description>
 Should be paired with a call to gtk_text_buffer_begin_user_action().
@@ -68815,6 +68824,25 @@ count is cached, so this function is very fast.
 </parameters>
 <return> number of characters in the buffer
 </return>
+</function>
+
+<function name="gtk_text_buffer_get_enable_undo">
+<description>
+Gets whether the buffer is saving modifications to the buffer to allow for
+undo and redo actions.
+
+See gtk_text_buffer_begin_irreversible_action() and
+gtk_text_buffer_end_irreversible_action() to create changes to the buffer
+that cannot be undone.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_text_buffer_get_end_iter">
@@ -69068,6 +69096,23 @@ mark exists in the buffer.
 </parameters>
 <return> a #GtkTextMark, or %NULL
 </return>
+</function>
+
+<function name="gtk_text_buffer_get_max_undo_levels">
+<description>
+Gets the maximum number of undo levels to perform. If 0, unlimited undo
+actions may be performed. Note that this may have a memory usage impact
+as it requires storing an additional copy of the inserted or removed text
+within the text buffer.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_text_buffer_get_modified">
@@ -69729,6 +69774,20 @@ be optimized.
 <return></return>
 </function>
 
+<function name="gtk_text_buffer_redo">
+<description>
+Redoes the next redoable action on the buffer, if there is one.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_buffer_remove_all_tags">
 <description>
 Removes all tags in the range between @start and @end.  Be careful
@@ -69858,6 +69917,26 @@ be optimized.
 <return></return>
 </function>
 
+<function name="gtk_text_buffer_set_enable_undo">
+<description>
+Sets whether or not to enable undoable actions in the text buffer. If
+enabled, the user will be able to undo the last number of actions up to
+gtk_text_buffer_get_max_undo_levels().
+
+See gtk_text_buffer_begin_irreversible_action() and
+gtk_text_buffer_end_irreversible_action() to create changes to the buffer
+that cannot be undone.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_text_buffer_set_mark">
 <description>
 Move the mark to the given position, if not @should_exist, 
@@ -69891,6 +69970,27 @@ immediately
 </parameters>
 <return> mark
 </return>
+</function>
+
+<function name="gtk_text_buffer_set_max_undo_levels">
+<description>
+Sets the maximum number of undo levels to perform. If 0, unlimited undo
+actions may be performed. Note that this may have a memory usage impact
+as it requires storing an additional copy of the inserted or removed text
+within the text buffer.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+<parameter name="max_undo_levels">
+<parameter_description> the maximum number of undo actions to perform
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_text_buffer_set_modified">
@@ -69932,6 +70032,20 @@ Deletes current contents of @buffer, and inserts @text instead. If
 </parameter>
 <parameter name="len">
 <parameter_description> length of @text in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_buffer_undo">
+<description>
+Undoes the last undoable action on the buffer, if there is one.
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
 </parameter_description>
 </parameter>
 </parameters>
@@ -84406,9 +84520,9 @@ This function should only be called from class init functions of widgets.
 <return></return>
 </function>
 
-<function name="gtk_widget_class_set_connect_func">
+<function name="gtk_widget_class_set_closure_func">
 <description>
-For use in language bindings, this will override the default #GtkBuilderConnectFunc to be
+For use in language bindings, this will override the default #GtkBuilderClosureFunc to be
 used when parsing GtkBuilder XML from this class’s template data.
 
 Note that this must be called from a composite widget classes class
@@ -84420,16 +84534,16 @@ initializer after calling gtk_widget_class_set_template().
 <parameter_description> A #GtkWidgetClass
 </parameter_description>
 </parameter>
-<parameter name="connect_func">
-<parameter_description> The #GtkBuilderConnectFunc to use when connecting signals in the class template
+<parameter name="closure_func">
+<parameter_description> The #GtkBuilderClosureFunc to use when creating closure in the class template
 </parameter_description>
 </parameter>
-<parameter name="connect_data">
-<parameter_description> The data to pass to @connect_func
+<parameter name="closure_data">
+<parameter_description> The data to pass to @closure_func
 </parameter_description>
 </parameter>
-<parameter name="connect_data_destroy">
-<parameter_description> The #GDestroyNotify to free @connect_data, this will only be used at
+<parameter name="closure_data_destroy">
+<parameter_description> The #GDestroyNotify to free @closure_data, this will only be used at
 class finalization time, when no classes of type @widget_type are in use anymore.
 </parameter_description>
 </parameter>
@@ -89063,26 +89177,6 @@ titlebars.
 <return></return>
 </function>
 
-<function name="gtk_window_deiconify">
-<description>
-Asks to deiconify (i.e. unminimize) the specified @window. Note
-that you shouldn’t assume the window is definitely deiconified
-afterward, because other entities (e.g. the user or
-[window manager][gtk-X11-arch])) could iconify it
-again before your code which assumes deiconification gets to run.
-
-You can track iconification via the #GdkSurface::state property.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GtkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_window_fullscreen">
 <description>
 Asks to place @window in the fullscreen state. Note that you
@@ -89779,32 +89873,6 @@ Returns whether @window has an explicit window group.
 </return>
 </function>
 
-<function name="gtk_window_iconify">
-<description>
-Asks to iconify (i.e. minimize) the specified @window. Note that
-you shouldn’t assume the window is definitely iconified afterward,
-because other entities (e.g. the user or
-[window manager][gtk-X11-arch]) could deiconify it
-again, or there may not be a window manager in which case
-iconification isn’t possible, etc. But normally the window will end
-up iconified. Just don’t write code that crashes if not.
-
-It’s permitted to call this function before showing a window,
-in which case the window will be iconified before it ever appears
-onscreen.
-
-You can track iconification via the #GdkSurface::state property.
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GtkWindow
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_window_is_active">
 <description>
 Returns whether the window is part of the current active toplevel.
@@ -89878,8 +89946,36 @@ It’s permitted to call this function before showing a window,
 in which case the window will be maximized when it appears onscreen
 initially.
 
-You can track iconification via the #GdkSurface::state property
-or by listening to notifications on the #GtkWindow:is-maximized property.
+You can track the result of this operation via the #GdkSurface:state
+property, or by listening to notifications on the #GtkWindow:is-maximized
+property.
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_window_minimize">
+<description>
+Asks to minimize the specified @window.
+
+Note that you shouldn’t assume the window is definitely minimized
+afterward, because the windowing system might not support this
+functionality; other entities (e.g. the user or the [window manager][gtk-X11-arch])
+could unminimize it again, or there may not be a window manager in
+which case minimization isn’t possible, etc.
+
+It’s permitted to call this function before showing a window,
+in which case the window will be minimized before it ever appears
+onscreen.
+
+You can track result of this operation via the #GdkSurface:state
+property.
 
 </description>
 <parameters>
@@ -89969,7 +90065,7 @@ to allow focus stealing prevention to work correctly.
 <function name="gtk_window_present_with_time">
 <description>
 Presents a window to the user. This may mean raising the window
-in the stacking order, deiconifying it, moving it to the current
+in the stacking order, unminimizing it, moving it to the current
 desktop, and/or giving it the keyboard focus, possibly dependent
 on the user’s platform, window manager, and preferences.
 
@@ -90847,7 +90943,8 @@ write code that crashes if not.
 
 It’s permitted to call this function before showing a window.
 
-You can track iconification via the #GdkSurface::state property.
+You can track result of this operation via the #GdkSurface:state
+property.
 
 </description>
 <parameters>
@@ -90890,7 +90987,32 @@ could maximize it again, and not all window
 managers honor requests to unmaximize. But normally the window will
 end up unmaximized. Just don’t write code that crashes if not.
 
-You can track iconification via the #GdkSurface::state property
+You can track the result of this operation via the #GdkSurface:state
+property, or by listening to notifications on the #GtkWindow:is-maximized
+property.
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_window_unminimize">
+<description>
+Asks to unminimize the specified @window.
+
+Note that you shouldn’t assume the window is definitely unminimized
+afterward, because the windowing system might not support this
+functionality; other entities (e.g. the user or the [window manager][gtk-X11-arch])
+could minimize it again, or there may not be a window manager in
+which case minimization isn’t possible, etc.
+
+You can track result of this operation via the #GdkSurface:state
+property.
 
 </description>
 <parameters>
@@ -90911,7 +91033,8 @@ window is definitely unstuck afterward, because other entities
 stick it again. But normally the window will
 end up stuck. Just don’t write code that crashes if not.
 
-You can track iconification via the #GdkSurface::state property.
+You can track result of this operation via the #GdkSurface:state
+property.
 
 </description>
 <parameters>
