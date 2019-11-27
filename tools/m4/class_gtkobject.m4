@@ -1,7 +1,5 @@
 dnl $Id$
 
-
-
 define(`_CLASS_GTKOBJECT',`dnl
 _PUSH()
 dnl
@@ -38,7 +36,16 @@ define(`__BOOL_CUSTOM_DTOR__',`$1')
 _POP()
 ')
 
-dnl Gtk::Object has a custom-written cast implementation:
+dnl For classes that need custom code for move operations.
+define(`_CUSTOM_MOVE_OPERATIONS', `dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_MOVE_OPERATIONS__',`$1')
+_POP()
+')
+
+dnl For classes that need custom code in their cast and construct_params
+dnl constructors.
 define(`_CUSTOM_CTOR_CAST',`dnl
 _PUSH()
 dnl Define this macro to be tested for later.
@@ -192,6 +199,8 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 
 ')dnl
 
+ifdef(`__BOOL_CUSTOM_MOVE_OPERATIONS__',`dnl
+',`dnl
 __CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src) noexcept
 : __CPPPARENT__`'(std::move(src))
 _IMPORT(SECTION_CC_MOVE_CONSTRUCTOR_INTERFACES)
@@ -203,6 +212,7 @@ __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src) noexcept
 _IMPORT(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)
   return *this;
 }
+')dnl
 
 ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
 ',`dnl
@@ -233,8 +243,11 @@ public:
   typedef __REAL_CNAME__`'Class BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+ifdef(`__BOOL_CUSTOM_MOVE_OPERATIONS__',`dnl
+',`dnl
   __CPPNAME__`'(__CPPNAME__&& src) noexcept;
   __CPPNAME__& operator=(__CPPNAME__&& src) noexcept;
+')dnl
 
   // noncopyable
   __CPPNAME__`'(const __CPPNAME__&) = delete;

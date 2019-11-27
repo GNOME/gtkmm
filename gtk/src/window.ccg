@@ -27,6 +27,60 @@
 namespace Gtk
 {
 
+// All constructors are hand-coded, because they connect a signal handler
+// that removes the window from its application when the window is closed (hidden).
+Window::Window(const Glib::ConstructParams& construct_params)
+:
+  Gtk::Bin(construct_params)
+{
+  signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+}
+
+Window::Window(GtkWindow* castitem)
+:
+  Gtk::Bin((GtkBin*)castitem)
+{
+  signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+}
+
+Window::Window(Window&& src)
+: Gtk::Bin(std::move(src))
+  , Native(std::move(src))
+  , Root(std::move(src))
+{
+  signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+}
+
+// The move assignment is identical to the one that gmmproc can generate.
+// _CUSTOM_MOVE_OPERATIONS() suppresses both move contructor and move assignment. 
+Window& Window::operator=(Window&& src) noexcept
+{
+  Gtk::Bin::operator=(std::move(src));
+  Native::operator=(std::move(src));
+  Root::operator=(std::move(src));
+  return *this;
+}
+
+Window::Window(WindowType type)
+: _CONSTRUCT("type", static_cast<GtkWindowType>(type))
+{
+  signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+}
+
+void Window::on_window_hide()
+{
+  auto appl = get_application();
+  if (appl)
+  {
+    // Tell GtkApplication to forget the window.
+    // This can cause Application::run() to return, if it is the last window.
+    // Otherwise, GtkApplication waits for the window to be _destroyed_,
+    // which is just not something that it should care about.
+    // See https://bugzilla.gnome.org/show_bug.cgi?id=639931
+    appl->remove_window(*this);
+  }
+}
+
 std::vector< Glib::RefPtr<AccelGroup> > Window::get_accel_groups()
 {
   return Glib::SListHandler< Glib::RefPtr<AccelGroup> >::slist_to_vector(

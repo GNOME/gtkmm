@@ -40,13 +40,18 @@ namespace Gtk
 class AccelGroup;
 class WindowGroup;
 
-/** Toplevel Window.
+/** Toplevel %Window.
  * This represents all widgets which are physical windows controlled
  * by the window manager.
  *
- * The window will be hidden when the window manager's close button is clicked. Override on_delete_event() to stop this.
+ * The window will be hidden when the window manager's close button is clicked.
+ * Override on_delete_event() to stop this.
  *
  * Gtk::manage() has no effect on Windows because they have no parent Containers.
+ *
+ * When a window is closed (hidden), it's removed from its application.
+ * This can cause Application::run() to return, if it is the last window.
+ *
  * @ingroup Widgets
  */
 class Window : public Bin, public Native, public Root
@@ -65,7 +70,14 @@ public:
   // to call gtk_widget_get_display() from a class that implements GtkRoot.
   using Root::get_display;
 
-  _WRAP_CTOR(Window(WindowType type = WindowType::TOPLEVEL), gtk_window_new)
+  // All constructors are hand-coded, because they connect a signal handler.
+  _CUSTOM_CTOR_CAST()
+  _CUSTOM_MOVE_OPERATIONS()
+  Window(Window&& src);
+  Window& operator=(Window&& src) noexcept;
+
+  explicit Window(WindowType type =  WindowType::TOPLEVEL);
+  _IGNORE(gtk_window_new)
 
   _WRAP_PROPERTY("type", WindowType)
   _WRAP_PROPERTY("title", Glib::ustring)
@@ -333,6 +345,7 @@ dnl
   void set_manage() override;
 
 protected:
+  void on_window_hide();
 
   //See comments in the implementations:
   void destroy_();
