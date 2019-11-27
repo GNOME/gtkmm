@@ -22,53 +22,6 @@
 
 namespace Gtk
 {
-
-// Allow GtkBuilder to instantiate a gtkmm derived GType instead of the regular
-// GTK+ GType, so we can, for instance, use our vfuncs and default signal handlers.
-// static
-GType Builder_Class::get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name)
-{
-  if (!type_name)
-    return G_TYPE_INVALID;
-
-  GType gtype = G_TYPE_INVALID;
-
-  // If a TreeModel (such as ListStore or TreeStore) is being built,
-  // Buildable_Class may have requested no search for gtkmm-derived types.
-  // See https://bugzilla.gnome.org/show_bug.cgi?id=742637
-  const auto obj = dynamic_cast<Builder*>(
-    Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-  if (!(obj && obj->no_gtkmm_derived_types))
-  {
-    // See if there is a gtkmm version of the gclass:
-    Glib::ustring classname_prefixed ("gtkmm__"); // gtkmm uses a prefix
-    classname_prefixed += type_name;
-
-    gtype = g_type_from_name(classname_prefixed.c_str());
-  }
-
-  if (gtype == G_TYPE_INVALID) // If it's not a registered typename
-  {
-    // Get the parent class of the object class (the original underlying C class).
-    const auto base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
-
-    // Call the original underlying C function.
-    if (base && base->get_type_from_name)
-      gtype = (*base->get_type_from_name)(self, type_name);
-    else // If that's not possible, just use the normal GType.
-      gtype = g_type_from_name(type_name);
-  }
-
-  return gtype;
-}
-
-// Called from Buildable
-void Builder::set_no_gtkmm_derived_types(bool status)
-{
-  no_gtkmm_derived_types = status;
-}
-
 // static
 Glib::RefPtr<Builder> Builder::create_from_file(const std::string& filename)
 {

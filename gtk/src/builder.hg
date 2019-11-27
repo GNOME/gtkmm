@@ -548,6 +548,18 @@ public:
    * auto pDialog2 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog2", "A storm is imminent!", true);
    * @endcode
    *
+   * If your derived class overrides vfuncs (virtual functions) or default signal
+   * handlers which are part of the wrapped C API, its class name in the XML UI file
+   * must have a @a gtkmm__ prefix, for instance
+   * @code
+   *   <object class="gtkmm__GtkDialog" id="mydialog3">
+   * @endcode
+   * gtkmm__GtkDialog is a subclass of GtkDialog in the GType system. In most
+   * respects a GtkSomeClass instance acts identically to a gtkmm__GtkSomeClass
+   * instance, but C++ vfuncs and default signal handlers are not called for
+   * GtkSomeClass instances. (Signal handlers, connected with signal_some_signal().connect(),
+   * are called for both gtkmm__GtkSomeClass and GtkSomeClass instances.)
+   *
    * @note
    * If get_widget_derived() is called more than once for the same widget (the
    * same @a name), only the first call will call the widget's constructor.
@@ -627,14 +639,8 @@ public:
 #m4 _CONVERSION(`GSList*',`std::vector<Glib::RefPtr<const Glib::Object> >',`Glib::SListHandler<Glib::RefPtr<const Glib::Object> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(std::vector<Glib::RefPtr<const Glib::Object> > get_objects() const, gtk_builder_get_objects)
 
-  //_WRAP_METHOD(void connect_signals(gpointer       user_data), gtk_builder_connect_signals)
-  //_WRAP_METHOD(void connect_signals_full(GtkBuilderConnectFunc func, gpointer       user_data), gtk_builder_connect_signals_full)
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), gtk_builder_set_translation_domain)
   _WRAP_METHOD(Glib::ustring get_translation_domain() const, gtk_builder_get_translation_domain)
-
-  _WRAP_METHOD(void set_application(const Glib::RefPtr<Application>& application), gtk_builder_set_application)
-  _WRAP_METHOD(Glib::RefPtr<Application> get_application(), gtk_builder_get_application, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Application> get_application() const, gtk_builder_get_application, refreturn, constversion)
 
   //We ignore gtk_builder_get_type_from_name() because it only seems useful when implementing GtkBuildable for widgets.
   _IGNORE(gtk_builder_get_type_from_name)
@@ -644,21 +650,6 @@ public:
 protected:
   Gtk::Widget* get_widget_checked(const Glib::ustring& name, GType type);
   GtkWidget* get_cwidget(const Glib::ustring& name);
-
-private:
-  void set_no_gtkmm_derived_types(bool status);
-  bool no_gtkmm_derived_types {false};
-  friend class Buildable_Class;
-
-#m4begin
-dnl Custom-coded vfunc:
-dnl
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->get_type_from_name = &get_type_from_name_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static GType get_type_from_name_vfunc_callback(GtkBuilder* self, const char* type_name);
-  _POP()
-#m4end
 };
 
 } // namespace Gtk

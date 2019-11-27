@@ -200,7 +200,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/menuitem.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/messagedialog.h>
-#include <gtkmm/modelbutton.h>
 #include <gtkmm/noselection.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/object.h>
