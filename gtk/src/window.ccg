@@ -43,12 +43,21 @@ Window::Window(GtkWindow* castitem)
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
 }
 
-Window::Window(Window&& src)
+Window::Window(Window&& src) noexcept
 : Gtk::Bin(std::move(src))
   , Native(std::move(src))
   , Root(std::move(src))
 {
-  signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+  try
+  {
+    signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+  }
+  catch (...)
+  {
+    // Ignore exceptions.
+    // The move ctor shall be noexcept. It can be called from a move ctor
+    // in a subclass, such as Gtk::Dialog.
+  }
 }
 
 // The move assignment is identical to the one that gmmproc can generate.
