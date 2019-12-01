@@ -39,10 +39,11 @@ const char gladefile[] =
         "<property name='can_focus'>False</property>"
         "<property name='orientation'>vertical</property>"
         "<child>"
-          "<object class='GtkButton' id='derived_button'>"
+          "<object class='gtkmm__CustomObject_DerivedButton' id='derived_button'>"
             "<property name='label' translatable='yes'>DerivedButton</property>"
             "<property name='can_focus'>True</property>"
             "<property name='receives_default'>True</property>"
+            "<property name='background'>#008080</property>"
           "</object>"
         "</child>"
         "<child>"
@@ -87,19 +88,66 @@ void on_adjustment_deleted(sigc::notifiable* /* data */)
 class DerivedButton : public Gtk::Button
 {
 public:
+  static void ensure_type()
+  {
+    std::cout << "DerivedButton::ensure_type()" << std::endl;
+    static_cast<void>(DerivedButton());
+  }
+
   DerivedButton(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& /* refBuilder */,
                 const Glib::ustring& icon_name = {})
-  : Gtk::Button(cobject)
+  : Glib::ObjectBase(s_type_name)
+  , Gtk::Button(cobject)
+  , m_cssProvider_background{ Gtk::CssProvider::create() }
   {
     std::cout << "DerivedButton::ctor" << std::endl;
+
+    get_style_context()->add_provider(
+      m_cssProvider_background, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    apply_background();
+    property_background().signal_changed().connect(
+      sigc::mem_fun(*this, &DerivedButton::apply_background));
 
     if (!icon_name.empty())
       set_icon_name(icon_name);
   }
 
+  auto property_background() const -> Glib::PropertyProxy_ReadOnly<Glib::ustring> { return m_property_background.get_proxy(); }
+  auto property_background()       -> Glib::PropertyProxy         <Glib::ustring> { return m_property_background.get_proxy(); }
+  auto get_background() const -> Glib::ustring { return m_property_background.get_value(); }
+  void set_background(const Glib::ustring& background){ m_property_background.set_value(background); }
+
   virtual ~DerivedButton()
   {
     std::cout << "DerivedButton::dtor" << std::endl;
+  }
+
+private:
+  static constexpr auto s_type_name = "DerivedButton";
+  Glib::Property<Glib::ustring> m_property_background{*this, "background"};
+
+  const Glib::RefPtr<Gtk::CssProvider> m_cssProvider_background;
+
+  DerivedButton()
+  : Glib::ObjectBase(s_type_name)
+  {
+    std::cout << "DerivedButton::ctor to register type" << std::endl;
+  }
+
+  void apply_background()
+  {
+    const auto background = get_background();
+    std::cout << "apply_background(\"" << background << "\")" << std::endl;
+
+    const auto css = background.empty() ? Glib::ustring()
+                     : Glib::ustring::compose("button { background: %1; }", background);
+
+    try {
+      m_cssProvider_background->load_from_data(css);
+    } catch (const Gtk::CssParserError&) {
+      std::cout << "invalid CSS, but I let you keep typing!" << std::endl;
+    }
   }
 };
 
@@ -151,6 +199,7 @@ int main(int argc, char* argv[])
   auto app = Gtk::Application::create();
   g_assert_nonnull(app);
 
+  DerivedButton::ensure_type();
   auto builder = Gtk::Builder::create_from_string(gladefile);
   g_assert_nonnull(builder);
 
