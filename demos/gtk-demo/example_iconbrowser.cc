@@ -875,7 +875,7 @@ bool Example_IconBrowser::is_icon_visible(const Gtk::TreeModel::const_iterator& 
   }
   else
   {
-    const auto context_id = row[m_store->m_columns.context_id];
+    const Glib::ustring context_id = row[m_store->m_columns.context_id];
     visible = context_id == m_current_context_id;
   }
   return visible;

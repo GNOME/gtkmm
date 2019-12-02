@@ -146,7 +146,7 @@ int Example_IconView::on_model_sort(const Gtk::TreeModel::const_iterator& a, con
   else
   {
     Glib::ustring name_a = row_a[m_columns.display_name];
-    return name_a.compare( row_b[m_columns.display_name] );
+    return name_a.compare(row_b.get_value(m_columns.display_name));
   }
 }
 
