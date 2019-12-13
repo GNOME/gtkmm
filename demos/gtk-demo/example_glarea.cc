@@ -57,7 +57,7 @@ protected:
 
   Gtk::Box* create_axis_slider_box(int axis);
   void init_buffers();
-  void init_shaders();
+  void init_shaders(const std::string& vertex_path, const std::string& fragment_path);
   void draw_triangle();
 };
 
@@ -121,7 +121,11 @@ void Example_GLArea::realize()
   {
     m_GLArea.throw_if_error();
     init_buffers();
-    init_shaders();
+
+    const bool use_es = m_GLArea.get_context()->get_use_es();
+    const std::string vertex_path = use_es ? "/glarea/glarea-gles.vs.glsl" : "/glarea/glarea-gl.vs.glsl";
+    const std::string fragment_path = use_es ? "/glarea/glarea-gles.fs.glsl" : "/glarea/glarea-gl.fs.glsl";
+    init_shaders(vertex_path, fragment_path);
   }
   catch(const Gdk::GLError& gle)
   {
@@ -138,7 +142,7 @@ void Example_GLArea::unrealize()
     m_GLArea.throw_if_error();
 
     // Delete buffers and program
-    glDeleteBuffers(1, &m_Vao);
+    glDeleteBuffers(1, &m_Buffer);
     glDeleteProgram(m_Program);
   }
   catch(const Gdk::GLError& gle)
@@ -257,9 +261,9 @@ static GLuint create_shader(int type, const char *src)
   return shader;
 }
 
-void Example_GLArea::init_shaders()
+void Example_GLArea::init_shaders(const std::string& vertex_path, const std::string& fragment_path)
 {
-  auto vshader_bytes = Gio::Resource::lookup_data_global("/glarea/glarea-vertex.glsl");
+  auto vshader_bytes = Gio::Resource::lookup_data_global(vertex_path);
   if(!vshader_bytes)
   {
     cerr << "Failed fetching vertex shader resource" << endl;
@@ -276,7 +280,7 @@ void Example_GLArea::init_shaders()
     return;
   }
 
-  auto fshader_bytes = Gio::Resource::lookup_data_global("/glarea/glarea-fragment.glsl");
+  auto fshader_bytes = Gio::Resource::lookup_data_global(fragment_path);
   if(!fshader_bytes)
   {
     cerr << "Failed fetching fragment shader resource" << endl;
@@ -380,7 +384,7 @@ void Example_GLArea::draw_triangle()
 
   glUniformMatrix4fv(m_Mvp, 1, GL_FALSE, &mvp[0]);
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_Vao);
+  glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 

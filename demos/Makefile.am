@@ -74,8 +74,10 @@ GTK_DEMO_RESOURCES = \
   gtk-demo/apple-red.png \
   gtk-demo/background.jpg \
   gtk-demo/floppybuddy.gif \
-  gtk-demo/glarea-fragment.glsl \
-  gtk-demo/glarea-vertex.glsl \
+  gtk-demo/glarea-gl.fs.glsl \
+  gtk-demo/glarea-gl.vs.glsl \
+  gtk-demo/glarea-gles.fs.glsl \
+  gtk-demo/glarea-gles.vs.glsl \
   gtk-demo/gnome-applets.png \
   gtk-demo/gnome-calendar.png \
   gtk-demo/gnome-foot.png \
