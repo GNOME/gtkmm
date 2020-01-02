@@ -37,6 +37,8 @@ public:
   ~Example_GLArea() override;
 
 protected:
+  // The m_GLContext must be deleted after m_GLArea, therefore declared before m_GLArea.
+  Glib::RefPtr<Gdk::GLContext> m_GLContext;
   Gtk::Box m_VBox {Gtk::ORIENTATION_VERTICAL, false};
   Gtk::GLArea m_GLArea;
   Gtk::Box m_Controls {Gtk::ORIENTATION_VERTICAL, false};
@@ -81,7 +83,9 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_VBox.add(m_GLArea);
 
   // Connect gl area signals
-  m_GLArea.signal_realize().connect(sigc::mem_fun(*this, &Example_GLArea::realize));
+  // Important that the realize signal calls our handler to clean up
+  // GL resources _after_ the default unrealize handler is called (the "true")
+  m_GLArea.signal_realize().connect(sigc::mem_fun(*this, &Example_GLArea::realize), true);
   // Important that the unrealize signal calls our handler to clean up
   // GL resources _before_ the default unrealize handler is called (the "false")
   m_GLArea.signal_unrealize().connect(sigc::mem_fun(*this, &Example_GLArea::unrealize), false);
@@ -126,6 +130,14 @@ void Example_GLArea::realize()
     const std::string vertex_path = use_es ? "/glarea/glarea-gles.vs.glsl" : "/glarea/glarea-gl.vs.glsl";
     const std::string fragment_path = use_es ? "/glarea/glarea-gles.fs.glsl" : "/glarea/glarea-gl.fs.glsl";
     init_shaders(vertex_path, fragment_path);
+
+    // GtkGLArea can drop its reference on the GLContext before the unrealize signal
+    // is emitted. We get our own reference and keep it until Example_GLArea::unrealize()
+    // has been called, thus making sure the context is not prematurely deleted.
+    // https://gitlab.gnome.org/GNOME/gtkmm/issues/63
+    // m_GLContext is unnecessary if https://gitlab.gnome.org/GNOME/gtk/issues/2309
+    // is fixed as in gtk4.
+    m_GLContext = m_GLArea.get_context();
   }
   catch(const Gdk::GLError& gle)
   {
@@ -136,7 +148,13 @@ void Example_GLArea::realize()
 
 void Example_GLArea::unrealize()
 {
+  // Does nothing if GtkGLArea has dropped its reference on the GLContext.
   m_GLArea.make_current();
+
+  if (m_GLContext)
+    // Necessary if m_GLArea.make_current() does nothing.
+    m_GLContext->make_current();
+
   try
   {
     m_GLArea.throw_if_error();
