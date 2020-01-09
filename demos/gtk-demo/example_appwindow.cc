@@ -19,7 +19,7 @@ protected:
 
   //Member widgets:
   Gtk::Grid m_Grid;
-  Gtk::Menu m_Menubar;
+  //Gtk::Menu m_Menubar;
   Gtk::Toolbar m_Toolbar;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Statusbar m_Statusbar;

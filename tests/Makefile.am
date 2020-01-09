@@ -26,7 +26,6 @@ check_PROGRAMS =			\
 	dialog_deletethis/test		\
 	gdk_rgba/test \
 	main_with_options/test		\
-	menu_destruction/test		\
 	object_move/test		\
 	property_notification/test	\
 	refcount_dialog/test		\
@@ -48,7 +47,6 @@ delete_cpp_child_test_SOURCES      = delete_cpp_child/main.cc
 dialog_deletethis_test_SOURCES     = dialog_deletethis/main.cc
 gdk_rgba_test_SOURCES              = gdk_rgba/main.cc
 main_with_options_test_SOURCES     = main_with_options/main.cc
-menu_destruction_test_SOURCES      = menu_destruction/main.cc
 object_move_test_SOURCES           = object_move/main.cc
 property_notification_test_SOURCES = property_notification/main.cc
 refcount_dialog_test_SOURCES       = refcount_dialog/main.cc

@@ -1,8 +1,34 @@
+// Test Gdk::RGBA
+// https://gitlab.gnome.org/GNOME/gtkmm/issues/40
+// https://gitlab.gnome.org/GNOME/gtkmm/issues/42
+// https://gitlab.gnome.org/GNOME/gtkmm/merge_requests/7
+// https://gitlab.gnome.org/GNOME/gtkmm/merge_requests/8
+
 #include <gdkmm/rgba.h>
 #include <glib.h>
+#include <limits>
+#include <cmath>
 
-int
-main()
+// It's usually not safe to compare floating-point numbers for exact equality.
+// In this test program, most (but not all) such comparisons are safe.
+// Where compared colors can't be expected to be exactly equal, but should
+// have been exactly equal, had all calculations been made with infinit precision,
+// then they are compared with is_almost_equal().
+
+namespace
+{
+bool is_almost_equal(const Gdk::RGBA& lhs, const Gdk::RGBA& rhs)
+{
+  constexpr float tolerance = 10 * std::numeric_limits<float>::epsilon();
+
+  return std::abs(lhs.get_red() - rhs.get_red()) <= tolerance
+      && std::abs(lhs.get_green() - rhs.get_green()) <= tolerance
+      && std::abs(lhs.get_blue() - rhs.get_blue()) <= tolerance
+      && std::abs(lhs.get_alpha() - rhs.get_alpha()) <= tolerance;
+}
+} // anonymous namespace
+
+int main()
 {
   // A default-constructed RGBA is black and fully transparent
   auto rgba = Gdk::RGBA{};
@@ -45,11 +71,11 @@ main()
   rgba2.set_hsv(360.0, 1.0, 1.0);
   g_assert_true(rgba == rgba2);
 
-  // Test HSL the same way
+  // Test HSL almost the same way
   rgba2.set_hsl(0.0, 1.0, 0.5);
-  g_assert_true(rgba == rgba2);
+  g_assert_true(is_almost_equal(rgba, rgba2));
   rgba2.set_hsl(360.0, 1.0, 0.5);
-  g_assert_true(rgba == rgba2);
+  g_assert_true(is_almost_equal(rgba, rgba2));
 
   return 0;
 }

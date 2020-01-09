@@ -18,6 +18,7 @@ protected:
   void on_file_quit();
   void on_help_about();
   void on_help_help();
+  void on_not_implemented();
 
   Glib::RefPtr<Gtk::Builder> m_builder;
 };
@@ -60,55 +61,14 @@ Example_Builder::Example_Builder(
   refActions->add_action("quit", sigc::mem_fun(*this, &Example_Builder::on_file_quit));
   refActions->add_action("about", sigc::mem_fun(*this, &Example_Builder::on_help_about));
   refActions->add_action("help", sigc::mem_fun(*this, &Example_Builder::on_help_help));
+  refActions->add_action("new", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("open", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("save", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("save-as", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("copy", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("cut", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
+  refActions->add_action("paste", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
   insert_action_group("win", refActions);
-
-  auto refAccelGroup = Gtk::AccelGroup::create();
-  add_accel_group(refAccelGroup);
-
-  auto pMenuItem = builder->get_widget<Gtk::MenuItem>("new_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_n, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("open_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_o, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("save_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("quit_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_q, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("copy_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("cut_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_x, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("paste_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("help_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_F1, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
-
-  pMenuItem = builder->get_widget<Gtk::MenuItem>("about_item");
-  if (pMenuItem)
-    pMenuItem->add_accelerator("activate", refAccelGroup,
-      GDK_KEY_F7, (Gdk::ModifierType)0, Gtk::AccelFlags::VISIBLE);
 }
 
 Example_Builder::~Example_Builder()
@@ -134,4 +94,9 @@ void Example_Builder::on_help_about()
 void Example_Builder::on_help_help()
 {
   std::cout << "Help not available." << std::endl;
+}
+
+void Example_Builder::on_not_implemented()
+{
+  std::cout << "The selected menu item is not implemented." << std::endl;
 }

@@ -15,7 +15,6 @@ struct Demo
 
 Gtk::Window* do_appwindow();
 Gtk::Window* do_builder();
-Gtk::Window* do_change_display();
 Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
@@ -26,7 +25,6 @@ Gtk::Window* do_headerbar();
 Gtk::Window* do_iconbrowser();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
-Gtk::Window* do_menus();
 Gtk::Window* do_overlay();
 Gtk::Window* do_panes();
 Gtk::Window* do_pixbufs();
@@ -52,7 +50,6 @@ Demo testgtk_demos[] =
 {
   { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), nullptr },
   { "Builder", "example_builder.cc", sigc::ptr_fun(&do_builder), nullptr },
-  { "Change Display", "example_change_display.cc", sigc::ptr_fun(&do_change_display), nullptr },
   { "Color Chooser", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), nullptr },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), nullptr },
@@ -62,7 +59,6 @@ Demo testgtk_demos[] =
   { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), nullptr },
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), nullptr },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), nullptr },
-  { "Menus", "example_menus.cc", sigc::ptr_fun(&do_menus), nullptr },
   { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), nullptr },
   { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), nullptr },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), nullptr },
