@@ -527,31 +527,6 @@ Emitted when an application item is selected from the widget's list.
 <return></return>
 </signal>
 
-<signal name="GtkAppChooserWidget::populate-popup">
-<description>
-Emitted when a context menu is about to popup over an application item.
-Clients can insert menu items into the provided #GtkMenu object in the
-callback of this signal; the context menu will be shown over the item
-if at least one item has been added to the menu.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="menu">
-<parameter_description> the #GtkMenu to populate
-</parameter_description>
-</parameter>
-<parameter name="application">
-<parameter_description> the current #GAppInfo
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <property name="GtkAppChooserWidget:default-text">
 <description>
 The #GtkAppChooserWidget:default-text property determines the text
@@ -1022,6 +997,20 @@ layout as its layout manager.
 </description>
 </property>
 
+<property name="GtkBuilder:current-object">
+<description>
+The object the builder is evaluating for.
+
+</description>
+</property>
+
+<property name="GtkBuilder:scope">
+<description>
+The scope the builder is operating in
+
+</description>
+</property>
+
 <property name="GtkBuilder:translation-domain">
 <description>
 The translation domain used when translating property values that
@@ -1031,6 +1020,24 @@ otherwise g_dgettext().
 
 </description>
 </property>
+
+<enum name="GtkBuilderClosureFlags">
+<description>
+The list of flags that can be passed to gtk_builder_scope_create_closure().
+New values may be added in the future for new features, so external
+implementations of GtkBuilderScopeInterface should test the flags for unknown
+values and raise a %@GTK_BUILDER_ERROR_INVALID_ATTRIBUTE error when they
+encounter one.
+
+</description>
+<parameters>
+<parameter name="GTK_BUILDER_CLOSURE_SWAPPED">
+<parameter_description> The closure should be created swapped. See
+g_cclosure_new_swap() for details.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GtkBuilderError">
 <description>
@@ -2312,23 +2319,6 @@ since 2.10
 
 </description>
 </property>
-
-<signal name="GtkCheckMenuItem::toggled">
-<description>
-This signal is emitted when the state of the check box is changed.
-
-A signal handler can use gtk_check_menu_item_get_active()
-to discover the new state.
-
-</description>
-<parameters>
-<parameter name="checkmenuitem">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
 
 <signal name="GtkColorButton::color-set">
 <description>
@@ -4247,10 +4237,10 @@ Emitted when the pointer moves inside the widget.
 <return></return>
 </signal>
 
-<property name="GtkEventControllerMotion:contains-pointer-focus">
+<property name="GtkEventControllerMotion:contains-pointer">
 <description>
-Whether the pointer is in a descendant of the controllers widget.
-See #GtkEventControllerMotion:is-pointer-focus.
+Whether the pointer is in the controllers widget or a descendant.
+See also #GtkEventControllerMotion:is-pointer.
 
 When handling crossing events, this property is updated
 before #GtkEventControllerMotion::enter or
@@ -4259,11 +4249,11 @@ before #GtkEventControllerMotion::enter or
 </description>
 </property>
 
-<property name="GtkEventControllerMotion:is-pointer-focus">
+<property name="GtkEventControllerMotion:is-pointer">
 <description>
 Whether the pointer is in the controllers widget itself,
-as opposed to in a descendent widget. See
-#GtkEventControllerMotion:contains-pointer-focus.
+as opposed to in a descendent widget. See also
+#GtkEventControllerMotion:contains-pointer.
 
 When handling crossing events, this property is updated
 before #GtkEventControllerMotion::enter or
@@ -6999,6 +6989,10 @@ interpret unknown values as “free form”.
 <parameter_description> Like @GTK_INPUT_PURPOSE_DIGITS, but characters are hidden
 </parameter_description>
 </parameter>
+<parameter name="GTK_INPUT_PURPOSE_TERMINAL">
+<parameter_description> Allow any character, in addition to control codes
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -7720,181 +7714,6 @@ Volume of the audio stream.
 </description>
 </property>
 
-<signal name="GtkMenu::move-scroll">
-<description>
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="scroll_type">
-<parameter_description> a #GtkScrollType
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenu::popped-up">
-<description>
-Emitted when the position of @menu is finalized after being popped up
-using gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (), or
-gtk_menu_popup_at_pointer ().
-
-@menu might be flipped over the anchor rectangle in order to keep it
-on-screen, in which case @flipped_x and @flipped_y will be set to %TRUE
-accordingly.
-
-@flipped_rect is the ideal position of @menu after any possible flipping,
-but before any possible sliding. @final_rect is @flipped_rect, but possibly
-translated in the case that flipping is still ineffective in keeping @menu
-on-screen.
-
-![](popup-slide.png)
-
-The blue menu is @menu's ideal position, the green menu is @flipped_rect,
-and the red menu is @final_rect.
-
-See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
-gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
-#GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and
-#GtkMenu:menu-type-hint.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> the #GtkMenu that popped up
-</parameter_description>
-</parameter>
-<parameter name="flipped_rect">
-<parameter_description> the position of @menu after any possible
-flipping or %NULL if the backend can't obtain it
-</parameter_description>
-</parameter>
-<parameter name="final_rect">
-<parameter_description> the final position of @menu or %NULL if the
-backend can't obtain it
-</parameter_description>
-</parameter>
-<parameter name="flipped_x">
-<parameter_description> %TRUE if the anchors were flipped horizontally
-</parameter_description>
-</parameter>
-<parameter name="flipped_y">
-<parameter_description> %TRUE if the anchors were flipped vertically
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<property name="GtkMenu:accel-group">
-<description>
-The accel group holding accelerators for the menu.
-
-</description>
-</property>
-
-<property name="GtkMenu:accel-path">
-<description>
-An accel path used to conveniently construct accel paths of child items.
-
-</description>
-</property>
-
-<property name="GtkMenu:active">
-<description>
-The index of the currently selected menu item, or -1 if no
-menu item is selected.
-
-</description>
-</property>
-
-<property name="GtkMenu:anchor-hints">
-<description>
-Positioning hints for aligning the menu relative to a rectangle.
-
-These hints determine how the menu should be positioned in the case that
-the menu would fall off-screen if placed in its ideal position.
-
-![](popup-flip.png)
-
-For example, %GDK_ANCHOR_FLIP_Y will replace %GDK_GRAVITY_NORTH_WEST with
-%GDK_GRAVITY_SOUTH_WEST and vice versa if the menu extends beyond the
-bottom edge of the monitor.
-
-See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
-gtk_menu_popup_at_pointer (), #GtkMenu:rect-anchor-dx,
-#GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
-
-</description>
-</property>
-
-<property name="GtkMenu:attach-widget">
-<description>
-The widget the menu is attached to. Setting this property attaches
-the menu without a #GtkMenuDetachFunc. If you need to use a detacher,
-use gtk_menu_attach_to_widget() directly.
-
-</description>
-</property>
-
-<property name="GtkMenu:menu-type-hint">
-<description>
-The #GdkSurfaceTypeHint to use for the menu's #GdkSurface.
-
-See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
-gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
-#GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and #GtkMenu::popped-up.
-
-</description>
-</property>
-
-<property name="GtkMenu:monitor">
-<description>
-The monitor the menu will be popped up on.
-
-</description>
-</property>
-
-<property name="GtkMenu:rect-anchor-dx">
-<description>
-Horizontal offset to apply to the menu, i.e. the rectangle or widget
-anchor.
-
-See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
-gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
-#GtkMenu:rect-anchor-dy, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
-
-</description>
-</property>
-
-<property name="GtkMenu:rect-anchor-dy">
-<description>
-Vertical offset to apply to the menu, i.e. the rectangle or widget anchor.
-
-See gtk_menu_popup_at_rect (), gtk_menu_popup_at_widget (),
-gtk_menu_popup_at_pointer (), #GtkMenu:anchor-hints,
-#GtkMenu:rect-anchor-dx, #GtkMenu:menu-type-hint, and #GtkMenu::popped-up.
-
-</description>
-</property>
-
-<property name="GtkMenu:reserve-toggle-size">
-<description>
-A boolean that indicates whether the menu reserves space for
-toggles and icons, regardless of their actual presence.
-
-This property should only be changed from its default value
-for special-purposes such as tabular menus. Regular menus that
-are connected to a menu bar or context menus should reserve
-toggle space for consistency.
-
-</description>
-</property>
-
 <property name="GtkMenuButton:align-widget">
 <description>
 The #GtkWidget to use to align the menu with.
@@ -7913,8 +7732,6 @@ menu or popover will be popped out.
 <property name="GtkMenuButton:menu-model">
 <description>
 The #GMenuModel from which the popup will be created.
-Depending on the #GtkMenuButton:use-popover property, that may
-be a menu or a popover.
 
 See gtk_menu_button_set_menu_model() for the interaction with the
 #GtkMenuButton:popup property.
@@ -7925,21 +7742,6 @@ See gtk_menu_button_set_menu_model() for the interaction with the
 <property name="GtkMenuButton:popover">
 <description>
 The #GtkPopover that will be popped up when the button is clicked.
-
-</description>
-</property>
-
-<property name="GtkMenuButton:popup">
-<description>
-The #GtkMenu that will be popped up when the button is clicked.
-
-</description>
-</property>
-
-<property name="GtkMenuButton:use-popover">
-<description>
-Whether to construct a #GtkPopover from the menu model,
-or a #GtkMenu.
 
 </description>
 </property>
@@ -7968,224 +7770,6 @@ An enumeration representing directional movements within a menu.
 </parameter>
 </parameters>
 </enum>
-
-<signal name="GtkMenuItem::activate">
-<description>
-Emitted when the item is activated.
-
-</description>
-<parameters>
-<parameter name="menuitem">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuItem::activate-item">
-<description>
-Emitted when the item is activated, but also if the menu item has a
-submenu. For normal applications, the relevant signal is
-#GtkMenuItem::activate.
-
-</description>
-<parameters>
-<parameter name="menuitem">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<property name="GtkMenuItem:accel-path">
-<description>
-Sets the accelerator path of the menu item, through which runtime
-changes of the menu item's accelerator caused by the user can be
-identified and saved to persistant storage.
-
-</description>
-</property>
-
-<property name="GtkMenuItem:label">
-<description>
-The text for the child label.
-
-</description>
-</property>
-
-<property name="GtkMenuItem:submenu">
-<description>
-The submenu attached to the menu item, or %NULL if it has none.
-
-</description>
-</property>
-
-<property name="GtkMenuItem:use-underline">
-<description>
-%TRUE if underlines in the text indicate mnemonics.
-
-</description>
-</property>
-
-<signal name="GtkMenuShell::activate-current">
-<description>
-An action signal that activates the current menu item within
-the menu shell.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="force_hide">
-<parameter_description> if %TRUE, hide the menu after activating the menu item
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::cancel">
-<description>
-An action signal which cancels the selection within the menu shell.
-Causes the #GtkMenuShell::selection-done signal to be emitted.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::cycle-focus">
-<description>
-A keybinding signal which moves the focus in the
-given @direction.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="direction">
-<parameter_description> the direction to cycle in
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::deactivate">
-<description>
-This signal is emitted when a menu shell is deactivated.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::insert">
-<description>
-The ::insert signal is emitted when a new #GtkMenuItem is added to
-a #GtkMenuShell.  A separate signal is used instead of
-GtkContainer::add because of the need for an additional position
-parameter.
-
-The inverse of this signal is the GtkContainer::removed signal.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> the object on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> the #GtkMenuItem that is being inserted
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> the position at which the insert occurs
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::move-current">
-<description>
-A keybinding signal which moves the current menu item
-in the direction specified by @direction.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="direction">
-<parameter_description> the direction to move
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkMenuShell::move-selected">
-<description>
-The ::move-selected signal is emitted to move the selection to
-another item.
-
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> the object on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="distance">
-<parameter_description> +1 to move to the next item, -1 to move to the previous
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE to stop the signal emission, %FALSE to continue
-</return>
-</signal>
-
-<signal name="GtkMenuShell::selection-done">
-<description>
-This signal is emitted when a selection has been
-completed within a menu shell.
-
-</description>
-<parameters>
-<parameter name="menushell">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<property name="GtkMenuShell:take-focus">
-<description>
-A boolean that determines whether the menu and its submenus grab the
-keyboard focus. See gtk_menu_shell_set_take_focus() and
-gtk_menu_shell_get_take_focus().
-
-</description>
-</property>
 
 <signal name="GtkMenuToolButton::show-menu">
 <description>
@@ -9120,8 +8704,7 @@ of the window that it is attached to
 <description>
 The #GMenuModel from which the menu bar is created.
 
-The model should only contain submenus as toplevel
-items.
+The model should only contain submenus as toplevel elements.
 
 </description>
 </property>
@@ -10194,13 +9777,6 @@ of the group that a button belongs to changes.
 <property name="GtkRadioButton:group">
 <description>
 Sets a new group for a radio button.
-
-</description>
-</property>
-
-<property name="GtkRadioMenuItem:group">
-<description>
-The radio menu item whose group this widget belongs to.
 
 </description>
 </property>
@@ -12362,25 +11938,6 @@ Is emitted whenever a new message gets pushed onto a statusbar's stack.
 <return></return>
 </signal>
 
-<signal name="GtkStyle::group-changed">
-<description>
-Emitted when the group of radio menu items that a radio menu item belongs
-to changes. This is emitted when a radio menu item switches from
-being alone to being part of a group of 2 or more menu items, or
-vice-versa, and when a button is moved from one group of 2 or
-more menu items ton a different one, but not when the composition
-of the group that a menu item belongs to changes.
-
-</description>
-<parameters>
-<parameter name="style">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <signal name="GtkStyleContext::changed">
 <description>
 The ::changed signal is emitted when there is a change in the
@@ -14140,40 +13697,6 @@ This property only has an effect if not overridden by
 </description>
 </property>
 
-<signal name="GtkToolItem::create-menu-proxy">
-<description>
-This signal is emitted when the toolbar needs information from @tool_item
-about whether the item should appear in the toolbar overflow menu. In
-response the tool item should either
-
-- call gtk_tool_item_set_proxy_menu_item() with a %NULL
-pointer and return %TRUE to indicate that the item should not appear
-in the overflow menu
-
-- call gtk_tool_item_set_proxy_menu_item() with a new menu
-item and return %TRUE, or 
-
-- return %FALSE to indicate that the signal was not handled by the item.
-This means that the item will not appear in the overflow menu unless
-a later handler installs a menu item.
-
-The toolbar may cache the result of this signal. When the tool item changes
-how it will respond to this signal it must call gtk_tool_item_rebuild_menu()
-to invalidate the cache and ensure that the toolbar rebuilds its overflow
-menu.
-
-
-</description>
-<parameters>
-<parameter name="tool_item">
-<parameter_description> the object the signal was emitted on
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the signal was handled, %FALSE if not
-</return>
-</signal>
-
 <signal name="GtkToolItem::toolbar-reconfigured">
 <description>
 This signal is emitted when some property of the toolbar that the
@@ -14194,6 +13717,16 @@ themselves accordingly.
 </parameters>
 <return></return>
 </signal>
+
+<property name="GtkToolItem:overflow-text">
+<description>
+The text to use as label in the overflow menu item for this
+toolitem.
+
+If unset, #GtkToolButton:label is used for #GtkToolButtons.
+
+</description>
+</property>
 
 <signal name="GtkToolbar::focus-home-or-end">
 <description>
@@ -17323,8 +16856,8 @@ or %NULL if it is not monitoring a widget.
 <function name="gtk_accel_label_get_accel_width">
 <description>
 Returns the width needed to display the accelerator key(s).
-This is used by menus to align all of the #GtkMenuItem widgets, and shouldn't
-be needed by applications.
+This is used by menus to align all of the menu item widgets,
+and shouldn't be needed by applications.
 
 
 </description>
@@ -21729,60 +21262,6 @@ Sets the name of the @buildable object.
 <return></return>
 </function>
 
-<function name="gtk_builder_add_callback_symbol">
-<description>
-Adds the @callback_symbol to the scope of @builder under the given @callback_name.
-
-Using this function overrides the behavior of gtk_builder_create_closure()
-for any callback symbols that are added. Using this method allows for better
-encapsulation as it does not require that callback symbols be declared in
-the global namespace.
-
-</description>
-<parameters>
-<parameter name="builder">
-<parameter_description> a #GtkBuilder
-</parameter_description>
-</parameter>
-<parameter name="callback_name">
-<parameter_description> The name of the callback, as expected in the XML
-</parameter_description>
-</parameter>
-<parameter name="callback_symbol">
-<parameter_description> The callback pointer
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_builder_add_callback_symbols">
-<description>
-A convenience function to add many callbacks instead of calling
-gtk_builder_add_callback_symbol() for each symbol.
-
-</description>
-<parameters>
-<parameter name="builder">
-<parameter_description> a #GtkBuilder
-</parameter_description>
-</parameter>
-<parameter name="first_callback_name">
-<parameter_description> The name of the callback, as expected in the XML
-</parameter_description>
-</parameter>
-<parameter name="first_callback_symbol">
-<parameter_description> The callback pointer
-</parameter_description>
-</parameter>
-<parameter name="Varargs">
-<parameter_description> A list of callback name and callback symbol pairs terminated with %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_builder_add_from_file">
 <description>
 Parses a file containing a [GtkBuilder UI definition][BUILDER-UI]
@@ -22012,45 +21491,6 @@ its child (for instance a #GtkTreeView that depends on its
 </return>
 </function>
 
-<function name="gtk_builder_create_cclosure">
-<description>
-This is the default function used by gtk_builder_set_closure_func(). Some bindings
-with C support may want to call this function as a fallback from their closure
-function.
-
-This function has no purpose otherwise.
-
-This function will prefer callbacks added via gtk_builder_add_callback_symbol()
-to looking up public symbols.
-
-
-</description>
-<parameters>
-<parameter name="builder">
-<parameter_description> a #GtkBuilder
-</parameter_description>
-</parameter>
-<parameter name="function_name">
-<parameter_description> name of the function to look up
-</parameter_description>
-</parameter>
-<parameter name="swapped">
-<parameter_description> %TRUE to create a swapped closure
-</parameter_description>
-</parameter>
-<parameter name="object">
-<parameter_description> Object to create the closure with
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for an error, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> A new closure for invoking @function_name
-</return>
-</function>
-
 <function name="gtk_builder_create_closure">
 <description>
 Creates a closure to invoke the function called @function_name.
@@ -22073,8 +21513,8 @@ be set.
 <parameter_description> name of the function to look up
 </parameter_description>
 </parameter>
-<parameter name="swapped">
-<parameter_description> %TRUE to create a swapped closure
+<parameter name="flags">
+<parameter_description> closure creation flags
 </parameter_description>
 </parameter>
 <parameter name="object">
@@ -22087,6 +21527,76 @@ be set.
 </parameter>
 </parameters>
 <return> A new closure for invoking @function_name
+</return>
+</function>
+
+<function name="gtk_builder_cscope_add_callback_symbol">
+<description>
+Adds the @callback_symbol to the scope of @builder under the given @callback_name.
+
+Using this function overrides the behavior of gtk_builder_create_closure()
+for any callback symbols that are added. Using this method allows for better
+encapsulation as it does not require that callback symbols be declared in
+the global namespace.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkBuilderCScope
+</parameter_description>
+</parameter>
+<parameter name="callback_name">
+<parameter_description> The name of the callback, as expected in the XML
+</parameter_description>
+</parameter>
+<parameter name="callback_symbol">
+<parameter_description> The callback pointer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_builder_cscope_add_callback_symbols">
+<description>
+A convenience function to add many callbacks instead of calling
+gtk_builder_cscope_add_callback_symbol() for each symbol.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkBuilderCScope
+</parameter_description>
+</parameter>
+<parameter name="first_callback_name">
+<parameter_description> The name of the callback, as expected in the XML
+</parameter_description>
+</parameter>
+<parameter name="first_callback_symbol">
+<parameter_description> The callback pointer
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> A list of callback name and callback symbol pairs terminated with %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_builder_cscope_new">
+<description>
+Creates a new #GtkbuilderCScope object to use with future #GtkBuilder
+instances.
+
+Calling this function is only necessary if you want to add custom
+callbacks via gtk_builder_cscope_add_callback_symbol().
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GtkBuilderCScope
 </return>
 </function>
 
@@ -22153,6 +21663,22 @@ templates, applications have no need to call this function.
 </return>
 </function>
 
+<function name="gtk_builder_get_current_object">
+<description>
+Gets the current object set via gtk_builder_set_current_object().
+
+
+</description>
+<parameters>
+<parameter name="builder">
+<parameter_description> a #GtkBuilder
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current object
+</return>
+</function>
+
 <function name="gtk_builder_get_object">
 <description>
 Gets the object named @name. Note that this function does not
@@ -22192,6 +21718,24 @@ objects.
 <return> a newly-allocated #GSList containing all the objects
 constructed by the #GtkBuilder instance. It should be freed by
 g_slist_free()
+</return>
+</function>
+
+<function name="gtk_builder_get_scope">
+<description>
+Gets the scope in use that was set via gtk_builder_set_scope().
+
+See the #GtkBuilderScope documentation for details.
+
+
+</description>
+<parameters>
+<parameter name="builder">
+<parameter_description> a #GtkBuilder
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current scope 
 </return>
 </function>
 
@@ -22238,18 +21782,14 @@ if no type was found
 
 <function name="gtk_builder_lookup_callback_symbol">
 <description>
-Fetches a symbol previously added to @builder
-with gtk_builder_add_callback_symbols()
-
-This function is intended for possible use in language bindings
-or for any case that one might be customizing signal connections
-using gtk_builder_set_closure_func().
+Fetches a symbol previously added to @self
+with gtk_builder_cscope_add_callback_symbol().
 
 
 </description>
 <parameters>
-<parameter name="builder">
-<parameter_description> a #GtkBuilder
+<parameter name="self">
+<parameter_description> a #GtkBuilderCScope
 </parameter_description>
 </parameter>
 <parameter name="callback_name">
@@ -22350,13 +21890,16 @@ from untrusted sources.
 </return>
 </function>
 
-<function name="gtk_builder_set_closure_func">
+<function name="gtk_builder_set_current_object">
 <description>
-Sets the function to call for creating closures.
-gtk_builder_create_closure() will use this function instead
-of gtk_builder_create_cclosure().
+Sets the current object for the @builder. The current object can be
+tought of as the `this` object that the builder is working for and
+will often be used as the default object when an object is optional.
 
-This is useful for bindings.
+gtk_widget_init_template() for example will set the current object to
+the widget the template is inited for.  
+For functions like gtk_builder_new_from_resource(), the current object
+will be %NULL.
 
 </description>
 <parameters>
@@ -22364,17 +21907,32 @@ This is useful for bindings.
 <parameter_description> a #GtkBuilder
 </parameter_description>
 </parameter>
-<parameter name="closure_func">
-<parameter_description> function to call when creating
-closures or %NULL to use the default
+<parameter name="current_object">
+<parameter_description> the new current object or
+%NULL for none
 </parameter_description>
 </parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @closure_func
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_builder_set_scope">
+<description>
+Sets the scope the builder should operate in.
+
+If @scope is %NULL a new #GtkBuilderCScope will be created.
+
+See the #GtkBuilderScope documentation for details.
+
+</description>
+<parameters>
+<parameter name="builder">
+<parameter_description> a #GtkBuilder
 </parameter_description>
 </parameter>
-<parameter name="user_destroy">
-<parameter_description> destroy function for user data
+<parameter name="scope">
+<parameter_description> the scope to use or
+%NULL for the default
 </parameter_description>
 </parameter>
 </parameters>
@@ -26590,178 +26148,6 @@ not the semantics of the button.
 </parameter>
 <parameter name="inconsistent">
 <parameter_description> %TRUE if state is inconsistent
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_check_menu_item_get_active">
-<description>
-Returns whether the check menu item is active. See
-gtk_check_menu_item_set_active ().
-
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the menu item is checked.
-</return>
-</function>
-
-<function name="gtk_check_menu_item_get_draw_as_radio">
-<description>
-Returns whether @check_menu_item looks like a #GtkRadioMenuItem
-
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> Whether @check_menu_item looks like a #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_check_menu_item_get_inconsistent">
-<description>
-Retrieves the value set by gtk_check_menu_item_set_inconsistent().
-
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if inconsistent
-</return>
-</function>
-
-<function name="gtk_check_menu_item_new">
-<description>
-Creates a new #GtkCheckMenuItem.
-
-
-</description>
-<parameters>
-</parameters>
-<return> a new #GtkCheckMenuItem.
-</return>
-</function>
-
-<function name="gtk_check_menu_item_new_with_label">
-<description>
-Creates a new #GtkCheckMenuItem with a label.
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> the string to use for the label.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkCheckMenuItem.
-</return>
-</function>
-
-<function name="gtk_check_menu_item_new_with_mnemonic">
-<description>
-Creates a new #GtkCheckMenuItem containing a label. The label
-will be created using gtk_label_new_with_mnemonic(), so underscores
-in @label indicate the mnemonic for the menu item.
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> The text of the button, with an underscore in front of the
-character
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkCheckMenuItem
-</return>
-</function>
-
-<function name="gtk_check_menu_item_set_active">
-<description>
-Sets the active state of the menu item’s check box.
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem.
-</parameter_description>
-</parameter>
-<parameter name="is_active">
-<parameter_description> boolean value indicating whether the check box is active.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_check_menu_item_set_draw_as_radio">
-<description>
-Sets whether @check_menu_item is drawn like a #GtkRadioMenuItem
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem
-</parameter_description>
-</parameter>
-<parameter name="draw_as_radio">
-<parameter_description> whether @check_menu_item is drawn like a #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_check_menu_item_set_inconsistent">
-<description>
-If the user has selected a range of elements (such as some text or
-spreadsheet cells) that are affected by a boolean setting, and the
-current values in that range are inconsistent, you may want to
-display the check in an “in between” state. This function turns on
-“in between” display.  Normally you would turn off the inconsistent
-state again if the user explicitly selects a setting. This has to be
-done manually, gtk_check_menu_item_set_inconsistent() only affects
-visual appearance, it doesn’t affect the semantics of the widget.
-
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem
-</parameter_description>
-</parameter>
-<parameter name="setting">
-<parameter_description> %TRUE to display an “inconsistent” third state check
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_check_menu_item_toggled">
-<description>
-Emits the #GtkCheckMenuItem::toggled signal.
-
-</description>
-<parameters>
-<parameter name="check_menu_item">
-<parameter_description> a #GtkCheckMenuItem.
 </parameter_description>
 </parameter>
 </parameters>
@@ -33864,6 +33250,22 @@ Creates a new legacy event controller.
 </return>
 </function>
 
+<function name="gtk_event_controller_motion_contains_pointer">
+<description>
+Returns the value of the GtkEventControllerMotion:contains-pointer property.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkEventControllerMotion
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a pointer is within @self or one of its children
+</return>
+</function>
+
 <function name="gtk_event_controller_motion_get_pointer_origin">
 <description>
 Returns the widget that contained the pointer before.
@@ -33901,6 +33303,22 @@ This function can only be used in handlers for the
 </parameter>
 </parameters>
 <return> the next pointer focus
+</return>
+</function>
+
+<function name="gtk_event_controller_motion_is_pointer">
+<description>
+Returns the value of the GtkEventControllerMotion:is-pointer property.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkEventControllerKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a pointer is within @self but not one of its children
 </return>
 </function>
 
@@ -43758,17 +43176,6 @@ Creates a new #GtkIMContextSimple.
 </return>
 </function>
 
-<function name="gtk_im_context_xim_shutdown">
-<description>
-Destroys all the status windows that are kept by the XIM contexts.  This
-function should only be called by the XIM module exit routine.
-
-</description>
-<parameters>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_im_multicontext_get_context_id">
 <description>
 Gets the id of the currently active slave of the @context.
@@ -48889,70 +48296,6 @@ implementations to call this at the frequency they deem appropriate.
 <return></return>
 </function>
 
-<function name="gtk_menu_attach_to_widget">
-<description>
-Attaches the menu to the widget and provides a callback function
-that will be invoked when the menu calls gtk_menu_detach() during
-its destruction.
-
-If the menu is attached to the widget then it will be destroyed
-when the widget is destroyed, as if it was a child widget.
-An attached menu will also move between screens correctly if the
-widgets moves between screens.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="attach_widget">
-<parameter_description> the #GtkWidget that the menu will be attached to
-</parameter_description>
-</parameter>
-<parameter name="detacher">
-<parameter_description> the user supplied callback function
-that will be called when the menu calls gtk_menu_detach()
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_bar_new">
-<description>
-Creates a new #GtkMenuBar
-
-
-</description>
-<parameters>
-</parameters>
-<return> the new menu bar, as a #GtkWidget
-</return>
-</function>
-
-<function name="gtk_menu_bar_new_from_model">
-<description>
-Creates a new #GtkMenuBar and populates it with menu items
-and submenus according to @model.
-
-The created menu items are connected to actions found in the
-#GtkApplicationWindow to which the menu bar belongs - typically
-by means of being contained within the #GtkApplicationWindows
-widget hierarchy.
-
-
-</description>
-<parameters>
-<parameter name="model">
-<parameter_description> a #GMenuModel
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkMenuBar
-</return>
-</function>
-
 <function name="gtk_menu_button_get_align_widget">
 <description>
 Returns the parent #GtkWidget to use to line up with menu.
@@ -49051,24 +48394,6 @@ returns %NULL.
 </return>
 </function>
 
-<function name="gtk_menu_button_get_popup">
-<description>
-Returns the #GtkMenu that pops out of the button.
-If the button does not use a #GtkMenu, this function
-returns %NULL.
-
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GtkMenu or %NULL
-</return>
-</function>
-
 <function name="gtk_menu_button_get_relief">
 <description>
 Returns the current relief style of the given #GtkMenuButton.
@@ -49082,23 +48407,6 @@ Returns the current relief style of the given #GtkMenuButton.
 </parameter>
 </parameters>
 <return> The current #GtkReliefStyle
-</return>
-</function>
-
-<function name="gtk_menu_button_get_use_popover">
-<description>
-Returns whether a #GtkPopover or a #GtkMenu will be constructed
-from the menu model.
-
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if using a #GtkPopover
 </return>
 </function>
 
@@ -49174,14 +48482,13 @@ and not for popovers.
 Sets @func to be called when a popup is about to be shown.
 @func should use one of
 
-- gtk_menu_button_set_popup()
 - gtk_menu_button_set_popover()
 - gtk_menu_button_set_menu_model()
 
-to set a popoup for @menu_button.
+to set a popup for @menu_button.
 If @func is non-%NULL, @menu_button will always be sensitive.
 
-Using this function will NOT reset the menu widget attached to @menu_button.
+Using this function will not reset the menu widget attached to @menu_button.
 Instead, this can be done manually in @func.
 
 </description>
@@ -49275,14 +48582,11 @@ Sets the label to show inside the menu button.
 Sets the #GMenuModel from which the popup will be constructed,
 or %NULL to dissociate any existing menu model and disable the button.
 
-Depending on the value of #GtkMenuButton:use-popover, either a
-#GtkMenu will be created with gtk_menu_new_from_model(), or a
-#GtkPopover with gtk_popover_new_from_model(). In either case,
-actions will be connected as documented for these functions.
+A #GtkPopover will be created from the menu model with gtk_popover_menu_new_from_model().
+Actions will be connected as documented for this function.
 
-If #GtkMenuButton:popup or #GtkMenuButton:popover are already set, those
-widgets are dissociated from the @menu_button, and those properties are set
-to %NULL.
+If #GtkMenuButton:popover is already set, it will be dissociated from the @menu_button,
+and the property is set to %NULL.
 
 </description>
 <parameters>
@@ -49304,8 +48608,8 @@ button
 Sets the #GtkPopover that will be popped up when the @menu_button is clicked,
 or %NULL to dissociate any existing popover and disable the button.
 
-If #GtkMenuButton:menu-model or #GtkMenuButton:popup are set, those objects
-are dissociated from the @menu_button, and those properties are set to %NULL.
+If #GtkMenuButton:menu-model is set, the menu model is dissociated from the
+@menu_button, and the property is set to %NULL.
 
 </description>
 <parameters>
@@ -49315,28 +48619,6 @@ are dissociated from the @menu_button, and those properties are set to %NULL.
 </parameter>
 <parameter name="popover">
 <parameter_description> a #GtkPopover, or %NULL to unset and disable the button
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_button_set_popup">
-<description>
-Sets the #GtkMenu that will be popped up when the @menu_button is clicked, or
-%NULL to dissociate any existing menu and disable the button.
-
-If #GtkMenuButton:menu-model or #GtkMenuButton:popover are set, those objects
-are dissociated from the @menu_button, and those properties are set to %NULL.
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-<parameter name="menu">
-<parameter_description> a #GtkMenu, or %NULL to unset and disable the button
 </parameter_description>
 </parameter>
 </parameters>
@@ -49363,1201 +48645,6 @@ The default style is, as one can guess, %GTK_RELIEF_NORMAL.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_menu_button_set_use_popover">
-<description>
-Sets whether to construct a #GtkPopover instead of #GtkMenu
-when gtk_menu_button_set_menu_model() is called. Note that
-this property is only consulted when a new menu model is set.
-
-</description>
-<parameters>
-<parameter name="menu_button">
-<parameter_description> a #GtkMenuButton
-</parameter_description>
-</parameter>
-<parameter name="use_popover">
-<parameter_description> %TRUE to construct a popover from the menu model
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_detach">
-<description>
-Detaches the menu from the widget to which it had been attached.
-This function will call the callback function, @detacher, provided
-when the gtk_menu_attach_to_widget() function was called.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_get_accel_group">
-<description>
-Gets the #GtkAccelGroup which holds global accelerators for the
-menu. See gtk_menu_set_accel_group().
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkAccelGroup associated with the menu
-</return>
-</function>
-
-<function name="gtk_menu_get_accel_path">
-<description>
-Retrieves the accelerator path set on the menu.
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a valid #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> the accelerator path set on the menu.
-</return>
-</function>
-
-<function name="gtk_menu_get_active">
-<description>
-Returns the selected menu item from the menu.  This is used by the
-#GtkComboBox.
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkMenuItem that was last selected
-in the menu.  If a selection has not yet been made, the
-first menu item is selected.
-</return>
-</function>
-
-<function name="gtk_menu_get_attach_widget">
-<description>
-Returns the #GtkWidget that the menu is attached to.
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkWidget that the menu is attached to
-</return>
-</function>
-
-<function name="gtk_menu_get_for_attach_widget">
-<description>
-Returns a list of the menus which are attached to this widget.
-This list is owned by GTK+ and must not be modified.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> the list
-of menus attached to his widget.
-</return>
-</function>
-
-<function name="gtk_menu_get_monitor">
-<description>
-Retrieves the number of the monitor on which to show the menu.
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> the number of the monitor on which the menu should
-be popped up or -1, if no monitor has been set
-</return>
-</function>
-
-<function name="gtk_menu_get_reserve_toggle_size">
-<description>
-Returns whether the menu reserves space for toggles and
-icons, regardless of their actual presence.
-
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return> Whether the menu reserves toggle space
-</return>
-</function>
-
-<function name="gtk_menu_item_activate">
-<description>
-Emits the #GtkMenuItem::activate signal on the given item
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> the menu item
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_deselect">
-<description>
-Emits the #GtkMenuItem::deselect signal on the given item.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> the menu item
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_get_accel_path">
-<description>
-Retrieve the accelerator path that was previously set on @menu_item.
-
-See gtk_menu_item_set_accel_path() for details.
-
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description>  a valid #GtkMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> the accelerator path corresponding to
-this menu item’s functionality, or %NULL if not set
-</return>
-</function>
-
-<function name="gtk_menu_item_get_label">
-<description>
-Sets @text on the @menu_item label
-
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> The text in the @menu_item label. This is the internal
-string used by the label, and must not be modified.
-</return>
-</function>
-
-<function name="gtk_menu_item_get_reserve_indicator">
-<description>
-Returns whether the @menu_item reserves space for
-the submenu indicator, regardless if it has a submenu
-or not.
-
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if @menu_item always reserves space for the
-submenu indicator
-</return>
-</function>
-
-<function name="gtk_menu_item_get_submenu">
-<description>
-Gets the submenu underneath this menu item, if any.
-See gtk_menu_item_set_submenu().
-
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> submenu for this menu item, or %NULL if none
-</return>
-</function>
-
-<function name="gtk_menu_item_get_use_underline">
-<description>
-Checks if an underline in the text indicates the next character
-should be used for the mnemonic accelerator key.
-
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if an embedded underline in the label
-indicates the mnemonic accelerator key.
-</return>
-</function>
-
-<function name="gtk_menu_item_new">
-<description>
-Creates a new #GtkMenuItem.
-
-
-</description>
-<parameters>
-</parameters>
-<return> the newly created #GtkMenuItem
-</return>
-</function>
-
-<function name="gtk_menu_item_new_with_label">
-<description>
-Creates a new #GtkMenuItem whose child is a #GtkLabel.
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> the text for the label
-</parameter_description>
-</parameter>
-</parameters>
-<return> the newly created #GtkMenuItem
-</return>
-</function>
-
-<function name="gtk_menu_item_new_with_mnemonic">
-<description>
-Creates a new #GtkMenuItem containing a label.
-
-The label will be created using gtk_label_new_with_mnemonic(),
-so underscores in @label indicate the mnemonic for the menu item.
-
-
-</description>
-<parameters>
-<parameter name="label">
-<parameter_description> The text of the button, with an underscore in front of the
-mnemonic character
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkMenuItem
-</return>
-</function>
-
-<function name="gtk_menu_item_select">
-<description>
-Emits the #GtkMenuItem::select signal on the given item.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> the menu item
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_set_accel_path">
-<description>
-Set the accelerator path on @menu_item, through which runtime
-changes of the menu item’s accelerator caused by the user can be
-identified and saved to persistent storage (see gtk_accel_map_save()
-on this). To set up a default accelerator for this menu item, call
-gtk_accel_map_add_entry() with the same @accel_path. See also
-gtk_accel_map_add_entry() on the specifics of accelerator paths,
-and gtk_menu_set_accel_path() for a more convenient variant of
-this function.
-
-This function is basically a convenience wrapper that handles
-calling gtk_widget_set_accel_path() with the appropriate accelerator
-group for the menu item.
-
-Note that you do need to set an accelerator on the parent menu with
-gtk_menu_set_accel_group() for this to work.
-
-Note that @accel_path string will be stored in a #GQuark.
-Therefore, if you pass a static string, you can save some memory
-by interning it first with g_intern_static_string().
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description>  a valid #GtkMenuItem
-</parameter_description>
-</parameter>
-<parameter name="accel_path">
-<parameter_description> accelerator path, corresponding to this menu
-item’s functionality, or %NULL to unset the current path.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_set_label">
-<description>
-Sets @text on the @menu_item label
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-<parameter name="label">
-<parameter_description> the text you want to set
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_set_reserve_indicator">
-<description>
-Sets whether the @menu_item should reserve space for
-the submenu indicator, regardless if it actually has
-a submenu or not.
-
-There should be little need for applications to call
-this functions.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-<parameter name="reserve">
-<parameter_description> the new value
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_set_submenu">
-<description>
-Sets or replaces the menu item’s submenu, or removes it when a %NULL
-submenu is passed.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-<parameter name="submenu">
-<parameter_description> the submenu, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_set_use_underline">
-<description>
-If true, an underline in the text indicates the next character
-should be used for the mnemonic accelerator key.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem
-</parameter_description>
-</parameter>
-<parameter name="setting">
-<parameter_description> %TRUE if underlines in the text indicate mnemonics
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_toggle_size_allocate">
-<description>
-Emits the #GtkMenuItem::toggle-size-allocate signal on the given item.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> the menu item.
-</parameter_description>
-</parameter>
-<parameter name="allocation">
-<parameter_description> the allocation to use as signal data.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_item_toggle_size_request">
-<description>
-Emits the #GtkMenuItem::toggle-size-request signal on the given item.
-
-</description>
-<parameters>
-<parameter name="menu_item">
-<parameter_description> the menu item
-</parameter_description>
-</parameter>
-<parameter name="requisition">
-<parameter_description> the requisition to use as signal data.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_new">
-<description>
-Creates a new #GtkMenu
-
-
-</description>
-<parameters>
-</parameters>
-<return> a new #GtkMenu
-</return>
-</function>
-
-<function name="gtk_menu_new_from_model">
-<description>
-Creates a #GtkMenu and populates it with menu items and
-submenus according to @model.
-
-The created menu items are connected to actions found in the
-#GtkApplicationWindow to which the menu belongs - typically
-by means of being attached to a widget (see gtk_menu_attach_to_widget())
-that is contained within the #GtkApplicationWindows widget hierarchy.
-
-Actions can also be added using gtk_widget_insert_action_group() on the menu's
-attach widget or on any of its parent widgets.
-
-
-</description>
-<parameters>
-<parameter name="model">
-<parameter_description> a #GMenuModel
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkMenu
-</return>
-</function>
-
-<function name="gtk_menu_place_on_monitor">
-<description>
-Places @menu on the given monitor.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="monitor">
-<parameter_description> the monitor to place the menu on
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_popdown">
-<description>
-Removes the menu from the screen.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_popup_at_pointer">
-<description>
-Displays @menu and makes it available for selection.
-
-See gtk_menu_popup_at_widget () to pop up a menu at a widget.
-gtk_menu_popup_at_rect () also allows you to position a menu at an arbitrary
-rectangle.
-
-@menu will be positioned at the pointer associated with @trigger_event.
-
-Properties that influence the behaviour of this function are
-#GtkMenu:anchor-hints, #GtkMenu:rect-anchor-dx, #GtkMenu:rect-anchor-dy, and
-#GtkMenu:menu-type-hint. Connect to the #GtkMenu::popped-up signal to find
-out how it was actually positioned.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> the #GtkMenu to pop up
-</parameter_description>
-</parameter>
-<parameter name="trigger_event">
-<parameter_description> the #GdkEvent that initiated this request or
-%NULL if it's the current event
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_popup_at_rect">
-<description>
-Displays @menu and makes it available for selection.
-
-See gtk_menu_popup_at_widget () and gtk_menu_popup_at_pointer (), which
-handle more common cases for popping up menus.
-
-@menu will be positioned at @rect, aligning their anchor points. @rect is
-relative to the top-left corner of @rect_surface. @rect_anchor and
-@menu_anchor determine anchor points on @rect and @menu to pin together.
-@menu can optionally be offset by #GtkMenu:rect-anchor-dx and
-#GtkMenu:rect-anchor-dy.
-
-Anchors should be specified under the assumption that the text direction is
-left-to-right; they will be flipped horizontally automatically if the text
-direction is right-to-left.
-
-Other properties that influence the behaviour of this function are
-#GtkMenu:anchor-hints and #GtkMenu:menu-type-hint. Connect to the
-#GtkMenu::popped-up signal to find out how it was actually positioned.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> the #GtkMenu to pop up
-</parameter_description>
-</parameter>
-<parameter name="rect_surface">
-<parameter_description> the #GdkSurface @rect is relative to
-</parameter_description>
-</parameter>
-<parameter name="rect">
-<parameter_description> the #GdkRectangle to align @menu with
-</parameter_description>
-</parameter>
-<parameter name="rect_anchor">
-<parameter_description> the point on @rect to align with @menu's anchor point
-</parameter_description>
-</parameter>
-<parameter name="menu_anchor">
-<parameter_description> the point on @menu to align with @rect's anchor point
-</parameter_description>
-</parameter>
-<parameter name="trigger_event">
-<parameter_description> the #GdkEvent that initiated this request or
-%NULL if it's the current event
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_popup_at_widget">
-<description>
-Displays @menu and makes it available for selection.
-
-See gtk_menu_popup_at_pointer () to pop up a menu at the master pointer.
-gtk_menu_popup_at_rect () also allows you to position a menu at an arbitrary
-rectangle.
-
-![](popup-anchors.png)
-
-@menu will be positioned at @widget, aligning their anchor points.
-@widget_anchor and @menu_anchor determine anchor points on @widget and @menu
-to pin together. @menu can optionally be offset by #GtkMenu:rect-anchor-dx
-and #GtkMenu:rect-anchor-dy.
-
-Anchors should be specified under the assumption that the text direction is
-left-to-right; they will be flipped horizontally automatically if the text
-direction is right-to-left.
-
-Other properties that influence the behaviour of this function are
-#GtkMenu:anchor-hints and #GtkMenu:menu-type-hint. Connect to the
-#GtkMenu::popped-up signal to find out how it was actually positioned.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> the #GtkMenu to pop up
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> the #GtkWidget to align @menu with
-</parameter_description>
-</parameter>
-<parameter name="widget_anchor">
-<parameter_description> the point on @widget to align with @menu's anchor point
-</parameter_description>
-</parameter>
-<parameter name="menu_anchor">
-<parameter_description> the point on @menu to align with @widget's anchor point
-</parameter_description>
-</parameter>
-<parameter name="trigger_event">
-<parameter_description> the #GdkEvent that initiated this request or
-%NULL if it's the current event
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_reorder_child">
-<description>
-Moves @child to a new @position in the list of @menu
-children.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> the #GtkMenuItem to move
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> the new position to place @child.
-Positions are numbered from 0 to n - 1
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_reposition">
-<description>
-Repositions the menu according to its position function.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_set_accel_group">
-<description>
-Set the #GtkAccelGroup which holds global accelerators for the
-menu.  This accelerator group needs to also be added to all windows
-that this menu is being used in with gtk_window_add_accel_group(),
-in order for those windows to support all the accelerators
-contained in this group.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="accel_group">
-<parameter_description> the #GtkAccelGroup to be associated
-with the menu.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_set_accel_path">
-<description>
-Sets an accelerator path for this menu from which accelerator paths
-for its immediate children, its menu items, can be constructed.
-The main purpose of this function is to spare the programmer the
-inconvenience of having to call gtk_menu_item_set_accel_path() on
-each menu item that should support runtime user changable accelerators.
-Instead, by just calling gtk_menu_set_accel_path() on their parent,
-each menu item of this menu, that contains a label describing its
-purpose, automatically gets an accel path assigned.
-
-For example, a menu containing menu items “New” and “Exit”, will, after
-`gtk_menu_set_accel_path (menu, &quot;&lt;Gnumeric-Sheet&gt;/File&quot;);` has been
-called, assign its items the accel paths: `&quot;&lt;Gnumeric-Sheet&gt;/File/New&quot;`
-and `&quot;&lt;Gnumeric-Sheet&gt;/File/Exit&quot;`.
-
-Assigning accel paths to menu items then enables the user to change
-their accelerators at runtime. More details about accelerator paths
-and their default setups can be found at gtk_accel_map_add_entry().
-
-Note that @accel_path string will be stored in a #GQuark. Therefore,
-if you pass a static string, you can save some memory by interning
-it first with g_intern_static_string().
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description>       a valid #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="accel_path">
-<parameter_description> a valid accelerator path, or %NULL to unset the path
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_set_active">
-<description>
-Selects the specified menu item within the menu.  This is used by
-the #GtkComboBox and should not be used by anyone else.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="index">
-<parameter_description> the index of the menu item to select.  Index values are
-from 0 to n-1
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_set_monitor">
-<description>
-Informs GTK+ on which monitor a menu should be popped up.
-See gdk_monitor_get_geometry().
-
-This function should be called from a #GtkMenuPositionFunc
-if the menu should not appear on the same monitor as the pointer.
-This information can’t be reliably inferred from the coordinates
-returned by a #GtkMenuPositionFunc, since, for very long menus,
-these coordinates may extend beyond the monitor boundaries or even
-the screen boundaries.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="monitor_num">
-<parameter_description> the number of the monitor on which the menu should
-be popped up
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_set_reserve_toggle_size">
-<description>
-Sets whether the menu should reserve space for drawing toggles
-or icons, regardless of their actual presence.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> a #GtkMenu
-</parameter_description>
-</parameter>
-<parameter name="reserve_toggle_size">
-<parameter_description> whether to reserve size for toggles
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_activate_item">
-<description>
-Activates the menu item within the menu shell.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="menu_item">
-<parameter_description> the #GtkMenuItem to activate
-</parameter_description>
-</parameter>
-<parameter name="force_deactivate">
-<parameter_description> if %TRUE, force the deactivation of the
-menu shell after the menu item is activated
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_append">
-<description>
-Adds a new #GtkMenuItem to the end of the menu shell's
-item list.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> The #GtkMenuItem to add
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_bind_model">
-<description>
-Establishes a binding between a #GtkMenuShell and a #GMenuModel.
-
-The contents of @shell are removed and then refilled with menu items
-according to @model.  When @model changes, @shell is updated.
-Calling this function twice on @shell with different @model will
-cause the first binding to be replaced with a binding to the new
-model. If @model is %NULL then any previous binding is undone and
-all children are removed.
-
-@with_separators determines if toplevel items (eg: sections) have
-separators inserted between them.  This is typically desired for
-menus but doesn’t make sense for menubars.
-
-If @action_namespace is non-%NULL then the effect is as if all
-actions mentioned in the @model have their names prefixed with the
-namespace, plus a dot.  For example, if the action “quit” is
-mentioned and @action_namespace is “app” then the effective action
-name is “app.quit”.
-
-This function uses #GtkActionable to define the action name and
-target values on the created menu items.  If you want to use an
-action group other than “app” and “win”, or if you want to use a
-#GtkMenuShell outside of a #GtkApplicationWindow, then you will need
-to attach your own action group to the widget hierarchy using
-gtk_widget_insert_action_group().  As an example, if you created a
-group with a “quit” action and inserted it with the name “mygroup”
-then you would use the action name “mygroup.quit” in your
-#GMenuModel.
-
-For most cases you are probably better off using
-gtk_menu_new_from_model() or gtk_menu_bar_new_from_model() or just
-directly passing the #GMenuModel to gtk_application_set_app_menu() or
-gtk_application_set_menubar().
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="model">
-<parameter_description> the #GMenuModel to bind to or %NULL to remove
-binding
-</parameter_description>
-</parameter>
-<parameter name="action_namespace">
-<parameter_description> the namespace for actions in @model
-</parameter_description>
-</parameter>
-<parameter name="with_separators">
-<parameter_description> %TRUE if toplevel items in @shell should have
-separators between them
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_cancel">
-<description>
-Cancels the selection within the menu shell.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_deactivate">
-<description>
-Deactivates the menu shell.
-
-Typically this results in the menu shell being erased
-from the screen.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_deselect">
-<description>
-Deselects the currently selected item from the menu shell,
-if any.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_get_parent_shell">
-<description>
-Gets the parent menu shell.
-
-The parent menu shell of a submenu is the #GtkMenu or #GtkMenuBar
-from which it was opened up.
-
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return> the parent #GtkMenuShell
-</return>
-</function>
-
-<function name="gtk_menu_shell_get_selected_item">
-<description>
-Gets the currently selected item.
-
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return> the currently selected item
-</return>
-</function>
-
-<function name="gtk_menu_shell_get_take_focus">
-<description>
-Returns %TRUE if the menu shell will take the keyboard focus on popup.
-
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the menu shell will take the keyboard focus on popup.
-</return>
-</function>
-
-<function name="gtk_menu_shell_insert">
-<description>
-Adds a new #GtkMenuItem to the menu shell’s item list
-at the position indicated by @position.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> The #GtkMenuItem to add
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> The position in the item list where @child
-is added. Positions are numbered from 0 to n-1
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_prepend">
-<description>
-Adds a new #GtkMenuItem to the beginning of the menu shell's
-item list.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> The #GtkMenuItem to add
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_select_first">
-<description>
-Select the first visible or selectable child of the menu shell.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="search_sensitive">
-<parameter_description> if %TRUE, search for the first selectable
-menu item, otherwise select nothing if
-the first item isn’t sensitive. This
-should be %FALSE if the menu is being
-popped up initially.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_select_item">
-<description>
-Selects the menu item from the menu shell.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="menu_item">
-<parameter_description> The #GtkMenuItem to select
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_shell_set_take_focus">
-<description>
-If @take_focus is %TRUE (the default) the menu shell will take
-the keyboard focus so that it will receive all keyboard events
-which is needed to enable keyboard navigation in menus.
-
-Setting @take_focus to %FALSE is useful only for special applications
-like virtual keyboard implementations which should not take keyboard
-focus.
-
-The @take_focus state of a menu or menu bar is automatically
-propagated to submenus whenever a submenu is popped up, so you
-don’t have to worry about recursively setting it for your entire
-menu hierarchy. Only when programmatically picking a submenu and
-popping it up manually, the @take_focus property of the submenu
-needs to be set explicitly.
-
-Note that setting it to %FALSE has side-effects:
-
-If the focus is in some other app, it keeps the focus and keynav in
-the menu doesn’t work. Consequently, keynav on the menu will only
-work if the focus is on some toplevel owned by the onscreen keyboard.
-
-To avoid confusing the user, menus with @take_focus set to %FALSE
-should not display mnemonics or accelerators, since it cannot be
-guaranteed that they will work.
-
-</description>
-<parameters>
-<parameter name="menu_shell">
-<parameter_description> a #GtkMenuShell
-</parameter_description>
-</parameter>
-<parameter name="take_focus">
-<parameter_description> %TRUE if the menu shell should take the keyboard
-focus on popup
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_menu_tool_button_get_menu">
-<description>
-Gets the #GtkMenu associated with #GtkMenuToolButton.
-
-
-</description>
-<parameters>
-<parameter name="button">
-<parameter_description> a #GtkMenuToolButton
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GtkMenu associated
-with #GtkMenuToolButton
-</return>
 </function>
 
 <function name="gtk_menu_tool_button_new">
@@ -50621,25 +48708,6 @@ on the whole #GtkMenuToolButton.
 <return></return>
 </function>
 
-<function name="gtk_menu_tool_button_set_menu">
-<description>
-Sets the #GtkMenu that is popped up when the user clicks on the arrow.
-If @menu is NULL, the arrow button becomes insensitive.
-
-</description>
-<parameters>
-<parameter name="button">
-<parameter_description> a #GtkMenuToolButton
-</parameter_description>
-</parameter>
-<parameter name="menu">
-<parameter_description> the #GtkMenu associated with #GtkMenuToolButton
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_menu_tracker_item_get_is_visible">
 <description>
 Don't use this unless you're tracking items for yourself -- normally
@@ -50669,44 +48737,6 @@ the tracker will emit add/remove automatically when this changes.
 </parameters>
 <return> if the item may disappear (ie: is-visible property may change)
 </return>
-</function>
-
-<function name="gtk_menu_update_scroll_offset">
-<description>
-Updates the scroll offset of @menu based on the amount of sliding done while
-positioning @menu. Connect this to the #GtkMenu::popped-up signal to keep the
-contents of the menu vertically aligned with their ideal position, for combo
-boxes for example.
-
-</description>
-<parameters>
-<parameter name="menu">
-<parameter_description> the #GtkMenu that popped up
-</parameter_description>
-</parameter>
-<parameter name="flipped_rect">
-<parameter_description> the position of @menu after any possible flipping
-or %NULL if unknown
-</parameter_description>
-</parameter>
-<parameter name="final_rect">
-<parameter_description> the final position of @menu or %NULL if unknown
-</parameter_description>
-</parameter>
-<parameter name="flipped_x">
-<parameter_description> %TRUE if the anchors were flipped horizontally
-</parameter_description>
-</parameter>
-<parameter name="flipped_y">
-<parameter_description> %TRUE if the anchors were flipped vertically
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_message_dialog_format_secondary_markup">
@@ -54691,6 +52721,22 @@ its contents.
 <return></return>
 </function>
 
+<function name="gtk_popover_menu_get_menu_model">
+<description>
+Returns the menu model used to populate the popover.
+
+
+</description>
+<parameters>
+<parameter name="popover">
+<parameter_description> a #GtkPopoverMenu
+</parameter_description>
+</parameter>
+</parameters>
+<return> the menu model of @popover
+</return>
+</function>
+
 <function name="gtk_popover_menu_new">
 <description>
 Creates a new popover menu.
@@ -54746,12 +52792,10 @@ Creates a #GtkPopoverMenu and populates it according to
 @model. The popover is pointed to the @relative_to widget.
 
 The created buttons are connected to actions found in the
-#GtkApplicationWindow to which the popover belongs - typically
-by means of being attached to a widget that is contained within
-the #GtkApplicationWindows widget hierarchy.
-
-Actions can also be added using gtk_widget_insert_action_group()
-on the menus attach widget or on any of its parent widgets.
+action groups that are accessible from the @relative-to widget.
+This includes the #GtkApplicationWindow to which the popover
+belongs. Actions can also be added using gtk_widget_insert_action_group()
+on the @relative-to widget or on any of its parent widgets.
 
 The only flag that is supported currently is
 #GTK_POPOVER_MENU_NESTED, which makes GTK create traditional,
@@ -54777,17 +52821,13 @@ nested submenus instead of the default sliding submenus.
 </return>
 </function>
 
-<function name="gtk_popover_menu_open_submenu">
+<function name="gtk_popover_menu_set_model">
 <description>
-Opens a submenu of the @popover. The @name
-must be one of the names given to the submenus
-of @popover with #GtkPopoverMenu:submenu, or
-&quot;main&quot; to switch back to the main menu.
+Sets a new menu model on @popover.
 
-#GtkModelButton will open submenus automatically
-when the #GtkModelButton:menu-name property is set,
-so this function is only needed when you are using
-other kinds of widgets to initiate menu changes.
+The existing contents of @popover are removed, and
+the @popover is populated with new contents according
+to @model.
 
 </description>
 <parameters>
@@ -54795,8 +52835,8 @@ other kinds of widgets to initiate menu changes.
 <parameter_description> a #GtkPopoverMenu
 </parameter_description>
 </parameter>
-<parameter name="name">
-<parameter_description> the name of the menu to switch to
+<parameter name="model">
+<parameter_description> a #GtkMenuModel, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -59585,207 +57625,6 @@ button group, such as one returned from gtk_radio_button_get_group(), or %NULL.
 <return></return>
 </function>
 
-<function name="gtk_radio_menu_item_get_group">
-<description>
-Returns the group to which the radio menu item belongs, as a #GList of
-#GtkRadioMenuItem. The list belongs to GTK+ and should not be freed.
-
-
-</description>
-<parameters>
-<parameter name="radio_menu_item">
-<parameter_description> a #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> the group
-of @radio_menu_item
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_join_group">
-<description>
-Joins a #GtkRadioMenuItem object to the group of another #GtkRadioMenuItem
-object.
-
-This function should be used by language bindings to avoid the memory
-manangement of the opaque #GSList of gtk_radio_menu_item_get_group()
-and gtk_radio_menu_item_set_group().
-
-A common way to set up a group of #GtkRadioMenuItem instances is:
-
-|[
-GtkRadioMenuItem *last_item = NULL;
-
-while ( ...more items to add... )
-{
-GtkRadioMenuItem *radio_item;
-
-radio_item = gtk_radio_menu_item_new (...);
-
-gtk_radio_menu_item_join_group (radio_item, last_item);
-last_item = radio_item;
-}
-]|
-
-</description>
-<parameters>
-<parameter name="radio_menu_item">
-<parameter_description> a #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-<parameter name="group_source">
-<parameter_description> a #GtkRadioMenuItem whose group we are
-joining, or %NULL to remove the @radio_menu_item from its current
-group
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_radio_menu_item_new">
-<description>
-Creates a new #GtkRadioMenuItem.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description> the group to which the
-radio menu item is to be attached, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_new_from_widget">
-<description>
-Creates a new #GtkRadioMenuItem adding it to the same group as @group.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description> An existing #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_new_with_label">
-<description>
-Creates a new #GtkRadioMenuItem whose child is a simple #GtkLabel.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description>
-group the radio menu item is inside, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="label">
-<parameter_description> the text for the label
-</parameter_description>
-</parameter>
-</parameters>
-<return> A new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_new_with_label_from_widget">
-<description>
-Creates a new GtkRadioMenuItem whose child is a simple GtkLabel.
-The new #GtkRadioMenuItem is added to the same group as @group.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description> an existing #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-<parameter name="label">
-<parameter_description> the text for the label
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_new_with_mnemonic">
-<description>
-Creates a new #GtkRadioMenuItem containing a label. The label
-will be created using gtk_label_new_with_mnemonic(), so underscores
-in @label indicate the mnemonic for the menu item.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description>
-group the radio menu item is inside, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="label">
-<parameter_description> the text of the button, with an underscore in front of the
-mnemonic character
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_new_with_mnemonic_from_widget">
-<description>
-Creates a new GtkRadioMenuItem containing a label. The label will be
-created using gtk_label_new_with_mnemonic(), so underscores in label
-indicate the mnemonic for the menu item.
-
-The new #GtkRadioMenuItem is added to the same group as @group.
-
-
-</description>
-<parameters>
-<parameter name="group">
-<parameter_description> An existing #GtkRadioMenuItem
-</parameter_description>
-</parameter>
-<parameter name="label">
-<parameter_description> the text of the button, with an underscore in front of the
-mnemonic character
-</parameter_description>
-</parameter>
-</parameters>
-<return> The new #GtkRadioMenuItem
-</return>
-</function>
-
-<function name="gtk_radio_menu_item_set_group">
-<description>
-Sets the group of a radio menu item, or changes it.
-
-</description>
-<parameters>
-<parameter name="radio_menu_item">
-<parameter_description> a #GtkRadioMenuItem.
-</parameter_description>
-</parameter>
-<parameter name="group">
-<parameter_description> the new group, or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_radio_tool_button_get_group">
 <description>
 Returns the radio button group @button belongs to.
@@ -64042,18 +61881,6 @@ Requests to unselect a range of items in the model.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gtk_separator_menu_item_new">
-<description>
-Creates a new #GtkSeparatorMenuItem.
-
-
-</description>
-<parameters>
-</parameters>
-<return> a new #GtkSeparatorMenuItem.
-</return>
 </function>
 
 <function name="gtk_separator_new">
@@ -68430,7 +66257,7 @@ gtk_text_buffer_end_irreversible_action() pairs.
 
 </description>
 <parameters>
-<parameter name="self">
+<parameter name="buffer">
 <parameter_description> a #Gtktextbuffer
 </parameter_description>
 </parameter>
@@ -68761,7 +66588,7 @@ gtk_text_buffer_end_irreversible_action() pairs.
 
 </description>
 <parameters>
-<parameter name="self">
+<parameter name="buffer">
 <parameter_description> a #Gtktextbuffer
 </parameter_description>
 </parameter>
@@ -75567,16 +73394,11 @@ used for @tool_item
 </return>
 </function>
 
-<function name="gtk_tool_item_get_proxy_menu_item">
+<function name="gtk_tool_item_get_overflow_text">
 <description>
-If @menu_item_id matches the string passed to
-gtk_tool_item_set_proxy_menu_item() return the corresponding #GtkMenuItem.
+Gets the label that is used for @tool_item in the overflow menu.
 
-Custom subclasses of #GtkToolItem should use this function to
-update their menu item when the #GtkToolItem changes. That the
-@menu_item_ids must match ensures that a #GtkToolItem
-will not inadvertently change a menu item that they did not create.
-
+Return: the overflow menu label for @tool_item
 
 </description>
 <parameters>
@@ -75584,15 +73406,8 @@ will not inadvertently change a menu item that they did not create.
 <parameter_description> a #GtkToolItem
 </parameter_description>
 </parameter>
-<parameter name="menu_item_id">
-<parameter_description> a string used to identify the menu item
-</parameter_description>
-</parameter>
 </parameters>
-<return> The #GtkMenuItem passed to
-gtk_tool_item_set_proxy_menu_item(), if the @menu_item_ids
-match.
-</return>
+<return></return>
 </function>
 
 <function name="gtk_tool_item_get_text_alignment">
@@ -75746,25 +73561,6 @@ will do in response to the #GtkToolItem::create-menu-proxy signal.
 <return></return>
 </function>
 
-<function name="gtk_tool_item_retrieve_proxy_menu_item">
-<description>
-Returns the #GtkMenuItem that was last set by
-gtk_tool_item_set_proxy_menu_item(), ie. the #GtkMenuItem
-that is going to appear in the overflow menu.
-
-
-</description>
-<parameters>
-<parameter name="tool_item">
-<parameter_description> a #GtkToolItem 
-</parameter_description>
-</parameter>
-</parameters>
-<return> The #GtkMenuItem that is going to appear in the
-overflow menu for @tool_item.
-</return>
-</function>
-
 <function name="gtk_tool_item_set_expand">
 <description>
 Sets whether @tool_item is allocated extra space when there
@@ -75828,13 +73624,9 @@ effect known as “priority text”
 <return></return>
 </function>
 
-<function name="gtk_tool_item_set_proxy_menu_item">
+<function name="gtk_tool_item_set_overflow_text">
 <description>
-Sets the #GtkMenuItem used in the toolbar overflow menu. The
-@menu_item_id is used to identify the caller of this function and
-should also be used with gtk_tool_item_get_proxy_menu_item().
-
-See also #GtkToolItem::create-menu-proxy.
+Sets the label to use for @tool_item in the overflow menu.
 
 </description>
 <parameters>
@@ -75842,12 +73634,8 @@ See also #GtkToolItem::create-menu-proxy.
 <parameter_description> a #GtkToolItem
 </parameter_description>
 </parameter>
-<parameter name="menu_item_id">
-<parameter_description> a string used to identify @menu_item
-</parameter_description>
-</parameter>
-<parameter name="menu_item">
-<parameter_description> a #GtkMenuItem to use in the overflow menu, or %NULL
+<parameter name="overflow_text">
+<parameter_description> Label to use in the overflow menu
 </parameter_description>
 </parameter>
 </parameters>
@@ -78161,7 +75949,7 @@ Checks if the given iter is a valid iter for this #GtkTreeModelSort.
 
 <function name="gtk_tree_model_sort_new_with_model">
 <description>
-Creates a new #GtkTreeModel, with @child_model as the child model.
+Creates a new #GtkTreeModelSort, with @child_model as the child model.
 
 
 </description>
@@ -78171,7 +75959,7 @@ Creates a new #GtkTreeModel, with @child_model as the child model.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A new #GtkTreeModel.
+<return> A new #GtkTreeModelSort.
 </return>
 </function>
 
@@ -82148,22 +79936,6 @@ Returns the compare function currently in use.
 </return>
 </function>
 
-<function name="gtk_tree_view_get_search_position_func">
-<description>
-Returns the positioning function currently in use.
-
-
-</description>
-<parameters>
-<parameter name="tree_view">
-<parameter_description> A #GtkTreeView
-</parameter_description>
-</parameter>
-</parameters>
-<return> the currently used function for positioning the search dialog.
-</return>
-</function>
-
 <function name="gtk_tree_view_get_selection">
 <description>
 Gets the #GtkTreeSelection associated with @tree_view.
@@ -83249,33 +81021,6 @@ that somewhat like strcmp() returning 0 for equality
 <return></return>
 </function>
 
-<function name="gtk_tree_view_set_search_position_func">
-<description>
-Sets the function to use when positioning the search dialog.
-
-</description>
-<parameters>
-<parameter name="tree_view">
-<parameter_description> A #GtkTreeView
-</parameter_description>
-</parameter>
-<parameter name="func">
-<parameter_description> the function to use to position the search dialog, or %NULL
-to use the default search position function
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> user data to pass to @func, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="destroy">
-<parameter_description> Destroy notifier for @data, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_tree_view_set_show_expanders">
 <description>
 Sets whether to draw and enable expanders and indent child rows in
@@ -84151,7 +81896,9 @@ if returning %FALSE, they don’t modify the current focus location.
 Binds a callback function defined in a template to the @widget_class.
 
 This macro is a convenience wrapper around the
-gtk_widget_class_bind_template_callback_full() function.
+gtk_widget_class_bind_template_callback_full() function. It is not
+supported after gtk_widget_class_set_template_scope() has been used
+on @widget_class.
 
 </description>
 <parameters>
@@ -84170,7 +81917,9 @@ gtk_widget_class_bind_template_callback_full() function.
 <function name="gtk_widget_class_bind_template_callback_full">
 <description>
 Declares a @callback_symbol to handle @callback_name from the template XML
-defined for @widget_type. See gtk_builder_add_callback_symbol().
+defined for @widget_type. This function is not supported after
+gtk_widget_class_set_template_scope() has been used on @widget_class.
+See gtk_builder_cscope_add_callback_symbol().
 
 Note that this must be called from a composite widget classes class
 initializer after calling gtk_widget_class_set_template().
@@ -84520,37 +82269,6 @@ This function should only be called from class init functions of widgets.
 <return></return>
 </function>
 
-<function name="gtk_widget_class_set_closure_func">
-<description>
-For use in language bindings, this will override the default #GtkBuilderClosureFunc to be
-used when parsing GtkBuilder XML from this class’s template data.
-
-Note that this must be called from a composite widget classes class
-initializer after calling gtk_widget_class_set_template().
-
-</description>
-<parameters>
-<parameter name="widget_class">
-<parameter_description> A #GtkWidgetClass
-</parameter_description>
-</parameter>
-<parameter name="closure_func">
-<parameter_description> The #GtkBuilderClosureFunc to use when creating closure in the class template
-</parameter_description>
-</parameter>
-<parameter name="closure_data">
-<parameter_description> The data to pass to @closure_func
-</parameter_description>
-</parameter>
-<parameter name="closure_data_destroy">
-<parameter_description> The #GDestroyNotify to free @closure_data, this will only be used at
-class finalization time, when no classes of type @widget_type are in use anymore.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_widget_class_set_css_name">
 <description>
 Sets the name to be used for CSS matching of widgets.
@@ -84632,6 +82350,28 @@ in the widget’s instance initializer.
 </parameter>
 <parameter name="resource_name">
 <parameter_description> The name of the resource to load the template from
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_class_set_template_scope">
+<description>
+For use in language bindings, this will override the default #GtkBuilderScope to be
+used when parsing GtkBuilder XML from this class’s template data.
+
+Note that this must be called from a composite widget classes class
+initializer after calling gtk_widget_class_set_template().
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> A #GtkWidgetClass
+</parameter_description>
+</parameter>
+<parameter name="scope">
+<parameter_description> The #GtkBuilderScope to use when loading the class template
 </parameter_description>
 </parameter>
 </parameters>
@@ -86135,24 +83875,6 @@ Gets the contents of the tooltip for @widget.
 </parameters>
 <return> the tooltip text, or %NULL. You should free the
 returned string with g_free() when done.
-</return>
-</function>
-
-<function name="gtk_widget_get_tooltip_window">
-<description>
-Returns the #GtkWindow of the current tooltip. This can be the
-GtkWindow created by default, or the custom tooltip window set
-using gtk_widget_set_tooltip_window().
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> The #GtkWindow of the current tooltip.
 </return>
 </function>
 
@@ -88693,28 +86415,6 @@ See also the #GtkWidget:tooltip-text property and gtk_tooltip_set_text().
 </parameter>
 <parameter name="text">
 <parameter_description> the contents of the tooltip for @widget
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_widget_set_tooltip_window">
-<description>
-Replaces the default window used for displaying
-tooltips with @custom_window. GTK+ will take care of showing and
-hiding @custom_window at the right moment, to behave likewise as
-the default tooltip window. If @custom_window is %NULL, the default
-tooltip window will be used.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="custom_window">
-<parameter_description> a #GtkWindow, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
