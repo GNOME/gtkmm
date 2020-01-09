@@ -97,26 +97,6 @@ static void SignalProxy_ColumnDrop_gtk_callback_destroy(void* data)
   delete static_cast<Gtk::TreeView::SlotColumnDrop*>(data);
 }
 
-
-static void SignalProxy_SearchPosition_gtk_callback(GtkTreeView* /* tree_view */, GtkWidget* search_dialog, gpointer user_data)
-{
-  auto the_slot = static_cast<Gtk::TreeView::SlotSearchPosition*>(user_data);
-
-  try
-  {
-    (*the_slot)(Glib::wrap(search_dialog));
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-static void SignalProxy_SearchPosition_gtk_callback_destroy(void* data)
-{
-  delete static_cast<Gtk::TreeView::SlotSearchPosition*>(data);
-}
-
 namespace Gtk
 {
 
@@ -353,17 +333,6 @@ void TreeView::set_row_separator_func(const SlotRowSeparator& slot)
   gtk_tree_view_set_row_separator_func(gobj(),
       &TreeView_Private::SignalProxy_RowSeparator_gtk_callback, slot_copy,
       &TreeView_Private::SignalProxy_RowSeparator_gtk_callback_destroy);
-}
-
-void TreeView::set_search_position_func(const SlotSearchPosition& slot)
-{
-  //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  //It will be deleted when SignalProxy_SearchPosition_gtk_callback_destroy() is called.
-  auto slot_copy = new SlotSearchPosition(slot);
-
-  gtk_tree_view_set_search_position_func(gobj(),
-      &SignalProxy_SearchPosition_gtk_callback, slot_copy,
-      &SignalProxy_SearchPosition_gtk_callback_destroy);
 }
 
 bool TreeView::get_visible_range(TreeModel::Path& start_path, TreeModel::Path& end_path) const

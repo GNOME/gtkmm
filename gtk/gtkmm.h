@@ -116,7 +116,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cellareacontext.h>
 #include <gtkmm/cellview.h>
 #include <gtkmm/checkbutton.h>
-#include <gtkmm/checkmenuitem.h>
 #include <gtkmm/cellrenderer.h>
 #include <gtkmm/cellrendereraccel.h>
 #include <gtkmm/cellrenderercombo.h>
@@ -194,11 +193,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/main.h>
 #include <gtkmm/mediacontrols.h>
 #include <gtkmm/mediafile.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
 #include <gtkmm/menubutton.h>
-#include <gtkmm/menuitem.h>
-#include <gtkmm/menushell.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/noselection.h>
 #include <gtkmm/notebook.h>
@@ -228,7 +223,6 @@ extern const int gtkmm_micro_version;
 #endif
 #include <gtkmm/progressbar.h>
 #include <gtkmm/radiobutton.h>
-#include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
 #include <gtkmm/recentinfo.h>
@@ -241,7 +235,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/searchbar.h>
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
-#include <gtkmm/separatormenuitem.h>
 #include <gtkmm/separatortoolitem.h>
 #include <gtkmm/settings.h>
 #include <gtkmm/shortcutlabel.h>

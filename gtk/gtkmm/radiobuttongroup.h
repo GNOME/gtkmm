@@ -34,7 +34,6 @@ namespace Gtk
 {
 
 class RadioButton;
-class RadioMenuItem;
 class RadioToolButton;
 
 /** RadioButtonGroup, identifier for RadioButtons.
@@ -55,7 +54,6 @@ protected:
   explicit RadioButtonGroup(GSList* group);
 
   friend class Gtk::RadioButton;
-  friend class Gtk::RadioMenuItem;
   friend class Gtk::RadioToolButton;
 
 
@@ -63,7 +61,6 @@ protected:
   //TODO: Add a common multiply-inherited base class, with set_group()=0?
   //      Would that anything useful other than being tidy? murrayc
   void add(RadioButton& item);
-  void add(RadioMenuItem& item);
   void add(RadioToolButton& item);
 
   void* operator new(std::size_t); // not implemented
@@ -72,6 +69,5 @@ protected:
 };
 
 } // namespace Gtk
-
 
 #endif /* _GTKMM_RADIOBUTTONGROUP_H */
