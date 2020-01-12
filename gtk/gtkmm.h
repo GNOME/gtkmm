@@ -210,6 +210,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/picture.h>
 #include <gtkmm/popover.h>
 #include <gtkmm/popovermenu.h>
+#include <gtkmm/popovermenubar.h>
 #include <gtkmm/printcontext.h>
 #ifndef G_OS_WIN32
 # include <gtkmm/printer.h>
