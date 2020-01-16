@@ -1,0 +1,94 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gdkmm/contentprovider.h>
+#include <gdkmm/drag.h>
+#include <gdkmm/enums.h>
+#include <gdkmm/paintable.h>
+#include <gtkmm/gesturesingle.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/gesturesingle_p.h)
+
+namespace Gtk
+{
+/** Event controller to initiate DND operations.
+ *
+ * %Gtk::DragSource is an auxiliary object that is used to initiate
+ * Drag-And-Drop operations. It can be set up with the necessary
+ * ingredients for a DND operation ahead of time. This includes
+ * the source for the data that is being transferred, in the form
+ * of a Gdk::ContentProvider, the desired action, and the icon to
+ * use during the drag operation. After setting it up, the drag
+ * source must be added to a widget as an event controller, using
+ * Gtk::Widget::add_controller().
+ *
+ * Setting up the content provider and icon ahead of time only
+ * makes sense when the data does not change. More commonly, you
+ * will want to set them up just in time. To do so, %Gtk::DragSource
+ * has signal_prepare() and signal_drag_begin().
+ * The prepare signal is emitted before a drag is started, and
+ * can be used to set the content provider and actions that the
+ * drag should be started with. The drag-begin signal is emitted
+ * after the Gdk::Drag object has been created, and can be used
+ * to set up the drag icon.
+ *
+ * During the DND operation, %Gtk::DragSource emits signals that
+ * can be used to obtain updates about the status of the operation,
+ * but it is not normally necessary to connect to any signals,
+ * except for one case: when the supported actions include
+ * Gdk::DragAction::MOVE, you need to listen for signal_drag_end() and
+ * delete the data after it has been transferred.
+ *
+ * @newin{3,96}
+ *
+ * @ingroup Gestures
+ */
+class DragSource : public GestureSingle
+{
+  _CLASS_GOBJECT(DragSource, GtkDragSource, GTK_DRAG_SOURCE, GestureSingle, GtkGestureSingle)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(void set_content(const Glib::RefPtr<Gdk::ContentProvider>& content), gtk_drag_source_set_content)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::ContentProvider> get_content(), gtk_drag_source_get_content, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentProvider> get_content() const, gtk_drag_source_get_content, refreturn, constversion)
+
+  _WRAP_METHOD(void set_actions(Gdk::DragAction actions), gtk_drag_source_set_actions)
+  _WRAP_METHOD(Gdk::DragAction get_actions() const, gtk_drag_source_get_actions)
+
+  _WRAP_METHOD(void set_icon(const Glib::RefPtr<Gdk::Paintable>& paintable, int hot_x, int hot_y), gtk_drag_source_set_icon)
+  _WRAP_METHOD(void drag_cancel(), gtk_drag_source_drag_cancel)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Drag> get_drag(), gtk_drag_source_get_drag, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Drag> get_drag() const, gtk_drag_source_get_drag, refreturn, constversion)
+
+  _WRAP_PROPERTY("content", Glib::RefPtr<Gdk::ContentProvider>)
+  _WRAP_PROPERTY("actions", Gdk::DragAction)
+
+#m4 _CONVERSION(`Glib::RefPtr<Gdk::ContentProvider>',`GdkContentProvider*',`Glib::unwrap_copy($3)')
+#m4 _CONVERSION(`GdkDrag*',`const Glib::RefPtr<Gdk::Drag>&',`Glib::wrap($3, true)')
+  // no_default_handler because GtkDragSourceClass is private.
+  _WRAP_SIGNAL(Glib::RefPtr<Gdk::ContentProvider> prepare(double x, double y), "prepare", no_default_handler)
+  _WRAP_SIGNAL(void drag_begin(const Glib::RefPtr<Gdk::Drag>& drag), "drag-begin", no_default_handler)
+  _WRAP_SIGNAL(void drag_end(const Glib::RefPtr<Gdk::Drag>& drag, bool delete_data), "drag-end", no_default_handler)
+  _WRAP_SIGNAL(bool drag_cancel(const Glib::RefPtr<Gdk::Drag>& drag, Gdk::DragCancelReason reason), "drag-cancel", no_default_handler)
+};
+
+} // namespace Gtk

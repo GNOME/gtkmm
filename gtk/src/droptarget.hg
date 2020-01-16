@@ -1,0 +1,110 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gdkmm/contentformats.h>
+#include <gdkmm/drop.h>
+#include <gdkmm/enums.h>
+#include <gtkmm/eventcontroller.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/eventcontroller_p.h)
+
+// The underlying C code can be found in gtkdragdest.h,.c
+
+namespace Gtk
+{
+/** Event controller to receive DND drops.
+ *
+ * %Gtk::DropTarget is an auxiliary object that is used to receive
+ * Drag-and-Drop operations.
+ *
+ * To use a %Gtk::DropTarget to receive drops on a widget, you create
+ * a %Gtk::DropTarget object, configure which data formats and actions
+ * you support, connect to its signals, and then attach
+ * it to the widget with Gtk::Widget::add_controller().
+ *
+ * During a drag operation, the first signal that a %Gtk::DropTarget
+ * emits is signal_accept(), which is meant to determine
+ * whether the target is a possible drop site for the ongoing drag.
+ * The default handler for the accept signal accepts the drag
+ * if it finds a compatible data format and an action that is supported
+ * on both sides.
+ *
+ * If it is, and the widget becomes the current target, you will
+ * receive a signal_drag_enter(), followed by
+ * signal_drag_motion() signals as the pointer moves, and
+ * finally either a signal_drag_leave() when the pointer
+ * move off the widget, or a signal_drag_drop() when a drop happens.
+ *
+ * The signal_drag_enter() and signal_drag_motion() handler can call Gdk::Drop::status()
+ * to update the status of the ongoing operation. The signal_drag_drop() handler
+ * should initiate the data transfer and finish the operation by calling
+ * Gdk::Drop::finish().
+ *
+ * Between the drag-enter and drag-leave signals the widget is the
+ * current drop target, and will receive the Gtk::StateFlags::DROP_ACTIVE
+ * state, which can be used to style the widget as a drop target.
+ *
+ * @newin{3,96}
+ *
+ * @ingroup Gestures
+ */
+class DropTarget : public EventController
+{
+  _CLASS_GOBJECT(DropTarget, GtkDropTarget, GTK_DROP_TARGET, EventController, GtkEventController)
+
+protected:
+  _WRAP_CTOR(DropTarget(const Glib::RefPtr<Gdk::ContentFormats>& formats, Gdk::DragAction actions), gtk_drop_target_new)
+
+public:
+  _WRAP_CREATE(const Glib::RefPtr<Gdk::ContentFormats>& formats, Gdk::DragAction actions)
+  Glib::RefPtr<DropTarget> create(Gdk::DragAction actions);
+
+  _WRAP_METHOD(void set_formats(const Glib::RefPtr<Gdk::ContentFormats>& formats), gtk_drop_target_set_formats)
+  _WRAP_METHOD(Glib::RefPtr<Gdk::ContentFormats> get_formats(), gtk_drop_target_get_formats, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentFormats> get_formats() const, gtk_drop_target_get_formats, refreturn, constversion)
+
+  _WRAP_METHOD(void set_actions(Gdk::DragAction actions), gtk_drop_target_set_actions)
+  _WRAP_METHOD(Gdk::DragAction get_actions() const, gtk_drop_target_get_actions)
+
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Drop> get_drop(), gtk_drop_target_get_drop, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gdk::Drop> get_drop() const, gtk_drop_target_get_drop, refreturn, constversion)
+
+  _WRAP_METHOD(Glib::ustring find_mimetype() const, gtk_drop_target_find_mimetype)
+
+  _WRAP_METHOD(void read_selection_async(const std::string& target, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}),
+    gtk_drop_target_read_selection, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+#m4 _CONVERSION(`GtkSelectionData*',`SelectionData', `Gtk::SelectionData(($3), false)')
+  _WRAP_METHOD(SelectionData read_selection_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gtk_drop_target_read_selection_finish, errthrow)
+
+  _WRAP_METHOD(void deny_drop(const Glib::RefPtr<Gdk::Drop>& drop), gtk_drop_target_deny_drop)
+
+  _WRAP_PROPERTY("formats", Glib::RefPtr<Gdk::ContentFormats>)
+  _WRAP_PROPERTY("actions", Gdk::DragAction)
+  _WRAP_PROPERTY("contains", bool)
+
+#m4 _CONVERSION(`GdkDrop*',`const Glib::RefPtr<Gdk::Drop>&',`Glib::wrap($3, true)')
+  // no_default_handler because GtkDropTargetClass is private.
+  _WRAP_SIGNAL(bool accept(const Glib::RefPtr<Gdk::Drop>& drop), "accept", no_default_handler)
+  _WRAP_SIGNAL(void drag_enter(const Glib::RefPtr<Gdk::Drop>& drop), "drag-enter", no_default_handler)
+  _WRAP_SIGNAL(void drag_motion(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag-motion", no_default_handler)
+  _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::Drop>& drop), "drag-leave", no_default_handler)
+  _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag-drop", no_default_handler)
+};
+
+} // namespace Gtk

@@ -260,8 +260,10 @@ _CONVERSION(`GdkContentFormatsBuilder*',`Glib::RefPtr<ContentFormatsBuilder>',`G
 
 # ContentProvider
 _CONVERSION(`const Glib::RefPtr<ContentProvider>&',`GdkContentProvider*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gdk::ContentProvider>&',`GdkContentProvider*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const ContentProvider>&',`GdkContentProvider*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GdkContentProvider*',`Glib::RefPtr<ContentProvider>',`Glib::wrap($3)')
+_CONVERSION(`GdkContentProvider*',`Glib::RefPtr<Gdk::ContentProvider>',`Glib::wrap($3)')
 
 # FrameClock, FrameTimings
 _CONVERSION(`GdkFrameClock*',`Glib::RefPtr<FrameClock>',`Glib::wrap($3)')
@@ -277,10 +279,11 @@ _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 
 dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
 
-dnl GdkAtom -> Glib::ustring and vice versa
+dnl GdkAtom -> Glib::ustring and std::string and vice versa
 _CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomUstring::to_cpp_type($3)')
 _CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomUstring::to_c_type($3)')
 _CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomUstring::to_c_type($3)')
+_CONVERSION(`const std::string&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
 
 dnl GdkEvent and GdkEventSequence
 _CONVERSION(`GdkEvent*',`Glib::RefPtr<Event>',`Glib::wrap($3)')
@@ -298,4 +301,5 @@ _CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)'
 
 _CONVERSION(`GdkDrag*',`Glib::RefPtr<Drag>',Glib::wrap($3))
 _CONVERSION(`GdkDrag*',`Glib::RefPtr<Gdk::Drag>',Glib::wrap($3))
+_CONVERSION(`GdkDrop*',`Glib::RefPtr<Gdk::Drop>',Glib::wrap($3))
 

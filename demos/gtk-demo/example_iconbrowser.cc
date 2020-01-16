@@ -238,9 +238,11 @@ Example_IconBrowser::Example_IconBrowser()
   m_text_cell.set_alignment(0.5, 0.5);
 
   // Enable dragging an icon name, and copying it to another program.
+  const std::vector<Glib::ustring> mime_types{"UTF8_STRING", "TEXT", "text/plain",
+    "text/plain;charset=utf-8"}; // mime types copied from gtkselection.c.
+  auto content_formats = Gdk::ContentFormats::create(mime_types);
   m_icon_view.enable_model_drag_source(
-    Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
-  m_icon_view.drag_source_add_text_targets();
+    content_formats, Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
 
   m_icon_view.set_has_tooltip(true);
   m_filter_model->set_visible_func(
@@ -906,11 +908,11 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
     m_image[i].set_valign(Gtk::Align::END);
 
     // Enable dragging an image, and copying it to another program.
-    m_image[i].drag_source_set(
-      Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
-    m_image[i].drag_source_add_image_targets();
-    m_image[i].signal_drag_data_get().connect(
-      sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
+    //??m_image[i].drag_source_set(
+    //??  Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
+    //??m_image[i].drag_source_add_image_targets();
+    //??m_image[i].signal_drag_data_get().connect(
+    //??  sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
 
     m_grid.attach(m_label[i], i, 1);
     m_label[i].set_margin(4);
@@ -940,7 +942,7 @@ void DetailDialog::set_image(
   {
     m_image[i].set_from_icon_name(icon_name);
     m_image[i].set_pixel_size(m_icon_size[i]);
-    m_image[i].drag_source_set_icon(icon_name);
+    //??m_image[i].drag_source_set_icon(icon_name);
   }
   if (description.empty())
     m_description.hide();

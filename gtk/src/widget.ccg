@@ -64,31 +64,6 @@ void Widget_signal_hide_callback(GObject* self, void* data)
   }
 }
 
-//These signal callbacks are custom implemented, so that we can create a temporary SelectionData instance.
-//To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-static void Widget_signal_drag_data_get_callback(GtkWidget* self, GdkDrag* p0,GtkSelectionData* p1,void* data)
-{
-  using namespace Gtk;
-  typedef sigc::slot<void(const Glib::RefPtr<Gdk::Drag>&,SelectionData&)> SlotType;
-
-  // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
-  {
-    try
-    {
-      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
-      {
-        SelectionData_WithoutOwnership temp_instance(p1);
-        (*static_cast<SlotType*>(slot))(Glib::wrap(p0, true), temp_instance);
-      }
-    }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke();
-    }
-  }
-}
-
 gboolean SlotTick_gtk_callback(GtkWidget* self, GdkFrameClock* frame_clock, void* data)
 {
   // Do not try to call a signal on a disassociated wrapper.
@@ -154,43 +129,6 @@ void Widget_Class::hide_callback(GtkWidget* self)
   // Call the original underlying C function:
   if(base && base->hide)
     (*base->hide)(self);
-}
-
-//This default handler callback is custom implemented, so that we can create a temporary SelectionData instance.
-//To do this, we used the optional custom_c_callback paramater to _WRAP_SIGNAL() in the .hg file.
-void Widget_Class::drag_data_get_callback(GtkWidget* self, GdkDrag* p0, GtkSelectionData* p1)
-{
-  const auto obj = dynamic_cast<CppObjectType*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj && obj->is_derived_())
-  {
-    try // Trap C++ exceptions which would normally be lost because this is a C callback.
-    {
-      // Call the virtual member method, which derived classes might override.
-      SelectionData_WithoutOwnership temp_instance(p1);
-      obj->on_drag_data_get(Glib::wrap(p0, true), temp_instance);
-    }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke();
-    }
-  }
-  else
-  {
-    const auto base = static_cast<BaseClassType*>(
-        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-    );
-
-    // Call the original underlying C function:
-    if(base && base->drag_data_get)
-      (*base->drag_data_get)(self, p0, p1);
-  }
 }
 
 // This vfunc callback is custom implemented because we want the output
@@ -383,11 +321,6 @@ Allocation Widget::get_allocation() const
   Allocation allocation;
   gtk_widget_get_allocation(const_cast<GtkWidget*>(gobj()), allocation.gobj());
   return allocation;
-}
-
-void Widget::drag_dest_set(DestDefaults flags, Gdk::DragAction actions)
-{
-  gtk_drag_dest_set(gobj(), (GtkDestDefaults)flags, nullptr, (GdkDragAction)actions);
 }
 
 void Widget_Class::dispose_vfunc_callback(GObject* self)
