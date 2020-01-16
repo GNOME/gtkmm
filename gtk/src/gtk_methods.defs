@@ -716,18 +716,6 @@
   )
 )
 
-(define-flags DestDefaults
-  (in-module "Gtk")
-  (c-name "GtkDestDefaults")
-  (gtype-id "GTK_TYPE_DEST_DEFAULTS")
-  (values
-    '("motion" "GTK_DEST_DEFAULT_MOTION")
-    '("highlight" "GTK_DEST_DEFAULT_HIGHLIGHT")
-    '("drop" "GTK_DEST_DEFAULT_DROP")
-    '("all" "GTK_DEST_DEFAULT_ALL")
-  )
-)
-
 (define-enum EditableProperties
   (in-module "Gtk")
   (c-name "GtkEditableProperties")
@@ -1154,20 +1142,6 @@
     '("horizontal" "GTK_TREE_VIEW_GRID_LINES_HORIZONTAL")
     '("vertical" "GTK_TREE_VIEW_GRID_LINES_VERTICAL")
     '("both" "GTK_TREE_VIEW_GRID_LINES_BOTH")
-  )
-)
-
-(define-enum DragResult
-  (in-module "Gtk")
-  (c-name "GtkDragResult")
-  (gtype-id "GTK_TYPE_DRAG_RESULT")
-  (values
-    '("success" "GTK_DRAG_RESULT_SUCCESS")
-    '("no-target" "GTK_DRAG_RESULT_NO_TARGET")
-    '("user-cancelled" "GTK_DRAG_RESULT_USER_CANCELLED")
-    '("timeout-expired" "GTK_DRAG_RESULT_TIMEOUT_EXPIRED")
-    '("grab-broken" "GTK_DRAG_RESULT_GRAB_BROKEN")
-    '("error" "GTK_DRAG_RESULT_ERROR")
   )
 )
 
@@ -7491,76 +7465,110 @@
 
 
 
-;; From gtkdnd.h
+;; From gtkdragdest.h
 
-(define-function gtk_drag_get_data
-  (c-name "gtk_drag_get_data")
-  (return-type "none")
+(define-function gtk_drop_target_get_type
+  (c-name "gtk_drop_target_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_drop_target_new
+  (c-name "gtk_drop_target_new")
+  (is-constructor-of "GtkDropTarget")
+  (return-type "GtkDropTarget*")
   (parameters
-    '("GtkWidget*" "widget")
-    '("GdkDrop*" "drop")
-    '("GdkAtom" "target")
+    '("GdkContentFormats*" "formats")
+    '("GdkDragAction" "actions")
   )
 )
 
-(define-function gtk_drag_get_source_widget
-  (c-name "gtk_drag_get_source_widget")
+(define-method set_formats
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_set_formats")
+  (return-type "none")
+  (parameters
+    '("GdkContentFormats*" "formats")
+  )
+)
+
+(define-method get_formats
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_get_formats")
+  (return-type "GdkContentFormats*")
+)
+
+(define-method set_actions
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_set_actions")
+  (return-type "none")
+  (parameters
+    '("GdkDragAction" "actions")
+  )
+)
+
+(define-method get_actions
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_get_actions")
+  (return-type "GdkDragAction")
+)
+
+(define-method get_drop
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_get_drop")
+  (return-type "GdkDrop*")
+)
+
+(define-method find_mimetype
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_find_mimetype")
+  (return-type "const-char*")
+)
+
+(define-method read_selection
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_read_selection")
+  (return-type "none")
+  (parameters
+    '("GdkAtom" "target")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_selection_finish
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_read_selection_finish")
+  (return-type "GtkSelectionData*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method deny_drop
+  (of-object "GtkDropTarget")
+  (c-name "gtk_drop_target_deny_drop")
+  (return-type "none")
+  (parameters
+    '("GdkDrop*" "drop")
+  )
+)
+
+
+
+;; From gtkdragicon.h
+
+(define-function gtk_drag_icon_new_for_drag
+  (c-name "gtk_drag_icon_new_for_drag")
   (return-type "GtkWidget*")
   (parameters
     '("GdkDrag*" "drag")
   )
 )
 
-(define-function gtk_drag_highlight
-  (c-name "gtk_drag_highlight")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_unhighlight
-  (c-name "gtk_drag_unhighlight")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_begin
-  (c-name "gtk_drag_begin")
-  (return-type "GdkDrag*")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkDevice*" "device")
-    '("GdkContentFormats*" "targets")
-    '("GdkDragAction" "actions")
-    '("gint" "x")
-    '("gint" "y")
-  )
-)
-
-(define-function gtk_drag_cancel
-  (c-name "gtk_drag_cancel")
-  (return-type "none")
-  (parameters
-    '("GdkDrag*" "drag")
-  )
-)
-
-(define-function gtk_drag_set_icon_widget
-  (c-name "gtk_drag_set_icon_widget")
-  (return-type "none")
-  (parameters
-    '("GdkDrag*" "drag")
-    '("GtkWidget*" "widget")
-    '("gint" "hot_x")
-    '("gint" "hot_y")
-  )
-)
-
-(define-function gtk_drag_set_icon_paintable
-  (c-name "gtk_drag_set_icon_paintable")
+(define-function gtk_drag_icon_set_from_paintable
+  (c-name "gtk_drag_icon_set_from_paintable")
   (return-type "none")
   (parameters
     '("GdkDrag*" "drag")
@@ -7570,34 +7578,72 @@
   )
 )
 
-(define-function gtk_drag_set_icon_name
-  (c-name "gtk_drag_set_icon_name")
+
+
+;; From gtkdragsource.h
+
+(define-function gtk_drag_source_get_type
+  (c-name "gtk_drag_source_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_drag_source_new
+  (c-name "gtk_drag_source_new")
+  (is-constructor-of "GtkDragSource")
+  (return-type "GtkDragSource*")
+)
+
+(define-method set_content
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_set_content")
   (return-type "none")
   (parameters
-    '("GdkDrag*" "drag")
-    '("const-gchar*" "icon_name")
-    '("gint" "hot_x")
-    '("gint" "hot_y")
+    '("GdkContentProvider*" "content")
   )
 )
 
-(define-function gtk_drag_set_icon_gicon
-  (c-name "gtk_drag_set_icon_gicon")
+(define-method get_content
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_get_content")
+  (return-type "GdkContentProvider*")
+)
+
+(define-method set_actions
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_set_actions")
   (return-type "none")
   (parameters
-    '("GdkDrag*" "drag")
-    '("GIcon*" "icon")
-    '("gint" "hot_x")
-    '("gint" "hot_y")
+    '("GdkDragAction" "actions")
   )
 )
 
-(define-function gtk_drag_set_icon_default
-  (c-name "gtk_drag_set_icon_default")
+(define-method get_actions
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_get_actions")
+  (return-type "GdkDragAction")
+)
+
+(define-method set_icon
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_set_icon")
   (return-type "none")
   (parameters
-    '("GdkDrag*" "drag")
+    '("GdkPaintable*" "paintable")
+    '("int" "hot_x")
+    '("int" "hot_y")
   )
+)
+
+(define-method drag_cancel
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_drag_cancel")
+  (return-type "none")
+)
+
+(define-method get_drag
+  (of-object "GtkDragSource")
+  (c-name "gtk_drag_source_get_drag")
+  (return-type "GdkDrag*")
 )
 
 (define-function gtk_drag_check_threshold
@@ -7605,192 +7651,10 @@
   (return-type "gboolean")
   (parameters
     '("GtkWidget*" "widget")
-    '("gint" "start_x")
-    '("gint" "start_y")
-    '("gint" "current_x")
-    '("gint" "current_y")
-  )
-)
-
-
-
-;; From gtkdragdest.h
-
-(define-function gtk_drag_dest_set
-  (c-name "gtk_drag_dest_set")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GtkDestDefaults" "flags")
-    '("GdkContentFormats*" "targets")
-    '("GdkDragAction" "actions")
-  )
-)
-
-(define-function gtk_drag_dest_unset
-  (c-name "gtk_drag_dest_unset")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_dest_find_target
-  (c-name "gtk_drag_dest_find_target")
-  (return-type "const-char*")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkDrop*" "drop")
-    '("GdkContentFormats*" "target_list")
-  )
-)
-
-(define-function gtk_drag_dest_get_target_list
-  (c-name "gtk_drag_dest_get_target_list")
-  (return-type "GdkContentFormats*")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_dest_set_target_list
-  (c-name "gtk_drag_dest_set_target_list")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkContentFormats*" "target_list")
-  )
-)
-
-(define-function gtk_drag_dest_add_text_targets
-  (c-name "gtk_drag_dest_add_text_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_dest_add_image_targets
-  (c-name "gtk_drag_dest_add_image_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_dest_add_uri_targets
-  (c-name "gtk_drag_dest_add_uri_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_dest_set_track_motion
-  (c-name "gtk_drag_dest_set_track_motion")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("gboolean" "track_motion")
-  )
-)
-
-(define-function gtk_drag_dest_get_track_motion
-  (c-name "gtk_drag_dest_get_track_motion")
-  (return-type "gboolean")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-
-
-;; From gtkdragsource.h
-
-(define-function gtk_drag_source_set
-  (c-name "gtk_drag_source_set")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkModifierType" "start_button_mask")
-    '("GdkContentFormats*" "targets")
-    '("GdkDragAction" "actions")
-  )
-)
-
-(define-function gtk_drag_source_unset
-  (c-name "gtk_drag_source_unset")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_source_get_target_list
-  (c-name "gtk_drag_source_get_target_list")
-  (return-type "GdkContentFormats*")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_source_set_target_list
-  (c-name "gtk_drag_source_set_target_list")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkContentFormats*" "target_list")
-  )
-)
-
-(define-function gtk_drag_source_add_text_targets
-  (c-name "gtk_drag_source_add_text_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_source_add_image_targets
-  (c-name "gtk_drag_source_add_image_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_source_add_uri_targets
-  (c-name "gtk_drag_source_add_uri_targets")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-  )
-)
-
-(define-function gtk_drag_source_set_icon_name
-  (c-name "gtk_drag_source_set_icon_name")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("const-gchar*" "icon_name")
-  )
-)
-
-(define-function gtk_drag_source_set_icon_gicon
-  (c-name "gtk_drag_source_set_icon_gicon")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GIcon*" "icon")
-  )
-)
-
-(define-function gtk_drag_source_set_icon_paintable
-  (c-name "gtk_drag_source_set_icon_paintable")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkPaintable*" "paintable")
+    '("int" "start_x")
+    '("int" "start_y")
+    '("int" "current_x")
+    '("int" "current_y")
   )
 )
 
@@ -8796,7 +8660,7 @@
   (return-type "none")
   (parameters
     '("GtkEntryIconPosition" "icon_pos")
-    '("GdkContentFormats*" "formats")
+    '("GdkContentProvider*" "provider")
     '("GdkDragAction" "actions")
   )
 )
@@ -12672,7 +12536,7 @@
 (define-method enable_model_drag_dest
   (of-object "GtkIconView")
   (c-name "gtk_icon_view_enable_model_drag_dest")
-  (return-type "none")
+  (return-type "GtkDropTarget*")
   (parameters
     '("GdkContentFormats*" "formats")
     '("GdkDragAction" "actions")
@@ -14818,7 +14682,7 @@
 
 (define-function gtk_propagate_event
   (c-name "gtk_propagate_event")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("GtkWidget*" "widget")
     '("GdkEvent*" "event")
@@ -20851,32 +20715,33 @@
 
 
 
+;; From gtksearchlistmodel.h
+
+(define-function gtk_search_list_model_new
+  (c-name "gtk_search_list_model_new")
+  (is-constructor-of "GtkSearchListModel")
+  (return-type "GtkSearchListModel*")
+  (parameters
+    '("GListModel*" "model")
+    '("GtkFilter*" "filter")
+  )
+)
+
+(define-method next_match
+  (of-object "GtkSearchListModel")
+  (c-name "gtk_search_list_model_next_match")
+  (return-type "gboolean")
+)
+
+(define-method previous_match
+  (of-object "GtkSearchListModel")
+  (c-name "gtk_search_list_model_previous_match")
+  (return-type "gboolean")
+)
+
+
+
 ;; From gtkselection.h
-
-(define-function gtk_content_formats_add_text_targets
-  (c-name "gtk_content_formats_add_text_targets")
-  (return-type "GdkContentFormats*")
-  (parameters
-    '("GdkContentFormats*" "list")
-  )
-)
-
-(define-function gtk_content_formats_add_image_targets
-  (c-name "gtk_content_formats_add_image_targets")
-  (return-type "GdkContentFormats*")
-  (parameters
-    '("GdkContentFormats*" "list")
-    '("gboolean" "writable")
-  )
-)
-
-(define-function gtk_content_formats_add_uri_targets
-  (c-name "gtk_content_formats_add_uri_targets")
-  (return-type "GdkContentFormats*")
-  (parameters
-    '("GdkContentFormats*" "list")
-  )
-)
 
 (define-method get_target
   (of-object "GtkSelectionData")
@@ -23591,6 +23456,12 @@
     '("gboolean" "interactive")
     '("gboolean" "default_editable")
   )
+)
+
+(define-method get_selection_content
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_selection_content")
+  (return-type "GdkContentProvider*")
 )
 
 (define-method get_can_undo
@@ -28254,7 +28125,7 @@
 (define-method enable_model_drag_dest
   (of-object "GtkTreeView")
   (c-name "gtk_tree_view_enable_model_drag_dest")
-  (return-type "none")
+  (return-type "GtkDropTarget*")
   (parameters
     '("GdkContentFormats*" "formats")
     '("GdkDragAction" "actions")
@@ -31512,11 +31383,6 @@
   (return-type "GType")
 )
 
-(define-function gtk_dest_defaults_get_type
-  (c-name "gtk_dest_defaults_get_type")
-  (return-type "GType")
-)
-
 (define-function gtk_editable_properties_get_type
   (c-name "gtk_editable_properties_get_type")
   (return-type "GType")
@@ -31684,11 +31550,6 @@
 
 (define-function gtk_tree_view_grid_lines_get_type
   (c-name "gtk_tree_view_grid_lines_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_drag_result_get_type
-  (c-name "gtk_drag_result_get_type")
   (return-type "GType")
 )
 

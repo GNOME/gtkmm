@@ -3080,44 +3080,6 @@ paragraph. Like C-k in Emacs (or its reverse).
 </parameters>
 </enum>
 
-<enum name="GtkDestDefaults">
-<description>
-The #GtkDestDefaults enumeration specifies the various
-types of action that will be taken on behalf
-of the user for a drag destination site.
-
-</description>
-<parameters>
-<parameter name="GTK_DEST_DEFAULT_MOTION">
-<parameter_description> If set for a widget, GTK+, during a drag over this
-widget will check if the drag matches this widget’s list of possible formats
-and actions.
-GTK+ will then call gdk_drag_status() as appropriate.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DEST_DEFAULT_HIGHLIGHT">
-<parameter_description> If set for a widget, GTK+ will draw a highlight on
-this widget as long as a drag is over this widget and the widget drag format
-and action are acceptable.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DEST_DEFAULT_DROP">
-<parameter_description> If set for a widget, when a drop occurs, GTK+ will
-will check if the drag matches this widget’s list of possible formats and
-actions. If so, GTK+ will call gtk_drag_get_data() on behalf of the widget.
-Whether or not the drop is successful, GTK+ will call gdk_drag_finish(). If
-the action was a move, then if the drag was successful, then %TRUE will be
-passed for the @delete parameter to gdk_drag_finish().
-</parameter_description>
-</parameter>
-<parameter name="GTK_DEST_DEFAULT_ALL">
-<parameter_description> If set, specifies that all default actions should
-be taken.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
 <signal name="GtkDialog::close">
 <description>
 The ::close signal is a
@@ -3222,42 +3184,123 @@ Focus movement types.
 </parameters>
 </enum>
 
-<enum name="GtkDragResult">
+<signal name="GtkDragSource::drag-begin">
 <description>
-Gives an indication why a drag operation failed.
-The value can by obtained by connecting to the
-#GtkWidget::drag-failed signal.
+The ::drag-begin signal is emitted on the drag source when a drag
+is started. It can be used to e.g. set a custom drag icon with
+gtk_drag_source_set_icon().
 
 </description>
 <parameters>
-<parameter name="GTK_DRAG_RESULT_SUCCESS">
-<parameter_description> The drag operation was successful.
+<parameter name="source">
+<parameter_description> the #GtkDragSource
 </parameter_description>
 </parameter>
-<parameter name="GTK_DRAG_RESULT_NO_TARGET">
-<parameter_description> No suitable drag target.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DRAG_RESULT_USER_CANCELLED">
-<parameter_description> The user cancelled the drag operation.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DRAG_RESULT_TIMEOUT_EXPIRED">
-<parameter_description> The drag operation timed out.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DRAG_RESULT_GRAB_BROKEN">
-<parameter_description> The pointer or keyboard grab used
-for the drag operation was broken.
-</parameter_description>
-</parameter>
-<parameter name="GTK_DRAG_RESULT_ERROR">
-<parameter_description> The drag operation failed due to some
-unspecified error.
+<parameter name="drag">
+<parameter_description> the #GtkDrag object
 </parameter_description>
 </parameter>
 </parameters>
-</enum>
+<return></return>
+</signal>
+
+<signal name="GtkDragSource::drag-cancel">
+<description>
+The ::drag-cancel signal is emitted on the drag source when a drag has
+failed. The signal handler may handle a failed drag operation based on
+the type of error. It should return %TRUE if the failure has been handled
+and the default &quot;drag operation failed&quot; animation should not be shown.
+
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the #GtkDragSource
+</parameter_description>
+</parameter>
+<parameter name="drag">
+<parameter_description> the #GtkDrag object
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> information on why the drag failed
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the failed drag operation has been already handled
+</return>
+</signal>
+
+<signal name="GtkDragSource::drag-end">
+<description>
+The ::drag-end signal is emitted on the drag source when a drag is
+finished. A typical reason to connect to this signal is to undo
+things done in #GtkDragSource::prepare or #GtkDragSource::drag-begin.
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the #GtkDragSource
+</parameter_description>
+</parameter>
+<parameter name="drag">
+<parameter_description> the #GtkDrag object
+</parameter_description>
+</parameter>
+<parameter name="delete_data">
+<parameter_description> %TRUE if the drag was performing %GDK_ACTION_MOVE,
+and the data should be deleted
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkDragSource::prepare">
+<description>
+The ::prepare signal is emitted when a drag is about to be initiated.
+It returns the * #GdkContentProvider to use for the drag that is about
+to start. The default handler for this signal returns the value of
+the #GtkDragSource::content property, so if you set up that property
+ahead of time, you don't need to connect to this signal.
+
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the #GtkDragSource
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the X coordinate of the drag starting point
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the Y coordinate fo the drag starting point
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GdkContentProvider, or %NULL
+</return>
+</signal>
+
+<property name="GtkDragSource:actions">
+<description>
+The actions that are supported by drag operations from the source.
+
+Note that you must handle the #GtkDragSource::drag-end signal
+if the actions include %GDK_ACTION_MOVE.
+
+</description>
+</property>
+
+<property name="GtkDragSource:content">
+<description>
+The data that is offered by drag operations from this source,
+in the form of a #GdkContentProvider.
+
+</description>
+</property>
 
 <property name="GtkDrawingArea:content-height">
 <description>
@@ -3269,6 +3312,141 @@ The content height. See gtk_drawing_area_set_content_height() for details.
 <property name="GtkDrawingArea:content-width">
 <description>
 The content width. See gtk_drawing_area_set_content_width() for details.
+
+</description>
+</property>
+
+<signal name="GtkDropTarget::drag-drop">
+<description>
+The ::drag-drop signal is emitted on the drop site when the user drops
+the data onto the widget. The signal handler must determine whether
+the cursor position is in a drop zone or not. If it is not in a drop
+zone, it returns %FALSE and no further processing is necessary.
+
+Otherwise, the handler returns %TRUE. In this case, the handler must
+ensure that gdk_drop_finish() is called to let the source know that
+the drop is done. The call to gtk_drag_finish() can be done either
+directly or after receiving the data.
+
+To receive the data, use one of the read functions provides by #GtkDrop
+and #GtkDragDest: gdk_drop_read_async(), gdk_drop_read_value_async(),
+gdk_drop_read_text_async(), gtk_drop_target_read_selection().
+
+You can use gtk_drop_target_get_drop() to obtain the #GtkDrop object
+for the ongoing operation in your signal handler. If you call one of the
+read functions in your handler, GTK will ensure that the #GtkDrop object
+stays alive until the read is completed. If you delay obtaining the data
+(e.g. to handle %GDK_ACTION_ASK by showing a #GtkPopover), you need to
+hold a reference on the #GtkDrop.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current cursor position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current cursor position
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the cursor position is in a drop zone
+</return>
+</signal>
+
+<signal name="GtkDropTarget::drag-enter">
+<description>
+The ::drag-enter signal is emitted on the drop site when the cursor
+enters the widget. It can be used to set up custom highlighting.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkDropTarget::drag-leave">
+<description>
+The ::drag-leave signal is emitted on the drop site when the cursor
+leaves the widget. Its main purpose it to undo things done in
+#GtkDropTarget::drag-enter.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkDropTarget::drag-motion">
+<description>
+The ::drag motion signal is emitted while the pointer is moving
+over the drop target.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current cursor position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current cursor position
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkDropTarget:actions">
+<description>
+The #GdkDragActions that this drop target supports
+
+</description>
+</property>
+
+<property name="GtkDropTarget:contains">
+<description>
+Whether the drop target is currently the targed of an ongoing drag operation,
+and highlighted.
+
+</description>
+</property>
+
+<property name="GtkDropTarget:formats">
+<description>
+The #GdkContentFormats that determines the supported data formats
 
 </description>
 </property>
@@ -10631,6 +10809,34 @@ The default bindings for this signal is Escape.
 <return></return>
 </signal>
 
+<property name="GtkSearchListModel:filter">
+<description>
+The filter determining the selected item
+
+</description>
+</property>
+
+<property name="GtkSearchListModel:model">
+<description>
+The model being managed
+
+</description>
+</property>
+
+<property name="GtkSearchListModel:selected">
+<description>
+Position of the selected item
+
+</description>
+</property>
+
+<property name="GtkSearchListModel:selected-item">
+<description>
+The selected item
+
+</description>
+</property>
+
 <enum name="GtkSelectionMode">
 <description>
 Used to control what selections users are allowed to make.
@@ -14525,6 +14731,42 @@ widget get added, removed or changed.
 <return></return>
 </signal>
 
+<signal name="GtkWidget::accept">
+<description>
+The ::accept signal is emitted on the drop site when the user
+moves the cursor over the widget during a drag. The signal handler
+must determine whether the cursor position is in a drop zone or not.
+If it is not in a drop zone, it returns %FALSE and no further processing
+is necessary. Otherwise, the handler returns %TRUE. In this case, the
+handler is responsible for providing the necessary information for
+displaying feedback to the user, by calling gdk_drag_status().
+
+The default handler for this signal decides whether to accept the drop
+based on the type of the data.
+
+If the decision whether the drop will be accepted or rejected can't be
+made based solely the data format, handler may inspect the dragged data
+by calling one of the #GdkDrop read functions and return %TRUE to
+tentatively accept the drop. When the data arrives and is found to not be
+acceptable, a call to gtk_drop_target_deny_drop() should be made to reject
+the drop.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the cursor position is in a drop zone
+</return>
+</signal>
+
 <signal name="GtkWidget::can-activate-accel">
 <description>
 Determines whether an accelerator that activates the signal
@@ -14584,388 +14826,6 @@ of a widget changes.
 </parameter>
 </parameters>
 <return></return>
-</signal>
-
-<signal name="GtkWidget::drag-begin">
-<description>
-The ::drag-begin signal is emitted on the drag source when a drag is
-started. A typical reason to connect to this signal is to set up a
-custom drag icon with e.g. gtk_drag_source_set_icon_paintable().
-
-Note that some widgets set up a drag icon in the default handler of
-this signal, so you may have to use g_signal_connect_after() to
-override what the default handler did.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context 
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-data-delete">
-<description>
-The ::drag-data-delete signal is emitted on the drag source when a drag
-with the action %GDK_ACTION_MOVE is successfully completed. The signal
-handler is responsible for deleting the data that has been dropped. What
-&quot;delete&quot; means depends on the context of the drag operation.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-data-get">
-<description>
-The ::drag-data-get signal is emitted on the drag source when the drop
-site requests the data which is dragged. It is the responsibility of
-the signal handler to fill @data with the data in the format which
-is indicated by @info. See gtk_selection_data_set() and
-gtk_selection_data_set_text().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> the #GtkSelectionData to be filled with the dragged data
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> the info that has been registered with the target in the
-#GtkTargetList
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-data-received">
-<description>
-The ::drag-data-received signal is emitted on the drop site when the
-dragged data has been received. If the data was received in order to
-determine whether the drop will be accepted, the handler is expected
-to call gdk_drag_status() and not finish the drag.
-If the data was received in response to a #GtkWidget::drag-drop signal
-(and this is the last target to be received), the handler for this
-signal is expected to process the received data and then call
-gdk_drag_finish(), setting the @success parameter depending on
-whether the data was processed successfully.
-
-Applications must create some means to determine why the signal was emitted 
-and therefore whether to call gdk_drag_status() or gdk_drag_finish(). 
-
-The handler may inspect the selected action with
-gdk_drag_context_get_selected_action() before calling
-gdk_drag_finish(), e.g. to implement %GDK_ACTION_ASK as
-shown in the following example:
-|[&lt;!-- language=&quot;C&quot; --&gt;
-void
-drag_data_received (GtkWidget          *widget,
-GdkDrop            *drop,
-GtkSelectionData   *data)
-{
-if ((data-&gt;length &gt;= 0) &amp;&amp; (data-&gt;format == 8))
-{
-GdkDragAction action;
-
-// handle data here
-
-action = gdk_drop_get_actions (drop);
-if (!gdk_drag_action_is_unique (action))
-{
-GtkWidget *dialog;
-gint response;
-
-dialog = gtk_message_dialog_new (NULL,
-GTK_DIALOG_MODAL |
-GTK_DIALOG_DESTROY_WITH_PARENT,
-GTK_MESSAGE_INFO,
-GTK_BUTTONS_YES_NO,
-&quot;Move the data ?\n&quot;);
-response = gtk_dialog_run (GTK_DIALOG (dialog));
-gtk_widget_destroy (dialog);
-
-if (response == GTK_RESPONSE_YES)
-action = GDK_ACTION_MOVE;
-else
-action = GDK_ACTION_COPY;
-}
-
-gdk_drop_finish (context, action);
-}
-else
-gdk_drop_finish (context, 0);
-}
-]|
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> where the drop happened
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> where the drop happened
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> the received data
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-drop">
-<description>
-The ::drag-drop signal is emitted on the drop site when the user drops
-the data onto the widget. The signal handler must determine whether
-the cursor position is in a drop zone or not. If it is not in a drop
-zone, it returns %FALSE and no further processing is necessary.
-Otherwise, the handler returns %TRUE. In this case, the handler must
-ensure that gdk_drag_finish() is called to let the source know that
-the drop is done. The call to gdk_drag_finish() can be done either
-directly or in a #GtkWidget::drag-data-received handler which gets
-triggered by calling gtk_drag_get_data() to receive the data for one
-or more of the supported targets.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> the x coordinate of the current cursor position
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the y coordinate of the current cursor position
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether the cursor position is in a drop zone
-</return>
-</signal>
-
-<signal name="GtkWidget::drag-end">
-<description>
-The ::drag-end signal is emitted on the drag source when a drag is
-finished.  A typical reason to connect to this signal is to undo
-things done in #GtkWidget::drag-begin.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-failed">
-<description>
-The ::drag-failed signal is emitted on the drag source when a drag has
-failed. The signal handler may hook custom code to handle a failed DnD
-operation based on the type of error, it returns %TRUE is the failure has
-been already handled (not showing the default &quot;drag operation failed&quot;
-animation), otherwise it returns %FALSE.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context
-</parameter_description>
-</parameter>
-<parameter name="result">
-<parameter_description> the result of the drag operation
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the failed drag operation has been already handled.
-</return>
-</signal>
-
-<signal name="GtkWidget::drag-leave">
-<description>
-The ::drag-leave signal is emitted on the drop site when the cursor
-leaves the widget. A typical reason to connect to this signal is to
-undo things done in #GtkWidget::drag-motion, e.g. undo highlighting
-with gtk_drag_unhighlight().
-
-
-Likewise, the #GtkWidget::drag-leave signal is also emitted before the 
-::drag-drop signal, for instance to allow cleaning up of a preview item  
-created in the #GtkWidget::drag-motion signal handler.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> the drag context
-</parameter_description>
-</parameter>
-<parameter name="time">
-<parameter_description> the timestamp of the motion event
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkWidget::drag-motion">
-<description>
-The ::drag-motion signal is emitted on the drop site when the user
-moves the cursor over the widget during a drag. The signal handler
-must determine whether the cursor position is in a drop zone or not.
-If it is not in a drop zone, it returns %FALSE and no further processing
-is necessary. Otherwise, the handler returns %TRUE. In this case, the
-handler is responsible for providing the necessary information for
-displaying feedback to the user, by calling gdk_drag_status().
-
-If the decision whether the drop will be accepted or rejected can't be
-made based solely on the cursor position and the type of the data, the
-handler may inspect the dragged data by calling gtk_drag_get_data() and
-defer the gdk_drag_status() call to the #GtkWidget::drag-data-received
-handler. Note that you must pass #GTK_DEST_DEFAULT_DROP,
-#GTK_DEST_DEFAULT_MOTION or #GTK_DEST_DEFAULT_ALL to gtk_drag_dest_set()
-when using the drag-motion signal that way.
-
-Also note that there is no drag-enter signal. The drag receiver has to
-keep track of whether he has received any drag-motion signals since the
-last #GtkWidget::drag-leave and if not, treat the drag-motion signal as
-an &quot;enter&quot; signal. Upon an &quot;enter&quot;, the handler will typically highlight
-the drop site with gtk_drag_highlight().
-|[&lt;!-- language=&quot;C&quot; --&gt;
-static void
-drag_motion (GtkWidget *widget,
-GdkDrop   *drop,
-gint       x,
-gint       y,
-{
-GdkAtom target;
-
-PrivateData *private_data = GET_PRIVATE_DATA (widget);
-
-if (!private_data-&gt;drag_highlight)
-{
-private_data-&gt;drag_highlight = 1;
-gtk_drag_highlight (widget);
-}
-
-target = gtk_drag_dest_find_target (widget, drop, NULL);
-if (target == NULL)
-gdk_drop_status (drop, 0);
-else
-{
-private_data-&gt;pending_status
-= gdk_drop_get_actions (drop);
-gtk_drag_get_data (widget, drop, target);
-}
-
-return TRUE;
-}
-
-static void
-drag_data_received (GtkWidget        *widget,
-GdkDrop          *drop,
-GtkSelectionData *selection_data)
-{
-PrivateData *private_data = GET_PRIVATE_DATA (widget);
-
-if (private_data-&gt;suggested_action)
-{
-private_data-&gt;suggested_action = 0;
-
-// We are getting this data due to a request in drag_motion,
-// rather than due to a request in drag_drop, so we are just
-// supposed to call gdk_drag_status(), not actually paste in
-// the data.
-
-str = gtk_selection_data_get_text (selection_data);
-if (!data_is_acceptable (str))
-gdk_drop_status (drop, 0);
-else
-gdk_drag_status (drop, GDK_ACTION_ALL);
-}
-else
-{
-// accept the drop
-}
-}
-]|
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> the x coordinate of the current cursor position
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the y coordinate of the current cursor position
-</parameter_description>
-</parameter>
-</parameters>
-<return> whether the cursor position is in a drop zone
-</return>
 </signal>
 
 <signal name="GtkWidget::grab-notify">
@@ -28294,56 +28154,6 @@ is moved among the descendents of @container
 <return></return>
 </function>
 
-<function name="gtk_content_formats_add_image_targets">
-<description>
-Appends the image targets supported by #GtkSelectionData to
-the target list. All targets are added with the same @info.
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GdkContentFormats
-</parameter_description>
-</parameter>
-<parameter name="writable">
-<parameter_description> whether to add only targets for which GTK+ knows
-how to convert a pixbuf into the format
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_content_formats_add_text_targets">
-<description>
-Appends the text targets supported by #GtkSelectionData to
-the target list. All targets are added with the same @info.
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GdkContentFormats
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_content_formats_add_uri_targets">
-<description>
-Appends the URI targets supported by #GtkSelectionData to
-the target list. All targets are added with the same @info.
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GdkContentFormats
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_css_node_new">
 <description>
 Creates a new CSS node.
@@ -29549,73 +29359,10 @@ to @sizes.
 </return>
 </function>
 
-<function name="gtk_drag_begin">
-<description>
-Initiates a drag on the source side. The function only needs to be used
-when the application is starting drags itself, and is not needed when
-gtk_drag_source_set() is used.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the source widget
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> the device that starts the drag or %NULL to use the default pointer
-</parameter_description>
-</parameter>
-<parameter name="targets">
-<parameter_description> The targets (data formats) in which the source can provide the data
-</parameter_description>
-</parameter>
-<parameter name="actions">
-<parameter_description> A bitmask of the allowed drag actions for this drag
-</parameter_description>
-</parameter>
-<parameter name="x">
-<parameter_description> The initial x coordinate to start dragging from, in the coordinate space of @widget.
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> The initial y coordinate to start dragging from, in the coordinate space of @widget.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the context for this drag
-</return>
-</function>
-
-<function name="gtk_drag_cancel">
-<description>
-Cancels an ongoing drag operation on the source side.
-
-If you want to be able to cancel a drag operation in this way,
-you need to keep a pointer to the drag context, either from an
-explicit call to gtk_drag_begin(), or by connecting to
-#GtkWidget::drag-begin.
-
-If @context does not refer to an ongoing drag operation, this
-function does nothing.
-
-If a drag is cancelled in this way, the @result argument of
-#GtkWidget::drag-failed is set to @GTK_DRAG_RESULT_ERROR.
-
-</description>
-<parameters>
-<parameter name="drag">
-<parameter_description> a drag context, as e.g. returned by gtk_drag_begin()
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_drag_check_threshold">
 <description>
 Checks to see if a mouse drag starting at (@start_x, @start_y) and ending
-at (@current_x, @current_y) has passed the GTK+ drag threshold, and thus
+at (@current_x, @current_y) has passed the GTK drag threshold, and thus
 should trigger the beginning of a drag-and-drop operation.
 
 
@@ -29646,649 +29393,207 @@ should trigger the beginning of a drag-and-drop operation.
 </return>
 </function>
 
-<function name="gtk_drag_dest_add_image_targets">
+<function name="gtk_drag_icon_new_for_drag">
 <description>
-Add the image targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_image_targets() and
-gtk_drag_dest_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_add_text_targets">
-<description>
-Add the text targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_text_targets() and
-gtk_drag_dest_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_add_uri_targets">
-<description>
-Add the URI targets supported by #GtkSelectionData to
-the target list of the drag destination. The targets
-are added with @info = 0. If you need another value,
-use gtk_target_list_add_uri_targets() and
-gtk_drag_dest_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_find_target">
-<description>
-Looks for a match between the supported targets of @drop and the
-@dest_target_list, returning the first matching target, otherwise
-returning %NULL. @dest_target_list should usually be the return
-value from gtk_drag_dest_get_target_list(), but some widgets may
-have different valid targets for different parts of the widget; in
-that case, they will have to implement a drag_motion handler that
-passes the correct target list to this function.
+Creates a #GtkDragIcon and associates it with the drag operation.
 
 
 </description>
 <parameters>
-<parameter name="widget">
-<parameter_description> drag destination widget
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> #GdkDrop
-</parameter_description>
-</parameter>
-<parameter name="target_list">
-<parameter_description> list of droppable targets, or %NULL to use
-gtk_drag_dest_get_target_list (@widget).
+<parameter name="drag">
+<parameter_description> a #GtkDrag
 </parameter_description>
 </parameter>
 </parameters>
-<return> first target that the source offers
-and the dest can accept, or %NULL
+<return> the new #GtkDragIcon
 </return>
 </function>
 
-<function name="gtk_drag_dest_get_target_list">
+<function name="gtk_drag_icon_set_from_paintable">
 <description>
-Returns the list of targets this widget can accept from
-drag-and-drop.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkContentFormats, or %NULL if none
-</return>
-</function>
-
-<function name="gtk_drag_dest_get_track_motion">
-<description>
-Returns whether the widget has been configured to always
-emit #GtkWidget::drag-motion signals.
-
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the widget always emits
-#GtkWidget::drag-motion events
-</return>
-</function>
-
-<function name="gtk_drag_dest_set">
-<description>
-Sets a widget as a potential drop destination, and adds default behaviors.
-
-The default behaviors listed in @flags have an effect similar
-to installing default handlers for the widget’s drag-and-drop signals
-(#GtkWidget::drag-motion, #GtkWidget::drag-drop, ...). They all exist
-for convenience. When passing #GTK_DEST_DEFAULT_ALL for instance it is
-sufficient to connect to the widget’s #GtkWidget::drag-data-received
-signal to get primitive, but consistent drag-and-drop support.
-
-Things become more complicated when you try to preview the dragged data,
-as described in the documentation for #GtkWidget::drag-motion. The default
-behaviors described by @flags make some assumptions, that can conflict
-with your own signal handlers. For instance #GTK_DEST_DEFAULT_DROP causes
-invokations of gdk_drag_status() in the context of #GtkWidget::drag-motion,
-and invokations of gdk_drag_finish() in #GtkWidget::drag-data-received.
-Especially the later is dramatic, when your own #GtkWidget::drag-motion
-handler calls gtk_drag_get_data() to inspect the dragged data.
-
-There’s no way to set a default action here, you can use the
-#GtkWidget::drag-motion callback for that. Here’s an example which selects
-the action to use depending on whether the control key is pressed or not:
-|[&lt;!-- language=&quot;C&quot; --&gt;
-static void
-drag_motion (GtkWidget *widget,
-GdkDrag *drag,
-gint x,
-gint y,
-guint time)
-{
-GdkModifierType mask;
-
-gdk_surface_get_pointer (gtk_native_get_surface (gtk_widget_get_native (widget)),
-NULL, NULL, &amp;mask);
-if (mask &amp; GDK_CONTROL_MASK)
-gdk_drag_status (context, GDK_ACTION_COPY, time);
-else
-gdk_drag_status (context, GDK_ACTION_MOVE, time);
-}
-]|
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> which types of default drag behavior to use
-</parameter_description>
-</parameter>
-<parameter name="targets">
-<parameter_description> the drop types that this @widget will
-accept, or %NULL. Later you can access the list with
-gtk_drag_dest_get_target_list() and gtk_drag_dest_find_target().
-</parameter_description>
-</parameter>
-<parameter name="actions">
-<parameter_description> a bitmask of possible actions for a drop onto this @widget.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_set_target_list">
-<description>
-Sets the target types that this widget can accept from drag-and-drop.
-The widget must first be made into a drag destination with
-gtk_drag_dest_set().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-<parameter name="target_list">
-<parameter_description> list of droppable targets, or %NULL for none
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_set_track_motion">
-<description>
-Tells the widget to emit #GtkWidget::drag-motion and
-#GtkWidget::drag-leave events regardless of the targets and the
-%GTK_DEST_DEFAULT_MOTION flag.
-
-This may be used when a widget wants to do generic
-actions regardless of the targets that the source offers.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag destination
-</parameter_description>
-</parameter>
-<parameter name="track_motion">
-<parameter_description> whether to accept all targets
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_dest_unset">
-<description>
-Clears information about a drop destination set with
-gtk_drag_dest_set(). The widget will no longer receive
-notification of drags.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_get_data">
-<description>
-Gets the data associated with a drag. When the data
-is received or the retrieval fails, GTK+ will emit a
-#GtkWidget::drag-data-received signal. Failure of the retrieval
-is indicated by the length field of the @selection_data
-signal parameter being negative. However, when gtk_drag_get_data()
-is called implicitely because the %GTK_DEST_DEFAULT_DROP was set,
-then the widget will not receive notification of failed
-drops.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> the widget that will receive the
-#GtkWidget::drag-data-received signal
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description> the target (form of the data) to retrieve
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_get_source_widget">
-<description>
-Determines the source widget for a drag.
-
+Creates a #GtkDragIcon that shows @paintable, and associates
+it with the drag operation. The hotspot position on the paintable
+is aligned with the hotspot of the cursor.
 
 </description>
 <parameters>
 <parameter name="drag">
-<parameter_description> a drag context
-</parameter_description>
-</parameter>
-</parameters>
-<return> if the drag is occurring
-within a single application, a pointer to the source widget.
-Otherwise, %NULL.
-</return>
-</function>
-
-<function name="gtk_drag_highlight">
-<description>
-Highlights a widget as a currently hovered drop target.
-To end the highlight, call gtk_drag_unhighlight().
-GTK+ calls this automatically if %GTK_DEST_DEFAULT_HIGHLIGHT is set.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a widget to highlight
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_set_icon_default">
-<description>
-Sets the icon for a particular drag to the default
-icon.
-
-</description>
-<parameters>
-<parameter name="drag">
-<parameter_description> the context for a drag
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_set_icon_gicon">
-<description>
-Sets the icon for a given drag from the given @icon.
-See the documentation for gtk_drag_set_icon_name()
-for more details about using icons in drag and drop.
-
-</description>
-<parameters>
-<parameter name="drag">
-<parameter_description> the context for a drag
-</parameter_description>
-</parameter>
-<parameter name="icon">
-<parameter_description> a #GIcon
-</parameter_description>
-</parameter>
-<parameter name="hot_x">
-<parameter_description> the X offset of the hotspot within the icon
-</parameter_description>
-</parameter>
-<parameter name="hot_y">
-<parameter_description> the Y offset of the hotspot within the icon
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_set_icon_name">
-<description>
-Sets the icon for a given drag from a named themed icon. See
-the docs for #GtkIconTheme for more details. Note that the
-size of the icon depends on the icon theme (the icon is
-loaded at the symbolic size #GTK_ICON_SIZE_DND), thus 
-@hot_x and @hot_y have to be used with care.
-
-</description>
-<parameters>
-<parameter name="drag">
-<parameter_description> the context for a drag
-</parameter_description>
-</parameter>
-<parameter name="icon_name">
-<parameter_description> name of icon to use
-</parameter_description>
-</parameter>
-<parameter name="hot_x">
-<parameter_description> the X offset of the hotspot within the icon
-</parameter_description>
-</parameter>
-<parameter name="hot_y">
-<parameter_description> the Y offset of the hotspot within the icon
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_set_icon_paintable">
-<description>
-Sets @paintable as the icon for a given drag. GTK+ retains
-references for the arguments, and will release them when
-they are no longer needed.
-
-To position the @paintable relative to the mouse, its top
-left will be positioned @hot_x, @hot_y pixels from the
-mouse cursor.
-
-</description>
-<parameters>
-<parameter name="drag">
-<parameter_description> the context for a drag
+<parameter_description> a #GdkDrag
 </parameter_description>
 </parameter>
 <parameter name="paintable">
-<parameter_description> the #GdkPaintable to use as icon
+<parameter_description> a #GdkPaintable to display
 </parameter_description>
 </parameter>
 <parameter name="hot_x">
-<parameter_description> the X offset of the hotspot within the icon
+<parameter_description> X coordinate of the hotspot
 </parameter_description>
 </parameter>
 <parameter name="hot_y">
-<parameter_description> the Y offset of the hotspot within the icon
+<parameter_description> Y coordinate of the hotspot
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gtk_drag_set_icon_widget">
+<function name="gtk_drag_source_drag_cancel">
 <description>
-Changes the icon for drag operation to a given widget.
-GTK+ will not destroy the widget, so if you don’t want
-it to persist, you should connect to the “drag-end” 
-signal and destroy it yourself.
+Cancels a currently ongoing drag operation.
 
 </description>
 <parameters>
-<parameter name="drag">
-<parameter_description> the context for a drag
-</parameter_description>
-</parameter>
-<parameter name="widget">
-<parameter_description> a widget to use as an icon
-</parameter_description>
-</parameter>
-<parameter name="hot_x">
-<parameter_description> the X offset within @widget of the hotspot
-</parameter_description>
-</parameter>
-<parameter name="hot_y">
-<parameter_description> the Y offset within @widget of the hotspot
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gtk_drag_source_add_image_targets">
+<function name="gtk_drag_source_get_actions">
 <description>
-Add the writable image targets supported by #GtkSelectionData to
-the target list of the drag source. The targets
-are added with @info = 0. If you need another value, 
-use gtk_target_list_add_image_targets() and
-gtk_drag_source_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s is a drag source
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_add_text_targets">
-<description>
-Add the text targets supported by #GtkSelectionData to
-the target list of the drag source.  The targets
-are added with @info = 0. If you need another value, 
-use gtk_content_formats_add_text_targets() and
-gtk_drag_source_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s is a drag source
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_add_uri_targets">
-<description>
-Add the URI targets supported by #GtkSelectionData to
-the target list of the drag source.  The targets
-are added with @info = 0. If you need another value, 
-use gtk_content_formats_add_uri_targets() and
-gtk_drag_source_set_target_list().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s is a drag source
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_get_target_list">
-<description>
-Gets the list of targets this widget can provide for
-drag-and-drop.
+Gets the actions that are currently set on the #GtkDragSource.
 
 
 </description>
 <parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GdkContentFormats, or %NULL if none
+<return> the actions set on @source
 </return>
 </function>
 
-<function name="gtk_drag_source_set">
+<function name="gtk_drag_source_get_content">
 <description>
-Sets up a widget so that GTK+ will start a drag operation when the user
-clicks and drags on the widget. The widget must have a window.
+Gets the current content provider of a #GtkDragSource.
+
 
 </description>
 <parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
-<parameter name="start_button_mask">
-<parameter_description> the bitmask of buttons that can start the drag
+</parameters>
+<return> the #GtkContentProvider of @source
+</return>
+</function>
+
+<function name="gtk_drag_source_get_drag">
+<description>
+Returns the underlying #GtkDrag object for an ongoing drag.
+
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
-<parameter name="targets">
-<parameter_description> the targets that the drag will support,
-may be %NULL
+</parameters>
+<return> the #GdkDrag of the current drag operation, or %NULL
+</return>
+</function>
+
+<function name="gtk_drag_source_new">
+<description>
+Creates a new #GtkDragSource object.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the new #GtkDragSource
+</return>
+</function>
+
+<function name="gtk_drag_source_set_actions">
+<description>
+Sets the actions on the #GtkDragSource.
+
+During a DND operation, the actions are offered
+to potential drop targets. If @actions include
+%GDK_ACTION_MOVE, you need to listen to the
+#GtkDraGSource::drag-end signal and handle
+@delete_data being %TRUE.
+
+This function can be called before a drag is started,
+or in a handler for the #GtkDragSource::prepare signal.
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
 <parameter name="actions">
-<parameter_description> the bitmask of possible actions for a drag from this widget
+<parameter_description> the actions to offer
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gtk_drag_source_set_icon_gicon">
+<function name="gtk_drag_source_set_content">
 <description>
-Sets the icon that will be used for drags from a particular source
-to @icon. See the docs for #GtkIconTheme for more details.
+Sets a content provider on a #GtkDragSource.
+
+When the data is requested in the cause of a
+DND operation, it will be obtained from the
+content provider.
+
+This function can be called before a drag is started,
+or in a handler for the #GtkDragSource::prepare signal.
+
+You may consider setting the content provider back to
+%NULL in a #GTkDragSource::drag-end signal handler.
 
 </description>
 <parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
-<parameter name="icon">
-<parameter_description> A #GIcon
+<parameter name="content">
+<parameter_description> a #GtkContentProvider, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gtk_drag_source_set_icon_name">
+<function name="gtk_drag_source_set_icon">
 <description>
-Sets the icon that will be used for drags from a particular source
-to a themed icon. See the docs for #GtkIconTheme for more details.
+Sets a paintable to use as icon during DND operations.
+
+The hotspot coordinates determine the point on the icon
+that gets aligned with the hotspot of the cursor.
+
+If @paintable is %NULL, a default icon is used.
+
+This function can be called before a drag is started, or in
+a #GtkDragSource::prepare or #GtkDragSource::drag-begin signal handler.
 
 </description>
 <parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="icon_name">
-<parameter_description> name of icon to use
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_set_icon_paintable">
-<description>
-Sets the icon that will be used for drags from a particular source
-to @paintable.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
+<parameter name="source">
+<parameter_description> a #GtkDragSource
 </parameter_description>
 </parameter>
 <parameter name="paintable">
-<parameter_description> A #GdkPaintable
+<parameter_description> the #GtkPaintable to use as icon, or %NULL
 </parameter_description>
 </parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_set_target_list">
-<description>
-Changes the target types that this widget offers for drag-and-drop.
-The widget must first be made into a drag source with
-gtk_drag_source_set().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget that’s a drag source
+<parameter name="hot_x">
+<parameter_description> the hotspot X coordinate on the icon
 </parameter_description>
 </parameter>
-<parameter name="target_list">
-<parameter_description> list of draggable targets, or %NULL for none
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_source_unset">
-<description>
-Undoes the effects of gtk_drag_source_set().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_drag_unhighlight">
-<description>
-Removes a highlight set by gtk_drag_highlight() from
-a widget.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a widget to remove the highlight from
+<parameter name="hot_y">
+<parameter_description> the hotspot Y coordinate on the icon
 </parameter_description>
 </parameter>
 </parameters>
@@ -30419,6 +29724,212 @@ the drawing area's contents
 </parameter>
 <parameter name="destroy">
 <parameter_description> destroy notifier for @user_data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_deny_drop">
+<description>
+Sets the @drop as not accepted on this drag site.
+
+This function should be used when delaying the decision
+on whether to accept a drag or not until after reading
+the data.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop of an ongoing drag operation
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_find_mimetype">
+<description>
+Returns a mimetype that is supported both by @dest and the ongoing
+drag. For more detailed control, you can use gdk_drop_get_formats()
+to obtain the content formats that are supported by the source.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a matching mimetype for the ongoing drag, or %NULL
+</return>
+</function>
+
+<function name="gtk_drop_target_get_actions">
+<description>
+Gets the actions that this drop target supports.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the actions that this drop target supports
+</return>
+</function>
+
+<function name="gtk_drop_target_get_drop">
+<description>
+Returns the underlying #GtkDrop object for an ongoing drag.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkDrop of the current drag operation, or %NULL
+</return>
+</function>
+
+<function name="gtk_drop_target_get_formats">
+<description>
+Gets the data formats that this drop target accepts.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the supported data formats
+</return>
+</function>
+
+<function name="gtk_drop_target_new">
+<description>
+Creates a new #GtkDropTarget object.
+
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> the supported data formats
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the supported actions
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GtkDropTarget
+</return>
+</function>
+
+<function name="gtk_drop_target_read_selection">
+<description>
+Asynchronously reads the dropped data from an ongoing
+drag on a #GtkDropTarget, and returns the data in a 
+#GtkSelectionData object.
+
+This function is meant for cases where a #GtkSelectionData
+object is needed, such as when using the #GtkTreeModel DND
+support. In most other cases, the #GdkDrop async read
+APIs that return in input stream or #GValue are more
+convenient and should be preferred.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the data format to read
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a cancellable
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call on completion
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_read_selection_finish">
+<description>
+Finishes an async drop read operation, see gtk_drop_target_read_selection().
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store error information on failure, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GtkSelectionData, or %NULL
+</return>
+</function>
+
+<function name="gtk_drop_target_set_actions">
+<description>
+Sets the actions that this drop target supports.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the supported actions
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_set_formats">
+<description>
+Sets the data formats that this drop target will accept.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="formats">
+<parameter_description> the supported data formats
 </parameter_description>
 </parameter>
 </parameters>
@@ -32585,8 +32096,8 @@ gets executed after the default handler.
 <parameter_description> icon position
 </parameter_description>
 </parameter>
-<parameter name="formats">
-<parameter_description> the targets (data formats) in which the data can be provided
+<parameter name="provider">
+<parameter_description> a #GdkContentProvider
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -41523,6 +41034,7 @@ This image is used for a drag icon.
 Turns @icon_view into a drop destination for automatic DND. Calling this
 method sets #GtkIconView:reorderable to %FALSE.
 
+
 </description>
 <parameters>
 <parameter name="icon_view">
@@ -41539,7 +41051,8 @@ widget
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the drop target that was attached
+</return>
 </function>
 
 <function name="gtk_icon_view_enable_model_drag_source">
@@ -48504,7 +48017,7 @@ to reset to default behavior.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to @callback
+<parameter_description> user data to pass to @func.
 </parameter_description>
 </parameter>
 <parameter name="destroy_notify">
@@ -48645,6 +48158,24 @@ The default style is, as one can guess, %GTK_RELIEF_NORMAL.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_menu_tool_button_get_popover">
+<description>
+Returns the #GtkPopover that pops out of the button.
+If the button is not using a #GtkPopover, this function
+returns %NULL.
+
+
+</description>
+<parameters>
+<parameter name="menu_button">
+<parameter_description> a #GtkMenuToolButton
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GtkPopover or %NULL
+</return>
 </function>
 
 <function name="gtk_menu_tool_button_new">
@@ -50293,15 +49824,17 @@ will initiate a drag cancel animation.
 |[&lt;!-- language=&quot;C&quot; --&gt;
 static void
 on_drag_data_received (GtkWidget        *widget,
-GdkDrag          *drag,
+GdkDrop          *drop,
 GtkSelectionData *data,
 guint             time,
 gpointer          user_data)
 {
+GtkDrag *drag;
 GtkWidget *notebook;
 GtkWidget **child;
 
-notebook = gtk_drag_get_source_widget (drag);
+drag = gtk_drop_get_drag (drop);
+notebook = g_object_get_data (drag, &quot;gtk-notebook-drag-origin&quot;);
 child = (void*) gtk_selection_data_get_data (data);
 
 // process_widget (*child);
@@ -57408,6 +56941,7 @@ certainly better ways to achieve your goals. For example, use
 gtk_widget_queue_draw() instead
 of making up expose events.
 
+
 </description>
 <parameters>
 <parameter name="widget">
@@ -57419,7 +56953,8 @@ of making up expose events.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the event was handled
+</return>
 </function>
 
 <function name="gtk_radio_button_get_group">
@@ -61231,6 +60766,26 @@ will reveal the entry in addition to triggering the search entry.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_search_list_model_new">
+<description>
+Creates a new selection to handle @model.
+
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> the #GListModel to manage
+</parameter_description>
+</parameter>
+<parameter name="filter">
+<parameter_description> the #GtkFilter to use
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GtkSearchListModel
+</return>
 </function>
 
 <function name="gtk_selection_data_copy">
@@ -67013,6 +66568,22 @@ whether text is selected.
 </parameter>
 </parameters>
 <return> whether the selection has nonzero length
+</return>
+</function>
+
+<function name="gtk_text_buffer_get_selection_content">
+<description>
+Get a content provider for this buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GtkTextBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GdkContentProvider.
 </return>
 </function>
 
@@ -79260,6 +78831,7 @@ This image is used for a drag icon.
 Turns @tree_view into a drop destination for automatic DND. Calling
 this method sets #GtkTreeView:reorderable to %FALSE.
 
+
 </description>
 <parameters>
 <parameter name="tree_view">
@@ -79276,7 +78848,8 @@ widget
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the drop target that has been attached
+</return>
 </function>
 
 <function name="gtk_tree_view_enable_model_drag_source">
