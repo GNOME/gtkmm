@@ -20,9 +20,17 @@ _PINCLUDE(glibmm/private/object_p.h)
 #include <glibmm/bytes.h>
 #include <glibmm/object.h>
 #include <glibmm/refptr.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
 #include <gdkmm/contentformats.h>
+#include <memory>
 
 _CC_INCLUDE(gdk/gdk.h)
+
+namespace Gio
+{
+class OutputStream;
+}
 
 namespace Gdk
 {
@@ -47,12 +55,54 @@ class ContentProvider : public Glib::Object
   _CLASS_GOBJECT(ContentProvider, GdkContentProvider, GDK_CONTENT_PROVIDER, Glib::Object, GObject)
 
 public:
-  // _WRAP_METHOD is used for the create() methods because the gdk_content_provider_new_for_*()
+  /** Callback type for providing data in a Glib::ValueBase.
+   * For instance:
+   * @code
+   * void on_get_value(Glib::ValueBase& value);
+   * @endcode
+   *
+   * @param[in,out] value Where to store the provided value. @a value has been
+   *   initialized to the GType the value should be provided in.
+   *   This given GType does not need to be listed in the formats returned by
+   *   ref_formats(). However, if the given GType is not supported,
+   *   the operation can fail.
+   */
+  using SlotGetValue = sigc::slot<void(Glib::ValueBase&)>;
+
+  /** Callback type for providing data in a Glib::Bytes.
+   * For instance:
+   * @code
+   * Glib::RefPtr<Glib::Bytes> on_get_bytes(const Glib::ustring& mime_type);
+   * @endcode
+   *
+   * @param mime_type The mime type.
+   * @return A Glib::Bytes with the data for @a mime_type.
+   */
+  using SlotGetBytes = sigc::slot<Glib::RefPtr<Glib::Bytes>(const Glib::ustring&)>;
+
+  // _WRAP_METHOD is used for the create() methods because the gdk_content_provider_new_*()
   // functions do more than call g_object_new().
   _WRAP_METHOD(static Glib::RefPtr<ContentProvider> create(const Glib::ustring& mime_type,
     const Glib::RefPtr<const Glib::Bytes>& bytes), gdk_content_provider_new_for_bytes)
   _WRAP_METHOD(static Glib::RefPtr<ContentProvider> create(const Glib::ValueBase& value),
     gdk_content_provider_new_for_value)
+
+  /** Create a content provider that provides data that is provided via a callback.
+   *
+   * @param type The type that the callback provides.
+   * @param slot Callback to populate a Glib::Value.
+   * @return A new Gdk::ContentProvider.
+   */
+  static Glib::RefPtr<ContentProvider> create(GType type, const SlotGetValue& slot);
+
+  /** Create a content provider that provides data that is provided via a callback.
+   *
+   * @param formats Formats to advertise.
+   * @param slot Callback to return a Glib::Bytes.
+   * @return A new Gdk::ContentProvider.
+   */
+  static Glib::RefPtr<ContentProvider> create(const Glib::RefPtr<const ContentFormats>& formats, const SlotGetBytes& slot);
+  _IGNORE(gdk_content_provider_new_with_callback, gdk_content_provider_new_with_formats)
 
   // ref_formats() and ref_storable_formats() are const because they return
   // newly created ContentFormats instances.
@@ -60,6 +110,15 @@ public:
   _WRAP_METHOD(Glib::RefPtr<ContentFormats> ref_storable_formats() const, gdk_content_provider_ref_storable_formats)
 
   _WRAP_METHOD(void content_changed(), gdk_content_provider_content_changed)
+
+  _WRAP_METHOD(void write_mime_type_async(const Glib::ustring& mime_type,
+    const Glib::RefPtr<Gio::OutputStream>& stream, int io_priority,
+    const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.?}) const,
+    gdk_content_provider_write_mime_type_async, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(void write_mime_type_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gdk_content_provider_write_mime_type_finish, errthrow)
+
+  _WRAP_METHOD(void get_value(Glib::ValueBase& value) const, gdk_content_provider_get_value, errthrow)
 
   _WRAP_PROPERTY("formats", Glib::RefPtr<ContentFormats>)
   _WRAP_PROPERTY("storable-formats", Glib::RefPtr<ContentFormats>)
@@ -70,6 +129,12 @@ public:
   // there is no constructor that calls g_object_new() to create a gtkmm__GdkContentProvider
   // instance. A GdkContentProvider instance never calls an overriding vfunc in
   // Gdk::ContentProvider.
+
+private:
+  // Pointers to copies of the slots. The slots shall be deleted
+  // when the ContentProvider is deleted.
+  std::unique_ptr<SlotGetValue> m_slot_get_value;
+  std::unique_ptr<SlotGetBytes> m_slot_get_bytes;
 };
 
 } // namespace Gdk

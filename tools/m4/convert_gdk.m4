@@ -265,6 +265,8 @@ _CONVERSION(`const Glib::RefPtr<const ContentProvider>&',`GdkContentProvider*',_
 _CONVERSION(`GdkContentProvider*',`Glib::RefPtr<ContentProvider>',`Glib::wrap($3)')
 _CONVERSION(`GdkContentProvider*',`Glib::RefPtr<Gdk::ContentProvider>',`Glib::wrap($3)')
 
+_CONVERSION(`const Glib::RefPtr<Gio::OutputStream>&',`GOutputStream*',__CONVERT_REFPTR_TO_P)
+
 # FrameClock, FrameTimings
 _CONVERSION(`GdkFrameClock*',`Glib::RefPtr<FrameClock>',`Glib::wrap($3)')
 _CONVERSION(`GdkFrameClock*',`Glib::RefPtr<Gdk::FrameClock>',`Glib::wrap($3)')

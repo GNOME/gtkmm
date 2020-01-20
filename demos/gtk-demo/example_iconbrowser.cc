@@ -92,8 +92,9 @@ public:
 
 protected:
   // Signal handler:
-  void on_image_drag_data_get(const Glib::RefPtr<Gdk::Drag>& drag,
-    Gtk::SelectionData& selection_data, int size_index);
+  void on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& drag, int size_index);
+
+  void on_image_get_texture(Glib::ValueBase& value, int size_index);
 
   Glib::RefPtr<const Gdk::Texture> get_icon(int size_index);
 
@@ -107,6 +108,8 @@ protected:
   Gtk::Image m_image[n_icon_sizes];
   Gtk::Label m_label[n_icon_sizes];
   Gtk::Label m_description;
+
+  Glib::RefPtr<Gtk::DragSource> m_image_drag_source[n_icon_sizes];
 
 }; // end DetailDialog
 
@@ -908,11 +911,14 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
     m_image[i].set_valign(Gtk::Align::END);
 
     // Enable dragging an image, and copying it to another program.
-    //??m_image[i].drag_source_set(
-    //??  Gdk::ContentFormats::create(), Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
-    //??m_image[i].drag_source_add_image_targets();
-    //??m_image[i].signal_drag_data_get().connect(
-    //??  sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_data_get), i));
+    m_image_drag_source[i] = Gtk::DragSource::create();
+    auto content = Gdk::ContentProvider::create(
+      Glib::Value<Glib::RefPtr<Gdk::Texture>>::value_type(),
+      sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_get_texture), i));
+    m_image_drag_source[i]->set_content(content);
+    m_image_drag_source[i]->signal_drag_begin().connect(
+      sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_begin), i));
+    m_image[i].add_controller(m_image_drag_source[i]);
 
     m_grid.attach(m_label[i], i, 1);
     m_label[i].set_margin(4);
@@ -942,7 +948,6 @@ void DetailDialog::set_image(
   {
     m_image[i].set_from_icon_name(icon_name);
     m_image[i].set_pixel_size(m_icon_size[i]);
-    //??m_image[i].drag_source_set_icon(icon_name);
   }
   if (description.empty())
     m_description.hide();
@@ -953,10 +958,29 @@ void DetailDialog::set_image(
   }
 }
 
-void DetailDialog::on_image_drag_data_get(const Glib::RefPtr<Gdk::Drag>& /* drag */,
-  Gtk::SelectionData& selection_data, int size_index)
+void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */, int size_index)
 {
-  selection_data.set_texture(get_icon(size_index));
+  std::cout << "on_image_drag_begin\n";
+  auto image_texture = get_icon(size_index);
+  if (image_texture)
+  {
+    const auto hot_x = image_texture->get_intrinsic_width();
+    const auto hot_y = image_texture->get_intrinsic_height();
+    m_image_drag_source[size_index]->set_icon(image_texture, hot_x, hot_y);
+  }
+}
+
+void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
+{
+  std::cout << "on_image_get_texture\n";
+  auto image_texture = get_icon(size_index);
+  if (image_texture)
+  {
+    Glib::Value<Glib::RefPtr<const Gdk::Texture>> texture_value;
+    texture_value.init(value.gobj());
+    texture_value.set(image_texture);
+    value = texture_value;
+  }
 }
 
 Glib::RefPtr<const Gdk::Texture> DetailDialog::get_icon(int size_index)
