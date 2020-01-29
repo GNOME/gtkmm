@@ -573,10 +573,6 @@ _CONVERSION(`GActionGroup*',`Glib::RefPtr<const Gio::ActionGroup>',`Glib::wrap($
 _CONVERSION(`GtkDragResult',`DragResult',`static_cast<$2>($3)')
 _CONVERSION(`GtkDropTarget*',`Glib::RefPtr<DropTarget>',`Glib::wrap($3)')
 
-_CONVERSION(`GtkWidgetPath*',`WidgetPath',`Glib::wrap($3, true)')
-_CONVERSION(`const GtkWidgetPath*',`WidgetPath',`Glib::wrap(const_cast<GtkWidgetPath*>($3), true)')
-_CONVERSION(`const WidgetPath&',`GtkWidgetPath*',`const_cast<WidgetPath&>($3).gobj()')
-
 # LayoutChild, LayoutManager
 _CONVERSION(`GtkLayoutManager*',`Glib::RefPtr<LayoutManager>',`Glib::wrap($3)')
 _CONVERSION(`GtkLayoutManager*',`Glib::RefPtr<const LayoutManager>',`Glib::wrap($3)')

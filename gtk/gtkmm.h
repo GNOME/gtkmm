@@ -285,7 +285,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/volumebutton.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpaintable.h>
-#include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
 
 #endif /* #ifndef GTKMM_H */
