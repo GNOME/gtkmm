@@ -84,6 +84,7 @@ _CONV_ENUM(Gtk,SortType)
 _CONV_INCLASS_ENUM(Gtk,SpinButton,UpdatePolicy)
 _CONV_ENUM(Gtk,SpinType)
 _CONV_ENUM(Gtk,StackTransitionType)
+_CONV_INCLASS_ENUM(Gtk,StyleContext,PrintFlags)
 _CONV_ENUM(Gtk,TextDirection)
 _CONV_ENUM(Gtk,TextSearchFlags)
 _CONV_ENUM(Gtk,TextWindowType)
@@ -288,8 +289,8 @@ _CONVERSION(Gtk::Notebook_Helpers::Page*,GtkNotebookPage*,`($1)((void*)($3))',`(
 
 _CONVERSION(`GtkSettings*',`Glib::RefPtr<Settings>', Glib::wrap($3))
 
-_CONVERSION(`GtkIconInfo*',`Glib::RefPtr<IconInfo>',`Glib::wrap($3)')
-_CONVERSION(`GtkIconInfo*',`Glib::RefPtr<const IconInfo>',`Glib::wrap($3)')
+_CONVERSION(`GtkIconPaintable*',`Glib::RefPtr<IconPaintable>',`Glib::wrap($3)')
+_CONVERSION(`GtkIconPaintable*',`Glib::RefPtr<const IconPaintable>',`Glib::wrap($3)')
 _CONVERSION(`GtkIconTheme*',`Glib::RefPtr<IconTheme>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkWindowGroup*',`Glib::RefPtr<WindowGroup>',`Glib::wrap($3)')

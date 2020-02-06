@@ -312,7 +312,7 @@ void Example_IconBrowser::on_icon_view_item_activated(const Gtk::TreeModel::Path
   const auto row = *iter;
   const Glib::ustring name = row[m_store->get_text_column()];
   const Glib::ustring description = row[m_store->m_columns.description];
-  if (name.empty() || !Gtk::IconTheme::get_default()->has_icon(name))
+  if (name.empty() || !Gtk::IconTheme::get_for_display(get_display())->has_icon(name))
     return;
 
   m_details.set_title(name);
@@ -849,11 +849,11 @@ void Example_IconBrowser::add_icon(const Glib::ustring& name,
   const Glib::ustring& description, const Glib::ustring& context_id)
 {
   auto regular_name = name;
-  if (!Gtk::IconTheme::get_default()->has_icon(regular_name))
+  if (!Gtk::IconTheme::get_for_display(get_display())->has_icon(regular_name))
     regular_name.clear();
 
   auto symbolic_name = name + "-symbolic";
-  if (!Gtk::IconTheme::get_default()->has_icon(symbolic_name))
+  if (!Gtk::IconTheme::get_for_display(get_display())->has_icon(symbolic_name))
     symbolic_name.clear();
 
   // Add a new row to the IconInfoStore (which is a ListStore).
@@ -960,7 +960,6 @@ void DetailDialog::set_image(
 
 void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */, int size_index)
 {
-  std::cout << "on_image_drag_begin\n";
   auto image_texture = get_icon(size_index);
   if (image_texture)
   {
@@ -972,7 +971,6 @@ void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */
 
 void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
 {
-  std::cout << "on_image_get_texture\n";
   auto image_texture = get_icon(size_index);
   if (image_texture)
   {
@@ -985,17 +983,12 @@ void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
 
 Glib::RefPtr<const Gdk::Texture> DetailDialog::get_icon(int size_index)
 {
-  auto context = m_image[size_index].get_style_context();
-  auto info = Gtk::IconTheme::get_default()->lookup_icon(
+  auto icon = Gtk::IconTheme::get_for_display(get_display())->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
   Glib::RefPtr<const Gdk::Texture> texture;
   try
   {
-    // Gtk::IconInfo::load_symbolic_for_context() returns a Glib::RefPtr<const Gdk::Paintable>
-    // which is actually a Glib::RefPtr<const Gdk::Texture>
-    bool is_symbolic = false;
-    texture = std::dynamic_pointer_cast<const Gdk::Texture>(
-      info->load_symbolic_for_context(context, is_symbolic));
+    texture = icon->download_texture();
   }
   catch (const Glib::Error& err)
   {

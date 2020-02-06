@@ -19,8 +19,8 @@
 
 #include <gdkmm/paintable.h>
 #include <gdkmm/display.h>
-
-#include <gtkmm/iconinfo.h>
+#include <gtkmm/enums.h>
+#include <gtkmm/iconpaintable.h>
 #include <giomm/icon.h>
 
 _DEFS(gtkmm,gtk)
@@ -42,7 +42,7 @@ _WRAP_GERROR(IconThemeError,GtkIconThemeError,GTK_ICON_THEME_ERROR)
  * providing a filename is to allow different icons to be used
  * depending on what “icon theme” is selected by the user.
  * The operation of icon themes on Linux and Unix follows the
- * [Icon Theme Specification](http://www.freedesktop.org/Standards/icon-theme-spec).
+ * [IconPaintable Theme Specification](http://www.freedesktop.org/Standards/icon-theme-spec).
  * There is a fallback icon theme, named `hicolor`, where applications
  * should install their icons, but additional icon themes can be installed
  * as operating system vendors and users choose.
@@ -54,7 +54,7 @@ _WRAP_GERROR(IconThemeError,GtkIconThemeError,GTK_ICON_THEME_ERROR)
  * can create new %Gtk::IconTheme objects, but it’s much more
  * efficient to use the standard icon theme for the Gdk::Display
  * so that the icon information is shared with other people
- * looking up icons. Use get_default() or get_for_display().
+ * looking up icons. Use get_for_display().
  */
 class IconTheme : public Glib::Object
 {
@@ -66,7 +66,6 @@ protected:
 public:
   _WRAP_CREATE()
 
-  _WRAP_METHOD(static Glib::RefPtr<IconTheme> get_default(), gtk_icon_theme_get_default, refreturn)
   _WRAP_METHOD(static Glib::RefPtr<IconTheme> get_for_display(const Glib::RefPtr<Gdk::Display>& display), gtk_icon_theme_get_for_display, refreturn)
   _WRAP_METHOD(void set_display(const Glib::RefPtr<Gdk::Display>& display), gtk_icon_theme_set_display)
   void set_search_path(const std::vector<Glib::ustring>& path);
@@ -79,52 +78,30 @@ public:
   _WRAP_METHOD(void set_custom_theme(const Glib::ustring& theme_name), gtk_icon_theme_set_custom_theme)
   _WRAP_METHOD(bool has_icon(const Glib::ustring& icon_name) const, gtk_icon_theme_has_icon)
 
+  _WRAP_METHOD_DOCS_ONLY(gtk_icon_theme_get_icon_sizes)
   std::vector<int> get_icon_sizes(const Glib::ustring& icon_name) const;
-  _IGNORE(gtk_icon_theme_get_icon_sizes)
 
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> lookup_icon(const Glib::ustring& icon_name, int size, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_icon)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> lookup_icon(const Glib::ustring& icon_name, int size, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_icon, constversion)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char*[]',`const_cast<const gchar**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
+  _WRAP_METHOD(Glib::RefPtr<IconPaintable> lookup_icon(const Glib::ustring& icon_name,
+    const std::vector<Glib::ustring>& fallbacks{?}, int size, int scale = 1, TextDirection direction = TextDirection::NONE,
+    IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_icon)
+  _WRAP_METHOD(Glib::RefPtr<const IconPaintable> lookup_icon(const Glib::ustring& icon_name,
+    const std::vector<Glib::ustring>& fallbacks{?}, int size, int scale = 1, TextDirection direction = TextDirection::NONE,
+    IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_icon, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> lookup_icon(const Glib::ustring& icon_name, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_icon_for_scale)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> lookup_icon(const Glib::ustring& icon_name, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_icon_for_scale, constversion)
-
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon, int size, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_by_gicon)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon, int size, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_by_gicon, constversion)
-
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_by_gicon_for_scale)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_by_gicon_for_scale, constversion)
-
-  #m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const gchar*[]',`const_cast<const gchar**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> choose_icon(const std::vector<Glib::ustring>& icon_names, int size, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_choose_icon)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> choose_icon(const std::vector<Glib::ustring>& icon_names, int size, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_choose_icon, constversion)
-
-  _WRAP_METHOD(Glib::RefPtr<IconInfo> choose_icon(const std::vector<Glib::ustring>& icon_names, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_choose_icon_for_scale)
-  _WRAP_METHOD(Glib::RefPtr<const IconInfo> choose_icon(const std::vector<Glib::ustring>& icon_names, int size, int scale, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_choose_icon_for_scale, constversion)
-
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Paintable> load_icon(const Glib::ustring& icon_name, int size,
-    IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_load_icon, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Paintable> load_icon(const Glib::ustring& icon_name, int size,
-    int scale, IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_load_icon_for_scale, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<IconPaintable> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon,
+    int size, int scale = 1, TextDirection direction = TextDirection::NONE,
+    IconLookupFlags flags = (IconLookupFlags)0), gtk_icon_theme_lookup_by_gicon)
+  _WRAP_METHOD(Glib::RefPtr<const IconPaintable> lookup_icon(const Glib::RefPtr<const Gio::Icon>& icon,
+    int size, int scale = 1, TextDirection direction = TextDirection::NONE,
+    IconLookupFlags flags = (IconLookupFlags)0) const, gtk_icon_theme_lookup_by_gicon, constversion)
 
 #m4 _CONVERSION(`GList*',`std::vector<Glib::ustring>',`Glib::ListHandler<Glib::ustring>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
   /** Lists the icons in the current icon theme.
    *
-   * Only a subset of the icons can be listed by providing a context string.
-   * The set of values for the context string is system dependent,
-   * but will typically include such values as “Applications” and
-   * “MimeTypes”. Contexts are explained in the
-   * <a href="http://www.freedesktop.org/wiki/Specifications/icon-theme-spec">Icon Theme Specification</a>.
-   * The standard contexts are listed in the
-   * <a href="http://www.freedesktop.org/wiki/Specifications/icon-naming-spec">Icon Naming Specification</a>.
-   *
-   * @param context A string identifying a particular type of icon,
-   *        or an empty string to list all icons.
-   * @return A vector holding the names of all the icons in the theme,
-   *         or all the icons in the context.
+   * @return A vector holding the names of all the icons in the theme.
    */
-  _WRAP_METHOD(std::vector<Glib::ustring> list_icons(const Glib::ustring& context{NULL} = {}) const, gtk_icon_theme_list_icons)
-
-  _WRAP_METHOD(bool rescan_if_needed(), gtk_icon_theme_rescan_if_needed)
+  _WRAP_METHOD(std::vector<Glib::ustring> list_icons() const, gtk_icon_theme_list_icons)
 
   // no_default_handler because GtkIconThemeClass is private.
   _WRAP_SIGNAL(void changed(), "changed", no_default_handler)
