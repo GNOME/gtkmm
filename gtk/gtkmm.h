@@ -141,6 +141,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/droptarget.h>
 #include <gtkmm/editable.h>
+#include <gtkmm/emojichooser.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
