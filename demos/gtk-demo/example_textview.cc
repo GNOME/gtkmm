@@ -240,9 +240,9 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
   iter = refBuffer->insert(iter, "The buffer can have images in it: ");
   if (refTexture)
   {
-    iter = refBuffer->insert_texture(iter, refTexture);
-    iter = refBuffer->insert_texture(iter, refTexture);
-    iter = refBuffer->insert_texture(iter, refTexture);
+    iter = refBuffer->insert_paintable(iter, refTexture);
+    iter = refBuffer->insert_paintable(iter, refTexture);
+    iter = refBuffer->insert_paintable(iter, refTexture);
   }
   iter = refBuffer->insert(iter, " for example.\n\n");
 

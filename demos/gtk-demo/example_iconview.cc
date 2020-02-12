@@ -47,8 +47,8 @@ protected:
 
   //Member widgets:
   Gtk::Box m_VBox;
-  Gtk::Toolbar m_Toolbar;
-  Gtk::ToolButton m_ButtonUp, m_ButtonHome;
+  Gtk::Box m_Toolbar;
+  Gtk::Button m_ButtonUp, m_ButtonHome;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::IconView m_IconView;
 };
@@ -82,13 +82,11 @@ Example_IconView::Example_IconView()
 
   m_VBox.add(m_Toolbar);
 
-  m_ButtonUp.set_is_important();
   m_ButtonUp.set_sensitive();
-  m_Toolbar.append(m_ButtonUp);
+  m_Toolbar.add(m_ButtonUp);
 
-  m_ButtonHome.set_is_important();
   m_ButtonHome.set_sensitive();
-  m_Toolbar.append(m_ButtonHome);
+  m_Toolbar.add(m_ButtonHome);
 
   m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);

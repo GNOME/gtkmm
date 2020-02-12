@@ -96,7 +96,7 @@ protected:
 
   void on_image_get_texture(Glib::ValueBase& value, int size_index);
 
-  Glib::RefPtr<const Gdk::Texture> get_icon(int size_index);
+  Glib::RefPtr<const Gdk::Paintable> get_paintable(int size_index);
 
   static const int n_icon_sizes = 5;
   static const int m_icon_size[n_icon_sizes];
@@ -960,41 +960,39 @@ void DetailDialog::set_image(
 
 void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */, int size_index)
 {
-  auto image_texture = get_icon(size_index);
-  if (image_texture)
+  auto image_paintable = get_paintable(size_index);
+  if (image_paintable)
   {
-    const auto hot_x = image_texture->get_intrinsic_width();
-    const auto hot_y = image_texture->get_intrinsic_height();
-    m_image_drag_source[size_index]->set_icon(image_texture, hot_x, hot_y);
+    const auto hot_x = image_paintable->get_intrinsic_width();
+    const auto hot_y = image_paintable->get_intrinsic_height();
+    m_image_drag_source[size_index]->set_icon(image_paintable, hot_x, hot_y);
   }
 }
 
 void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
 {
-  auto image_texture = get_icon(size_index);
-  if (image_texture)
+  auto image_paintable = get_paintable(size_index);
+  if (image_paintable)
   {
-    Glib::Value<Glib::RefPtr<const Gdk::Texture>> texture_value;
-    texture_value.init(value.gobj());
-    texture_value.set(image_texture);
-    value = texture_value;
+    auto image_texture = std::dynamic_pointer_cast<const Gdk::Texture>(image_paintable);
+    if (image_texture)
+    {
+      Glib::Value<Glib::RefPtr<const Gdk::Texture>> texture_value;
+      texture_value.init(value.gobj());
+      texture_value.set(image_texture);
+      value = texture_value;
+    }
+    else
+      std::cout << "DetailDialog::on_image_get_texture(): Could not get a Gdk::Texture" << std::endl;
   }
+  else
+    std::cout << "DetailDialog::on_image_get_texture(): Could not get a Gdk::Paintable" << std::endl;
 }
 
-Glib::RefPtr<const Gdk::Texture> DetailDialog::get_icon(int size_index)
+Glib::RefPtr<const Gdk::Paintable> DetailDialog::get_paintable(int size_index)
 {
-  auto icon = Gtk::IconTheme::get_for_display(get_display())->lookup_icon(
+  return Gtk::IconTheme::get_for_display(get_display())->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
-  Glib::RefPtr<const Gdk::Texture> texture;
-  try
-  {
-    texture = icon->download_texture();
-  }
-  catch (const Glib::Error& err)
-  {
-    std::cout << "Error in DetailDialog::get_icon(): " << err.what() << std::endl;
-  }
-  return texture;
 }
 
 IconInfoStore::IconInfoStore()

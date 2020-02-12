@@ -225,7 +225,6 @@ extern const int gtkmm_micro_version;
 #endif
 #include <gtkmm/progressbar.h>
 #include <gtkmm/radiobutton.h>
-#include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
 #include <gtkmm/recentinfo.h>
 #include <gtkmm/recentmanager.h>
@@ -237,7 +236,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/searchbar.h>
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
-#include <gtkmm/separatortoolitem.h>
 #include <gtkmm/settings.h>
 #include <gtkmm/shortcutlabel.h>
 #include <gtkmm/shortcutsgroup.h>
@@ -264,11 +262,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/texttagtable.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/togglebutton.h>
-#include <gtkmm/toolbar.h>
-#include <gtkmm/toolitem.h>
-#include <gtkmm/toolbutton.h>
-#include <gtkmm/toggletoolbutton.h>
-#include <gtkmm/menutoolbutton.h>
 #include <gtkmm/tooltip.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>

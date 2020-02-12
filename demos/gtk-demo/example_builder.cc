@@ -53,10 +53,6 @@ Example_Builder::Example_Builder(
 : Gtk::Window(cobject),
   m_builder(builder)
 {
-  auto pToolbar = builder->get_widget<Gtk::Toolbar>("toolbar1");
-  if (pToolbar)
-    pToolbar->get_style_context()->add_class("primary-toolbar");
-
   auto refActions = Gio::SimpleActionGroup::create();
   refActions->add_action("quit", sigc::mem_fun(*this, &Example_Builder::on_file_quit));
   refActions->add_action("about", sigc::mem_fun(*this, &Example_Builder::on_help_about));

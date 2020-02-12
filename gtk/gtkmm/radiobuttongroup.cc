@@ -15,13 +15,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#undef GTK_DISABLE_DEPRECATED
-#define GDK_DISABLE_DEPRECATION_WARNINGS 1
-
 #include <gtkmm/radiobuttongroup.h>
-
 #include <gtkmm/radiobutton.h>
-#include <gtkmm/radiotoolbutton.h>
 #include <gtk/gtk.h>
 
 namespace Gtk
@@ -53,14 +48,6 @@ void RadioButtonGroup::add(RadioButton& item)
 
   //probably not necessary:
   group_ = gtk_radio_button_get_group(item.gobj());
-}
-
-void RadioButtonGroup::add(RadioToolButton& item)
-{
-  item.set_group(*this);
-
-  //probably not necessary:
-  group_ = gtk_radio_tool_button_get_group(item.gobj());
 }
 
 } //namespace Gtk

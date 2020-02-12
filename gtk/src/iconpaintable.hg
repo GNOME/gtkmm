@@ -16,7 +16,8 @@
  */
 
 #include <glibmm/object.h>
-#include <gdkmm/texture.h>
+#include <gdkmm/paintable.h>
+#include <giomm/file.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -24,17 +25,27 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gtk
 {
 
+/** An icon, used with Gtk::IconTheme.
+ */
 class IconPaintable : public Glib::Object, public Gdk::Paintable
 {
   _CLASS_GOBJECT(IconPaintable, GtkIconPaintable, GTK_ICON_PAINTABLE, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Gdk::Paintable)
 
 public:
-  _WRAP_METHOD(Glib::ustring get_filename() const, gtk_icon_paintable_get_filename)
+  // gtk_icon_paintable_new_for_file() does more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<IconPaintable> create(const Glib::RefPtr<Gio::File>& file,
+    int size, int scale = 1), gtk_icon_paintable_new_for_file)
+
+  // The const get_file() can return a non-const Gio::File.
+  // gtk_icon_paintable_get_file() returns a newly created GFile.
+  _WRAP_METHOD(Glib::RefPtr<Gio::File> get_file() const, gtk_icon_paintable_get_file)
+  _WRAP_METHOD(Glib::ustring get_icon_name() const, gtk_icon_paintable_get_icon_name)
   _WRAP_METHOD(bool is_symbolic() const, gtk_icon_paintable_is_symbolic)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Texture> download_texture(), gtk_icon_paintable_download_texture, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Texture> download_texture() const, gtk_icon_paintable_download_texture, errthrow, constversion)
+  _WRAP_PROPERTY("file", Glib::RefPtr<Gio::File>)
+  _WRAP_PROPERTY("icon-name", Glib::ustring)
+  _WRAP_PROPERTY("is-symbolic", bool)
 };
 
 } // namespace Gtk

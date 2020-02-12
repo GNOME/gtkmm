@@ -19,8 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmmconfig.h> // Can define GTKMM_DISABLE_DEPRECATED
-
 #include <glibmm/object.h> //For Glib::RefPtr<> and std::size_t
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -34,7 +32,6 @@ namespace Gtk
 {
 
 class RadioButton;
-class RadioToolButton;
 
 /** RadioButtonGroup, identifier for RadioButtons.
  * To set up this RadioButtonGroup, construct a RadioButtonGroup and then pass it
@@ -54,14 +51,8 @@ protected:
   explicit RadioButtonGroup(GSList* group);
 
   friend class Gtk::RadioButton;
-  friend class Gtk::RadioToolButton;
 
-
-  //These all have similar interfaces.
-  //TODO: Add a common multiply-inherited base class, with set_group()=0?
-  //      Would that anything useful other than being tidy? murrayc
   void add(RadioButton& item);
-  void add(RadioToolButton& item);
 
   void* operator new(std::size_t); // not implemented
 
