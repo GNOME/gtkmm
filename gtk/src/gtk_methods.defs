@@ -238,12 +238,6 @@
   (gtype-id "GTK_TYPE_TEXT_TAG")
 )
 
-(define-object ToolShell
-  (in-module "Gtk")
-  (c-name "GtkToolShell")
-  (gtype-id "GTK_TYPE_TOOL_SHELL")
-)
-
 (define-object TreeDragDest
   (in-module "Gtk")
   (c-name "GtkTreeDragDest")
@@ -371,27 +365,6 @@
   (parent "GtkContainer")
   (c-name "GtkBin")
   (gtype-id "GTK_TYPE_BIN")
-)
-
-(define-object ToolItem
-  (in-module "Gtk")
-  (parent "GtkBin")
-  (c-name "GtkToolItem")
-  (gtype-id "GTK_TYPE_TOOL_ITEM")
-)
-
-(define-object ToolButton
-  (in-module "Gtk")
-  (parent "GtkToolItem")
-  (c-name "GtkToolButton")
-  (gtype-id "GTK_TYPE_TOOL_BUTTON")
-)
-
-(define-object ToggleToolButton
-  (in-module "Gtk")
-  (parent "GtkToolButton")
-  (c-name "GtkToggleToolButton")
-  (gtype-id "GTK_TYPE_TOGGLE_TOOL_BUTTON")
 )
 
 (define-object Popover
@@ -611,19 +584,6 @@
   )
 )
 
-(define-flags CalendarDisplayOptions
-  (in-module "Gtk")
-  (c-name "GtkCalendarDisplayOptions")
-  (gtype-id "GTK_TYPE_CALENDAR_DISPLAY_OPTIONS")
-  (values
-    '("show-heading" "GTK_CALENDAR_SHOW_HEADING")
-    '("show-day-names" "GTK_CALENDAR_SHOW_DAY_NAMES")
-    '("no-month-change" "GTK_CALENDAR_NO_MONTH_CHANGE")
-    '("show-week-numbers" "GTK_CALENDAR_SHOW_WEEK_NUMBERS")
-    '("show-details" "GTK_CALENDAR_SHOW_DETAILS")
-  )
-)
-
 (define-enum CellRendererAccelMode
   (in-module "Gtk")
   (c-name "GtkCellRendererAccelMode")
@@ -675,7 +635,6 @@
     '("builder" "GTK_DEBUG_BUILDER")
     '("size-request" "GTK_DEBUG_SIZE_REQUEST")
     '("no-css-cache" "GTK_DEBUG_NO_CSS_CACHE")
-    '("baselines" "GTK_DEBUG_BASELINES")
     '("interactive" "GTK_DEBUG_INTERACTIVE")
     '("touchscreen" "GTK_DEBUG_TOUCHSCREEN")
     '("actions" "GTK_DEBUG_ACTIONS")
@@ -1013,18 +972,6 @@
   )
 )
 
-(define-enum ToolbarStyle
-  (in-module "Gtk")
-  (c-name "GtkToolbarStyle")
-  (gtype-id "GTK_TYPE_TOOLBAR_STYLE")
-  (values
-    '("icons" "GTK_TOOLBAR_ICONS")
-    '("text" "GTK_TOOLBAR_TEXT")
-    '("both" "GTK_TOOLBAR_BOTH")
-    '("both-horiz" "GTK_TOOLBAR_BOTH_HORIZ")
-  )
-)
-
 (define-enum WrapMode
   (in-module "Gtk")
   (c-name "GtkWrapMode")
@@ -1207,10 +1154,10 @@
   (gtype-id "GTK_TYPE_BORDER_STYLE")
   (values
     '("none" "GTK_BORDER_STYLE_NONE")
+    '("hidden" "GTK_BORDER_STYLE_HIDDEN")
     '("solid" "GTK_BORDER_STYLE_SOLID")
     '("inset" "GTK_BORDER_STYLE_INSET")
     '("outset" "GTK_BORDER_STYLE_OUTSET")
-    '("hidden" "GTK_BORDER_STYLE_HIDDEN")
     '("dotted" "GTK_BORDER_STYLE_DOTTED")
     '("dashed" "GTK_BORDER_STYLE_DASHED")
     '("double" "GTK_BORDER_STYLE_DOUBLE")
@@ -1519,9 +1466,9 @@
   (c-name "GtkIconLookupFlags")
   (gtype-id "GTK_TYPE_ICON_LOOKUP_FLAGS")
   (values
-    '("size" "GTK_ICON_LOOKUP_FORCE_SIZE")
-    '("regular" "GTK_ICON_LOOKUP_FORCE_REGULAR")
-    '("symbolic" "GTK_ICON_LOOKUP_FORCE_SYMBOLIC")
+    '("force-regular" "GTK_ICON_LOOKUP_FORCE_REGULAR")
+    '("force-symbolic" "GTK_ICON_LOOKUP_FORCE_SYMBOLIC")
+    '("preload" "GTK_ICON_LOOKUP_PRELOAD")
   )
 )
 
@@ -2008,6 +1955,15 @@
   (return-type "none")
   (parameters
     '("GskPangoRendererState" "state")
+  )
+)
+
+(define-method set_shape_handler
+  (of-object "GskPangoRenderer")
+  (c-name "gsk_pango_renderer_set_shape_handler")
+  (return-type "none")
+  (parameters
+    '("GskPangoShapeHandler" "handler")
   )
 )
 
@@ -4660,22 +4616,12 @@
   (return-type "GtkWidget*")
 )
 
-(define-method select_month
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_select_month")
-  (return-type "none")
-  (parameters
-    '("guint" "month")
-    '("guint" "year")
-  )
-)
-
 (define-method select_day
   (of-object "GtkCalendar")
   (c-name "gtk_calendar_select_day")
   (return-type "none")
   (parameters
-    '("guint" "day")
+    '("GDateTime*" "date")
   )
 )
 
@@ -4703,71 +4649,55 @@
   (return-type "none")
 )
 
-(define-method set_display_options
+(define-method set_show_week_numbers
   (of-object "GtkCalendar")
-  (c-name "gtk_calendar_set_display_options")
+  (c-name "gtk_calendar_set_show_week_numbers")
   (return-type "none")
   (parameters
-    '("GtkCalendarDisplayOptions" "flags")
+    '("gboolean" "value")
   )
 )
 
-(define-method get_display_options
+(define-method get_show_week_numbers
   (of-object "GtkCalendar")
-  (c-name "gtk_calendar_get_display_options")
-  (return-type "GtkCalendarDisplayOptions")
+  (c-name "gtk_calendar_get_show_week_numbers")
+  (return-type "gboolean")
+)
+
+(define-method set_show_heading
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_set_show_heading")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_show_heading
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_get_show_heading")
+  (return-type "gboolean")
+)
+
+(define-method set_show_day_names
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_set_show_day_names")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_show_day_names
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_get_show_day_names")
+  (return-type "gboolean")
 )
 
 (define-method get_date
   (of-object "GtkCalendar")
   (c-name "gtk_calendar_get_date")
-  (return-type "none")
-  (parameters
-    '("guint*" "year")
-    '("guint*" "month")
-    '("guint*" "day")
-  )
-)
-
-(define-method set_detail_func
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_set_detail_func")
-  (return-type "none")
-  (parameters
-    '("GtkCalendarDetailFunc" "func")
-    '("gpointer" "data")
-    '("GDestroyNotify" "destroy")
-  )
-)
-
-(define-method set_detail_width_chars
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_set_detail_width_chars")
-  (return-type "none")
-  (parameters
-    '("gint" "chars")
-  )
-)
-
-(define-method set_detail_height_rows
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_set_detail_height_rows")
-  (return-type "none")
-  (parameters
-    '("gint" "rows")
-  )
-)
-
-(define-method get_detail_width_chars
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_get_detail_width_chars")
-  (return-type "gint")
-)
-
-(define-method get_detail_height_rows
-  (of-object "GtkCalendar")
-  (c-name "gtk_calendar_get_detail_height_rows")
-  (return-type "gint")
+  (return-type "GDateTime*")
 )
 
 (define-method get_day_is_marked
@@ -11900,6 +11830,16 @@
   )
 )
 
+(define-function gtk_icon_paintable_new_for_file
+  (c-name "gtk_icon_paintable_new_for_file")
+  (return-type "GtkIconPaintable*")
+  (parameters
+    '("GFile*" "file")
+    '("gint" "size")
+    '("gint" "scale")
+  )
+)
+
 (define-method list_icons
   (of-object "GtkIconTheme")
   (c-name "gtk_icon_theme_list_icons")
@@ -11911,9 +11851,15 @@
   (return-type "GType")
 )
 
-(define-method get_filename
+(define-method get_file
   (of-object "GtkIconPaintable")
-  (c-name "gtk_icon_paintable_get_filename")
+  (c-name "gtk_icon_paintable_get_file")
+  (return-type "GFile*")
+)
+
+(define-method get_icon_name
+  (of-object "GtkIconPaintable")
+  (c-name "gtk_icon_paintable_get_icon_name")
   (return-type "const-gchar*")
 )
 
@@ -11921,15 +11867,6 @@
   (of-object "GtkIconPaintable")
   (c-name "gtk_icon_paintable_is_symbolic")
   (return-type "gboolean")
-)
-
-(define-method download_texture
-  (of-object "GtkIconPaintable")
-  (c-name "gtk_icon_paintable_download_texture")
-  (return-type "GdkTexture*")
-  (parameters
-    '("GError**" "error")
-  )
 )
 
 
@@ -14309,11 +14246,6 @@
   (return-type "gboolean")
 )
 
-(define-function gtk_get_main_thread
-  (c-name "gtk_get_main_thread")
-  (return-type "GThread*")
-)
-
 (define-function gtk_init_abi_check
   (c-name "gtk_init_abi_check")
   (return-type "none")
@@ -14347,47 +14279,6 @@
 (define-function gtk_get_locale_direction
   (c-name "gtk_get_locale_direction")
   (return-type "GtkTextDirection")
-)
-
-(define-function gtk_events_pending
-  (c-name "gtk_events_pending")
-  (return-type "gboolean")
-)
-
-(define-function gtk_main_do_event
-  (c-name "gtk_main_do_event")
-  (return-type "none")
-  (parameters
-    '("GdkEvent*" "event")
-  )
-)
-
-(define-function gtk_main
-  (c-name "gtk_main")
-  (return-type "none")
-)
-
-(define-function gtk_main_level
-  (c-name "gtk_main_level")
-  (return-type "guint")
-)
-
-(define-function gtk_main_quit
-  (c-name "gtk_main_quit")
-  (return-type "none")
-)
-
-(define-function gtk_main_iteration
-  (c-name "gtk_main_iteration")
-  (return-type "gboolean")
-)
-
-(define-function gtk_main_iteration_do
-  (c-name "gtk_main_iteration_do")
-  (return-type "gboolean")
-  (parameters
-    '("gboolean" "blocking")
-  )
 )
 
 (define-function gtk_grab_add
@@ -14475,15 +14366,6 @@
   (parameters
     '("GdkEvent*" "event")
     '("GType" "type")
-  )
-)
-
-(define-function gtk_propagate_event
-  (c-name "gtk_propagate_event")
-  (return-type "gboolean")
-  (parameters
-    '("GtkWidget*" "widget")
-    '("GdkEvent*" "event")
   )
 )
 
@@ -15035,58 +14917,6 @@
     '("GtkMenuButtonCreatePopupFunc" "func")
     '("gpointer" "user_data")
     '("GDestroyNotify" "destroy_notify")
-  )
-)
-
-
-
-;; From gtkmenutoolbutton.h
-
-(define-function gtk_menu_tool_button_get_type
-  (c-name "gtk_menu_tool_button_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_menu_tool_button_new
-  (c-name "gtk_menu_tool_button_new")
-  (is-constructor-of "GtkMenuToolButton")
-  (return-type "GtkToolItem*")
-  (parameters
-    '("GtkWidget*" "icon_widget")
-    '("const-gchar*" "label")
-  )
-)
-
-(define-method set_popover
-  (of-object "GtkMenuToolButton")
-  (c-name "gtk_menu_tool_button_set_popover")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "popover")
-  )
-)
-
-(define-method get_popover
-  (of-object "GtkMenuToolButton")
-  (c-name "gtk_menu_tool_button_get_popover")
-  (return-type "GtkWidget*")
-)
-
-(define-method set_arrow_tooltip_text
-  (of-object "GtkMenuToolButton")
-  (c-name "gtk_menu_tool_button_set_arrow_tooltip_text")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "text")
-  )
-)
-
-(define-method set_arrow_tooltip_markup
-  (of-object "GtkMenuToolButton")
-  (c-name "gtk_menu_tool_button_set_arrow_tooltip_markup")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "markup")
   )
 )
 
@@ -19047,45 +18877,6 @@
 
 
 
-;; From gtkradiotoolbutton.h
-
-(define-function gtk_radio_tool_button_get_type
-  (c-name "gtk_radio_tool_button_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_radio_tool_button_new
-  (c-name "gtk_radio_tool_button_new")
-  (is-constructor-of "GtkRadioToolButton")
-  (return-type "GtkToolItem*")
-  (parameters
-    '("GSList*" "group")
-  )
-)
-
-(define-method new_from_widget
-  (of-object "GtkRadioToolButton")
-  (c-name "gtk_radio_tool_button_new_from_widget")
-  (return-type "GtkToolItem*")
-)
-
-(define-method get_group
-  (of-object "GtkRadioToolButton")
-  (c-name "gtk_radio_tool_button_get_group")
-  (return-type "GSList*")
-)
-
-(define-method set_group
-  (of-object "GtkRadioToolButton")
-  (c-name "gtk_radio_tool_button_set_group")
-  (return-type "none")
-  (parameters
-    '("GSList*" "group")
-  )
-)
-
-
-
 ;; From gtkrange.h
 
 (define-function gtk_range_get_type
@@ -20496,32 +20287,6 @@
 
 
 
-;; From gtksearchlistmodel.h
-
-(define-function gtk_search_list_model_new
-  (c-name "gtk_search_list_model_new")
-  (is-constructor-of "GtkSearchListModel")
-  (return-type "GtkSearchListModel*")
-  (parameters
-    '("GListModel*" "model")
-    '("GtkFilter*" "filter")
-  )
-)
-
-(define-method next_match
-  (of-object "GtkSearchListModel")
-  (c-name "gtk_search_list_model_next_match")
-  (return-type "gboolean")
-)
-
-(define-method previous_match
-  (of-object "GtkSearchListModel")
-  (c-name "gtk_search_list_model_previous_match")
-  (return-type "gboolean")
-)
-
-
-
 ;; From gtkselection.h
 
 (define-method get_target
@@ -20820,36 +20585,6 @@
   (return-type "GtkWidget*")
   (parameters
     '("GtkOrientation" "orientation")
-  )
-)
-
-
-
-;; From gtkseparatortoolitem.h
-
-(define-function gtk_separator_tool_item_get_type
-  (c-name "gtk_separator_tool_item_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_separator_tool_item_new
-  (c-name "gtk_separator_tool_item_new")
-  (is-constructor-of "GtkSeparatorToolItem")
-  (return-type "GtkToolItem*")
-)
-
-(define-method get_draw
-  (of-object "GtkSeparatorToolItem")
-  (c-name "gtk_separator_tool_item_get_draw")
-  (return-type "gboolean")
-)
-
-(define-method set_draw
-  (of-object "GtkSeparatorToolItem")
-  (c-name "gtk_separator_tool_item_set_draw")
-  (return-type "none")
-  (parameters
-    '("gboolean" "draw")
   )
 )
 
@@ -22798,13 +22533,13 @@
   )
 )
 
-(define-method insert_texture
+(define-method insert_paintable
   (of-object "GtkTextBuffer")
-  (c-name "gtk_text_buffer_insert_texture")
+  (c-name "gtk_text_buffer_insert_paintable")
   (return-type "none")
   (parameters
     '("GtkTextIter*" "iter")
-    '("GdkTexture*" "texture")
+    '("GdkPaintable*" "texture")
   )
 )
 
@@ -23616,10 +23351,10 @@
   )
 )
 
-(define-method get_texture
+(define-method get_paintable
   (of-object "GtkTextIter")
-  (c-name "gtk_text_iter_get_texture")
-  (return-type "GdkTexture*")
+  (c-name "gtk_text_iter_get_paintable")
+  (return-type "GdkPaintable*")
 )
 
 (define-method get_marks
@@ -25059,457 +24794,6 @@
   (of-object "GtkToggleButton")
   (c-name "gtk_toggle_button_toggled")
   (return-type "none")
-)
-
-
-
-;; From gtktoggletoolbutton.h
-
-(define-function gtk_toggle_tool_button_get_type
-  (c-name "gtk_toggle_tool_button_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_toggle_tool_button_new
-  (c-name "gtk_toggle_tool_button_new")
-  (is-constructor-of "GtkToggleToolButton")
-  (return-type "GtkToolItem*")
-)
-
-(define-method set_active
-  (of-object "GtkToggleToolButton")
-  (c-name "gtk_toggle_tool_button_set_active")
-  (return-type "none")
-  (parameters
-    '("gboolean" "is_active")
-  )
-)
-
-(define-method get_active
-  (of-object "GtkToggleToolButton")
-  (c-name "gtk_toggle_tool_button_get_active")
-  (return-type "gboolean")
-)
-
-
-
-;; From gtktoolbar.h
-
-(define-function gtk_toolbar_get_type
-  (c-name "gtk_toolbar_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_toolbar_new
-  (c-name "gtk_toolbar_new")
-  (is-constructor-of "GtkToolbar")
-  (return-type "GtkWidget*")
-)
-
-(define-method insert
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_insert")
-  (return-type "none")
-  (parameters
-    '("GtkToolItem*" "item")
-    '("gint" "pos")
-  )
-)
-
-(define-method get_item_index
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_item_index")
-  (return-type "gint")
-  (parameters
-    '("GtkToolItem*" "item")
-  )
-)
-
-(define-method get_n_items
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_n_items")
-  (return-type "gint")
-)
-
-(define-method get_nth_item
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_nth_item")
-  (return-type "GtkToolItem*")
-  (parameters
-    '("gint" "n")
-  )
-)
-
-(define-method get_show_arrow
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_show_arrow")
-  (return-type "gboolean")
-)
-
-(define-method set_show_arrow
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_set_show_arrow")
-  (return-type "none")
-  (parameters
-    '("gboolean" "show_arrow")
-  )
-)
-
-(define-method get_style
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_style")
-  (return-type "GtkToolbarStyle")
-)
-
-(define-method set_style
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_set_style")
-  (return-type "none")
-  (parameters
-    '("GtkToolbarStyle" "style")
-  )
-)
-
-(define-method unset_style
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_unset_style")
-  (return-type "none")
-)
-
-(define-method get_drop_index
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_get_drop_index")
-  (return-type "gint")
-  (parameters
-    '("gint" "x")
-    '("gint" "y")
-  )
-)
-
-(define-method set_drop_highlight_item
-  (of-object "GtkToolbar")
-  (c-name "gtk_toolbar_set_drop_highlight_item")
-  (return-type "none")
-  (parameters
-    '("GtkToolItem*" "tool_item")
-    '("gint" "index_")
-  )
-)
-
-
-
-;; From gtktoolbutton.h
-
-(define-function gtk_tool_button_get_type
-  (c-name "gtk_tool_button_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_tool_button_new
-  (c-name "gtk_tool_button_new")
-  (is-constructor-of "GtkToolButton")
-  (return-type "GtkToolItem*")
-  (parameters
-    '("GtkWidget*" "icon_widget")
-    '("const-gchar*" "label")
-  )
-)
-
-(define-method set_label
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_set_label")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "label")
-  )
-)
-
-(define-method get_label
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_get_label")
-  (return-type "const-gchar*")
-)
-
-(define-method set_use_underline
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_set_use_underline")
-  (return-type "none")
-  (parameters
-    '("gboolean" "use_underline")
-  )
-)
-
-(define-method get_use_underline
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_get_use_underline")
-  (return-type "gboolean")
-)
-
-(define-method set_icon_name
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_set_icon_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "icon_name")
-  )
-)
-
-(define-method get_icon_name
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_get_icon_name")
-  (return-type "const-gchar*")
-)
-
-(define-method set_icon_widget
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_set_icon_widget")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "icon_widget")
-  )
-)
-
-(define-method get_icon_widget
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_get_icon_widget")
-  (return-type "GtkWidget*")
-)
-
-(define-method set_label_widget
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_set_label_widget")
-  (return-type "none")
-  (parameters
-    '("GtkWidget*" "label_widget")
-  )
-)
-
-(define-method get_label_widget
-  (of-object "GtkToolButton")
-  (c-name "gtk_tool_button_get_label_widget")
-  (return-type "GtkWidget*")
-)
-
-
-
-;; From gtktoolitem.h
-
-(define-function gtk_tool_item_get_type
-  (c-name "gtk_tool_item_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_tool_item_new
-  (c-name "gtk_tool_item_new")
-  (is-constructor-of "GtkToolItem")
-  (return-type "GtkToolItem*")
-)
-
-(define-method set_homogeneous
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_homogeneous")
-  (return-type "none")
-  (parameters
-    '("gboolean" "homogeneous")
-  )
-)
-
-(define-method get_homogeneous
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_homogeneous")
-  (return-type "gboolean")
-)
-
-(define-method set_expand
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_expand")
-  (return-type "none")
-  (parameters
-    '("gboolean" "expand")
-  )
-)
-
-(define-method get_expand
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_expand")
-  (return-type "gboolean")
-)
-
-(define-method set_tooltip_text
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_tooltip_text")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "text")
-  )
-)
-
-(define-method set_tooltip_markup
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_tooltip_markup")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "markup")
-  )
-)
-
-(define-method set_visible_horizontal
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_visible_horizontal")
-  (return-type "none")
-  (parameters
-    '("gboolean" "visible_horizontal")
-  )
-)
-
-(define-method get_visible_horizontal
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_visible_horizontal")
-  (return-type "gboolean")
-)
-
-(define-method set_visible_vertical
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_visible_vertical")
-  (return-type "none")
-  (parameters
-    '("gboolean" "visible_vertical")
-  )
-)
-
-(define-method get_visible_vertical
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_visible_vertical")
-  (return-type "gboolean")
-)
-
-(define-method get_is_important
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_is_important")
-  (return-type "gboolean")
-)
-
-(define-method set_is_important
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_is_important")
-  (return-type "none")
-  (parameters
-    '("gboolean" "is_important")
-  )
-)
-
-(define-method get_ellipsize_mode
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_ellipsize_mode")
-  (return-type "PangoEllipsizeMode")
-)
-
-(define-method get_orientation
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_orientation")
-  (return-type "GtkOrientation")
-)
-
-(define-method get_toolbar_style
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_toolbar_style")
-  (return-type "GtkToolbarStyle")
-)
-
-(define-method get_text_alignment
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_text_alignment")
-  (return-type "gfloat")
-)
-
-(define-method get_text_orientation
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_text_orientation")
-  (return-type "GtkOrientation")
-)
-
-(define-method get_text_size_group
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_text_size_group")
-  (return-type "GtkSizeGroup*")
-)
-
-(define-method get_overflow_text
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_get_overflow_text")
-  (return-type "const-char*")
-)
-
-(define-method set_overflow_text
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_set_overflow_text")
-  (return-type "none")
-  (parameters
-    '("const-char*" "overflow_text")
-  )
-)
-
-(define-method rebuild_menu
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_rebuild_menu")
-  (return-type "none")
-)
-
-(define-method toolbar_reconfigured
-  (of-object "GtkToolItem")
-  (c-name "gtk_tool_item_toolbar_reconfigured")
-  (return-type "none")
-)
-
-
-
-;; From gtktoolshell.h
-
-(define-function gtk_tool_shell_get_type
-  (c-name "gtk_tool_shell_get_type")
-  (return-type "GType")
-)
-
-(define-method get_orientation
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_orientation")
-  (return-type "GtkOrientation")
-)
-
-(define-method get_style
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_style")
-  (return-type "GtkToolbarStyle")
-)
-
-(define-method rebuild_menu
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_rebuild_menu")
-  (return-type "none")
-)
-
-(define-method get_text_orientation
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_text_orientation")
-  (return-type "GtkOrientation")
-)
-
-(define-method get_text_alignment
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_text_alignment")
-  (return-type "gfloat")
-)
-
-(define-method get_ellipsize_mode
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_ellipsize_mode")
-  (return-type "PangoEllipsizeMode")
-)
-
-(define-method get_text_size_group
-  (of-object "GtkToolShell")
-  (c-name "gtk_tool_shell_get_text_size_group")
-  (return-type "GtkSizeGroup*")
 )
 
 
@@ -29811,30 +29095,30 @@
   (return-type "gboolean")
 )
 
-(define-method add_style_class
+(define-method add_css_class
   (of-object "GtkWidget")
-  (c-name "gtk_widget_add_style_class")
+  (c-name "gtk_widget_add_css_class")
   (return-type "none")
   (parameters
-    '("const-char*" "style_class")
+    '("const-char*" "css_class")
   )
 )
 
-(define-method remove_style_class
+(define-method remove_css_class
   (of-object "GtkWidget")
-  (c-name "gtk_widget_remove_style_class")
+  (c-name "gtk_widget_remove_css_class")
   (return-type "none")
   (parameters
-    '("const-char*" "style_class")
+    '("const-char*" "css_class")
   )
 )
 
-(define-method has_style_class
+(define-method has_css_class
   (of-object "GtkWidget")
-  (c-name "gtk_widget_has_style_class")
+  (c-name "gtk_widget_has_css_class")
   (return-type "gboolean")
   (parameters
-    '("const-char*" "style_class")
+    '("const-char*" "css_class")
   )
 )
 
@@ -30797,11 +30081,6 @@
   (return-type "GType")
 )
 
-(define-function gtk_calendar_display_options_get_type
-  (c-name "gtk_calendar_display_options_get_type")
-  (return-type "GType")
-)
-
 (define-function gtk_cell_renderer_state_get_type
   (c-name "gtk_cell_renderer_state_get_type")
   (return-type "GType")
@@ -30944,11 +30223,6 @@
 
 (define-function gtk_shadow_type_get_type
   (c-name "gtk_shadow_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gtk_toolbar_style_get_type
-  (c-name "gtk_toolbar_style_get_type")
   (return-type "GType")
 )
 
