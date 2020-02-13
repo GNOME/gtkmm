@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [3.95.1],
+AC_INIT([gtkmm], [3.97.1],
         [https://gitlab.gnome.org/GNOME/gtkmm/issues/],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -95,7 +95,7 @@ AS_IF([test "x$enable_static" = xyes],
 # gdkmm really does need GTK, because part of Gdk::DragContext is in GTK.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk4 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.64 >= 2.63.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.96.0 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.64 >= 2.63.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.98.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
