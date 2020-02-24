@@ -120,11 +120,11 @@ TreePath::const_iterator TreePath::end() const
 }
 
 //static
-bool TreePath::get_from_selection_data(const SelectionData& selection_data, Glib::RefPtr<const TreeModel>& model, TreePath& path)
+bool TreePath::get_row_drag_data(const Glib::ValueBase& value, Glib::RefPtr<const TreeModel>& model, TreePath& path)
 {
   GtkTreeModel* src_model = nullptr;
   GtkTreePath* src_path = nullptr;
-  gboolean result = gtk_tree_get_row_drag_data(const_cast<GtkSelectionData*>(selection_data.gobj()), &src_model, &src_path);
+  gboolean result = gtk_tree_get_row_drag_data(value.gobj(), &src_model, &src_path);
 
   model = Glib::wrap(src_model, true /* take_copy=true */);
 
@@ -135,10 +135,10 @@ bool TreePath::get_from_selection_data(const SelectionData& selection_data, Glib
 }
 
 //static
-bool TreePath::get_from_selection_data(const SelectionData& selection_data, TreePath& path)
+bool TreePath::get_row_drag_data(const Glib::ValueBase& value, TreePath& path)
 {
   GtkTreePath* src_path = nullptr;
-  gboolean result = gtk_tree_get_row_drag_data(const_cast<GtkSelectionData*>(selection_data.gobj()), nullptr, &src_path);
+  gboolean result = gtk_tree_get_row_drag_data(value.gobj(), nullptr, &src_path);
 
   //gtk_tree_get_row_drag_data gives us ownership of src_path.
   path = Glib::wrap(src_path, false /* take_copy=false */);
@@ -146,10 +146,12 @@ bool TreePath::get_from_selection_data(const SelectionData& selection_data, Tree
   return result;
 }
 
-
-bool TreePath::set_in_selection_data(SelectionData& selection_data, const Glib::RefPtr<const TreeModel>& model) const
+Glib::RefPtr<Gdk::ContentProvider> TreePath::create_row_drag_content(
+  const Glib::RefPtr<const TreeModel>& model) const
 {
-  return gtk_tree_set_row_drag_data(selection_data.gobj(), const_cast<GtkTreeModel*>(model->gobj()), const_cast<GtkTreePath*>(gobj()));
+  // gtk_tree_create_row_drag_content() creates a new GdkContentProvider.
+  return Glib::wrap(gtk_tree_create_row_drag_content(
+    const_cast<GtkTreeModel*>(model->gobj()), const_cast<GtkTreePath*>(gobj())));
 }
 
 } // namespace Gtk

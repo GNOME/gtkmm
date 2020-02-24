@@ -17,7 +17,8 @@
 
 #include <glibmm/interface.h>
 #include <gtkmm/treemodel.h>
-#include <gtkmm/selectiondata.h>
+#include <gdkmm/contentprovider.h>
+
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/interface_p.h)
 
@@ -25,10 +26,8 @@ _PINCLUDE(glibmm/private/interface_p.h)
 extern "C"
 {
 typedef struct _GtkTreeDragSourceIface GtkTreeDragSourceIface;
-typedef struct _GtkSelectionData GtkSelectionData;
 }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 namespace Gtk
 {
@@ -43,28 +42,18 @@ class TreeDragSource : public Glib::Interface
 public:
   _WRAP_METHOD(bool row_draggable(const TreeModel::Path& path) const, gtk_tree_drag_source_row_draggable)
 
-  _WRAP_METHOD(bool drag_data_get(const TreeModel::Path& path, SelectionData& selection_data), gtk_tree_drag_source_drag_data_get)
+  // gtk_tree_drag_source_drag_data_get() returns a newly created GdkContentProvider.
+  _WRAP_METHOD(Glib::RefPtr<Gdk::ContentProvider> drag_data_get(const TreeModel::Path& path) const, gtk_tree_drag_source_drag_data_get)
 
   _WRAP_METHOD(bool drag_data_delete(const TreeModel::Path& path), gtk_tree_drag_source_drag_data_delete)
 
 protected:
 
-#m4begin
-dnl// We want to hand-code these C vfunc callbacks,
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-    klass->drag_data_get = &drag_data_get_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-    static gboolean drag_data_get_vfunc_callback(GtkTreeDragSource* self, GtkTreePath* path, GtkSelectionData* selection_data);
-  _POP()
-#m4end
-
   _WRAP_VFUNC(bool row_draggable(const TreeModel::Path& path) const, row_draggable)
-
-  //We hand-code this so that we can use a temporary instance for the SelectionData& output parameter:
-  virtual bool drag_data_get_vfunc(const TreeModel::Path& path, SelectionData& selection_data) const;
-
+#m4 _CONVERSION(`Glib::RefPtr<Gdk::ContentProvider>', `GdkContentProvider*', __CONVERT_REFPTR_TO_P)
+  _WRAP_VFUNC(Glib::RefPtr<Gdk::ContentProvider> drag_data_get(const TreeModel::Path& path) const,
+    drag_data_get, refreturn_ctype)
   _WRAP_VFUNC(bool drag_data_delete(const TreeModel::Path& path), drag_data_delete)
 };
 
 } // namespace Gtk
-

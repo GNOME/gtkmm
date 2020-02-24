@@ -23,7 +23,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 _DEFS(gtkmm,gtk)
 
 #include <gtkmm/treemodel.h>
-#include <gtkmm/selectiondata.h>
+#include <gdkmm/contentprovider.h>
 #ifdef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
 #include <cstddef> /* for std::ptrdiff_t */
 #endif
@@ -148,37 +148,26 @@ public:
   _IGNORE(gtk_tree_path_get_depth) //replaced by size()
   _IGNORE(gtk_tree_path_get_indices_with_depth)
 
-  /**
-   * Obtains a Gtk::TreeModel and Gtk::TreeModel::Path from selection data of target type
-   * "GTK_TREE_MODEL_ROW". Normally called from a drag_data_received handler.
-   * This function can only be used if @a selection_data originates from the same
-   * process that's calling this function, because a pointer to the tree model
-   * is being passed around. If you aren't in the same process, then you'll
-   * get memory corruption. In the Gtk::TreeDragDest drag_data_received signal handler,
-   * you can assume that selection data of type "GTK_TREE_MODEL_ROW" is
-   * from the current process.
+  /** Obtains a Gtk::TreeModel and Gtk::TreeModel::Path from @a value of target type
+   * GTK_TYPE_TREE_ROW_DATA.
    *
-   * @param selection_data A SelectionData
+   * @param value A Glib::ValueBase
    * @param[out] model A Gtk::TreeModel
    * @param[out] path A row in @a model
-   * @return <tt>true</tt> if the @a selection_data had target type GTK_TREE_MODEL_ROW
+   * @return <tt>true</tt> if the @a value had target type GTK_TYPE_TREE_ROW_DATA
    *         and is otherwise valid.
    */
-  static bool get_from_selection_data(const SelectionData& selection_data, Glib::RefPtr<const TreeModel>& model, TreePath& path);
+  static bool get_row_drag_data(const Glib::ValueBase& value, Glib::RefPtr<const TreeModel>& model, TreePath& path);
 
   /// See description in the other overload.
-  static bool get_from_selection_data(const SelectionData& selection_data, TreePath& path);
+  static bool get_row_drag_data(const Glib::ValueBase& value, TreePath& path);
 
-  /**
-   * Sets selection data of target type "GTK_TREE_MODEL_ROW". Normally used
-   * in a drag_data_get signal handler.
+  /** Creates a content provider for dragging the path from @a model.
    *
-   * @param[in,out] selection_data Some SelectionData
-   * @param model A Gtk::TreeModel
-   * @return <tt>true</tt> if the @a selection_data had the proper target type
-   *         to allow us to set a tree row.
+   * @param model A Gtk::TreeModel.
+   * @return A Gdk::ContentProvider.
    */
-  bool set_in_selection_data(SelectionData& selection_data, const Glib::RefPtr<const TreeModel>& model) const;
+  Glib::RefPtr<Gdk::ContentProvider> create_row_drag_content(const Glib::RefPtr<const TreeModel>& model) const;
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

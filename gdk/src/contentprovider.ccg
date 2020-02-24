@@ -17,75 +17,21 @@
 #include <giomm/slot_async.h>
 #include <giomm/outputstream.h>
 
-namespace
-{
-
-void ContentProvider_get_value_callback(GValue* value, void* data)
-{
-  auto the_slot = static_cast<Gdk::ContentProvider::SlotGetValue*>(data);
-  Glib::ValueBase cpp_value;
-  cpp_value.init(G_VALUE_TYPE(value));
-
-  try
-  {
-    (*the_slot)(cpp_value);
-    g_value_copy(cpp_value.gobj(), value);
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-GBytes* ContentProvider_get_bytes_callback(const char* mime_type, void* data)
-{
-  auto the_slot = static_cast<Gdk::ContentProvider::SlotGetBytes*>(data);
-
-  try
-  {
-    auto bytes = (*the_slot)(mime_type);
-    return Glib::unwrap_copy(bytes);
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  return nullptr;
-}
-
-} // anonymous namespace
-
 namespace Gdk
 {
 
-Glib::RefPtr<ContentProvider> ContentProvider::create(GType type, const SlotGetValue& slot)
-{
-  // Create a copy of the slot object. A pointer to this will be passed
-  // through the callback's data parameter. It will also be stored
-  // in m_slot_get_value. It will be deleted when *this is deleted.
-  auto slot_copy = new SlotGetValue(slot);
-
-  auto content_provider = Glib::wrap(gdk_content_provider_new_with_callback(
-    type, &ContentProvider_get_value_callback, slot_copy));
-
-  content_provider->m_slot_get_value.reset(slot_copy);
-  return content_provider;
-}
-
 Glib::RefPtr<ContentProvider> ContentProvider::create(
-  const Glib::RefPtr<const ContentFormats>& formats, const SlotGetBytes& slot)
+  const std::vector<Glib::RefPtr<ContentProvider>>& providers)
 {
-  // Create a copy of the slot object. A pointer to this will be passed
-  // through the callback's data parameter. It will also be stored
-  // in m_slot_get_bytes. It will be deleted when *this is deleted.
-  auto slot_copy = new SlotGetBytes(slot);
+  // gdk_content_provider_new_union() does not take a reference on the
+  // supplied elements, but it unrefs them when the created
+  // content provider union is deleted. [transfer elements]
+  for (auto provider : providers)
+    provider->reference();
 
-  auto content_provider = Glib::wrap(gdk_content_provider_new_with_formats(
-    const_cast<GdkContentFormats*>(Glib::unwrap(formats)),
-    &ContentProvider_get_bytes_callback, slot_copy));
-
-  content_provider->m_slot_get_bytes.reset(slot_copy);
-  return content_provider;
+  return Glib::wrap(gdk_content_provider_new_union(
+    Glib::ArrayHandler<Glib::RefPtr<ContentProvider>>::vector_to_array(providers).data(),
+    providers.size()));
 }
 
-} //namespace Gdk
+} // namespace Gdk

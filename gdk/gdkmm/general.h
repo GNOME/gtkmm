@@ -72,29 +72,6 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
  */
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region);
 
-/** This is a convenience function around Cairo::Context::get_clip_extents().
- * It rounds the clip extents to integer coordinates and returns
- * a boolean indicating if a clip area exists.
- *
- * @param context A cairo context.
- * @param[out] rectangle Return location for the clip rectangle.
- * @returns <tt>true</tt> if a clip rectangle exists, <tt>false</tt> if all
- *          of @a context is clipped and all drawing can be skipped.
- *
- * @newin{3,24}
- */
-bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk::Rectangle& rectangle);
-
-/** This is a convenience function around Cairo::Context::get_clip_extents().
- *
- * @param context A cairo context.
- * @returns <tt>true</tt> if a clip rectangle exists, <tt>false</tt> if all
- *          of @a context is clipped and all drawing can be skipped.
- *
- * @newin{3,24}
- */
-bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
-
 /** Creates a region that covers the area where the given
  * @a surface is more than 50% opaque.
  *

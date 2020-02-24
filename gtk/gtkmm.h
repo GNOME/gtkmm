@@ -139,6 +139,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/dialog.h>
 #include <gtkmm/dragsource.h>
 #include <gtkmm/drawingarea.h>
+#include <gtkmm/dropcontrollermotion.h>
 #include <gtkmm/droptarget.h>
 #include <gtkmm/editable.h>
 #include <gtkmm/emojichooser.h>
@@ -146,6 +147,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/eventcontroller.h>
+#include <gtkmm/eventcontrollerfocus.h>
 #include <gtkmm/eventcontrollerkey.h>
 #include <gtkmm/eventcontrollermotion.h>
 #include <gtkmm/eventcontrollerscroll.h>

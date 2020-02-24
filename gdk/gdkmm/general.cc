@@ -47,16 +47,6 @@ void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, cons
   gdk_cairo_region(context->cobj(), (region ? region->cobj() : nullptr));
 }
 
-bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk::Rectangle& rectangle)
-{
-  return gdk_cairo_get_clip_rectangle(context->cobj(), rectangle.gobj());
-}
-
-bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context)
-{
-  return gdk_cairo_get_clip_rectangle(context->cobj(), nullptr);
-}
-
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface)
 {
   return Gdk::Cairo::wrap(gdk_cairo_region_create_from_surface(surface->cobj()), true);

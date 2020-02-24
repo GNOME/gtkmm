@@ -16,12 +16,12 @@
  */
 
 _DEFS(gdkmm,gdk)
-_CC_INCLUDE(gdk/gdk.h)
-_PINCLUDE(glibmm/private/object_p.h)
 
-#include <glibmm/object.h>
 #include <glibmm/refptr.h>
 #include <glibmm/value.h>
+#include <gdkmm/enums.h>
+#include <gdkmm/timecoord.h>
+#include <gdkmm/types.h>
 
 /* Shadow DELETE macro (from winnt.h).
  * It interferes with Gdk::Event::Type::DELETE.
@@ -34,87 +34,105 @@ enum { DELETE = GTKMM_MACRO_DEFINITION_DELETE };
 #define GTKMM_MACRO_SHADOW_DELETE 1
 #endif
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-using GdkEvent = union _GdkEvent;
-using GdkEventClass = struct _GdkEventClass;
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 namespace Gdk
 {
 class Device;
+class DeviceTool;
 class Display;
-class Seat;
+class Drop;
 class Surface;
+
+/** Representing an event sequence.
+ * Used to differentiate between multiple touches on multitouch touchscreens.
+ * It's a hidden struct. You can test %EventSequence pointers for equality,
+ * but you can't do much more with them.
+ */
+struct EventSequence;
 
 /** Functions for handling events from the window system.
  *
- * In GTK+ applications the events are handled automatically in
- * gtk_main_do_event() and passed on to the appropriate widgets,
- * so %Gdk::Event and its subclasses are rarely needed.
+ * In GTK applications the events are handled automatically by toplevel
+ * widgets and passed on to the event controllers of appropriate widgets,
+ * so these functions are rarely needed.
  */
-class Event : public Glib::Object
+class Event final
 {
-  _CLASS_GOBJECT(Event, GdkEvent, GDK_EVENT, Glib::Object, GObject)
-  _STRUCT_NOT_HIDDEN dnl// _GdkEvent is not a struct, it's a union
-  _IGNORE(gdk_event_new)
+  // GdkEvent is actually registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(Event, GdkEvent, NONE, gdk_event_ref, gdk_event_unref)
+  _IGNORE(gdk_event_ref, gdk_event_unref)
 
 public:
   _WRAP_ENUM(Type, GdkEventType)
 
-protected:
-  _WRAP_CTOR(Event(Type event_type), gdk_event_new)
-
-public:
-  /** Creates a new event of the given type. All fields are set to 0.
-   */
-  _WRAP_CREATE(Type event_type)
-  _WRAP_METHOD(Glib::RefPtr<Event> copy() const, gdk_event_copy)
-
   _WRAP_METHOD(Type get_event_type() const, gdk_event_get_event_type)
 
-  _WRAP_METHOD(Glib::RefPtr<Gdk::Surface> get_surface(), gdk_event_get_surface, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Gdk::Surface> get_surface() const, gdk_event_get_surface, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_surface(), gdk_event_get_surface, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_surface() const, gdk_event_get_surface, refreturn, constversion)
 
-  /**
-   * Returns @c true if the event was sent explicitly (e.g. using @c XSendEvent)
-   */
-  _WRAP_METHOD(bool is_sent() const, gdk_event_is_sent)
-
-  _WRAP_METHOD(static void set_show_events(bool show_events = true), gdk_set_show_events)
-  _WRAP_METHOD(static bool get_show_events(), gdk_get_show_events)
-
-  _WRAP_METHOD(void set_device(const Glib::RefPtr<Device>& device), gdk_event_set_device, newin "3,94")
   _WRAP_METHOD(Glib::RefPtr<Device> get_device(), gdk_event_get_device, refreturn, newin "3,94")
   _WRAP_METHOD(Glib::RefPtr<const Device> get_device() const, gdk_event_get_device, refreturn, constversion, newin "3,94")
 
-  _WRAP_METHOD(void set_source_device(const Glib::RefPtr<Device>& device), gdk_event_set_source_device, newin "3,94")
   _WRAP_METHOD(Glib::RefPtr<Device> get_source_device(), gdk_event_get_source_device, refreturn, newin "3,94")
   _WRAP_METHOD(Glib::RefPtr<const Device> get_source_device() const, gdk_event_get_source_device, refreturn, constversion, newin "3,94")
 
-  _WRAP_METHOD(void set_display(const Glib::RefPtr<Display>& display), gdk_event_set_display)
+  _WRAP_METHOD(Glib::RefPtr<DeviceTool> get_device_tool(), gdk_event_get_device_tool, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const DeviceTool> get_device_tool() const, gdk_event_get_device_tool, refreturn, constversion)
+
+  _WRAP_METHOD(guint32 get_time() const, gdk_event_get_time)
+
   _WRAP_METHOD(Glib::RefPtr<Display> get_display(), gdk_event_get_display, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Display> get_display() const, gdk_event_get_display, refreturn, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<Seat> get_seat(), gdk_event_get_seat, refreturn, newin "3,90")
-  _WRAP_METHOD(Glib::RefPtr<const Seat> get_seat() const, gdk_event_get_seat, refreturn, constversion, newin "3,90")
+  _WRAP_METHOD(const EventSequence* get_event_sequence() const, gdk_event_get_event_sequence)
+  _WRAP_METHOD(ModifierType get_modifier_state() const, gdk_event_get_modifier_state)
+  _WRAP_METHOD(bool get_position(double& x, double& y) const, gdk_event_get_position)
 
-  _WRAP_PROPERTY("event-type", Type)
+  /** Extracts all axis values from an event.
+   *
+   * @return A vector of values for all axes. An empty vector in case of failure.
+   */
+  std::vector<double> get_axes() const;
+  _IGNORE(gdk_event_get_axes)
 
-  // Belong to subclasses:
-  _IGNORE(gdk_event_get_time, gdk_event_get_state, gdk_event_get_keyval,
-    gdk_event_get_device_tool, gdk_event_set_device_tool,
-    gdk_event_get_keycode, gdk_event_get_scancode, gdk_event_get_key_group,
-    gdk_event_get_key_is_modifier, gdk_event_get_button,
-    gdk_event_get_click_count, gdk_event_triggers_context_menu,
-    gdk_event_get_coords, gdk_event_get_scroll_deltas,
-    gdk_event_get_scroll_direction, gdk_event_is_scroll_stop_event, gdk_event_get_axis,
-    gdk_event_get_event_sequence, gdk_event_get_touch_emulating_pointer,
-    gdk_event_get_pointer_emulated, gdk_event_get_drop, gdk_event_get_crossing_mode,
-    gdk_event_get_crossing_detail, gdk_event_get_focus_in,
-    gdk_event_get_grab_surface, gdk_event_get_touchpad_gesture_phase,
-    gdk_event_get_touchpad_gesture_n_fingers, gdk_event_get_touchpad_deltas,
-    gdk_event_get_touchpad_angle_delta, gdk_event_get_touchpad_scale,
-    gdk_event_get_pad_group_mode, gdk_event_get_pad_button, gdk_event_get_pad_axis_value)
+  _WRAP_METHOD(bool get_axis(Gdk::AxisUse axis_use, double& value) const, gdk_event_get_axis)
+  _WRAP_METHOD(bool get_pointer_emulated() const, gdk_event_get_pointer_emulated)
+  _WRAP_METHOD(guint get_button() const, gdk_button_event_get_button)
+  _WRAP_METHOD(ScrollDirection get_direction() const, gdk_scroll_event_get_direction)
+  _WRAP_METHOD(void get_deltas(double& delta_x, double& delta_y) const, gdk_scroll_event_get_deltas)
+  _WRAP_METHOD(bool is_scroll_stop() const, gdk_scroll_event_is_stop)
+  _WRAP_METHOD(guint get_keyval() const, gdk_key_event_get_keyval)
+  _WRAP_METHOD(guint get_keycode() const, gdk_key_event_get_keycode)
+  _WRAP_METHOD(guint get_scancode() const, gdk_key_event_get_scancode)
+  _WRAP_METHOD(guint get_group() const, gdk_key_event_get_group)
+  _WRAP_METHOD(bool is_modifier() const, gdk_key_event_is_modifier)
+  _WRAP_METHOD(bool get_focus_in() const, gdk_focus_event_get_in)
+  _WRAP_METHOD(bool get_touch_emulating_pointer() const, gdk_touch_event_get_emulating_pointer)
+  _WRAP_METHOD(CrossingMode get_crossing_mode() const, gdk_crossing_event_get_mode)
+  _WRAP_METHOD(NotifyType get_crossing_detail() const, gdk_crossing_event_get_detail)
+  _WRAP_METHOD(void get_configure_size(int& width, int& height) const, gdk_configure_event_get_size)
+  _WRAP_METHOD(TouchpadGesturePhase get_touchpad_gesture_phase() const, gdk_touchpad_event_get_gesture_phase)
+  _WRAP_METHOD(guint get_touchpad_n_fingers() const, gdk_touchpad_event_get_n_fingers)
+  _WRAP_METHOD(void get_touchpad_deltas(double& dx, double& dy) const, gdk_touchpad_event_get_deltas)
+  _WRAP_METHOD(double get_touchpad_pinch_angle_delta() const, gdk_touchpad_pinch_event_get_angle_delta)
+  _WRAP_METHOD(double get_touchpad_pinch_scale() const, gdk_touchpad_pinch_event_get_scale)
+  _WRAP_METHOD(guint get_pad_button_button() const, gdk_pad_button_event_get_button)
+  _WRAP_METHOD(void get_pad_axis_value(guint& index, double& value) const, gdk_pad_axis_event_get_value)
+  _WRAP_METHOD(void get_pad_group_mode(guint& group, guint& mode) const, gdk_pad_event_get_group_mode)
+
+  _WRAP_METHOD(Glib::RefPtr<Drop> get_drag_drop(), gdk_drag_event_get_drop, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Drop> get_drag_drop() const, gdk_drag_event_get_drop, refreturn, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Surface> get_grab_broken_grab_surface(), gdk_grab_broken_event_get_grab_surface, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Surface> get_grab_broken_grab_surface() const, gdk_grab_broken_event_get_grab_surface, refreturn, constversion)
+
+#m4 _CONVERSION(`GList*',`std::vector<TimeCoord>',`Glib::ListHandler<TimeCoord, TimeCoordPtrTraits>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector<TimeCoord> get_motion_history() const, gdk_event_get_motion_history)
+
+  _WRAP_METHOD(bool triggers_context_menu() const, gdk_event_triggers_context_menu)
+  _WRAP_METHOD(bool get_distance(const Glib::RefPtr<const Event>& event2, double& distance) const, gdk_events_get_distance)
+  _WRAP_METHOD(bool get_angle(const Glib::RefPtr<const Event>& event2, double& angle) const, gdk_events_get_angle)
+  _WRAP_METHOD(bool get_center(const Glib::RefPtr<const Event>& event2, double& x, double& y) const, gdk_events_get_center)
 };
 
 } // namespace Gdk

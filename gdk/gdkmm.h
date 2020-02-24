@@ -32,7 +32,7 @@
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
 #include <gdkmm/drop.h>
-#include <gdkmm/events.h>
+#include <gdkmm/event.h>
 #include <gdkmm/frameclock.h>
 #include <gdkmm/general.h>
 #include <gdkmm/glcontext.h>
@@ -43,6 +43,7 @@
 #include <gdkmm/pixbufanimation.h>
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/pixbufloader.h>
+#include <gdkmm/popuplayout.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/seat.h>
 #include <gdkmm/snapshot.h>

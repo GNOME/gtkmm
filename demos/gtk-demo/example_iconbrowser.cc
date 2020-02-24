@@ -73,8 +73,8 @@ protected:
   IconInfoStore();
 
   // Overridden virtual function:
-  bool drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
-    Gtk::SelectionData& selection_data) const override;
+  Glib::RefPtr<Gdk::ContentProvider> drag_data_get_vfunc(
+    const Gtk::TreeModel::Path& path) const override;
 
 private:
   Gtk::TreeModelColumn<Glib::ustring> m_text_column;
@@ -93,8 +93,7 @@ public:
 protected:
   // Signal handler:
   void on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& drag, int size_index);
-
-  void on_image_get_texture(Glib::ValueBase& value, int size_index);
+  Glib::RefPtr<Gdk::ContentProvider> on_image_prepare_texture(double x, double y, int size_index);
 
   Glib::RefPtr<const Gdk::Paintable> get_paintable(int size_index);
 
@@ -912,10 +911,8 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 
     // Enable dragging an image, and copying it to another program.
     m_image_drag_source[i] = Gtk::DragSource::create();
-    auto content = Gdk::ContentProvider::create(
-      Glib::Value<Glib::RefPtr<Gdk::Texture>>::value_type(),
-      sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_get_texture), i));
-    m_image_drag_source[i]->set_content(content);
+    m_image_drag_source[i]->signal_prepare().connect(
+      sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_prepare_texture), i), false);
     m_image_drag_source[i]->signal_drag_begin().connect(
       sigc::bind(sigc::mem_fun(*this, &DetailDialog::on_image_drag_begin), i));
     m_image[i].add_controller(m_image_drag_source[i]);
@@ -969,7 +966,8 @@ void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */
   }
 }
 
-void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
+Glib::RefPtr<Gdk::ContentProvider> DetailDialog::on_image_prepare_texture(
+  double, double, int size_index)
 {
   auto image_paintable = get_paintable(size_index);
   if (image_paintable)
@@ -978,15 +976,17 @@ void DetailDialog::on_image_get_texture(Glib::ValueBase& value, int size_index)
     if (image_texture)
     {
       Glib::Value<Glib::RefPtr<const Gdk::Texture>> texture_value;
-      texture_value.init(value.gobj());
+      texture_value.init(texture_value.value_type());
       texture_value.set(image_texture);
-      value = texture_value;
+      return Gdk::ContentProvider::create(texture_value);
     }
     else
-      std::cout << "DetailDialog::on_image_get_texture(): Could not get a Gdk::Texture" << std::endl;
+      std::cout << "DetailDialog::on_image_prepare_texture(): Could not get a Gdk::Texture" << std::endl;
   }
   else
-    std::cout << "DetailDialog::on_image_get_texture(): Could not get a Gdk::Paintable" << std::endl;
+    std::cout << "DetailDialog::on_image_prepare_texture(): Could not get a Gdk::Paintable" << std::endl;
+
+  return {};
 }
 
 Glib::RefPtr<const Gdk::Paintable> DetailDialog::get_paintable(int size_index)
@@ -1016,15 +1016,17 @@ Glib::RefPtr<IconInfoStore> IconInfoStore::create()
   return Glib::RefPtr<IconInfoStore>(new IconInfoStore());
 }
 
-bool IconInfoStore::drag_data_get_vfunc(const Gtk::TreeModel::Path& path,
-  Gtk::SelectionData& selection_data) const
+Glib::RefPtr<Gdk::ContentProvider> IconInfoStore::drag_data_get_vfunc(
+  const Gtk::TreeModel::Path& path) const
 {
   const auto iter = get_iter(path);
   if (!iter)
-    return false;
+    return {};
 
   const auto row = *iter;
   const auto name = row[m_text_column];
-  selection_data.set_text(name);
-  return true;
+  Glib::Value<Glib::ustring> name_value;
+  name_value.init(name_value.value_type());
+  name_value.set(name);
+  return Gdk::ContentProvider::create(name_value);
 }

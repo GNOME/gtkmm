@@ -117,6 +117,7 @@ _CONVERSION(`const Glib::RefPtr<Cursor>&',`GdkCursor*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Cursor>&',`GdkCursor*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Cursor>&',`GdkCursor*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Gdk::Cursor>&',`GdkCursor*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const PopupLayout>&',`GdkPopupLayout*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gdk::Surface>&',`GdkSurface*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Surface>&',`GdkSurface*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<GLContext>&',`GdkGLContext*',__CONVERT_REFPTR_TO_P)
@@ -163,6 +164,7 @@ _CONVERSION(`Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap($3)')
 _CONVERSION(`const Gdk::Rectangle*',`GdkRectangle*',`Glib::unwrap(const_cast<Gdk::Rectangle*>($3))')
 _CONVERSION(`GdkRectangle*',`Gdk::Rectangle*',`&Glib::wrap($3)')
 _CONVERSION(`GdkRectangle*',`const Gdk::Rectangle*',`&Glib::wrap($3)')
+_CONVERSION(`const GdkRectangle*',`Rectangle',`Rectangle($3)')
 
 # Special treatment for the Sun Forte compiler
 #_CONVERSION(const Glib::RefPtr<const Gdk::Surface>&,GdkSurface*,__CONVERT_CONST_REFPTR_TO_P)
@@ -179,6 +181,7 @@ _CONVERSION(`const Glib::RefPtr<const Gdk::Bitmap>&', `GdkBitmap*',__CONVERT_CON
 #_CONVERSION(`const Glib::RefPtr<const Display>&', `GdkDrawable*',__CONVERT_CONST_REFPTR_TO_P_SUN(Drawable))
 
 
+_CONVERSION(`GdkPopupLayout*',`Glib::RefPtr<PopupLayout>', `Glib::wrap($3)')
 _CONVERSION(`GdkSurface*',`Glib::RefPtr<Surface>', `Glib::wrap($3)')
 _CONVERSION(`GdkSurface*',`Glib::RefPtr<const Surface>', `Glib::wrap($3)')
 _CONVERSION(`GdkSurface*',`Glib::RefPtr<Gdk::Surface>', `Glib::wrap($3)')
@@ -217,6 +220,7 @@ _CONVERSION(`GdkDevice*',`Glib::RefPtr<Gdk::Device>', `Glib::wrap($3)')
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<const Device>', `Glib::wrap($3)')
 _CONVERSION(`GdkDevice*',`Glib::RefPtr<const Gdk::Device>', `Glib::wrap($3)')
 
+_CONVERSION(`GdkDeviceTool*',`Glib::RefPtr<DeviceTool>', `Glib::wrap($3)')
 _CONVERSION(`GdkDeviceTool*',`Glib::RefPtr<Gdk::DeviceTool>', `Glib::wrap($3)')
 
 _CONVERSION(`GdkPaintable*',`Glib::RefPtr<Paintable>', `Glib::wrap($3)')
@@ -300,8 +304,10 @@ _CONVERSION(`const Glib::RefPtr<Gdk::EventButton>&',`GdkEventButton*',__CONVERT_
 _CONVERSION(`const Glib::RefPtr<Gdk::EventKey>&',`GdkEventKey*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Gdk::EventSequence*',`GdkEventSequence*',`reinterpret_cast<$2>($3)')
 _CONVERSION(`GdkEventSequence*',`Gdk::EventSequence*',`reinterpret_cast<$2>($3)')
+_CONVERSION(`GdkEventSequence*',`const EventSequence*',`reinterpret_cast<$2>($3)')
 
 _CONVERSION(`GdkDrag*',`Glib::RefPtr<Drag>',Glib::wrap($3))
 _CONVERSION(`GdkDrag*',`Glib::RefPtr<Gdk::Drag>',Glib::wrap($3))
+_CONVERSION(`GdkDrop*',`Glib::RefPtr<Drop>',Glib::wrap($3))
 _CONVERSION(`GdkDrop*',`Glib::RefPtr<Gdk::Drop>',Glib::wrap($3))
 

@@ -21,11 +21,10 @@ _CONFIGINCLUDE(gdkmmconfig.h)
 #include <gdkmm/drag.h>
 #include <gdkmm/types.h>
 #include <cairomm/region.h>
-#include <cairomm/pattern.h>
 #include <gdkmm/device.h>
+#include <gdkmm/enums.h>
 #include <gdkmm/event.h>
-#include <gdkmm/rectangle.h>
-#include <gdkmm/rgba.h>
+#include <gdkmm/popuplayout.h>
 #include <cairomm/context.h>
 #include <gdk/gdk.h>
 
@@ -38,8 +37,6 @@ namespace Gdk
 _WRAP_ENUM(WMDecoration, GdkWMDecoration)
 _WRAP_ENUM(WMFunction, GdkWMFunction)
 _WRAP_ENUM(SurfaceEdge, GdkSurfaceEdge)
-_WRAP_ENUM(Gravity, GdkGravity)
-_WRAP_ENUM(AnchorHints, GdkAnchorHints)
 _WRAP_ENUM(FullscreenMode, GdkFullscreenMode,
   s#^CURRENT_MONITOR$#ON_CURRENT_MONITOR#,
   s#^ALL_MONITORS$#ON_ALL_MONITORS#)
@@ -48,7 +45,6 @@ class ContentProvider;
 class Cursor;
 class CairoContext;
 class GLContext;
-class DrawContext;
 class FrameClock;
 class Monitor;
 
@@ -75,9 +71,7 @@ public:
   // function, because some of them have identical prototypes.
   _WRAP_METHOD(static Glib::RefPtr<Surface> create_toplevel(const Glib::RefPtr<Display>& display,
     int width, int height), gdk_surface_new_toplevel)
-  _WRAP_METHOD(static Glib::RefPtr<Surface> create_temp(const Glib::RefPtr<Display>& display,
-    const Rectangle& position), gdk_surface_new_temp)
-  _WRAP_METHOD(static Glib::RefPtr<Surface> create_popup(const Glib::RefPtr<Display>& display,
+  _WRAP_METHOD(static Glib::RefPtr<Surface> create_popup(
     const Glib::RefPtr<Surface>& parent, bool autohide), gdk_surface_new_popup)
 
   _WRAP_METHOD(Type get_surface_type() const, gdk_surface_get_surface_type)
@@ -92,9 +86,11 @@ public:
   _WRAP_METHOD(void hide(), gdk_surface_hide)
   _WRAP_METHOD(void show_unraised(), gdk_surface_show_unraised)
   _WRAP_METHOD(void resize(int width, int height), gdk_surface_resize)
-  _WRAP_METHOD(void move_to_rect(const Rectangle& rect, Gravity rect_anchor,
-    Gravity surface_anchor, AnchorHints anchor_hints, int rect_anchor_dx, int rect_anchor_dy),
-    gdk_surface_move_to_rect)
+
+  _WRAP_METHOD(bool present_popup(int width, int height, const Glib::RefPtr<const PopupLayout>& layout),
+    gdk_surface_present_popup)
+  _WRAP_METHOD(Gravity get_popup_surface_anchor() const, gdk_surface_get_popup_surface_anchor)
+  _WRAP_METHOD(Gravity get_popup_rect_anchor() const, gdk_surface_get_popup_rect_anchor)
 
   _WRAP_METHOD(void raise(), gdk_surface_raise)
   _WRAP_METHOD(void lower(), gdk_surface_lower)
@@ -174,7 +170,6 @@ public:
   _WRAP_METHOD(void unstick(), gdk_surface_unstick)
   _WRAP_METHOD(void maximize(), gdk_surface_maximize)
   _WRAP_METHOD(void unmaximize(), gdk_surface_unmaximize)
-  _WRAP_METHOD(void register_dnd(), gdk_surface_register_dnd)
 
   _WRAP_METHOD(void begin_resize_drag(SurfaceEdge edge, int button, int root_x, int root_y, guint32 timestamp), gdk_surface_begin_resize_drag)
 
@@ -243,9 +238,7 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gdk::CairoContext> create_cairo_context(), gdk_surface_create_cairo_context)
 
   // no_default_handler because the wrapped C signals have no default handlers.
-#m4 _CONVERSION(`gpointer',`const Gdk::Rectangle&',`Glib::wrap((GdkRectangle*)$3)')
-  _WRAP_SIGNAL(void moved_to_rect(const Gdk::Rectangle& flipped_rect, const Gdk::Rectangle& final_rect,
-    bool flipped_x, bool flipped_y), "moved-to-rect", no_default_handler)
+  _WRAP_SIGNAL(void popup_layout_changed(), "popup-layout-changed", no_default_handler)
   _WRAP_SIGNAL(void size_changed(int width, int height), "size-changed", no_default_handler)
 #m4 _CONVERSION(`CairoRegion*',`const ::Cairo::RefPtr<const ::Cairo::Region>&',`Gdk::Cairo::wrap($3)')
   _WRAP_SIGNAL(bool render(const ::Cairo::RefPtr<const ::Cairo::Region>& expose_region),

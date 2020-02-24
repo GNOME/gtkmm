@@ -30,14 +30,16 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gtkmm/object.h>
 #include <gtkmm/buildable.h>
 #include <gtkmm/constrainttarget.h>
-#include <gdkmm/events.h>
 #include <gdkmm/types.h>
 #include <gtkmm/enums.h>
 #include <gdkmm/display.h>
 #include <gdkmm/clipboard.h>
+#include <gdkmm/cursor.h>
+#include <gdkmm/rectangle.h>
 #include <gtkmm/requisition.h>
 #include <gtkmm/stylecontext.h>
 #include <giomm/actiongroup.h>
+#include <cairomm/region.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/object_p.h)
@@ -166,7 +168,6 @@ public:
   _IGNORE(gtk_widget_can_activate_accel)
   //Probably not useful. Too C-specific: _WRAP_METHOD(bool can_activate_accel(guint signal_id) const, gtk_widget_can_activate_accel)
 
-  _WRAP_METHOD(bool event(const Glib::RefPtr<Gdk::Event>& gdk_event), gtk_widget_event)
   _WRAP_METHOD(bool activate(), gtk_widget_activate)
 
   // gtk_widget_reparent() has been removed, but we want to keep Gtk::Widget::reparent().
@@ -582,9 +583,15 @@ public:
 
   _WRAP_METHOD(bool should_layout() const, gtk_widget_should_layout)
 
+  _WRAP_METHOD(Glib::ustring get_css_name() const, gtk_widget_get_css_name)
   _WRAP_METHOD(void add_css_class(const Glib::ustring& css_class), gtk_widget_add_css_class)
   _WRAP_METHOD(void remove_css_class(const Glib::ustring& css_class), gtk_widget_remove_css_class)
   _WRAP_METHOD(bool has_css_class(const Glib::ustring& css_class) const, gtk_widget_has_css_class)
+
+#m4 _CONVERSION(`char**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_css_classes() const, gtk_widget_get_css_classes)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char**',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data ()')
+  _WRAP_METHOD(void set_css_classes(const std::vector<Glib::ustring>& classes), gtk_widget_set_css_classes)
 
   _WRAP_SIGNAL(void show(),"show")
   _WRAP_SIGNAL(void hide(),"hide", custom_c_callback)
@@ -680,6 +687,7 @@ dnl
   _WRAP_PROPERTY("overflow", Overflow, newin "3,96")
   _WRAP_PROPERTY("scale-factor", int)
   _WRAP_PROPERTY("css-name", Glib::ustring)
+  _WRAP_PROPERTY("css-classes", std::vector<Glib::ustring>)
   _WRAP_PROPERTY("layout-manager", Glib::RefPtr<LayoutManager>)
 
 protected:
