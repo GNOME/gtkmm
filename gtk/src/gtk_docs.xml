@@ -3092,6 +3092,13 @@ Focus movement types.
 </parameters>
 </enum>
 
+<property name="GtkDragIcon:child">
+<description>
+The widget to display as drag icon.
+
+</description>
+</property>
+
 <signal name="GtkDragSource::drag-begin">
 <description>
 The ::drag-begin signal is emitted on the drag source when a drag
@@ -3323,33 +3330,28 @@ before #GtkDropControllerMotion::enter but after
 </description>
 </property>
 
-<signal name="GtkDropTarget::drag-drop">
+<signal name="GtkDropTarget::accept">
 <description>
-The ::drag-drop signal is emitted on the drop site when the user drops
-the data onto the widget. The signal handler must determine whether
-the cursor position is in a drop zone or not. If it is not in a drop
-zone, it returns %FALSE and no further processing is necessary.
+The ::accept signal is emitted on the drop site when a drop operation
+is about to begin.  
+If the drop is not accepted, %FALSE will be returned and the drop target
+will ignore the drop. If %TRUE is returned, the drop is accepted for now
+but may be rejected later via a call to gtk_drop_target_reject() or
+ultimately by returning %FALSE from GtkDropTarget::drop
 
-Otherwise, the handler returns %TRUE. In this case, the handler must
-ensure that gdk_drop_finish() is called to let the source know that
-the drop is done. The call to gtk_drag_finish() can be done either
-directly or after receiving the data.
+The default handler for this signal decides whether to accept the drop
+based on the formats provided by the @drop.
 
-To receive the data, use one of the read functions provides by #GtkDrop
-and #GtkDragDest: gdk_drop_read_async(), gdk_drop_read_value_async(),
-gdk_drop_read_text_async().
-
-You can use gtk_drop_target_get_drop() to obtain the #GtkDrop object
-for the ongoing operation in your signal handler. If you call one of the
-read functions in your handler, GTK will ensure that the #GtkDrop object
-stays alive until the read is completed. If you delay obtaining the data
-(e.g. to handle %GDK_ACTION_ASK by showing a #GtkPopover), you need to
-hold a reference on the #GtkDrop.
+If the decision whether the drop will be accepted or rejected needs
+inspecting the data, this function should return %TRUE, the 
+GtkDropTarget:preload property should be set and the value
+should be inspected via the GObject::notify:value signal and then call
+gtk_drop_target_reject().
 
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> the #GtkDropTarget
 </parameter_description>
 </parameter>
@@ -3357,83 +3359,116 @@ hold a reference on the #GtkDrop.
 <parameter_description> the #GdkDrop
 </parameter_description>
 </parameter>
-<parameter name="x">
-<parameter_description> the x coordinate of the current cursor position
-</parameter_description>
-</parameter>
-<parameter name="y">
-<parameter_description> the y coordinate of the current cursor position
-</parameter_description>
-</parameter>
 </parameters>
-<return> whether the cursor position is in a drop zone
+<return> %TRUE if @drop is accepted
 </return>
 </signal>
 
-<signal name="GtkDropTarget::drag-enter">
+<signal name="GtkDropTarget::drop">
 <description>
-The ::drag-enter signal is emitted on the drop site when the cursor
-enters the widget. It can be used to set up custom highlighting.
+The ::drop signal is emitted on the drop site when the user drops
+the data onto the widget. The signal handler must determine whether
+the pointer position is in a drop zone or not. If it is not in a drop
+zone, it returns %FALSE and no further processing is necessary.
+
+Otherwise, the handler returns %TRUE. In this case, this handler will
+accept the drop. The handler is responsible for rading the given @value
+and performing the drop operation.
+
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> the #GtkDropTarget
 </parameter_description>
 </parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkDropTarget::drag-leave">
-<description>
-The ::drag-leave signal is emitted on the drop site when the cursor
-leaves the widget. Its main purpose it to undo things done in
-#GtkDropTarget::drag-enter.
-
-</description>
-<parameters>
-<parameter name="dest">
-<parameter_description> the #GtkDropTarget
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkDropTarget::drag-motion">
-<description>
-The ::drag motion signal is emitted while the pointer is moving
-over the drop target.
-
-</description>
-<parameters>
-<parameter name="dest">
-<parameter_description> the #GtkDropTarget
-</parameter_description>
-</parameter>
-<parameter name="drop">
-<parameter_description> the #GdkDrop
+<parameter name="value">
+<parameter_description> the #GValue being dropped
 </parameter_description>
 </parameter>
 <parameter name="x">
-<parameter_description> the x coordinate of the current cursor position
+<parameter_description> the x coordinate of the current pointer position
 </parameter_description>
 </parameter>
 <parameter name="y">
-<parameter_description> the y coordinate of the current cursor position
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the drop was accepted at the given pointer position
+</return>
+</signal>
+
+<signal name="GtkDropTarget::enter">
+<description>
+The ::enter signal is emitted on the drop site when the pointer
+enters the widget. It can be used to set up custom highlighting.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current pointer position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> Preferred action for this drag operation or 0 if dropping is not
+supported at the current @x,@y location.
+</return>
+</signal>
+
+<signal name="GtkDropTarget::leave">
+<description>
+The ::leave signal is emitted on the drop site when the pointer
+leaves the widget. Its main purpose it to undo things done in
+#GtkDropTarget::enter.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</signal>
+
+<signal name="GtkDropTarget::motion">
+<description>
+The ::motion signal is emitted while the pointer is moving
+over the drop target.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current pointer position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> Preferred action for this drag operation or 0 if dropping is not
+supported at the current @x,@y location.
+</return>
 </signal>
 
 <property name="GtkDropTarget:actions">
@@ -3443,15 +3478,180 @@ The #GdkDragActions that this drop target supports
 </description>
 </property>
 
-<property name="GtkDropTarget:contains">
+<property name="GtkDropTarget:drop">
 <description>
-Whether the drop target is currently the targed of an ongoing drag operation,
-and highlighted.
+The #GdkDrop that is currently being performed
 
 </description>
 </property>
 
 <property name="GtkDropTarget:formats">
+<description>
+The #GdkContentFormats that determine the supported data formats
+
+</description>
+</property>
+
+<property name="GtkDropTarget:preload">
+<description>
+Whether the drop data should be preloaded when the pointer is only
+hovering over the widget but has not been released.
+
+Setting this property allows finer grained reaction to an ongoing
+drop at the cost of loading more data.
+
+The default value for this property is %FALSE to avoid downloading
+huge amounts of data by accident.  
+For example, if somebody drags a full document of gigabytes of text
+from a text editor across a widget with a preloading drop target,
+this data will be downloaded, even if the data is ultimately dropped
+elsewhere.
+
+For a lot of data formats, the amount of data is very small (like
+%GDK_TYPE_RGBA), so enabling this property does not hurt at all.  
+And for local-only drag'n'drop operations, no data transfer is done,
+so enabling it there is free.
+
+</description>
+</property>
+
+<property name="GtkDropTarget:value">
+<description>
+The value for this drop operation or %NULL if the data has not been
+loaded yet or no drop operation is going on.
+
+Data may be available before the GtkDropTarget::drop signal gets emitted -
+for example when the GtkDropTarget:preload property is set.
+You can use the GObject::notify signal to be notified of available data.
+
+</description>
+</property>
+
+<signal name="GtkDropTargetAsync::drag-enter">
+<description>
+The ::drag-enter signal is emitted on the drop site when the pointer
+enters the widget. It can be used to set up custom highlighting.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current pointer position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> Preferred action for this drag operation. 
+</return>
+</signal>
+
+<signal name="GtkDropTargetAsync::drag-leave">
+<description>
+The ::drag-leave signal is emitted on the drop site when the pointer
+leaves the widget. Its main purpose it to undo things done in
+#GtkDropTargetAsync::drag-enter.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkDropTargetAsync::drag-motion">
+<description>
+The ::drag-motion signal is emitted while the pointer is moving
+over the drop target.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current pointer position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> Preferred action for this drag operation. 
+</return>
+</signal>
+
+<signal name="GtkDropTargetAsync::drop">
+<description>
+The ::drop signal is emitted on the drop site when the user drops
+the data onto the widget. The signal handler must determine whether
+the pointer position is in a drop zone or not. If it is not in a drop
+zone, it returns %FALSE and no further processing is necessary.
+
+Otherwise, the handler returns %TRUE. In this case, this handler will
+accept the drop. The handler must ensure that gdk_drop_finish() is
+called to let the source know that the drop is done. The call to
+gtk_drag_finish() must only be done when all data has been received.
+
+To receive the data, use one of the read functions provides by #GdkDrop
+such as gdk_drop_read_async() or gdk_drop_read_value_async().
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="drop">
+<parameter_description> the #GdkDrop
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the x coordinate of the current pointer position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the y coordinate of the current pointer position
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the drop is accepted at the given pointer position
+</return>
+</signal>
+
+<property name="GtkDropTargetAsync:actions">
+<description>
+The #GdkDragActions that this drop target supports
+
+</description>
+</property>
+
+<property name="GtkDropTargetAsync:formats">
 <description>
 The #GdkContentFormats that determines the supported data formats
 
@@ -14356,29 +14556,26 @@ widget get added, removed or changed.
 
 <signal name="GtkWidget::accept">
 <description>
-The ::accept signal is emitted on the drop site when the user
-moves the cursor over the widget during a drag. The signal handler
-must determine whether the cursor position is in a drop zone or not.
-If it is not in a drop zone, it returns %FALSE and no further processing
-is necessary. Otherwise, the handler returns %TRUE. In this case, the
-handler is responsible for providing the necessary information for
-displaying feedback to the user, by calling gdk_drag_status().
+The ::accept signal is emitted on the drop site when a drop operation
+is about to begin.  
+If the drop is not accepted, %FALSE will be returned and the drop target
+will ignore the drop. If %TRUE is returned, the drop is accepted for now
+but may be rejected later via a call to gtk_drop_target_reject() or
+ultimately by returning %FALSE from GtkDropTarget::drop
 
 The default handler for this signal decides whether to accept the drop
-based on the type of the data.
+based on the formats provided by the @drop.
 
-If the decision whether the drop will be accepted or rejected can't be
-made based solely the data format, handler may inspect the dragged data
-by calling one of the #GdkDrop read functions and return %TRUE to
-tentatively accept the drop. When the data arrives and is found to not be
-acceptable, a call to gtk_drop_target_deny_drop() should be made to reject
-the drop.
+If the decision whether the drop will be accepted or rejected needs
+further procesing, such as inspecting the data, this function should
+return %TRUE and proceed as is @drop was accepted and if it decides to
+reject the drop later, it should call gtk_drop_target_reject_drop().
 
 
 </description>
 <parameters>
-<parameter name="dest">
-<parameter_description> the #GtkDropTarget
+<parameter name="self">
+<parameter_description> the #GtkDropTargetAsync
 </parameter_description>
 </parameter>
 <parameter name="drop">
@@ -14386,7 +14583,7 @@ the drop.
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether the cursor position is in a drop zone
+<return> %TRUE if @drop is accepted
 </return>
 </signal>
 
@@ -14774,13 +14971,6 @@ The cursor used by @widget. See gtk_widget_set_cursor() for details.
 </description>
 </property>
 
-<property name="GtkWidget:expand">
-<description>
-Whether to expand in both directions. Setting this sets both #GtkWidget:hexpand and #GtkWidget:vexpand
-
-</description>
-</property>
-
 <property name="GtkWidget:focus-on-click">
 <description>
 Whether the widget should grab focus when it is clicked with the mouse.
@@ -14828,14 +15018,6 @@ Whether to use the #GtkWidget:hexpand property. See gtk_widget_get_hexpand_set()
 <description>
 The #GtkLayoutManager instance to use to compute the preferred size
 of the widget, and allocate its children.
-
-</description>
-</property>
-
-<property name="GtkWidget:margin">
-<description>
-Sets all four sides' margin at once. If read, returns max
-margin on any side.
 
 </description>
 </property>
@@ -28408,52 +28590,6 @@ Creates a new custom paper dialog.
 </return>
 </function>
 
-<function name="gtk_device_grab_add">
-<description>
-Adds a GTK grab on @device, so all the events on @device and its
-associated pointer or keyboard (if any) are delivered to @widget.
-If the @block_others parameter is %TRUE, any other devices will be
-unable to interact with @widget during the grab.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice to grab on.
-</parameter_description>
-</parameter>
-<parameter name="block_others">
-<parameter_description> %TRUE to prevent other devices to interact with @widget.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_device_grab_remove">
-<description>
-Removes a device grab from the given widget.
-
-You have to pair calls to gtk_device_grab_add() and
-gtk_device_grab_remove().
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_dialog_add_action_widget">
 <description>
 Adds an activatable widget to the action area of a #GtkDialog,
@@ -28898,20 +29034,82 @@ should trigger the beginning of a drag-and-drop operation.
 </return>
 </function>
 
-<function name="gtk_drag_icon_new_for_drag">
+<function name="gtk_drag_icon_create_widget_for_value">
 <description>
-Creates a #GtkDragIcon and associates it with the drag operation.
+Creates a widget that can be used as a drag icon for the given
+@value.
+
+If GTK does not know how to create a widget for a given value,
+it will return %NULL.
+
+This method is used to set the default drag icon on drag'n'drop
+operations started by #GtkDragSource, so you don't need to set
+a drag icon using this function there.
+
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GValue
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GtkWidget
+for displaying @value as a drag icon.
+</return>
+</function>
+
+<function name="gtk_drag_icon_get_child">
+<description>
+Gets the widget currently used as drag icon.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDragIcon
+</parameter_description>
+</parameter>
+</parameters>
+<return> The drag icon or %NULL if none.
+</return>
+</function>
+
+<function name="gtk_drag_icon_get_for_drag">
+<description>
+Gets the #GtkDragIcon in use with @drag.
+
+If no drag icon exists yet, a new one will be created
+and shown.
 
 
 </description>
 <parameters>
 <parameter name="drag">
-<parameter_description> a #GtkDrag
+<parameter_description> a #GdkDrag
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new #GtkDragIcon
+<return> the #GtkDragIcon
 </return>
+</function>
+
+<function name="gtk_drag_icon_set_child">
+<description>
+Sets the widget to display as the drag icon.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDragIcon
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a #GtkWidget or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_drag_icon_set_from_paintable">
@@ -29263,7 +29461,8 @@ Returns the value of the GtkDropControllerMotion:drop property.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GdkDrop currently happening within @self or %NULL if none
+<return> The #GdkDrop currently happening
+within @self or %NULL if none
 </return>
 </function>
 
@@ -29296,7 +29495,61 @@ events during drag and drop.
 </return>
 </function>
 
-<function name="gtk_drop_target_deny_drop">
+<function name="gtk_drop_target_async_get_actions">
+<description>
+Gets the actions that this drop target supports.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+</parameters>
+<return> the actions that this drop target supports
+</return>
+</function>
+
+<function name="gtk_drop_target_async_get_formats">
+<description>
+Gets the data formats that this drop target accepts.
+
+If the result is %NULL, all formats are expected to be supported.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+</parameters>
+<return> the supported data formats
+</return>
+</function>
+
+<function name="gtk_drop_target_async_new">
+<description>
+Creates a new #GtkDropTargetAsync object.
+
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> the supported data formats
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the supported actions
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GtkDropTargetAsync
+</return>
+</function>
+
+<function name="gtk_drop_target_async_reject_drop">
 <description>
 Sets the @drop as not accepted on this drag site.
 
@@ -29306,8 +29559,8 @@ the data.
 
 </description>
 <parameters>
-<parameter name="dest">
-<parameter_description> a #GtkDropTarget
+<parameter name="self">
+<parameter_description> a #GtkDropTargetAsync
 </parameter_description>
 </parameter>
 <parameter name="drop">
@@ -29318,22 +29571,41 @@ the data.
 <return></return>
 </function>
 
-<function name="gtk_drop_target_find_mimetype">
+<function name="gtk_drop_target_async_set_actions">
 <description>
-Returns a mimetype that is supported both by @dest and the ongoing
-drag. For more detailed control, you can use gdk_drop_get_formats()
-to obtain the content formats that are supported by the source.
-
+Sets the actions that this drop target supports.
 
 </description>
 <parameters>
-<parameter name="dest">
-<parameter_description> a #GtkDropTarget
+<parameter name="self">
+<parameter_description> a #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="actions">
+<parameter_description> the supported actions
 </parameter_description>
 </parameter>
 </parameters>
-<return> a matching mimetype for the ongoing drag, or %NULL
-</return>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_async_set_formats">
+<description>
+Sets the data formats that this drop target will accept.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTargetAsync
+</parameter_description>
+</parameter>
+<parameter name="formats">
+<parameter_description> the supported data formats or %NULL for
+any format.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_drop_target_get_actions">
@@ -29343,7 +29615,7 @@ Gets the actions that this drop target supports.
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> a #GtkDropTarget
 </parameter_description>
 </parameter>
@@ -29354,17 +29626,19 @@ Gets the actions that this drop target supports.
 
 <function name="gtk_drop_target_get_drop">
 <description>
-Returns the underlying #GtkDrop object for an ongoing drag.
+Gets the currently handled drop operation.
+
+If no drop operation is going on, %NULL is returned.
 
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> a #GtkDropTarget
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GtkDrop of the current drag operation, or %NULL
+<return> The current drop
 </return>
 </function>
 
@@ -29377,7 +29651,7 @@ If the result is %NULL, all formats are expected to be supported.
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> a #GtkDropTarget
 </parameter_description>
 </parameter>
@@ -29386,15 +29660,75 @@ If the result is %NULL, all formats are expected to be supported.
 </return>
 </function>
 
-<function name="gtk_drop_target_new">
+<function name="gtk_drop_target_get_gtypes">
 <description>
-Creates a new #GtkDropTarget object.
+Gets the list of supported #GTypes for @self. If no type have been set,
+%NULL will be returned.
 
 
 </description>
 <parameters>
-<parameter name="formats">
-<parameter_description> the supported data formats
+<parameter name="self">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="n_types">
+<parameter_description> optional pointer to take the
+number of #GTypes contained in the return value
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+%G_TYPE_INVALID-terminated array of types included in @formats or
+%NULL if none.
+</return>
+</function>
+
+<function name="gtk_drop_target_get_preload">
+<description>
+Gets the value of the GtkDropTarget:preload property.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if drop data should be preloaded
+</return>
+</function>
+
+<function name="gtk_drop_target_get_value">
+<description>
+Gets the value of the GtkDropTarget:value porperty.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current drop data
+</return>
+</function>
+
+<function name="gtk_drop_target_new">
+<description>
+Creates a new #GtkDropTarget object.
+
+If the drop target should support more than 1 type, pass
+%G_TYPE_INVALID for @type and then call
+gtk_drop_target_set_gtypes().
+
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> The supported type or %G_TYPE_INVALID
 </parameter_description>
 </parameter>
 <parameter name="actions">
@@ -29406,13 +29740,34 @@ Creates a new #GtkDropTarget object.
 </return>
 </function>
 
+<function name="gtk_drop_target_reject">
+<description>
+Rejects the ongoing drop operation.
+
+If no drop operation is ongoing - when GdkDropTarget:drop
+returns %NULL - this function does nothing.
+
+This function should be used when delaying the decision
+on whether to accept a drag or not until after reading
+the data.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_drop_target_set_actions">
 <description>
 Sets the actions that this drop target supports.
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> a #GtkDropTarget
 </parameter_description>
 </parameter>
@@ -29424,18 +29779,43 @@ Sets the actions that this drop target supports.
 <return></return>
 </function>
 
-<function name="gtk_drop_target_set_formats">
+<function name="gtk_drop_target_set_gtypes">
 <description>
-Sets the data formats that this drop target will accept.
+Sets the supported #GTypes for this drop target.
+
+The GtkDropTarget::drop signal will 
 
 </description>
 <parameters>
-<parameter name="dest">
+<parameter name="self">
 <parameter_description> a #GtkDropTarget
 </parameter_description>
 </parameter>
-<parameter name="formats">
-<parameter_description> the supported data formats
+<parameter name="types">
+<parameter_description>
+all supported #GTypes that can be dropped
+</parameter_description>
+</parameter>
+<parameter name="n_types">
+<parameter_description> number of @types
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_drop_target_set_preload">
+<description>
+Sets the GtkDropTarget:preload property.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GtkDropTarget
+</parameter_description>
+</parameter>
+<parameter name="preload">
+<parameter_description> %TRUE to preload drop data
 </parameter_description>
 </parameter>
 </parameters>
@@ -37281,19 +37661,6 @@ grabbed widget and this function does nothing.
 <return></return>
 </function>
 
-<function name="gtk_grab_get_current">
-<description>
-Queries the current grab of the default window group.
-
-
-</description>
-<parameters>
-</parameters>
-<return> The widget which currently
-has the grab or %NULL if no grab is active
-</return>
-</function>
-
 <function name="gtk_grab_remove">
 <description>
 Removes the grab from the given widget.
@@ -38764,7 +39131,8 @@ See gtk_icon_theme_set_resource_path().
 </parameter_description>
 </parameter>
 </parameters>
-<return> A list of resource paths or %NULL.
+<return>
+A list of resource paths or %NULL.
 The returned value should be freed with g_strfreev().
 </return>
 </function>
@@ -38983,8 +39351,8 @@ rather than directly on the icon path.)
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> NULL-terminated array of
-directories that are searched for icon themes
+<parameter_description> NULL-terminated
+array of directories that are searched for icon themes
 </parameter_description>
 </parameter>
 </parameters>
@@ -39038,7 +39406,6 @@ This image is used for a drag icon.
 Turns @icon_view into a drop destination for automatic DND. Calling this
 method sets #GtkIconView:reorderable to %FALSE.
 
-
 </description>
 <parameters>
 <parameter name="icon_view">
@@ -39055,8 +39422,7 @@ widget
 </parameter_description>
 </parameter>
 </parameters>
-<return> the drop target that was attached
-</return>
+<return></return>
 </function>
 
 <function name="gtk_icon_view_enable_model_drag_source">
@@ -49960,22 +50326,6 @@ Returns the preferred position of @popover.
 </return>
 </function>
 
-<function name="gtk_popover_get_relative_to">
-<description>
-Returns the widget @popover is currently attached to
-
-
-</description>
-<parameters>
-<parameter name="popover">
-<parameter_description> a #GtkPopover
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GtkWidget
-</return>
-</function>
-
 <function name="gtk_popover_menu_bar_get_menu_model">
 <description>
 Returns the model from which the contents of @bar are taken.
@@ -50050,10 +50400,6 @@ Creates a new popover menu.
 
 </description>
 <parameters>
-<parameter name="relative_to">
-<parameter_description> #GtkWidget the popover is related to
-</parameter_description>
-</parameter>
 </parameters>
 <return> a new #GtkPopoverMenu
 </return>
@@ -50062,7 +50408,7 @@ Creates a new popover menu.
 <function name="gtk_popover_menu_new_from_model">
 <description>
 Creates a #GtkPopoverMenu and populates it according to
-@model. The popover is pointed to the @relative_to widget.
+@model.
 
 The created buttons are connected to actions found in the
 #GtkApplicationWindow to which the popover belongs - typically
@@ -50079,10 +50425,6 @@ to control this.
 
 </description>
 <parameters>
-<parameter name="relative_to">
-<parameter_description> #GtkWidget the popover is related to
-</parameter_description>
-</parameter>
 <parameter name="model">
 <parameter_description> a #GMenuModel, or %NULL
 </parameter_description>
@@ -50095,13 +50437,13 @@ to control this.
 <function name="gtk_popover_menu_new_from_model_full">
 <description>
 Creates a #GtkPopoverMenu and populates it according to
-@model. The popover is pointed to the @relative_to widget.
+@model.
 
 The created buttons are connected to actions found in the
-action groups that are accessible from the @relative-to widget.
+action groups that are accessible from the parent widget.
 This includes the #GtkApplicationWindow to which the popover
 belongs. Actions can also be added using gtk_widget_insert_action_group()
-on the @relative-to widget or on any of its parent widgets.
+on the parent widget or on any of its parent widgets.
 
 The only flag that is supported currently is
 #GTK_POPOVER_MENU_NESTED, which makes GTK create traditional,
@@ -50110,10 +50452,6 @@ nested submenus instead of the default sliding submenus.
 
 </description>
 <parameters>
-<parameter name="relative_to">
-<parameter_description> #GtkWidget the popover is related to
-</parameter_description>
-</parameter>
 <parameter name="model">
 <parameter_description> a #GMenuModel
 </parameter_description>
@@ -50228,8 +50566,7 @@ pointing at the widget it is relative to.
 <function name="gtk_popover_set_pointing_to">
 <description>
 Sets the rectangle that @popover will point to, in the
-coordinate space of the widget @popover is attached to,
-see gtk_popover_set_relative_to().
+coordinate space of the @popover parent.
 
 </description>
 <parameters>
@@ -50262,30 +50599,6 @@ on lack of space (eg. if close to the window edges), the
 </parameter>
 <parameter name="position">
 <parameter_description> preferred popover position
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_popover_set_relative_to">
-<description>
-Sets a new widget to be attached to @popover. If @popover is
-visible, the position will be updated.
-
-Note: the ownership of popovers is always given to their @relative_to
-widget, so if @relative_to is set to %NULL on an attached @popover, it
-will be detached from its previous widget, and consequently destroyed
-unless extra references are kept.
-
-</description>
-<parameters>
-<parameter name="popover">
-<parameter_description> a #GtkPopover
-</parameter_description>
-</parameter>
-<parameter name="relative_to">
-<parameter_description> a #GtkWidget
 </parameter_description>
 </parameter>
 </parameters>
@@ -60966,6 +61279,22 @@ Manually force an update of the spin button.
 <return></return>
 </function>
 
+<function name="gtk_spinner_get_spinning">
+<description>
+Returns whether the spinner is spinning.
+
+
+</description>
+<parameters>
+<parameter name="spinner">
+<parameter_description> a #GtkSpinner
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the spinner is active
+</return>
+</function>
+
 <function name="gtk_spinner_new">
 <description>
 Returns a new spinner widget. Not yet started.
@@ -60976,6 +61305,24 @@ Returns a new spinner widget. Not yet started.
 </parameters>
 <return> a new #GtkSpinner
 </return>
+</function>
+
+<function name="gtk_spinner_set_spinning">
+<description>
+Sets the activity of the spinner.
+
+</description>
+<parameters>
+<parameter name="spinner">
+<parameter_description> a #GtkSpinner
+</parameter_description>
+</parameter>
+<parameter name="spinning">
+<parameter_description> whether the spinner should be spinning
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_spinner_start">
@@ -61670,22 +62017,6 @@ the new message is being used in
 </parameter>
 </parameters>
 <return> an integer id
-</return>
-</function>
-
-<function name="gtk_statusbar_get_message_area">
-<description>
-Retrieves the box containing the label widget.
-
-
-</description>
-<parameters>
-<parameter name="statusbar">
-<parameter_description> a #GtkStatusbar
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GtkBox
 </return>
 </function>
 
@@ -74630,7 +74961,6 @@ This image is used for a drag icon.
 Turns @tree_view into a drop destination for automatic DND. Calling
 this method sets #GtkTreeView:reorderable to %FALSE.
 
-
 </description>
 <parameters>
 <parameter name="tree_view">
@@ -74647,8 +74977,7 @@ widget
 </parameter_description>
 </parameter>
 </parameters>
-<return> the drop target that has been attached
-</return>
+<return></return>
 </function>
 
 <function name="gtk_tree_view_enable_model_drag_source">
@@ -79541,26 +79870,6 @@ should take precedence over properties set in the private template XML.
 <return></return>
 </function>
 
-<function name="gtk_widget_input_shape_combine_region">
-<description>
-Sets an input shape for this widget’s GDK surface. This allows for
-windows which react to mouse click in a nonrectangular region, see
-gdk_surface_input_shape_combine_region() for more information.
-
-</description>
-<parameters>
-<parameter name="widget">
-<parameter_description> a #GtkWidget
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> shape to be added, or %NULL to remove an existing shape
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_widget_insert_action_group">
 <description>
 Inserts @group into @widget. Children of @widget that implement
@@ -80175,8 +80484,7 @@ GtkWidgetClass::size_allocate will be silently ignored.
 <function name="gtk_widget_realize">
 <description>
 Creates the GDK (windowing system) resources associated with a
-widget.  For example, @widget-&gt;surface will be created when a widget
-is realized.  Normally realization happens implicitly; if you show
+widget. Normally realization happens implicitly; if you show
 a widget and all its parent containers, then the widget will be
 realized and mapped automatically.
 
@@ -81445,7 +81753,7 @@ from the parent.
 <description>
 This function is only useful in widget implementations.
 Causes a widget to be unrealized (frees all GDK resources
-associated with the widget, such as @widget-&gt;surface).
+associated with the widget).
 
 </description>
 <parameters>
@@ -82205,43 +82513,6 @@ Adds a window to a #GtkWindowGroup.
 <return></return>
 </function>
 
-<function name="gtk_window_group_get_current_device_grab">
-<description>
-Returns the current grab widget for @device, or %NULL if none.
-
-
-</description>
-<parameters>
-<parameter name="window_group">
-<parameter_description> a #GtkWindowGroup
-</parameter_description>
-</parameter>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return> The grab widget, or %NULL
-</return>
-</function>
-
-<function name="gtk_window_group_get_current_grab">
-<description>
-Gets the current grab widget of the given group,
-see gtk_grab_add().
-
-
-</description>
-<parameters>
-<parameter name="window_group">
-<parameter_description> a #GtkWindowGroup
-</parameter_description>
-</parameter>
-</parameters>
-<return> the current grab widget of the group
-</return>
-</function>
-
 <function name="gtk_window_group_list_windows">
 <description>
 Returns a list of the #GtkWindows that belong to @window_group.
@@ -82261,8 +82532,10 @@ newly-allocated list of windows inside the group.
 
 <function name="gtk_window_group_new">
 <description>
-Creates a new #GtkWindowGroup object. Grabs added with
-gtk_grab_add() only affect windows within the same #GtkWindowGroup.
+Creates a new #GtkWindowGroup object.
+
+Modality of windows only affects windows
+within the same #GtkWindowGroup.
 
 
 </description>

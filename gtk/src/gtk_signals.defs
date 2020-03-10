@@ -2719,6 +2719,17 @@
   (default-value "-1")
 )
 
+;; From GtkDragIcon
+
+(define-property child
+  (of-object "GtkDragIcon")
+  (prop-type "GParamObject")
+  (docs "The widget to display as drag icon.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GtkDragSource
 
 (define-signal prepare
@@ -2860,32 +2871,40 @@
 
 ;; From GtkDropTarget
 
-(define-signal drag-enter
+(define-signal drop
   (of-object "GtkDropTarget")
-  (return-type "void")
+  (return-type "gboolean")
   (flags "Run Last")
   (parameters
-    '("GdkDrop*" "p0")
+    '("const-GValue*" "p0")
+    '("gdouble" "p1")
+    '("gdouble" "p2")
   )
 )
 
-(define-signal drag-leave
+(define-signal enter
   (of-object "GtkDropTarget")
-  (return-type "void")
+  (return-type "GdkDragAction")
   (flags "Run Last")
   (parameters
-    '("GdkDrop*" "p0")
+    '("gdouble" "p0")
+    '("gdouble" "p1")
   )
 )
 
-(define-signal drag-motion
+(define-signal leave
   (of-object "GtkDropTarget")
   (return-type "void")
   (flags "Run Last")
+)
+
+(define-signal motion
+  (of-object "GtkDropTarget")
+  (return-type "GdkDragAction")
+  (flags "Run Last")
   (parameters
-    '("GdkDrop*" "p0")
-    '("gint" "p1")
-    '("gint" "p2")
+    '("gdouble" "p0")
+    '("gdouble" "p1")
   )
 )
 
@@ -2898,28 +2917,108 @@
   )
 )
 
-(define-signal drag-drop
+(define-property actions
   (of-object "GtkDropTarget")
-  (return-type "gboolean")
-  (flags "Run Last")
-  (parameters
-    '("GdkDrop*" "p0")
-    '("gint" "p1")
-    '("gint" "p2")
-  )
+  (prop-type "GParamFlags")
+  (docs "The actions supported by this drop target")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "0")
+)
+
+(define-property drop
+  (of-object "GtkDropTarget")
+  (prop-type "GParamObject")
+  (docs "Current drop")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
 )
 
 (define-property formats
   (of-object "GtkDropTarget")
   (prop-type "GParamBoxed")
-  (docs "Formats")
+  (docs "The supported formats")
   (readable #t)
-  (writable #t)
+  (writable #f)
   (construct-only #f)
 )
 
-(define-property actions
+(define-property preload
   (of-object "GtkDropTarget")
+  (prop-type "GParamBoolean")
+  (docs "Whether drop data should be preloaded while hovering")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+  (default-value "FALSE")
+)
+
+(define-property value
+  (of-object "GtkDropTarget")
+  (prop-type "GParamBoxed")
+  (docs "The value for this drop operation")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+;; From GtkDropTargetAsync
+
+(define-signal drop
+  (of-object "GtkDropTargetAsync")
+  (return-type "gboolean")
+  (flags "Run Last")
+  (parameters
+    '("GdkDrop*" "p0")
+    '("gdouble" "p1")
+    '("gdouble" "p2")
+  )
+)
+
+(define-signal accept
+  (of-object "GtkDropTargetAsync")
+  (return-type "gboolean")
+  (flags "Run Last")
+  (parameters
+    '("GdkDrop*" "p0")
+  )
+)
+
+(define-signal drag-enter
+  (of-object "GtkDropTargetAsync")
+  (return-type "GdkDragAction")
+  (flags "Run Last")
+  (parameters
+    '("GdkDrop*" "p0")
+    '("gdouble" "p1")
+    '("gdouble" "p2")
+  )
+)
+
+(define-signal drag-motion
+  (of-object "GtkDropTargetAsync")
+  (return-type "GdkDragAction")
+  (flags "Run Last")
+  (parameters
+    '("GdkDrop*" "p0")
+    '("gdouble" "p1")
+    '("gdouble" "p2")
+  )
+)
+
+(define-signal drag-leave
+  (of-object "GtkDropTargetAsync")
+  (return-type "void")
+  (flags "Run Last")
+  (parameters
+    '("GdkDrop*" "p0")
+  )
+)
+
+(define-property actions
+  (of-object "GtkDropTargetAsync")
   (prop-type "GParamFlags")
   (docs "Actions")
   (readable #t)
@@ -2928,14 +3027,13 @@
   (default-value "0")
 )
 
-(define-property contains
-  (of-object "GtkDropTarget")
-  (prop-type "GParamBoolean")
-  (docs "Contains the current drag")
+(define-property formats
+  (of-object "GtkDropTargetAsync")
+  (prop-type "GParamBoxed")
+  (docs "Formats")
   (readable #t)
-  (writable #f)
+  (writable #t)
   (construct-only #f)
-  (default-value "FALSE")
 )
 
 ;; From GtkEditable
@@ -6979,15 +7077,6 @@
   (flags "Run Last, Action")
 )
 
-(define-property relative-to
-  (of-object "GtkPopover")
-  (prop-type "GParamObject")
-  (docs "Widget the bubble window points to")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 (define-property pointing-to
   (of-object "GtkPopover")
   (prop-type "GParamBoxed")
@@ -9130,10 +9219,10 @@
 
 ;; From GtkSpinner
 
-(define-property active
+(define-property spinning
   (of-object "GtkSpinner")
   (prop-type "GParamBoolean")
-  (docs "Whether the spinner is active")
+  (docs "Whether the spinner is spinning")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -12159,16 +12248,6 @@
   (default-value "0")
 )
 
-(define-property margin
-  (of-object "GtkWidget")
-  (prop-type "GParamInt")
-  (docs "Pixels of extra space on all four sides")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "0")
-)
-
 (define-property hexpand
   (of-object "GtkWidget")
   (prop-type "GParamBoolean")
@@ -12203,16 +12282,6 @@
   (of-object "GtkWidget")
   (prop-type "GParamBoolean")
   (docs "Whether to use the vexpand property")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-  (default-value "FALSE")
-)
-
-(define-property expand
-  (of-object "GtkWidget")
-  (prop-type "GParamBoolean")
-  (docs "Whether widget wants to expand in both directions")
   (readable #t)
   (writable #t)
   (construct-only #f)
