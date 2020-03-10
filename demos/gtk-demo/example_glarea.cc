@@ -71,7 +71,7 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   set_title("GL Area");
   set_default_size(400, 600);
 
-  m_VBox.property_margin() = 12;
+  m_VBox.set_margin(12);
   m_VBox.set_spacing(6);
   add(m_VBox);
 

@@ -55,7 +55,7 @@ Example_Stack::Example_Stack()
 
   // Page 3
   m_stack.get_page(m_spinner)->property_icon_name() = "face-laugh-symbolic";
-  m_spinner.property_active() = true;
+  m_spinner.set_spinning(true);
 
   // Stack transition
   m_stack.set_transition_type(Gtk::StackTransitionType::CROSSFADE);

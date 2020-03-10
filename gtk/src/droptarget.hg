@@ -22,41 +22,35 @@
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/eventcontroller_p.h)
 
-// The underlying C code can be found in gtkdragdest.h,.c
-
 namespace Gtk
 {
 /** Event controller to receive DND drops.
  *
- * %Gtk::DropTarget is an auxiliary object that is used to receive
- * Drag-and-Drop operations.
+ * %Gtk::DropTarget is an event controller implementing a simple way to
+ * receive Drag-and-Drop operations.
  *
- * To use a %Gtk::DropTarget to receive drops on a widget, you create
- * a %Gtk::DropTarget object, configure which data formats and actions
- * you support, connect to its signals, and then attach
- * it to the widget with Gtk::Widget::add_controller().
+ * The most basic way to use a %Gtk::DropTarget to receive drops on a
+ * widget is to create it via create() passing in the
+ * GType of the data you want to receive and connect to signal_drop()
+ * to receive the data.
  *
- * During a drag operation, the first signal that a %Gtk::DropTarget
- * emits is signal_accept(), which is meant to determine
- * whether the target is a possible drop site for the ongoing drag.
- * The default handler for the accept signal accepts the drag
- * if it finds a compatible data format and an action that is supported
- * on both sides.
+ * %Gtk::DropTarget supports more options, such as:
  *
- * If it is, and the widget becomes the current target, you will
- * receive a signal_drag_enter(), followed by
- * signal_drag_motion() signals as the pointer moves, and
- * finally either a signal_drag_leave() when the pointer
- * moves off the widget, or a signal_drag_drop() when a drop happens.
+ *  * rejecting potential drops via signal_accept() and the reject() method
+ *    to let other drop targets handle the drop
+ *  * tracking an ongoing drag operation before the drop via
+ *    signal_enter(), signal_motion() and signal_leave()
+ *  * configuring how to receive data by setting property_preload() and
+ *    listening for its availability via property_value()
  *
- * The signal_drag_enter() and signal_drag_motion() handler can call Gdk::Drop::status()
- * to update the status of the ongoing operation. The signal_drag_drop() handler
- * should initiate the data transfer and finish the operation by calling
- * Gdk::Drop::finish().
+ * However, %Gtk::DropTarget is ultimately modeled in a synchronous way
+ * and only supports data transferred via GType.  
+ * If you want full control over an ongoing drop, the Gtk::DropTargetAsync
+ * object gives you this ability.
  *
- * Between the drag-enter and drag-leave signals the widget is the
- * current drop target, and will receive the Gtk::StateFlags::DROP_ACTIVE
- * state, which can be used to style the widget as a drop target.
+ * While a pointer is dragged over the drop target's widget and the drop
+ * has not been rejected, that widget will receive the
+ * Gtk::StateFlags::DROP_ACTIVE state, which can be used to style the widget.
  *
  * @newin{3,96}
  *
@@ -66,44 +60,73 @@ class DropTarget : public EventController
 {
   _CLASS_GOBJECT(DropTarget, GtkDropTarget, GTK_DROP_TARGET, EventController, GtkEventController)
 
-protected:
-  // Gdk::ContentFormats is an immutable object. It can be declared const
-  // in input parameters. No one can change it.
-  _WRAP_CTOR(DropTarget(const Glib::RefPtr<const Gdk::ContentFormats>& formats, Gdk::DragAction actions), gtk_drop_target_new)
-
 public:
-  _WRAP_CREATE(const Glib::RefPtr<const Gdk::ContentFormats>& formats, Gdk::DragAction actions = static_cast<Gdk::DragAction>(0))
-  static Glib::RefPtr<DropTarget> create(Gdk::DragAction actions = static_cast<Gdk::DragAction>(0));
+  // gtk_drop_target_new() does more than call g_object_new().
+  // GdkDropTarget has no "type" property.
+  _WRAP_METHOD(static Glib::RefPtr<DropTarget> create(GType type, Gdk::DragAction actions), gtk_drop_target_new)
 
-  _WRAP_METHOD(void set_formats(const Glib::RefPtr<const Gdk::ContentFormats>& formats), gtk_drop_target_set_formats)
+  /** Sets the supported Types for this drop target.
+   *
+   * @param types All supported Types that can be dropped.
+   */
+  void set_gtypes(const std::vector<GType>& types);
+  _IGNORE(gtk_drop_target_set_gtypes)
+
+  /** Gets a vector of supported Types. If no type have been set,
+   * an empty vector will be returned.
+   *
+   * @return Vector of types.
+   */
+  std::vector<GType> get_gtypes() const;
+  _IGNORE(gtk_drop_target_get_gtypes)
+
   _WRAP_METHOD(Glib::RefPtr<Gdk::ContentFormats> get_formats(), gtk_drop_target_get_formats, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::ContentFormats> get_formats() const, gtk_drop_target_get_formats, refreturn, constversion)
 
   _WRAP_METHOD(void set_actions(Gdk::DragAction actions), gtk_drop_target_set_actions)
   _WRAP_METHOD(Gdk::DragAction get_actions() const, gtk_drop_target_get_actions)
 
+  _WRAP_METHOD(void set_preload(bool preload = true), gtk_drop_target_set_preload)
+  _WRAP_METHOD(bool get_preload() const, gtk_drop_target_get_preload)
+
   _WRAP_METHOD(Glib::RefPtr<Gdk::Drop> get_drop(), gtk_drop_target_get_drop, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gdk::Drop> get_drop() const, gtk_drop_target_get_drop, refreturn, constversion)
 
-  _WRAP_METHOD(Glib::ustring find_mimetype() const, gtk_drop_target_find_mimetype)
+  _WRAP_METHOD_DOCS_ONLY(gtk_drop_target_get_value)
+  Glib::ValueBase get_value() const;
 
-  _WRAP_METHOD(void deny_drop(const Glib::RefPtr<Gdk::Drop>& drop), gtk_drop_target_deny_drop)
+  _WRAP_METHOD(void reject(), gtk_drop_target_reject)
 
-  _WRAP_PROPERTY("formats", Glib::RefPtr<Gdk::ContentFormats>)
   _WRAP_PROPERTY("actions", Gdk::DragAction)
-  _WRAP_PROPERTY("contains", bool)
+  _WRAP_PROPERTY("drop", Glib::RefPtr<Gdk::Drop>)
+  _WRAP_PROPERTY("formats", Glib::RefPtr<Gdk::ContentFormats>)
+  _WRAP_PROPERTY("preload", bool)
+  _WRAP_PROPERTY("value", GValue*)
 
 #m4 _CONVERSION(`GdkDrop*',`const Glib::RefPtr<Gdk::Drop>&',`Glib::wrap($3, true)')
   // no_default_handler because GtkDropTargetClass is private.
+  // All C signals except "leave" use g_signal_accumulator_first_wins().
   /** Only one signal handler is called. If you connect a handler, it must be
    * called before (instead of) the default handler, otherwise it won't be called.
    * Set the @a after parameter in connect() to <tt>false</tt>.
    */
   _WRAP_SIGNAL(bool accept(const Glib::RefPtr<Gdk::Drop>& drop), "accept", no_default_handler)
-  _WRAP_SIGNAL(void drag_enter(const Glib::RefPtr<Gdk::Drop>& drop), "drag-enter", no_default_handler)
-  _WRAP_SIGNAL(void drag_motion(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag-motion", no_default_handler)
-  _WRAP_SIGNAL(void drag_leave(const Glib::RefPtr<Gdk::Drop>& drop), "drag-leave", no_default_handler)
-  _WRAP_SIGNAL(bool drag_drop(const Glib::RefPtr<Gdk::Drop>& drop, int x, int y), "drag-drop", no_default_handler)
+  /** Only one signal handler is called. If you connect a handler, it must be
+   * called before (instead of) the default handler, otherwise it won't be called.
+   * Set the @a after parameter in connect() to <tt>false</tt>.
+   */
+  _WRAP_SIGNAL(Gdk::DragAction enter(double x, double y), "enter", no_default_handler)
+  /** Only one signal handler is called. If you connect a handler, it must be
+   * called before (instead of) the default handler, otherwise it won't be called.
+   * Set the @a after parameter in connect() to <tt>false</tt>.
+   */
+  _WRAP_SIGNAL(Gdk::DragAction motion(double x, double y), "motion", no_default_handler)
+  _WRAP_SIGNAL(void leave(), "leave", no_default_handler)
+  /** Only one signal handler is called. If you connect a handler, it must be
+   * called before (instead of) the default handler, otherwise it won't be called.
+   * Set the @a after parameter in connect() to <tt>false</tt>.
+   */
+  _WRAP_SIGNAL(bool drop(const Glib::ValueBase& value, double x, double y), "drop", no_default_handler)
 };
 
 } // namespace Gtk

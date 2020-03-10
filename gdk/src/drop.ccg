@@ -29,12 +29,25 @@ namespace Gdk
 
 void Drop::refuse()
 {
-  gdk_drop_status(gobj(), (static_cast<GdkDragAction>(0)) /* see GDK docs */);
+  // see GDK docs
+  gdk_drop_status(gobj(), static_cast<GdkDragAction>(0), static_cast<GdkDragAction>(0));
 }
 
 void Drop::failed()
 {
   gdk_drop_finish(gobj(), (static_cast<GdkDragAction>(0)) /* see GDK docs */);
+}
+
+Glib::ValueBase Drop::read_value_finish(const Glib::RefPtr<Gio::AsyncResult>& result)
+{
+  GError* gerror = nullptr;
+  const GValue* gvalue = gdk_drop_read_value_finish(gobj(), Glib::unwrap(result), &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  Glib::ValueBase retvalue;
+  retvalue.init(gvalue);
+  return retvalue;
 }
 
 } // namespace Gdk

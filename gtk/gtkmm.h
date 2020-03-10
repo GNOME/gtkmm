@@ -137,10 +137,12 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/dragicon.h>
 #include <gtkmm/dragsource.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/dropcontrollermotion.h>
 #include <gtkmm/droptarget.h>
+#include <gtkmm/droptargetasync.h>
 #include <gtkmm/editable.h>
 #include <gtkmm/emojichooser.h>
 #include <gtkmm/entry.h>
