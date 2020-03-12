@@ -4,32 +4,32 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-$(CFG)\$(PLAT)\gendef	\
-$(CFG)\$(PLAT)\gdkmm	\
-$(CFG)\$(PLAT)\gtkmm	\
-$(CFG)\$(PLAT)\gtkmm4-demo	\
-$(CFG)\$(PLAT)\gtkmm4-test-builder	\
-$(CFG)\$(PLAT)\gtkmm4-test-child_widget	\
-$(CFG)\$(PLAT)\gtkmm4-test-child_widget2	\
-$(CFG)\$(PLAT)\gtkmm4-test-child_widget_managed	\
-$(CFG)\$(PLAT)\gtkmm4-test-delete_cpp_child	\
-$(CFG)\$(PLAT)\gtkmm4-test-dialog_deletethis	\
-$(CFG)\$(PLAT)\gtkmm4-test-main_with_options	\
-$(CFG)\$(PLAT)\gtkmm4-test-menu_destruction	\
-$(CFG)\$(PLAT)\gtkmm4-test-object_move	\
-$(CFG)\$(PLAT)\gtkmm4-test-property_notification	\
-$(CFG)\$(PLAT)\gtkmm4-test-refcount_dialog	\
-$(CFG)\$(PLAT)\gtkmm4-test-scrolledwindow	\
-$(CFG)\$(PLAT)\gtkmm4-test-tree_model_iterator	\
-$(CFG)\$(PLAT)\gtkmm4-test-wrap_existing:
+vs$(VSVER)\$(CFG)\$(PLAT)\gendef	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-builder	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget2	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget_managed	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-delete_cpp_child	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-dialog_deletethis	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-main_with_options	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-menu_destruction	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-object_move	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-property_notification	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-refcount_dialog	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-scrolledwindow	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-tree_model_iterator	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-wrap_existing:
 	@-mkdir $@
 
 # Generate .def files
-$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) $(CFG)\$(PLAT)\gdkmm $(CFG)\$(PLAT)\gtkmm $(gdkmm_OBJS) $(gtkmm_OBJS)
-	$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) $(CFG)\$(PLAT)\gdkmm\*.obj $(CFG)\$(PLAT)\gtkmm\*.obj
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm $(gdkmm_OBJS) $(gtkmm_OBJS)
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
 
 # Generate demo GResource source file
-$(CFG)\$(PLAT)\gtkmm4-demo\demo_resources.c:	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\demo_resources.c:	\
 $(gtkmm_demo_example_sources)	\
 $(gtkmm_demo_resources)	\
 ..\demos\gtk-demo\demo.gresource.xml
