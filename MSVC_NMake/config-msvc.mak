@@ -7,6 +7,7 @@
 !message normally c:\VulkanSDK\$$(YOUR_LUNARG_VULKAN_SDK_VER) to the
 !message NMake command line, and retry the build.
 !message
+VULKAN_SDK_DIR=$(VULKAN_SDK)
 !endif
 
 # These are the base minimum libraries required for building gtkmm.
