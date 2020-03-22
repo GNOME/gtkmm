@@ -55,10 +55,12 @@ int main(int /* argc */, char** /* argv */)
             << get_defs( GDK_TYPE_PIXBUF )
             << get_defs( GDK_TYPE_PIXBUF_ANIMATION )
             << get_defs( GDK_TYPE_PIXBUF_LOADER )
+            << get_defs( GDK_TYPE_POPUP )
             << get_defs( GDK_TYPE_RGBA )
             << get_defs( GDK_TYPE_SEAT )
             << get_defs( GDK_TYPE_SURFACE )
             << get_defs( GDK_TYPE_TEXTURE )
+            << get_defs( GDK_TYPE_TOPLEVEL )
             << get_defs( GDK_TYPE_GL_CONTEXT )
             ;
   return 0;
