@@ -31,6 +31,7 @@
 #include <gdkmm/devicewithpad.h>
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
+#include <gdkmm/dragsurface.h>
 #include <gdkmm/drop.h>
 #include <gdkmm/event.h>
 #include <gdkmm/frameclock.h>
@@ -43,12 +44,13 @@
 #include <gdkmm/pixbufanimation.h>
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/pixbufloader.h>
-#include <gdkmm/popuplayout.h>
+#include <gdkmm/popup.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/seat.h>
 #include <gdkmm/snapshot.h>
 #include <gdkmm/surface.h>
 #include <gdkmm/texture.h>
+#include <gdkmm/toplevel.h>
 #include <gdkmm/types.h>
 
 #endif /* _GDKMM_GDKMM_H_ */
