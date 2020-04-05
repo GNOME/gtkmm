@@ -31,10 +31,6 @@ help:
 	@echo DISABLE_DEPRECATED: Set to 1 to not build the deprecated APIs into
 	@echo the final DLLs.
 	@echo.
-	@echo VULKAN_SDK_DIR: Path to the base installation directory of the LunarG
-	@echo Vulkan SDK.  This may be necessary if the gtk+-4.x DLLs are built with
-	@echo Vulkan enabled, so that Vulkan's headers and libraries could be found.
-	@echo.
 	@echo ======
 	@echo A 'clean' target is supported to remove all generated files, intermediate
 	@echo object files and binaries for the specified configuration.
