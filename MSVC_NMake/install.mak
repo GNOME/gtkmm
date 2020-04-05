@@ -7,14 +7,14 @@ install: all
 	@if not exist $(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\private\ @mkdir $(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\private
 	@if not exist $(PREFIX)\lib\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\include\ mkdir $(PREFIX)\lib\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\include
 	@if not exist $(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private\ @mkdir $(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private
-	@if exist $(CFG)\$(PLAT)\gtkmm3-demo.exe copy /b $(CFG)\$(PLAT)\gtkmm3-demo.exe $(PREFIX)\bin
-	@if exist $(CFG)\$(PLAT)\gtkmm3-demo.pdb copy /b $(CFG)\$(PLAT)\gtkmm3-demo.pdb $(PREFIX)\bin
-	@copy /b $(CFG)\$(PLAT)\$(GDKMM_LIBNAME).dll $(PREFIX)\bin
-	@copy /b $(CFG)\$(PLAT)\$(GTKMM_LIBNAME).dll $(PREFIX)\bin
-	@copy /b $(CFG)\$(PLAT)\$(GDKMM_LIBNAME).pdb $(PREFIX)\bin
-	@copy /b $(CFG)\$(PLAT)\$(GTKMM_LIBNAME).pdb $(PREFIX)\bin
-	@copy /b $(CFG)\$(PLAT)\$(GDKMM_LIBNAME).lib $(PREFIX)\lib
-	@copy /b $(CFG)\$(PLAT)\$(GTKMM_LIBNAME).lib $(PREFIX)\lib
+	@if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo.exe copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo.exe $(PREFIX)\bin
+	@if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo.pdb copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo.pdb $(PREFIX)\bin
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GDKMM_LIBNAME).dll $(PREFIX)\bin
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GTKMM_LIBNAME).dll $(PREFIX)\bin
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GDKMM_LIBNAME).pdb $(PREFIX)\bin
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GTKMM_LIBNAME).pdb $(PREFIX)\bin
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GDKMM_LIBNAME).lib $(PREFIX)\lib
+	@copy /b vs$(PDBVER)\$(CFG)\$(PLAT)\$(GTKMM_LIBNAME).lib $(PREFIX)\lib
 	@copy ..\gdk\gdkmm.h "$(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\"
 	@for %h in ($(GDKMM_INT_GENERATED_HEADERS) $(gdkmm_files_extra_h)) do @copy ..\gdk\gdkmm\%h "$(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\%h"
 	@for %h in ($(GDKMM_INT_GENERATED_HEADERS_P)) do @copy ..\gdk\gdkmm\private\%h "$(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\private\%h"

@@ -40,13 +40,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gdkmm_OBJS]
 !endif
 
-!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gdkmm\gdkmm.res]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\gdkmm.res]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -56,13 +56,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_OBJS]
 !endif
 
-!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -72,10 +72,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_demo_OBJS]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm3-demo\%~ns.obj]
+!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\%~ns.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm3-demo\demo_resources.obj]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\demo_resources.obj]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -117,7 +117,7 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_tests]
 !endif
 
-!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^$(CFG)\^$(PLAT)\gtkmm3-test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-test-%d.exe]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
