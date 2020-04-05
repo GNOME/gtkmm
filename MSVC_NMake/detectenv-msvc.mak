@@ -8,7 +8,7 @@
 # in $(GLIB_PREFIX)\lib.
 
 !if "$(PREFIX)" == ""
-PREFIX = ..\..\vs$(VSVER)\$(PLAT)
+PREFIX = ..\..\vs$(PDBVER)\$(PLAT)
 !endif
 
 # Location of the PERL interpreter, for running glib-mkenums.  glib-mkenums
