@@ -19,6 +19,18 @@ DEBUG_SUFFIX = -d
 DEBUG_SUFFIX =
 !endif
 
+!ifndef GMMPROC_DIR
+GMMPROC_DIR=$(PREFIX)\share\glibmm-$(GLIBMM_MAJOR_VERSION).$(GLIBMM_MINOR_VERSION)\proc
+!endif
+
+!ifndef GMMPROC_PANGO_DIR
+GMMPROC_PANGO_DIR=$(GMMPROC_DIR)\..\..\pangomm-$(PANGOMM_MAJOR_VERSION).$(PANGOMM_MINOR_VERSION)\proc\m4
+!endif
+
+!ifndef GMMPROC_ATK_DIR
+GMMPROC_ATK_DIR=$(GMMPROC_DIR)\..\..\atkmm-$(ATKMM_MAJOR_VERSION).$(ATKMM_MINOR_VERSION)\proc\m4
+!endif
+
 # Dependencies
 
 GLIB_API_VERSION = 2.0
@@ -110,11 +122,13 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 
 # CXXFLAGS
 GDKMM_BASE_CFLAGS =		\
+	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
 	/I..\gdk /I.\gdkmm	\
 	/wd4530			\
 	/FImsvc_recommended_pragmas.h
 
 GTKMM_BASE_CFLAGS =		\
+	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
 	/I..\gtk /I.\gtkmm	\
 	/wd4250				\
 	$(GDKMM_BASE_CFLAGS)
@@ -192,26 +206,28 @@ TARGETS = $(TARGETS) $(GTKMM3_DEMO)
 
 GENDEF = vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe
 
-GDKMM_INT_GENERATED_SOURCES = $(gdkmm_files_any_hg:.hg=.cc)
 GDKMM_INT_GENERATED_HEADERS = $(gdkmm_files_any_hg:.hg=.h)
 GDKMM_INT_GENERATED_HEADERS_P = $(gdkmm_files_any_hg:.hg=_p.h)
-GTKMM_INT_GENERATED_SOURCES = $(gtkmm_files_any_hg:.hg=.cc)
 GTKMM_INT_GENERATED_HEADERS = $(gtkmm_files_any_hg:.hg=.h)
 GTKMM_INT_GENERATED_HEADERS_P = $(gtkmm_files_any_hg:.hg=_p.h)
 GTKMM_INT_EXTRA_SOURCES = $(gtkmm_files_extra_any_cc)
 GTKMM_INT_EXTRA_HEADERS_P = $(gtkmm_files_extra_ph:/=\)
 
+GDKMM_HG_FILES = $(gdkmm_files_any_hg)
+GTKMM_HG_FILES = $(gtkmm_files_any_hg)
+
 ENABLED_DEPRECATED = no
 
 !ifndef DISABLE_DEPRECATED
-GDKMM_INT_GENERATED_SOURCES = $(GDKMM_INT_GENERATED_SOURCES) $(gdkmm_files_deprecated_hg:.hg=.cc)
-GTKMM_INT_GENERATED_SOURCES = $(GTKMM_INT_GENERATED_SOURCES) $(gtkmm_files_deprecated_hg:.hg=.cc)
 GTKMM_INT_EXTRA_SOURCES = $(GTKMM_INT_EXTRA_SOURCES) $(gtkmm_files_extra_deprecated_cc)
+
+GDKMM_HG_FILES = $(GDKMM_HG_FILES) $(gdkmm_files_deprecated_hg)
+GTKMM_HG_FILES = $(GTKMM_HG_FILES) $(gtkmm_files_deprecated_hg)
 ENABLED_DEPRECATED = yes
 !endif
 
-GDKMM_INT_GENERATED_SOURCES = $(GDKMM_INT_GENERATED_SOURCES) wrap_init.cc
-GTKMM_INT_GENERATED_SOURCES = $(GTKMM_INT_GENERATED_SOURCES) wrap_init.cc
+GDKMM_INT_GENERATED_SOURCES = $(GDKMM_HG_FILES:.hg=.cc) wrap_init.cc
+GTKMM_INT_GENERATED_SOURCES = $(GTKMM_HG_FILES:.hg=.cc) wrap_init.cc
 
 # Path to glib-compile-resources.exe
 !ifndef GLIB_COMPILE_RESOURCES

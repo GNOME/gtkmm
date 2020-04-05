@@ -6,7 +6,9 @@
 # Create the build directories
 vs$(PDBVER)\$(CFG)\$(PLAT)\gendef	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget	\
@@ -22,7 +24,7 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing:
-	@-mkdir $@
+	@-md $@
 
 # Generate .def files
 vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
@@ -30,6 +32,21 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)
 
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
 	vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+
+# Generate wrap_init.cc files
+vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
+	@if not exist ..\gdk\gdkmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gdk --parent_dir=gdkmm $(gdkmm_real_hg:\=/)>$@
+
+# Avoid the dreaded U1095 command line error... @#$@#!
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
+	@if exist $@ del $@
+	@echo @echo off>gen_$(@B).bat
+	@echo.>>gen_$(@B).bat
+	@echo $(PERL) -- "$(GMMPROC_DIR)\generate_wrap_init.pl" ^^>>gen_$(@B).bat
+	@echo --namespace=Gtk --parent_dir=gtkmm ^^>>gen_$(@B).bat
+	@for %%f in ($(GTKMM_HG_FILES)) do @echo ../gtk/src/%%f ^^>>gen_$(@B).bat
+	@if not exist ..\gtk\gtkmm\wrap_init.cc call gen_$(@B).bat>$@
+	@del gen_$(@B).bat
 
 # Generate demo GResource source file
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c:	\
@@ -63,7 +80,7 @@ gtkmm\gtkmm.rc: pkg-ver.mak
 # You may change GTKMM_DISABLE_DEPRECATED and GTKMM_STATIC_LIB if you know what you are doing
 gdkmm\gdkmmconfig.h: pkg-ver.mak ..\gdk\gdkmmconfig.h.in
 	@echo Generating $@...
-	@if not exist $(@D) mkdir $(@D)
+	@if not exist $(@D) md $(@D)
 	@copy ..\gdk\$(@F).in $@
 	@$(PERL) -pi.bak -e "s/\#undef GDKMM_DISABLE_DEPRECATED/\/\* \#undef GDKMM_DISABLE_DEPRECATED \*\//g" $@
 	@$(PERL) -pi.bak -e "s/\#undef GDKMM_STATIC_LIB/\/\* \#undef GDKMM_STATIC_LIB \*\//g" $@

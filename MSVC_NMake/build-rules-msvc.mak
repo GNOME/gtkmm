@@ -13,18 +13,40 @@
 # 	$(CC)|$(CXX) $(cflags) /Fo$(destdir) /c @<<
 # $<
 # <<
+{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+$<
+<<
+
 {..\gdk\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
 	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
 $<
 <<
 
+{..\gdk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
+	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gdk\gdkmm\$(<B).cc not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
+
 {.\gdkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.res:
 	rc /fo$@ $<
+
+{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+$<
+<<
 
 {..\gtk\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
 	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
 <<
+
+{..\gtk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
+	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gtk\gtkmm\$(<B).cc not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
 
 {.\gtkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
 	rc /fo$@ $<
@@ -128,18 +150,28 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.def
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.res
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.h
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.cc
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.def
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.res
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.cc
+	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
 	@-for /f %d in ('dir /ad /b vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-*') do @rd vs$(PDBVER)\$(CFG)\$(PLAT)\%d
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo
+	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm
+	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
+
+.SUFFIXES: .cc .ccg .h .hg .obj
