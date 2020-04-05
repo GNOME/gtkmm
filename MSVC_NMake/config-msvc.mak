@@ -122,9 +122,10 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 
 # CXXFLAGS
 GDKMM_BASE_CFLAGS =		\
+	/EHsc	\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
 	/I..\gdk /I.\gdkmm	\
-	/wd4530			\
+	/wd4530 /wd4251 /wd4275	\
 	/FImsvc_recommended_pragmas.h
 
 GTKMM_BASE_CFLAGS =		\
