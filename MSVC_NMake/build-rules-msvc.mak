@@ -109,7 +109,9 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: ..\tests\child_widget\m
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: ..\tests\child_widget2\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: ..\tests\child_widget_managed\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: ..\tests\delete_cpp_child\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: ..\tests\dialog\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: ..\tests\dialog_deletethis\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: ..\tests\gdk_rgba\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: ..\tests\main_with_options\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: ..\tests\menu_destruction\main.cc
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: ..\tests\object_move\main.cc
@@ -124,7 +126,9 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe	\

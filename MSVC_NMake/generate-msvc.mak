@@ -15,7 +15,9 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis	\
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move	\
