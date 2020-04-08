@@ -4,28 +4,9 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-vs$(PDBVER)\$(CFG)\$(PLAT)\gendef	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing:
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo:
 	@-md $@
 
 # Generate .def files

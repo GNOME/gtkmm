@@ -24,7 +24,7 @@ $<
 <<
 
 {..\gdk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gdk\gdkmm\$(<B).cc not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
@@ -43,7 +43,7 @@ $<
 <<
 
 {..\gtk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gtk\gtkmm\$(<B).cc not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
@@ -94,7 +94,7 @@ $(gtkmm_OBJS)
 
 # For the gendef tool
 {.\gendef\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\ $(MAKE) -f Makefile.vc CFG=$(CFG) vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
+	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\ md vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
@@ -138,7 +138,7 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe:
 	@if not exist $(GTKMM_LIB) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) $(GTKMM_LIB)
-	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
+	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B) md vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(@D)\$(@B)\ /Fd$(@D)\$(@B)\ $**	\
 	/link  $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
@@ -150,7 +150,7 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.lib
-	@-for /f %d in ('dir /ad /b ..\tests\') do (for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
+	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
@@ -170,7 +170,7 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-for /f %d in ('dir /ad /b ..\tests\') do (for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d
+	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d)
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm
