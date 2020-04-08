@@ -146,7 +146,7 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.lib
-	@-for /f %d in ('dir /ad /b vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-*') do @(for %x in (obj pdb) do @del /f/q vs$(PDBVER)\$(CFG)\$(PLAT)\%d\*.%x)
+	@-for /f %d in ('dir /ad /b ..\tests\') do (for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
@@ -166,7 +166,7 @@ clean:
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.h
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-for /f %d in ('dir /ad /b vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-*') do @rd vs$(PDBVER)\$(CFG)\$(PLAT)\%d
+	@-for /f %d in ('dir /ad /b ..\tests\') do (for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private
 	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm
