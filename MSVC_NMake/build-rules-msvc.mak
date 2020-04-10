@@ -19,12 +19,13 @@ $<
 <<
 
 {..\gdk\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
 	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
 $<
 <<
 
 {..\gdk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gdk\gdkmm\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
@@ -35,20 +36,23 @@ $<
 <<
 
 {..\gtk\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
 	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
 <<
 
 {..\gtk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
-	@if not exist $(@D)\private\ $(MAKE) /f Makefile.vc CFG=$(CFG) $(@D)\private
+	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\gtk\gtkmm\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
 
 {.\gtkmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
+	@if not exist $(@D)\ md $(@D)
 	rc /fo$@ $<
 
 {..\demos\gtk-demo\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
 $<
 <<
@@ -85,7 +89,7 @@ $(gtkmm_OBJS) $(gdkmm_OBJS)
 
 # For the gendef tool
 {.\gendef\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gendef\ $(MAKE) -f Makefile.vc CFG=$(CFG) vs$(VSVER)\$(CFG)\$(PLAT)\gendef
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gendef\ md vs$(VSVER)\$(CFG)\$(PLAT)\gendef
 	$(CXX) $(GTKMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
@@ -125,7 +129,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-scrolledwindow.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-tree_model_iterator.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-wrap_existing.exe:
 	@if not exist $(GTKMM_LIB) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) $(GTKMM_LIB)
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\$(@B) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) vs$(VSVER)\$(CFG)\$(PLAT)\$(@B)
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\$(@B) md vs$(VSVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(@D)\$(@B)\ /Fd$(@D)\$(@B)\ $**	\
 	/link  $(LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
