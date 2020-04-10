@@ -159,7 +159,7 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 GDKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\gdk /I.\gdkmm	\
-	/wd4530 /std:c++17	\
+	/wd4251 /wd4275 /wd4530	/std:c++17	\
 	/FImsvc_recommended_pragmas.h
 
 GTKMM_BASE_CFLAGS =		\
@@ -179,7 +179,6 @@ LIBGTKMM_CFLAGS =	\
 	$(GTKMM_INCLUDES)
 
 GTKMM_DEMO_CFLAGS =	\
-	/wd4275	\
 	$(GTKMM_BASE_CFLAGS)	\
 	$(GTKMM_INCLUDES)
 
