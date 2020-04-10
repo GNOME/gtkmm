@@ -49,6 +49,15 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat footer gtkmm.mak]
 !endif
 
+!if [call create-lists.bat header gtkmm.mak gdkmm_real_hg]
+!endif
+
+!if [for %c in ($(gdkmm_files_any_hg)) do @call create-lists.bat file gtkmm.mak ..\gdk\src\%c]
+!endif
+
+!if [call create-lists.bat footer gtkmm.mak]
+!endif
+
 # For gtkmm
 !if [call create-lists.bat header gtkmm.mak gtkmm_OBJS]
 !endif
@@ -60,6 +69,15 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !endif
 
 !if [@call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
+!endif
+
+!if [call create-lists.bat footer gtkmm.mak]
+!endif
+
+!if [call create-lists.bat header gtkmm.mak gtkmm_real_hg]
+!endif
+
+!if [for %c in ($(gtkmm_files_any_hg)) do @call create-lists.bat file gtkmm.mak ..\gtk\src\%c]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]

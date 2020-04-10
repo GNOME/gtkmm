@@ -6,7 +6,9 @@
 # Create the build directories
 vs$(VSVER)\$(CFG)\$(PLAT)\gendef	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-builder	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget	\
@@ -23,6 +25,21 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-scrolledwindow	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-tree_model_iterator	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-wrap_existing:
 	@-mkdir $@
+
+# Generate wrap_init.cc files
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
+	@if not exist ..\gdk\gdkmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gdk --parent_dir=gdkmm $(gdkmm_real_hg:\=/)>$@
+
+# Avoid the dreaded U1095 command line error... @#$@#!
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
+	@if exist $@ del $@
+	@echo @echo off>gen_$(@B).bat
+	@echo.>>gen_$(@B).bat
+	@echo $(PERL) -- "$(GMMPROC_DIR)\generate_wrap_init.pl" ^^>>gen_$(@B).bat
+	@echo --namespace=Gtk --parent_dir=gtkmm ^^>>gen_$(@B).bat
+	@for %%f in ($(GTKMM_HG_FILES)) do @echo ../gtk/src/%%f ^^>>gen_$(@B).bat
+	@if not exist ..\gtk\gtkmm\wrap_init.cc call gen_$(@B).bat>$@
+	@del gen_$(@B).bat
 
 # Generate .def files
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm $(gdkmm_OBJS) $(gtkmm_OBJS)
