@@ -214,12 +214,9 @@ TARGETS = $(TARGETS) $(GTKMM3_DEMO)
 
 GENDEF = vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe
 
-GDKMM_INT_GENERATED_HEADERS = $(gdkmm_files_any_hg:.hg=.h)
-GDKMM_INT_GENERATED_HEADERS_P = $(gdkmm_files_any_hg:.hg=_p.h)
-GTKMM_INT_GENERATED_HEADERS = $(gtkmm_files_any_hg:.hg=.h)
-GTKMM_INT_GENERATED_HEADERS_P = $(gtkmm_files_any_hg:.hg=_p.h)
 GTKMM_INT_EXTRA_SOURCES = $(gtkmm_files_extra_any_cc)
 GTKMM_INT_EXTRA_HEADERS_P = $(gtkmm_files_extra_ph:/=\)
+GTKMM_INT_EXTRA_HEADERS = $(gtkmm_files_extra_any_h)
 
 GDKMM_HG_FILES = $(gdkmm_files_any_hg)
 GTKMM_HG_FILES = $(gtkmm_files_any_hg)
@@ -228,12 +225,15 @@ ENABLED_DEPRECATED = no
 
 !ifndef DISABLE_DEPRECATED
 GTKMM_INT_EXTRA_SOURCES = $(GTKMM_INT_EXTRA_SOURCES) $(gtkmm_files_extra_deprecated_cc)
-
+GTKMM_INT_EXTRA_HEADERS = $(GTKMM_INT_EXTRA_HEADERS) $(gtkmm_files_extra_deprecated_h)
 GDKMM_HG_FILES = $(GDKMM_HG_FILES) $(gdkmm_files_deprecated_hg)
 GTKMM_HG_FILES = $(GTKMM_HG_FILES) $(gtkmm_files_deprecated_hg)
 ENABLED_DEPRECATED = yes
 !endif
 
+GDKMM_INT_GENERATED_HEADERS = $(GDKMM_HG_FILES:.hg=.h)
+GDKMM_INT_GENERATED_HEADERS_P = $(GDKMM_HG_FILES:.hg=_p.h)
+GTKMM_INT_GENERATED_HEADERS = $(GTKMM_HG_FILES:.hg=.h)
 GDKMM_INT_GENERATED_SOURCES = $(GDKMM_HG_FILES:.hg=.cc) wrap_init.cc
 GTKMM_INT_GENERATED_SOURCES = $(GTKMM_HG_FILES:.hg=.cc) wrap_init.cc
 
