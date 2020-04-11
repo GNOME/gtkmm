@@ -29,7 +29,6 @@ _CONVERSION(`ui_merge_id',`guint',`$3')
 _CONVERSION(`guint',`ui_merge_id',`$3')
 
 # Enums: TODO: It would be nice if gmmproc knew about these automatically.
-_CONV_ENUM(Gtk,AccelFlags)
 _CONV_ENUM(Gtk,Align)
 _CONV_ENUM(Gtk,ArrowType)
 _CONV_INCLASS_ENUM(Gtk,AssistantPage,Type)
@@ -173,12 +172,6 @@ _CONVERSION(`GtkCssProvider*',`Glib::RefPtr<CssProvider>',`Glib::wrap($3)')
 _CONVERSION(`GtkCssSection*',`Glib::RefPtr<CssSection>',`Glib::wrap($3)')
 _CONVERSION(`const CssLocation&',`const GtkCssLocation*',__FR2P)
 _CONVERSION(`const GtkCssLocation*',`CssLocation',`Glib::wrap($3)')
-
-# AccelGroup:
-_CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<AccelGroup>',`Glib::wrap($3)')
-_CONVERSION(`GtkAccelGroup*',`Glib::RefPtr<const AccelGroup>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<AccelGroup>&',`GtkAccelGroup*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`Gtk::Object&',`GObject*', `($3).Glib::Object::gobj()')
 
 _CONVERSION(`GtkAssistantPage*',`Glib::RefPtr<AssistantPage>',`Glib::wrap($3)')
 _CONVERSION(`GtkNotebookPage*',`Glib::RefPtr<NotebookPage>',`Glib::wrap($3)')

@@ -60,7 +60,6 @@ namespace Gtk
 
 _CC_INCLUDE(gtk/gtk.h)
 
-class AccelGroup;
 class Adjustment;
 class Window;
 class Root;
@@ -109,7 +108,7 @@ class Widget
   _IMPLEMENTS_INTERFACE(ConstraintTarget)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
 
-  _IGNORE(gtk_widget_destroy, gtk_widget_destroyed, gtk_widget_list_accel_closures)
+  _IGNORE(gtk_widget_destroy, gtk_widget_destroyed)
   _IGNORE(gtk_widget_paintable_new)
 
 public:
@@ -151,17 +150,6 @@ public:
     gtk_widget_get_layout_manager, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const LayoutManager> get_layout_manager() const,
     gtk_widget_get_layout_manager, refreturn, constversion)
-
-  _WRAP_METHOD(void add_accelerator(const Glib::ustring& accel_signal, const Glib::RefPtr<AccelGroup>& accel_group,
-               guint accel_key, Gdk::ModifierType accel_mods, AccelFlags accel_flags), gtk_widget_add_accelerator)
-
-  _WRAP_METHOD(bool remove_accelerator(const Glib::RefPtr<AccelGroup>& accel_group,
-               guint accel_key, Gdk::ModifierType accel_mods), gtk_widget_remove_accelerator)
-  _WRAP_METHOD(void set_accel_path(const Glib::ustring& accel_path,
-                                   const Glib::RefPtr<AccelGroup>& accel_group),
-               gtk_widget_set_accel_path)
-
-  //GList* gtk_widget_list_accel_closures();
 
   _WRAP_METHOD(bool mnemonic_activate(bool group_cycling), gtk_widget_mnemonic_activate)
 
@@ -411,8 +399,6 @@ public:
   _WRAP_METHOD(Glib::RefPtr<StyleContext> get_style_context(), gtk_widget_get_style_context, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const StyleContext> get_style_context() const, gtk_widget_get_style_context, refreturn, constversion)
 
-  _WRAP_METHOD(Gdk::ModifierType get_modifier_mask(Gdk::ModifierIntent intent), gtk_widget_get_modifier_mask)
-
   /** Callback type for adding a function to update animations. See add_tick_callback().
    *
    * For instance:
@@ -616,14 +602,6 @@ dnl
   _POP()
 #m4end
 
-  // The accel_closures_changed signal can't have a default handler because the wrapped C signal has no default handler.
-  _WRAP_SIGNAL(void accel_closures_changed(), "accel_closures_changed", no_default_handler)
-
-//TODO: The signal_id is very C-like here:
-  //_WRAP_SIGNAL(bool can_activate_accel(guint signal_id), "can_activate_accel")
-
-  _WRAP_SIGNAL(bool popup_menu(), "popup_menu") //Note that popup-menu is a keybinding signal, but is really meant to be wrapped.
-
   _IGNORE_SIGNAL("move-focus")dnl // Action signal
 
   //Keybinding signals:
@@ -641,7 +619,6 @@ dnl
   _WRAP_PROPERTY("sensitive", bool)
   _WRAP_PROPERTY("can_focus", bool)
   _WRAP_PROPERTY("has_focus", bool)
-  _WRAP_PROPERTY("is_focus", bool)
   _WRAP_PROPERTY("can_target", bool)
   _WRAP_PROPERTY("focus_on_click", bool)
   _WRAP_PROPERTY("has_default", bool)

@@ -1,8 +1,4 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /*
- *
  * Copyright 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,7 +17,7 @@
  */
 
 #include <gtkmm/accelkey.h>
-#include <gtkmm/accelgroup.h>
+#include <gtkmm/accelerator.h>
 
 namespace Gtk
 {
@@ -44,7 +40,7 @@ AccelKey::AccelKey(const Glib::ustring& accelerator, const Glib::ustring& accel_
 : path_(accel_path)
 {
   //Get the key and mod by parsing the accelerator string:
-  AccelGroup::parse (accelerator, key_, mod_);
+  Accelerator::parse (accelerator, key_, mod_);
 }
 
 AccelKey::AccelKey(const AccelKey& src)
@@ -85,9 +81,7 @@ bool AccelKey::is_null() const
 
 Glib::ustring AccelKey::get_abbrev() const
 {
-  return AccelGroup::name (key_, mod_);
+  return Accelerator::name(key_, mod_);
 }
 
-
-} // namespace
-
+} // namespace Gtk
