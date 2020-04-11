@@ -1548,6 +1548,29 @@ it has a lower quality than the @GDK_INTERP_BILINEAR filter
 </parameters>
 </enum>
 
+<enum name="GdkKeyMatch">
+<description>
+The possible return values from gdk_key_event_matches()
+describe how well an event matches a given keyval and modifiers.
+
+</description>
+<parameters>
+<parameter name="GDK_KEY_MATCH_NONE">
+<parameter_description> The key event does not match
+</parameter_description>
+</parameter>
+<parameter name="GDK_KEY_MATCH_PARTIAL">
+<parameter_description> The key event matches if keyboard state
+(specifically, the currently active group) is ignored
+</parameter_description>
+</parameter>
+<parameter name="GDK_KEY_MATCH_EXACT">
+<parameter_description> The key event matches
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GdkKeymap::direction-changed">
 <description>
 The ::direction-changed signal gets emitted when the direction
@@ -1652,81 +1675,15 @@ more formats get added, so do not rely on its concrete integer.
 </parameters>
 </enum>
 
-<enum name="GdkModifierIntent">
-<description>
-This enum is used with gdk_keymap_get_modifier_mask()
-in order to determine what modifiers the
-currently used windowing system backend uses for particular
-purposes. For example, on X11/Windows, the Control key is used for
-invoking menu shortcuts (accelerators), whereas on Apple computers
-it’s the Command key (which correspond to %GDK_CONTROL_MASK and
-%GDK_MOD2_MASK, respectively).
-
-</description>
-<parameters>
-<parameter name="GDK_MODIFIER_INTENT_PRIMARY_ACCELERATOR">
-<parameter_description> the primary modifier used to invoke
-menu accelerators.
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_CONTEXT_MENU">
-<parameter_description> the modifier used to invoke context menus.
-Note that mouse button 3 always triggers context menus. When this modifier
-is not 0, it additionally triggers context menus when used with mouse button 1.
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_EXTEND_SELECTION">
-<parameter_description> the modifier used to extend selections
-using `modifier`-click or `modifier`-cursor-key
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_MODIFY_SELECTION">
-<parameter_description> the modifier used to modify selections,
-which in most cases means toggling the clicked item into or out of the selection.
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_NO_TEXT_INPUT">
-<parameter_description> when any of these modifiers is pressed, the
-key event cannot produce a symbol directly. This is meant to be used for
-input methods, and for use cases like typeahead search.
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_SHIFT_GROUP">
-<parameter_description> the modifier that switches between keyboard
-groups (AltGr on X11/Windows and Option/Alt on OS X).
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_INTENT_DEFAULT_MOD_MASK">
-<parameter_description> The set of modifier masks accepted
-as modifiers in accelerators. Needed because Command is mapped to MOD2 on
-OSX, which is widely used, but on X11 MOD2 is NumLock and using that for a
-mod key is problematic at best.
-Ref: https://bugzilla.gnome.org/show_bug.cgi?id=736125.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
 <enum name="GdkModifierType">
 <description>
 A set of bit-flags to indicate the state of modifier keys and mouse buttons
 in various event types. Typical modifier keys are Shift, Control, Meta,
 Super, Hyper, Alt, Compose, Apple, CapsLock or ShiftLock.
 
-Like the X Window System, GDK supports 8 modifier keys and 5 mouse buttons.
-
-GDK recognizes which of the Meta, Super or Hyper keys are mapped
-to Mod2 - Mod5, and indicates this by setting %GDK_SUPER_MASK,
-%GDK_HYPER_MASK or %GDK_META_MASK in the state field of key events.
-
-Note that GDK may add internal values to events which include
-reserved values such as %GDK_MODIFIER_RESERVED_13_MASK.  Your code
-should preserve and ignore them.  You can use %GDK_MODIFIER_MASK to
-remove all reserved values.
-
-Also note that the GDK X backend interprets button press events for button
-4-7 as scroll events, so %GDK_BUTTON4_MASK and %GDK_BUTTON5_MASK will never
-be set.
+Note that GDK may add internal values to events which include values outside
+of this enumeration. Your code should preserve and ignore them.  You can use
+%GDK_MODIFIER_MASK to remove all private values.
 
 </description>
 <parameters>
@@ -1743,30 +1700,10 @@ X server this may either be CapsLock or ShiftLock).
 <parameter_description> the Control key.
 </parameter_description>
 </parameter>
-<parameter name="GDK_MOD1_MASK">
+<parameter name="GDK_ALT_MASK">
 <parameter_description> the fourth modifier key (it depends on the modifier
 mapping of the X server which key is interpreted as this modifier, but
 normally it is the Alt key).
-</parameter_description>
-</parameter>
-<parameter name="GDK_MOD2_MASK">
-<parameter_description> the fifth modifier key (it depends on the modifier
-mapping of the X server which key is interpreted as this modifier).
-</parameter_description>
-</parameter>
-<parameter name="GDK_MOD3_MASK">
-<parameter_description> the sixth modifier key (it depends on the modifier
-mapping of the X server which key is interpreted as this modifier).
-</parameter_description>
-</parameter>
-<parameter name="GDK_MOD4_MASK">
-<parameter_description> the seventh modifier key (it depends on the modifier
-mapping of the X server which key is interpreted as this modifier).
-</parameter_description>
-</parameter>
-<parameter name="GDK_MOD5_MASK">
-<parameter_description> the eighth modifier key (it depends on the modifier
-mapping of the X server which key is interpreted as this modifier).
 </parameter_description>
 </parameter>
 <parameter name="GDK_BUTTON1_MASK">
@@ -1789,58 +1726,6 @@ mapping of the X server which key is interpreted as this modifier).
 <parameter_description> the fifth mouse button.
 </parameter_description>
 </parameter>
-<parameter name="GDK_MODIFIER_RESERVED_13_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_14_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_15_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_16_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_17_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_18_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_19_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_20_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_21_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_22_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_23_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_24_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_25_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
 <parameter name="GDK_SUPER_MASK">
 <parameter_description> the Super modifier
 </parameter_description>
@@ -1851,19 +1736,6 @@ mapping of the X server which key is interpreted as this modifier).
 </parameter>
 <parameter name="GDK_META_MASK">
 <parameter_description> the Meta modifier
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_RESERVED_29_MASK">
-<parameter_description> A reserved bit flag; do not use in your own code
-</parameter_description>
-</parameter>
-<parameter name="GDK_RELEASE_MASK">
-<parameter_description> not used in GDK itself. GTK uses it to differentiate
-between (keyval, modifiers) pairs from key press and release events.
-</parameter_description>
-</parameter>
-<parameter name="GDK_MODIFIER_MASK">
-<parameter_description> a mask covering all modifier types.
 </parameter_description>
 </parameter>
 </parameters>
@@ -6671,6 +6543,89 @@ Sets @display as the default display.
 <return></return>
 </function>
 
+<function name="gdk_display_map_keycode">
+<description>
+Returns the keyvals bound to @keycode. The Nth #GdkKeymapKey
+in @keys is bound to the Nth keyval in @keyvals.
+
+When a keycode is pressed by the user, the keyval from
+this list of entries is selected by considering the effective
+keyboard group and level.
+
+Free the returned arrays with g_free().
+
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="keycode">
+<parameter_description> a keycode
+</parameter_description>
+</parameter>
+<parameter name="keys">
+<parameter_description> return
+location for array of #GdkKeymapKey, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="keyvals">
+<parameter_description> return
+location for array of keyvals, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="n_entries">
+<parameter_description> length of @keys and @keyvals
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there were any entries
+</return>
+</function>
+
+<function name="gdk_display_map_keyval">
+<description>
+Obtains a list of keycode/group/level combinations that will
+generate @keyval. Groups and levels are two kinds of keyboard mode;
+in general, the level determines whether the top or bottom symbol
+on a key is used, and the group determines whether the left or
+right symbol is used.
+
+On US keyboards, the shift key changes the keyboard level, and there
+are no groups. A group switch key might convert a keyboard between
+Hebrew to English modes, for example.
+
+#GdkEventKey contains a %group field that indicates the active
+keyboard group. The level is computed from the modifier mask.
+
+The returned array should be freed with g_free().
+
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a #GdkDisplay
+</parameter_description>
+</parameter>
+<parameter name="keyval">
+<parameter_description> a keyval, such as %GDK_KEY_a, %GDK_KEY_Up, %GDK_KEY_Return, etc.
+</parameter_description>
+</parameter>
+<parameter name="keys">
+<parameter_description> return location
+for an array of #GdkKeymapKey
+</parameter_description>
+</parameter>
+<parameter name="n_keys">
+<parameter_description> return location for number of elements in returned array
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if keys were found and returned
+</return>
+</function>
+
 <function name="gdk_display_notify_startup_complete">
 <description>
 Indicates to the GUI environment that the application has
@@ -7827,10 +7782,7 @@ Increase the ref count of @event.
 <description>
 This function returns whether a #GdkEventButton should trigger a
 context menu, according to platform conventions. The right mouse
-button always triggers context menus. Additionally, if
-gdk_keymap_get_modifier_mask() returns a non-0 mask for
-%GDK_MODIFIER_INTENT_CONTEXT_MENU, then the left mouse button will
-also trigger a context menu if this modifier is pressed.
+button always triggers context menus.
 
 This function should always be used instead of simply checking for
 event-&gt;button == %GDK_BUTTON_SECONDARY.
@@ -8757,9 +8709,9 @@ or %NULL if the string wasn't a valid mime type
 </return>
 </function>
 
-<function name="gdk_key_event_get_group">
+<function name="gdk_key_event_get_consumed_modifiers">
 <description>
-Extracts the group from a key event.
+Extracts the consumed modifiers from a key event.
 
 
 </description>
@@ -8769,7 +8721,7 @@ Extracts the group from a key event.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the group of @event
+<return> the consumed modifiers or @event
 </return>
 </function>
 
@@ -8805,9 +8757,9 @@ Extracts the keyval from a key event.
 </return>
 </function>
 
-<function name="gdk_key_event_get_scancode">
+<function name="gdk_key_event_get_layout">
 <description>
-Extracts the scancode from a key event.
+Extracts the layout from a key event.
 
 
 </description>
@@ -8817,7 +8769,48 @@ Extracts the scancode from a key event.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the scancode of @event
+<return> the layout of @event
+</return>
+</function>
+
+<function name="gdk_key_event_get_level">
+<description>
+Extracts the shift level from a key event.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a key event
+</parameter_description>
+</parameter>
+</parameters>
+<return> the shift level of @event
+</return>
+</function>
+
+<function name="gdk_key_event_get_match">
+<description>
+Gets a keyval and modifier combination that will cause
+gdk_event_match() to successfully match the given event.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a key #GdkEvent
+</parameter_description>
+</parameter>
+<parameter name="keyval">
+<parameter_description> return location for a keyval
+</parameter_description>
+</parameter>
+<parameter name="modifiers">
+<parameter_description> return location for modifiers
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success
 </return>
 </function>
 
@@ -8837,31 +8830,32 @@ Extracts whether the key event is for a modifier key.
 </return>
 </function>
 
-<function name="gdk_keymap_add_virtual_modifiers">
+<function name="gdk_key_event_matches">
 <description>
-Maps the non-virtual modifiers (i.e Mod2, Mod3, ...) which are set
-in @state to the virtual modifiers (i.e. Super, Hyper and Meta) and
-set the corresponding bits in @state.
+Matches a key event against a keyboard shortcut that is specified
+as a keyval and modifiers. Partial matches are possible where the
+combination matches if the currently active group is ignored.
 
-GDK already does this before delivering key events, but for
-compatibility reasons, it only sets the first virtual modifier
-it finds, whereas this function sets all matching virtual modifiers.
+Note that we ignore Caps Lock for matching.
 
-This function is useful when matching key events against
-accelerators.
 
 </description>
 <parameters>
-<parameter name="keymap">
-<parameter_description> a #GdkKeymap
+<parameter name="event">
+<parameter_description> a key #GdkEvent
 </parameter_description>
 </parameter>
-<parameter name="state">
-<parameter_description> pointer to the modifier mask to change
+<parameter name="keyval">
+<parameter_description> the keyval to match
+</parameter_description>
+</parameter>
+<parameter name="modifiers">
+<parameter_description> the modifiers to match
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a GdkKeyMatch value describing whether @event matches
+</return>
 </function>
 
 <function name="gdk_keymap_get_caps_lock_state">
@@ -8994,34 +8988,6 @@ for an array of #GdkKeymapKey
 </return>
 </function>
 
-<function name="gdk_keymap_get_modifier_mask">
-<description>
-Returns the modifier mask the @keymap’s windowing system backend
-uses for a particular purpose.
-
-Note that this function always returns real hardware modifiers, not
-virtual ones (e.g. it will return #GDK_MOD1_MASK rather than
-#GDK_META_MASK if the backend maps MOD1 to META), so there are use
-cases where the return value of this function has to be transformed
-by gdk_keymap_add_virtual_modifiers() in order to contain the
-expected result.
-
-
-</description>
-<parameters>
-<parameter name="keymap">
-<parameter_description> a #GdkKeymap
-</parameter_description>
-</parameter>
-<parameter name="intent">
-<parameter_description> the use case for the modifier mask
-</parameter_description>
-</parameter>
-</parameters>
-<return> the modifier mask used for @intent.
-</return>
-</function>
-
 <function name="gdk_keymap_get_modifier_state">
 <description>
 Returns the current modifier state.
@@ -9111,34 +9077,6 @@ the same as the current keyboard state.
 </return>
 </function>
 
-<function name="gdk_keymap_map_virtual_modifiers">
-<description>
-Maps the virtual modifiers (i.e. Super, Hyper and Meta) which
-are set in @state to their non-virtual counterparts (i.e. Mod2,
-Mod3,...) and set the corresponding bits in @state.
-
-This function is useful when matching key events against
-accelerators.
-
-
-</description>
-<parameters>
-<parameter name="keymap">
-<parameter_description> a #GdkKeymap
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description> pointer to the modifier state to map
-</parameter_description>
-</parameter>
-</parameters>
-<return> %FALSE if two virtual modifiers were mapped to the
-same non-virtual modifier. Note that %FALSE is also returned
-if a virtual modifier is mapped to a non-virtual modifier that
-was already set in @state.
-</return>
-</function>
-
 <function name="gdk_keymap_translate_keyboard_state">
 <description>
 Translates the contents of a #GdkEventKey into a keyval, effective
@@ -9159,7 +9097,7 @@ the `plus` symbol is shifted, so when comparing a key press to a
 
 |[&lt;!-- language=&quot;C&quot; --&gt;
 // We want to ignore irrelevant modifiers like ScrollLock
-#define ALL_ACCELS_MASK (GDK_CONTROL_MASK | GDK_SHIFT_MASK | GDK_MOD1_MASK)
+#define ALL_ACCELS_MASK (GDK_CONTROL_MASK | GDK_SHIFT_MASK | GDK_ALT_MASK)
 state = gdk_event_get_modifier_state (event);
 gdk_keymap_translate_keyboard_state (keymap,
 gdk_key_event_get_keycode (event),
@@ -16152,6 +16090,45 @@ from the #GdkSurfaceState enumeration.
 </return>
 </function>
 
+<function name="gdk_toplevel_inhibit_system_shortcuts">
+<description>
+Requests that the @toplevel inhibit the system shortcuts, asking the
+desktop environment/windowing system to let all keyboard events reach
+the surface, as long as it is focused, instead of triggering system
+actions.
+
+If granted, the rerouting remains active until the default shortcuts
+processing is restored with gdk_toplevel_restore_system_shortcuts(),
+or the request is revoked by the desktop enviroment, windowing system
+or the user.
+
+A typical use case for this API is remote desktop or virtual machine
+viewers which need to inhibit the default system keyboard shortcuts
+so that the remote session or virtual host gets those instead of the
+local environment.
+
+The windowing system or desktop environment may ask the user to grant
+or deny the request or even choose to ignore the request entirely.
+
+The caller can be notified whenever the request is granted or revoked
+by listening to the GdkToplevel::shortcuts-inhibited property.
+
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> the #GdkToplevel requesting system keyboard shortcuts
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> the #GdkEvent that is triggering the inhibit
+request, or %NULL if none is available.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_toplevel_layout_copy">
 <description>
 Create a new #GdkToplevelLayout and copy the contents of @layout into it.
@@ -16469,6 +16446,21 @@ Presenting may fail.
 </parameters>
 <return> %FALSE if @toplevel failed to be presented, otherwise %TRUE.
 </return>
+</function>
+
+<function name="gdk_toplevel_restore_system_shortcuts">
+<description>
+Restore default system keyboard shortcuts which were previously
+requested to be inhibited by gdk_toplevel_inhibit_system_shortcuts().
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> a #GdkToplevel
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_toplevel_set_decorated">
