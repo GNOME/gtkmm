@@ -30,7 +30,7 @@ namespace Gtk
  *
  * @newin{3,16}
  */
-class StylePropertyBase
+class GTKMM_API StylePropertyBase
 {
 public:
 

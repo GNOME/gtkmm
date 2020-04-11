@@ -33,10 +33,10 @@ extern "C"
 namespace Gtk
 {
 
-class RadioButton;
-class RadioMenuItem;
-class RadioAction; //deprecated
-class RadioToolButton;
+class GTKMM_API RadioButton;
+class GTKMM_API RadioMenuItem;
+class GTKMM_API RadioAction; //deprecated
+class GTKMM_API RadioToolButton;
 
 /** RadioButtonGroup, identifier for RadioButtons.
  * To set up this RadioButtonGroup, construct a RadioButtonGroup and then pass it
@@ -44,7 +44,7 @@ class RadioToolButton;
  * to keep the RadioButtonGroup beyond the initial construction.
  * It should not be instantiated with new, and it will be invalid after the RadioButtons have been deleted.
  */
-class RadioButtonGroup
+class GTKMM_API RadioButtonGroup
 {
 public:
   RadioButtonGroup();

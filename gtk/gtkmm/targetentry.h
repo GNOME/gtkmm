@@ -38,7 +38,7 @@ extern "C"
 namespace Gtk
 {
 
-class TargetEntry
+class GTKMM_API TargetEntry
 {
 public:
   TargetEntry();

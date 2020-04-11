@@ -34,7 +34,7 @@ namespace Gtk
  * or try to free the underlying instance in its destructor.
  * So far it's only used by gtkmm internally.
  */
-class SelectionData_WithoutOwnership : public SelectionData
+class GTKMM_API SelectionData_WithoutOwnership : public SelectionData
 {
 public:
   explicit SelectionData_WithoutOwnership(GtkSelectionData* gobject);

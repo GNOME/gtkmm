@@ -38,7 +38,7 @@ namespace Gtk
  *
  * @newin{2,10}
  */
-class ListViewText : public Gtk::TreeView
+class GTKMM_API ListViewText : public Gtk::TreeView
 {
 public:
 
