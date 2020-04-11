@@ -72,14 +72,14 @@ $(GTKMM_LIB): $(GTKMM_DLL)
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
-$(GDKMM_DLL): vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def $(gdkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_DEP_LIBS) /implib:$(GDKMM_LIB) /def:vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def -out:$@ @<<
+$(GDKMM_DLL): $(GDKMM_INT_TARGET) $(gdkmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_DEP_LIBS) /implib:$(GDKMM_LIB) $(GDKMM_DEF_LDFLAG) -out:$@ @<<
 $(gdkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
-$(GTKMM_DLL): $(GDKMM_LIB) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def $(gtkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_LIB) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) /def:vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def -out:$@ @<<
+$(GTKMM_DLL): $(GDKMM_LIB) $(GTKMM_INT_TARGET) $(gtkmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GDKMM_LIB) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) $(GTKMM_DEF_LDFLAG) -out:$@ @<<
 $(gtkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
