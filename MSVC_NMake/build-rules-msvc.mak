@@ -104,22 +104,22 @@ $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe: ..\tests\builder\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: ..\tests\child_widget\main.cc ..\tests\child_widget\testwindow.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: ..\tests\child_widget2\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: ..\tests\child_widget_managed\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: ..\tests\delete_cpp_child\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: ..\tests\dialog\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: ..\tests\dialog_deletethis\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: ..\tests\gdk_rgba\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: ..\tests\main_with_options\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: ..\tests\menu_destruction\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: ..\tests\object_move\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe: ..\tests\property_notification\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe: ..\tests\refcount_dialog\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe: ..\tests\scrolledwindow\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe: ..\tests\tree_model_iterator\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe: ..\tests\wrap_existing\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe: $(GTKMM_LIB) ..\tests\builder\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: $(GTKMM_LIB) ..\tests\child_widget\main.cc ..\tests\child_widget\testwindow.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: $(GTKMM_LIB) ..\tests\child_widget2\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: $(GTKMM_LIB) ..\tests\child_widget_managed\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: $(GTKMM_LIB) ..\tests\delete_cpp_child\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: $(GTKMM_LIB) ..\tests\dialog\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: $(GTKMM_LIB) ..\tests\dialog_deletethis\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: $(GTKMM_LIB) ..\tests\gdk_rgba\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: $(GTKMM_LIB) ..\tests\main_with_options\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: $(GTKMM_LIB) ..\tests\menu_destruction\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: $(GTKMM_LIB) ..\tests\object_move\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe: $(GTKMM_LIB) ..\tests\property_notification\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe: $(GTKMM_LIB) ..\tests\refcount_dialog\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe: $(GTKMM_LIB) ..\tests\scrolledwindow\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe: $(GTKMM_LIB) ..\tests\tree_model_iterator\main.cc
+vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe: $(GTKMM_LIB) ..\tests\wrap_existing\main.cc
 
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe	\
@@ -137,10 +137,9 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe	\
 vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe:
-	@if not exist $(GTKMM_LIB) $(MAKE) /f Makefile.vc $(SAVED_OPTIONS) $(GTKMM_LIB)
 	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B) md vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(@D)\$(@B)\ /Fd$(@D)\$(@B)\ $**	\
-	/link  $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
+	/link  $(LDFLAGS) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 clean:
