@@ -2416,6 +2416,24 @@ of physical pixels on an output device are laid out.
 </parameters>
 </enum>
 
+<signal name="GdkSurface::enter-montor">
+<description>
+Emitted when @surface starts being present on the monitor.
+
+</description>
+<parameters>
+<parameter name="surface">
+<parameter_description> the #GdkSurface
+</parameter_description>
+</parameter>
+<parameter name="monitor">
+<parameter_description> the monitor
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GdkSurface::event">
 <description>
 Emitted when GDK receives an input event for @surface.
@@ -2434,6 +2452,24 @@ Emitted when GDK receives an input event for @surface.
 </parameters>
 <return> %TRUE to indicate that the event has been handled
 </return>
+</signal>
+
+<signal name="GdkSurface::leave-montor">
+<description>
+Emitted when @surface stops being present on the monitor.
+
+</description>
+<parameters>
+<parameter name="surface">
+<parameter_description> the #GdkSurface
+</parameter_description>
+</parameter>
+<parameter name="monitor">
+<parameter_description> the monitor
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </signal>
 
 <signal name="GdkSurface::popup-layout-changed">
@@ -2476,6 +2512,9 @@ Emitted when part of the surface needs to be redrawn.
 <signal name="GdkSurface::size-changed">
 <description>
 Emitted when the size of @surface is changed.
+
+Surface size is reported in ”application pixels”, not
+”device pixels” (see gdk_surface_get_scale_factor()).
 
 </description>
 <parameters>
@@ -2547,60 +2586,6 @@ Determines a surface edge or corner.
 </parameter>
 <parameter name="GDK_SURFACE_EDGE_SOUTH_EAST">
 <parameter_description> the lower right corner.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
-<enum name="GdkSurfaceHints">
-<description>
-Used to indicate which fields of a #GdkGeometry struct should be paid
-attention to. Also, the presence/absence of @GDK_HINT_POS,
-@GDK_HINT_USER_POS, and @GDK_HINT_USER_SIZE is significant, though they don't
-directly refer to #GdkGeometry fields. @GDK_HINT_USER_POS will be set
-automatically by #GtkWindow if you call gtk_window_move().
-@GDK_HINT_USER_POS and @GDK_HINT_USER_SIZE should be set if the user
-specified a size/position using a --geometry command-line argument;
-gtk_window_parse_geometry() automatically sets these flags.
-
-</description>
-<parameters>
-<parameter name="GDK_HINT_POS">
-<parameter_description> indicates that the program has positioned the surface
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_MIN_SIZE">
-<parameter_description> min size fields are set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_MAX_SIZE">
-<parameter_description> max size fields are set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_BASE_SIZE">
-<parameter_description> base size fields are set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_ASPECT">
-<parameter_description> aspect ratio fields are set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_RESIZE_INC">
-<parameter_description> resize increment fields are set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_WIN_GRAVITY">
-<parameter_description> surface gravity field is set
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_USER_POS">
-<parameter_description> indicates that the surface’s position was explicitly set
-by the user
-</parameter_description>
-</parameter>
-<parameter name="GDK_HINT_USER_SIZE">
-<parameter_description> indicates that the surface’s size was explicitly set by
-the user
 </parameter_description>
 </parameter>
 </parameters>
@@ -5065,6 +5050,22 @@ Extracts the notify detail from a crossing event.
 </return>
 </function>
 
+<function name="gdk_crossing_event_get_focus">
+<description>
+Checks if the @event surface is the focus surface.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a crossing event
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the surface is the focus surface
+</return>
+</function>
+
 <function name="gdk_crossing_event_get_mode">
 <description>
 Extracts the crossing mode from a crossing event.
@@ -6763,6 +6764,22 @@ handled synchronously, this function will do nothing.
 <return></return>
 </function>
 
+<function name="gdk_dnd_event_get_drop">
+<description>
+Gets the #GdkDrop from a DND event.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a DND event
+</parameter_description>
+</parameter>
+</parameters>
+<return> the drop
+</return>
+</function>
+
 <function name="gdk_drag_action_is_unique">
 <description>
 Checks if @action represents a single action or if it
@@ -6857,22 +6874,6 @@ all subsequent calls will be ignored.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gdk_drag_event_get_drop">
-<description>
-Gets the #GdkDrop from a DND event.
-
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a DND event
-</parameter_description>
-</parameter>
-</parameters>
-<return> the drop
-</return>
 </function>
 
 <function name="gdk_drag_get_actions">
@@ -7556,7 +7557,7 @@ Returns the device of an event.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GdkDevice, or %NULL.
+<return> a #GdkDevice.
 </return>
 </function>
 
@@ -7645,24 +7646,6 @@ Returns the modifier state field of an event.
 </parameter>
 </parameters>
 <return> the modifier state of @event
-</return>
-</function>
-
-<function name="gdk_event_get_motion_history">
-<description>
-Retrieves the history of the @event motion, as a list of time and
-coordinates.
-
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent of type %GDK_MOTION_NOTIFY
-</parameter_description>
-</parameter>
-</parameters>
-<return> a list
-of time and coordinates
 </return>
 </function>
 
@@ -8689,6 +8672,22 @@ Extracts the grab surface from a grab broken event.
 </return>
 </function>
 
+<function name="gdk_grab_broken_event_get_implicit">
+<description>
+Checks whether the grab broken event is for an implicit grab.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a grab broken event
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the an implicit grab was broken
+</return>
+</function>
+
 <function name="gdk_intern_mime_type">
 <description>
 Canonicalizes the given mime type and interns the result.
@@ -9585,7 +9584,25 @@ physical monitor is unplugged or removed.
 </return>
 </function>
 
-<function name="gdk_pad_axis_event_get_value">
+<function name="gdk_motion_event_get_history">
+<description>
+Retrieves the history of the @event motion, as a list of time and
+coordinates.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a motion #GdkEvent
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list
+of time and coordinates
+</return>
+</function>
+
+<function name="gdk_pad_event_get_axis_value">
 <description>
 Extracts the information from a pad strip or ring event.
 
@@ -9607,7 +9624,7 @@ Extracts the information from a pad strip or ring event.
 <return></return>
 </function>
 
-<function name="gdk_pad_button_event_get_button">
+<function name="gdk_pad_event_get_button">
 <description>
 Extracts information about the pressed button from
 a pad event.
@@ -15372,9 +15389,8 @@ surface.
 <description>
 Returns the height of the given @surface.
 
-On the X11 platform the returned size is the size reported in the
-most-recently-processed configure event, rather than the current
-size on the X server.
+Surface size is reported in ”application pixels”, not
+”device pixels” (see gdk_surface_get_scale_factor()).
 
 
 </description>
@@ -15453,9 +15469,8 @@ devices.
 <description>
 Returns the width of the given @surface.
 
-On the X11 platform the returned size is the size reported in the
-most-recently-processed configure event, rather than the current
-size on the X server.
+Surface size is reported in ”application pixels”, not
+”device pixels” (see gdk_surface_get_scale_factor()).
 
 
 </description>
@@ -16273,6 +16288,9 @@ Create a toplevel layout description.
 Used together with gdk_toplevel_present() to describe
 how a toplevel surface should be placed and behave on-screen.
 
+The size is in ”application pixels”, not
+”device pixels” (see gdk_surface_get_scale_factor()).
+
 
 </description>
 <parameters>
@@ -16728,7 +16746,7 @@ Extracts the number of fingers from a touchpad event.
 </return>
 </function>
 
-<function name="gdk_touchpad_pinch_event_get_angle_delta">
+<function name="gdk_touchpad_event_get_pinch_angle_delta">
 <description>
 Extracts the angle delta from a touchpad pinch event.
 
@@ -16744,7 +16762,7 @@ Extracts the angle delta from a touchpad pinch event.
 </return>
 </function>
 
-<function name="gdk_touchpad_pinch_event_get_scale">
+<function name="gdk_touchpad_event_get_pinch_scale">
 <description>
 Extracts the scale from a touchpad pinch event.
 
