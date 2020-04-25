@@ -61,18 +61,15 @@ Example_Panes::Example_Panes()
 
   Gtk::Frame *const pFrame1 = new Gtk::Frame();
   pHPaned->add1(*Gtk::manage(pFrame1));
-  pFrame1->set_shadow_type(Gtk::ShadowType::IN);
   pFrame1->set_size_request(60, 60);
   pFrame1->add(*Gtk::make_managed<Gtk::Button>("_Hi there", true));
 
   Gtk::Frame *const pFrame2 = new Gtk::Frame();
   pHPaned->add2(*Gtk::manage(pFrame2));
-  pFrame2->set_shadow_type(Gtk::ShadowType::IN);
   pFrame2->set_size_request(80, 60);
 
   Gtk::Frame *const pFrame3 = new Gtk::Frame();
   pVPaned->add2(*Gtk::manage(pFrame3));
-  pFrame3->set_shadow_type(Gtk::ShadowType::IN);
   pFrame3->set_size_request(60, 80);
 
   // Now create check buttons to control sizing
@@ -82,7 +79,6 @@ Example_Panes::Example_Panes()
 
 Example_Panes::~Example_Panes()
 {}
-
 
 PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
                          const Glib::ustring& label1, const Glib::ustring& label2)

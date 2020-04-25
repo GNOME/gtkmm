@@ -29,7 +29,7 @@ using std::strlen;
 TextWidget::TextWidget(bool is_source)
 {
   set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  set_shadow_type (Gtk::ShadowType::IN);
+  set_has_frame(true);
 
   m_refTextBuffer = Gtk::TextBuffer::create();
   m_TextView.set_buffer(m_refTextBuffer);

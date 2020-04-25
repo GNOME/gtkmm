@@ -105,7 +105,7 @@ Example_AppWindow::Example_AppWindow()
 
 
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::IN);
+  m_ScrolledWindow.set_has_frame(true);
   //                              left  top  width  height
   m_Grid.attach(m_ScrolledWindow, 0,    2,   1,     1);
 

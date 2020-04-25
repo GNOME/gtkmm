@@ -88,7 +88,7 @@ Example_IconView::Example_IconView()
   m_ButtonHome.set_sensitive();
   m_Toolbar.add(m_ButtonHome);
 
-  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
+  m_ScrolledWindow.set_has_frame(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_expand();
 

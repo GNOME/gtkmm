@@ -109,7 +109,7 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
   add(m_VBox);
   m_VBox.add(m_Label);
 
-  m_ScrolledWindow.set_shadow_type(Gtk::ShadowType::ETCHED_IN);
+  m_ScrolledWindow.set_has_frame(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_expand();
   m_VBox.add(m_ScrolledWindow);

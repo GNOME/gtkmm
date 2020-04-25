@@ -83,7 +83,6 @@ Example_Images::Example_Images()
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
   pVBox->add(m_Label_Image);
 
-  m_Frame_Image.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Image.set_halign(Gtk::Align::CENTER);
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
   pVBox->add(m_Frame_Image);
@@ -98,7 +97,6 @@ Example_Images::Example_Images()
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
   pVBox->add(m_Label_Animation);
 
-  m_Frame_Animation.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
   pVBox->add(m_Frame_Animation);
@@ -112,7 +110,6 @@ Example_Images::Example_Images()
   m_Label_ThemedIcon.set_markup("<u>Symbolic themed icon</u>");
   pVBox->add(m_Label_ThemedIcon);
 
-  m_Frame_ThemedIcon.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_ThemedIcon.set_halign(Gtk::Align::CENTER);
   m_Frame_ThemedIcon.set_valign(Gtk::Align::CENTER);
   pVBox->add(m_Frame_ThemedIcon);
@@ -130,7 +127,6 @@ Example_Images::Example_Images()
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
   pVBox->add(m_Label_Progressive);
 
-  m_Frame_Progressive.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Progressive.set_halign(Gtk::Align::CENTER);
   m_Frame_Progressive.set_valign(Gtk::Align::CENTER);
   pVBox->add(m_Frame_Progressive);
@@ -147,7 +143,6 @@ Example_Images::Example_Images()
   m_Label_Video.set_markup("<u>Displaying video</u>");
   pVBox->add(m_Label_Video);
 
-  m_Frame_Video.set_shadow_type(Gtk::ShadowType::IN);
   m_Frame_Video.set_halign(Gtk::Align::CENTER);
   m_Frame_Video.set_valign(Gtk::Align::CENTER);
   pVBox->add(m_Frame_Video);
