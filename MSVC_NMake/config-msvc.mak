@@ -148,6 +148,12 @@ GTKMM_DEMO_CFLAGS =	\
 	$(GTKMM_BASE_CFLAGS)	\
 	$(GTKMM_INCLUDES)
 
+# With /EHsc, gtkmm3-demo fails on VS 2015 32 bit
+# with an internal compiler error...
+!if "$(VSVER)" == "14" && "$(PLAT)" == "Win32"
+GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/EHsc=)
+!endif
+
 # We build gdkmm-vc$(PDBVER)0-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll or
 #          gdkmm-vc$(PDBVER)0-d-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll at least
 #          gtkmm-vc$(PDBVER)0-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll or
