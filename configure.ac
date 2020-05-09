@@ -78,6 +78,9 @@ AM_CONDITIONAL([GDK_TARGET_X11], [test "x$gdk_target_x11" = xyes])
 AM_CONDITIONAL([GDK_TARGET_BROADWAY], [test "x$gdk_target_broadway" = xyes])
 AM_CONDITIONAL([GDK_TARGET_WAYLAND], [test "x$gdk_target_wayland" = xyes])
 
+AS_IF([test "x$gdk_target_x11" = xyes],
+  [AC_DEFINE([GDKMM_X11_BACKEND_ENABLED], [1], [Define when building X11 API])])
+
 if test "x$gdk_target_win32" = xyes ; then
    AC_MSG_CHECKING([for native Windows host])
    AS_CASE([$host_os], [mingw*], [gtkmm_host_windows=yes], [gtkmm_host_windows=no])
