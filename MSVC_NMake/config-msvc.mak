@@ -125,7 +125,7 @@ GDKMM_BASE_CFLAGS =		\
 	/EHsc	\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
 	/I..\gdk /I.\gdkmm	\
-	/wd4530 /wd4251 /wd4275	\
+	/wd4530 /wd4251 /wd4273 /wd4275	\
 	/FImsvc_recommended_pragmas.h
 
 !if $(PDBVER) >= 14
