@@ -124,8 +124,8 @@ epoxy_dep = dependency('epoxy', version: epoxy_req, required: build_demos)
 # so check for them manually
 glibmm_req_minor_ver = '4'
 
-glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req, required: not is_msvc)
-giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req, required: not is_msvc)
+glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
+giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 
 # Where to find gmmproc and generate_wrap_init.pl.
 if glibmm_dep.found() and glibmm_dep.type_name() == 'pkgconfig'
@@ -155,99 +155,32 @@ else
   endif
 endif
 
-if is_msvc
-  # We must have Visual Studio 2013 or later...
-  assert(cpp_compiler.version().split('.')[0].to_int() >= 18, 'Visual Studio 2013 or later is required')
+gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
+gdkmm_requires = [
+  'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
+  'gtk+-3.0', gtk_req,
+  'cairomm-1.0', cairomm_req,
+  'pangomm-1.4', cairomm_req,
+  'gdk-pixbuf-2.0', gdk_pixbuf_req,
+]
 
-  sigc_major_ver = '2'
+gtkmm_build_dep = gdkmm_build_dep
+gtkmm_requires = gdkmm_requires
 
-  if not glibmm_dep.found()
-    assert(cpp_compiler.has_header('sigc++-@0@.0/sigc++/sigc++.h'.format(sigc_major_ver)) and cpp_compiler.has_header('sigc++-@0@.0/include/sigc++config.h'.format(sigc_major_ver)),
-           'sigc++-@0@.x headers are required'.format(sigc_major_ver))
-    assert(cpp_compiler.has_header('glibmm-2.@0@/glibmm.h'.format(glibmm_req_minor_ver)) and cpp_compiler.has_header('glibmm-2.@0@/include/glibmmconfig.h'.format(glibmm_req_minor_ver)),
-           'glibmm-2.@0@ headers are required'.format(glibmm_req_minor_ver))
-
-  else
-    sigc_dep = dependency('', required: false) # glibmm covers for libsigc++ in its pkg-config file
-  endif
-  message('Ensure your INCLUDE and LIB contain the paths that lead to the appropriate headers and .lib\'s for glibmm-2.@0@ and libsigc++-2.x'.format(glibmm_req_minor_ver))
-
-  # We need to look for appropriate versions of Visual
-  # Studio since those built by NMake and the former
-  # Visual Studio projects are versioned by the VS versions
-  if cpp_compiler.version().split('.')[0].to_int() == 18
-    msvc_check_range = [12] # Visual Studio 2013
-    warning('Visual Studio 2013 must configure without -Dwarnings=fatal, which is the default')
-  elif cpp_compiler.version().split('.')[0].to_int() == 19
-    # Visual Studio 2019 can consume libraries built with 2017 and 2015
-    # and Visual Studio 2017 can consume libraries built with 2015
-    msvc_check_range = [14] # Visual Studio 2015, 2017, 2019
-    message('It is safe to ignore warnings from Meson that MSVC does not support C++11')
-  endif
-
-  debugsuffix = ''
-  if get_option('buildtype') == 'debug'
-    debugsuffix = '-d'
-  endif
-
-  # We can be looking for MSVC 2015-built libraries on 2017 and 2019 builds as well,
-  # as well as 2017-built libraries on 2019 as well, so we can't just assume that
-  # libraries exist, but check that compatible versions are really found
-  foreach v : msvc_check_range
-    glibmm_dep = glibmm_dep.found() ? glibmm_dep : cpp_compiler.find_library('glibmm-vc@0@0@1@-2_@2@'.format(v.to_string(), debugsuffix, glibmm_req_minor_ver), required: false)
-  endforeach
-
-  # Check whether we compile gtkmm without using gendef
-  build_shared_libs_directly = false
-
-  if glibmm_dep.type_name() == 'library'
-    warning('Note: Be sure to check that this finds the same libsigc++ .lib your glibmm is linked to')
-    sigc_dep = cpp_compiler.find_library('sigc-@0@.0'.format(sigc_major_ver), required: false)
-    foreach v : msvc_check_range
-      sigc_dep = sigc_dep.found() ? sigc_dep : cpp_compiler.find_library('sigc-vc@0@0@1@-2_0'.format(v.to_string(), debugsuffix), required: false)
-    endforeach
-  endif
-
-  # Now make sure the appropriate -mm libraries are found
-  assert(glibmm_dep.found() and (glibmm_dep.type_name() == 'pkgconfig' or sigc_dep.found()), 'Appropriate glibmm-vcxx0@0@-2_@1@.lib and sigc-vcxx0@0@-@2@_0.lib are required'.format(debugsuffix, glibmm_req_minor_ver, sigc_major_ver))
-
-  # Put glibmm in the required packages if we find it by pkg-config
-  mm_lib_requires = ''
-  if glibmm_dep.type_name() == 'pkgconfig'
-    mm_lib_requires += ' '.join([
-      'glibmm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
-    ]) + ' '
-  endif
-
-  gtkmm_requires = mm_lib_requires + ' '.join([
-    'gtk+-3.0', gtk_req,
-  ])
-
-  gtkmm_build_dep = [giomm_dep, sigc_dep, gtk_dep]
-else
-  # not MSVC
-  gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
-  gdkmm_requires = [
-    'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
-    'gtk+-3.0', gtk_req,
-    'cairomm-1.0', cairomm_req,
-    'pangomm-1.4', cairomm_req,
-    'gdk-pixbuf-2.0', gdk_pixbuf_req,
-  ]
-
-  gtk_unix_print_dep = dependency('gtk+-unix-print-3.0')
-  gtkmm_build_dep = gdkmm_build_dep + [gtk_unix_print_dep]
-  gtkmm_requires = gdkmm_requires + ['gtk+-unix-print-3.0', '']
-  if build_atkmm_api
-    gtkmm_build_dep += [atkmm_dep]
-    gtkmm_requires += ['atkmm-1.6', atkmm_req]
-  endif
-
-  gdkmm_requires = ' '.join(gdkmm_requires)
-  gtkmm_requires = ' '.join(gtkmm_requires)
-
-  build_shared_libs_directly = true
+if build_atkmm_api
+  gtkmm_build_dep += [atkmm_dep]
+  gtkmm_requires += ['atkmm-1.6', atkmm_req]
 endif
+
+# not Windows
+if host_machine.system() != 'windows'
+  gtk_unix_print_dep = dependency('gtk+-unix-print-3.0')
+  gtkmm_build_dep += [gtk_unix_print_dep]
+  gtkmm_requires += ['gtk+-unix-print-3.0', '']
+endif
+
+gdkmm_requires = ' '.join(gdkmm_requires)
+gtkmm_requires = ' '.join(gtkmm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.
@@ -289,6 +222,7 @@ endif
 gtkmm_script_dir = project_source_root / 'tools'
 dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 
+# Do we build the gdkmm/gtkmm without using gendef.exe?
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
 
@@ -310,6 +244,8 @@ if is_msvc
   # were generated using a recent enough gmmproc
   build_shared_libs_directly = run_command(check_gmmproc_ver_cmd).returncode() == 0
   message('Using __declspec(dllexport) to build gtkmm: @0@'.format(build_shared_libs_directly ? 'YES' : 'NO'))
+else
+  build_shared_libs_directly = true
 endif
 
 # Set compiler warnings.

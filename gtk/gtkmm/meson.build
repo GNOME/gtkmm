@@ -504,7 +504,7 @@ if build_shared_libs_directly
   )
 else
   # Building with headers generated from *.hg files with
-  # gmmproc < 2.64.0 on Visual Studio: We need this so
+  # gmmproc < 2.64.3 on Visual Studio: We need this so
   # that we can run gendef.exe to get the .def file
   # needed for obtaining the .lib file for the gtkmm DLL
   gtk_int_lib = static_library('gtkmm-int',
