@@ -278,13 +278,20 @@ endif
 warning_flags = cpp_compiler.get_supported_arguments(warning_flags)
 add_project_arguments(warning_flags, language: 'cpp')
 
+gui_app_ldflags = []
+
 # MSVC: Ignore warnings that aren't really harmful, but make those
-#       that should not be overlooked stand out.
+#       that should not be overlooked stand out.  For gtkmm applications
+#       where we do not want a console window to show up with Visual Studio
+#       builds, we must use '-entry:mainCRTStartup' in the linker flags,
+#       otherwise the program will fail to link unless we defined a WinMain()
+#       for them
 if is_msvc
   foreach wd : ['/FImsvc_recommended_pragmas.h', '/wd4267', '/wd4530', '/wd4250', '/wd4251', '/wd4273', '/wd4275', '/wd4805']
     disabled_warning = cpp_compiler.get_supported_arguments(wd)
     add_project_arguments(disabled_warning, language: 'cpp')
   endforeach
+  gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
 subdir('tools/extra_defs_gen')

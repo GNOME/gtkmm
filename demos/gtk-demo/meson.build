@@ -1,6 +1,6 @@
 # demos/gtk-demo
 
-# Input: gtkmm_dep, epoxy_dep, build_demos
+# Input: gtkmm_dep, epoxy_dep, build_demos, gui_app_ldflags
 # Output: -
 
 gtkmm_demo_cc_files = [
@@ -49,6 +49,7 @@ if epoxy_dep.found()
     dependencies: [gtkmm_dep, epoxy_dep],
     gui_app: true,
     build_by_default: build_demos,
+    link_args: gui_app_ldflags,
     install: false,
   )
 endif

@@ -1,6 +1,6 @@
 # tests
 
-# Input: gdkmm_dep, gtkmm_dep, build_tests
+# Input: gdkmm_dep, gtkmm_dep, build_tests, gui_app_ldflags
 # Output: -
 
 test_programs = [
@@ -37,6 +37,7 @@ foreach ex : test_programs
     dependencies: ex[3] ? gtkmm_dep : gdkmm_dep,
     gui_app: ex[3],
     build_by_default: build_tests,
+    link_args: ex[3] ? gui_app_ldflags : [],
     install: false,
   )
 
