@@ -141,10 +141,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat footer gtkmm.mak]
 !endif
 
-!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\gdk\%f if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\%f (md vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private) & ($(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src vs$(PDBVER)/$(CFG)/$(PLAT)/gdkmm)]
+!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\untracked\gdk\%f if not exist ..\gdk\%f if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\%f (md vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private) & ($(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src vs$(PDBVER)/$(CFG)/$(PLAT)/gdkmm)]
 !endif
 
-!if [for %d in (vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm ..\gdk\gdkmm) do @if exist %d\applaunchcontext.h call get-gmmproc-ver %d\applaunchcontext.h>>gtkmm.mak]
+!if [for %d in (vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm ..\untracked\gdk\gdkmm ..\gdk\gdkmm) do @if exist %d\applaunchcontext.h call get-gmmproc-ver %d\applaunchcontext.h>>gtkmm.mak]
 !endif
 
 !include gtkmm.mak

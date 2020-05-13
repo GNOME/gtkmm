@@ -124,6 +124,7 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 GDKMM_BASE_CFLAGS =		\
 	/EHsc	\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gdk	\
 	/I..\gdk /I.\gdkmm	\
 	/wd4530 /wd4251 /wd4273 /wd4275	\
 	/FImsvc_recommended_pragmas.h
@@ -136,6 +137,7 @@ GDKMM_BASE_CFLAGS =		\
 
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(PDBVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gtk	\
 	/I..\gtk /I.\gtkmm	\
 	/wd4250				\
 	$(GDKMM_BASE_CFLAGS)
