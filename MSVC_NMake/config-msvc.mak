@@ -128,7 +128,7 @@ GDKMM_BASE_CFLAGS =		\
 	/wd4530 /wd4251 /wd4275	\
 	/FImsvc_recommended_pragmas.h
 
-!if $(PDBVER) > 14
+!if $(PDBVER) >= 14
 GDKMM_BASE_CFLAGS =		\
 	$(GDKMM_BASE_CFLAGS)	\
 	/utf-8 /wd4828	\
