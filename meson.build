@@ -225,6 +225,7 @@ dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 # Do we build the gdkmm/gtkmm without using gendef.exe?
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
+  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
 
   # Check for the first line in a file generated with gmmproc,
   # to see which gmmproc version was used
