@@ -1,6 +1,6 @@
 # tests
 
-# Input: gdkmm_dep, gtkmm_dep, build_tests, gui_app_ldflags
+# Input: gdkmm_dep, gtkmm_dep, build_tests, gui_app_ldflags, gtkmm_extra_gendef_cpp_args
 # Output: -
 
 test_programs = [
@@ -38,6 +38,7 @@ foreach ex : test_programs
     gui_app: ex[3],
     build_by_default: build_tests,
     link_args: ex[3] ? gui_app_ldflags : [],
+    cpp_args: gtkmm_extra_gendef_cpp_args,
     install: false,
   )
 

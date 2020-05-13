@@ -223,6 +223,8 @@ gtkmm_script_dir = project_source_root / 'tools'
 dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 
 # Do we build the gdkmm/gtkmm without using gendef.exe?
+gdkmm_extra_gendef_cpp_args = []
+gtkmm_extra_gendef_cpp_args = []
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
@@ -245,6 +247,10 @@ if is_msvc
   # were generated using a recent enough gmmproc
   build_shared_libs_directly = run_command(check_gmmproc_ver_cmd).returncode() == 0
   message('Using __declspec(dllexport) to build gtkmm: @0@'.format(build_shared_libs_directly ? 'YES' : 'NO'))
+  if not build_shared_libs_directly
+    gdkmm_extra_gendef_cpp_args += '-DGDKMM_USE_GENDEF'
+    gtkmm_extra_gendef_cpp_args = gdkmm_extra_gendef_cpp_args + [ '-DGTKMM_USE_GENDEF' ]
+  endif
 else
   build_shared_libs_directly = true
 endif

@@ -1,6 +1,6 @@
 # demos/gtk-demo
 
-# Input: gtkmm_dep, epoxy_dep, build_demos, gui_app_ldflags
+# Input: gtkmm_dep, epoxy_dep, build_demos, gui_app_ldflags, gtkmm_extra_gendef_cpp_args
 # Output: -
 
 gtkmm_demo_cc_files = [
@@ -50,6 +50,7 @@ if epoxy_dep.found()
     gui_app: true,
     build_by_default: build_demos,
     link_args: gui_app_ldflags,
+    cpp_args: gtkmm_extra_gendef_cpp_args,
     install: false,
   )
 endif

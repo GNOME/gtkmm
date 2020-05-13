@@ -4,7 +4,7 @@
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, build_x11_api, gmmproc_extra_m4_dirs, is_host_windows,
-#        gdkmm_library, gdkmm_used_built_h_file_targets
+#        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_extra_gendef_cpp_args
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_dep
 
@@ -349,11 +349,7 @@ install_headers(gtkmm_extra_ph_files, subdir: gtkmm_pcname / 'gtkmm' / 'private'
 untracked_gtkmm = 'untracked' / 'gtk' / 'gtkmm'
 src_untracked_gtkmm = project_source_root / untracked_gtkmm
 
-gtkmm_cpp_args = [ '-DGTKMM_BUILD=1' ]
-
-if is_msvc and not build_shared_libs_directly
-  gtkmm_cpp_args += '-DGTKMM_USE_GENDEF'
-endif
+gtkmm_cpp_args = [ '-DGTKMM_BUILD=1' ] + gtkmm_extra_gendef_cpp_args
 
 if maintainer_mode
 
@@ -534,6 +530,7 @@ else
     dependencies: gtkmm_build_dep,
     link_depends: gtkmm_def,
     link_args: gtkmm_extra_link_args,
+    link_with: gdkmm_library,
     install: true,
   )
 endif
