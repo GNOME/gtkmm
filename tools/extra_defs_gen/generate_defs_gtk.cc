@@ -84,7 +84,6 @@ int main(int /* argc */, char** /* argv */)
             << get_defs( GTK_TYPE_COMBO_BOX )
             << get_defs( GTK_TYPE_CONSTRAINT )
             << get_defs( GTK_TYPE_CONSTRAINT_GUIDE )
-            << get_defs( GTK_TYPE_CONTAINER )
             << get_defs( GTK_TYPE_CELL_VIEW )
             << get_defs( GTK_TYPE_CSS_PROVIDER )
             << get_defs( GTK_TYPE_DIALOG )
@@ -233,6 +232,8 @@ int main(int /* argc */, char** /* argv */)
             << get_defs( GTK_TYPE_WIDGET )
             << get_defs( GTK_TYPE_WIDGET_PAINTABLE )
             << get_defs( GTK_TYPE_WINDOW )
+            << get_defs( GTK_TYPE_WINDOW_CONTROLS )
+            << get_defs( GTK_TYPE_WINDOW_HANDLE )
             ;
   return 0;
 }
