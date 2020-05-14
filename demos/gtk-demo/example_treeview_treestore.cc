@@ -152,13 +152,13 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   set_default_size(650, 400);
 
   m_VBox.set_margin(8);
-  add(m_VBox);
-  m_VBox.add(m_Label);
+  set_child(m_VBox);
+  m_VBox.append(m_Label);
 
   m_ScrolledWindow.set_has_frame(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_expand();
-  m_VBox.add(m_ScrolledWindow);
+  m_VBox.append(m_ScrolledWindow);
 
   /* create model */
   create_model();
@@ -168,9 +168,8 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   auto refTreeSelection = m_TreeView.get_selection();
   refTreeSelection->set_mode(Gtk::SelectionMode::MULTIPLE);
 
-
   add_columns();
-  m_ScrolledWindow.add(m_TreeView);
+  m_ScrolledWindow.set_child(m_TreeView);
 }
 
 Example_TreeView_TreeStore::~Example_TreeView_TreeStore()

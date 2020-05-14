@@ -21,14 +21,14 @@
 #include <glibmm/object.h>
 #include <gdkmm/surface.h>
 #include <gdkmm/texture.h>
-#include <gtkmm/bin.h>
+#include <gtkmm/widget.h>
 #include <gtkmm/native.h>
 #include <gtkmm/root.h>
 #include <gtkmm/application.h>
 #include <gtkmm/windowgroup.h>
 
 _DEFS(gtkmm,gtk)
-_PINCLUDE(gtkmm/private/bin_p.h)
+_PINCLUDE(gtkmm/private/widget_p.h)
 
 namespace Gio
 {
@@ -54,13 +54,16 @@ class WindowGroup;
  *
  * @ingroup Widgets
  */
-class Window : public Bin, public Native, public Root
+class Window : public Widget, public Native, public Root
 {
-  _CLASS_GTKOBJECT(Window,GtkWindow,GTK_WINDOW,Gtk::Bin,GtkBin)
+  _CLASS_GTKOBJECT(Window, GtkWindow, GTK_WINDOW, Gtk::Widget, GtkWidget)
   _IMPLEMENTS_INTERFACE(Native)
   _IMPLEMENTS_INTERFACE(Root)
   _UNMANAGEABLE
-  _IGNORE(gtk_window_set_has_user_ref_count, gtk_window_set_destroy_with_parent)
+  _IGNORE(gtk_window_destroy, gtk_window_set_destroy_with_parent)
+
+  // GtkWindow also implements GtkShortcutManager, but that interface is not
+  // (yet) wrapped in a C++ class.
 
   //TODO: Use gtk_window_set_destroy_with_parent() to allow use of Gtk::manage() with top-level windows, using the transient-parent?
 
@@ -100,6 +103,7 @@ public:
   _WRAP_PROPERTY("is-maximized", bool)
   _WRAP_PROPERTY("default-widget", Widget*)
   _WRAP_PROPERTY("focus-widget", Widget*)
+  _WRAP_PROPERTY("child", Widget*)
 
   _WRAP_SIGNAL(void keys_changed(), "keys_changed")
   _WRAP_SIGNAL(bool close_request(), "close-request")
@@ -120,7 +124,6 @@ dnl
     static void dispose_vfunc_callback(GObject* self);
   _POP()
 #m4end
-
 
   _WRAP_METHOD(void set_title(const Glib::ustring& title),
                gtk_window_set_title)
@@ -189,7 +192,6 @@ dnl
   _WRAP_METHOD(static void set_auto_startup_notification(bool setting = true), gtk_window_set_auto_startup_notification)
 
   _WRAP_METHOD(void set_modal(bool modal = true), gtk_window_set_modal)
-
   _WRAP_METHOD(bool get_modal() const, gtk_window_get_modal)
 
   _WRAP_METHOD(static Glib::RefPtr<Gio::ListModel> get_toplevels(), gtk_window_get_toplevels, refreturn)
@@ -252,6 +254,11 @@ dnl
    * This could cause the application to exit if it is the application's last window.
    */
   void unset_application();
+
+  _WRAP_METHOD(void set_child(Widget& child), gtk_window_set_child)
+  void unset_child();
+  _WRAP_METHOD(Widget* get_child(), gtk_window_get_child)
+  _WRAP_METHOD(const Widget* get_child() const, gtk_window_get_child, constversion)
 
   _WRAP_METHOD(void set_titlebar(Widget& titlebar), gtk_window_set_titlebar)
 

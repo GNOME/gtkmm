@@ -103,7 +103,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
-#include <gtkmm/bin.h>
 #include <gtkmm/binlayout.h>
 #include <gtkmm/border.h>
 #include <gtkmm/box.h>
@@ -132,7 +131,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/constraintlayout.h>
-#include <gtkmm/container.h>
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>
 #include <gtkmm/dialog.h>

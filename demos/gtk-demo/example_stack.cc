@@ -64,7 +64,7 @@ Example_Stack::Example_Stack()
   m_stack_switcher.set_stack(m_stack);
   m_grid.attach(m_stack_switcher, 0, 0, 1, 1);
   m_grid.attach(m_stack, 0, 1, 1, 1);
-  add(m_grid);
+  set_child(m_grid);
 }
 
 Example_Stack::~Example_Stack()

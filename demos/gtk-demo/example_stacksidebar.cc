@@ -48,11 +48,11 @@ Example_StackSidebar::Example_StackSidebar()
   set_title("Stack Sidebar demo");
   set_default_size(500, 350);
 
-  add(m_Box);
+  set_child(m_Box);
 
-  m_Box.add(m_StackSidebar);
-  m_Box.add(m_Separator);
-  m_Box.add(m_Stack);
+  m_Box.append(m_StackSidebar);
+  m_Box.append(m_Separator);
+  m_Box.append(m_Stack);
   m_Stack.set_expand();
 
   m_Stack.set_transition_type(Gtk::StackTransitionType::SLIDE_UP_DOWN);

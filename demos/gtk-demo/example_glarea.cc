@@ -73,12 +73,12 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
 
   m_VBox.set_margin(12);
   m_VBox.set_spacing(6);
-  add(m_VBox);
+  set_child(m_VBox);
 
   m_GLArea.set_hexpand(true);
   m_GLArea.set_vexpand(true);
   m_GLArea.set_auto_render(true);
-  m_VBox.add(m_GLArea);
+  m_VBox.append(m_GLArea);
 
   // Connect gl area signals
   m_GLArea.signal_realize().connect(sigc::mem_fun(*this, &Example_GLArea::realize));
@@ -87,17 +87,17 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_GLArea.signal_unrealize().connect(sigc::mem_fun(*this, &Example_GLArea::unrealize), false);
   m_GLArea.signal_render().connect(sigc::mem_fun(*this, &Example_GLArea::render), false);
 
-  m_VBox.add(m_Controls);
+  m_VBox.append(m_Controls);
   m_Controls.set_hexpand(true);
 
   for(int i = 0 ; i < N_AXIS ; ++i)
   {
     auto sliderBox = create_axis_slider_box(i);
-    m_Controls.add(*sliderBox);
+    m_Controls.append(*sliderBox);
   }
 
   m_Button.set_hexpand(true);
-  m_VBox.add(m_Button);
+  m_VBox.append(m_Button);
   // Connect clicked to close of window
   m_Button.signal_clicked().connect(sigc::mem_fun(*this, &Gtk::Window::close));
 }
@@ -202,7 +202,7 @@ Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
   }
 
   auto label = Gtk::manage(new Gtk::Label{text});
-  box->add(*label);
+  box->append(*label);
   label->show();
 
   auto adj = Gtk::Adjustment::create(0.0, 0.0, 360.0, 1.0, 12.0, 0.0);
@@ -211,7 +211,7 @@ Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
     sigc::bind(sigc::mem_fun(*this, &Example_GLArea::on_axis_value_change), axis, adj)
                                       );
   auto slider = Gtk::manage(new Gtk::Scale{adj, Gtk::Orientation::HORIZONTAL});
-  box->add(*slider);
+  box->append(*slider);
   slider->set_hexpand(true);
   slider->show();
 

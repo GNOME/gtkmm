@@ -40,14 +40,14 @@ Example_Overlay::Example_Overlay()
 
   // Main text view
   m_scrolled_window.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_scrolled_window.add(m_text_view);
+  m_scrolled_window.set_child(m_text_view);
 
   // Entries and labels
   configure_entries_and_labels();
 
   // Layout
-  m_overlay.add(m_scrolled_window);
-  add(m_overlay);
+  m_overlay.set_child(m_scrolled_window);
+  set_child(m_overlay);
 }
 
 Example_Overlay::~Example_Overlay()

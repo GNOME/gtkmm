@@ -49,7 +49,7 @@ Example_Gestures::Example_Gestures()
   set_title("Gestures demo");
   set_default_size(400, 400);
 
-  add(m_DrawingArea);
+  set_child(m_DrawingArea);
   m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Gestures::on_drawing_area_draw));
 
   // Create gestures.

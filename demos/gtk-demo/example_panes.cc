@@ -49,32 +49,32 @@ Example_Panes::Example_Panes()
   set_title("Panes");
 
   Gtk::Box *const pVBox = new Gtk::Box(Gtk::Orientation::VERTICAL);
-  add(*Gtk::manage(pVBox));
+  set_child(*Gtk::manage(pVBox));
 
   Gtk::Paned *const pVPaned = new Gtk::Paned(Gtk::Orientation::VERTICAL);
-  pVBox->add(*Gtk::manage(pVPaned));
+  pVBox->append(*Gtk::manage(pVPaned));
   pVPaned->set_margin(5);
   pVPaned->set_expand();
 
   Gtk::Paned *const pHPaned = new Gtk::Paned(Gtk::Orientation::HORIZONTAL);
-  pVPaned->add1(*Gtk::manage(pHPaned));
+  pVPaned->set_start_child(*Gtk::manage(pHPaned));
 
   Gtk::Frame *const pFrame1 = new Gtk::Frame();
-  pHPaned->add1(*Gtk::manage(pFrame1));
+  pHPaned->set_start_child(*Gtk::manage(pFrame1));
   pFrame1->set_size_request(60, 60);
-  pFrame1->add(*Gtk::make_managed<Gtk::Button>("_Hi there", true));
+  pFrame1->set_child(*Gtk::make_managed<Gtk::Button>("_Hi there", true));
 
   Gtk::Frame *const pFrame2 = new Gtk::Frame();
-  pHPaned->add2(*Gtk::manage(pFrame2));
+  pHPaned->set_end_child(*Gtk::manage(pFrame2));
   pFrame2->set_size_request(80, 60);
 
   Gtk::Frame *const pFrame3 = new Gtk::Frame();
-  pVPaned->add2(*Gtk::manage(pFrame3));
+  pVPaned->set_end_child(*Gtk::manage(pFrame3));
   pFrame3->set_size_request(60, 80);
 
   // Now create check buttons to control sizing
-  pVBox->add(*Gtk::make_managed<PaneOptions>(*pHPaned, "Horizontal", "Left", "Right"));
-  pVBox->add(*Gtk::make_managed<PaneOptions>(*pVPaned, "Vertical", "Top", "Bottom"));
+  pVBox->append(*Gtk::make_managed<PaneOptions>(*pHPaned, "Horizontal", "Left", "Right"));
+  pVBox->append(*Gtk::make_managed<PaneOptions>(*pVPaned, "Vertical", "Top", "Bottom"));
 }
 
 Example_Panes::~Example_Panes()
@@ -92,7 +92,7 @@ PaneOptions::PaneOptions(Gtk::Paned& paned, const Glib::ustring& frame_label,
 {
   Gtk::Grid *const pGrid = new Gtk::Grid();
   pGrid->set_margin(4);
-  add(*Gtk::manage(pGrid));
+  set_child(*Gtk::manage(pGrid));
 
   pGrid->attach(*Gtk::make_managed<Gtk::Label>(label1), 0, 0, 1, 1);
   pGrid->attach(*Gtk::make_managed<Gtk::Label>(label2), 1, 0, 1, 1);
@@ -124,18 +124,14 @@ PaneOptions::~PaneOptions()
 
 void PaneOptions::on_checkbutton1()
 {
-  Gtk::Widget *const pChild = m_pPaned->get_child1();
-
-  m_pPaned->remove(*pChild);
-  m_pPaned->pack1(*pChild, m_CheckButton_resize1.get_active(), m_CheckButton_shrink1.get_active());
+  m_pPaned->set_resize_start_child(m_CheckButton_resize1.get_active());
+  m_pPaned->set_shrink_start_child(m_CheckButton_shrink1.get_active());
 }
 
 void PaneOptions::on_checkbutton2()
 {
-  Gtk::Widget *const pChild = m_pPaned->get_child2();
-
-  m_pPaned->remove(*pChild);
-  m_pPaned->pack2(*pChild, m_CheckButton_resize2.get_active(), m_CheckButton_shrink2.get_active());
+  m_pPaned->set_resize_end_child(m_CheckButton_resize2.get_active());
+  m_pPaned->set_shrink_end_child(m_CheckButton_shrink2.get_active());
 }
 
 } // anonymous namespace

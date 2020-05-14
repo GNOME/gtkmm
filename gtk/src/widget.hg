@@ -64,7 +64,6 @@ class Adjustment;
 class Window;
 class Root;
 class Native;
-class Container;
 class EventController;
 class LayoutManager;
 class Settings;
@@ -76,6 +75,10 @@ class Tooltip;
 typedef Gdk::Rectangle Allocation;
 
 /** @defgroup Widgets Widgets
+ */
+
+/** @defgroup Containers Container Widgets
+ * These widgets can be used to group other widgets together.
  */
 
 //TODO: Deal with the GtkObject->GObject change:
@@ -108,7 +111,6 @@ class Widget
   _IMPLEMENTS_INTERFACE(ConstraintTarget)
   _IMPLEMENTS_INTERFACE(Atk::Implementor, ifdef GTKMM_ATKMM_ENABLED)
 
-  _IGNORE(gtk_widget_destroy, gtk_widget_destroyed)
   _IGNORE(gtk_widget_paintable_new)
 
 public:
@@ -155,16 +157,10 @@ public:
 
   _WRAP_METHOD(bool activate(), gtk_widget_activate)
 
-  // gtk_widget_reparent() has been removed, but we want to keep Gtk::Widget::reparent().
-  /** Moves a widget from one Gtk::Container to another, handling reference
-   * count issues to avoid destroying the widget.
-   *
-   * @param new_parent A Gtk::Container to move the widget into.
-   */
-  void reparent(Container& new_parent);
-
   _WRAP_METHOD(void set_can_focus(bool can_focus = true), gtk_widget_set_can_focus)
   _WRAP_METHOD(bool get_can_focus() const, gtk_widget_get_can_focus)
+  _WRAP_METHOD(void set_focusable(bool focusable = true), gtk_widget_set_focusable)
+  _WRAP_METHOD(bool get_focusable() const, gtk_widget_get_focusable)
   _WRAP_METHOD(bool has_focus() const, gtk_widget_has_focus)
 
   _WRAP_METHOD(bool is_focus() const, gtk_widget_is_focus)
@@ -224,8 +220,8 @@ public:
   _WRAP_METHOD(int get_width() const, gtk_widget_get_width)
   _WRAP_METHOD(int get_height() const, gtk_widget_get_height)
 
-  _WRAP_METHOD(Container* get_parent(), gtk_widget_get_parent)
-  _WRAP_METHOD(const Container* get_parent() const, gtk_widget_get_parent, constversion)
+  _WRAP_METHOD(Widget* get_parent(), gtk_widget_get_parent)
+  _WRAP_METHOD(const Widget* get_parent() const, gtk_widget_get_parent, constversion)
 
   _WRAP_METHOD(Root* get_root(), gtk_widget_get_root)
   _WRAP_METHOD(const Root* get_root() const, gtk_widget_get_root, constversion)
@@ -574,8 +570,6 @@ public:
   //_WRAP(meth|sig|impl,void unrealize_(),gtk_widget_unrealize,"unrealize")
   _WRAP_SIGNAL(void unrealize(),"unrealize")
 
-  _WRAP_SIGNAL(void size_allocate(int width, int height, int baseline), "size_allocate")
-
   _WRAP_SIGNAL(void state_flags_changed(Gtk::StateFlags previous_state_flags), "state-flags-changed")
 
   _WRAP_SIGNAL(void direction_changed(TextDirection direction), "direction_changed")
@@ -605,7 +599,7 @@ dnl
   _WRAP_SIGNAL(bool query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Tooltip>& tooltip), "query_tooltip")
 
   _WRAP_PROPERTY("name", Glib::ustring)
-  _WRAP_PROPERTY("parent", Container*)
+  _WRAP_PROPERTY("parent", Widget*)
   _WRAP_PROPERTY("root", Root*)
   _WRAP_PROPERTY("width_request", int)
   _WRAP_PROPERTY("height_request", int)
@@ -615,6 +609,7 @@ dnl
   _WRAP_PROPERTY("has_focus", bool)
   _WRAP_PROPERTY("can_target", bool)
   _WRAP_PROPERTY("focus_on_click", bool)
+  _WRAP_PROPERTY("focusable", bool)
   _WRAP_PROPERTY("has_default", bool)
   _WRAP_PROPERTY("receives_default", bool)
   _WRAP_PROPERTY("cursor", Glib::RefPtr<Gdk::Cursor>)
@@ -640,14 +635,14 @@ dnl
   _WRAP_PROPERTY("layout-manager", Glib::RefPtr<LayoutManager>)
 
 protected:
-
   _WRAP_VFUNC(void root(), root)
   _WRAP_VFUNC(void unroot(), unroot)
+  _WRAP_VFUNC(void size_allocate(int width, int height, int baseline), size_allocate)
   _WRAP_VFUNC(SizeRequestMode get_request_mode() const, get_request_mode)
   _WRAP_VFUNC(void measure(Orientation orientation, int for_size, int& minimum, int& natural,
     int& minimum_baseline, int& natural_baseline) const, measure, custom_vfunc_callback)
   _WRAP_VFUNC(bool grab_focus(), grab_focus)
-  /** Sets the focused child of container.
+  /** Sets the focused child of widget.
    *
    * @param child The child widget.
    */

@@ -75,7 +75,7 @@ DemoWindow::DemoWindow()
 
   configure_header_bar();
 
-  add(m_HBox);
+  set_child(m_HBox);
 
   //Tree:
   m_refTreeStore = Gtk::TreeStore::create(demo_columns());
@@ -93,8 +93,8 @@ DemoWindow::DemoWindow()
   m_SideBar.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_SideBar.get_style_context()->add_class("sidebar");
   m_SideBar.set_hexpand(false);
-  m_SideBar.add(m_TreeView);
-  m_HBox.add(m_SideBar);
+  m_SideBar.set_child(m_TreeView);
+  m_HBox.append(m_SideBar);
 
   //Notebook:
   m_Notebook.popup_enable();
@@ -104,7 +104,7 @@ DemoWindow::DemoWindow()
   m_Notebook.get_page(m_TextWidget_Info)->property_tab_expand() = true;
   m_Notebook.get_page(m_TextWidget_Source)->property_tab_expand() = true;
   m_Notebook.set_expand(true);
-  m_HBox.add(m_Notebook);
+  m_HBox.append(m_Notebook);
   m_HBox.set_vexpand(true);
 
   set_default_size (800, 600);
@@ -232,7 +232,7 @@ void DemoWindow::on_treeselection_changed()
     const auto title = (*iter)[demo_columns().title];
 
     load_file(Glib::filename_from_utf8(filename));
-    m_HeaderBar.set_title(title);
+    set_title(title);
   }
 }
 

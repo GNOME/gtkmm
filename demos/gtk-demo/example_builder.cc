@@ -78,12 +78,20 @@ void Example_Builder::on_file_quit()
 
 void Example_Builder::on_help_about()
 {
+  static bool firstcall = true;
+
   auto pDialog = m_builder->get_widget<Gtk::AboutDialog>("aboutdialog1");
   if (pDialog)
   {
-    pDialog->set_transient_for(*this);
-    pDialog->run();
-    pDialog->hide();
+    if (firstcall)
+    {
+      // Don't call signal_response().connect() more than once.
+      firstcall = false;
+      pDialog->set_transient_for(*this);
+      pDialog->set_hide_on_close(true);
+      pDialog->signal_response().connect(sigc::hide(sigc::mem_fun(*pDialog, &Gtk::Widget::hide)));
+    }
+    pDialog->show();
   }
 }
 

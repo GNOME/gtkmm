@@ -20,15 +20,15 @@ AppWindow::AppWindow()
     : m_label (nullptr)
 {
     auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 5);
-    add(*vbox);
+    set_child(*vbox);
 
     auto button = Gtk::make_managed<Gtk::Button>("Delete Label");
-    vbox->add(*button);
+    vbox->append(*button);
 
     //m_label = Gtk::make_managed<Gtk::Label>("test");
     m_label = new Gtk::Label("test");
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
-    vbox->add(*m_label);
+    vbox->append(*m_label);
     g_warning("m_label -> ref_count: %d\n", G_OBJECT(m_label->gobj())->ref_count);
 
     button->signal_clicked().connect( sigc::mem_fun(*this, &AppWindow::on_button_clicked));

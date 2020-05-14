@@ -38,7 +38,7 @@ Example_AppWindow::Example_AppWindow()
 {
   set_title("Application Window");
 
-  add(m_Grid);
+  set_child(m_Grid);
 
 /*
   //Menu:
@@ -111,8 +111,7 @@ Example_AppWindow::Example_AppWindow()
 
   set_default_size(200, 200);
 
-  m_ScrolledWindow.add(m_TextView);
-
+  m_ScrolledWindow.set_child(m_TextView);
 
   /* Create statusbar */
   m_Statusbar.set_hexpand();
@@ -133,8 +132,8 @@ Example_AppWindow::~Example_AppWindow()
 void Example_AppWindow::on_menu_item()
 {
   Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item", false,
-                            Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE);
-  dialog.run();
+                            Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE, true);
+  dialog.show();
 }
 
 void Example_AppWindow::on_text_changed()

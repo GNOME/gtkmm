@@ -13,7 +13,7 @@ class Dlg : public sigc::trackable
       auto btn = Gtk::make_managed<Gtk::Button>("ClickMe");
       btn->signal_clicked().connect(sigc::mem_fun(*this, &Dlg::on_button_clicked));
       btn->set_expand(true);
-      dlg_->get_content_area()->add(*btn);
+      dlg_->get_content_area()->append(*btn);
       dlg_->add_button("_OK", Gtk::ResponseType::OK);
       dlg_->signal_response().connect(sigc::mem_fun(*this, &Dlg::on_response));
       dlg_->show();
@@ -30,18 +30,19 @@ class Dlg : public sigc::trackable
     }
 
     void on_response(int id)
-   {
+    {
       if (id == Gtk::ResponseType::OK || id == Gtk::ResponseType::DELETE_EVENT)
         quit();
     }
 
-    void quit() {
+    void quit()
+    {
       delete this; //This is _not_ a good example of coding with gtkmm.
       app->quit();
     }
 
   private:
-    Gtk::Dialog *dlg_;
+    Gtk::Dialog* dlg_;
 };
 
 int main (int argc, char **argv)
@@ -53,5 +54,3 @@ int main (int argc, char **argv)
   app->hold();
   return app->run(argc, argv);
 }
-
-

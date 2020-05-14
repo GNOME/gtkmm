@@ -50,8 +50,7 @@ Example_HeaderBar::Example_HeaderBar()
 
   // Configuration
   m_header_bar.set_show_title_buttons();
-  m_header_bar.set_title("Welcome to Facebook - Log in, sign up or learn more");
-  m_header_bar.set_has_subtitle(false);
+  set_title("Welcome to Facebook - Log in, sign up or learn more");
 
   // Header Bar buttons
   configure_send_receive_button();
@@ -63,7 +62,7 @@ Example_HeaderBar::Example_HeaderBar()
 
   // Layout
   set_titlebar(m_header_bar);
-  add(m_text_view);
+  set_child(m_text_view);
 }
 
 Example_HeaderBar::~Example_HeaderBar()
@@ -75,7 +74,7 @@ void Example_HeaderBar::configure_send_receive_button()
   auto icon = Gio::ThemedIcon::create("mail-send-receive-symbolic", false);
 
   m_send_receive_image.set(icon);
-  m_send_receive_button.add(m_send_receive_image);
+  m_send_receive_button.set_child(m_send_receive_image);
 }
 
 void Example_HeaderBar::configure_arrow_buttons()
@@ -85,6 +84,6 @@ void Example_HeaderBar::configure_arrow_buttons()
   m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::IconSize::INHERIT, true);
   m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::IconSize::INHERIT, true);
 
-  m_arrow_buttons_box.add(m_left_arrow_button);
-  m_arrow_buttons_box.add(m_right_arrow_button);
+  m_arrow_buttons_box.append(m_left_arrow_button);
+  m_arrow_buttons_box.append(m_right_arrow_button);
 }

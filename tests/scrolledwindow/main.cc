@@ -33,7 +33,7 @@ public:
   Instance()
   {
     //m_pLabel = new DerivedLabel();
-    m_ScrolledWindow.add( m_pLabel );
+    m_ScrolledWindow.set_child( m_pLabel );
 
     g_signal_connect (G_OBJECT(m_ScrolledWindow.get_child()->gobj()), "destroy", G_CALLBACK(on_viewport_destroyed), NULL);
 

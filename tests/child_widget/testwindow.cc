@@ -19,7 +19,7 @@
 TestWindow::TestWindow()
 : m_Button("test")
 {
-  add(m_Button);
+  set_child(m_Button);
 
   //This seems to be 2, and then 3 during destruction. Looks like unref-ing isn't enough - we'll have to gtk_object_destroy() it instead of just unrefing.
   g_warning("m_Button -> refcount = %d\n", G_OBJECT(m_Button.gobj())->ref_count);

@@ -79,7 +79,7 @@ Example_Pixbufs::Example_Pixbufs()
     set_size_request(m_back_width, m_back_height);
     m_refPixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::RGB, false, 8, m_back_width, m_back_height);
     m_DrawingArea.set_draw_func(sigc::mem_fun(*this, &Example_Pixbufs::on_drawingarea_draw));
-    add(m_DrawingArea);
+    set_child(m_DrawingArea);
 
     m_tick_id = m_DrawingArea.add_tick_callback(
         sigc::mem_fun(*this, &Example_Pixbufs::on_tick));
@@ -90,7 +90,7 @@ Example_Pixbufs::Example_Pixbufs()
     strMsg += error.what();
 
     Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-    dialog.run();
+    dialog.show();
   }
 }
 

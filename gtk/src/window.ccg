@@ -28,20 +28,20 @@ namespace Gtk
 // that removes the window from its application when the window is closed (hidden).
 Window::Window(const Glib::ConstructParams& construct_params)
 :
-  Gtk::Bin(construct_params)
+  Gtk::Widget(construct_params)
 {
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
 }
 
 Window::Window(GtkWindow* castitem)
 :
-  Gtk::Bin((GtkBin*)castitem)
+  Gtk::Widget((GtkWidget*)castitem)
 {
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
 }
 
 Window::Window(Window&& src) noexcept
-: Gtk::Bin(std::move(src))
+: Gtk::Widget(std::move(src))
   , Native(std::move(src))
   , Root(std::move(src))
 {
@@ -61,7 +61,7 @@ Window::Window(Window&& src) noexcept
 // _CUSTOM_MOVE_OPERATIONS() suppresses both move contructor and move assignment. 
 Window& Window::operator=(Window&& src) noexcept
 {
-  Gtk::Bin::operator=(std::move(src));
+  Gtk::Widget::operator=(std::move(src));
   Native::operator=(std::move(src));
   Root::operator=(std::move(src));
   return *this;
@@ -120,7 +120,7 @@ void Window::destroy_()
 void Window::_release_c_instance()
 {
   //We override this, (though it's not virtual - we just call it from this class),
-  //because top-level windows can only be destroyed with gtk_widget_destroy, according to Owen Taylor. murrayc.
+  //because top-level windows can only be destroyed with gtk_window_destroy, according to Owen Taylor. murrayc.
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Gtk::Window::_release_c_instance() gobject_=%p\n", (void*) gobject_);
   #endif
@@ -128,11 +128,10 @@ void Window::_release_c_instance()
   cpp_destruction_in_progress_ = true;
 
   // remove our hook.
-  GtkWidget* object = GTK_WIDGET(gobj());
-  if (object)
+  if (gobj())
   {
     //Windows can not be unrefed. They are "self-owning".
-    gtk_widget_destroy(object);
+    gtk_window_destroy(gobj());
 
     //If the GObject still exists, disconnect the C++ wrapper from it.
     //The C++ wrapper is being deleted right now.
@@ -227,6 +226,11 @@ void Window::unset_default_widget()
 void Window::unset_transient_for()
 {
   gtk_window_set_transient_for(gobj(), nullptr /* See GTK+ docs */);
+}
+
+void Window::unset_child()
+{
+  gtk_window_set_child(gobj(), nullptr);
 }
 
 void Window::unset_application()

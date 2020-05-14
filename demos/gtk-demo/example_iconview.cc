@@ -80,19 +80,19 @@ Example_IconView::Example_IconView()
     std::cout << error.what() << std::endl;
   }
 
-  m_VBox.add(m_Toolbar);
+  m_VBox.append(m_Toolbar);
 
   m_ButtonUp.set_sensitive();
-  m_Toolbar.add(m_ButtonUp);
+  m_Toolbar.append(m_ButtonUp);
 
   m_ButtonHome.set_sensitive();
-  m_Toolbar.add(m_ButtonHome);
+  m_Toolbar.append(m_ButtonHome);
 
   m_ScrolledWindow.set_has_frame(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_expand();
 
-  m_VBox.add(m_ScrolledWindow);
+  m_VBox.append(m_ScrolledWindow);
 
   //Create the data model:
   m_model = Gtk::ListStore::create(m_columns);
@@ -118,11 +118,11 @@ Example_IconView::Example_IconView()
 
   m_IconView.signal_item_activated().connect( sigc::mem_fun(*this, &Example_IconView::on_iconview_item_activated) );
 
-  m_ScrolledWindow.add(m_IconView);
+  m_ScrolledWindow.set_child(m_IconView);
 
   m_IconView.grab_focus();
 
-  add(m_VBox);
+  set_child(m_VBox);
 }
 
 int Example_IconView::on_model_sort(const Gtk::TreeModel::const_iterator& a, const Gtk::TreeModel::const_iterator& b)

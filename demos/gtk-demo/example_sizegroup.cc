@@ -58,7 +58,7 @@ Example_SizeGroup::Example_SizeGroup()
   set_resizable(false);
   add_button("_Close", Gtk::ResponseType::CLOSE);
 
-  get_content_area()->add(m_VBox);
+  get_content_area()->append(m_VBox);
   m_VBox.set_margin(5);
   m_VBox.set_expand();
 
@@ -67,12 +67,12 @@ Example_SizeGroup::Example_SizeGroup()
   /* Create one frame holding color options
    */
   m_Frame_Color.set_expand();
-  m_VBox.add(m_Frame_Color);
+  m_VBox.append(m_Frame_Color);
 
   m_Grid_Color.set_margin(5);
   m_Grid_Color.set_row_spacing(5);
   m_Grid_Color.set_column_spacing(10);
-  m_Frame_Color.add(m_Grid_Color);
+  m_Frame_Color.set_child(m_Grid_Color);
 
   type_listStrings color_options;
   color_options.push_back("Red");
@@ -84,12 +84,12 @@ Example_SizeGroup::Example_SizeGroup()
 
   /* And another frame holding line style options
    */
-  m_VBox.add(m_Frame_Line);
+  m_VBox.append(m_Frame_Line);
 
   m_Grid_Line.set_margin(5);
   m_Grid_Line.set_row_spacing(5);
   m_Grid_Line.set_column_spacing(10);
-  m_Frame_Line.add(m_Grid_Line);
+  m_Frame_Line.set_child(m_Grid_Line);
 
 
   type_listStrings dash_options;
@@ -107,7 +107,7 @@ Example_SizeGroup::Example_SizeGroup()
   add_row(m_Grid_Line, 1, m_refSizeGroup, "_Line ends", end_options);
 
   /* And a check button to turn grouping on and off */
-  m_VBox.add(m_CheckButton);
+  m_VBox.append(m_CheckButton);
   m_CheckButton.set_active();
   m_CheckButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_SizeGroup::on_checkbutton_toggled));
 }

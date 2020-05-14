@@ -68,7 +68,7 @@ Example_TextView::Example_TextView()
   set_title("Text View");
 
   m_VPaned.set_margin(5);
-  add(m_VPaned);
+  set_child(m_VPaned);
 
   /* For convenience, we just use the autocreated buffer from
    * the first text view; you could also create the buffer
@@ -79,12 +79,12 @@ Example_TextView::Example_TextView()
   m_pView2 = Gtk::make_managed<Gtk::TextView>(refBuffer);
 
   m_ScrolledWindow1.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_VPaned.add1(m_ScrolledWindow1);
-  m_ScrolledWindow1.add(m_View1);
+  m_VPaned.set_start_child(m_ScrolledWindow1);
+  m_ScrolledWindow1.set_child(m_View1);
 
   m_ScrolledWindow2.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  m_VPaned.add2(m_ScrolledWindow2);
-  m_ScrolledWindow2.add(*m_pView2);
+  m_VPaned.set_end_child(m_ScrolledWindow2);
+  m_ScrolledWindow2.set_child(*m_pView2);
 
   create_tags(refBuffer);
   insert_text(refBuffer);
@@ -452,8 +452,8 @@ Window_EasterEgg::Window_EasterEgg()
   recursive_attach_view(0, *m_pTextView, refAnchor);
 
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
-  add(m_ScrolledWindow);
-  m_ScrolledWindow.add(*m_pTextView);
+  set_child(m_ScrolledWindow);
+  m_ScrolledWindow.set_child(*m_pTextView);
 
   hide();
 }
@@ -472,7 +472,7 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
   /* Frame is to add a black border around each child view */
   auto pFrame = Gtk::make_managed<Gtk::Frame>();
 
-  pFrame->add(*pChildView);
+  pFrame->set_child(*pChildView);
 
   view.add_child_at_anchor(*pFrame, refAnchor);
   recursive_attach_view (depth + 1, *pChildView, refAnchor);

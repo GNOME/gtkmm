@@ -7,6 +7,8 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 
+class Dialog_Interactive;
+
 class Example_Dialog : public Gtk::Window
 {
 public:
@@ -15,8 +17,9 @@ public:
 
 protected:
   //Signal handlers:
-  virtual void on_button_message();
-  virtual void on_button_interactive();
+  void on_button_message();
+  void on_button_interactive();
+  void on_dialog_response(int response_id, Gtk::Dialog* dialog);
 
   //Member widgets:
   Gtk::Frame m_Frame;
@@ -71,29 +74,29 @@ Example_Dialog::Example_Dialog()
   set_title("Dialogs");
 
   m_Frame.set_margin(8);
-  add(m_Frame);
+  set_child(m_Frame);
 
   m_VBox.set_margin(8);
-  m_Frame.add(m_VBox);
+  m_Frame.set_child(m_VBox);
 
 
   /* Standard message dialog */
-  m_VBox.add(m_HBox);
+  m_VBox.append(m_HBox);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
-  m_HBox.add(m_Button_Message);
-  m_VBox.add(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL));
+  m_HBox.append(m_Button_Message);
+  m_VBox.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL));
 
 
   /* Interactive dialog*/
-  m_VBox.add(m_HBox2);
+  m_VBox.append(m_HBox2);
   m_Button_Interactive.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_interactive));
-  m_HBox2.add(m_VBox2);
-  m_VBox2.add(m_Button_Interactive);
+  m_HBox2.append(m_VBox2);
+  m_VBox2.append(m_Button_Interactive);
 
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
-  m_HBox2.add(m_Grid);
+  m_HBox2.append(m_Grid);
 
   m_Grid.attach(m_Label1, 0, 0);
   m_Grid.attach(m_Entry1, 1, 0);
@@ -117,7 +120,9 @@ void Example_Dialog::on_button_message()
     strMessage += buf.get();
   }
   Gtk::MessageDialog dialog(*this, strMessage, false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true); //true = modal
-  /*int response =*/ dialog.run();
+  dialog.signal_response().connect(sigc::bind(
+    sigc::mem_fun(*this, &Example_Dialog::on_dialog_response), &dialog));
+  dialog.show();
 
   m_count++;
 }
@@ -125,12 +130,20 @@ void Example_Dialog::on_button_message()
 void Example_Dialog::on_button_interactive()
 {
   Dialog_Interactive* pDialog = new Dialog_Interactive(*this, m_Entry1.get_text(), m_Entry2.get_text());
-  /*int response =*/ pDialog->run();
+  pDialog->set_modal(true);
+  pDialog->signal_response().connect(sigc::bind(
+    sigc::mem_fun(*this, &Example_Dialog::on_dialog_response), pDialog));
+  pDialog->show();
+
   m_Entry1.set_text(pDialog->get_entry1());
   m_Entry2.set_text(pDialog->get_entry2());
   delete pDialog;
 }
 
+void Example_Dialog::on_dialog_response(int /* response_id */, Gtk::Dialog* dialog)
+{
+  dialog->hide();
+}
 
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
 : Gtk::Dialog("Interactive Dialog", parent, true),
@@ -143,13 +156,13 @@ Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring&
   add_button("_OK", Gtk::ResponseType::OK);
   add_button("_Cancel", Gtk::ResponseType::CANCEL);
 
-  get_content_area()->add(m_HBox);
-  m_HBox.add(m_Image);
+  get_content_area()->append(m_HBox);
+  m_HBox.append(m_Image);
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
   m_Grid.set_expand(true);
-  m_HBox.add(m_Grid);
+  m_HBox.append(m_Grid);
 
   m_Grid.attach(m_Label1, 0, 0);
   m_Entry1.set_text(entry1);

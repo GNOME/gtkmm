@@ -32,8 +32,7 @@ int main (int argc, char **argv)
 
   button.connect_property_changed("name", sigc::ptr_fun(&on_property_name_changed));
 
-
-  window.add(button);
+  window.set_child(button);
 
   return app->run(window, argc, argv);
 }

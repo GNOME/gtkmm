@@ -25,7 +25,6 @@
 #include <gtkmm/root.h>
 #include <gtkmm/native.h>
 #include <gtkmm/settings.h>
-#include <gtkmm/container.h>
 #include <gtkmm/eventcontroller.h>
 #include <gtkmm/tooltip.h>
 #include <gtkmm/snapshot.h>
@@ -254,20 +253,6 @@ Glib::RefPtr<const ConstraintTarget> Widget::make_refptr_constrainttarget() cons
   return const_cast<Widget*>(this)->make_refptr_constrainttarget();
 }
 
-void Widget::reparent(Container& new_parent)
-{
-  auto old_parent = get_parent();
-  g_return_if_fail(old_parent != nullptr); // if the widget is not in a Container
-
-  if (old_parent != &new_parent)
-  {
-    reference();
-    old_parent->remove(*this);
-    new_parent.add(*this);
-    unreference();
-  }
-}
-
 void Widget::set_layout_manager(const Glib::RefPtr<LayoutManager>& layout_manager)
 {
   // gtk_widget_set_layout_manager() does not take a ref.
@@ -328,7 +313,7 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
 
     // Abort dispose if the widget isn't managed, in order to prevent
     // the nasty self-destroying behaviour of GTK+.  This applies to
-    // any widget inside a GtkContainer on gtk_container_destroy()
+    // any widget inside a container on gtk_container_destroy()
     // See also Window_Class::dispose_vfunc_callback().
 
     if(obj->referenced_) //Not managed
@@ -340,15 +325,15 @@ void Widget_Class::dispose_vfunc_callback(GObject* self)
       if(parent)
       {
         // Normally, we would have to ref the child widget because
-        // gtk_container_remove() unrefs it.  But since we only remove
+        // gtk_widget_unparent() unrefs it.  But since we only remove
         // non-managed objects here, the container just releases the
-        // reference it has acquired before in gtk_container_add().
+        // reference it has acquired before in gtk_widget_set_parent().
 
         #ifdef GLIBMM_DEBUG_REFCOUNTING
         g_warning("Widget_Class::dispose_vfunc_callback(): removing gobject_: %p from parent: %p", (void*)self, (void*)parent);
         #endif
 
-        gtk_container_remove(GTK_CONTAINER(parent), pWidget);
+        gtk_widget_unparent(pWidget);
 
         #ifdef GLIBMM_DEBUG_REFCOUNTING
         g_warning("Widget_Class::dispose_vfunc_callback(): after removing from parent.");

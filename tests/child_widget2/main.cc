@@ -13,9 +13,9 @@ MyWindow::MyWindow() :
   b("hello"),
   vbox(Gtk::Orientation::VERTICAL)
 {
-  add(vbox);
+  set_child(vbox);
   b.set_expand(true);
-  vbox.add(b);
+  vbox.append(b);
 }
 
 int main (int argc, char *argv[])

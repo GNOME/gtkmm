@@ -193,15 +193,15 @@ Example_IconBrowser::Example_IconBrowser()
 
   // The header bar.
   set_titlebar(m_header);
-  m_header.set_title("Icon Browser");
+  set_title("Icon Browser");
   m_header.set_show_title_buttons(true);
   m_header.pack_end(m_search_button);
   m_search_button.set_image_from_icon_name("edit-find-symbolic");
   m_header.pack_end(m_header_radio_button_box);
   m_normal_radio.set_expand();
-  m_header_radio_button_box.add(m_normal_radio);
+  m_header_radio_button_box.append(m_normal_radio);
   m_symbolic_radio.set_expand();
-  m_header_radio_button_box.add(m_symbolic_radio);
+  m_header_radio_button_box.append(m_symbolic_radio);
   m_normal_radio.set_draw_indicator(false); // Make it look as a normal button
   m_symbolic_radio.set_draw_indicator(false);
   m_symbolic_radio.join_group(m_normal_radio);
@@ -212,23 +212,23 @@ Example_IconBrowser::Example_IconBrowser()
   m_button_size_group->add_widget(m_search_button);
 
   // Main part of the window.
-  add(m_hbox);
-  m_hbox.add(m_context_list);
+  set_child(m_hbox);
+  m_hbox.append(m_context_list);
   m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
-  m_hbox.add(m_vseparator);
+  m_hbox.append(m_vseparator);
   m_vcontent_box.set_expand();
-  m_hbox.add(m_vcontent_box);
-  m_vcontent_box.add(m_search_bar);
-  m_search_bar.add(m_search_entry);
+  m_hbox.append(m_vcontent_box);
+  m_vcontent_box.append(m_search_bar);
+  m_search_bar.set_child(m_search_entry);
   // The search bar is shown when the search toggle button is pressed.
   m_binding_search_button_search_entry = Glib::Binding::bind_property(
     m_search_button.property_active(),
     m_search_bar.property_search_mode_enabled(),
     Glib::Binding::Flags::BIDIRECTIONAL);
   m_scrolled_window.set_expand();
-  m_vcontent_box.add(m_scrolled_window);
+  m_vcontent_box.append(m_scrolled_window);
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-  m_scrolled_window.add(m_icon_view);
+  m_scrolled_window.set_child(m_icon_view);
   m_icon_view.set_model(m_filter_model);
   m_icon_view.set_selection_mode(Gtk::SelectionMode::NONE);
   m_icon_view.set_activate_on_single_click(true);
@@ -897,7 +897,7 @@ DetailDialog::DetailDialog(Gtk::Window& parent)
 {
   set_resizable(false);
   auto content_area = get_content_area();
-  content_area->add(m_grid);
+  content_area->append(m_grid);
   m_grid.set_expand();
   m_grid.set_margin(10);
   m_grid.set_row_spacing(10);

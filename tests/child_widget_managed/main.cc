@@ -32,7 +32,7 @@ ExampleWindow::ExampleWindow()
     set_default_size(150, 150);
 
     m_button = Gtk::make_managed<MyButton>();
-    add(*m_button);
+    set_child(*m_button);
 }
 
 ExampleWindow::~ExampleWindow()

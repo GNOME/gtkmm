@@ -107,13 +107,13 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   set_default_size(320, 200);
 
   m_VBox.set_margin(5);
-  add(m_VBox);
-  m_VBox.add(m_Label);
+  set_child(m_VBox);
+  m_VBox.append(m_Label);
 
   m_ScrolledWindow.set_has_frame(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_expand();
-  m_VBox.add(m_ScrolledWindow);
+  m_VBox.append(m_ScrolledWindow);
 
   /* create model */
   create_model();
@@ -124,19 +124,19 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   refTreeSelection->set_mode(Gtk::SelectionMode::SINGLE);
 
   add_columns();
-  m_ScrolledWindow.add(m_TreeView);
+  m_ScrolledWindow.set_child(m_TreeView);
 
   /* some buttons */
-  m_VBox.add(m_HBox);
+  m_VBox.append(m_HBox);
 
   m_Button_Add.set_expand();
-  m_HBox.add(m_Button_Add);
+  m_HBox.append(m_Button_Add);
   m_HBox.set_vexpand(false);
 
   m_Button_Add.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
 
-  m_HBox.add(m_Button_Remove);
+  m_HBox.append(m_Button_Remove);
   m_Button_Remove.set_expand();
   m_Button_Remove.signal_clicked().connect(
     sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
@@ -286,8 +286,6 @@ void Example_TreeView_EditableCells::add_columns()
 
     m_TreeView.append_column(*pViewColumn);
   }
-
-
 }
 
 

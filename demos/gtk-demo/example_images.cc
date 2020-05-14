@@ -72,93 +72,93 @@ Example_Images::Example_Images()
   set_title("Images");
 
   m_BaseVBox.set_margin(16);
-  add(m_BaseVBox);
-  m_BaseVBox.add(m_HBox);
+  set_child(m_BaseVBox);
+  m_BaseVBox.append(m_HBox);
 
   /* Image */
 
   auto pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.add(*pVBox);
+  m_HBox.append(*pVBox);
 
   m_Label_Image.set_markup("<u>Image loaded from a file</u>");
-  pVBox->add(m_Label_Image);
+  pVBox->append(m_Label_Image);
 
   m_Frame_Image.set_halign(Gtk::Align::CENTER);
   m_Frame_Image.set_valign(Gtk::Align::CENTER);
-  pVBox->add(m_Frame_Image);
+  pVBox->append(m_Frame_Image);
 
   auto pImage = Gtk::make_managed<Gtk::Image>();
   pImage->set_from_icon_name("gtk3-demo");
   pImage->set_icon_size(Gtk::IconSize::LARGE);
-  m_Frame_Image.add(*pImage);
+  m_Frame_Image.set_child(*pImage);
 
   /* Animation */
 
   m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
-  pVBox->add(m_Label_Animation);
+  pVBox->append(m_Label_Animation);
 
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
-  pVBox->add(m_Frame_Animation);
+  pVBox->append(m_Frame_Animation);
 
   auto pPicture = Gtk::make_managed<Gtk::Picture>();
   pPicture->set_resource("/images/floppybuddy.gif");
-  m_Frame_Animation.add(*pPicture);
+  m_Frame_Animation.set_child(*pPicture);
 
   /* Symbolic themed icon */
 
   m_Label_ThemedIcon.set_markup("<u>Symbolic themed icon</u>");
-  pVBox->add(m_Label_ThemedIcon);
+  pVBox->append(m_Label_ThemedIcon);
 
   m_Frame_ThemedIcon.set_halign(Gtk::Align::CENTER);
   m_Frame_ThemedIcon.set_valign(Gtk::Align::CENTER);
-  pVBox->add(m_Frame_ThemedIcon);
+  pVBox->append(m_Frame_ThemedIcon);
 
   auto icon = Gio::ThemedIcon::create("battery-caution-charging-symbolic", true);
   pImage = Gtk::make_managed<Gtk::Image>(icon);
   pImage->set_icon_size(Gtk::IconSize::LARGE);
-  m_Frame_ThemedIcon.add(*pImage);
+  m_Frame_ThemedIcon.set_child(*pImage);
 
   /* Progressive */
 
   pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.add(*pVBox);
+  m_HBox.append(*pVBox);
 
   m_Label_Progressive.set_markup("<u>Progressive image loading</u>");
-  pVBox->add(m_Label_Progressive);
+  pVBox->append(m_Label_Progressive);
 
   m_Frame_Progressive.set_halign(Gtk::Align::CENTER);
   m_Frame_Progressive.set_valign(Gtk::Align::CENTER);
-  pVBox->add(m_Frame_Progressive);
+  pVBox->append(m_Frame_Progressive);
 
   /* Create an empty image for now; the progressive loader
    * will create the pixbuf and fill it in.
    */
-  m_Frame_Progressive.add(m_Picture_Progressive);
+  m_Frame_Progressive.set_child(m_Picture_Progressive);
 
   start_progressive_loading();
 
   /* Video */
 
   m_Label_Video.set_markup("<u>Displaying video</u>");
-  pVBox->add(m_Label_Video);
+  pVBox->append(m_Label_Video);
 
   m_Frame_Video.set_halign(Gtk::Align::CENTER);
   m_Frame_Video.set_valign(Gtk::Align::CENTER);
-  pVBox->add(m_Frame_Video);
+  pVBox->append(m_Frame_Video);
 
   auto video = Gtk::make_managed<Gtk::Video>();
   video->set_resource("/images/gtk-logo.webm");
   video->get_media_stream()->set_loop();
-  m_Frame_Video.add(*video);
+  m_Frame_Video.set_child(*video);
 
   /* Widget paintable */
 
   pVBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 8);
-  m_HBox.add(*pVBox);
+  m_HBox.append(*pVBox);
 
   m_Label_Paintable.set_markup("<u>Gtk::WidgetPaintable</u>");
-  pVBox->add(m_Label_Paintable);
+  pVBox->append(m_Label_Paintable);
 
   pPicture = Gtk::make_managed<Gtk::Picture>();
   auto demo_window = DemoWindow::get_demo_window();
@@ -169,10 +169,10 @@ Example_Images::Example_Images()
   }
   pPicture->set_size_request(100, 100);
   pPicture->set_valign(Gtk::Align::START);
-  pVBox->add(*pPicture);
+  pVBox->append(*pPicture);
 
   /* Sensitivity control */
-  m_BaseVBox.add(m_ToggleButton);
+  m_BaseVBox.append(m_ToggleButton);
   m_ToggleButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_Images::on_toggle_sensitivity));
 }
 
@@ -217,7 +217,7 @@ bool Example_Images::on_timeout()
       strMsg += error.what();
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.run();
+      dialog.show();
 
       m_image_stream.reset();
 
@@ -234,7 +234,7 @@ bool Example_Images::on_timeout()
       strMsg += error.what();
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.run();
+      dialog.show();
 
       m_image_stream.reset();
 
@@ -260,7 +260,7 @@ bool Example_Images::on_timeout()
         strMsg += error.what();
 
         Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-        dialog.run();
+        dialog.show();
 
         m_refPixbufLoader.reset();
 
@@ -282,7 +282,7 @@ bool Example_Images::on_timeout()
       strMsg += error.what();
 
       Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.run();
+      dialog.show();
 
       return false; // uninstall the timeout
     }

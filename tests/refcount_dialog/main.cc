@@ -32,16 +32,18 @@ MyWindow::MyWindow()
 
   m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
   m_Button.set_expand(true);
-  m_Box.add(m_Button);
-  add(m_Box);
+  m_Box.append(m_Button);
+  set_child(m_Box);
 }
 
 void MyWindow::on_button_clicked()
 {
   {
     MyDialog d;
-    d.run();
-    std::cout << "After d.run()" << std::endl;
+    d.set_transient_for(*this);
+    d.set_modal();
+    d.show();
+    std::cout << "After d.show()" << std::endl;
   }
 
   std::cout << "before list_toplevel" << std::endl;

@@ -16,11 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmm/bin.h>
+#include <gtkmm/widget.h>
 #include <gtkmm/native.h>
 
 _DEFS(gtkmm,gtk)
-_PINCLUDE(gtkmm/private/bin_p.h)
+_PINCLUDE(gtkmm/private/widget_p.h)
 
 namespace Gtk
 {
@@ -46,14 +46,21 @@ namespace Gtk
  * @ingroup Widgets
  * @newin{3,12}
  */
-class Popover : public Bin, public Native
+class Popover : public Widget, public Native
 {
-  _CLASS_GTKOBJECT(Popover, GtkPopover, GTK_POPOVER, Gtk::Bin, GtkBin)
+  _CLASS_GTKOBJECT(Popover, GtkPopover, GTK_POPOVER, Gtk::Widget, GtkWidget)
   _IMPLEMENTS_INTERFACE(Native)
+  // GtkPopover also implements GtkShortcutManager, but that interface is not
+  // (yet) wrapped in a C++ class.
 public:
   _WRAP_ENUM(Constraint, GtkPopoverConstraint)
 
   _CTOR_DEFAULT
+
+  _WRAP_METHOD(void set_child(Widget& child), gtk_popover_set_child)
+  void unset_child();
+  _WRAP_METHOD(Widget* get_child(), gtk_popover_get_child)
+  _WRAP_METHOD(const Widget* get_child() const, gtk_popover_get_child, constversion)
 
   //This cannot take NULL to mean unset.
 #m4 _CONVERSION(`const GdkRectangle*',`const Gdk::Rectangle&',`Glib::wrap($3)')
@@ -84,6 +91,7 @@ public:
   _WRAP_PROPERTY("has-arrow", bool)
   _WRAP_PROPERTY("default-widget", Widget*)
   _WRAP_PROPERTY("mnemonics-visible", bool)
+  _WRAP_PROPERTY("child", Widget*)
 
   _WRAP_SIGNAL(void closed(), "closed")
   _IGNORE_SIGNAL("activate-default")dnl// action signal

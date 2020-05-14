@@ -35,7 +35,7 @@ TextWidget::TextWidget(bool is_source)
   m_TextView.set_buffer(m_refTextBuffer);
   m_TextView.set_editable(false);
   m_TextView.set_cursor_visible(false);
-  add(m_TextView);
+  set_child(m_TextView);
 
   if (is_source)
   {
