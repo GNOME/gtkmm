@@ -26,7 +26,7 @@
 namespace Gtk
 {
 
-class TreeModelColumnBase;
+class GTKMM_API TreeModelColumnBase;
 
 
 /** Typedefed as TreeModel::ColumnRecord.
@@ -67,7 +67,7 @@ class TreeModelColumnBase;
  * sure it's instantiated after Gtk::Main), even when creating multiple models
  * from it.
  */
-class TreeModelColumnRecord
+class GTKMM_API TreeModelColumnRecord
 {
 public:
   TreeModelColumnRecord();
@@ -95,7 +95,7 @@ private:
 /** Base class of TreeModelColumn templates.
  * @ingroup TreeView
  */
-class TreeModelColumnBase
+class GTKMM_API TreeModelColumnBase
 {
 public:
   GType type()  const { return type_;  }

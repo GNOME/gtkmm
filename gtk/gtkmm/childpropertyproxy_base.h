@@ -33,7 +33,7 @@ namespace Gtk
 
 // We need to reimplement the connect() method so that it uses
 // "child-notify" as prefix for notify signal.
-class SignalProxyChildProperty : public Glib::SignalProxyProperty
+class GTKMM_API SignalProxyChildProperty : public Glib::SignalProxyProperty
 {
 public:
   SignalProxyChildProperty(Widget* child, const char* property_name)
@@ -42,9 +42,9 @@ public:
   sigc::connection connect(const SlotType& sl);
 };
 
-class Container;
+class GTKMM_API Container;
 
-class ChildPropertyProxy_Base
+class GTKMM_API ChildPropertyProxy_Base
 {
 public:
   ChildPropertyProxy_Base(Container* parent, Widget& child, const char* property_name);

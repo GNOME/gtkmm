@@ -34,22 +34,27 @@ namespace Gdk
 #ifndef GDKMM_DISABLE_DEPRECATED
 /**  @deprecated Use per-monitor information.
  */
+GDKMM_API
 int screen_width();
 
 /**  @deprecated Use per-monitor information.
  */
+GDKMM_API
 int screen_height();
 
 /**  @deprecated Use per-monitor information.
  */
+GDKMM_API
 int screen_width_mm();
 
 /**  @deprecated Use per-monitor information.
  */
+GDKMM_API
 int screen_height_mm();
 
 /**  @deprecated Use Gdk::Display::flush() instead.
  */
+GDKMM_API
 void flush();
 #endif //GDKMM_DISABLE_DEPRECATED
 
@@ -65,6 +70,7 @@ namespace Cairo
  * @newin{2,10}
  * @deprecated Use set_source_rgba() instead.
  */
+GDKMM_API
 void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Color& color);
 
 #endif //GDKMM_DISABLE_DEPRECATED
@@ -75,6 +81,7 @@ void set_source_color(const ::Cairo::RefPtr< ::Cairo::Context >& context, const 
  *
  * @newin{3,0}
  */
+GDKMM_API
 void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color);
 
 /** Sets the given pixbuf as the source pattern for the %Cairo context.
@@ -87,6 +94,7 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
  *
  * @newin{2,10}
  */
+GDKMM_API
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Pixbuf>& pixbuf, double pixbuf_x = 0, double pixbuf_y = 0);
 
@@ -97,6 +105,7 @@ void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
  *
  * @newin{2,10}
  */
+GDKMM_API
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
 
 /** Adds the given region to the current path of the context.
@@ -106,6 +115,7 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
  *
  * @newin{2,10}
  */
+GDKMM_API
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region);
 
 /** This is a convenience function around Cairo::Context::get_clip_extents().
@@ -119,6 +129,7 @@ void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, cons
  *
  * @newin{3,24}
  */
+GDKMM_API
 bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk::Rectangle& rectangle);
 
 /** This is a convenience function around Cairo::Context::get_clip_extents().
@@ -129,6 +140,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context, Gdk:
  *
  * @newin{3,24}
  */
+GDKMM_API
 bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
 
 /** Creates a region that covers the area where the given
@@ -142,6 +154,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  *
  * @newin{3,24}
  */
+GDKMM_API
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface);
 
 /** Creates an image surface with the same contents as the pixbuf.
@@ -154,6 +167,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  *
  * @newin{3,24}
  */
+GDKMM_API
 ::Cairo::RefPtr< ::Cairo::ImageSurface> create_surface_from_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf,
   int scale, const Glib::RefPtr<Gdk::Window>& for_window = {});
 
@@ -187,6 +201,7 @@ bool get_clip_rectangle(const ::Cairo::RefPtr< ::Cairo::Context >& context);
  *
  * @newin{3,24}
  */
+GDKMM_API
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Window>& window, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height);

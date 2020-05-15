@@ -25,6 +25,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmmconfig.h>
+
 #include <glibmm/ustring.h>
 #include <glibmm/containerhandle_shared.h>
 
@@ -36,7 +38,7 @@ struct BuiltinStockID;
 /** See also Gtk::BuiltinStockID.
  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
  */
-class StockID
+class GTKMM_API StockID
 {
 public:
   /** Create an empty StockID
@@ -138,7 +140,7 @@ namespace Glib
 {
 
 template <>
-class Value<Gtk::StockID> : public Glib::ValueBase_String
+class GTKMM_API Value<Gtk::StockID> : public Glib::ValueBase_String
 {
 public:
   typedef Gtk::StockID CppType;

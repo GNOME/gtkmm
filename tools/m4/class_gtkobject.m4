@@ -19,6 +19,7 @@ dnl rather than the real instance type.  That is really ugly, yes.  We get aroun
 dnl the problem by supporting optional __REAL_* arguments to this macro.
 define(`__REAL_CNAME__',ifelse(`$6',,__CNAME__,`$6'))
 define(`__REAL_CPARENT__',ifelse(`$7',,__CPARENT__,`$7'))
+define(`__FUNC_DECORATION__',`$8')
 
 
 dnl
@@ -104,7 +105,7 @@ dnl _STRUCT_PROTOTYPE() can be disabled with _STRUCT_NOT_HIDDEN.
 _STRUCT_PROTOTYPE()
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-__NAMESPACE_BEGIN__ class __CPPNAME__`'_Class; __NAMESPACE_END__
+__NAMESPACE_BEGIN__ class __FUNC_DECORATION__ __CPPNAME__`'_Class; __NAMESPACE_END__
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 _SECTION(SECTION_HEADER3)
@@ -121,6 +122,7 @@ namespace Glib
    *
    * @relates __NAMESPACE__::__CPPNAME__
    */
+  __FUNC_DECORATION__
   __NAMESPACE__::__CPPNAME__`'* wrap(__CNAME__`'* object, bool take_copy = false);
 } //namespace Glib
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
@@ -249,7 +251,7 @@ m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
 `protected:',`dnl else
 private:')dnl endif
 
-  friend class __CPPNAME__`'_Class;
+  friend class __FUNC_DECORATION__ __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
 
 protected:

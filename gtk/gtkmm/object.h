@@ -27,7 +27,7 @@
 namespace Gtk
 {
 
-class Object;
+class GTKMM_API Object;
 
 /** Mark a Gtk::Object as owned by its parent container widget, so you don't need to delete it manually.
  * For instance,

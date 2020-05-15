@@ -53,6 +53,7 @@ namespace AccelMap
  * @param accel_mods the accelerator modifiers
  *
  */
+GTKMM_API
 void add_entry(const std::string& accel_path,
                guint accel_key,
                Gdk::ModifierType accel_mods);
@@ -70,6 +71,7 @@ void add_entry(const std::string& accel_path,
  * @param replace     true if other accelerators may be deleted upon conflicts
  * @result     true if the accelerator could be changed, false otherwise
  */
+GTKMM_API
 bool change_entry(const std::string& accel_path,
                   guint accel_key,
                   Gdk::ModifierType accel_mods,
@@ -80,6 +82,7 @@ bool change_entry(const std::string& accel_path,
  *
  * @param filename a file containing accelerator specifications
  */
+GTKMM_API
 void load(const std::string& filename);
 
 /** Saves current accelerator specifications (accelerator path, key
@@ -89,6 +92,7 @@ void load(const std::string& filename);
  *
  * @param filename the file to contain accelerator specifications
  */
+GTKMM_API
 void save(const std::string& filename);
 
 /** Locks the given accelerator path.
@@ -107,6 +111,7 @@ void save(const std::string& filename);
  *
  * @newin{2,4}
  */
+GTKMM_API
 void lock_path(const std::string& accel_path);
 
 /** Unlocks the given accelerator path. Refer to gtk_accel_map_lock_path()
@@ -116,6 +121,7 @@ void lock_path(const std::string& accel_path);
  *
  * @newin{2,4}
  */
+GTKMM_API
 void unlock_path(const std::string& accel_path);
 
 /** Looks up the accelerator entry for accel_path.
@@ -124,6 +130,7 @@ void unlock_path(const std::string& accel_path);
  *
  * @newin{2,10}
  */
+GTKMM_API
 bool lookup_entry (const Glib::ustring& accel_path);
 
 /** Looks up the accelerator entry for accel_path and fills in key.
@@ -133,6 +140,7 @@ bool lookup_entry (const Glib::ustring& accel_path);
  *
  * @newin{2,10}
  */
+GTKMM_API
 bool lookup_entry (const Glib::ustring& accel_path, Gtk::AccelKey& key);
 
 } // namespace AccelMap

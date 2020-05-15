@@ -293,6 +293,7 @@ extern GTKMM_API const Gtk::BuiltinStockID ZOOM_OUT;         /*!< @image html gt
  *             stock ID the old item gets replaced.
  * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
  */
+GTKMM_API
 void add(const Gtk::StockItem& item);
 
 /** Fills item with the registered values for stock_id.
@@ -302,6 +303,7 @@ void add(const Gtk::StockItem& item);
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
   * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
+GTKMM_API
 bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
 
 /** See IconSet::lookup_default()
@@ -311,6 +313,7 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::StockItem& item);
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise.
   * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
+GTKMM_API
 bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
 
 /** Receive an Image of the registered stock id with the correct size.
@@ -321,6 +324,7 @@ bool lookup(const Gtk::StockID& stock_id, Glib::RefPtr<Gtk::IconSet>& iconset);
   * @return <tt>true</tt> if the item was found - <tt>false</tt> otherwise
   * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
+GTKMM_API
 bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image);
 
 /** Retrieves a list of all known stock IDs added to an IconFactory or registered with Stock::add().
@@ -328,6 +332,7 @@ bool lookup(const Gtk::StockID& stock_id, Gtk::IconSize size, Gtk::Image& image)
   * @return list of all known stock IDs.
   * @deprecated Use icon names instead of StockItem, StockID and BuiltinStockID.
   */
+GTKMM_API
 std::vector<Gtk::StockID> get_ids();
 
 } // namespace Stock
