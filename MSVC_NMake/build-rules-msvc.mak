@@ -23,11 +23,17 @@ $<
 $<
 <<
 
+{..\untracked\gdk\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+$<
+<<
+
 {..\gdk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
-	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gdk\gdkmm\%%~ns.cc if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gdk\gdkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
+	@if exist ..\untracked\gdk\gdkmm\$(<B).cc if not exist ..\gdk\gdkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
+	@if exist ..\gdk\gdkmm\$(<B).cc if not exist ..\untracked\gdk\gdkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
 
 {.\gdkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.res:
 	rc /fo$@ $<
@@ -42,11 +48,17 @@ $<
 $<
 <<
 
+{..\untracked\gtk\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+$<
+<<
+
 {..\gtk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
-	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist ..\untracked\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gtk\gtkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
+	@if exist ..\untracked\gtk\gtkmm\$(<B).cc if not exist ..\gtk\gtkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
+	@if exist ..\gtk\gtkmm\$(<B).cc if not exist ..\untracked\gtk\gtkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
 
 {.\gtkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
 	rc /fo$@ $<
