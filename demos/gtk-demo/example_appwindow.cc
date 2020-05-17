@@ -133,6 +133,8 @@ void Example_AppWindow::on_menu_item()
 {
   Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item", false,
                             Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE, true);
+  // This is not by itself an acceptable replacement for the removed Gtk::Dialog::run().
+  // Won't be fixed now. All uses of on_menu_item() are commented out.
   dialog.show();
 }
 

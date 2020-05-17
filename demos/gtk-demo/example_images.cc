@@ -35,6 +35,8 @@ protected:
   void on_loader_area_updated(int x, int y, int width, int height);
   void on_toggle_sensitivity();
 
+  void init_message_dialog();
+
   //Member widgets:
   Gtk::Box m_BaseVBox;
   Gtk::Box m_HBox;
@@ -54,6 +56,7 @@ protected:
 
   Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
   Glib::RefPtr<Gio::InputStream> m_image_stream;
+  std::unique_ptr<Gtk::MessageDialog> m_pMessageDialog;
 };
 
 //Called by DemoWindow;
@@ -189,6 +192,19 @@ Example_Images::~Example_Images()
   }
 }
 
+void Example_Images::init_message_dialog()
+{
+  if (!m_pMessageDialog)
+  {
+    m_pMessageDialog.reset(new Gtk::MessageDialog(
+      "", false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE, true));
+    m_pMessageDialog->set_transient_for(*this);
+    m_pMessageDialog->set_hide_on_close(true);
+    m_pMessageDialog->signal_response().connect(
+      sigc::hide(sigc::mem_fun(*m_pMessageDialog, &Gtk::Widget::hide)));
+  }
+}
+
 void Example_Images::start_progressive_loading()
 {
   Glib::signal_timeout().connect(sigc::mem_fun(*this, &Example_Images::on_timeout), 150);
@@ -212,12 +228,13 @@ bool Example_Images::on_timeout()
     }
     catch(const Glib::Error& error)
     {
+      init_message_dialog();
 
       Glib::ustring strMsg = "Failure reading image 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.show();
+      m_pMessageDialog->set_message(strMsg);
+      m_pMessageDialog->show();
 
       m_image_stream.reset();
 
@@ -230,11 +247,13 @@ bool Example_Images::on_timeout()
     }
     catch(const Glib::Error& error)
     {
+      init_message_dialog();
+
       Glib::ustring strMsg = "Failed to load image: ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.show();
+      m_pMessageDialog->set_message(strMsg);
+      m_pMessageDialog->show();
 
       m_image_stream.reset();
 
@@ -256,11 +275,13 @@ bool Example_Images::on_timeout()
       }
       catch(const Glib::Error& error)
       {
+        init_message_dialog();
+
         Glib::ustring strMsg = "Failed to close image: ";
         strMsg += error.what();
 
-        Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-        dialog.show();
+        m_pMessageDialog->set_message(strMsg);
+        m_pMessageDialog->show();
 
         m_refPixbufLoader.reset();
 
@@ -278,11 +299,13 @@ bool Example_Images::on_timeout()
     }
     catch(const Glib::Error& error)
     {
+      init_message_dialog();
+
       Glib::ustring strMsg = "Unable to open image 'alphatest.png': ";
       strMsg += error.what();
 
-      Gtk::MessageDialog dialog(strMsg, false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE);
-      dialog.show();
+      m_pMessageDialog->set_message(strMsg);
+      m_pMessageDialog->show();
 
       return false; // uninstall the timeout
     }

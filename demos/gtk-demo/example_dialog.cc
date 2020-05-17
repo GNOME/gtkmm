@@ -19,7 +19,8 @@ protected:
   //Signal handlers:
   void on_button_message();
   void on_button_interactive();
-  void on_dialog_response(int response_id, Gtk::Dialog* dialog);
+  void on_message_response(int response_id, Gtk::MessageDialog* dialog);
+  void on_interactive_response(int response_id, Dialog_Interactive* dialog);
 
   //Member widgets:
   Gtk::Frame m_Frame;
@@ -50,7 +51,6 @@ protected:
   Gtk::Entry m_Entry1, m_Entry2;
   Gtk::Image m_Image;
 };
-
 
 
 //Called by DemoWindow;
@@ -115,16 +115,12 @@ void Example_Dialog::on_button_message()
 {
   Glib::ustring strMessage = "This message box has been popped up the following\n"
                              "number of times:\n\n";
-  {
-    auto buf = Glib::make_unique_ptr_gfree(g_strdup_printf("%d", m_count));
-    strMessage += buf.get();
-  }
-  Gtk::MessageDialog dialog(*this, strMessage, false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true); //true = modal
-  dialog.signal_response().connect(sigc::bind(
-    sigc::mem_fun(*this, &Example_Dialog::on_dialog_response), &dialog));
-  dialog.show();
+  strMessage += Glib::ustring::format(m_count);
 
-  m_count++;
+  auto dialog = new Gtk::MessageDialog(*this, strMessage, false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true); //true = modal
+  dialog->signal_response().connect(sigc::bind(
+    sigc::mem_fun(*this, &Example_Dialog::on_message_response), dialog));
+  dialog->show();
 }
 
 void Example_Dialog::on_button_interactive()
@@ -132,17 +128,25 @@ void Example_Dialog::on_button_interactive()
   Dialog_Interactive* pDialog = new Dialog_Interactive(*this, m_Entry1.get_text(), m_Entry2.get_text());
   pDialog->set_modal(true);
   pDialog->signal_response().connect(sigc::bind(
-    sigc::mem_fun(*this, &Example_Dialog::on_dialog_response), pDialog));
+    sigc::mem_fun(*this, &Example_Dialog::on_interactive_response), pDialog));
   pDialog->show();
 
-  m_Entry1.set_text(pDialog->get_entry1());
-  m_Entry2.set_text(pDialog->get_entry2());
-  delete pDialog;
 }
 
-void Example_Dialog::on_dialog_response(int /* response_id */, Gtk::Dialog* dialog)
+void Example_Dialog::on_message_response(int /* response_id */, Gtk::MessageDialog* dialog)
 {
-  dialog->hide();
+  m_count++;
+  delete dialog;
+}
+
+void Example_Dialog::on_interactive_response(int response_id, Dialog_Interactive* dialog)
+{
+  if (response_id == Gtk::ResponseType::OK)
+  {
+    m_Entry1.set_text(dialog->get_entry1());
+    m_Entry2.set_text(dialog->get_entry2());
+  }
+  delete dialog;
 }
 
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)

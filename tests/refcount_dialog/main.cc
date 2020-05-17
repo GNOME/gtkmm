@@ -18,10 +18,12 @@ public:
   MyWindow();
 
   void on_button_clicked();
+  void on_dialog_response(int response_id);
 
 protected:
   Gtk::Box m_Box;
   Gtk::Button m_Button;
+  std::unique_ptr<MyDialog> m_Dialog;
 };
 
 MyWindow::MyWindow()
@@ -38,19 +40,28 @@ MyWindow::MyWindow()
 
 void MyWindow::on_button_clicked()
 {
-  {
-    MyDialog d;
-    d.set_transient_for(*this);
-    d.set_modal();
-    d.show();
-    std::cout << "After d.show()" << std::endl;
-  }
-
-  std::cout << "before list_toplevel" << std::endl;
+  m_Dialog.reset(nullptr);
+  std::cout << "before list_toplevels 1" << std::endl;
   std::vector<Gtk::Window*> toplevelwindows = list_toplevels();
-  std::cout << "after list_toplevel" << std::endl;
-
+  std::cout << "after list_toplevels" << std::endl;
   std::cout << "toplevelwindows.size = " << toplevelwindows.size() << std::endl;
+
+  m_Dialog.reset(new MyDialog);
+  m_Dialog->set_transient_for(*this);
+  m_Dialog->set_modal();
+  m_Dialog->set_hide_on_close();
+  m_Dialog->signal_response().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
+  m_Dialog->show();
+  std::cout << "After m_Dialog->show()" << std::endl;
+}
+
+void MyWindow::on_dialog_response(int /* response_id */)
+{
+  std::cout << "before list_toplevels 2" << std::endl;
+  std::vector<Gtk::Window*> toplevelwindows = list_toplevels();
+  std::cout << "after list_toplevels" << std::endl;
+  std::cout << "toplevelwindows.size = " << toplevelwindows.size() << std::endl;
+  m_Dialog->hide();
 }
 
 int main(int argc, char* argv[])
