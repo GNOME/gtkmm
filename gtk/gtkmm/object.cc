@@ -62,16 +62,15 @@ void Object::_init_unmanage()
     }
     else
     {
-      //This widget is already not floating. It's probably already been added to a GTK+ container, and has just had Glib::wrap() called on it.
-      //It's not floating because containers call g_object_sink() on child widgets to take control of them.
-      //We just ref() it so that we can unref it later.
-      //GLIBMM_DEBUG_REFERENCE(this, gobject_);
-      //g_object_ref(gobject_);
-
-      //Alternatively, it might be a top-level window (e.g. a Dialog). We would then be doing one too-many refs(),
-      //We do an extra unref() in Window::_release_c_instance() to take care of that.
-
-      referenced_ = false; //Managed. We should not try to unfloat GObjects that we did not instantiate.
+      // This widget is already not floating. It's probably already been added to
+      // a GTK+ container, and has just had Glib::wrap() called on it.
+      // It's not floating because containers call g_object_ref_sink()
+      // on child widgets to take control of them.
+      // Alternatively, it might be a top-level window (e.g. a Window or a Dialog).
+      if (GTK_IS_WINDOW(gobject_))
+        referenced_ = true; // Not managed. GtkWindow or one of its subbclasses.
+      else
+        referenced_ = false; // Managed. We should not try to unfloat GObjects that we did not instantiate.
     }
   }
 }

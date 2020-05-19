@@ -148,7 +148,10 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Window_Class::dispose_vfunc_callback(): gobject_: %p\n", (void*)self);
   #endif
-
+#if 0
+  // The "dispose" vfunc in GtkWindow does much more in gtk4 than in gtk3.
+  // It would be difficult to make the deletion of windows work without letting
+  // the gtk4 dispose vfunc do its job. /Kjell 2020-05-19
   const auto obj = dynamic_cast<Widget*>(
       Glib::ObjectBase::_get_current_wrapper(self));
 
@@ -161,8 +164,8 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     const auto pWidget = obj->gobj();
     g_return_if_fail(pWidget == GTK_WIDGET(self));
 
-    // Abort dispose if the widget isn't managed, in order to prevent
-    // the nasty self-destroying behaviour of GTK+.  This applies to:
+    // Abort dispose if the widget isn't managed (which a window isn't), in order
+    // to prevent the nasty self-destroying behaviour of GTK+.  This applies to:
     //
     // - GtkWindow, if it received "delete_event"
     // - GtkDialog, which destroys on "response" by default
@@ -170,6 +173,14 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     #ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("Window_Class::dispose_vfunc_callback(): before gtk_widget_hide().");
     #endif
+
+    // The window may have been hidden with a call to the static (i.e. private)
+    // gtk_window_hide(), which does not send the "hide" signal.
+    // In that case gtk_widget_hide() has no effect, and on_window_hide()
+    // won't be called indirectly from gtk_widget_hide().
+    const auto win = dynamic_cast<Window*>(obj);
+    if (win)
+      win->on_window_hide();
 
     // Now hide the widget.  The C++ object must _not_ be accessed anymore
     // after this call, because a signal_hide() handler might delete it.
@@ -183,6 +194,7 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     return; // Prevent calling of normal C dispose vfunc (see below)
   }
   else
+#endif
   {
     #ifdef GLIBMM_DEBUG_REFCOUNTING
     //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");

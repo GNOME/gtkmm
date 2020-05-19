@@ -34,6 +34,7 @@ const char gladefile[] =
     "<property name='title' translatable='yes'>Gtk::Builder ref count</property>"
     "<property name='default_width'>440</property>"
     "<property name='default_height'>150</property>"
+    "<property name='hide_on_close'>True</property>"
     "<child>"
       "<object class='GtkBox' id='vbox'>"
         "<property name='can_focus'>False</property>"

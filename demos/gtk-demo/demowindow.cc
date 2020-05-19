@@ -212,6 +212,7 @@ void DemoWindow::run_example(Gtk::TreeModel::Row& row)
   {
     row[columns.italic] = true;
 
+    m_pWindow_Example->set_hide_on_close(true);
     m_pWindow_Example->signal_hide().connect(sigc::mem_fun(*this, &DemoWindow::on_example_window_hide));
     m_pWindow_Example->show();
   }
