@@ -77,6 +77,7 @@ void Example_ColorSel::on_button_clicked()
   {
     m_pDialog.reset(new Gtk::ColorChooserDialog("Changing color"));
     m_pDialog->set_transient_for(*this);
+    m_pDialog->set_hide_on_close(true);
     m_pDialog->set_modal(true);
     m_pDialog->signal_response().connect(
       sigc::mem_fun(*this, &Example_ColorSel::on_dialog_response));

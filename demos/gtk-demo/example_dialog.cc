@@ -130,7 +130,6 @@ void Example_Dialog::on_button_interactive()
   pDialog->signal_response().connect(sigc::bind(
     sigc::mem_fun(*this, &Example_Dialog::on_interactive_response), pDialog));
   pDialog->show();
-
 }
 
 void Example_Dialog::on_message_response(int /* response_id */, Gtk::MessageDialog* dialog)

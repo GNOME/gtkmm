@@ -75,9 +75,17 @@ Window::Window()
 
 void Window::on_window_hide()
 {
+  #ifdef GLIBMM_DEBUG_REFCOUNTING
+  g_warning("Gtk::Window::on_window_hide() gobject_=%p\n", (void*) gobject_);
+  #endif
+
   auto appl = get_application();
   if (appl)
   {
+    #ifdef GLIBMM_DEBUG_REFCOUNTING
+    g_warning("Gtk::Window::on_window_hide(): before remove_window().");
+    #endif
+
     // Tell GtkApplication to forget the window.
     // This can cause Application::run() to return, if it is the last window.
     // Otherwise, GtkApplication waits for the window to be _destroyed_,
@@ -143,15 +151,10 @@ void Window::_release_c_instance()
 
 void Window_Class::dispose_vfunc_callback(GObject* self)
 {
-  //Avoid disposal of Windows on delete_event (window close) signal.
-
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Window_Class::dispose_vfunc_callback(): gobject_: %p\n", (void*)self);
   #endif
-#if 0
-  // The "dispose" vfunc in GtkWindow does much more in gtk4 than in gtk3.
-  // It would be difficult to make the deletion of windows work without letting
-  // the gtk4 dispose vfunc do its job. /Kjell 2020-05-19
+
   const auto obj = dynamic_cast<Widget*>(
       Glib::ObjectBase::_get_current_wrapper(self));
 
@@ -163,12 +166,6 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
   {
     const auto pWidget = obj->gobj();
     g_return_if_fail(pWidget == GTK_WIDGET(self));
-
-    // Abort dispose if the widget isn't managed (which a window isn't), in order
-    // to prevent the nasty self-destroying behaviour of GTK+.  This applies to:
-    //
-    // - GtkWindow, if it received "delete_event"
-    // - GtkDialog, which destroys on "response" by default
 
     #ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("Window_Class::dispose_vfunc_callback(): before gtk_widget_hide().");
@@ -189,40 +186,26 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     #ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("Window_Class::dispose_vfunc_callback(): after gtk_widget_hide().");
     #endif
-
-    // GTKMM_LIFECYCLE
-    return; // Prevent calling of normal C dispose vfunc (see below)
   }
-  else
-#endif
-  {
-    #ifdef GLIBMM_DEBUG_REFCOUNTING
-    //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced: before gtk_widget_hide().");
-    #endif
 
-    // Always hide widgets on object destruction, regardless of whether
-    // the widget is managed or not.  This is done for consistency so that
-    // connecting to signal_hide() is guaranteed to work.
-    //gtk_widget_hide(pWidget);
+  // The "dispose" vfunc in GtkWindow does much more in gtk4 than in gtk3.
+  // It would be difficult to make the deletion of windows work without letting
+  // the gtk4 dispose vfunc do its job. /Kjell 2020-05-19
+  // GTKMM_LIFECYCLE
 
-    #ifdef GLIBMM_DEBUG_REFCOUNTING
-    //g_warning("Window_Class::dispose_vfunc_callback(): unreferenced:  after gtk_widget_hide().");
-    #endif
+  const auto base = static_cast<GObjectClass*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
 
-    const auto base = static_cast<GObjectClass*>(
-        g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)));
+  #ifdef GLIBMM_DEBUG_REFCOUNTING
+  g_warning("Window_Class::dispose_vfunc_callback(): before calling base->dispose.");
+  #endif
 
-    #ifdef GLIBMM_DEBUG_REFCOUNTING
-    g_warning("Window_Class::dispose_vfunc_callback(): before calling base->dispose.");
-    #endif
+  if(base->dispose)
+    (*base->dispose)(self);
 
-    if(base->dispose)
-      (*base->dispose)(self);
-
-    #ifdef GLIBMM_DEBUG_REFCOUNTING
-    g_warning("Window_Class::dispose_vfunc_callback(): after calling base->dispose.");
-    #endif
-  }
+  #ifdef GLIBMM_DEBUG_REFCOUNTING
+  g_warning("Window_Class::dispose_vfunc_callback(): after calling base->dispose.");
+  #endif
 }
 
 void Window::unset_focus()
