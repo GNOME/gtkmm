@@ -597,12 +597,10 @@ marked as idle (and possibly locked)
 <property name="GtkApplicationWindow:show-menubar">
 <description>
 If this property is %TRUE, the window will display a menubar
-that includes the app menu and menubar, unless these are
-shown by the desktop shell. See gtk_application_set_app_menu()
-and gtk_application_set_menubar().
+unless it is shown by the desktop shell. See gtk_application_set_menubar().
 
 If %FALSE, the window will not display a menubar, regardless
-of whether the desktop shell is showing the menus or not.
+of whether the desktop shell is showing it or not.
 
 </description>
 </property>
@@ -17995,24 +17993,6 @@ there isn't one.
 </return>
 </function>
 
-<function name="gtk_application_get_app_menu">
-<description>
-Returns the menu model that has been set with
-gtk_application_set_app_menu().
-
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> a #GtkApplication
-</parameter_description>
-</parameter>
-</parameters>
-<return> the application menu of @application
-or %NULL if no application menu has been set.
-</return>
-</function>
-
 <function name="gtk_application_get_menu_by_id">
 <description>
 Gets a menu from automatically loaded resources.
@@ -18213,55 +18193,6 @@ uniqueness) will be disabled.
 </return>
 </function>
 
-<function name="gtk_application_prefers_app_menu">
-<description>
-Determines if the desktop environment in which the application is
-running would prefer an application menu be shown.
-
-If this function returns %TRUE then the application should call
-gtk_application_set_app_menu() with the contents of an application
-menu, which will be shown by the desktop environment.  If it returns
-%FALSE then you should consider using an alternate approach, such as
-a menubar.
-
-The value returned by this function is purely advisory and you are
-free to ignore it.  If you call gtk_application_set_app_menu() even
-if the desktop environment doesn't support app menus, then a fallback
-will be provided.
-
-Applications are similarly free not to set an app menu even if the
-desktop environment wants to show one.  In that case, a fallback will
-also be created by the desktop environment (GNOME, for example, uses
-a menu with only a &quot;Quit&quot; item in it).
-
-The value returned by this function never changes.  Once it returns a
-particular value, it is guaranteed to always return the same value.
-
-You may only call this function after the application has been
-registered and after the base startup handler has run.  You're most
-likely to want to use this from your own startup handler.  It may
-also make sense to consult this function while constructing UI (in
-activate, open or an action activation handler) in order to determine
-if you should show a gear menu or not.
-
-This function will return %FALSE on Mac OS and a default app menu
-will be created automatically with the &quot;usual&quot; contents of that menu
-typical to most Mac OS applications.  If you call
-gtk_application_set_app_menu() anyway, then this menu will be
-replaced with your own.
-
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> a #GtkApplication
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if you should set an app menu
-</return>
-</function>
-
 <function name="gtk_application_remove_window">
 <description>
 Remove a window from @application.
@@ -18313,40 +18244,6 @@ and target to associate accelerators with
 <parameter name="accels">
 <parameter_description> a list of accelerators in the format
 understood by gtk_accelerator_parse()
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_application_set_app_menu">
-<description>
-Sets or unsets the application menu for @application.
-
-This can only be done in the primary instance of the application,
-after it has been registered.  #GApplication::startup is a good place
-to call this.
-
-The application menu is a single menu containing items that typically
-impact the application as a whole, rather than acting on a specific
-window or document.  For example, you would expect to see
-“Preferences” or “Quit” in an application menu, but not “Save” or
-“Print”.
-
-If supported, the application menu will be rendered by the desktop
-environment.
-
-Use the base #GActionMap interface to add actions, to respond to the user
-selecting these menu items.
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> a #GtkApplication
-</parameter_description>
-</parameter>
-<parameter name="app_menu">
-<parameter_description> a #GMenuModel, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -46332,6 +46229,29 @@ Returns the surface of this #GtkNative.
 </parameters>
 <return> the surface of @self
 </return>
+</function>
+
+<function name="gtk_native_get_surface_transform">
+<description>
+Retrieves the surface transform of @self. This is the translation
+from @self's surface coordinates into @self's widget coordinates.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a @GtkNative
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> return location for the x coordinate
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> return location for the y coordinate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_never_trigger_get">
@@ -82511,9 +82431,8 @@ gtk_window_get_size (GTK_WINDOW (widget), &amp;new_width, &amp;new_height);
 ]|
 
 If you are getting a window size in order to position the window
-on the screen, you should, instead, simply set the window’s semantic
-type with gtk_window_set_type_hint(), which allows the window manager
-to e.g. center dialogs. Also, if you set the transient parent of
+on the screen, don't. You should, instead, simply let the window
+manager place windows. Also, if you set the transient parent of
 dialogs with gtk_window_set_transient_for() window managers will
 often center the dialog over its parent window. It's much preferred
 to let the window manager handle these cases rather than doing it
