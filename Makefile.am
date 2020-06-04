@@ -55,5 +55,25 @@ dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files)) win32_installer/lgpl.txt
 
+# Distribute files needed when building gtkmm with Meson.
+EXTRA_DIST = \
+  meson.build \
+  meson_options.txt \
+  MSVC_NMake/gendef/meson.build \
+  MSVC_NMake/gdkmm/meson.build \
+  MSVC_NMake/gtkmm/meson.build \
+  demos/gtk-demo/meson.build \
+  docs/reference/meson.build \
+  gdk/meson.build \
+  gdk/gdkmmconfig.h.meson \
+  gdk/gdkmm/meson.build \
+  gtk/meson.build \
+  gtk/gtkmmconfig.h.meson \
+  gtk/gtkmm/meson.build \
+  tests/meson.build \
+  tools/dummy-header.py \
+  tools/extra_defs_gen/meson.build \
+  untracked/README
+
 # Optional: auto-generate the ChangeLog file from the git log on make dist
 include $(top_srcdir)/build/dist-changelog.am
