@@ -183,7 +183,6 @@ generate_binding_py = script_dir / 'generate-binding.py'
 doc_reference_py = script_dir / 'doc-reference.py'
 dist_changelog_py = script_dir / 'dist-changelog.py'
 dist_build_scripts_py = script_dir / 'dist-build-scripts.py'
-check_dllexport_usage_py = script_dir / 'check-dllexport-usage.py'
 
 if maintainer_mode
   # Copy files to untracked/build_scripts and untracked/doc.
@@ -205,31 +204,16 @@ endif
 gtkmm_script_dir = project_source_root / 'tools'
 dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 
-# Do we build the gdkmm/gtkmm without using gendef.exe?
+# Do we build the gdkmm/gtkmm without using gendef.exe?  TODO: Remove later
 gdkmm_extra_gendef_cpp_args = []
 gtkmm_extra_gendef_cpp_args = []
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
 
-  # Check for the first line in a file generated with gmmproc,
-  # to see which gmmproc version was used
-  if maintainer_mode
-    check_gmmproc_ver_cmd = [
-      python3, check_dllexport_usage_py,
-      '--gmmprocdir=@0@'.format(gmmproc_dir),
-    ]
-  else
-    check_gmmproc_ver_cmd = [
-      python3, check_dllexport_usage_py,
-      '--file=@0@/untracked/gtk/gtkmm/aboutdialog.h'.format('/'.join(project_source_root.split('\\')))
-    ]
-  endif
-
-  # Enable __declspec(dllexport) if the gtkmm headers generated from the .hg files
-  # were generated using a recent enough gmmproc
-  build_shared_libs_directly = run_command(check_gmmproc_ver_cmd).returncode() == 0
-  message('Using __declspec(dllexport) to build gtkmm: @0@'.format(build_shared_libs_directly ? 'YES' : 'NO'))
+  # Use gendef for now, for all gtkmm-4.x builds.  We will always use __declspec(dllexport)
+  # when the .hg's can be generated with GDKMM_API/GTKMM_API.
+  build_shared_libs_directly = false
   if not build_shared_libs_directly
     gdkmm_extra_gendef_cpp_args += '-DGDKMM_USE_GENDEF'
     gtkmm_extra_gendef_cpp_args = gdkmm_extra_gendef_cpp_args + [ '-DGTKMM_USE_GENDEF' ]
