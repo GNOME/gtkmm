@@ -462,10 +462,8 @@ if build_shared_libs_directly
     install: true,
   )
 else
-  # Building with headers generated from *.hg files with
-  # gmmproc < 2.64.3 on Visual Studio: We need this so
-  # that we can run gendef.exe to get the .def file
-  # needed for obtaining the .lib file for the gtkmm DLL
+  # TODO: Remove this section when headers and gmmproc files are updated
+  # to mark classes and APIs with GDKMM_API and GTKMM_API
   gtk_int_lib = static_library('gtkmm-int',
     gtk_gen_sources, built_dummy_h_file_target, gtkmm_extra_used_cc_files,
     include_directories: extra_include_dirs,
@@ -477,10 +475,11 @@ else
 
   gtkmm_def = custom_target('gtkmm.def',
     output: 'gtkmm.def',
-    depends: gtk_int_lib,
+    depends: [gdkmm_library, gtk_int_lib],
     command: [ gendef,
       '@OUTPUT@',
       '@0@-@1@.dll'.format(gtkmm_pcname, gtkmm_libversion.split('.')[0]),
+      gdkmm_library.full_path(),
       gtk_int_lib.full_path(),
     ],
     install: false,
