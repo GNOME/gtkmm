@@ -158,12 +158,14 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 # CXXFLAGS
 GDKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gdk /I..\untracked\gdk\gdkmm	\
 	/I..\gdk /I.\gdkmm	\
 	/wd4251 /wd4275 /wd4530	/std:c++17	\
 	/FImsvc_recommended_pragmas.h /utf-8
 
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gtk /I..\untracked\gtk\gtkmm	\
 	/I..\gtk /I.\gtkmm	\
 	/wd4250				\
 	$(GDKMM_BASE_CFLAGS)
