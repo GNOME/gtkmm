@@ -160,7 +160,7 @@ GDKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\gdk /I.\gdkmm	\
 	/wd4251 /wd4275 /wd4530	/std:c++17	\
-	/FImsvc_recommended_pragmas.h
+	/FImsvc_recommended_pragmas.h /utf-8
 
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
