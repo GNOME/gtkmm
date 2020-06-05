@@ -256,7 +256,6 @@ if is_msvc
 endif
 
 subdir('tools/extra_defs_gen')
-subdir('MSVC_NMake/gendef')
 subdir('gdk')
 subdir('MSVC_NMake/gdkmm')
 subdir('gdk/gdkmm')
