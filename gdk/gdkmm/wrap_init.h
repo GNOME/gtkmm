@@ -1,6 +1,8 @@
 #ifndef _GDKMM_WRAP_INIT_H
 #define _GDKMM_WRAP_INIT_H
 
+#include <gdkmmconfig.h>
+
 /* wrap_init.h
  *
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -25,7 +27,7 @@
 namespace Gdk
 {
 
-void wrap_init();
+GDKMM_API void wrap_init();
 
 } /* namespace Gdk */
 

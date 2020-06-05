@@ -29,7 +29,7 @@ namespace Gdk
  * Use Gdk::Device::device_with_pad_cast() to get a Glib::RefPtr<Gdk::DeviceWithPad>.
  */
 
-class DeviceWithPad : public Device, public DevicePad
+class GDKMM_API DeviceWithPad : public Device, public DevicePad
 {
 private:
   // noncopyable

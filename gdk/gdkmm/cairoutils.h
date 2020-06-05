@@ -17,6 +17,8 @@
 #ifndef _GDKMM_CAIROUTILS_H
 #define _GDKMM_CAIROUTILS_H
 
+#include <gdkmmconfig.h>
+
 #include <cairomm/context.h>
 #include <cairomm/region.h>
 #include <cairomm/surface.h>
@@ -41,6 +43,7 @@ namespace Cairo
  *
  * @newin{3,92}
  */
+GDKMM_API
 ::Cairo::RefPtr< ::Cairo::Context> wrap(cairo_t* cobject, bool has_reference = true);
 
 /** Creates a Cairo::RefPtr with a C++ wrapper for the C instance.
@@ -53,6 +56,7 @@ namespace Cairo
  *
  * @newin{3,92}
  */
+GDKMM_API
 ::Cairo::RefPtr< ::Cairo::Region> wrap(cairo_region_t* cobject, bool has_reference = true);
 
 /** Creates a Cairo::RefPtr with a C++ wrapper for the C instance.

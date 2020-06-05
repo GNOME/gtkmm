@@ -17,14 +17,16 @@
 #ifndef _GDKMM_VALUE_CAIRO_H
 #define _GDKMM_VALUE_CAIRO_H
 
+#include <gdkmmconfig.h>
+
 #include <glibmm/value.h>
 #include <cairomm/refptr.h>
 #include <type_traits>
 
 namespace Cairo
 {
-class Region;
-class Surface;
+class GDKMM_API Region;
+class GDKMM_API Surface;
 }
 
 namespace Gdk
@@ -41,10 +43,10 @@ GType get_base_type()
 }
 
 template <>
-GType get_base_type<::Cairo::Region>();
+GDKMM_API GType get_base_type<::Cairo::Region>();
 
 template <>
-GType get_base_type<::Cairo::Surface>();
+GDKMM_API GType get_base_type<::Cairo::Surface>();
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 } //namespace Cairo
