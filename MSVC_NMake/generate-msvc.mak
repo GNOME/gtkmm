@@ -26,10 +26,6 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@if not exist ..\gtk\gtkmm\wrap_init.cc call gen_$(@B).bat>$@
 	@del gen_$(@B).bat
 
-# Generate .def files
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) $(gdkmm_OBJS) $(gtkmm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
-
 # Generate demo GResource source file
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\demo_resources.c:	\
 $(gtkmm_demo_example_sources)	\
