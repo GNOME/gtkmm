@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmmconfig.h>
+
 #include <glibmm/object.h> //For Glib::RefPtr<> and std::size_t
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -31,7 +33,7 @@ extern "C"
 namespace Gtk
 {
 
-class RadioButton;
+class GTKMM_API RadioButton;
 
 /** RadioButtonGroup, identifier for RadioButtons.
  * To set up this RadioButtonGroup, construct a RadioButtonGroup and then pass it
@@ -39,7 +41,7 @@ class RadioButton;
  * to keep the RadioButtonGroup beyond the initial construction.
  * It should not be instantiated with new, and it will be invalid after the RadioButtons have been deleted.
  */
-class RadioButtonGroup
+class GTKMM_API RadioButtonGroup
 {
 public:
   RadioButtonGroup();

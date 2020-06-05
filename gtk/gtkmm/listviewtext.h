@@ -38,7 +38,7 @@ namespace Gtk
  *
  * @newin{2,10}
  */
-class ListViewText : public Gtk::TreeView
+class GTKMM_API ListViewText : public Gtk::TreeView
 {
 public:
 
@@ -112,7 +112,7 @@ public:
 
 protected:
 
- class TextModelColumns : public Gtk::TreeModel::ColumnRecord
+ class GTKMM_API TextModelColumns : public Gtk::TreeModel::ColumnRecord
   {
   public:
     TextModelColumns(guint columns_count);

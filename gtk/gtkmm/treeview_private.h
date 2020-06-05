@@ -32,11 +32,15 @@ namespace Gtk
 namespace TreeView_Private
 {
 
+GTKMM_API
 void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
                            GtkTreeModel* model, GtkTreeIter* iter, void* data);
+GTKMM_API
 void SignalProxy_CellData_gtk_callback_destroy(void* data);
 
+GTKMM_API
 gboolean SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data);
+GTKMM_API
 void SignalProxy_RowSeparator_gtk_callback_destroy(void* data);
 
 
