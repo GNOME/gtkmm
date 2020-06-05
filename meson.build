@@ -204,22 +204,9 @@ endif
 gtkmm_script_dir = project_source_root / 'tools'
 dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 
-# Do we build the gdkmm/gtkmm without using gendef.exe?  TODO: Remove later
-gdkmm_extra_gendef_cpp_args = []
-gtkmm_extra_gendef_cpp_args = []
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
-
-  # Use gendef for now, for all gtkmm-4.x builds.  We will always use __declspec(dllexport)
-  # when the .hg's can be generated with GDKMM_API/GTKMM_API.
-  build_shared_libs_directly = false
-  if not build_shared_libs_directly
-    gdkmm_extra_gendef_cpp_args += '-DGDKMM_USE_GENDEF'
-    gtkmm_extra_gendef_cpp_args = gdkmm_extra_gendef_cpp_args + [ '-DGTKMM_USE_GENDEF' ]
-  endif
-else
-  build_shared_libs_directly = true
 endif
 
 # Set compiler warnings.

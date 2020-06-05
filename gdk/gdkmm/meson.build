@@ -3,7 +3,7 @@
 # Input: gdkmm_build_dep, gtkmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, m4_files, install_includedir, python3,
 #        dummy_header_py, gmmproc_dir, build_deprecated_api,
-#        gmmproc_extra_m4_dirs, gdkmm_extra_gendef_cpp_args
+#        gmmproc_extra_m4_dirs
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
 #         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets,
 #         gdkmm_library
@@ -110,7 +110,7 @@ install_headers(gdkmm_extra_h_files, subdir: gtkmm_pcname / 'gdkmm')
 untracked_gdkmm = 'untracked' / 'gdk' / 'gdkmm'
 src_untracked_gdkmm = project_source_root / untracked_gdkmm
 
-gdkmm_cpp_args = [ '-DGDKMM_BUILD=1' ] + gdkmm_extra_gendef_cpp_args
+gdkmm_cpp_args = [ '-DGDKMM_BUILD=1' ]
 
 if maintainer_mode
 
