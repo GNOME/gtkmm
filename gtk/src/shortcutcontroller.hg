@@ -1,0 +1,114 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/eventcontroller.h>
+#include <gtkmm/buildable.h>
+#include <giomm/listmodel.h>
+#include <gtkmm/enums.h>
+#include <gdkmm/types.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/eventcontroller_p.h)
+
+namespace Gtk
+{
+/** Event controller for shortcuts.
+ *
+ * %Gtk::ShortcutController is an event controller that manages shortcuts.
+ *
+ * Most common shortcuts are using this controller implicitly, e.g. by
+ * adding a mnemonic underline to a Gtk::Label, or by installing a key
+ * binding using gtk_widget_class_add_binding(), or by adding accelerators
+ * to global actions using Gtk::Application::set_accels_for_action().
+ *
+ * But it is possible to create your own shortcut controller, and add
+ * shortcuts to it.
+ *
+ * %Gtk::ShortcutController implements Gio::ListModel for querying the shortcuts that
+ * have been added to it.
+ *
+ * ## ShortcutController as a Buildable
+ *
+ * ShortcutControllers can be created in ui files to set up shortcuts
+ * in the same place as the widgets.
+ *
+ * An example of a UI definition fragment with GtkShortcutController:
+ * @code
+ *   <object class='GtkButton'>
+ *     <child>
+ *       <object class='GtkShortcutController'>
+ *         <property name='scope'>managed</property>
+ *         <child>
+ *           <object class='GtkShortcut'>
+ *             <property name='trigger'>&lt;Control&gt;k</property>
+ *             <property name='action'>activate</property>
+ *           </object>
+ *         </child>
+ *       </object>
+ *     </child>
+ *   </object>
+ * @endcode
+ *
+ * @newin{3,98}
+ *
+ * @ingroup Gestures
+ */
+class ShortcutController : public EventController, public Gio::ListModel, public Buildable
+{
+  _CLASS_GOBJECT(ShortcutController, GtkShortcutController, GTK_SHORTCUT_CONTROLLER,
+    EventController, GtkEventController)
+  _IMPLEMENTS_INTERFACE(Gio::ListModel)
+  _IMPLEMENTS_INTERFACE(Buildable)
+
+protected:
+  _CTOR_DEFAULT
+  _WRAP_CTOR(ShortcutController(const Glib::RefPtr<Gio::ListModel>& model), gtk_shortcut_controller_new_for_model)
+
+public:
+  _WRAP_CREATE()
+
+  /** Creates a new shortcut controller that takes its shortcuts from
+   * the given list model.
+   *
+   * A controller created by this function does not let you add or
+   * remove individual shortcuts using the shortcut controller api,
+   * but you can change the contents of the model.
+   *
+   * @param model A ListModel containing shortcuts.
+   * @return A newly created shortcut controller.
+   */
+  _WRAP_CREATE(const Glib::RefPtr<Gio::ListModel>& model)
+
+  _WRAP_METHOD(void set_mnemonics_modifiers(Gdk::ModifierType modifiers),
+    gtk_shortcut_controller_set_mnemonics_modifiers)
+  _WRAP_METHOD(Gdk::ModifierType get_mnemonics_modifiers() const,
+    gtk_shortcut_controller_get_mnemonics_modifiers)
+
+  _WRAP_METHOD(void set_scope(ShortcutScope scope), gtk_shortcut_controller_set_scope)
+  _WRAP_METHOD(ShortcutScope set_scope() const, gtk_shortcut_controller_get_scope)
+
+  // TODO: Activate when there is a Gtk::Shortcut class.
+  //_WRAP_METHOD_DOCS_ONLY(gtk_shortcut_controller_add_shortcut)
+  //void add_shortcut(const Glib::RefPtr<Shortcut>& shortcut);
+  //_WRAP_METHOD(void remove_shortcut(const Glib::RefPtr<const Shortcut>& shortcut),
+  //  gtk_shortcut_controller_remove_shortcut)
+
+  _WRAP_PROPERTY("mnemonic-modifiers", Gdk::ModifierType)
+  _WRAP_PROPERTY("scope", ShortcutScope)
+  // The "model" property is write-pnly, construct-only. Can't be wrapped.
+};
+
+} // namespace Gtk

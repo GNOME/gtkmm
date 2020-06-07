@@ -239,6 +239,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/settings.h>
+#include <gtkmm/shortcutcontroller.h>
 #include <gtkmm/shortcutlabel.h>
 #include <gtkmm/shortcutsgroup.h>
 #include <gtkmm/shortcutssection.h>
