@@ -119,6 +119,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget2.exe: ..\tests\child_widget2\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget_managed.exe: ..\tests\child_widget_managed\main.cc
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-delete_cpp_child.exe: ..\tests\delete_cpp_child\main.cc
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-dialog_deletethis.exe: ..\tests\dialog_deletethis\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-gdk_rgba.exe: ..\tests\gdk_rgba\main.cc
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-main_with_options.exe: ..\tests\main_with_options\main.cc
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-menu_destruction.exe: ..\tests\menu_destruction\main.cc
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-object_move.exe: ..\tests\object_move\main.cc
@@ -134,6 +135,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget2.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-child_widget_managed.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-delete_cpp_child.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-dialog_deletethis.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-gdk_rgba.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-main_with_options.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-menu_destruction.exe	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-object_move.exe	\
