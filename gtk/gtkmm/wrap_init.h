@@ -1,6 +1,8 @@
 #ifndef _GTKMM_WRAP_INIT_H
 #define _GTKMM_WRAP_INIT_H
 
+#include <gtkmmconfig.h>
+
 /* wrap_init.h
  *
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -31,7 +33,7 @@ namespace Gtk
 // their .h files have not been moved to the gtk+/gtk/deprecated directory.
 #define GDK_DISABLE_DEPRECATION_WARNINGS 1
 
-void wrap_init();
+GTKMM_API void wrap_init();
 
 } /* namespace Gtk */
 

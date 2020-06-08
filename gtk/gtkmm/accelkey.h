@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmmconfig.h>
+
 #include <gdk/gdkkeysyms.h>
 #include <gdkmm/types.h>
 
@@ -34,7 +36,7 @@ namespace Gtk
  * @see Gtk::AccelMap
  * @ingroup Menus
  */
-class AccelKey
+class GTKMM_API AccelKey
 {
 public:
   AccelKey();

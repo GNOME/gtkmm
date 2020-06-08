@@ -59,7 +59,6 @@ DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files)) win32_installer/lgpl.txt
 EXTRA_DIST = \
   meson.build \
   meson_options.txt \
-  MSVC_NMake/gendef/meson.build \
   MSVC_NMake/gdkmm/meson.build \
   MSVC_NMake/gtkmm/meson.build \
   demos/gtk-demo/meson.build \

@@ -17,6 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmmconfig.h>
+
 #include <glibmm/ustring.h>
 #include <gdkmm/types.h>
 
@@ -45,6 +47,7 @@ namespace Accelerator
    *
    * @return <tt>true</tt> if the accelerator is valid.
    */
+  GTKMM_API
   bool valid(guint keyval, Gdk::ModifierType modifiers);
 
   /** Parses a string representing an accelerator.
@@ -65,6 +68,7 @@ namespace Accelerator
    * @param[out] accelerator_mods Accelerator modifier mask.
    * @return <tt>true</tt> if parsing succeeded.
    */
+  GTKMM_API
   bool parse(const Glib::ustring& accelerator, guint& accelerator_key,
     Gdk::ModifierType& accelerator_mods);
 
@@ -80,6 +84,7 @@ namespace Accelerator
    * @param accelerator_mods Accelerator modifier mask.
    * @return The accelerator name.
    */
+  GTKMM_API
   Glib::ustring name(guint accelerator_key, Gdk::ModifierType accelerator_mods);
   
   /** Converts an accelerator keyval and modifier mask into a string
@@ -89,6 +94,7 @@ namespace Accelerator
    * @param accelerator_mods Accelerator modifier mask.
    * @return A string representing the accelerator.
    */
+  GTKMM_API
   Glib::ustring get_label(guint accelerator_key, Gdk::ModifierType accelerator_mods);
 
   /** Gets the modifier mask.
@@ -99,6 +105,7 @@ namespace Accelerator
    *
    * @return The modifier mask for accelerators
    */
+  GTKMM_API
   Gdk::ModifierType get_default_mod_mask();
 
 } // namespace Accelerator

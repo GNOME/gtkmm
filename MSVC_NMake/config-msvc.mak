@@ -236,8 +236,6 @@ GTKMM_LIB = vs$(VSVER)\$(CFG)\$(PLAT)\$(GTKMM_LIBNAME).lib
 
 GTKMM4_DEMO = vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo$(DEBUG_SUFFIX).exe
 
-GENDEF = vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe
-
 GTKMM_INT_EXTRA_SOURCES = $(gtkmm_files_extra_any_cc)
 GTKMM_INT_EXTRA_HEADERS = $(gtkmm_files_extra_any_h)
 GTKMM_INT_EXTRA_HEADERS_P = $(gtkmm_files_extra_ph:/=\)

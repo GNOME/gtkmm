@@ -87,9 +87,9 @@ $(GTKMM_LIB): $(GTKMM_DLL)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
-$(GTKMM_DLL): vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def $(gtkmm_OBJS) $(gdkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) /def:vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def -out:$@ @<<
-$(gtkmm_OBJS) $(gdkmm_OBJS)
+$(GTKMM_DLL): $(gdkmm_OBJS) $(gtkmm_OBJS)
+	link /DLL $(LDFLAGS_NOLTCG) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) -out:$@ @<<
+$(gdkmm_OBJS) $(gtkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
@@ -100,12 +100,6 @@ $(gtkmm_OBJS) $(gdkmm_OBJS)
 # $(dependent_objects)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
-
-# For the gendef tool
-{.\gendef\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gendef\ md vs$(VSVER)\$(CFG)\$(PLAT)\gendef
-	$(CXX) $(GTKMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
-	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 $(GTKMM4_DEMO): $(GTKMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo $(gtkmm_demo_OBJS)
 	link $(LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
@@ -162,7 +156,6 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.def
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.res
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
@@ -173,14 +166,11 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.cc
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.obj
 	@-for /f %d in ('dir /ad /b ..\tests') do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-%d rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-test-%d
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gendef
 
 .SUFFIXES: .cc .h .ccg .hg .obj
