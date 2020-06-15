@@ -1,10 +1,9 @@
 # docs/reference
 
 # Input: built_files_root, project_source_root, gdkmm_pcname, gtkmm_pcname,
-#        perl, gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames,
+#        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, build_documentation,
 #        gdkmm_extra_h_files, gtkmm_extra_h_files, gdkmm_built_h_file_targets,
-#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py,
-#        build_documentation
+#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py
 # Output: install_docdir, install_devhelpdir
 
 tag_file_modules = [
@@ -64,7 +63,6 @@ doc_conf_data.set('abs_top_builddir', built_files_root)
 doc_conf_data.set('abs_top_srcdir', project_source_root)
 doc_conf_data.set('GTKMM_MODULE_NAME', book_name)
 doc_conf_data.set('DOXYGEN_TAGFILES', doxygen_tagfiles)
-doc_conf_data.set('PERL', perl.found() ? perl.path() : '')
 
 configure_file(
   input: 'Doxyfile.in',
