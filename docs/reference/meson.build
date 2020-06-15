@@ -28,11 +28,26 @@ foreach module : tag_file_modules
     elif htmlrefdir == ''
       htmlrefdir = htmlrefpub
     endif
+    if htmlrefpub.startswith('/')
+      htmlrefpub = 'file://' + htmlrefpub
+    endif
+    if htmlrefdir.startswith('/')
+      htmlrefdir = 'file://' + htmlrefdir
+    endif
     doxygen_tagfiles += ' "' + doxytagfile + '=' + htmlrefpub + '"'
+
     if not htmlrefdir.endswith('/')
       htmlrefdir += '/'
     endif
+    if not htmlrefpub.endswith('/')
+      htmlrefpub += '/'
+    endif
+    # Doxygen <= 1.8.15
     docinstall_flags += ['-l', doxytagfile.split('/')[-1] + '@' + htmlrefdir]
+    if htmlrefpub != htmlrefdir
+      # Doxygen >= 1.8.16
+      docinstall_flags += ['-l', 's@' + htmlrefpub + '@' + htmlrefdir]
+    endif
   endif
 endforeach
 
