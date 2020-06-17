@@ -40,13 +40,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gdkmm_OBJS]
 !endif
 
-!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gdkmm\gdkmm.res]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gdkmm\gdkmm.res]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -56,13 +56,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_OBJS]
 !endif
 
-!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -90,10 +90,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_demo_OBJS]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\%~ns.obj]
+!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\%~ns.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\demo_resources.obj]
+!if [@call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm3-demo\demo_resources.obj]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -135,16 +135,16 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_tests]
 !endif
 
-!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^vs$(PDBVER)\^$(CFG)\^$(PLAT)\gtkmm3-test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm3-test-%d.exe]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
 !endif
 
-!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\untracked\gdk\%f if not exist ..\gdk\%f if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\%f (md vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private) & ($(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src vs$(PDBVER)/$(CFG)/$(PLAT)/gdkmm)]
+!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\untracked\gdk\%f if not exist ..\gdk\%f if not exist vs$(VSVER)\$(CFG)\$(PLAT)\%f (md vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private) & ($(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src vs$(VSVER)/$(CFG)/$(PLAT)/gdkmm)]
 !endif
 
-!if [for %d in (vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm ..\untracked\gdk\gdkmm ..\gdk\gdkmm) do @if exist %d\applaunchcontext.h call get-gmmproc-ver %d\applaunchcontext.h>>gtkmm.mak]
+!if [for %d in (vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm ..\untracked\gdk\gdkmm ..\gdk\gdkmm) do @if exist %d\applaunchcontext.h call get-gmmproc-ver %d\applaunchcontext.h>>gtkmm.mak]
 !endif
 
 !include gtkmm.mak
@@ -153,11 +153,11 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !endif
 
 !if "$(GMMPROC_VER)" >= "2.64.3"
-GDKMM_INT_TARGET = vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm
-GTKMM_INT_TARGET = vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm
+GDKMM_INT_TARGET = vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
+GTKMM_INT_TARGET = vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
 GDKMM_DEF_LDFLAG =
 !else
-GDKMM_INT_TARGET = vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def
+GDKMM_INT_TARGET = vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def
 GDKMM_DEF_LDFLAG = /def:$(GDKMM_INT_TARGET)
 GDKMM_BASE_CFLAGS = $(GDKMM_BASE_CFLAGS) /DGDKMM_USE_GENDEF
 GTKMM_INT_TARGET = $(GDKMM_INT_TARGET:gdk=gtk)

@@ -4,24 +4,24 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo:
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo:
 	@-md $@
 
 # Generate .def files
-vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
-	vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_LIBNAME) vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
-	vs$(PDBVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
 
 # Generate wrap_init.cc files
-vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
 	@if not exist ..\gdk\gdkmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gdk --parent_dir=gdkmm $(gdkmm_real_hg:\=/)>$@
 
 # Avoid the dreaded U1095 command line error... @#$@#!
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@if exist $@ del $@
 	@echo @echo off>gen_$(@B).bat
 	@echo.>>gen_$(@B).bat
@@ -32,7 +32,7 @@ vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@del gen_$(@B).bat
 
 # Generate demo GResource source file
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c:	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c:	\
 $(gtkmm_demo_example_sources)	\
 $(gtkmm_demo_resources)	\
 ..\demos\gtk-demo\demo.gresource.xml

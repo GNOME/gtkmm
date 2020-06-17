@@ -13,63 +13,63 @@
 # 	$(CC)|$(CXX) $(cflags) /Fo$(destdir) /c @<<
 # $<
 # <<
-{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
 $<
 <<
 
-{..\gdk\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{..\gdk\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
 $<
 <<
 
-{..\untracked\gdk\gdkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{..\untracked\gdk\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
+	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
 $<
 <<
 
-{..\gdk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
+{..\gdk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gdk\gdkmm\%%~ns.cc if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\untracked\gdk\gdkmm\$(<B).cc if not exist ..\gdk\gdkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
 	@if exist ..\gdk\gdkmm\$(<B).cc if not exist ..\untracked\gdk\gdkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
 
-{.\gdkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\}.res:
+{.\gdkmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.res:
 	rc /fo$@ $<
 
-{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
 <<
 
-{..\gtk\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{..\gtk\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
 <<
 
-{..\untracked\gtk\gtkmm\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{..\untracked\gtk\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
+	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
 <<
 
-{..\gtk\src\}.ccg{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
+{..\gtk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\gtk\gtkmm\%%~ns.cc if not exist ..\untracked\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
 	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
 	@if exist ..\untracked\gtk\gtkmm\$(<B).cc if not exist ..\gtk\gtkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
 	@if exist ..\gtk\gtkmm\$(<B).cc if not exist ..\untracked\gtk\gtkmm\$(<B).cc if not exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
 
-{.\gtkmm\}.rc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
+{.\gtkmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
 	rc /fo$@ $<
 
-{..\demos\gtk-demo\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
-	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
+{..\demos\gtk-demo\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
+	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
 $<
 <<
 
-{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.c{vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
-	$(CC) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
+{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.c{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
+	$(CC) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
 $<
 <<
 
@@ -105,88 +105,88 @@ $(gtkmm_OBJS)
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 # For the gendef tool
-{.\gendef\}.cc{vs$(PDBVER)\$(CFG)\$(PLAT)\}.exe:
-	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\ md vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
+{.\gendef\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\}.exe:
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gendef\ md vs$(VSVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_BASE_CFLAGS) $(CFLAGS) /Fo$(@D)\gendef\ /Fd$(@D)\gendef\ $< /link $(LDFLAGS) /out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
-$(GTKMM3_DEMO): $(GTKMM_LIB) vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo $(gtkmm_demo_OBJS)
+$(GTKMM3_DEMO): $(GTKMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo $(gtkmm_demo_OBJS)
 	link $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
 $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe: $(GTKMM_LIB) ..\tests\builder\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: $(GTKMM_LIB) ..\tests\child_widget\main.cc ..\tests\child_widget\testwindow.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: $(GTKMM_LIB) ..\tests\child_widget2\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: $(GTKMM_LIB) ..\tests\child_widget_managed\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: $(GTKMM_LIB) ..\tests\delete_cpp_child\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: $(GTKMM_LIB) ..\tests\dialog\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: $(GTKMM_LIB) ..\tests\dialog_deletethis\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: $(GTKMM_LIB) ..\tests\gdk_rgba\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: $(GTKMM_LIB) ..\tests\main_with_options\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: $(GTKMM_LIB) ..\tests\menu_destruction\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: $(GTKMM_LIB) ..\tests\object_move\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe: $(GTKMM_LIB) ..\tests\property_notification\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe: $(GTKMM_LIB) ..\tests\refcount_dialog\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe: $(GTKMM_LIB) ..\tests\scrolledwindow\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe: $(GTKMM_LIB) ..\tests\tree_model_iterator\main.cc
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe: $(GTKMM_LIB) ..\tests\wrap_existing\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe: $(GTKMM_LIB) ..\tests\builder\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: $(GTKMM_LIB) ..\tests\child_widget\main.cc ..\tests\child_widget\testwindow.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: $(GTKMM_LIB) ..\tests\child_widget2\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: $(GTKMM_LIB) ..\tests\child_widget_managed\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: $(GTKMM_LIB) ..\tests\delete_cpp_child\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: $(GTKMM_LIB) ..\tests\dialog\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: $(GTKMM_LIB) ..\tests\dialog_deletethis\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: $(GTKMM_LIB) ..\tests\gdk_rgba\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: $(GTKMM_LIB) ..\tests\main_with_options\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: $(GTKMM_LIB) ..\tests\menu_destruction\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: $(GTKMM_LIB) ..\tests\object_move\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe: $(GTKMM_LIB) ..\tests\property_notification\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe: $(GTKMM_LIB) ..\tests\refcount_dialog\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe: $(GTKMM_LIB) ..\tests\scrolledwindow\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe: $(GTKMM_LIB) ..\tests\tree_model_iterator\main.cc
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe: $(GTKMM_LIB) ..\tests\wrap_existing\main.cc
 
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe	\
-vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe:
-	@if not exist vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B) md vs$(PDBVER)\$(CFG)\$(PLAT)\$(@B)
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe:
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\$(@B) md vs$(VSVER)\$(CFG)\$(PLAT)\$(@B)
 	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(@D)\$(@B)\ /Fd$(@D)\$(@B)\ $**	\
 	/link  $(LDFLAGS) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 clean:
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.exe
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.dll
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.pdb
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.ilk
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.exp
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\*.lib
-	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private\*.h
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.def
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.res
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.pdb
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.h
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\*.cc
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private\*.h
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.def
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.res
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.pdb
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.cc
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\*.h
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.pdb
-	@-del /f /q vs$(PDBVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d)
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm3-demo
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm\private
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gtkmm
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm\private
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gdkmm
-	@-rd vs$(PDBVER)\$(CFG)\$(PLAT)\gendef
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exe
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.dll
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.ilk
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
+	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.def
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.res
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.cc
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.def
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.res
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.cc
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.obj
+	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d)
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gendef
 
 .SUFFIXES: .cc .ccg .h .hg .obj
