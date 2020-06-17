@@ -116,44 +116,6 @@ $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe: $(GTKMM_LIB) ..\tests\builder\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe: $(GTKMM_LIB) ..\tests\child_widget\main.cc ..\tests\child_widget\testwindow.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe: $(GTKMM_LIB) ..\tests\child_widget2\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe: $(GTKMM_LIB) ..\tests\child_widget_managed\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe: $(GTKMM_LIB) ..\tests\delete_cpp_child\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe: $(GTKMM_LIB) ..\tests\dialog\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe: $(GTKMM_LIB) ..\tests\dialog_deletethis\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe: $(GTKMM_LIB) ..\tests\gdk_rgba\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe: $(GTKMM_LIB) ..\tests\main_with_options\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe: $(GTKMM_LIB) ..\tests\menu_destruction\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe: $(GTKMM_LIB) ..\tests\object_move\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe: $(GTKMM_LIB) ..\tests\property_notification\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe: $(GTKMM_LIB) ..\tests\refcount_dialog\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe: $(GTKMM_LIB) ..\tests\scrolledwindow\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe: $(GTKMM_LIB) ..\tests\tree_model_iterator\main.cc
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe: $(GTKMM_LIB) ..\tests\wrap_existing\main.cc
-
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-builder.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget2.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-child_widget_managed.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-delete_cpp_child.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-dialog_deletethis.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-gdk_rgba.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-main_with_options.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-menu_destruction.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-object_move.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-property_notification.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-refcount_dialog.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-scrolledwindow.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-tree_model_iterator.exe	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-wrap_existing.exe:
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\$(@B) md vs$(VSVER)\$(CFG)\$(PLAT)\$(@B)
-	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fo$(@D)\$(@B)\ /Fd$(@D)\$(@B)\ $**	\
-	/link  $(LDFLAGS) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@
-	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
-
 clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exe
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.dll
@@ -161,7 +123,8 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.ilk
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
-	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ del /f/q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\*.%x)
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\*.obj
@@ -181,7 +144,7 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.h
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gendef\*.obj
-	@-for /f %d in ('dir /ad /b ..\tests\') do @(for %x in (obj pdb) do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d\ rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-test-%d)
+	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private
 	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm

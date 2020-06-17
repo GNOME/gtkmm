@@ -111,22 +111,7 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_demo_resources]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\*.gif) do @call create-lists.bat file gtkmm.mak %s]
-!endif
-
-!if [for %s in (..\demos\gtk-demo\*.jpg) do @call create-lists.bat file gtkmm.mak %s]
-!endif
-
-!if [for %s in (..\demos\gtk-demo\*.png) do @call create-lists.bat file gtkmm.mak %s]
-!endif
-
-!if [for %s in (..\demos\gtk-demo\*.webm) do @call create-lists.bat file gtkmm.mak %s]
-!endif
-
-!if [for %s in (..\demos\gtk-demo\*.ui) do @call create-lists.bat file gtkmm.mak %s]
-!endif
-
-!if [for %s in (..\demos\gtk-demo\*.glsl) do @call create-lists.bat file gtkmm.mak %s]
+!if [for %x in (gif jpg png webm ui glsl) do @for %s in (..\demos\gtk-demo\*.%x) do @call create-lists.bat file gtkmm.mak %s]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -139,6 +124,18 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
+!endif
+
+!if [call create-lists.bat header gtkmm.mak gtkmm_tests & @(for /f %t in ('dir /ad /b ..\tests') do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer gtkmm.mak]
+!endif
+
+!if [for /f %t in ('dir /ad /b ..\tests') do @for %s in (..\tests\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm-tests\%t-%~ns.obj: %s>>gtkmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>gtkmm.mak & @echo.	^$(CXX) ^$(GTKMM_DEMO_CFLAGS) ^$(CFLAGS) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>gtkmm.mak & @echo.>>gtkmm.mak]
+!endif
+
+!if [for /f %t in ('dir /ad /b ..\tests') do @call create-lists.bat header gtkmm.mak %t_OBJS & @(for %s in (..\tests\%t\*.cc) do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\%t-%~ns.obj) & @call create-lists.bat footer gtkmm.mak]
+!endif
+
+!if [for /f %t in ('dir /ad /b ..\tests') do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GTKMM_LIB) ^$(GDKMM_LIB) ^$(%t_OBJS)>>gtkmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GTKMM_DEMO_DEP_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>gtkmm.mak & @echo.>>gtkmm.mak]
 !endif
 
 !if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\untracked\gdk\%f if not exist ..\gdk\%f if not exist vs$(VSVER)\$(CFG)\$(PLAT)\%f (md vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private) & ($(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src vs$(VSVER)/$(CFG)/$(PLAT)/gdkmm)]
