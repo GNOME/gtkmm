@@ -156,9 +156,9 @@ GTKMM_DEMO_CFLAGS =	\
 	$(GTKMM_BASE_CFLAGS)	\
 	$(GTKMM_INCLUDES)
 
-# With /EHsc, gtkmm3-demo fails on VS 2015 32 bit
+# With /EHsc, gtkmm3-demo fails on VS 2015 and 2017 32 bit
 # with an internal compiler error...
-!if "$(VSVER)" == "14" && "$(PLAT)" == "Win32"
+!if $(VSVER) < 16 && "$(PLAT)" == "Win32"
 GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/EHsc=)
 !endif
 
