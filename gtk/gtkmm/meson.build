@@ -86,6 +86,7 @@ gtkmm_any_hg_ccg_basenames = [
   'droptarget',
   'droptargetasync',
   'editable',
+  'editablelabel',
   'emojichooser',
   'entry',
   'entrycompletion',

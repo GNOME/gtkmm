@@ -48,12 +48,6 @@ class GTKMM_API Entry;
  * from the signal handler to suppress the default behaviour.
  *
  * To add completion functionality to an entry, use Gtk::Entry::set_completion().
- *
- * In addition to regular completion matches, which will be inserted into
- * the entry when they are selected, Gtk::EntryCompletion also allows the display of
- * "actions" in the popup window. Their appearance is similar to menu items,
- * to differentiate them clearly from completion strings. When an action is
- * selected, the action_activated signal is emitted.
  */
 class GTKMM_API EntryCompletion
  : public Glib::Object,
@@ -99,21 +93,6 @@ public:
 
   _WRAP_METHOD(void insert_prefix(), gtk_entry_completion_insert_prefix)
 
-  //We reordered the parameters, compared to the C version, so that we can have method overloads without the index.
-
-  // TODO: We would really like an insert() which before-inserts an iterator, like ListStore::insert(),
-  // but there is no EntryCompletion::insert_before() for us to use.
-  void insert_action_text(const Glib::ustring& text, int index);
-  void prepend_action_text(const Glib::ustring& text);
-  //TODO: Add append_action_text() somehow? It would be slow if we count the children each time. murrayc.
-  _IGNORE(gtk_entry_completion_insert_action_text)
-  void insert_action_markup(const Glib::ustring& markup, int index);
-  void prepend_action_markup(const Glib::ustring& markup);
-  _IGNORE(gtk_entry_completion_insert_action_markup)
-
-  //TODO: Change default - it would be nicer to delete the last action instead of the first.
-  _WRAP_METHOD(void delete_action(int index = 0), gtk_entry_completion_delete_action)
-
   _WRAP_METHOD(void set_inline_completion(bool inline_completion = true), gtk_entry_completion_set_inline_completion)
   _WRAP_METHOD(bool get_inline_completion() const, gtk_entry_completion_get_inline_completion)
   _WRAP_METHOD(void set_inline_selection(bool inline_selection = true), gtk_entry_completion_set_inline_selection)
@@ -132,9 +111,6 @@ public:
   _WRAP_METHOD(void set_text_column(const TreeModelColumnBase& column), gtk_entry_completion_set_text_column)
   _WRAP_METHOD(void set_text_column(int column), gtk_entry_completion_set_text_column)
   _WRAP_METHOD(int get_text_column() const, gtk_entry_completion_get_text_column)
-
-  // no_default_handler because GtkEntryCompletionClass is private.
-  _WRAP_SIGNAL(void action_activated(int index), action_activated, no_default_handler)
 
   //We completely hand-code these signals because we want to change how the parameters are wrapped,
   //because we need both the iter and the model to make the C++ iter.
@@ -180,6 +156,7 @@ public:
    */
   Glib::SignalProxy<bool(const TreeModel::iterator&)> signal_cursor_on_match();
 
+  // no_default_handler because GtkEntryCompletionClass is private.
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(bool insert_prefix(const Glib::ustring& prefix), insert_prefix, no_default_handler)
   _WRAP_SIGNAL(void no_matches(), no_matches, no_default_handler)

@@ -140,7 +140,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/dropcontrollermotion.h>
 #include <gtkmm/droptarget.h>
 #include <gtkmm/droptargetasync.h>
-#include <gtkmm/editable.h>
+#include <gtkmm/editablelabel.h>
 #include <gtkmm/emojichooser.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/expander.h>

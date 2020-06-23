@@ -16,8 +16,31 @@
 
 #include <gtk/gtk.h>
 
+namespace
+{
+
+void SelectionModel_selection_callback(guint position, guint* start_range,
+  guint* n_items, gboolean* selected, gpointer data)
+{
+  auto the_slot = static_cast<Gtk::SelectionModel::SlotSelection*>(data);
+
+  try
+  {
+    bool selected_cxx = false;
+    (*the_slot)(position, *start_range, *n_items, selected_cxx);
+    *selected = selected_cxx;
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+} // anonymous namespace
+
 namespace Gtk
 {
+using SlotSelection = SelectionModel::SlotSelection;
 
 // This vfunc callback and the corresponding vfunc are custom implemented because we want
 // an output argument of the C++ vfunc to be bool& (not gboolean* or gboolean&).
@@ -80,4 +103,3 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
 }
 
 } // namespace Gtk
-
