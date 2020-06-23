@@ -31,8 +31,8 @@
   (c-name "GdkDeviceType")
   (gtype-id "GDK_TYPE_DEVICE_TYPE")
   (values
-    '("master" "GDK_DEVICE_TYPE_MASTER")
-    '("slave" "GDK_DEVICE_TYPE_SLAVE")
+    '("logical" "GDK_DEVICE_TYPE_LOGICAL")
+    '("physical" "GDK_DEVICE_TYPE_PHYSICAL")
     '("floating" "GDK_DEVICE_TYPE_FLOATING")
   )
 )
@@ -390,6 +390,8 @@
     '("ignore" "GDK_AXIS_IGNORE")
     '("x" "GDK_AXIS_X")
     '("y" "GDK_AXIS_Y")
+    '("delta-x" "GDK_AXIS_DELTA_X")
+    '("delta-y" "GDK_AXIS_DELTA_Y")
     '("pressure" "GDK_AXIS_PRESSURE")
     '("xtilt" "GDK_AXIS_XTILT")
     '("ytilt" "GDK_AXIS_YTILT")
@@ -408,6 +410,8 @@
   (values
     '("x" "GDK_AXIS_FLAG_X")
     '("y" "GDK_AXIS_FLAG_Y")
+    '("delta-x" "GDK_AXIS_FLAG_DELTA_X")
+    '("delta-y" "GDK_AXIS_FLAG_DELTA_Y")
     '("pressure" "GDK_AXIS_FLAG_PRESSURE")
     '("xtilt" "GDK_AXIS_FLAG_XTILT")
     '("ytilt" "GDK_AXIS_FLAG_YTILT")
@@ -1422,50 +1426,12 @@
   (return-type "GdkInputSource")
 )
 
-(define-method get_n_keys
-  (of-object "GdkDevice")
-  (c-name "gdk_device_get_n_keys")
-  (return-type "gint")
-)
-
-(define-method get_key
-  (of-object "GdkDevice")
-  (c-name "gdk_device_get_key")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "index_")
-    '("guint*" "keyval")
-    '("GdkModifierType*" "modifiers")
-  )
-)
-
-(define-method set_key
-  (of-object "GdkDevice")
-  (c-name "gdk_device_set_key")
-  (return-type "none")
-  (parameters
-    '("guint" "index_")
-    '("guint" "keyval")
-    '("GdkModifierType" "modifiers")
-  )
-)
-
 (define-method get_axis_use
   (of-object "GdkDevice")
   (c-name "gdk_device_get_axis_use")
   (return-type "GdkAxisUse")
   (parameters
     '("guint" "index_")
-  )
-)
-
-(define-method set_axis_use
-  (of-object "GdkDevice")
-  (c-name "gdk_device_set_axis_use")
-  (return-type "none")
-  (parameters
-    '("guint" "index_")
-    '("GdkAxisUse" "use")
   )
 )
 
@@ -1490,49 +1456,10 @@
   )
 )
 
-(define-method get_history
-  (of-object "GdkDevice")
-  (c-name "gdk_device_get_history")
-  (return-type "gboolean")
-  (parameters
-    '("GdkSurface*" "surface")
-    '("guint32" "start")
-    '("guint32" "stop")
-    '("GdkTimeCoord***" "events")
-    '("gint*" "n_events")
-  )
-)
-
-(define-function gdk_device_free_history
-  (c-name "gdk_device_free_history")
-  (return-type "none")
-  (parameters
-    '("GdkTimeCoord**" "events")
-    '("gint" "n_events")
-  )
-)
-
 (define-method get_n_axes
   (of-object "GdkDevice")
   (c-name "gdk_device_get_n_axes")
   (return-type "gint")
-)
-
-(define-method get_axis_names
-  (of-object "GdkDevice")
-  (c-name "gdk_device_get_axis_names")
-  (return-type "char**")
-)
-
-(define-method get_axis_value
-  (of-object "GdkDevice")
-  (c-name "gdk_device_get_axis_value")
-  (return-type "gboolean")
-  (parameters
-    '("gdouble*" "axes")
-    '("const-char*" "axis_label")
-    '("gdouble*" "value")
-  )
 )
 
 (define-method get_axis
@@ -1558,9 +1485,9 @@
   (return-type "GdkDevice*")
 )
 
-(define-method list_slave_devices
+(define-method list_physical_devices
   (of-object "GdkDevice")
-  (c-name "gdk_device_list_slave_devices")
+  (c-name "gdk_device_list_physical_devices")
   (return-type "GList*")
 )
 
@@ -2354,6 +2281,15 @@
   )
 )
 
+(define-method get_history
+  (of-object "GdkEvent")
+  (c-name "gdk_event_get_history")
+  (return-type "GdkTimeCoord*")
+  (parameters
+    '("guint*" "out_n_coords")
+  )
+)
+
 (define-method get_pointer_emulated
   (of-object "GdkEvent")
   (c-name "gdk_event_get_pointer_emulated")
@@ -2644,15 +2580,6 @@
 (define-function gdk_motion_event_get_type
   (c-name "gdk_motion_event_get_type")
   (return-type "GType")
-)
-
-(define-function gdk_motion_event_get_history
-  (c-name "gdk_motion_event_get_history")
-  (return-type "GdkTimeCoord*")
-  (parameters
-    '("GdkEvent*" "event")
-    '("guint*" "out_n_coords")
-  )
 )
 
 (define-function gdk_delete_event_get_type
@@ -3653,9 +3580,9 @@
   (return-type "GdkSeatCapabilities")
 )
 
-(define-method get_slaves
+(define-method get_physical_devices
   (of-object "GdkSeat")
-  (c-name "gdk_seat_get_slaves")
+  (c-name "gdk_seat_get_physical_devices")
   (return-type "GList*")
   (parameters
     '("GdkSeatCapabilities" "capabilities")
@@ -3674,9 +3601,9 @@
   (return-type "GdkDevice*")
 )
 
-(define-method get_master_pointers
+(define-method get_logical_pointers
   (of-object "GdkSeat")
-  (c-name "gdk_seat_get_master_pointers")
+  (c-name "gdk_seat_get_logical_pointers")
   (return-type "GList*")
   (parameters
     '("GdkSeatCapabilities" "capabilities")
