@@ -1,11 +1,11 @@
 # tools/extra_defs_gen
 
 # Input: cpp_compiler, gdkmm_build_dep, gtkmm_build_dep, install_libdir,
-#        gtkmm_pcname
+#        gtkmm_pcname, msvc14x_toolset_ver
 # Output: m4_files, install_m4dir
 
 glibmm_generate_extra_defs_dep = cpp_compiler.find_library(
-  'glibmm_generate_extra_defs-2.4',
+  'glibmm_generate_extra_defs@0@-2.4'.format(msvc14x_toolset_ver),
 )
 
 executable('generate_defs_gdk', 'generate_defs_gdk.cc',

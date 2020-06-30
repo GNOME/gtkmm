@@ -4,7 +4,7 @@
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
 #        python3, gdkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
-#        gdkmm_extra_gendef_cpp_args
+#        gdkmm_extra_gendef_cpp_args, gdkmm_libname
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
 #         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets, gdkmm_dep
 
@@ -224,7 +224,7 @@ if is_host_windows
 endif
 
 if build_shared_libs_directly
-  gdkmm_library = library(gdkmm_pcname, extra_gdkmm_objects,
+  gdkmm_library = library(gdkmm_libname, extra_gdkmm_objects,
     gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
     include_directories: extra_include_dirs,
     cpp_args: gdkmm_cpp_args,
@@ -250,14 +250,14 @@ else
     depends: gdk_int_lib,
     command: [ gendef,
       '@OUTPUT@',
-      '@0@-@1@.dll'.format(gdkmm_pcname, gtkmm_libversion.split('.')[0]),
+      '@0@-@1@.dll'.format(gdkmm_libname, gtkmm_libversion.split('.')[0]),
       gdk_int_lib.full_path(),
     ],
     install: false,
   )
   gdkmm_extra_link_args = ['/def:@0@'.format(gdkmm_def.full_path())]
 
-  gdkmm_library = library(gdkmm_pcname, extra_gdkmm_objects,
+  gdkmm_library = library(gdkmm_libname, extra_gdkmm_objects,
     objects: gdk_int_lib.extract_all_objects(),
     version: gtkmm_libversion,
     dependencies: gdkmm_build_dep,

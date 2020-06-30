@@ -220,6 +220,12 @@ dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 # Do we build the gdkmm/gtkmm without using gendef.exe?
 gdkmm_extra_gendef_cpp_args = []
 gtkmm_extra_gendef_cpp_args = []
+
+# Include Visual Studio toolset version in DLL/.lib file names
+# in Visual Studio 2015 and later (enabled by default)
+use_msvc14x_toolset_ver = get_option('msvc14x-parallel-installable')
+msvc14x_toolset_ver = ''
+
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
@@ -246,9 +252,24 @@ if is_msvc
     gdkmm_extra_gendef_cpp_args += '-DGDKMM_USE_GENDEF'
     gtkmm_extra_gendef_cpp_args = gdkmm_extra_gendef_cpp_args + [ '-DGTKMM_USE_GENDEF' ]
   endif
+
+  if use_msvc14x_toolset_ver
+    if cpp_compiler.version().version_compare('>=19.20')
+      msvc14x_toolset_ver = '-vc142'
+    elif cpp_compiler.version().version_compare('>=19.10')
+      msvc14x_toolset_ver = '-vc141'
+    elif cpp_compiler.version().version_compare('>=19.00')
+      msvc14x_toolset_ver = '-vc140'
+    else
+      message('Visual Studio toolset version not applied for pre-Visual Studio 2015 builds')
+    endif
+  endif
 else
   build_shared_libs_directly = true
 endif
+
+gtkmm_libname = meson.project_name() + msvc14x_toolset_ver + '-' + gtkmm_api_version
+gdkmm_libname = 'gdkmm' + msvc14x_toolset_ver + '-' + gtkmm_api_version
 
 # Set compiler warnings.
 warning_flags = []
