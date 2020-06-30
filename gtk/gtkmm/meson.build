@@ -4,7 +4,7 @@
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
-#        gdkmm_library, gdkmm_used_built_h_file_targets
+#        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_libname
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_dep
 
@@ -454,7 +454,7 @@ if is_host_windows
   extra_gtkmm_objects += gtkmm_res
 endif
 
-gtkmm_library = library(gtkmm_pcname, extra_gtkmm_objects,
+gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
   gtk_gen_sources, built_dummy_h_file_target, gtkmm_extra_used_cc_files,
   include_directories: extra_include_dirs,
   cpp_args: gtkmm_cpp_args,

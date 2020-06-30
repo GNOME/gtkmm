@@ -199,10 +199,25 @@ endif
 gtkmm_script_dir = project_source_root / 'tools'
 dummy_header_py = gtkmm_script_dir / 'dummy-header.py'
 
+# Include Visual Studio toolset version in DLL/.lib file names
+# in Visual Studio 2017 and later (enabled by default)
+use_msvc14x_toolset_ver = get_option('msvc14x-parallel-installable')
+msvc14x_toolset_ver = ''
+
 if is_msvc
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
   add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
+
+  if use_msvc14x_toolset_ver
+    if cpp_compiler.version().version_compare('>=19.20')
+      msvc14x_toolset_ver = '-vc142'
+    elif cpp_compiler.version().version_compare('>=19.10')
+      msvc14x_toolset_ver = '-vc141'
+    endif
+  endif
 endif
+
+gtkmm_libname = meson.project_name() + msvc14x_toolset_ver + '-' + gtkmm_api_version
 
 # Set compiler warnings.
 warning_flags = []
