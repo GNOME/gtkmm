@@ -167,7 +167,7 @@ GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/EHsc=)
 #          gtkmm-vc$(VSVER_LIB)-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll or
 #          gtkmm-vc$(VSVER_LIB)-d-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll at least
 
-!if $(VSVER) > 14 && "$(USE_COMPAT_LIBS)" != ""
+!if "$(USE_COMPAT_LIBS)" != ""
 VSVER_LIB = $(PDBVER)0
 MESON_VERVER_LIB =
 !else
