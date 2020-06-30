@@ -106,12 +106,6 @@ VSVER = $(PDBVER)
 VSVER = $(PDBVER)
 !endif
 
-!if $(VSVER) > 14 && "$(USE_COMPAT_LIBS)" != ""
-VSVER_LIB = $(PDBVER)0
-!else
-VSVER_LIB = $(PDBVER)$(VSVER_SUFFIX)
-!endif
-
 !if "$(VSVER)" == "0"
 MSG = ^
 This NMake Makefile set supports Visual Studio^
