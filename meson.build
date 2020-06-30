@@ -128,12 +128,7 @@ glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: gl
 giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 
 # Where to find gmmproc and generate_wrap_init.pl.
-if glibmm_dep.found() and glibmm_dep.type_name() == 'pkgconfig'
-  gmmproc_dir = glibmm_dep.get_pkgconfig_variable('gmmprocdir')
-else
-  # We don't have a pkg-config file for glibmm, so use build option.
-  gmmproc_dir = get_option('gmmproc-dir')
-endif
+gmmproc_dir = glibmm_dep.get_pkgconfig_variable('gmmprocdir')
 
 gmmproc_extra_m4_dirs = [pangomm_dep.get_pkgconfig_variable('gmmprocm4dir')]
 if atkmm_dep.found()
