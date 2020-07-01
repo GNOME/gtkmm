@@ -4,7 +4,8 @@
 #        gdkmm_pcname, gtkmm_pcname, gtkmm_api_version, gdkmm_requires,
 #        gtkmm_requires, build_deprecated_api, install_pkgconfigdir,
 #        is_os_cocoa, cpp_compiler, gtkmm_major_version, gtkmm_minor_version,
-#        gtkmm_micro_version, build_atkmm_api, build_x11_api
+#        gtkmm_micro_version, build_atkmm_api, build_x11_api,
+#        msvc14x_toolset_ver
 # Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h
 
 pkg_conf_data = configuration_data()
@@ -22,6 +23,7 @@ pkg_conf_data.set('GDKMM_MODULES', gdkmm_requires)
 pkg_conf_data.set('GTKMM_MODULE_NAME', gtkmm_pcname)
 pkg_conf_data.set('GTKMM_API_VERSION', gtkmm_api_version)
 pkg_conf_data.set('GTKMM_MODULES', gtkmm_requires)
+pkg_conf_data.set('MSVC_TOOLSET_VER', msvc14x_toolset_ver)
 if not build_deprecated_api
   pkg_conf_data.set('GDKMM_DISABLE_DEPRECATED', 1)
   pkg_conf_data.set('GTKMM_DISABLE_DEPRECATED', 1)
