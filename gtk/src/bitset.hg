@@ -1,0 +1,85 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+
+#include <glibmm/refptr.h>
+
+extern "C" typedef struct _GtkBitset GtkBitset;
+
+namespace Gtk
+{
+
+/** Sets of integers.
+ *
+ * %Gtk::Bitset is a data structure for representing a set of unsigned integers.
+ * Another name for this data structure is "bitmap".
+ *
+ * This version is based on
+ * <a href="https://roaringbitmap.org/">roaring bitmaps</a>.
+ *
+ * A bitset allows adding a set of integers and provides support for set operations
+ * like unions, intersections and checks for equality or if a value is contained
+ * in the set. %Gtk::Bitset also contains various functions to query metadata about
+ * the bitset, such as the minimum or maximum values or its size.
+ *
+ * The main use case for %Gtk::Bitset is implementing complex selections for
+ * Gtk::SelectionModel.
+ *
+ * @see SelectionModel
+ *
+ * @newin{3,98}
+ */
+class GTKMM_API Bitset final
+{
+  // GtkBitset is registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(Bitset, GtkBitset, NONE, gtk_bitset_ref, gtk_bitset_unref, GTKMM_API)
+  _IGNORE(gtk_bitset_ref, gtk_bitset_unref)
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<Bitset> create(), gtk_bitset_new_empty)
+
+  _WRAP_METHOD(bool contains(guint value) const, gtk_bitset_contains)
+  _WRAP_METHOD(bool is_empty() const, gtk_bitset_is_empty)
+  _WRAP_METHOD(bool equals(const Glib::RefPtr<const Bitset>& other) const, gtk_bitset_equals)
+  _WRAP_METHOD(guint get_minimum() const, gtk_bitset_get_minimum)
+  _WRAP_METHOD(guint get_maximum() const, gtk_bitset_get_maximum)
+  _WRAP_METHOD(Glib::RefPtr<Bitset> copy() const, gtk_bitset_copy)
+  _WRAP_METHOD(void remove_all(), gtk_bitset_remove_all)
+  _WRAP_METHOD(bool add(guint value), gtk_bitset_add)
+  _WRAP_METHOD(bool remove(guint value), gtk_bitset_remove)
+  _WRAP_METHOD(void add_range(guint start, guint n_items), gtk_bitset_add_range)
+  _WRAP_METHOD(void remove_range(guint start, guint n_items), gtk_bitset_remove_range)
+  _WRAP_METHOD(void add_range_closed(guint first, guint last), gtk_bitset_add_range_closed)
+  _WRAP_METHOD(void remove_range_closed(guint first, guint last), gtk_bitset_remove_range_closed)
+  _WRAP_METHOD(void add_rectangle(guint start, guint width, guint height, guint stride),
+    gtk_bitset_add_rectangle)
+  _WRAP_METHOD(void remove_rectangle(guint start, guint width, guint height, guint stride),
+    gtk_bitset_remove_rectangle)
+  // 'union' is a C and C++ keyword. Can't be a method name. (see also Gdk::Rectangle)
+  _WRAP_METHOD(void join(const Glib::RefPtr<const Bitset>& other), gtk_bitset_union)
+  _WRAP_METHOD(void intersect(const Glib::RefPtr<const Bitset>& other), gtk_bitset_intersect)
+  _WRAP_METHOD(void subtract(const Glib::RefPtr<const Bitset>& other), gtk_bitset_subtract)
+  _WRAP_METHOD(void difference(const Glib::RefPtr<const Bitset>& other), gtk_bitset_difference)
+  _WRAP_METHOD(void shift_left(guint amount), gtk_bitset_shift_left)
+  _WRAP_METHOD(void shift_right(guint amount), gtk_bitset_shift_right)
+  _WRAP_METHOD(void slice(guint position, guint removed, guint value), gtk_bitset_slice)
+};
+
+} // namespace Gtk

@@ -547,6 +547,11 @@ _CONVERSION(`GListModel*',`Glib::RefPtr<const Gio::ListModel>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gio::ListModel>&',`GListModel*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkSelectionModel*',`Glib::RefPtr<SelectionModel>',`Glib::wrap($3)')
 
+_CONVERSION(`const Glib::RefPtr<const Bitset>&',`GtkBitset*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Bitset>&',`const GtkBitset*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkBitset*',`Glib::RefPtr<const Bitset>',`Glib::wrap($3)')
+_CONVERSION(`GtkBitset*',`Glib::RefPtr<Bitset>',`Glib::wrap($3)')
+
 _CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::ActionGroup))
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<Gio::ActionGroup>',`Glib::wrap($3)')
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<const Gio::ActionGroup>',`Glib::wrap($3)')

@@ -17,6 +17,7 @@
 _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <glibmm/interface.h>
+#include <gtkmm/bitset.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -72,47 +73,18 @@ class GTKMM_API SelectionModel : public Glib::Interface
   _CLASS_INTERFACE(SelectionModel, GtkSelectionModel, GTK_SELECTION_MODEL, GtkSelectionModelInterface, , , GTKMM_API)
 
 public:
-  /** Callback type for determining items to operate on with
-   * select_callback() or unselect_callback().
-   *
-   * For instance:
-   * @code
-   * void on_selection(guint position, guint& start_range, guint& n_items, bool& selected);
-   * @endcode
-   *
-   * The callback determines a range of consecutive items around
-   * @a position which should either all
-   * be changed, in which case @a selected is set to <tt>true</tt>, or all not
-   * be changed, in which case @a selected is set to <tt>false</tt>.
-   *
-   * @a start_range and @a n_items are set to return the range.
-   *
-   * The callback will be called repeatedly to find all ranges
-   * to operate on until it has exhausted the items of the model,
-   * or until it returns an empty range (ie @a n_items == 0).
-   *
-   * @param position The position to query.
-   * @param[out] start_range Returns the position of the first element of the range.
-   * @param[out] n_items Returns the size of the range.
-   * @param[out] selected Returns whether items in @a range are selected.
-   *
-   * @newin{3,98}
-   */
-  using SlotSelection = sigc::slot<void(guint position, guint& start_range, guint& n_items, bool& selected)>;
-
   _WRAP_METHOD(bool is_selected(guint position) const, gtk_selection_model_is_selected)
+  _WRAP_METHOD(Glib::RefPtr<const Bitset> get_selection() const, gtk_selection_model_get_selection)
+  _WRAP_METHOD(Glib::RefPtr<const Bitset> get_selection(guint position, guint n_items) const,
+    gtk_selection_model_get_selection_in_range)
   _WRAP_METHOD(bool select_item(guint position, bool unselect_rest), gtk_selection_model_select_item)
   _WRAP_METHOD(bool unselect_item(guint position), gtk_selection_model_unselect_item)
   _WRAP_METHOD(bool select_range(guint position, guint n_items, bool unselect_rest), gtk_selection_model_select_range)
   _WRAP_METHOD(bool unselect_range(guint position, guint n_items), gtk_selection_model_unselect_range)
   _WRAP_METHOD(bool select_all(), gtk_selection_model_select_all)
   _WRAP_METHOD(bool unselect_all(), gtk_selection_model_unselect_all)
-  _WRAP_METHOD(bool select_callback(bool unselect_rest, const SlotSelection& slot{callback}),
-    gtk_selection_model_select_callback, slot_name slot, slot_callback SelectionModel_selection_callback, no_slot_copy)
-  _WRAP_METHOD(bool unselect_callback(const SlotSelection& slot{callback}),
-    gtk_selection_model_unselect_callback, slot_name slot, slot_callback SelectionModel_selection_callback, no_slot_copy)
-  _WRAP_METHOD(void query_range(guint position, guint& start_range, guint& n_items, bool& selected) const,
-    gtk_selection_model_query_range)
+  _WRAP_METHOD(bool set_selection(const Glib::RefPtr<const Bitset>& selected,
+    const Glib::RefPtr<const Bitset>& mask), gtk_selection_model_set_selection)
 
   // no_default_handler because the wrapped C signal has no default handler.
   _WRAP_SIGNAL(void selection_changed(guint position, guint n_items), "selection-changed", no_default_handler)
@@ -122,18 +94,17 @@ protected:
   _WRAP_METHOD(void selection_changed(guint position, guint n_items), gtk_selection_model_selection_changed)
 
   _WRAP_VFUNC(bool is_selected(guint position) const, is_selected)
+#m4 _CONVERSION(`Glib::RefPtr<const Bitset>',`GtkBitset*',`Glib::unwrap_copy(std::const_pointer_cast<Bitset>($3))')
+  _WRAP_VFUNC(Glib::RefPtr<const Bitset> get_selection(guint position, guint n_items), get_selection_in_range)
   _WRAP_VFUNC(bool select_item(guint position, bool unselect_rest), select_item)
   _WRAP_VFUNC(bool unselect_item(guint position), unselect_item)
   _WRAP_VFUNC(bool select_range(guint position, guint n_items, bool unselect_rest), select_range)
   _WRAP_VFUNC(bool unselect_range(guint position, guint n_items), unselect_range)
   _WRAP_VFUNC(bool select_all(), select_all)
   _WRAP_VFUNC(bool unselect_all(), unselect_all)
-  _WRAP_VFUNC(bool select_callback(bool unselect_rest, const SlotSelection& slot{callback}),
-    select_callback, slot_name slot, slot_callback SelectionModel_selection_callback, no_slot_copy)
-  _WRAP_VFUNC(bool unselect_callback(const SlotSelection& slot{callback}),
-    unselect_callback, slot_name slot, slot_callback SelectionModel_selection_callback, no_slot_copy)
-  _WRAP_VFUNC(void query_range(guint position, guint& start_range, guint& n_items, bool& selected) const,
-    query_range, custom_vfunc_callback, custom_vfunc)
+#m4 _CONVERSION(`GtkBitset*',`const Glib::RefPtr<const Bitset>&',`Glib::wrap($3, true)')
+  _WRAP_VFUNC(bool set_selection(const Glib::RefPtr<const Bitset>& selected,
+    const Glib::RefPtr<const Bitset>& mask), set_selection)
 };
 
 } // namespace Gtk
