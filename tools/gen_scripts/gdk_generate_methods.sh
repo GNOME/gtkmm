@@ -24,12 +24,12 @@ shopt -s extglob # Enable extended pattern matching
 shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
-  # Process files whose names end with .h, but not with private.h.
+  # Process files whose names start with gdk and end with .h, but not with private.h.
   # Exclude gtk+/gdk/gdkinternals.h.
-  "$gen_methods" "$gtk_source_prefix"/gdk/!(*private|gdkinternals).h "$gtk_source_prefix"/gdk/deprecated/!(*private).h \
-                 "$gtk_build_prefix"/gdk/*.h > "$out_dir"/gdk_methods.defs
+  "$gen_methods" "$gtk_source_prefix"/gdk/gdk!(*private|internals).h "$gtk_source_prefix"/gdk/deprecated/!(*private).h \
+                 "$gtk_build_prefix"/gdk/gdk*.h > "$out_dir"/gdk_methods.defs
   "$gen_methods" "$pixbuf_source_prefix"/gdk-pixbuf/gdk!(*private).h \
-                 "$pixbuf_build_prefix"/gdk-pixbuf/*.h > "$out_dir"/gdk_pixbuf_methods.defs
+                 "$pixbuf_build_prefix"/gdk-pixbuf/gdk*.h > "$out_dir"/gdk_pixbuf_methods.defs
   # patch version 2.7.5 does not like directory names.
   cd "$out_dir"
   patch_options="--backup --version-control=simple --suffix=.orig"
