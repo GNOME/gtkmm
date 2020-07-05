@@ -255,6 +255,7 @@ gtkmm_deprecated_hg_ccg_basenames = []
 gtkmm_extra_any_h_cc_basenames = [
   'accelerator',
   'accelkey',
+  'bitsetconstiter',
   'cellrenderer_generation',
   'listviewtext',
   'object',

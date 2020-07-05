@@ -5,6 +5,7 @@
 
 test_programs = [
 # [[dir-name], exe-name, [sources], GUI, execute]
+  [['bitset_iterator'], 'test', ['main.cc'], false, true],
   [['builder'], 'test', ['main.cc'], true, false],
   [['child_widget'], 'test', ['main.cc', 'testwindow.cc'], true, false],
   [['child_widget2'], 'test', ['main.cc'], true, false],

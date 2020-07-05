@@ -18,6 +18,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS =			\
+	bitset_iterator/test \
 	builder/test		\
 	child_widget/test		\
 	child_widget2/test		\
@@ -33,10 +34,12 @@ check_PROGRAMS =			\
 	tree_model_iterator/test \
 	wrap_existing/test
 
-TESTS =	object_move/test \
+TESTS = bitset_iterator/test \
+	object_move/test \
   gdk_rgba/test \
   test_validate_docs_xhtml.sh
 
+bitset_iterator_test_SOURCES       = bitset_iterator/main.cc
 builder_test_SOURCES               = builder/main.cc
 child_widget_test_SOURCES          = child_widget/main.cc	\
                                      child_widget/testwindow.cc	\
