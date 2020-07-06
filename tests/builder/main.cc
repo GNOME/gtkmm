@@ -169,6 +169,15 @@ public:
     m_pStandardButton->add_destroy_notify_callback(nullptr, on_managed_button_deleted);
   }
 
+  // A default signal handler in Gtk::Window shall be called if the
+  // class name in the UI file is GtkWindow, although the real GType name
+  // is gtkmm__GtkWindow. https://gitlab.gnome.org/GNOME/gtkmm/-/issues/61
+  bool on_close_request() override
+  {
+    std::cout << "MainWindow::on_close_request()" << std::endl;
+    return Gtk::Window::on_close_request(); // Call the base class
+  }
+
   virtual ~MainWindow()
   {
     std::cout << "MainWindow::dtor" << std::endl;

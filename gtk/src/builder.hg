@@ -78,8 +78,8 @@ class GTKMM_API Builder : public Glib::Object
   _CLASS_GOBJECT(Builder, GtkBuilder, GTK_BUILDER, Glib::Object, GObject, , , GTKMM_API)
 
 protected:
- _CTOR_DEFAULT
- _IGNORE(gtk_builder_new)
+  Builder();
+  _IGNORE(gtk_builder_new)
 
 public:
   /** Creates a new builder object.
@@ -548,18 +548,6 @@ public:
    * auto pDialog2 = Gtk::Builder::get_widget_derived<MyDerivedDialog>(refBuilder, "mydialog2", "A storm is imminent!", true);
    * @endcode
    *
-   * If your derived class overrides vfuncs (virtual functions) or default signal
-   * handlers which are part of the wrapped C API, its class name in the XML UI file
-   * must have a @a gtkmm__ prefix, for instance
-   * @code
-   *   <object class="gtkmm__GtkDialog" id="mydialog3">
-   * @endcode
-   * gtkmm__GtkDialog is a subclass of GtkDialog in the GType system. In most
-   * respects a GtkSomeClass instance acts identically to a gtkmm__GtkSomeClass
-   * instance, but C++ vfuncs and default signal handlers are not called for
-   * GtkSomeClass instances. (Signal handlers, connected with signal_some_signal().connect(),
-   * are called for both gtkmm__GtkSomeClass and GtkSomeClass instances.)
-   *
    * @note
    * If get_widget_derived() is called more than once for the same widget (the
    * same @a name), only the first call will call the widget's constructor.
@@ -642,14 +630,25 @@ public:
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), gtk_builder_set_translation_domain)
   _WRAP_METHOD(Glib::ustring get_translation_domain() const, gtk_builder_get_translation_domain)
 
-  //We ignore gtk_builder_get_type_from_name() because it only seems useful when implementing GtkBuildable for widgets.
+  // We ignore gtk_builder_get_type_from_name() because it only seems useful when implementing GtkBuildable for widgets.
   _IGNORE(gtk_builder_get_type_from_name)
+  // We ignore BuilderScope methods and property because it seems unlikely
+  // that a user of Builder wants to change the scope.
+  _IGNORE(gtk_builder_set_scope, gtk_builder_get_scope)
+  _IGNORE_PROPERTY(scope)
 
   _WRAP_PROPERTY("translation-domain", Glib::ustring)
 
 protected:
   Gtk::Widget* get_widget_checked(const Glib::ustring& name, GType type);
   GtkWidget* get_cwidget(const Glib::ustring& name);
+
+private:
+  bool no_gtkmm_derived_types {false};
+  void set_no_gtkmm_derived_types(bool status);
+  bool get_no_gtkmm_derived_types() const;
+  friend class GTKMM_API Buildable_Class;
+  friend class GTKMM_API BuilderScope_Class;
 };
 
 } // namespace Gtk

@@ -47,6 +47,8 @@ gtkmm_any_hg_ccg_basenames = [
   'boxlayout',
   'buildable',
   'builder',
+  'buildercscope',
+  'builderscope',
   'button',
   'calendar',
   'cellarea',
