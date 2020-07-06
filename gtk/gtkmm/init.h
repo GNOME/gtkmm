@@ -1,6 +1,7 @@
-/* main.cc
- *
- * Copyright (C) 2001-2002 The gtkmm Development Team
+#ifndef _GTKMM_INIT_H
+#define _GTKMM_INIT_H
+
+/* Copyright (C) 2020 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,18 +14,25 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtkmm/application.h>
-#include "demowindow.h"
+#include <gtkmmconfig.h>
 
-int main (int argc, char *argv[])
+namespace Gtk
 {
-  auto app = Gtk::Application::create();
 
-  DemoWindow window;
+/** Initialize the table of wrap_new functions.
+ *
+ * This would usually only be used by the init() methods of libraries that
+ * depend on gtkmm. Gtkmm applications initialize gtkmm by a call to
+ * Gtk::Application::create().
+ *
+ * @newin{3,98}
+ */
+GTKMM_API
+void init_gtkmm_internals();
 
-  return app->run(window, argc, argv);
-}
+} // namespace Gtk
+
+#endif /* _GTKMM_INIT_H */

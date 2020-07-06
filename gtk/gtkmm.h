@@ -193,7 +193,6 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/liststore.h>
 #include <gtkmm/listviewtext.h>
 #include <gtkmm/linkbutton.h>
-#include <gtkmm/main.h>
 #include <gtkmm/mediacontrols.h>
 #include <gtkmm/mediafile.h>
 #include <gtkmm/menubutton.h>

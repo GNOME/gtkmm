@@ -1,8 +1,8 @@
+#include <gtkmm/application.h>
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/label.h>
 #include <gtkmm/window.h>
-#include <gtkmm/main.h>
 
 class AppWindow
     : public Gtk::Window

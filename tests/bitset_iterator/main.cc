@@ -1,4 +1,5 @@
 #include <gtkmm.h>
+#include <gtkmm/init.h>
 #include <iostream>
 #include <set>
 
@@ -95,7 +96,7 @@ void test_copy()
 int main(int /* argc */, char** /* argv */)
 {
   gtk_init();
-  Gtk::Main::init_gtkmm_internals();
+  Gtk::init_gtkmm_internals();
 
   test_traversal1();
   test_traversal2();

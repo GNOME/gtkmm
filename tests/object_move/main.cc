@@ -1,4 +1,5 @@
 #include <gtkmm.h>
+#include <gtkmm/init.h>
 #include <gtk/gtk.h>
 #include <iostream>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ void test_object_move_assignment_operator()
 int main(int /* argc */, char** /* argv */)
 {
   gtk_init();
-  Gtk::Main::init_gtkmm_internals();
+  Gtk::init_gtkmm_internals();
 
   test_object_move_constructor();
   test_object_move_assignment_operator();
