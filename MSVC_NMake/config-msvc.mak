@@ -73,7 +73,9 @@ GTKMM_C_INCLUDES =	\
 	/I$(PREFIX)\include\atk-$(ATK_API_VERSION)	\
 	/I$(PREFIX)\include\pango-$(PANGO_API_VERSION)	\
 	/I$(PREFIX)\include\glib-$(GLIB_API_VERSION)	\
-	/I$(PREFIX)\lib\glib-$(GLIB_API_VERSION)\include
+	/I$(PREFIX)\lib\glib-$(GLIB_API_VERSION)\include	\
+	/I$(PREFIX)\include\harfbuzz	\
+	/I$(PREFIX)\include
 
 GTKMM_INCLUDES =	\
 	$(GTKMM_CXX_INCLUDES)	\
