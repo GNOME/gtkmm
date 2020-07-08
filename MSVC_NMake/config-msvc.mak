@@ -89,7 +89,9 @@ GTKMM_C_INCLUDES =	\
 	/I$(PREFIX)\include\atk-$(ATK_API_VERSION)	\
 	/I$(PREFIX)\include\pango-$(PANGO_API_VERSION)	\
 	/I$(PREFIX)\include\glib-$(GLIB_API_VERSION)	\
-	/I$(PREFIX)\lib\glib-$(GLIB_API_VERSION)\include
+	/I$(PREFIX)\lib\glib-$(GLIB_API_VERSION)\include	\
+	/I$(PREFIX)\include\harfbuzz	\
+	/I$(PREFIX)\include
 
 # If gtk+ is built with Vulkan, we need to include the Vulkan headers and
 # possibly the Vulkan import libraries
