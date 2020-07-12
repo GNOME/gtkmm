@@ -20,6 +20,7 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/filefilter.h>
 #include <giomm/file.h>
+#include <giomm/listmodel.h>
 
 _DEFS(gtkmm,gtk)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -74,21 +75,17 @@ public:
   _WRAP_METHOD(void set_current_name(const Glib::ustring& name), gtk_file_chooser_set_current_name)
   _WRAP_METHOD(Glib::ustring get_current_name() const, gtk_file_chooser_get_current_name)
 
-  _WRAP_METHOD(void select_all(), gtk_file_chooser_select_all)
-  _WRAP_METHOD(void unselect_all(), gtk_file_chooser_unselect_all)
-
   _WRAP_METHOD(bool set_file(const Glib::RefPtr<const Gio::File>& file), gtk_file_chooser_set_file, errthrow)
 
-  _WRAP_METHOD(bool select_file(const Glib::RefPtr<const Gio::File>& file), gtk_file_chooser_select_file, errthrow)
-  _WRAP_METHOD(void unselect_file(const Glib::RefPtr<const Gio::File>& file), gtk_file_chooser_unselect_file)
-
-#m4 _CONVERSION(`GSList*',`std::vector< Glib::RefPtr<Gio::File> >',`Glib::SListHandler< Glib::RefPtr<Gio::File> >::slist_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector< Glib::RefPtr<Gio::File> > get_files(), gtk_file_chooser_get_files)
+  //No refreturn is needed here, because the C function provides a reference:
+  _WRAP_METHOD(Glib::RefPtr<Gio::ListModel> get_files(), gtk_file_chooser_get_files)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> get_files() const, gtk_file_chooser_get_files)
 
   _WRAP_METHOD(bool set_current_folder(const Glib::RefPtr<const Gio::File>& file), gtk_file_chooser_set_current_folder, errthrow)
 
   //No refreturn is needed here, because the C function provides a reference:
   _WRAP_METHOD(Glib::RefPtr<Gio::File> get_current_folder(), gtk_file_chooser_get_current_folder)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::File> get_current_folder() const, gtk_file_chooser_get_current_folder, constversion)
 
   //No refreturn is needed here, because the C function provides a reference:
   _WRAP_METHOD(Glib::RefPtr<Gio::File> get_file(), gtk_file_chooser_get_file)
@@ -99,10 +96,8 @@ public:
   _WRAP_METHOD(void add_filter(const Glib::RefPtr<FileFilter>& filter), gtk_file_chooser_add_filter)
   _WRAP_METHOD(void remove_filter (const Glib::RefPtr<FileFilter>& filter), gtk_file_chooser_remove_filter)
 
-#m4 _CONVERSION(`GSList*',`std::vector< Glib::RefPtr<FileFilter> >',`Glib::SListHandler< Glib::RefPtr<FileFilter> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
-#m4 _CONVERSION(`GSList*',`std::vector< Glib::RefPtr<const FileFilter> >',`Glib::SListHandler< Glib::RefPtr<const FileFilter> >::slist_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(std::vector< Glib::RefPtr<FileFilter> > list_filters(), gtk_file_chooser_list_filters)
-  _WRAP_METHOD(std::vector< Glib::RefPtr<const FileFilter> > list_filters() const, gtk_file_chooser_list_filters)
+  //No refreturn is needed here, because the C function provides a reference:
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> get_filters() const, gtk_file_chooser_get_filters)
 
 /* Current filter
  */
@@ -115,10 +110,8 @@ public:
   _WRAP_METHOD(bool add_shortcut_folder(const Glib::RefPtr<Gio::File>& folder), gtk_file_chooser_add_shortcut_folder, errthrow)
   _WRAP_METHOD(bool remove_shortcut_folder(const Glib::RefPtr<Gio::File>& folder), gtk_file_chooser_remove_shortcut_folder, errthrow)
 
-#m4 _CONVERSION(`GSList*',`std::vector<Glib::RefPtr<Gio::File>>',`Glib::SListHandler<Glib::RefPtr<Gio::File>>::slist_to_vector($3, Glib::OWNERSHIP_DEEP)')
-#m4 _CONVERSION(`GSList*',`std::vector<Glib::RefPtr<const Gio::File>>',`Glib::SListHandler<Glib::RefPtr<const Gio::File>>::slist_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector<Glib::RefPtr<Gio::File>> list_shortcut_folders(), gtk_file_chooser_list_shortcut_folders)
-  _WRAP_METHOD(std::vector<Glib::RefPtr<const Gio::File>> list_shortcut_folders() const, gtk_file_chooser_list_shortcut_folders)
+  //No refreturn is needed here, because the C function provides a reference:
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> get_shortcut_folders() const, gtk_file_chooser_get_shortcut_folders)
 
 #m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char**',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data ()')
   _WRAP_METHOD(void add_choice(const Glib::ustring& id, const Glib::ustring& label, const std::vector<Glib::ustring>& options, const std::vector<Glib::ustring>& option_labels), gtk_file_chooser_add_choice)
@@ -142,13 +135,11 @@ public:
   _WRAP_METHOD(void set_choice(const Glib::ustring& id, const Glib::ustring& option), gtk_file_chooser_set_choice)
   _WRAP_METHOD(Glib::ustring get_choice(const Glib::ustring& id) const, gtk_file_chooser_get_choice)
 
-  _WRAP_SIGNAL(void current_folder_changed(), "current_folder_changed", no_default_handler)
-  _WRAP_SIGNAL(void selection_changed(), "selection_changed", no_default_handler)
-  _WRAP_SIGNAL(void file_activated(), "file_activated", no_default_handler)
-
   _WRAP_PROPERTY("action", Action)
   _WRAP_PROPERTY("filter", Glib::RefPtr<FileFilter>)
   _WRAP_PROPERTY("select-multiple", bool)
+  _WRAP_PROPERTY("filters", Glib::RefPtr<Gio::ListModel>)
+  _WRAP_PROPERTY("shortcut-folders", Glib::RefPtr<Gio::ListModel>)
   _WRAP_PROPERTY("create-folders", bool)
 };
 
