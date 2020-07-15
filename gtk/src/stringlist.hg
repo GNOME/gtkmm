@@ -1,0 +1,59 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/buildable.h>
+#include <giomm/listmodel.h>
+#include <gtk/gtk.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+class GTKMM_API StringObject : public Glib::Object
+{
+  _CLASS_GOBJECT(StringObject, GtkStringObject, GTK_STRING_OBJECT, Glib::Object, GObject, , , GTKMM_API)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _WRAP_CTOR(StringObject(const Glib::ustring& string), gtk_string_object_new)
+
+public:
+  _WRAP_METHOD(Glib::ustring get_string() const, gtk_string_object_get_string)
+  _WRAP_PROPERTY("string", Glib::ustring)
+};
+
+class GTKMM_API StringList : public Glib::Object, public Gio::ListModel, public Buildable
+{
+  _CLASS_GOBJECT(StringList, GtkStringList, GTK_STRING_LIST, Glib::Object, GObject, , , GTKMM_API)
+  _IMPLEMENTS_INTERFACE(Gio::ListModel)
+  _IMPLEMENTS_INTERFACE(Buildable)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  StringList(const std::vector<Glib::ustring>& strings);
+
+public:
+  _WRAP_CREATE(const std::vector<Glib::ustring>& strings)
+  _WRAP_METHOD(void append(const Glib::ustring& string), gtk_string_list_append)
+  _WRAP_METHOD(void remove(guint position), gtk_string_list_remove)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char*-const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
+  _WRAP_METHOD(void splice(guint position, guint n_removals, const std::vector<Glib::ustring>& additions),
+    gtk_string_list_splice)
+  _WRAP_METHOD(Glib::ustring get_string(guint position) const, gtk_string_list_get_string)
+};
+
+} // namespace Gtk

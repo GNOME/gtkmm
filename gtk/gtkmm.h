@@ -138,6 +138,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/dragsource.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/dropcontrollermotion.h>
+#include <gtkmm/dropdown.h>
 #include <gtkmm/droptarget.h>
 #include <gtkmm/droptargetasync.h>
 #include <gtkmm/editablelabel.h>
@@ -245,6 +246,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/shortcutssection.h>
 #include <gtkmm/shortcutsshortcut.h>
 #include <gtkmm/shortcutswindow.h>
+#include <gtkmm/signallistitemfactory.h>
 #include <gtkmm/singleselection.h>
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/snapshot.h>
@@ -254,6 +256,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stacksidebar.h>
 #include <gtkmm/stackswitcher.h>
 #include <gtkmm/statusbar.h>
+#include <gtkmm/stringlist.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/text.h>
