@@ -582,3 +582,4 @@ _CONVERSION(`const Glib::RefPtr<ConstraintTarget>&',`gpointer',__CONVERT_REFPTR_
 
 _CONVERSION(`const Glib::RefPtr<ListItemFactory>&', `GtkListItemFactory*', __CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkListItemFactory*',`Glib::RefPtr<ListItemFactory>',`Glib::wrap($3)')
+_CONVERSION(`GtkStringObject*',`Glib::RefPtr<StringObject>',`Glib::wrap($3)')

@@ -211,6 +211,7 @@ gtkmm_any_hg_ccg_basenames = [
   'stackswitcher',
   'statusbar',
   'stringlist',
+  'stringobject',
   'stylecontext',
   'styleprovider',
   'switch',
