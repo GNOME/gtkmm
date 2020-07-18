@@ -1,0 +1,89 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/listitem.h>
+#include <gtkmm/listitemfactory.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/listitemfactory_p.h)
+
+namespace Gtk
+{
+
+/** A listitem factory providing signals.
+ *
+ * %Gtk::SignalListItemFactory is a Gtk::ListItemFactory that provides signals
+ * that user code can connect to to manage listitems.
+ * Signals are emitted for every listitem in the same order:
+ *
+ *  1. signal_setup() is emitted to set up permanent things
+ *  on the listitem. This usually means constructing the widgets used in the
+ *  row and adding them to the listitem.
+ *
+ *  2. signal_bind() is emitted to bind the item passed via
+ *  Gtk::ListItem::property_item() to the widgets that have been
+ *  created in step 1 or to add item-specific widgets. Signals are
+ *  connected to listen to changes - both to changes in the item to
+ *  update the widgets or to changes in the widgets to update the
+ *  item. After this signal has been called, the listitem may be shown
+ *  in a list widget.
+ *
+ *  3. signal_unbind() is emitted to undo everything done in step 2.
+ *  Usually this means disconnecting signal handlers. Once this signal
+ *  has been called, the listitem will no longer be used in a list
+ *  widget.
+ *
+ *  4. signal_bind() and signal_unbind() may be emitted multiple times
+ *  again to bind the listitem for use with new items. By reusing
+ *  listitems, potentially costly setup can be avoided. However, it
+ *  means code needs to make sure to properly clean up the listitem in
+ *  step 3 so that no information from the previous use leaks into the
+ *  next use.
+ *
+ * 5. signal_teardown() is emitted to allow undoing the effects of
+ * signal_setup(). After this signal was emitted on a listitem, the
+ * listitem will be destroyed and not be used again.
+ *
+ * Note that during the signal emissions, changing properties on the
+ * Gtk::ListItems passed will not trigger notify signals as the listitem's
+ * notifications are frozen. See Glib::ObjectBase::freeze_notify() for details.
+ *
+ * For tracking changes in other properties in the Gtk::ListItem, the
+ * Gtk::ListItem notify signal is recommended. The signal can be connected
+ * in the signal_setup() signal and removed again during signal_teardown().
+ *
+ * @see Gtk::ListItemFactory
+ * @newin{3,98}
+ */
+class GTKMM_API SignalListItemFactory : public ListItemFactory
+{
+  _CLASS_GOBJECT(SignalListItemFactory, GtkSignalListItemFactory, GTK_SIGNAL_LIST_ITEM_FACTORY, Gtk::ListItemFactory, GtkListItemFactory, , , GTKMM_API)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  // no_default_handler because GtkSignalListItemFactoryClass is private.
+#m4 _CONVERSION(`GtkListItem*',`const Glib::RefPtr<ListItem>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void setup(const Glib::RefPtr<ListItem>& list_item), "setup", no_default_handler)
+  _WRAP_SIGNAL(void bind(const Glib::RefPtr<ListItem>& list_item), "bind", no_default_handler)
+  _WRAP_SIGNAL(void unbind(const Glib::RefPtr<ListItem>& list_item), "unbind", no_default_handler)
+  _WRAP_SIGNAL(void teardown(const Glib::RefPtr<ListItem>& list_item), "teardown", no_default_handler)
+};
+
+} // namespace Gtk
