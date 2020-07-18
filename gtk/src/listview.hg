@@ -1,0 +1,121 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/listbase.h>
+#include <giomm/listmodel.h>
+#include <gtkmm/listitemfactory.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/listbase_p.h)
+
+namespace Gtk
+{
+
+/** A widget for displaying lists.
+ *
+ * %Gtk::ListView is a widget to present a view into a large dynamic list of items.
+ *
+ * %Gtk::ListView uses its factory to generate one row widget for each visible item
+ * and shows them in a linear display, either vertically or horizontally. The
+ * property_show_separators() property offers a simple way to display separators
+ * between the rows.
+ *
+ * %Gtk::ListView allows the user to select items according to the selection
+ * characteristics of the model. If the provided model is not a Gtk::SelectionModel,
+ * %Gtk::ListView will wrap it in a Gtk::SingleSelection. For models that allow
+ * multiple selected items, it is possible to turn on _rubberband selection_,
+ * using set_enable_rubberband().
+ *
+ * If you need multiple columns with headers, see Gtk::ColumnView.
+ *
+ * An example of using %Gtk::ListView:
+ * ~~~
+ * void setup_listitem_cb(const Glib::RefPtr<Gtk::ListItem>& list_item)
+ * {
+ *   auto image = new Gtk::Image;
+ *   image->set_icon_size(Gtk::IconSize::LARGE);
+ *   list_item->set_child(*image);
+ * }
+ *
+ * void bind_listitem_cb(const Glib::RefPtr<Gtk::ListItem>& list_item)
+ * {
+ *   auto item = list_item->get_item();
+ *   if (auto app_info = std::dynamic_pointer_cast<Gio::AppInfo>(item))
+ *     if (auto image = dynamic_cast<Gtk::Image*>(list_item->get_child()))
+ *       image->set(app_info->get_icon());
+ * }
+ *
+ * void activate_cb(Gtk::ListView* list, guint position)
+ * {
+ *   auto item = list->get_model()->get_object(position);
+ *   if (auto app_info = std::dynamic_pointer_cast<Gio::AppInfo>(item))
+ *     app_info->launch(std::vector<Glib::RefPtr<Gio::File>>());
+ * }
+ *
+ * ...
+ *
+ *   auto factory = Gtk::SignalListItemFactory::create();
+ *   factory->signal_setup().connect(sigc::ptr_fun(setup_listitem_cb));
+ *   factory->signal_bind().connect(sigc::ptr_fun(bind_listitem_cb));
+ *
+ *   auto list = new Gtk::ListView(factory);
+ *
+ *   list->signal_activate().connect(
+ *     sigc::bind<0>(sigc::ptr_fun(activate_cb), list));
+ *
+ *   auto model = create_application_list();
+ *   list->set_model(model);
+ *
+ *   scrolled_window.set_child(*list);
+ * ~~~
+ * @see Gio::ListModel, Gtk::ColumnView, Gtk::GridView
+ *
+ * @ingroup Widgets
+ *
+ * @newin{3,98}
+ */
+class GTKMM_API ListView : public ListBase
+{
+  _CLASS_GTKOBJECT(ListView, GtkListView, GTK_LIST_VIEW, ListBase, GtkListBase, , , GTKMM_API)
+
+public:
+  _CTOR_DEFAULT
+  _WRAP_CTOR(ListView(const Glib::RefPtr<ListItemFactory>& factory), gtk_list_view_new_with_factory)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::ListModel> get_model(), gtk_list_view_get_model, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::ListModel> get_model() const, gtk_list_view_get_model, refreturn, constversion)
+  _WRAP_METHOD(void set_model(const Glib::RefPtr<Gio::ListModel>& model), gtk_list_view_set_model)
+  _WRAP_METHOD(void set_factory(const Glib::RefPtr<ListItemFactory>& factory), gtk_list_view_set_factory)
+  _WRAP_METHOD(Glib::RefPtr<ListItemFactory> get_factory(), gtk_list_view_get_factory, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const ListItemFactory> get_factory() const, gtk_list_view_get_factory, refreturn, constversion)
+  _WRAP_METHOD(void set_show_separators(bool show_separators = true), gtk_list_view_set_show_separators)
+  _WRAP_METHOD(bool get_show_separators() const, gtk_list_view_get_show_separators)
+  _WRAP_METHOD(void set_single_click_activate(bool single_click_activate = true), gtk_list_view_set_single_click_activate)
+  _WRAP_METHOD(bool get_single_click_activate() const, gtk_list_view_get_single_click_activate)
+  _WRAP_METHOD(void set_enable_rubberband(bool enable_rubberband = true), gtk_list_view_set_enable_rubberband)
+  _WRAP_METHOD(bool get_enable_rubberband() const, gtk_list_view_get_enable_rubberband)
+
+  _WRAP_PROPERTY("factory", Glib::RefPtr<ListItemFactory>)
+  _WRAP_PROPERTY("model", Glib::RefPtr<Gio::ListModel>)
+  _WRAP_PROPERTY("show-separators", bool)
+  _WRAP_PROPERTY("single-click-activate", bool)
+  _WRAP_PROPERTY("enable-rubberband", bool)
+
+  // no_default_handler because GtkListViewClass is private.
+  _WRAP_SIGNAL(void activate(guint pos), "activate", no_default_handler)
+};
+
+} // namespace Gtk
