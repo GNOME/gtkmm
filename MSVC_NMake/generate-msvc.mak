@@ -36,38 +36,31 @@ $(gtkmm_demo_resources)	\
 
 prep-git-build: pkg-ver.mak
 
-gtkmm\gtkmm.rc: pkg-ver.mak
-	@echo Generating $@...
-	@copy $@.in $@
-	@$(PERL) -pi.bak -e "s/\@GTKMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GTKMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GTKMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\@GTKMM_MODULE_NAME\@/gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)/g" $@
-	@del $@.bak
-
 # You may change GTKMM_DISABLE_DEPRECATED and GTKMM_STATIC_LIB if you know what you are doing
-gdkmm\gdkmmconfig.h: pkg-ver.mak ..\gdk\gdkmmconfig.h.in
-	@echo Generating $@...
-	@if not exist $(@D) mkdir $(@D)
-	@copy ..\gdk\$(@F).in $@
-	@$(PERL) -pi.bak -e "s/\#undef GDKMM_DISABLE_DEPRECATED/\/\* \#undef GDKMM_DISABLE_DEPRECATED \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GDKMM_STATIC_LIB/\/\* \#undef GDKMM_STATIC_LIB \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GDKMM_MAJOR_VERSION/\#define GDKMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GDKMM_MINOR_VERSION/\#define GDKMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GDKMM_MICRO_VERSION/\#define GDKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
-	@del $@.bak
+gdkmm\gdkmmconfig.h: ..\configure.ac ..\gdk\gdkmmconfig.h.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\gdk\$(@F).in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_DISABLE_DEPRECATED/\/\* \#undef GDKMM_DISABLE_DEPRECATED \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_STATIC_LIB/\/\* \#undef GDKMM_STATIC_LIB \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_MAJOR_VERSION/\#define GDKMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_MINOR_VERSION/\#define GDKMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_MICRO_VERSION/\#define GDKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
-gtkmm\gtkmmconfig.h: pkg-ver.mak ..\gtk\gtkmmconfig.h.in
-	@echo Generating $@...
-	@copy ..\gtk\$(@F).in $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_ATKMM_ENABLED/\#define GTKMM_ATKMM_ENABLED 1/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_DISABLE_DEPRECATED/\/\* \#undef GTKMM_DISABLE_DEPRECATED \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_STATIC_LIB/\/\* \#undef GTKMM_STATIC_LIB \*\//g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_MAJOR_VERSION/\#define GTKMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_MINOR_VERSION/\#define GTKMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
-	@$(PERL) -pi.bak -e "s/\#undef GTKMM_MICRO_VERSION/\#define GTKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
-	@del $@.bak
+gtkmm\gtkmmconfig.h: ..\configure.ac ..\gtk\gtkmmconfig.h.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\gtk\$(@F).in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_ATKMM_ENABLED/\#define GTKMM_ATKMM_ENABLED 1/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_DISABLE_DEPRECATED/\/\* \#undef GTKMM_DISABLE_DEPRECATED \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_STATIC_LIB/\/\* \#undef GTKMM_STATIC_LIB \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_MAJOR_VERSION/\#define GTKMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_MINOR_VERSION/\#define GTKMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_MICRO_VERSION/\#define GTKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 pkg-ver.mak: ..\configure.ac
 	@echo Generating version info Makefile Snippet...
