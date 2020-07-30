@@ -5521,6 +5521,22 @@ current mode.
 </return>
 </function>
 
+<function name="gdk_device_tool_get_axes">
+<description>
+Gets the axes of the tool.
+
+
+</description>
+<parameters>
+<parameter name="tool">
+<parameter_description> a #GdkDeviceTool
+</parameter_description>
+</parameter>
+</parameters>
+<return> the axes of @tool
+</return>
+</function>
+
 <function name="gdk_device_tool_get_hardware_id">
 <description>
 Gets the hardware ID of this tool, or 0 if it's not known. When
@@ -5696,25 +5712,6 @@ function for:
 </parameters>
 <return> a #GdkDisplay, or %NULL if
 there is no default display.
-</return>
-</function>
-
-<function name="gdk_display_get_default_group">
-<description>
-Returns the default group leader surface for all toplevel surfaces
-on @display. This surface is implicitly created by GDK.
-See gdk_surface_set_group().
-
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-</parameters>
-<return> The default group leader surface
-for @display
 </return>
 </function>
 
@@ -6261,8 +6258,10 @@ and should not be used by applications.
 
 <function name="gdk_display_supports_input_shapes">
 <description>
-Returns %TRUE if gdk_surface_input_shape_combine_mask() can
+Returns %TRUE if gdk_surface_set_input_region() can
 be used to modify the input shape of surfaces on @display.
+
+On modern displays, this value is always %TRUE.
 
 
 </description>
@@ -9154,36 +9153,6 @@ Gets the width in millimeters of the monitor.
 </parameters>
 <return> the physical width of the monitor
 </return>
-</function>
-
-<function name="gdk_monitor_get_workarea">
-<description>
-Retrieves the size and position of the “work area” on a monitor
-within the display coordinate space. The returned geometry is in
-”application pixels”, not in ”device pixels” (see
-gdk_monitor_get_scale_factor()).
-
-The work area should be considered when positioning menus and
-similar popups, to avoid placing them below panels, docks or other
-desktop components.
-
-Note that not all backends may have a concept of workarea. This
-function will return the monitor geometry if a workarea is not
-available, or does not apply.
-
-</description>
-<parameters>
-<parameter name="monitor">
-<parameter_description> a #GdkMonitor
-</parameter_description>
-</parameter>
-<parameter name="workarea">
-<parameter_description> a #GdkRectangle to be filled with
-the monitor workarea
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_monitor_is_valid">
@@ -14446,7 +14415,7 @@ capabilities. This object is owned by GTK and must not be freed.
 
 <function name="gdk_seat_get_tools">
 <description>
-Returns all #GdkDeviceTool&lt;!-- --&gt;s that are known to the
+Returns all #GdkDeviceTools that are known to the
 application.
 
 
@@ -14774,24 +14743,6 @@ reaches zero. You must call this function yourself before that happens.
 <return></return>
 </function>
 
-<function name="gdk_surface_freeze_updates">
-<description>
-Temporarily freezes a surface such that it won’t receive expose
-events.  The surface will begin receiving expose events again when
-gdk_surface_thaw_updates() is called. If gdk_surface_freeze_updates()
-has been called more than once, gdk_surface_thaw_updates() must be called
-an equal number of times to begin processing exposes.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_surface_get_cursor">
 <description>
 Retrieves a #GdkCursor pointer for the cursor currently set on the
@@ -15005,50 +14956,6 @@ part of gtk_widget_hide().
 <return></return>
 </function>
 
-<function name="gdk_surface_invalidate_rect">
-<description>
-A convenience wrapper around gdk_surface_invalidate_region() which
-invalidates a rectangular region. See
-gdk_surface_invalidate_region() for details.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="rect">
-<parameter_description> rectangle to invalidate or %NULL to invalidate the whole
-surface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_invalidate_region">
-<description>
-Adds @region to the update area for @surface. The update area is the
-region that needs to be redrawn, or “dirty region.”
-
-GDK will process all updates whenever the frame clock schedules a redraw,
-so there’s no need to do forces redraws manually, you just need to
-invalidate regions that you know should be redrawn.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> a #cairo_region_t
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_surface_is_destroyed">
 <description>
 Check to see if a surface is destroyed..
@@ -15133,12 +15040,10 @@ Creates a new toplevel surface.
 </return>
 </function>
 
-<function name="gdk_surface_queue_expose">
+<function name="gdk_surface_queue_render">
 <description>
-Forces an expose event for @surface to be scheduled.
-
-If the invalid area of @surface is empty, an expose event will
-still be emitted. Its invalid region will be empty.
+Forces a #GdkSurface::render signal emission for @surface
+to be scheduled.
 
 This function is useful for implementations that track invalid
 regions on their own.
@@ -15298,22 +15203,6 @@ to create toplevel surfaces.
 </parameter>
 <parameter name="bottom">
 <parameter_description> The bottom extent
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_thaw_updates">
-<description>
-Thaws a surface frozen with gdk_surface_freeze_updates(). Note that this
-will not necessarily schedule updates if the surface freeze count reaches
-zero.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
 </parameter_description>
 </parameter>
 </parameters>
