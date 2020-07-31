@@ -348,22 +348,6 @@ The ::tool-changed signal is emitted on pen/eraser
 <return></return>
 </signal>
 
-<property name="GdkDevice:associated-device">
-<description>
-Associated pointer or keyboard with this device, if any. Devices of
-type #GDK_DEVICE_TYPE_LOGICAL always come in keyboard/pointer pairs.
-Other device types will have a %NULL associated device.
-
-</description>
-</property>
-
-<property name="GdkDevice:axes">
-<description>
-The axes currently available for this device.
-
-</description>
-</property>
-
 <property name="GdkDevice:display">
 <description>
 The #GdkDisplay the #GdkDevice pertains to.
@@ -373,8 +357,7 @@ The #GdkDisplay the #GdkDevice pertains to.
 
 <property name="GdkDevice:has-cursor">
 <description>
-Whether the device is represented by a cursor on the screen. Devices of type
-%GDK_DEVICE_TYPE_LOGICAL will have %TRUE here.
+Whether the device is represented by a cursor on the screen.
 
 </description>
 </property>
@@ -419,13 +402,6 @@ Product ID of this device, see gdk_device_get_product_id().
 <property name="GdkDevice:source">
 <description>
 Source type for the device.
-
-</description>
-</property>
-
-<property name="GdkDevice:type">
-<description>
-Device role in the device manager.
 
 </description>
 </property>
@@ -495,29 +471,6 @@ airbrush, pencil, etc.
 </parameter>
 <parameter name="GDK_DEVICE_TOOL_TYPE_LENS">
 <parameter_description> Tool is a lens cursor.
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
-<enum name="GdkDeviceType">
-<description>
-Indicates the device type.
-
-</description>
-<parameters>
-<parameter name="GDK_DEVICE_TYPE_LOGICAL">
-<parameter_description> Device is a logical device. There will
-be an associated focus indicator on the screen.
-</parameter_description>
-</parameter>
-<parameter name="GDK_DEVICE_TYPE_PHYSICAL">
-<parameter_description> Device is a physical device.
-</parameter_description>
-</parameter>
-<parameter name="GDK_DEVICE_TYPE_FLOATING">
-<parameter_description> Device is a physical device, currently
-not attached to any seat.
 </parameter_description>
 </parameter>
 </parameters>
@@ -1286,10 +1239,6 @@ pointer, even if it is something else, such as a trackball.)
 </parameter>
 <parameter name="GDK_SOURCE_PEN">
 <parameter_description> the device is a stylus of a graphics tablet or similar device.
-</parameter_description>
-</parameter>
-<parameter name="GDK_SOURCE_CURSOR">
-<parameter_description> the device is a graphics tablet “puck” or similar device.
 </parameter_description>
 </parameter>
 <parameter name="GDK_SOURCE_KEYBOARD">
@@ -5009,44 +4958,6 @@ this one cannot be supported
 </return>
 </function>
 
-<function name="gdk_device_get_associated_device">
-<description>
-Returns the #GdkDevice associated to @device:
-
-- if @device is of type %GDK_DEVICE_TYPE_LOGICAL, it will return
-the paired pointer or keyboard.
-- if @device is of type %GDK_DEVICE_TYPE_PHYSICAL, it will return
-the logical device to which @device is attached to.
-- if @device is of type %GDK_DEVICE_TYPE_FLOATING, %NULL will be
-returned, as there is no associated device.
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return> The associated device, or
-%NULL
-</return>
-</function>
-
-<function name="gdk_device_get_axes">
-<description>
-Returns the axes currently available on the device.
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_device_get_axis">
 <description>
 Interprets an array of double as axis values for a given device,
@@ -5126,22 +5037,6 @@ Retrieves the #GdkDeviceTool associated to @device.
 </parameter>
 </parameters>
 <return> the #GdkDeviceTool
-</return>
-</function>
-
-<function name="gdk_device_get_device_type">
-<description>
-Returns the device type for @device.
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GdkDeviceType for @device.
 </return>
 </function>
 
@@ -5351,47 +5246,11 @@ Determines the type of the device.
 </return>
 </function>
 
-<function name="gdk_device_get_state">
-<description>
-Gets the current state of a pointer device relative to @surface. As a
-physical device’s coordinates are those of its logical pointer, this
-function may not be called on devices of type %GDK_DEVICE_TYPE_PHYSICAL,
-unless there is an ongoing grab on them.
-
-See also: gdk_seat_grab().
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice.
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> a #GdkSurface.
-</parameter_description>
-</parameter>
-<parameter name="axes">
-<parameter_description> an array of doubles to store the values of
-the axes of @device in, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="mask">
-<parameter_description> location to store the modifiers, or %NULL.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_device_get_surface_at_position">
 <description>
 Obtains the surface underneath @device, returning the location of the device in @win_x and @win_y in
 double precision. Returns %NULL if the surface tree under @device is not known to GDK (for example,
 belongs to another application).
-
-As a physical device coordinates are those of its logical pointer, this
-function may not be called on devices of type %GDK_DEVICE_TYPE_PHYSICAL,
-unless there is an ongoing grab on them, see gdk_seat_grab().
 
 
 </description>
@@ -5429,10 +5288,10 @@ compose #GSettings paths to store settings for this device.
 static GSettings *
 get_device_settings (GdkDevice *device)
 {
-const gchar *vendor, *product;
+const char *vendor, *product;
 GSettings *settings;
 GdkDevice *device;
-gchar *path;
+char *path;
 
 vendor = gdk_device_get_vendor_id (device);
 product = gdk_device_get_product_id (device);
@@ -5575,6 +5434,22 @@ current mode.
 </parameter>
 </parameters>
 <return> The number of button/ring/strip groups in the pad.
+</return>
+</function>
+
+<function name="gdk_device_tool_get_axes">
+<description>
+Gets the axes of the tool.
+
+
+</description>
+<parameters>
+<parameter name="tool">
+<parameter_description> a #GdkDeviceTool
+</parameter_description>
+</parameter>
+</parameters>
+<return> the axes of @tool
 </return>
 </function>
 
@@ -5753,25 +5628,6 @@ function for:
 </parameters>
 <return> a #GdkDisplay, or %NULL if
 there is no default display.
-</return>
-</function>
-
-<function name="gdk_display_get_default_group">
-<description>
-Returns the default group leader surface for all toplevel surfaces
-on @display. This surface is implicitly created by GDK.
-See gdk_surface_set_group().
-
-
-</description>
-<parameters>
-<parameter name="display">
-<parameter_description> a #GdkDisplay
-</parameter_description>
-</parameter>
-</parameters>
-<return> The default group leader surface
-for @display
 </return>
 </function>
 
@@ -6318,8 +6174,10 @@ and should not be used by applications.
 
 <function name="gdk_display_supports_input_shapes">
 <description>
-Returns %TRUE if gdk_surface_input_shape_combine_mask() can
+Returns %TRUE if gdk_surface_set_input_region() can
 be used to modify the input shape of surfaces on @display.
+
+On modern displays, this value is always %TRUE.
 
 
 </description>
@@ -7382,30 +7240,6 @@ Returns the seat that originated the event.
 </parameter>
 </parameters>
 <return> a #GdkSeat.
-</return>
-</function>
-
-<function name="gdk_event_get_source_device">
-<description>
-This function returns the physical #GdkDevice that has triggered
-the event, falling back to the logical device, as returned by
-gdk_event_get_device(), if the event wasn’t caused by
-interaction with a hardware device. This may happen for example
-in synthesized crossing events after a #GdkSurface updates its
-geometry or a grab is acquired/released.
-
-If the event does not contain a device field, this function will
-return %NULL.
-
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a #GdkEvent
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GdkDevice, or %NULL.
 </return>
 </function>
 
@@ -9235,36 +9069,6 @@ Gets the width in millimeters of the monitor.
 </parameters>
 <return> the physical width of the monitor
 </return>
-</function>
-
-<function name="gdk_monitor_get_workarea">
-<description>
-Retrieves the size and position of the “work area” on a monitor
-within the display coordinate space. The returned geometry is in
-”application pixels”, not in ”device pixels” (see
-gdk_monitor_get_scale_factor()).
-
-The work area should be considered when positioning menus and
-similar popups, to avoid placing them below panels, docks or other
-desktop components.
-
-Note that not all backends may have a concept of workarea. This
-function will return the monitor geometry if a workarea is not
-available, or does not apply.
-
-</description>
-<parameters>
-<parameter name="monitor">
-<parameter_description> a #GdkMonitor
-</parameter_description>
-</parameter>
-<parameter name="workarea">
-<parameter_description> a #GdkRectangle to be filled with
-the monitor workarea
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_monitor_is_valid">
@@ -14347,7 +14151,7 @@ a is a floating point value in the range 0 to 1.
 <description>
 Returns a textual specification of @rgba in the form
 `rgb(r,g,b)` or
-`rgba(r g,b,a)`,
+`rgba(r,g,b,a)`,
 where “r”, “g”, “b” and “a” represent the red, green,
 blue and alpha values respectively. “r”, “g”, and “b” are
 represented as integers in the range 0 to 255, and “a”
@@ -14452,6 +14256,28 @@ Returns the capabilities this #GdkSeat currently has.
 </return>
 </function>
 
+<function name="gdk_seat_get_devices">
+<description>
+Returns the devices that match the given capabilities.
+
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> a #GdkSeat
+</parameter_description>
+</parameter>
+<parameter name="capabilities">
+<parameter_description> capabilities to get devices for
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list of #GdkDevices.
+The list must be freed with g_list_free(), the elements are owned
+by GDK and must not be freed.
+</return>
+</function>
+
 <function name="gdk_seat_get_display">
 <description>
 Returns the #GdkDisplay this seat belongs to.
@@ -14486,28 +14312,6 @@ capabilities. This object is owned by GTK and must not be freed.
 </return>
 </function>
 
-<function name="gdk_seat_get_physical_devices">
-<description>
-Returns the physical devices that match the given capabilities.
-
-
-</description>
-<parameters>
-<parameter name="seat">
-<parameter_description> a #GdkSeat
-</parameter_description>
-</parameter>
-<parameter name="capabilities">
-<parameter_description> capabilities to get devices for
-</parameter_description>
-</parameter>
-</parameters>
-<return> A list of #GdkDevices.
-The list must be freed with g_list_free(), the elements are owned
-by GDK and must not be freed.
-</return>
-</function>
-
 <function name="gdk_seat_get_pointer">
 <description>
 Returns the logical device that routes pointer events.
@@ -14522,6 +14326,24 @@ Returns the logical device that routes pointer events.
 </parameters>
 <return> a logical #GdkDevice with pointer
 capabilities. This object is owned by GTK and must not be freed.
+</return>
+</function>
+
+<function name="gdk_seat_get_tools">
+<description>
+Returns all #GdkDeviceTools that are known to the
+application.
+
+
+</description>
+<parameters>
+<parameter name="seat">
+<parameter_description> A #GdkSeat
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list of tools. Free with
+g_list_free().
 </return>
 </function>
 
@@ -14837,24 +14659,6 @@ reaches zero. You must call this function yourself before that happens.
 <return></return>
 </function>
 
-<function name="gdk_surface_freeze_updates">
-<description>
-Temporarily freezes a surface such that it won’t receive expose
-events.  The surface will begin receiving expose events again when
-gdk_surface_thaw_updates() is called. If gdk_surface_freeze_updates()
-has been called more than once, gdk_surface_thaw_updates() must be called
-an equal number of times to begin processing exposes.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_surface_get_cursor">
 <description>
 Retrieves a #GdkCursor pointer for the cursor currently set on the
@@ -15068,50 +14872,6 @@ part of gtk_widget_hide().
 <return></return>
 </function>
 
-<function name="gdk_surface_invalidate_rect">
-<description>
-A convenience wrapper around gdk_surface_invalidate_region() which
-invalidates a rectangular region. See
-gdk_surface_invalidate_region() for details.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="rect">
-<parameter_description> rectangle to invalidate or %NULL to invalidate the whole
-surface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_invalidate_region">
-<description>
-Adds @region to the update area for @surface. The update area is the
-region that needs to be redrawn, or “dirty region.”
-
-GDK will process all updates whenever the frame clock schedules a redraw,
-so there’s no need to do forces redraws manually, you just need to
-invalidate regions that you know should be redrawn.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="region">
-<parameter_description> a #cairo_region_t
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_surface_is_destroyed">
 <description>
 Check to see if a surface is destroyed..
@@ -15196,12 +14956,10 @@ Creates a new toplevel surface.
 </return>
 </function>
 
-<function name="gdk_surface_queue_expose">
+<function name="gdk_surface_queue_render">
 <description>
-Forces an expose event for @surface to be scheduled.
-
-If the invalid area of @surface is empty, an expose event will
-still be emitted. Its invalid region will be empty.
+Forces a #GdkSurface::render signal emission for @surface
+to be scheduled.
 
 This function is useful for implementations that track invalid
 regions on their own.
@@ -15361,22 +15119,6 @@ to create toplevel surfaces.
 </parameter>
 <parameter name="bottom">
 <parameter_description> The bottom extent
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_thaw_updates">
-<description>
-Thaws a surface frozen with gdk_surface_freeze_updates(). Note that this
-will not necessarily schedule updates if the surface freeze count reaches
-zero.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
 </parameter_description>
 </parameter>
 </parameters>

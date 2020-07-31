@@ -20,7 +20,8 @@ include(convert_glib.m4)
 
 #
 # Basic Types
-_CONVERSION(`gdouble*',`double&',`*($3)')
+_CONVERSION(`double*',`double&',`*($3)')
+_CONVERSION(`float&',`float*',`&($3)')
 
 _CONVERSION(`time_t&',`time_t*',`&($3)')
 _CONVERSION(`time_t',`std::time_t',`$3')
