@@ -74,7 +74,6 @@ else
   warning_level = get_option('warnings')
 endif
 build_deprecated_api = get_option('build-deprecated-api')
-build_atkmm_api = get_option('build-atkmm-api')
 build_documentation_opt = get_option('build-documentation')
 build_documentation = build_documentation_opt == 'true' or \
                      (build_documentation_opt == 'if-maintainer-mode' and maintainer_mode)
@@ -98,7 +97,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 glibmm_req = '>= 2.65.1'
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
-gtk_req = '>= 3.98.0'
+gtk_req = '>= 3.99.0'
 gtk_dep = dependency('gtk4', version: gtk_req)
 
 cairomm_req = '>= 1.15.4'
@@ -109,11 +108,6 @@ pangomm_dep = dependency('pangomm-2.44', version: pangomm_req)
 
 gdk_pixbuf_req = '>= 2.35.5'
 gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: gdk_pixbuf_req)
-
-# atkmm is required in maintainer mode even if atkmm API shall not be built.
-# gmmproc must be able to find atkmm's installed M4 files.
-atkmm_req = '>= 2.29.1'
-atkmm_dep = dependency('atkmm-2.30', version: atkmm_req, required: build_atkmm_api or maintainer_mode)
 
 epoxy_req = '>= 1.2'
 epoxy_dep = dependency('epoxy', version: epoxy_req, required: build_demos)
@@ -129,9 +123,6 @@ giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glib
 gmmproc_dir = glibmm_dep.get_pkgconfig_variable('gmmprocdir')
 
 gmmproc_extra_m4_dirs = [pangomm_dep.get_pkgconfig_variable('gmmprocm4dir')]
-if atkmm_dep.found()
-  gmmproc_extra_m4_dirs += [atkmm_dep.get_pkgconfig_variable('gmmprocm4dir')]
-endif
 
 gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
 gdkmm_requires = [
@@ -144,11 +135,6 @@ gdkmm_requires = [
 
 gtkmm_build_dep = gdkmm_build_dep
 gtkmm_requires = gdkmm_requires
-
-if build_atkmm_api
-  gtkmm_build_dep += [atkmm_dep]
-  gtkmm_requires += ['atkmm-2.30', atkmm_req]
-endif
 
 # not Windows
 if host_machine.system() != 'windows'
@@ -239,7 +225,7 @@ elif warning_level == 'max' or warning_level == 'fatal'
     else
       warning_flags += ['-Werror']
     endif
-    deprecations = 'G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM SIGCXX'.split()
+    deprecations = 'G PANGO GDK GDK_PIXBUF GTK GLIBMM PANGOMM CAIROMM SIGCXX'.split()
     foreach d : deprecations
       warning_flags += '-D@0@_DISABLE_DEPRECATED'.format(d)
     endforeach
@@ -311,7 +297,6 @@ summary = [
   '         Maintainer mode: @0@@1@'.format(maintainer_mode_opt, real_maintainer_mode),
   '       Compiler warnings: @0@'.format(warning_level),
   '    Build deprecated API: @0@'.format(build_deprecated_api),
-  '         Build atkmm API: @0@'.format(build_atkmm_api),
   'Build HTML documentation: @0@@1@'.format(build_documentation_opt, real_build_documentation),
   '     Build demo programs: @0@'.format(build_demos),
   '     Build test programs: @0@'.format(build_tests),

@@ -30,6 +30,10 @@ _CONVERSION(`ui_merge_id',`guint',`$3')
 _CONVERSION(`guint',`ui_merge_id',`$3')
 
 # Enums: TODO: It would be nice if gmmproc knew about these automatically.
+_CONV_INCLASS_ENUM(Gtk,Accessible,Role)
+_CONV_INCLASS_ENUM(Gtk,Accessible,State)
+_CONV_INCLASS_ENUM(Gtk,Accessible,Property)
+_CONV_INCLASS_ENUM(Gtk,Accessible,Relation)
 _CONV_ENUM(Gtk,Align)
 _CONV_ENUM(Gtk,ArrowType)
 _CONV_INCLASS_ENUM(Gtk,AssistantPage,Type)
@@ -130,7 +134,6 @@ _CONV_ENUM(Gtk,InputHints)
 _CONV_INCLASS_ENUM(Gtk,LevelBar,Mode)
 _CONV_ENUM(Gtk,BaselinePosition)
 
-include(convert_atk.m4)
 include(convert_pango.m4)
 include(convert_gdk.m4)
 

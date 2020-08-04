@@ -13,7 +13,6 @@ tag_file_modules = [
   'glibmm-2.66',
   'cairomm-1.16',
   'pangomm-2.44',
-  'atkmm-2.30',
 ]
 doxygen_tagfiles = ''
 docinstall_flags = []

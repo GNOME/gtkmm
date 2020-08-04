@@ -95,18 +95,12 @@ AS_IF([test "x$enable_static" = xyes],
 # gdkmm really does need GTK, because part of Gdk::DragContext is in GTK.
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk4 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
-AC_SUBST([GDKMM_MODULES], ['giomm-2.66 >= 2.65.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.98.0 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GDKMM_MODULES], ['giomm-2.66 >= 2.65.1 pangomm-2.44 >= 2.43.1 cairomm-1.16 >= 1.15.4 gtk4 >= 3.99.0 gdk-pixbuf-2.0 >= 2.35.5'])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
       [GTKMM_MODULES="$GDKMM_MODULES gtk4-unix-print"])
 
-# Offer the ability to omit some API from the library, to reduce the code size.
-# Note that there are other options in glibmm, which affect gtkmm.
-GTKMM_ARG_ENABLE_API_ATKMM
-
-AS_IF([test "x$gtkmm_enable_api_atkmm" != xno],
-      [GTKMM_MODULES="atkmm-2.30 >= 2.29.1 $GTKMM_MODULES"])
 AC_SUBST([GTKMM_MODULES])
 
 # gtkmm.pc.in can assume that GDKMM_MODULES is a subset of GTKMM_MODULES,
@@ -121,7 +115,7 @@ PKG_CHECK_MODULES([GTKMM_DEMOS_EXTRA], [$GTKMM_DEMOS_EXTRA_MODULES])
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.66])
-MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.44 atkmm-2.30])
+MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.44])
 
 MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
 
@@ -131,7 +125,6 @@ MM_ARG_WITH_TAGFILE_DOC([libsigc++-3.0.tag], [sigc++-3.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.66.tag], [glibmm-2.66])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.16.tag], [cairomm-1.16])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-2.44.tag], [pangomm-2.44])
-MM_ARG_WITH_TAGFILE_DOC([atkmm-2.30.tag], [atkmm-2.30])
 
 # glib-compile-resources and C compiler are needed to generate and compile
 # resource files in demo programs.
@@ -146,7 +139,7 @@ AC_CHECK_FUNCS([mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -Wformat-security -Wshadow -Wsuggest-override -Wno-long-long -DGSEAL_ENABLE],
-                       [G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM SIGCXX])
+                       [G PANGO GDK GDK_PIXBUF GTK GLIBMM PANGOMM CAIROMM SIGCXX])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile

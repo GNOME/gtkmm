@@ -28,6 +28,7 @@ endforeach
 gtkmm_any_hg_ccg_basenames = [
   'aboutdialog',
   'accellabel',
+  'accessible',
   'actionable',
   'actionbar',
   'adjustment',

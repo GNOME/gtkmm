@@ -44,6 +44,7 @@ int main(int /* argc */, char** /* argv */)
 
   std::cout << get_defs( GTK_TYPE_ABOUT_DIALOG )
             << get_defs( GTK_TYPE_ACCEL_LABEL )
+            << get_defs( GTK_TYPE_ACCESSIBLE )
             << get_defs( GTK_TYPE_ACTIONABLE )
             << get_defs( GTK_TYPE_ACTION_BAR )
             << get_defs( GTK_TYPE_ADJUSTMENT )
