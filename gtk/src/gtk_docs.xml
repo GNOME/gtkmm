@@ -7375,6 +7375,13 @@ The amount of space between to consecutive rows.
 </description>
 </property>
 
+<property name="GtkGridLayoutChild:column">
+<description>
+The column to place the child in.
+
+</description>
+</property>
+
 <property name="GtkGridLayoutChild:column-span">
 <description>
 The number of columns the child spans to.
@@ -7382,9 +7389,9 @@ The number of columns the child spans to.
 </description>
 </property>
 
-<property name="GtkGridLayoutChild:left-attach">
+<property name="GtkGridLayoutChild:row">
 <description>
-The column number to attach the left side of the child to.
+The row to place the child in.
 
 </description>
 </property>
@@ -7392,13 +7399,6 @@ The column number to attach the left side of the child to.
 <property name="GtkGridLayoutChild:row-span">
 <description>
 The number of rows the child spans to.
-
-</description>
-</property>
-
-<property name="GtkGridLayoutChild:top-attach">
-<description>
-The row number to attach the top side of the child to.
 
 </description>
 </property>
@@ -23756,7 +23756,7 @@ indicates the mnemonic accelerator keys.
 <function name="gtk_button_new">
 <description>
 Creates a new #GtkButton widget. To add a child widget to the button,
-use gtk_container_add().
+use gtk_button_set_child().
 
 
 </description>
@@ -31604,7 +31604,7 @@ so the first button in the list will be the leftmost button in the dialog.
 
 Here’s a simple example:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-GtkWidget *main_app_window; // Window the dialog should show up on
+GtkWindow *main_app_window; // Window the dialog should show up on
 GtkWidget *dialog;
 GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
 dialog = gtk_dialog_new_with_buttons (&quot;My dialog&quot;,
@@ -37607,16 +37607,25 @@ a file name already — for example, if the user just created a new
 file and is saving it for the first time, do not call this function.
 Instead, use something similar to this:
 |[&lt;!-- language=&quot;C&quot; --&gt;
+static void
+prepare_file_chooser (GtkFileChooser *chooser,
+GFile          *existing_file)
+{
+gboolean document_is_new = (existing_file == NULL);
+
 if (document_is_new)
 {
+GFile *default_file_for_saving = g_file_new_for_path (&quot;./out.txt&quot;);
 // the user just created a new document
-gtk_file_chooser_set_current_folder (chooser, default_file_for_saving);
+gtk_file_chooser_set_current_folder (chooser, default_file_for_saving, NULL);
 gtk_file_chooser_set_current_name (chooser, &quot;Untitled document&quot;);
+g_object_unref (default_file_for_saving);
 }
 else
 {
 // the user edited an existing document
-gtk_file_chooser_set_file (chooser, existing_file);
+gtk_file_chooser_set_file (chooser, existing_file, NULL);
+}
 }
 ]|
 
@@ -38432,7 +38441,7 @@ represent items from @model. @box is updated whenever @model changes.
 If @model is %NULL, @box is left empty.
 
 It is undefined to add or remove widgets directly (for example, with
-gtk_flow_box_insert() or gtk_container_add()) while @box is bound to a
+gtk_flow_box_insert()) while @box is bound to a
 model.
 
 Note that using a model is incompatible with the filtering and sorting
@@ -38761,8 +38770,7 @@ Gets the selection mode of @box.
 Inserts the @widget into @box at @position.
 
 If a sort function is set, the widget will actually be inserted
-at the calculated position and this function has the same effect
-as gtk_container_add().
+at the calculated position.
 
 If @position is -1, or larger than the total number of children
 in the @box, then the @widget will be appended to the end.
@@ -41449,9 +41457,9 @@ If @widget does not have the grab, this function does nothing.
 <description>
 Adds a widget to the grid.
 
-The position of @child is determined by @left and @top. The
-number of “cells” that @child will occupy is determined by
-@width and @height.
+The position of @child is determined by @column and @row.
+The number of “cells” that @child will occupy is determined
+by @width and @height.
 
 </description>
 <parameters>
@@ -41463,11 +41471,11 @@ number of “cells” that @child will occupy is determined by
 <parameter_description> the widget to add
 </parameter_description>
 </parameter>
-<parameter name="left">
+<parameter name="column">
 <parameter_description> the column number to attach the left side of @child to
 </parameter_description>
 </parameter>
-<parameter name="top">
+<parameter name="row">
 <parameter_description> the row number to attach the top side of @child to
 </parameter_description>
 </parameter>
@@ -41545,7 +41553,7 @@ Returns which row defines the global baseline of @grid.
 <function name="gtk_grid_get_child_at">
 <description>
 Gets the child of @grid whose area covers the grid
-cell whose upper left corner is at @left, @top.
+cell at @column, @row.
 
 
 </description>
@@ -41554,11 +41562,11 @@ cell whose upper left corner is at @left, @top.
 <parameter_description> a #GtkGrid
 </parameter_description>
 </parameter>
-<parameter name="left">
+<parameter name="column">
 <parameter_description> the left edge of the cell
 </parameter_description>
 </parameter>
-<parameter name="top">
+<parameter name="row">
 <parameter_description> the top edge of the cell
 </parameter_description>
 </parameter>
@@ -41725,6 +41733,22 @@ position are grown to span the new row.
 <return></return>
 </function>
 
+<function name="gtk_grid_layout_child_get_column">
+<description>
+Retrieves the column number to which @child attaches its left side.
+
+
+</description>
+<parameters>
+<parameter name="child">
+<parameter_description> a #GtkGridLayoutChild
+</parameter_description>
+</parameter>
+</parameters>
+<return> the column number
+</return>
+</function>
+
 <function name="gtk_grid_layout_child_get_column_span">
 <description>
 Retrieves the number of columns that @child spans to.
@@ -41741,9 +41765,9 @@ Retrieves the number of columns that @child spans to.
 </return>
 </function>
 
-<function name="gtk_grid_layout_child_get_left_attach">
+<function name="gtk_grid_layout_child_get_row">
 <description>
-Retrieves the column number to which @child attaches its left side.
+Retrieves the row number to which @child attaches its top side.
 
 
 </description>
@@ -41753,7 +41777,7 @@ Retrieves the column number to which @child attaches its left side.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the column number
+<return> the row number
 </return>
 </function>
 
@@ -41773,10 +41797,9 @@ Retrieves the number of rows that @child spans to.
 </return>
 </function>
 
-<function name="gtk_grid_layout_child_get_top_attach">
+<function name="gtk_grid_layout_child_set_column">
 <description>
-Retrieves the row number to which @child attaches its top side.
-
+Sets the column number to attach the left side of @child.
 
 </description>
 <parameters>
@@ -41784,9 +41807,12 @@ Retrieves the row number to which @child attaches its top side.
 <parameter_description> a #GtkGridLayoutChild
 </parameter_description>
 </parameter>
+<parameter name="column">
+<parameter_description> the attach point for @child
+</parameter_description>
+</parameter>
 </parameters>
-<return> the row number
-</return>
+<return></return>
 </function>
 
 <function name="gtk_grid_layout_child_set_column_span">
@@ -41807,9 +41833,9 @@ Sets the number of columns @child spans to.
 <return></return>
 </function>
 
-<function name="gtk_grid_layout_child_set_left_attach">
+<function name="gtk_grid_layout_child_set_row">
 <description>
-Sets the column number to attach the left side of @child.
+Sets the row to place @child in.
 
 </description>
 <parameters>
@@ -41817,8 +41843,8 @@ Sets the column number to attach the left side of @child.
 <parameter_description> a #GtkGridLayoutChild
 </parameter_description>
 </parameter>
-<parameter name="attach">
-<parameter_description> the attach point for @child
+<parameter name="row">
+<parameter_description> the row for @child
 </parameter_description>
 </parameter>
 </parameters>
@@ -41837,24 +41863,6 @@ Sets the number of rows @child spans to.
 </parameter>
 <parameter name="span">
 <parameter_description> the span of @child
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_grid_layout_child_set_top_attach">
-<description>
-Sets the row number to attach the top side of @child.
-
-</description>
-<parameters>
-<parameter name="child">
-<parameter_description> a #GtkGridLayoutChild
-</parameter_description>
-</parameter>
-<parameter name="attach">
-<parameter_description> the attach point for @child
 </parameter_description>
 </parameter>
 </parameters>
@@ -42118,11 +42126,11 @@ Queries the attach points and spans of @child inside the given #GtkGrid.
 <parameter_description> a #GtkWidget child of @grid
 </parameter_description>
 </parameter>
-<parameter name="left">
+<parameter name="column">
 <parameter_description> the column used to attach the left side of @child
 </parameter_description>
 </parameter>
-<parameter name="top">
+<parameter name="row">
 <parameter_description> the row used to attach the top side of @child
 </parameter_description>
 </parameter>
@@ -47672,6 +47680,25 @@ offset.
 <return></return>
 </function>
 
+<function name="gtk_list_box_append">
+<description>
+Append a widget to the list. If a sort function is set, the widget will
+actually be inserted at the calculated position.
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #GtkListBox
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> the #GtkWidget to add
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_list_box_bind_model">
 <description>
 Binds @model to @box.
@@ -47684,7 +47711,7 @@ represent items from @model. @box is updated whenever @model changes.
 If @model is %NULL, @box is left empty.
 
 It is undefined to add or remove widgets directly (for example, with
-gtk_list_box_insert() or gtk_container_add()) while @box is bound to a
+gtk_list_box_insert()) while @box is bound to a
 model.
 
 Note that using a model is incompatible with the filtering and sorting
@@ -47906,8 +47933,7 @@ between rows.
 <function name="gtk_list_box_insert">
 <description>
 Insert the @child into the @box at @position. If a sort function is
-set, the widget will actually be inserted at the calculated position and
-this function has the same effect of gtk_container_add().
+set, the widget will actually be inserted at the calculated position.
 
 If @position is -1, or larger than the total number of items in the
 @box, then the @child will be appended to the end.
@@ -47995,8 +48021,7 @@ Creates a new #GtkListBox container.
 <function name="gtk_list_box_prepend">
 <description>
 Prepend a widget to the list. If a sort function is set, the widget will
-actually be inserted at the calculated position and this function has the
-same effect of gtk_container_add().
+actually be inserted at the calculated position.
 
 </description>
 <parameters>
@@ -53137,7 +53162,7 @@ Sets the orientation of the @orientable.
 Adds @widget to @overlay.
 
 The widget will be stacked on top of the main widget
-added with gtk_container_add().
+added with gtk_overlay_set_child().
 
 The position at which @widget is placed is determined
 from its #GtkWidget:halign and #GtkWidget:valign properties.
@@ -67848,7 +67873,7 @@ The child is identified by the @name.
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> the name for @child
+<parameter_description> the name for @child or %NULL
 </parameter_description>
 </parameter>
 </parameters>
