@@ -27,7 +27,6 @@ endforeach
 # Generated from pairs of .hg and .ccg files.
 gtkmm_any_hg_ccg_basenames = [
   'aboutdialog',
-  'accellabel',
   'accessible',
   'actionable',
   'actionbar',
