@@ -27,20 +27,17 @@ help:
 	@echo.
 	@echo USE_MESON_LIBS: Use this if linking to Meson-built
 	@echo variants of glibmm, pangomm and libsigc++ is desired.
-	@echo By using this option, pangomm, atkmm and cairomm
-	@echo should be linked to the Meson-built variants of
-	@echo glibmm and libsigc++ as well.
+	@echo By using this option, pangomm and cairomm should be linked to the
+	@echo Meson-built variants of glibmm and libsigc++ as well.
 	@echo.
-	@echo GMMPROC_DIR, GMMPROC_PANGO_DIR, GMMPROC_ATK_DIR:
+	@echo GMMPROC_DIR, GMMPROC_PANGO_DIR:
 	@echo Required if building directly from a GIT checkout,
 	@echo or re-generating the source files from the .hg/.ccg
-	@echo files.  GMMPROC_PANGO_DIR and GMMPROC_ATK_DIR are by
-	@echo default in ^$(GMMPROC_DIR)/../../pangomm-$(PANGOMM_MAJOR_VERSION).$(PANGOMM_MINOR_VERSION)/proc/m4
-	@echo and ^$(GMMPROC_DIR)/../../atkmm-$(ATKMM_MAJOR_VERSION).$(ATKMM_MINOR_VERSION)/proc/m4 respectively.
+	@echo files.  GMMPROC_PANGO_DIR is by default in
+	@echo ^$(GMMPROC_DIR)/../../pangomm-$(PANGOMM_MAJOR_VERSION).$(PANGOMM_MINOR_VERSION)/proc/m4.
 	@echo PERL with XML::Parser and some common *nix  commands
 	@echo are required, as well as the .m4 and PERL files from
-	@echo glibmm, atkmm and pangomm, which will be used by
-	@echo gmmproc.
+	@echo glibmm and pangomm, which will be used by gmmproc.
 	@echo ------
 	@echo Possible options include the following:
 	@echo.
