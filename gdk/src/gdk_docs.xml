@@ -995,8 +995,8 @@ performed. GTK normally handles this internally.
 This signal is emitted as the third step of toolkit and
 application processing of the frame. The frame is
 repainted. GDK normally handles this internally and
-produces expose events, which are turned into GTK
-#GtkWidget::draw signals.
+emits #GdkSurface::render which are turned into
+#GtkWidget::snapshot signals by GTK.
 
 </description>
 <parameters>
@@ -2016,7 +2016,7 @@ Specifies the direction for scroll events.
 </parameter>
 <parameter name="GDK_SCROLL_SMOOTH">
 <parameter_description> the scrolling is determined by the delta values
-in scroll events. See gdk_event_get_scroll_deltas()
+in scroll events. See gdk_scroll_event_get_deltas()
 </parameter_description>
 </parameter>
 </parameters>
@@ -2454,6 +2454,38 @@ The width of the texture.
 
 </description>
 </property>
+
+<signal name="GdkToplevel::compute-size">
+<description>
+Compute the desired size of the toplevel, given the information passed via
+the #GdkToplevelSize object.
+
+It will normally be emitted during or after gdk_toplevel_present(),
+depending on the configuration received by the windowing system. It may
+also be emitted at any other point in time, in response to the windowing
+system spontaneously changing the configuration.
+
+It is the responsibility of the GdkToplevel user to handle this signal;
+failing to do so will result in an arbitrary fixed size being used as a
+result. The signal may be emitted with the pointer to the @size being
+%NULL, in which case only the minimum and maximum size needs to be
+computed. This could happen for example if the toplevel configuration is in
+a state where the size is decided by the windowing system, such as
+maximized or fullscreen.
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> a #GdkToplevel
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> a #GdkToplevelSize
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
 
 <enum name="GdkTouchpadGesturePhase">
 <description>
@@ -5876,9 +5908,6 @@ windowing manager and compositing manager must be running to
 provide appropriate display. Use gdk_display_is_composited()
 to check if that is the case.
 
-For setting an overall opacity for a top-level surface, see
-gdk_surface_set_opacity().
-
 On modern displays, this value is always %TRUE.
 
 
@@ -5925,9 +5954,7 @@ to limit what backends can be used.
 </description>
 <parameters>
 </parameters>
-<return> The global #GdkDisplayManager singleton;
-gdk_parse_args(), gdk_init(), or gdk_init_check() must have
-been called first.
+<return> The global #GdkDisplayManager singleton
 </return>
 </function>
 
@@ -6196,9 +6223,9 @@ On modern displays, this value is always %TRUE.
 Flushes any requests queued for the windowing system and waits until all
 requests have been handled. This is often used for making sure that the
 display is synchronized with the current state of the program. Calling
-gdk_display_sync() before gdk_error_trap_pop() makes sure that any errors
-generated from earlier requests are handled before the error trap is
-removed.
+gdk_display_sync() before gdk_x11_display_error_trap_pop() makes sure
+that any errors generated from earlier requests are handled before the
+error trap is removed.
 
 This is most useful for X11. On windowing systems where requests are
 handled synchronously, this function will do nothing.
@@ -6734,7 +6761,7 @@ contains multiple actions - ie gdk_drag_action_is_unique()
 returns %FALSE for the result - gdk_drop_finish() must choose
 the action to use when accepting the drop. This will only
 happen if you passed %GDK_ACTION_ASK as one of the possible
-actions in gdk_drag_status(). %GDK_ACTION_ASK itself will not
+actions in gdk_drop_status(). %GDK_ACTION_ASK itself will not
 be included in the actions returned by this function.
 
 This value may change over the lifetime of the #GdkDrop both
@@ -7294,9 +7321,9 @@ Increase the ref count of @event.
 
 <function name="gdk_event_triggers_context_menu">
 <description>
-This function returns whether a #GdkEventButton should trigger a
-context menu, according to platform conventions. The right mouse
-button always triggers context menus.
+This function returns whether a #GdkEvent should trigger a
+context menu, according to platform conventions. The right
+mouse button always triggers context menus.
 
 This function should always be used instead of simply checking for
 event-&gt;button == %GDK_BUTTON_SECONDARY.
@@ -13709,13 +13736,12 @@ Returns the anchor position on the popup surface.
 
 <function name="gdk_popup_layout_new">
 <description>
-Create a popup layout description. Used together with
-gdk_surface_present_popup() to describe how a popup surface should be placed
-and behave on-screen.
+Create a popup layout description. Used together with gdk_popup_present()
+to describe how a popup surface should be placed and behave on-screen.
 
 @anchor_rect is relative to the top-left corner of the surface's parent.
-@rect_anchor and @surface_anchor determine anchor points on @anchor_rect and
-surface to pin together.
+@rect_anchor and @surface_anchor determine anchor points on @anchor_rect
+and surface to pin together.
 
 The position of @anchor_rect's anchor point can optionally be offset using
 gdk_popup_layout_set_offset(), which is equivalent to offsetting the
@@ -14122,14 +14148,16 @@ The string can be either one of:
 - A standard name (Taken from the X11 rgb.txt file).
 - A hexadecimal value in the form “\#rgb”, “\#rrggbb”,
 “\#rrrgggbbb” or ”\#rrrrggggbbbb”
+- A hexadecimal value in the form “\#rgba”, “\#rrggbbaa”,
+or ”\#rrrrggggbbbbaaaa”
 - A RGB color in the form “rgb(r,g,b)” (In this case the color will
 have full opacity)
 - A RGBA color in the form “rgba(r,g,b,a)”
 
 Where “r”, “g”, “b” and “a” are respectively the red, green, blue and
-alpha color values. In the last two cases, “r”, “g”, and “b” are either integers
-in the range 0 to 255 or percentage values in the range 0% to 100%, and
-a is a floating point value in the range 0 to 1.
+alpha color values. In the last two cases, “r”, “g”, and “b” are either
+integers in the range 0 to 255 or percentage values in the range 0% to
+100%, and a is a floating point value in the range 0 to 1.
 
 
 </description>
@@ -14794,8 +14822,8 @@ Surface size is reported in ”application pixels”, not
 
 <function name="gdk_surface_get_mapped">
 <description>
-Checks whether the surface has been mapped (with gdk_surface_show() or
-gdk_surface_show_unraised()).
+Checks whether the surface has been mapped (with gdk_toplevel_present()
+or gdk_popup_present()).
 
 
 </description>
@@ -14892,8 +14920,8 @@ Check to see if a surface is destroyed..
 <description>
 Create a new popup surface.
 
-The surface will be attached to @parent and can be positioned relative to it
-using gdk_surface_show_popup() or later using gdk_surface_layout_popup().
+The surface will be attached to @parent and can be positioned
+relative to it using gdk_popup_present().
 
 
 </description>
@@ -14941,14 +14969,6 @@ Creates a new toplevel surface.
 <parameters>
 <parameter name="display">
 <parameter_description> the display to create the surface on
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width of new surface
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height of new surface
 </parameter_description>
 </parameter>
 </parameters>
@@ -15040,7 +15060,7 @@ invisible and allows for nicely antialiased borders,
 and the input region controls where the surface is
 “clickable”.
 
-Use gdk_display_support_input_shapes() to find out if
+Use gdk_display_supports_input_shapes() to find out if
 a particular backend supports input regions.
 
 </description>
@@ -15572,38 +15592,6 @@ surface as maximized.
 </return>
 </function>
 
-<function name="gdk_toplevel_layout_get_min_height">
-<description>
-Returns the minimum height of the given layout.
-
-
-</description>
-<parameters>
-<parameter name="layout">
-<parameter_description> a #GdkToplevelLayout
-</parameter_description>
-</parameter>
-</parameters>
-<return> the minimum height of @layout
-</return>
-</function>
-
-<function name="gdk_toplevel_layout_get_min_width">
-<description>
-Returns the minimum width of the given layout.
-
-
-</description>
-<parameters>
-<parameter name="layout">
-<parameter_description> a #GdkToplevelLayout
-</parameter_description>
-</parameter>
-</parameters>
-<return> the minimum width of @layout
-</return>
-</function>
-
 <function name="gdk_toplevel_layout_get_resizable">
 <description>
 Returns whether the layout should allow the user
@@ -15634,14 +15622,6 @@ The size is in ”application pixels”, not
 
 </description>
 <parameters>
-<parameter name="min_width">
-<parameter_description> the minimum width for the layout
-</parameter_description>
-</parameter>
-<parameter name="min_height">
-<parameter_description> the minimum height for the layout
-</parameter_description>
-</parameter>
 </parameters>
 <return> newly created instance of #GdkToplevelLayout
 </return>
@@ -15777,8 +15757,12 @@ The windowing system may choose to ignore the request.
 <function name="gdk_toplevel_present">
 <description>
 Present @toplevel after having processed the #GdkToplevelLayout rules.
-If the toplevel was previously now showing, it will be showed,
+If the toplevel was previously not showing, it will be showed,
 otherwise it will change layout according to @layout.
+
+GDK may emit the 'compute-size' signal to let the user of this toplevel
+compute the preferred size of the toplevel surface. See
+#GdkToplevel::compute-size for details.
 
 Presenting may fail.
 
@@ -15787,14 +15771,6 @@ Presenting may fail.
 <parameters>
 <parameter name="toplevel">
 <parameter_description> the #GdkToplevel to show
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> the unconstrained toplevel width to layout
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> the unconstrained toplevel height to layout
 </parameter_description>
 </parameter>
 <parameter name="layout">
@@ -15996,6 +15972,87 @@ right-click on the window decorations.
 </parameters>
 <return> %TRUE if the window menu was shown and %FALSE otherwise.
 </return>
+</function>
+
+<function name="gdk_toplevel_size_get_bounds">
+<description>
+Retrieves the bounds the toplevel is placed within.
+
+The bounds represent the largest size a toplevel may have while still being
+able to fit within some type of boundery. Depending on the backend, this may
+be equivalent to the dimensions of the work area or the monitor on which the
+window is being presented on, or something else that limits the way a
+toplevel can be presented.
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> a #GdkToplevelSize
+</parameter_description>
+</parameter>
+<parameter name="bounds_width">
+<parameter_description> return location for width
+</parameter_description>
+</parameter>
+<parameter name="bounds_height">
+<parameter_description> return location for height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_toplevel_size_set_min_size">
+<description>
+The minimum size corresponds to the limitations the toplevel can be shrunk
+to, without resulting in incorrect painting. A user of a #GdkToplevel should
+calculate these given both the existing size, and the bounds retrieved from
+the #GdkToplevelSize object.
+
+The minimum size should be within the bounds (see
+gdk_toplevel_size_get_bounds()).
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> a #GdkToplevelSize
+</parameter_description>
+</parameter>
+<parameter name="min_width">
+<parameter_description> the minimum width
+</parameter_description>
+</parameter>
+<parameter name="min_height">
+<parameter_description> the minimum height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_toplevel_size_set_size">
+<description>
+Sets the size the toplevel prefers to be resized to. The size should be
+within the bounds (see gdk_toplevel_size_get_bounds()). The set size should
+be considered as a hint, and should not be assumed to be respected by the
+windowing system, or backend.
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> a #GdkToplevelSize
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the width
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_toplevel_supports_edge_constraints">
