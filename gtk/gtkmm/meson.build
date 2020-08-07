@@ -233,6 +233,8 @@ gtkmm_any_hg_ccg_basenames = [
   'treedragdest',
   'treedragsource',
   'treeiter',
+  'treelistmodel',
+  'treelistrow',
   'treemodel',
   'treemodelfilter',
   'treemodelsort',
