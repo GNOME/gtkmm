@@ -15,3 +15,33 @@
  */
 
 #include <gdk/gdk.h>
+
+namespace
+{
+// Hand-coded because the slot can't be called with a non-const temporary ToplevelSize.
+static void Toplevel_signal_compute_size_callback(GdkToplevel* self, GdkToplevelSize* p0, void* data)
+{
+  using namespace Gdk;
+  using SlotType = sigc::slot<void(ToplevelSize&)>;
+
+  auto obj = dynamic_cast<Toplevel*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
+  // Do not try to call a signal on a disassociated wrapper.
+  if(obj)
+  {
+    try
+    {
+      if (const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        // This works because Gdk::ToplevelSize neither copies nor deletes *p0.
+        ToplevelSize toplevelsize(p0);
+        (*static_cast<SlotType*>(slot))(toplevelsize);
+      }
+    }
+    catch(...)
+    {
+       Glib::exception_handlers_invoke();
+    }
+  }
+}
+
+} // anonymous namespace

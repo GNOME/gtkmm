@@ -69,6 +69,7 @@ gdkmm_any_hg_ccg_basenames = [
   'timecoord',
   'toplevel',
   'toplevellayout',
+  'toplevelsize',
   'types',
 ]
 
