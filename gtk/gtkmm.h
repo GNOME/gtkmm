@@ -158,6 +158,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filechoosernative.h>
 #include <gtkmm/filechooserwidget.h>
 #include <gtkmm/filefilter.h>
+#include <gtkmm/filterlistmodel.h>
 #include <gtkmm/fixed.h>
 #include <gtkmm/flowbox.h>
 #include <gtkmm/flowboxchild.h>
@@ -252,14 +253,17 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/singleselection.h>
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/snapshot.h>
+#include <gtkmm/sortlistmodel.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/spinner.h>
 #include <gtkmm/stack.h>
 #include <gtkmm/stacksidebar.h>
 #include <gtkmm/stackswitcher.h>
 #include <gtkmm/statusbar.h>
+#include <gtkmm/stringfilter.h>
 #include <gtkmm/stringlist.h>
 #include <gtkmm/stringobject.h>
+#include <gtkmm/stringsorter.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/text.h>
