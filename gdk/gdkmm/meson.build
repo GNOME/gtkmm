@@ -79,7 +79,10 @@ gdkmm_deprecated_hg_ccg_basenames = []
 gdkmm_extra_any_h_cc_basenames = [
   'cairoutils',
   'devicewithpad',
+  'dragsurfaceimpl',
   'general',
+  'popupsurfaceimpl',
+  'toplevelsurfaceimpl',
   'value_cairo',
 ]
 

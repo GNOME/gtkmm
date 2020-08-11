@@ -47,15 +47,17 @@ class GDKMM_API GLContext;
 class GDKMM_API FrameClock;
 class GDKMM_API Monitor;
 
-/** A Gdk::Surface is a rectangular region on the screen. It's a low-level object, used to implement high-level objects such
- * as Gtk::Widget and Gtk::Window on the GTK+ level. A Gtk::Window is a toplevel window, the thing a user might think of as
- * a "window" with a titlebar and so on; a Gtk::Window may contain many Gdk::Surfaces. For example, each Gtk::Button has a
- * Gdk::Surface associated with it.
+/** Onscreen display areas in the target window system.
+ *
+ * A %Gdk::Surface is a (usually) rectangular region on the screen.
+ * It's a low-level object, used to implement high-level objects such
+ * as Gtk::Window on the GTK level.
  */
 class GDKMM_API Surface : public Glib::Object
 {
   _CLASS_GOBJECT(Surface, GdkSurface, GDK_SURFACE, Glib::Object, GObject, , , GDKMM_API)
   _STRUCT_NOT_HIDDEN
+  _CUSTOM_WRAP_NEW
   _IGNORE(gdk_surface_destroy, gdk_surface_is_destroyed)
 
 public:
@@ -63,9 +65,41 @@ public:
 
   // _WRAP_CREATE() would not be very useful here.
   // The gdk_surface_new_*() functions do more than call g_object_new().
-  // And we can't make one hand-coded constructor for each gdk_surface_new_*()
-  // function, because some of them have identical prototypes.
+
+  /** Creates a new toplevel surface.
+   *
+   * The created surface is usually a subclass of Gdk::Surface that implements
+   * the Gdk::Toplevel interface. To use toplevel API, do something like
+   * @code
+   * auto surface = Gdk::Surface::create_toplevel(display);
+   * auto toplevel = std::dynamic_pointer_cast<Gdk::ToplevelSurfaceImpl>(surface);
+   * if (toplevel)
+   *   toplevel->do_something();
+   * @endcode
+   * 
+   * @param display The display to create the surface on.
+   * @return The new %Gdk::Surface.
+   */
   _WRAP_METHOD(static Glib::RefPtr<Surface> create_toplevel(const Glib::RefPtr<Display>& display), gdk_surface_new_toplevel)
+
+  /** Create a new popup surface.
+   * 
+   * The surface will be attached to @a parent and can be positioned
+   * relative to it using Gdk::Popup::present().
+   *
+   * The created surface is usually a subclass of Gdk::Surface that implements
+   * the Gdk::Popup interface. To use popup API, do something like
+   * @code
+   * auto surface = Gdk::Surface::create_popup(parent, autohide);
+   * auto popup = std::dynamic_pointer_cast<Gdk::PopupSurfaceImpl>(surface);
+   * if (popup)
+   *   popup->do_something();
+   * @endcode
+   * 
+   * @param parent The parent surface to attach the surface to.
+   * @param autohide Whether to hide the surface on outside clicks.
+   * @return A new %Gdk::Surface.
+   */
   _WRAP_METHOD(static Glib::RefPtr<Surface> create_popup(
     const Glib::RefPtr<Surface>& parent, bool autohide), gdk_surface_new_popup)
 

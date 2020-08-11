@@ -25,12 +25,30 @@
 #include <gdkmm/glcontext.h>
 #include <gdkmm/frameclock.h>
 #include <gdkmm/monitor.h>
+#include <gdkmm/dragsurfaceimpl.h>
+#include <gdkmm/popupsurfaceimpl.h>
+#include <gdkmm/toplevelsurfaceimpl.h>
 
 using State = Gdk::Surface::State;
 using CairoRegion = cairo_region_t;
 
 namespace Gdk
 {
+
+// Custom wrap_new() because we want to create
+// a DragSurfaceImpl if the underlying C class implements the GdkDragSurface interface,
+// a PopupSurfaceImpl if the underlying C class implements the GdkPopup interface,
+// a ToplevelSurfaceImpl if the underlying C class implements the GdkToplevel interface.
+Glib::ObjectBase* Surface_Class::wrap_new(GObject* object)
+{
+  if (GDK_IS_DRAG_SURFACE(object))
+     return new DragSurfaceImpl((GdkSurface*)object);
+  if (GDK_IS_POPUP(object))
+     return new PopupSurfaceImpl((GdkSurface*)object);
+  if (GDK_IS_TOPLEVEL(object))
+     return new ToplevelSurfaceImpl((GdkSurface*)object);
+  return new Surface((GdkSurface*)object);
+}
 
 void Surface::set_cursor()
 {
