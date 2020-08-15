@@ -744,7 +744,7 @@ The #GdkDisplay used to create the #GdkDrawContext.
 
 <property name="GdkDrawContext:surface">
 <description>
-The #GdkSurface the gl context is bound to.
+The #GdkSurface the context is bound to.
 
 </description>
 </property>
@@ -1135,42 +1135,6 @@ Error enumeration for #GdkGLContext.
 </parameter>
 <parameter name="GDK_GL_ERROR_LINK_FAILED">
 <parameter_description> The shader linking failed
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
-<enum name="GdkGrabStatus">
-<description>
-Returned by gdk_device_grab() to indicate success or the reason for the
-failure of the grab attempt.
-
-</description>
-<parameters>
-<parameter name="GDK_GRAB_SUCCESS">
-<parameter_description> the resource was successfully grabbed.
-</parameter_description>
-</parameter>
-<parameter name="GDK_GRAB_ALREADY_GRABBED">
-<parameter_description> the resource is actively grabbed by another client.
-</parameter_description>
-</parameter>
-<parameter name="GDK_GRAB_INVALID_TIME">
-<parameter_description> the resource was grabbed more recently than the
-specified time.
-</parameter_description>
-</parameter>
-<parameter name="GDK_GRAB_NOT_VIEWABLE">
-<parameter_description> the grab surface or the @confine_to surface are not
-viewable.
-</parameter_description>
-</parameter>
-<parameter name="GDK_GRAB_FROZEN">
-<parameter_description> the resource is frozen by an active grab of another client.
-</parameter_description>
-</parameter>
-<parameter name="GDK_GRAB_FAILED">
-<parameter_description> the grab failed for some other reason
 </parameter_description>
 </parameter>
 </parameters>
@@ -1992,6 +1956,22 @@ which must be repeated.
 </parameters>
 </enum>
 
+<signal name="GdkPopup::popup-layout-changed">
+<description>
+Emitted when the layout of a popup surface has changed, e.g. if the popup
+layout was reactive and after the parent moved causing the popover to end
+up partially off-screen.
+
+</description>
+<parameters>
+<parameter name="popup">
+<parameter_description> the #GdkSurface that was laid out
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <enum name="GdkScrollDirection">
 <description>
 Specifies the direction for scroll events.
@@ -2240,23 +2220,6 @@ Emitted when @surface stops being present on the monitor.
 <return></return>
 </signal>
 
-<signal name="GdkSurface::popup-layout-changed">
-<description>
-Emitted when the layout of a popup @surface has changed, e.g. if the popup
-layout was reactive and after the parent moved causing the popover to end
-up partially off-screen.
-
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> the #GdkSurface that was laid out
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <signal name="GdkSurface::render">
 <description>
 Emitted when part of the surface needs to be redrawn.
@@ -2466,12 +2429,7 @@ also be emitted at any other point in time, in response to the windowing
 system spontaneously changing the configuration.
 
 It is the responsibility of the GdkToplevel user to handle this signal;
-failing to do so will result in an arbitrary fixed size being used as a
-result. The signal may be emitted with the pointer to the @size being
-%NULL, in which case only the minimum and maximum size needs to be
-computed. This could happen for example if the toplevel configuration is in
-a state where the size is decided by the windowing system, such as
-maximized or fullscreen.
+failing to do so will result in an arbitrary size being used as a result.
 
 </description>
 <parameters>
@@ -4990,35 +4948,6 @@ this one cannot be supported
 </return>
 </function>
 
-<function name="gdk_device_get_axis">
-<description>
-Interprets an array of double as axis values for a given device,
-and locates the value in the array for a given axis use.
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a #GdkDevice
-</parameter_description>
-</parameter>
-<parameter name="axes">
-<parameter_description> pointer to an array of axes
-</parameter_description>
-</parameter>
-<parameter name="use">
-<parameter_description> the use to look for
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> location to store the found value.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the given axis use was found, otherwise %FALSE
-</return>
-</function>
-
 <function name="gdk_device_get_axis_use">
 <description>
 Returns the axis use for @index_.
@@ -5114,7 +5043,8 @@ by GTK+, and must not be freed or unreffed.
 <function name="gdk_device_get_has_cursor">
 <description>
 Determines whether the pointer follows device motion.
-This is not meaningful for keyboard devices, which don't have a pointer.
+This is not meaningful for keyboard devices, which
+don't have a pointer.
 
 
 </description>
@@ -5145,25 +5075,10 @@ if @device is a keyboard device.
 </return>
 </function>
 
-<function name="gdk_device_get_n_axes">
-<description>
-Returns the number of axes the device currently has.
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a pointer #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return> the number of axes.
-</return>
-</function>
-
 <function name="gdk_device_get_name">
 <description>
-Determines the name of the device.
+Determines the name of the device, suitable
+for showing in a user interface.
 
 
 </description>
@@ -5257,8 +5172,7 @@ Returns the #GdkSeat the device belongs to.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GdkSeat. This memory is owned by GTK+ and
-must not be freed.
+<return> a #GdkSeat
 </return>
 </function>
 
@@ -5364,24 +5278,6 @@ left-to-right languages are in use on the keyboard, if
 </parameters>
 <return> %TRUE if there are layouts with both directions,
 %FALSE otherwise
-</return>
-</function>
-
-<function name="gdk_device_list_physical_devices">
-<description>
-Returns the list of physical devices attached to the given logical
-#GdkDevice.
-
-
-</description>
-<parameters>
-<parameter name="device">
-<parameter_description> a logical #GdkDevice
-</parameter_description>
-</parameter>
-</parameters>
-<return>
-the list of physical devices attached to a logical #GdkDevice
 </return>
 </function>
 
@@ -14302,7 +14198,7 @@ Returns the devices that match the given capabilities.
 </parameters>
 <return> A list of #GdkDevices.
 The list must be freed with g_list_free(), the elements are owned
-by GDK and must not be freed.
+by GTK and must not be freed.
 </return>
 </function>
 
@@ -14325,7 +14221,7 @@ and must not be freed.
 
 <function name="gdk_seat_get_keyboard">
 <description>
-Returns the logical device that routes keyboard events.
+Returns the device that routes keyboard events.
 
 
 </description>
@@ -14335,14 +14231,14 @@ Returns the logical device that routes keyboard events.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a logical #GdkDevice with keyboard
+<return> a #GdkDevice with keyboard
 capabilities. This object is owned by GTK and must not be freed.
 </return>
 </function>
 
 <function name="gdk_seat_get_pointer">
 <description>
-Returns the logical device that routes pointer events.
+Returns the device that routes pointer events.
 
 
 </description>
@@ -14352,7 +14248,7 @@ Returns the logical device that routes pointer events.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a logical #GdkDevice with pointer
+<return> a #GdkDevice with pointer
 capabilities. This object is owned by GTK and must not be freed.
 </return>
 </function>
@@ -14370,101 +14266,9 @@ application.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A list of tools. Free with
-g_list_free().
+<return>
+A list of tools. Free with g_list_free().
 </return>
-</function>
-
-<function name="gdk_seat_grab">
-<description>
-Grabs the seat so that all events corresponding to the given @capabilities
-are passed to this application until the seat is ungrabbed with gdk_seat_ungrab(),
-or the surface becomes hidden. This overrides any previous grab on the
-seat by this client.
-
-As a rule of thumb, if a grab is desired over %GDK_SEAT_CAPABILITY_POINTER,
-all other &quot;pointing&quot; capabilities (eg. %GDK_SEAT_CAPABILITY_TOUCH) should
-be grabbed too, so the user is able to interact with all of those while
-the grab holds, you should thus use %GDK_SEAT_CAPABILITY_ALL_POINTING most
-commonly.
-
-Grabs are used for operations which need complete control over the
-events corresponding to the given capabilities. For example in GTK this
-is used for Drag and Drop operations, popup menus and such.
-
-Note that if the event mask of a #GdkSurface has selected both button press
-and button release events, or touch begin and touch end, then a press event
-will cause an automatic grab until the button is released, equivalent to a
-grab on the surface with @owner_events set to %TRUE. This is done because most
-applications expect to receive paired press and release events.
-
-If you set up anything at the time you take the grab that needs to be
-cleaned up when the grab ends, you should handle the #GdkEventGrabBroken
-events that are emitted when the grab ends unvoluntarily.
-
-
-</description>
-<parameters>
-<parameter name="seat">
-<parameter_description> a #GdkSeat
-</parameter_description>
-</parameter>
-<parameter name="surface">
-<parameter_description> the #GdkSurface which will own the grab
-</parameter_description>
-</parameter>
-<parameter name="capabilities">
-<parameter_description> capabilities that will be grabbed
-</parameter_description>
-</parameter>
-<parameter name="owner_events">
-<parameter_description> if %FALSE then all device events are reported with respect to
-@surface and are only reported if selected by @event_mask. If
-%TRUE then pointer events for this application are reported
-as normal, but pointer events outside this application are
-reported with respect to @surface and only if selected by
-@event_mask. In either mode, unreported events are discarded.
-</parameter_description>
-</parameter>
-<parameter name="cursor">
-<parameter_description> the cursor to display while the grab is active. If
-this is %NULL then the normal cursors are used for
-@surface and its descendants, and the cursor for @surface is used
-elsewhere.
-</parameter_description>
-</parameter>
-<parameter name="event">
-<parameter_description> the event that is triggering the grab, or %NULL if none
-is available.
-</parameter_description>
-</parameter>
-<parameter name="prepare_func">
-<parameter_description> function to
-prepare the surface to be grabbed, it can be %NULL if @surface is
-visible before this call.
-</parameter_description>
-</parameter>
-<parameter name="prepare_func_data">
-<parameter_description> user data to pass to @prepare_func
-</parameter_description>
-</parameter>
-</parameters>
-<return> %GDK_GRAB_SUCCESS if the grab was successful.
-</return>
-</function>
-
-<function name="gdk_seat_ungrab">
-<description>
-Releases a grab added through gdk_seat_grab().
-
-</description>
-<parameters>
-<parameter name="seat">
-<parameter_description> a #GdkSeat
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_set_allowed_backends">
@@ -14517,41 +14321,6 @@ the display just as gdk_display_beep().
 <parameters>
 <parameter name="surface">
 <parameter_description> a toplevel #GdkSurface
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_surface_constrain_size">
-<description>
-Constrains a desired width and height according to a
-set of geometry hints (such as minimum and maximum size).
-
-</description>
-<parameters>
-<parameter name="geometry">
-<parameter_description> a #GdkGeometry structure
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a mask indicating what portions of @geometry are set
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> desired width of surface
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> desired height of the surface
-</parameter_description>
-</parameter>
-<parameter name="new_width">
-<parameter_description> location to store resulting width
-</parameter_description>
-</parameter>
-<parameter name="new_height">
-<parameter_description> location to store resulting height
 </parameter_description>
 </parameter>
 </parameters>
