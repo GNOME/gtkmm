@@ -9,7 +9,7 @@
 namespace Gtk
 {
 
-class Object_Class : public Glib::Class
+class GTKMM_API Object_Class : public Glib::Class
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
