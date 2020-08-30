@@ -82,6 +82,7 @@ _CONV_ENUM(Gtk,PropagationPhase)
 _CONV_ENUM(Gtk,RevealerTransitionType)
 _CONV_ENUM(Gtk,ScrollType)
 _CONV_ENUM(Gtk,SelectionMode)
+_CONV_INCLASS_ENUM(Gtk,ShortcutAction,Flags)
 _CONV_ENUM(Gtk,ShortcutScope)
 _CONV_ENUM(Gtk,ShortcutType)
 _CONV_INCLASS_ENUM(Gtk,SizeGroup,Mode)
@@ -424,7 +425,13 @@ _CONVERSION(`GtkShortcutsWindow*',`ShortcutsWindow*',__RP2P)
 _CONVERSION(`GtkShortcutsWindow*',`const ShortcutsWindow*',__RP2P)
 _CONVERSION(`ShortcutsWindow&',`GtkShortcutsWindow*',__FR2P)
 
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<ShortcutAction>', `Glib::wrap($3)')
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<ShortcutTrigger>', `Glib::wrap($3)')
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<const ShortcutTrigger>', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const ShortcutAction>&', `GtkShortcutAction*', __CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const ShortcutTrigger>&', `GtkShortcutTrigger*', __CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<ShortcutController>&', `GtkShortcutController*', __CONVERT_REFPTR_TO_P)
+
 _CONVERSION(`const Glib::RefPtr<Gtk::Snapshot>&', `GtkSnapshot*', __CONVERT_REFPTR_TO_P)
 
 #FlowBoxChild

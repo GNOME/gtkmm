@@ -1,0 +1,183 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <glibmm/object.h>
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+class GTKMM_API Widget;
+
+/** Tracking if shortcuts should be activated.
+ *
+ * %Gtk::ShortcutAction is the object used to describe what a Gtk::Shortcut should
+ * do when triggered. To activate a %ShortcutAction manually, activate() can be called.
+ *
+ * ShortcutActions contain methods that allow easy presentation to end
+ * users as well as being printed for debugging.
+ *
+ * All ShortcutActions are immutable, you can only specify their properties
+ * during construction. If you want to change an action, you have to replace it
+ * with a new one. If you need to pass arguments to an action, these are specified
+ * by the higher-level Gtk::Shortcut object.
+ *
+ * GTK provides various actions:
+ *
+ *  - Gtk::MnemonicAction: a shortcut action that calls Gtk::Widget::mnemonic_activate()
+ *  - Gtk::CallbackAction: a shortcut action that invokes a given callback
+ *  - Gtk::SignalAction: a shortcut action that emits a given signal
+ *  - Gtk::ActivateAction: a shortcut action that calls Gtk::Widget::activate()
+ *  - Gtk::NamedAction: a shortcut action that calls Gtk::Widget::activate_action()
+ *  - Gtk::NothingAction: a shortcut action that does nothing
+ *
+ * @see Gtk::Shortcut
+ * @ingroup Gestures
+ * @newin{3,98}
+ */
+class GTKMM_API ShortcutAction : public Glib::Object
+{
+  _CLASS_GOBJECT(ShortcutAction, GtkShortcutAction, GTK_SHORTCUT_ACTION, Glib::Object, GObject, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_ENUM(Flags, GtkShortcutActionFlags, decl_prefix GTKMM_API)
+
+  _WRAP_METHOD(static Glib::RefPtr<ShortcutAction> parse_string(const Glib::ustring& string),
+    gtk_shortcut_action_parse_string)
+
+  /** Prints the given action into a human-readable string.
+   *
+   * This is meant for debugging and logging.
+   * The form of the representation may change at any time and is
+   * not guaranteed to stay identical.
+   *
+   * @return A new string.
+   */
+  _WRAP_METHOD(Glib::ustring to_string() const, gtk_shortcut_action_to_string)
+  _IGNORE(gtk_shortcut_action_print)
+
+  _WRAP_METHOD(bool activate(Widget& widget{.}, Flags flags{.} = static_cast<Flags>(0),
+    const Glib::VariantBase& args{.} = {}), gtk_shortcut_action_activate)
+};
+
+#m4begin
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<NothingAction>', `Glib::wrap(GTK_NOTHING_ACTION($3))')
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<CallbackAction>', `Glib::wrap(GTK_CALLBACK_ACTION($3))')
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<MnemonicAction>', `Glib::wrap(GTK_MNEMONIC_ACTION($3))')
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<ActivateAction>', `Glib::wrap(GTK_ACTIVATE_ACTION($3))')
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<SignalAction>', `Glib::wrap(GTK_SIGNAL_ACTION($3))')
+_CONVERSION(`GtkShortcutAction*',`Glib::RefPtr<NamedAction>', `Glib::wrap(GTK_NAMED_ACTION($3))')
+#m4end
+
+/** A Gtk::ShortcutAction that does nothing.
+ */
+class GTKMM_API NothingAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(NothingAction, GtkNothingAction, GTK_NOTHING_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<NothingAction> get(), gtk_nothing_action_get, refreturn)
+};
+
+/** A Gtk::ShortcutAction that invokes a callback.
+ */
+class GTKMM_API CallbackAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(CallbackAction, GtkCallbackAction, GTK_CALLBACK_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+public:
+  /** Slot for shortcuts based on user callbacks.
+   *
+   * For instance:
+   * @code
+   * void on_shortcut(Widget& widget, const Glib::VariantBase& args);
+   * @endcode
+   *
+   * @param widget The widget passed to the activation.
+   * @param args The arguments passed to the activation. Can be empty,
+   *             if there are no arguments.
+   */
+  using SlotShortcut = sigc::slot<bool(Widget&, const Glib::VariantBase&)>;
+
+  _WRAP_CREATE(const SlotShortcut& slot)
+
+protected:
+  explicit CallbackAction(const SlotShortcut& slot);
+  _IGNORE(gtk_callback_action_new)
+};
+
+/** A Gtk::ShortcutAction that calls Gtk::Widget::mnemonic_activate().
+ */
+class GTKMM_API MnemonicAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(MnemonicAction, GtkMnemonicAction, GTK_MNEMONIC_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<MnemonicAction> get(), gtk_mnemonic_action_get, refreturn)
+};
+
+/** A Gtk::ShortcutAction that calls Gtk::Widget::activate().
+ */
+class GTKMM_API ActivateAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(ActivateAction, GtkActivateAction, GTK_ACTIVATE_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<ActivateAction> get(), gtk_activate_action_get, refreturn)
+};
+
+/** A Gtk::ShortcutAction that emits a signal.
+ */
+class GTKMM_API SignalAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(SignalAction, GtkSignalAction, GTK_SIGNAL_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+protected:
+  _WRAP_CTOR(SignalAction(const Glib::ustring& signal_name), gtk_signal_action_new)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& signal_name)
+
+  _WRAP_METHOD(Glib::ustring get_signal_name() const, gtk_signal_action_get_signal_name)
+
+  _WRAP_PROPERTY("signal-name", Glib::ustring)
+};
+
+/** A Gtk::ShortcutAction that activates an action by name.
+ */
+class GTKMM_API NamedAction : public ShortcutAction
+{
+  _CLASS_GOBJECT(NamedAction, GtkNamedAction, GTK_NAMED_ACTION, ShortcutAction, GtkShortcutAction, , , GTKMM_API)
+protected:
+  _WRAP_CTOR(NamedAction(const Glib::ustring& action_name), gtk_named_action_new)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& action_name)
+
+  _WRAP_METHOD(Glib::ustring get_action_name() const, gtk_named_action_get_action_name)
+
+  _WRAP_PROPERTY("action-name", Glib::ustring)
+};
+
+} //namespace Gtk

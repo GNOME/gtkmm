@@ -1,0 +1,156 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <glibmm/object.h>
+#include <gdkmm/display.h>
+#include <gdkmm/event.h>
+#include <gdkmm/types.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+/** Triggers to track if shortcuts should be activated.
+ *
+ * %Gtk::ShortcutTrigger is the object used to track if a Gtk::Shortcut should be
+ * activated. For this purpose, trigger() can be called on a Gdk::Event.
+ *
+ * ShortcutTriggers contain methods that allow easy presentation to end
+ * users as well as being printed for debugging.
+ *
+ * All ShortcutTriggers are immutable, you can only specify their properties
+ * during construction. If you want to change a trigger, you have to replace it
+ * with a new one.
+ *
+ * @see Gtk::Shortcut
+ * @ingroup Gestures
+ * @newin{3,98}
+ */
+class GTKMM_API ShortcutTrigger : public Glib::Object
+{
+  _CLASS_GOBJECT(ShortcutTrigger, GtkShortcutTrigger, GTK_SHORTCUT_TRIGGER, Glib::Object, GObject, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<ShortcutTrigger> parse_string(const Glib::ustring& string),
+    gtk_shortcut_trigger_parse_string)
+
+  /** Prints the given trigger into a human-readable string.
+   *
+   * This is meant for debugging and logging.
+   * The form of the representation may change at any time and is
+   * not guaranteed to stay identical.
+   *
+   * @return A new string.
+   */
+  _WRAP_METHOD(Glib::ustring to_string() const, gtk_shortcut_trigger_to_string)
+  _IGNORE(gtk_shortcut_trigger_print)
+
+  _WRAP_METHOD(Glib::ustring to_label(const Glib::RefPtr<const Gdk::Display>& display) const,
+    gtk_shortcut_trigger_to_label)
+  _IGNORE(gtk_shortcut_trigger_print_label)
+
+  // Is this useful? _WRAP_METHOD(guint hash() const, gtk_shortcut_trigger_hash)
+
+#m4 _CONVERSION(`const Glib::RefPtr<const ShortcutTrigger>&', `gconstpointer', __CONVERT_REFPTR_TO_P)
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<const ShortcutTrigger>& trigger2) const,
+    gtk_shortcut_trigger_equal)
+  _WRAP_METHOD(int compare(const Glib::RefPtr<const ShortcutTrigger>& trigger2) const,
+    gtk_shortcut_trigger_compare)
+
+  _WRAP_METHOD(Gdk::KeyMatch trigger(const Glib::RefPtr<const Gdk::Event>& event,
+    bool enable_mnemonics) const, gtk_shortcut_trigger_trigger)
+};
+
+#m4begin
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<NeverTrigger>', `Glib::wrap(GTK_NEVER_TRIGGER($3))')
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<KeyvalTrigger>', `Glib::wrap(GTK_KEYVAL_TRIGGER($3))')
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<MnemonicTrigger>', `Glib::wrap(GTK_MNEMONIC_TRIGGER($3))')
+_CONVERSION(`GtkShortcutTrigger*',`Glib::RefPtr<AlternativeTrigger>', `Glib::wrap(GTK_ALTERNATIVE_TRIGGER($3))')
+#m4end
+
+/** A Gtk::ShortcutTrigger that never triggers.
+ */
+class GTKMM_API NeverTrigger : public ShortcutTrigger
+{
+  _CLASS_GOBJECT(NeverTrigger, GtkNeverTrigger, GTK_NEVER_TRIGGER, ShortcutTrigger, GtkShortcutTrigger, , , GTKMM_API)
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<NeverTrigger> get(), gtk_never_trigger_get, refreturn)
+};
+
+/** A Gtk::ShortcutTrigger that triggers when a specific keyval
+ * and (optionally) modifiers are pressed.
+ */
+class GTKMM_API KeyvalTrigger : public ShortcutTrigger
+{
+  _CLASS_GOBJECT(KeyvalTrigger, GtkKeyvalTrigger, GTK_KEYVAL_TRIGGER, ShortcutTrigger, GtkShortcutTrigger, , , GTKMM_API)
+protected:
+  _WRAP_CTOR(KeyvalTrigger(guint keyval, Gdk::ModifierType modifiers), gtk_keyval_trigger_new)
+
+public:
+  _WRAP_CREATE(guint keyval, Gdk::ModifierType modifiers = static_cast<Gdk::ModifierType>(0))
+
+  _WRAP_METHOD(guint get_keyval() const, gtk_keyval_trigger_get_keyval)
+  _WRAP_METHOD(Gdk::ModifierType get_modifiers() const, gtk_keyval_trigger_get_modifiers)
+
+  _WRAP_PROPERTY("keyval", guint)
+  _WRAP_PROPERTY("modifiers", Gdk::ModifierType)
+};
+
+/** A Gtk::ShortcutTrigger that triggers when a specific mnemonic is pressed.
+ */
+class GTKMM_API MnemonicTrigger : public ShortcutTrigger
+{
+  _CLASS_GOBJECT(MnemonicTrigger, GtkMnemonicTrigger, GTK_MNEMONIC_TRIGGER, ShortcutTrigger, GtkShortcutTrigger, , , GTKMM_API)
+protected:
+  _WRAP_CTOR(MnemonicTrigger(guint keyval), gtk_mnemonic_trigger_new)
+
+public:
+  _WRAP_CREATE(guint keyval)
+
+  _WRAP_METHOD(guint get_keyval() const, gtk_mnemonic_trigger_get_keyval)
+
+  _WRAP_PROPERTY("keyval", guint)
+};
+
+/** A Gtk::ShortcutTrigger that triggers when either of two ShortcutTriggers trigger.
+ */
+class GTKMM_API AlternativeTrigger : public ShortcutTrigger
+{
+  _CLASS_GOBJECT(AlternativeTrigger, GtkAlternativeTrigger, GTK_ALTERNATIVE_TRIGGER, ShortcutTrigger, GtkShortcutTrigger, , , GTKMM_API)
+protected:
+  _WRAP_CTOR(AlternativeTrigger(const Glib::RefPtr<const ShortcutTrigger>& first,
+    const Glib::RefPtr<const ShortcutTrigger>& second), gtk_alternative_trigger_new)
+
+public:
+  _WRAP_CREATE(const Glib::RefPtr<const ShortcutTrigger>& first,
+    const Glib::RefPtr<const ShortcutTrigger>& second)
+
+  _WRAP_METHOD(Glib::RefPtr<const ShortcutTrigger> get_first() const, gtk_alternative_trigger_get_first, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const ShortcutTrigger> get_second() const, gtk_alternative_trigger_get_second, refreturn)
+
+  _WRAP_PROPERTY("first", Glib::RefPtr<const ShortcutTrigger>)
+  _WRAP_PROPERTY("second", Glib::RefPtr<const ShortcutTrigger>)
+};
+
+} //namespace Gtk
