@@ -7,6 +7,7 @@ install: all
 	@if not exist $(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\private\ @md $(PREFIX)\include\gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gdkmm\private
 	@if not exist $(PREFIX)\lib\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\include\ md $(PREFIX)\lib\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\include
 	@if not exist $(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private\ @md $(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private
+	@if not exist $(PREFIX)\share\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\proc\m4\ md $(PREFIX)\share\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\proc\m4
 	@if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo.exe copy /b vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo.exe $(PREFIX)\bin
 	@if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo.pdb copy /b vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo.pdb $(PREFIX)\bin
 	@copy /b vs$(VSVER)\$(CFG)\$(PLAT)\$(GDKMM_LIBNAME).dll $(PREFIX)\bin
@@ -30,3 +31,4 @@ install: all
 	@for %h in ($(GTKMM_HG_FILES)) do @if exist ..\gtk\gtkmm\private\%~nh_p.h copy ..\gtk\gtkmm\private\%~nh_p.h "$(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private\%~nh_p.h"
 	@for %h in ($(GTKMM_HG_FILES)) do @if exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private\%~nh_p.h copy vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private\%~nh_p.h "$(PREFIX)\include\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\gtkmm\private\%~nh_p.h"
 	@copy ".\gtkmm\gtkmmconfig.h" "$(PREFIX)\lib\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\include\"
+	@copy ..\tools\m4\*.m4 $(PREFIX)\share\gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)\proc\m4
