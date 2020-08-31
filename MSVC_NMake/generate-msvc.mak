@@ -11,10 +11,10 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo:
 
 # Generate .def files
 vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_DLLNAME).dll vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
 
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_LIBNAME) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_DLLNAME).dll vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
 
 # Generate wrap_init.cc files
 vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
