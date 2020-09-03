@@ -230,7 +230,6 @@ extern const int gtkmm_micro_version;
 # include <gtkmm/printunixdialog.h>
 #endif
 #include <gtkmm/progressbar.h>
-#include <gtkmm/radiobutton.h>
 #include <gtkmm/range.h>
 #include <gtkmm/recentinfo.h>
 #include <gtkmm/recentmanager.h>

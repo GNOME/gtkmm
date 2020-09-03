@@ -181,7 +181,6 @@ gtkmm_any_hg_ccg_basenames = [
   'printoperationpreview',
   'printsettings',
   'progressbar',
-  'radiobutton',
   'range',
   'recentinfo',
   'recentmanager',
@@ -282,7 +281,6 @@ gtkmm_extra_any_h_cc_basenames = [
   'init',
   'listviewtext',
   'object',
-  'radiobuttongroup',
   'treemodelcolumn',
   'treeview_private',
 ]

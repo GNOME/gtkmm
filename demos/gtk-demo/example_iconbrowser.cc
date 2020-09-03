@@ -139,8 +139,8 @@ protected:
   // Child widgets, header bar:
   Gtk::HeaderBar m_header;
   Gtk::Box m_header_radio_button_box;
-  Gtk::RadioButton m_normal_radio;
-  Gtk::RadioButton m_symbolic_radio;
+  Gtk::ToggleButton m_normal_radio;
+  Gtk::ToggleButton m_symbolic_radio;
   Gtk::ToggleButton m_search_button;
 
   Glib::RefPtr<Gtk::SizeGroup> m_button_size_group;
@@ -202,9 +202,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_header_radio_button_box.append(m_normal_radio);
   m_symbolic_radio.set_expand();
   m_header_radio_button_box.append(m_symbolic_radio);
-  m_normal_radio.set_draw_indicator(false); // Make it look as a normal button
-  m_symbolic_radio.set_draw_indicator(false);
-  m_symbolic_radio.join_group(m_normal_radio);
+  m_symbolic_radio.set_group(m_normal_radio);
 
   m_button_size_group = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::VERTICAL);
   m_button_size_group->add_widget(m_normal_radio);
