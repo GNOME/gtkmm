@@ -34,8 +34,7 @@ namespace Gtk
  * between the rows.
  *
  * %Gtk::ListView allows the user to select items according to the selection
- * characteristics of the model. If the provided model is not a Gtk::SelectionModel,
- * %Gtk::ListView will wrap it in a Gtk::SingleSelection. For models that allow
+ * characteristics of the model. For models that allow
  * multiple selected items, it is possible to turn on _rubberband selection_,
  * using set_enable_rubberband().
  *
@@ -60,9 +59,12 @@ namespace Gtk
  *
  * void activate_cb(Gtk::ListView* list, guint position)
  * {
- *   auto item = list->get_model()->get_object(position);
- *   if (auto app_info = std::dynamic_pointer_cast<Gio::AppInfo>(item))
- *     app_info->launch(std::vector<Glib::RefPtr<Gio::File>>());
+ *   if (auto model = std::dynamic_pointer_cast<Gio::ListModel>(list->get_model()))
+ *   {
+ *     auto item = model->get_object(position);
+ *     if (auto app_info = std::dynamic_pointer_cast<Gio::AppInfo>(item))
+ *       app_info->launch(std::vector<Glib::RefPtr<Gio::File>>());
+ *   }
  * }
  *
  * ...
@@ -71,13 +73,13 @@ namespace Gtk
  *   factory->signal_setup().connect(sigc::ptr_fun(setup_listitem_cb));
  *   factory->signal_bind().connect(sigc::ptr_fun(bind_listitem_cb));
  *
- *   auto list = Gtk::make_managed<Gtk::ListView>(factory);
+ *   Glib::RefPtr<Gio::ListModel> model = create_application_list();
+ *
+ *   auto list = Gtk::make_managed<Gtk::ListView>(
+ *               Gtk::SingleSelection::create(model), factory);
  *
  *   list->signal_activate().connect(
  *     sigc::bind<0>(sigc::ptr_fun(activate_cb), list));
- *
- *   auto model = create_application_list();
- *   list->set_model(model);
  *
  *   scrolled_window.set_child(*list);
  * ~~~
