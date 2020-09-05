@@ -48,6 +48,7 @@ GTK_DEMOS = \
   gtk-demo/example_iconbrowser.cc \
   gtk-demo/example_iconview.cc \
   gtk-demo/example_images.cc \
+  gtk-demo/example_listview_applauncher.cc \
   gtk-demo/example_overlay.cc \
   gtk-demo/example_panes.cc \
   gtk-demo/example_pixbufs.cc \
