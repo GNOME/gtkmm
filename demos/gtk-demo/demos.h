@@ -25,6 +25,7 @@ Gtk::Window* do_headerbar();
 Gtk::Window* do_iconbrowser();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
+Gtk::Window* do_listview_applauncher();
 Gtk::Window* do_overlay();
 Gtk::Window* do_panes();
 Gtk::Window* do_pixbufs();
@@ -46,6 +47,11 @@ Demo child0[] =
   { nullptr, nullptr, type_slotDo(), nullptr }
 };
 
+Demo child1[] =
+{
+  { "Application launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr }
+};
+
 Demo testgtk_demos[] =
 {
   { "Application main window", "example_appwindow.cc", sigc::ptr_fun(&do_appwindow), nullptr },
@@ -59,6 +65,7 @@ Demo testgtk_demos[] =
   { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), nullptr },
   { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), nullptr },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), nullptr },
+  { "Lists", "", type_slotDo(), child1 },
   { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), nullptr },
   { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), nullptr },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), nullptr },
