@@ -49,7 +49,8 @@ Demo child0[] =
 
 Demo child1[] =
 {
-  { "Application launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr }
+  { "Application launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr },
+  { nullptr, nullptr, type_slotDo(), nullptr }
 };
 
 Demo testgtk_demos[] =
