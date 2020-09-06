@@ -181,6 +181,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/grid.h>
 #include <gtkmm/gridlayout.h>
 #include <gtkmm/gridlayoutchild.h>
+#include <gtkmm/gridview.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/icontheme.h>
 #include <gtkmm/iconview.h>
