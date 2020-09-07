@@ -134,6 +134,7 @@ gtkmm_any_hg_ccg_basenames = [
   'grid',
   'gridlayout',
   'gridlayoutchild',
+  'gridview',
   'headerbar',
   'iconpaintable',
   'icontheme',
