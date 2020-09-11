@@ -160,6 +160,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filefilter.h>
 #include <gtkmm/filterlistmodel.h>
 #include <gtkmm/fixed.h>
+#include <gtkmm/flattenlistmodel.h>
 #include <gtkmm/flowbox.h>
 #include <gtkmm/flowboxchild.h>
 #include <gtkmm/fontbutton.h>
@@ -252,6 +253,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/signallistitemfactory.h>
 #include <gtkmm/singleselection.h>
 #include <gtkmm/sizegroup.h>
+#include <gtkmm/slicelistmodel.h>
 #include <gtkmm/snapshot.h>
 #include <gtkmm/sortlistmodel.h>
 #include <gtkmm/spinbutton.h>
