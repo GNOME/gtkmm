@@ -607,3 +607,4 @@ _CONVERSION(`GtkFilter*',`Glib::RefPtr<Filter>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Expression<Glib::ustring>>&',`GtkExpression*',`(($3) ? ($3)->gobj() : nullptr)')
 _CONVERSION(`GtkExpression*',`Glib::RefPtr<Expression<Glib::ustring>>',`Glib::wrap<Glib::ustring>($3)')
+_CONVERSION(`GtkExpression*',`Glib::RefPtr<const Expression<Glib::ustring>>',`Glib::wrap<Glib::ustring>($3)')
