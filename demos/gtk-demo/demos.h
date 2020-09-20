@@ -18,6 +18,7 @@ Gtk::Window* do_builder();
 Gtk::Window* do_colorsel();
 Gtk::Window* do_dialog();
 Gtk::Window* do_drawingarea();
+Gtk::Window* do_dropdown();
 Gtk::Window* do_flowbox();
 Gtk::Window* do_gestures();
 Gtk::Window* do_glarea();
@@ -60,6 +61,7 @@ Demo testgtk_demos[] =
   { "Color Chooser", "example_colorsel.cc", sigc::ptr_fun(&do_colorsel), nullptr },
   { "Dialog and Message Boxes", "example_dialog.cc", sigc::ptr_fun(&do_dialog), nullptr },
   { "Drawing Area", "example_drawingarea.cc", sigc::ptr_fun(&do_drawingarea), nullptr },
+  { "Drop Downs", "example_dropdown.cc", sigc::ptr_fun(&do_dropdown), nullptr },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), nullptr },
   { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), nullptr },
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), nullptr },

@@ -12,6 +12,7 @@ gtkmm_demo_cc_files = [
   'example_colorsel.cc',
   'example_dialog.cc',
   'example_drawingarea.cc',
+  'example_dropdown.cc',
   'example_flowbox.cc',
   'example_gestures.cc',
   'example_glarea.cc',
