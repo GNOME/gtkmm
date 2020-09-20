@@ -1,0 +1,82 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <glibmm/object.h>
+#include <gtk/gtk.h>
+
+_DEFS(gtkmm,gtk)
+
+namespace Gtk
+{
+class GTKMM_API ExpressionWatchBase
+{
+  _CLASS_OPAQUE_REFCOUNTED(ExpressionWatchBase, GtkExpressionWatch, NONE, gtk_expression_watch_ref, gtk_expression_watch_unref, GTKMM_API)
+  _IGNORE(gtk_expression_watch_ref, gtk_expression_watch_unref, gtk_expression_watch_evaluate)
+
+public:
+  _WRAP_METHOD(void unwatch(), gtk_expression_watch_unwatch)
+};
+
+template<class T>
+class GTKMM_API ExpressionWatch final : public ExpressionWatchBase
+{
+public:
+  /** Evaluates the watched expression and on success returns the result.
+   *
+   * This is equivalent to calling Gtk::Expression::evaluate() with the
+   * expression and this pointer originally used to create the watch.
+   *
+   * @return The optional result of the evaluation.
+   */
+  std::optional<T> evaluate();
+};
+
+template<class T>
+std::optional<T> ExpressionWatch<T>::evaluate()
+{
+  Glib::Value<T> value;
+  bool result = gtk_expression_watch_evaluate(gobj(), value.gobj());
+  if (!result)
+    return {};
+
+  if (!G_VALUE_HOLDS(value.gobj(), Glib::Value<T>::value_type()))
+  {
+    g_warning("%s: The evaluated expression has type '%s', expected '%s'", G_STRLOC,
+      g_type_name(G_VALUE_TYPE(value.gobj())), g_type_name(Glib::Value<T>::value_type()));
+    return {};
+  }
+
+  return value.get();
+}
+
+} // namespace Gtk
+
+namespace Glib
+{
+
+template<class T>
+RefPtr<Gtk::ExpressionWatch<T>> wrap(GtkExpressionWatch* object, bool take_copy = false)
+{
+  if (take_copy && object)
+    gtk_expression_watch_ref(object);
+
+  return Glib::make_refptr_for_instance<Gtk::ExpressionWatch<T>>(
+    reinterpret_cast<Gtk::ExpressionWatch<T>*>(object));
+}
+
+} // namespace Glib
