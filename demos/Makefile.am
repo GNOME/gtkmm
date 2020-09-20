@@ -41,6 +41,7 @@ GTK_DEMOS = \
   gtk-demo/example_colorsel.cc \
   gtk-demo/example_dialog.cc \
   gtk-demo/example_drawingarea.cc \
+  gtk-demo/example_dropdown.cc \
   gtk-demo/example_flowbox.cc \
   gtk-demo/example_gestures.cc \
   gtk-demo/example_glarea.cc \
