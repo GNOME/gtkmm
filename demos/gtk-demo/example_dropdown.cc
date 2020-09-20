@@ -239,10 +239,7 @@ Example_DropDown::Example_DropDown()
   set_title("Drop Downs");
   set_resizable(false);
 
-  m_box.set_margin_start(10);
-  m_box.set_margin_end(10);
-  m_box.set_margin_top(10);
-  m_box.set_margin_bottom(10);
+  m_box.set_margin(10);
   set_child(m_box);
 
   auto model = Pango::CairoFontMap::get_default();
