@@ -104,6 +104,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
 #include <gtkmm/binlayout.h>
+#include <gtkmm/boolfilter.h>
 #include <gtkmm/border.h>
 #include <gtkmm/box.h>
 #include <gtkmm/boxlayout.h>
@@ -204,6 +205,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/menubutton.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/multiselection.h>
+#include <gtkmm/multisorter.h>
 #include <gtkmm/noselection.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/object.h>
