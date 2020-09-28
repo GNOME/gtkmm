@@ -60,13 +60,6 @@ void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
     buffer_scale, x, y, width, height);
 }
 
-void upload_surface_to_gl(const ::Cairo::RefPtr< ::Cairo::Surface>& surface,
-  int target, int width, int height, const Glib::RefPtr<GLContext>& context)
-{
-  gdk_cairo_surface_upload_to_gl(surface->cobj(), target, width, height,
-    context ? context->gobj() : nullptr);
-}
-
 } //namespace Cairo
 
 } //namespace Gdk

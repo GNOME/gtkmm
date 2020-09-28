@@ -125,21 +125,6 @@ void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height);
 
-/** Uploads the contents of a %Cairo surface to a GL texture target.
- *
- * @param surface A %Cairo surface.
- * @param target A GL texture target.
- * @param width The width of the texture @a target.
- * @param height The height of the texture @a target.
- * @param context A Gdk::GLContext, or an empty Glib::RefPtr<Gdk::GLContext>
- *        to use the currently bound context.
- *
- * @newin{3,92}
- */
-GDKMM_API
-void upload_surface_to_gl(const ::Cairo::RefPtr< ::Cairo::Surface>& surface,
-  int target, int width, int height, const Glib::RefPtr<GLContext>& context = {});
-
 } //namespace Cairo
 
 } //namespace Gdk
