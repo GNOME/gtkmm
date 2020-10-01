@@ -30,7 +30,12 @@ libtool_soversion = [0, 0, 0]
 gtkmm_libversion = '@0@.@1@.@2@'.format(
   libtool_soversion[0] - libtool_soversion[2],
   libtool_soversion[2],
-  libtool_soversion[1])
+  libtool_soversion[1]
+)
+macos_darwin_versions = [
+  libtool_soversion[0] + 1,
+  '@0@.@1@'.format(libtool_soversion[0] + 1, libtool_soversion[1])
+]
 
 # Use these instead of meson.source_root() and meson.build_root() in subdirectories.
 # source_root() and build_root() are not useful, if this is a subproject.

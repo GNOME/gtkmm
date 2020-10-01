@@ -2,7 +2,7 @@
 
 # Input: gtkmm_build_dep, gtkmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
-#        python3, gtkmm_rc, dummy_header_py, gmmproc_dir
+#        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, macos_darwin_versions,
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_libname
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
@@ -490,6 +490,7 @@ gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
   include_directories: extra_include_dirs,
   cpp_args: gtkmm_cpp_args,
   version: gtkmm_libversion,
+  darwin_versions: macos_darwin_versions,
   dependencies: gtkmm_build_dep,
   link_whole: gdkmm_library,
   install: true,
