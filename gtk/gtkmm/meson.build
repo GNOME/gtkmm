@@ -5,7 +5,7 @@
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, build_x11_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_extra_gendef_cpp_args,
-#        gtkmm_libname
+#        gtkmm_libname, macos_darwin_versions
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_dep
 
@@ -495,6 +495,7 @@ if build_shared_libs_directly
     include_directories: extra_include_dirs,
     cpp_args: gtkmm_cpp_args,
     version: gtkmm_libversion,
+    darwin_versions: macos_darwin_versions,
     dependencies: gtkmm_build_dep,
     link_with: gdkmm_library,
     install: true,
@@ -528,6 +529,7 @@ else
   gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
     objects: gtk_int_lib.extract_all_objects(),
     version: gtkmm_libversion,
+    darwin_versions: macos_darwin_versions,
     dependencies: gtkmm_build_dep,
     link_depends: gtkmm_def,
     link_args: gtkmm_extra_link_args,
