@@ -201,6 +201,7 @@ gtkmm_any_hg_ccg_basenames = [
   'scrolledwindow',
   'searchbar',
   'searchentry',
+  'selectionfiltermodel',
   'selectionmodel',
   'separator',
   'settings',
