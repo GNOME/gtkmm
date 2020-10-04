@@ -136,6 +136,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/directorylist.h>
 #include <gtkmm/dragicon.h>
 #include <gtkmm/dragsource.h>
 #include <gtkmm/drawingarea.h>
