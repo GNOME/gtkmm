@@ -1,0 +1,90 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <giomm/listmodel.h>
+#include <giomm/file.h>
+#include <gtk/gtk.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+
+/** A list model for directory listings.
+ *
+ * %Gtk::DirectoryList is a list model that wraps Gio::File::enumerate_children_async().
+ * It presents a Gio::ListModel and fills it asynchronously with the Gio::FileInfo%s
+ * returned from that function.
+ *
+ * Enumeration will start automatically when the property_file() property
+ * is set.
+ *
+ * While the %Gtk::DirectoryList is being filled, the property_loading()
+ * property will be set to <tt>true</tt>. You can listen to that property if you want
+ * to show information like a Gtk::Spinner or a "Loading..." text.
+ *
+ * If loading fails at any point, the property_error() property will be
+ * set to give more indication about the failure.
+ *
+ * The Gio::FileInfo%s returned from a %Gtk::DirectoryList have the "standard::file"
+ * attribute set to the Gio::File they refer to. This way you can get at the file
+ * that is referred to in the same way you would via Gio::File::enumerator_get_child().
+ * This means you do not need access to the %Gtk::DirectoryList but can access
+ * the Gio::File directly from the Gio::FileInfo when operating with a Gtk::ListView
+ * or similar.
+ *
+ * @see Gio::ListModel, Gio::File::enumerate_children()
+ * @newin{3,98}
+ */
+class GTKMM_API DirectoryList : public Glib::Object, public Gio::ListModel
+{
+  _CLASS_GOBJECT(DirectoryList, GtkDirectoryList, GTK_DIRECTORY_LIST, Glib::Object, GObject, , , GTKMM_API)
+  _IMPLEMENTS_INTERFACE(Gio::ListModel)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _WRAP_CTOR(DirectoryList(const std::string& attributes, const Glib::RefPtr<Gio::File>& file = {}), gtk_directory_list_new)
+
+public:
+  _WRAP_CREATE(const std::string& attributes, const Glib::RefPtr<Gio::File>& file = {})
+
+  _WRAP_METHOD(void set_file(const Glib::RefPtr<Gio::File>& file), gtk_directory_list_set_file)
+  _WRAP_METHOD(Glib::RefPtr<Gio::File> get_file(), gtk_directory_list_get_file, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::File> get_file() const, gtk_directory_list_get_file, refreturn, constversion)
+  _WRAP_METHOD(void set_attributes(const std::string& attributes), gtk_directory_list_set_attributes)
+  _WRAP_METHOD(std::string get_attributes() const, gtk_directory_list_get_attributes)
+  _WRAP_METHOD(void set_io_priority(int io_priority), gtk_directory_list_set_io_priority)
+  _WRAP_METHOD(int get_io_priority() const, gtk_directory_list_get_io_priority)
+
+  _WRAP_METHOD(bool is_loading() const, gtk_directory_list_is_loading)
+#m4 _CONVERSION(`const GError*',`Glib::Error',`Glib::Error(const_cast<GError*>($3), true)')
+  _WRAP_METHOD(Glib::Error get_error() const, gtk_directory_list_get_error)
+
+  _WRAP_METHOD(void set_monitored(bool monitored = true), gtk_directory_list_set_monitored)
+  _WRAP_METHOD(bool get_monitored() const, gtk_directory_list_get_monitored)
+
+  _WRAP_PROPERTY("attributes", std::string)
+  _WRAP_PROPERTY("error", Glib::Error)
+  _WRAP_PROPERTY("file", Glib::RefPtr<Gio::File>)
+  _WRAP_PROPERTY("io-priority", int)
+  _WRAP_PROPERTY("loading", bool)
+  _WRAP_PROPERTY("monitored", bool)
+};
+
+} // namespace Gtk
