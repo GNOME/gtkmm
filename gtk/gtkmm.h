@@ -204,6 +204,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/mediafile.h>
 #include <gtkmm/menubutton.h>
 #include <gtkmm/messagedialog.h>
+#include <gtkmm/multifilter.h>
 #include <gtkmm/multiselection.h>
 #include <gtkmm/multisorter.h>
 #include <gtkmm/noselection.h>

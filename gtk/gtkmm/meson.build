@@ -163,6 +163,7 @@ gtkmm_any_hg_ccg_basenames = [
   'mediastream',
   'menubutton',
   'messagedialog',
+  'multifilter',
   'multiselection',
   'multisorter',
   'native',
