@@ -1,0 +1,157 @@
+/* Copyright (C) 2020 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/sorter.h>
+#include <gtkmm/expression.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/sorter_p.h)
+
+namespace Gtk
+{
+
+/** Base class for Gtk::NumericSorter.
+ *
+ * @see Gtk::NumericSorter
+ *
+ * @newin{3,98}
+ */
+class GTKMM_API NumericSorterBase : public Sorter
+{
+  _CLASS_GOBJECT(NumericSorterBase, GtkNumericSorter, GTK_NUMERIC_SORTER, Gtk::Sorter, GtkSorter, , , GTKMM_API)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+#m4 _CONVERSION(`const Glib::RefPtr<ExpressionBase>&',`GtkExpression*',`(($3) ? ($3)->gobj() : nullptr)')
+  _WRAP_CTOR(NumericSorterBase(const Glib::RefPtr<ExpressionBase>& expression), gtk_numeric_sorter_new)
+
+public:
+  _IGNORE(gtk_numeric_sorter_get_expression, gtk_numeric_sorter_set_expression)
+
+  _WRAP_METHOD(SortType get_sort_order() const, gtk_numeric_sorter_get_sort_order)
+  _WRAP_METHOD(void set_sort_order(SortType sort_order), gtk_numeric_sorter_set_sort_order)
+
+  _IGNORE_PROPERTY(expression)
+  _WRAP_PROPERTY("sort-order", SortType)
+};
+
+/** Sort by comparing numbers.
+ *
+ * %Gtk::NumericSorter is a Gtk::Sorter that compares numbers.
+ *
+ * To obtain the numbers to compare, this sorter evaluates a Gtk::Expression.
+ *
+ * @see Gtk::Expression
+ * @newin{3,98}
+ */
+template<class T>
+class NumericSorter : public NumericSorterBase
+{
+  static_assert(std::is_arithmetic<T>::value);
+
+protected:
+  NumericSorter(const Glib::RefPtr<Expression<T>>& expression);
+
+public:
+  static Glib::RefPtr<NumericSorter> create(const Glib::RefPtr<Expression<T>>& expression);
+
+  /** Gets the expression that is evaluated to obtain numbers from items.
+   *
+   * @return A Gtk::Expression, or <tt>nullptr</tt>.
+   */
+  Glib::RefPtr<Expression<T>> get_expression();
+  /** @copydoc get_expression()
+   */
+  Glib::RefPtr<const Expression<T>> get_expression() const;
+
+  /** Sets the expression that is evaluated to obtain numbers from items.
+   *
+   * Unless an expression is set on the %Gtk::NumericSorter, the
+   * sorter will always compare items as invalid.
+   *
+   * The expression must have a return type that can be compared
+   * numerically, such as int or double.
+   *
+   * @param expression A Gtk::Expression, or <tt>nullptr</tt>.
+   */
+  void set_expression(const Glib::RefPtr<Expression<T>>& expression);
+
+  /** The expression to evalute on items to get a number to compare with
+   *
+   * @return A PropertyProxy that allows you to get or set the value of the property,
+   * or receive notification when the value of the property changes.
+   */
+  Glib::PropertyProxy<Glib::RefPtr<Expression<T>>> property_expression();
+
+  /** The expression to evalute on items to get a number to compare with
+   *
+   * @return A PropertyProxy_ReadOnly that allows you to get the value of the property,
+   * or receive notification when the value of the property changes.
+   */
+  Glib::PropertyProxy_ReadOnly<Glib::RefPtr<Expression<T>>> property_expression() const;
+};
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template<class T>
+NumericSorter<T>::NumericSorter(const Glib::RefPtr<Expression<T>>& expression)
+:
+  NumericSorterBase(expression)
+{
+}
+
+template<class T>
+Glib::RefPtr<NumericSorter<T>> NumericSorter<T>::create(
+  const Glib::RefPtr<Expression<T>>& expression)
+{
+  return Glib::make_refptr_for_instance<NumericSorter>(new NumericSorter(expression));
+}
+
+template<class T>
+void NumericSorter<T>::set_expression(const Glib::RefPtr<Expression<T>>& expression)
+{
+  gtk_numeric_sorter_set_expression(gobj(), const_cast<GtkExpression*>(expression->gobj()));
+}
+
+template<class T>
+Glib::RefPtr<Expression<T>> NumericSorter<T>::get_expression()
+{
+  return Glib::wrap<T>(gtk_numeric_sorter_get_expression(gobj()), true);
+}
+
+template<class T>
+Glib::RefPtr<const Expression<T>> NumericSorter<T>::get_expression() const
+{
+  return Glib::wrap<T>(gtk_numeric_sorter_get_expression(const_cast<GtkNumericSorter*>(gobj())),
+    true);
+}
+
+template<class T>
+Glib::PropertyProxy<Glib::RefPtr<Expression<T>>> NumericSorter<T>::property_expression()
+{
+  return Glib::PropertyProxy<Glib::RefPtr<Expression<T>>>(this, "expression");
+}
+
+template<class T>
+Glib::PropertyProxy_ReadOnly<Glib::RefPtr<Expression<T>>>
+NumericSorter<T>::property_expression() const
+{
+  return Glib::PropertyProxy_ReadOnly<Glib::RefPtr<Expression<T>>>(this, "expression");
+}
+
+#endif
+
+} // namespace Gtk
