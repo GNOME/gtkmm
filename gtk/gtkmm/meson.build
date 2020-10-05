@@ -172,6 +172,7 @@ gtkmm_any_hg_ccg_basenames = [
   'noselection',
   'notebook',
   'notebookpage',
+  'numericsorter',
   'orientable',
   'overlay',
   'padactionentry',

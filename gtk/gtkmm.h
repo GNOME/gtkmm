@@ -210,6 +210,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/multisorter.h>
 #include <gtkmm/noselection.h>
 #include <gtkmm/notebook.h>
+#include <gtkmm/numericsorter.h>
 #include <gtkmm/object.h>
 #include <gtkmm/overlay.h>
 #include <gtkmm/padcontroller.h>
