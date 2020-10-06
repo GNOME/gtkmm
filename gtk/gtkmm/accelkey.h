@@ -32,11 +32,16 @@ namespace Gtk
 
 /** Defines accelerator key combinations.
  * For instance, pressing Control-Q to activate the File|Quit menu item.
- * Typedefed as Gtk::Menu::AccelKey
  *
  * By defining accelerator paths you can allow the user of your application
  * to change accelerators himself. An example of an accelerator might be
- * "<MainWindow>/File/Open". Modified accelerators may be saved
+ * "<MainWindow>/File/Open". Modified accelerators may be saved.
+ *
+ * Key values are the codes which are sent whenever a key is pressed or released.
+ * The complete list of key values can be found in the
+ * <a href="https://gitlab.gnome.org/GNOME/gtk/tree/gtk-3-24/gdk/gdkkeysyms.h">gdk/gdkkeysyms.h</a>
+ * header file. They are prefixed with <tt>GDK_KEY_</tt>.
+ *
  * @see Gtk::AccelMap
  * @ingroup Menus
  */
