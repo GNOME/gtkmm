@@ -35,6 +35,11 @@ namespace Gtk
  * If you want to set up keyboard accelerators for widgets,
  * Gtk::ShortcutTrigger is probably more convenient than the
  * functions in this namespace.
+ *
+ * Key values are the codes which are sent whenever a key is pressed or released.
+ * The complete list of key values can be found in the
+ * <a href="https://gitlab.gnome.org/GNOME/gtk/tree/master/gdk/gdkkeysyms.h">gdk/gdkkeysyms.h</a>
+ * header file. They are prefixed with <tt>GDK_KEY_</tt>.
  */
 namespace Accelerator
 {
