@@ -42,7 +42,7 @@
  *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
  * - Use inheritance to derive custom widgets.
  * - Type-safe signal handlers (slots), in standard C++, using
- *   <a href="http://libsigc.sourceforge.net/">libsigc++</a>.
+ *   <a href="https://libsigcplusplus.github.io/libsigcplusplus/">libsigc++</a>.
  * - Polymorphism.
  * - Use of the Standard C++ Library, including strings, containers and
  *   iterators.
