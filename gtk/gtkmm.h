@@ -24,7 +24,7 @@
  *
  * @section description Description
  *
- * gtkmm is the official C++ interface for the popular GUI library GTK+.
+ * gtkmm is the official C++ interface for the popular GUI library GTK.
  * Highlights include typesafe callbacks, and a comprehensive set of widgets
  * that are easily extensible via inheritance.
  *
@@ -38,11 +38,11 @@
  *
  * @section features Features
  *
- * - GTK+’s mature, capable set of @ref Widgets widgets. See
- *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
+ * - GTK’s mature, capable set of @ref Widgets widgets. See
+ *   <a href="http://www.gtk.org/">the GTK website</a> for more information.
  * - Use inheritance to derive custom widgets.
  * - Type-safe signal handlers (slots), in standard C++, using
- *   <a href="http://libsigc.sourceforge.net/">libsigc++</a>.
+ *   <a href="https://libsigcplusplus.github.io/libsigcplusplus/">libsigc++</a>.
  * - Polymorphism.
  * - Use of the Standard C++ Library, including strings, containers and
  *   iterators.
