@@ -108,7 +108,7 @@ gtk_dep = dependency('gtk4', version: gtk_req)
 cairomm_req = '>= 1.15.4'
 cairomm_dep = dependency('cairomm-1.16', version: cairomm_req)
 
-pangomm_req = '>= 2.43.1'
+pangomm_req = '>= 2.43.3'
 pangomm_dep = dependency('pangomm-2.44', version: pangomm_req)
 
 gdk_pixbuf_req = '>= 2.35.5'
