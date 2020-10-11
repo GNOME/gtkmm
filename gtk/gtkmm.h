@@ -32,14 +32,13 @@
  * @ref TextView "TextView".
  *
  * See also the
- * <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
+ * <a href="https://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
  * with gtkmm</a> book.
- *
  *
  * @section features Features
  *
- * - GTK+’s mature, capable set of @ref Widgets widgets. See
- *   <a href="http://www.gtk.org/">the GTK+ website</a> for more information.
+ * - GTK+’s mature, capable set of @ref Widgets "widgets". See
+ *   <a href="https://www.gtk.org/">the GTK+ website</a> for more information.
  * - Use inheritance to derive custom widgets.
  * - Type-safe signal handlers (slots), in standard C++, using
  *   <a href="https://libsigcplusplus.github.io/libsigcplusplus/">libsigc++</a>.
@@ -65,6 +64,20 @@
  * If your source file is @c program.cc, you can compile it with:
  * @code
  * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-3.0`
+ * @endcode
+ * If your version of g++ is not C++11-compliant be default,
+ * add the @c -std=c++11 option.
+ *
+ * If you use <a href="https://mesonbuild.com/">Meson</a>, include the following
+ * in @c meson.build:
+ * @code
+ * gtkmm_dep = dependency('gtkmm-3.0')
+ * program_name = 'program'
+ * cpp_sources = [ 'program.cc' ]
+ * executable(program_name,
+ *   cpp_sources,
+ *   dependencies: gtkmm_dep
+ * )
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
