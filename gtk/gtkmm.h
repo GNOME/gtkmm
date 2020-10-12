@@ -65,7 +65,7 @@
  * @code
  * g++ program.cc -o program  `pkg-config --cflags --libs gtkmm-3.0`
  * @endcode
- * If your version of g++ is not C++11-compliant be default,
+ * If your version of g++ is not C++11-compliant by default,
  * add the @c -std=c++11 option.
  *
  * If you use <a href="https://mesonbuild.com/">Meson</a>, include the following
