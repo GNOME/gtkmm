@@ -75,8 +75,8 @@ Example_GLArea::Example_GLArea() : m_RotationAngles(N_AXIS, 0.0f)
   m_VBox.set_spacing(6);
   set_child(m_VBox);
 
-  m_GLArea.set_hexpand(true);
-  m_GLArea.set_vexpand(true);
+  m_GLArea.set_expand(true);
+  m_GLArea.set_size_request(100, 200);
   m_GLArea.set_auto_render(true);
   m_VBox.append(m_GLArea);
 
