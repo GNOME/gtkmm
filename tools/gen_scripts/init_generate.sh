@@ -39,12 +39,12 @@ gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/enum.pl"
 # autotools support, but don't require, non-source-dir builds.
 extra_defs_gen_dir="$GMMPROC_GEN_BUILD_DIR/gtkmm/tools/extra_defs_gen"
 
-gtk_source_prefix="$GMMPROC_GEN_SOURCE_DIR/gtk+"
-gtk_build_prefix="$GMMPROC_GEN_BUILD_DIR/gtk+"
+gtk_source_prefix="$GMMPROC_GEN_SOURCE_DIR/gtk"
+gtk_build_prefix="$GMMPROC_GEN_BUILD_DIR/gtk"
 pixbuf_source_prefix="$GMMPROC_GEN_SOURCE_DIR/gdk-pixbuf"
 pixbuf_build_prefix="$GMMPROC_GEN_BUILD_DIR/gdk-pixbuf"
 if [ "$GMMPROC_GEN_SOURCE_DIR" == "$GMMPROC_GEN_BUILD_DIR" ]; then
-  # gtk+ and gdk-pixbuf are built with meson, which requires non-source-dir builds.
+  # gtk and gdk-pixbuf are built with meson, which requires non-source-dir builds.
   # This is what jhbuild does, if neccesary, to force non-source-dir builds.
   gtk_build_prefix="$gtk_build_prefix/build"
   pixbuf_build_prefix="$pixbuf_build_prefix/build"
