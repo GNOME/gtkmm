@@ -67,7 +67,5 @@ void MyWindow::on_dialog_response(int /* response_id */)
 int main(int argc, char* argv[])
 {
   auto app = Gtk::Application::create();
-
-  MyWindow win;
-  return app->run(win, argc, argv);
+  return app->make_window_and_run<MyWindow>(argc, argv);
 }

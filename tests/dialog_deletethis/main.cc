@@ -48,6 +48,7 @@ class Dlg : public sigc::trackable
 int main (int argc, char **argv)
 {
   app = Gtk::Application::create();
+  app->register_application();
 
   new Dlg(); //Not a Gtk::Dialog - it creates one in its constructor.
 

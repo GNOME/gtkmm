@@ -208,6 +208,7 @@ int main(int argc, char* argv[])
 
   auto app = Gtk::Application::create();
   g_assert_nonnull(app);
+  app->register_application();
 
   DerivedButton::ensure_type();
   auto builder = Gtk::Builder::create_from_string(gladefile);
@@ -233,37 +234,52 @@ int main(int argc, char* argv[])
   const GObject* const standard_button = (GObject*)main_win->get_standard_button()->gobj();
   const GObject* const adjustment_gobj = (GObject*)adjustment->gobj();
 
-  std::cout << "Before app->run(*main_win, argc1, argv)" << std::endl
+  std::cout << "Before app->run(argc1, argv)" << std::endl
     << "  ref_count(MainWindow)=" << window->ref_count << std::endl
     << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
     << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
     << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
     << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
 
-  const int result = app->run(*main_win, argc1, argv);
+  // This is approximately what Gtk::Application::make_window_and_run() would do.
+  app->signal_activate().connect([&app, main_win] ()
+  {
+    app->add_window(*main_win);
+    main_win->show();
+  });
+  main_win->signal_hide().connect([&] ()
+  {
+    delete main_win;
 
-  std::cout << "After app->run(*main_win, argc1, argv)" << std::endl
-    << "  ref_count(MainWindow)=" << window->ref_count << std::endl
-    << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
-    << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
-    << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
+    std::cout << "After delete main_win" << std::endl
+      << "  ref_count(MainWindow)=" << window->ref_count << std::endl
+      << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
+      << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
+      << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+      << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
 
-  delete main_win;
+    builder.reset();
 
-  std::cout << "After delete main_win" << std::endl
-    << "  ref_count(MainWindow)=" << window->ref_count << std::endl
-    << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
-    << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
-    << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
-    << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
+    std::cout << "After builder.reset()" << std::endl;
+    if (print_after_deletion)
+    {
+      // If Builder is correct, this code will access deallocated memory.
+      std::cout
+        << "  ref_count(MainWindow)=" << window->ref_count << std::endl
+        << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
+        << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl
+        << "  ref_count(orphaned_button)=" << orphaned_button->ref_count << std::endl
+        << "  ref_count(adjustment)=" << adjustment_gobj->ref_count << std::endl;
+    }
+  });
 
-  builder.reset();
+  const int result = app->run(argc1, argv);
 
+  std::cout << "After app->run(argc1, argv)" << std::endl;
   if (print_after_deletion)
   {
     // If Builder is correct, this code will access deallocated memory.
-    std::cout << "After builder.reset()" << std::endl
+    std::cout
       << "  ref_count(MainWindow)=" << window->ref_count << std::endl
       << "  ref_count(DerivedButton)=" << derived_button->ref_count << std::endl
       << "  ref_count(Gtk::Button)=" << standard_button->ref_count << std::endl

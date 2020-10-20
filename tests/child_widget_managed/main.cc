@@ -44,7 +44,5 @@ ExampleWindow::~ExampleWindow()
 int main(int argc, char* argv[])
 {
   auto app = Gtk::Application::create();
-
-  ExampleWindow window;
-  return app->run(window, argc, argv);
+  return app->make_window_and_run<ExampleWindow>(argc, argv);
 }

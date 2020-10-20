@@ -93,7 +93,7 @@ Application::Application(const Glib::ustring& application_id, Gio::Application::
 {
   // gtk_init() is called by the 'startup' default signal handler when g_application_run() is called.
   // It's also called here, to make it possible for users of gtkmm to create
-  // a window and other widgets before calling run().
+  // a window and other widgets before calling run(). (This is not recommended.)
   // See https://bugzilla.gnome.org/show_bug.cgi?id=639925
   gtk_init();
   set_cxx_locale_to_c_locale();
@@ -109,37 +109,9 @@ int Application::run(int argc, char** argv)
   return Gio::Application::run(argc, argv);
 }
 
-int Application::run(Window& window, int argc, char** argv)
-{
-  //We cannot add and show the window until the GApplication::activate signal
-  //has been emitted, or we will crash because the application has not been
-  //registered. (At least if window is an ApplicationWindow.)
-  signal_activate().connect(
-    sigc::bind(
-      sigc::mem_fun(*this, &Application::on_activate_add_and_show_main_window),
-      &window));
-
-  return Gio::Application::run(argc, argv);
-}
-
-
-int Application::run(Window& window)
-{
-  return run(window, 0, nullptr);
-}
-
 int Application::run()
 {
   return Gio::Application::run(0, nullptr);
-}
-
-void Application::on_activate_add_and_show_main_window(Window* window)
-{
-  if(window)
-  {
-    add_window(*window);
-    window->show();
-  }
 }
 
 void Application::set_accel_for_action(const Glib::ustring& detailed_action_name, const Glib::ustring& accel)
