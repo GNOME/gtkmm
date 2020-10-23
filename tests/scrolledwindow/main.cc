@@ -55,9 +55,10 @@ protected:
   DerivedScrolledWindow m_ScrolledWindow;
 };
 
-int main (int /* argc */, char** /* argv */)
+int main(int /* argc */, char** /* argv */)
 {
   auto app = Gtk::Application::create();
+  app->register_application();
 
   Instance instance;
 

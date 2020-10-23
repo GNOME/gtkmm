@@ -18,6 +18,8 @@
 _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <vector>
+#include <type_traits>
+#include <utility>
 #include <giomm/application.h>
 #include <giomm/menumodel.h>
 #include <giomm/menu.h>
@@ -80,6 +82,12 @@ class GTKMM_API Window;
  * inform the user about the negative consequences of ending the
  * session while inhibitors are present.
  *
+ * @note
+ * Most widgets can't safely be created before the application has been registered
+ * (Gio::Application::register_application() called) or activated
+ * (Gio::Application::signal_activate() emitted).
+ * They can't safely be deleted after run() or make_window_and_run() returns.
+ *
  * @newin{3,4}
  */
 class GTKMM_API Application
@@ -108,7 +116,6 @@ protected:
   explicit Application(const Glib::ustring& application_id = {}, Gio::Application::Flags flags = Gio::Application::Flags::NONE);
   _IGNORE(gtk_application_new)
   _IGNORE(gtk_application_window_new)
-
 
 public:
   _WRAP_ENUM(InhibitFlags, GtkApplicationInhibitFlags, decl_prefix GTKMM_API)
@@ -166,15 +173,11 @@ public:
 
   /** Starts the application.
    *
-   * The default implementation of this virtual function will simply run
-   * a main loop.
-   *
-   * It is an error to call this function if @a application is a proxy for
-   * a remote application.
-   *
-   * @param argc The argc from main() (or 0 if @a argv is <tt>0</tt>).
-   * @param argv The argv from main(), or <tt>0</tt>.
+   * @param argc The argc from main() (or 0 if @a argv is <tt>nullptr</tt>).
+   * @param argv The argv from main(), or <tt>nullptr</tt>.
    * @return The exit status.
+   *
+   * @see Gio::Application::run()
    *
    * @newin{3,4}
    */
@@ -182,57 +185,41 @@ public:
 
   /** Starts the application.
    *
-   * The default implementation of this virtual function will simply run
-   * a main loop.
-   *
-   * It is an error to call this function if @a application is a proxy for
-   * a remote application.
-   *
-   * @note If you call Gio::Application::quit() while a window is connected to
-   * the application, and then return from main() without removing the window
-   * from the application, the application's destructor will not be called.
-   *
-   * @param window The window to show. This method will return when the window is hidden.
-   * @param argc The argc from main() (or 0 if @a argv is <tt>0</tt>).
-   * @param argv The argv from main(), or <tt>0</tt>.
    * @return The exit status.
    *
-   * @newin{3,4}
-   */
-  int run(Window& window, int argc, char** argv);
-
-  /** Starts the application.
-   *
-   * The default implementation of this virtual function will simply run
-   * a main loop.
-   *
-   * It is an error to call this function if @a application is a proxy for
-   * a remote application.
-   *
-   * @note If you call Gio::Application::quit() while a window is connected to
-   * the application, and then return from main() without removing the window
-   * from the application, the application's destructor will not be called.
-   *
-   * @param window The window to show. This method will return when the window is hidden.
-   * @return The exit status.
-   *
-   * @newin{3,4}
-   */
-  int run(Window& window);
-
-  /** Starts the application.
-   *
-   * The default implementation of this virtual function will simply run
-   * a main loop.
-   *
-   * It is an error to call this function if @a application is a proxy for
-   * a remote application.
-   *
-   * @return The exit status.
+   * @see Gio::Application::run()
    *
    * @newin{3,4}
    */
   int run();
+
+  /** Starts the application, creates and shows a window.
+   *
+   * A window of type T_Window is constructed and added to the application
+   * in a signal_activate() handler. The window is deleted when it is hidden
+   * or removed from the application. The method returns when the window is hidden,
+   * unless other windows have been added but not removed.
+   *
+   * @tparam T_Window The type of window to show. Must be Gtk::Window or a class type
+   *                  that inherits from Gtk::Window.
+   * @param argc The argc from main() (or 0 if @a argv is <tt>nullptr</tt>).
+   * @param argv The argv from main(), or <tt>nullptr</tt>.
+   * @param args Arguments to T_Window's constructor, if any.
+   * @return The exit status.
+   *
+   * @see Gio::Application::run()
+   *
+   * @newin{3,98}
+   */
+  template <typename T_Window, typename... T_Args>
+  int make_window_and_run(int argc, char** argv, T_Args&&... args);
+
+  /** Get the window, constructed by make_window_and_run().
+   */
+  Window* get_run_window() { return m_run_window; }
+  /** Get the window, constructed by make_window_and_run().
+   */
+  const Window* get_run_window() const { return m_run_window; }
 
   _WRAP_METHOD(Glib::RefPtr<Gio::MenuModel> get_menubar(), gtk_application_get_menubar, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gio::MenuModel> get_menubar() const, gtk_application_get_menubar, refreturn, constversion)
@@ -302,8 +289,30 @@ private:
    */
   const Glib::Class& custom_class_init();
 
-  void on_activate_add_and_show_main_window(Window* window);
-  void on_window_hide(Window* window);
+  Window* m_run_window = nullptr;
 };
+
+template <typename T_Window, typename... T_Args>
+int Application::make_window_and_run(int argc, char** argv, T_Args&&... args)
+{
+  static_assert(std::is_base_of<Window, T_Window>::value);
+  
+  signal_activate().connect([this, &args...] () {
+    auto window = new T_Window(std::forward<T_Args>(args)...);
+    m_run_window = window;
+    add_window(*window);
+    window->show();
+  });
+
+  signal_window_removed().connect([this] (Window* window) {
+    if (window == m_run_window)
+    {
+      delete window;
+      m_run_window = nullptr;
+    }
+  });
+
+  return Gio::Application::run(argc, argv);
+}
 
 } // namespace Gtk

@@ -18,10 +18,8 @@ MyWindow::MyWindow() :
   vbox.append(b);
 }
 
-int main (int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   auto app = Gtk::Application::create();
-
-  MyWindow window;
-  return app->run(window, argc, argv);
+  return app->make_window_and_run<MyWindow>(argc, argv);
 }

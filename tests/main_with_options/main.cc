@@ -122,8 +122,7 @@ int main(int argc, char *argv[])
     }
     std::cout << std::endl;
 
-    Gtk::Window testWindow;
-    return app->run(testWindow); //Shows the window and returns when it is closed.
+    return app->make_window_and_run<Gtk::Window>(0, nullptr); //Shows the window and returns when it is closed.
   }
   catch(const Glib::Error& ex)
   {
