@@ -58,8 +58,11 @@ public:
 protected:
   void strings_setup_item_single_line(const Glib::RefPtr<Gtk::ListItem>& item);
   void strings_setup_item_full(const Glib::RefPtr<Gtk::ListItem>& item);
-  void strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item);
-  Glib::RefPtr<Gtk::ListItemFactory> strings_factory_new(bool full);
+  void selected_item_changed(const Gtk::DropDown* dropdown,
+                             const Glib::RefPtr<Gtk::ListItem>& item);
+  void strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item, Gtk::DropDown* dropdown);
+  void strings_unbind_item(const Glib::RefPtr<Gtk::ListItem>& item);
+  Glib::RefPtr<Gtk::ListItemFactory> strings_factory_new(Gtk::DropDown* dropdown, bool full);
   Glib::RefPtr<Gio::ListModel> strings_model_new(const std::vector<Glib::ustring>& titles,
                                                  const std::vector<Glib::ustring>& icons,
                                                  const std::vector<Glib::ustring>& descriptions);
@@ -85,12 +88,16 @@ void Example_DropDown::strings_setup_item_single_line(const Glib::RefPtr<Gtk::Li
   auto image = Gtk::make_managed<Gtk::Image>();
   auto title = Gtk::make_managed<Gtk::Label>();
   title->set_xalign(0.0);
+  auto checkmark = Gtk::make_managed<Gtk::Image>();
+  checkmark->set_from_icon_name("object-select-symbolic");
 
   box->append(*image);
   box->append(*title);
+  box->append(*checkmark);
 
   item->set_data("title", title);
   item->set_data("image", image);
+  item->set_data("checkmark", checkmark);
 
   item->set_child(*box);
 }
@@ -103,6 +110,8 @@ void Example_DropDown::strings_setup_item_full(const Glib::RefPtr<Gtk::ListItem>
   auto description = Gtk::make_managed<Gtk::Label>();
   description->set_xalign(0.0);
   description->add_css_class("dim-label");
+  auto checkmark = Gtk::make_managed<Gtk::Image>();
+  checkmark->set_from_icon_name("object-select-symbolic");
 
   auto box = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
   auto box2 = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 2);
@@ -111,21 +120,35 @@ void Example_DropDown::strings_setup_item_full(const Glib::RefPtr<Gtk::ListItem>
   box->append(*box2);
   box2->append(*title);
   box2->append(*description);
+  box->append(*checkmark);
 
   item->set_data("title", title);
   item->set_data("image", image);
   item->set_data("description", description);
+  item->set_data("checkmark", checkmark);
 
   item->set_child(*box);
 }
 
-void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item)
+void Example_DropDown::selected_item_changed(const Gtk::DropDown* dropdown,
+                                             const Glib::RefPtr<Gtk::ListItem>& item)
+{
+  auto checkmark = static_cast<Gtk::Image*>(item->get_data("checkmark"));
+  if (dropdown->get_selected_item() == item->get_item())
+    checkmark->set_opacity(1.0);
+  else
+    checkmark->set_opacity(0.0);
+}
+
+void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item,
+                                         Gtk::DropDown* dropdown)
 {
   auto holder = std::dynamic_pointer_cast<StringHolder>(item->get_item());
 
   auto title = static_cast<Gtk::Label*>(item->get_data("title"));
   auto image = static_cast<Gtk::Image*>(item->get_data("image"));
   auto description = static_cast<Gtk::Label*>(item->get_data("description"));
+  auto checkmark = static_cast<Gtk::Image*>(item->get_data("checkmark"));
 
   title->set_label(holder->m_title);
   if (image)
@@ -141,9 +164,35 @@ void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item
     description->set_label(*holder->m_description);
     description->set_visible(holder->m_description.has_value());
   }
+
+  auto popup = title->get_ancestor(GTK_TYPE_POPOVER);
+  if (popup && popup->is_ancestor(*dropdown))
+  {
+    checkmark->show();
+    auto connection = dropdown->property_selected_item().signal_changed().connect(
+      sigc::bind(sigc::mem_fun(*this, &Example_DropDown::selected_item_changed),
+                 dropdown, item));
+    item->set_data("connection", new sigc::connection(connection),
+                   Glib::destroy_notify_delete<sigc::connection>);
+    selected_item_changed(dropdown, item);
+  }
+  else
+  {
+    checkmark->hide();
+  }
 }
 
-Glib::RefPtr<Gtk::ListItemFactory> Example_DropDown::strings_factory_new(bool full)
+void Example_DropDown::strings_unbind_item(const Glib::RefPtr<Gtk::ListItem>& item)
+{
+  if (auto connection = static_cast<sigc::connection*>(item->get_data("connection")))
+  {
+    connection->disconnect();
+    item->set_data("connection", nullptr);
+  }
+}
+
+Glib::RefPtr<Gtk::ListItemFactory> Example_DropDown::strings_factory_new(Gtk::DropDown* dropdown,
+                                                                         bool full)
 {
   auto factory = Gtk::SignalListItemFactory::create();
   if (full)
@@ -153,7 +202,9 @@ Glib::RefPtr<Gtk::ListItemFactory> Example_DropDown::strings_factory_new(bool fu
     factory->signal_setup().connect(
       sigc::mem_fun(*this, &Example_DropDown::strings_setup_item_single_line));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_DropDown::strings_bind_item));
+    sigc::bind(sigc::mem_fun(*this, &Example_DropDown::strings_bind_item), dropdown));
+  factory->signal_unbind().connect(
+    sigc::mem_fun(*this, &Example_DropDown::strings_unbind_item));
 
   return factory;
 }
@@ -166,7 +217,7 @@ Glib::RefPtr<Gio::ListModel> Example_DropDown::strings_model_new(
   auto store = Gio::ListStore<StringHolder>::create();
   for (guint i = 0; i < titles.size(); i++)
   {
-    auto icon = icons.empty() ? std::nullopt : 
+    auto icon = icons.empty() ? std::nullopt :
       std::make_optional<Glib::ustring>(icons[i]);
     auto description = descriptions.empty() ? std::nullopt :
       std::make_optional<Glib::ustring>(descriptions[i]);
@@ -187,12 +238,13 @@ Gtk::DropDown* Example_DropDown::drop_down_new_from_strings(
   g_return_val_if_fail(descriptions.empty() || icons.size() == descriptions.size(), nullptr);
 
   auto model = strings_model_new(titles, icons, descriptions);
-  auto factory = strings_factory_new(false);
+  auto dropdown = Gtk::make_managed<Gtk::DropDown>(model);
+
+  auto factory = strings_factory_new(dropdown, false);
   Glib::RefPtr<Gtk::ListItemFactory> list_factory;
   if (!icons.empty() || !descriptions.empty())
-    list_factory = strings_factory_new(true);
+    list_factory = strings_factory_new(dropdown, true);
 
-  auto dropdown = Gtk::make_managed<Gtk::DropDown>(model);
   dropdown->set_factory(factory);
   dropdown->set_list_factory(list_factory);
 
