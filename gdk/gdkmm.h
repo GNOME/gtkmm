@@ -54,6 +54,5 @@
 #include <gdkmm/texture.h>
 #include <gdkmm/toplevel.h>
 #include <gdkmm/toplevelsurfaceimpl.h>
-#include <gdkmm/types.h>
 
 #endif /* _GDKMM_GDKMM_H_ */

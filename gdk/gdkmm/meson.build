@@ -70,7 +70,6 @@ gdkmm_any_hg_ccg_basenames = [
   'toplevel',
   'toplevellayout',
   'toplevelsize',
-  'types',
 ]
 
 gdkmm_deprecated_hg_ccg_basenames = []

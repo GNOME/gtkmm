@@ -20,7 +20,7 @@
 #include <gtkmmconfig.h>
 
 #include <glibmm/ustring.h>
-#include <gdkmm/types.h>
+#include <gdkmm/enums.h>
 
 // The corresponding gtk functions are declared in gtkaccelgroup.h.
 

@@ -21,8 +21,7 @@
 #include <gtkmmconfig.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <gdkmm/types.h>
-
+#include <gdkmm/enums.h>
 
 namespace Gtk
 {
