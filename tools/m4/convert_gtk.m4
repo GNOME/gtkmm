@@ -397,12 +397,9 @@ _CONVERSION(const Gtk::Widget&,GtkWidget*,__CFR2P)
 
 _CONVERSION(`const Glib::RefPtr<Tooltip>&',`GtkTooltip*',__CONVERT_REFPTR_TO_P)
 
-_CONVERSION(`Requisition&', `GtkRequisition*', `($2)(&$3)')
-_CONVERSION(`const Requisition&', `GtkRequisition*', `($2)(&$3)')
-_CONVERSION(`GtkRequisition*', `Requisition&', `($2)(*$3)')
-_CONVERSION(`GtkRequisition*', `Requisition*', `($2)($3)')
-_CONVERSION(`Requisition*', `GtkRequisition*', `($2)($3)')
-_CONVERSION(`GtkRequisition', `Requisition', `static_cast<$2>($3)')
+_CONVERSION(`Requisition&', `GtkRequisition*', __FR2P)
+_CONVERSION(`const Requisition&', `GtkRequisition*', __FCR2P)
+_CONVERSION(`GtkRequisition*', `Requisition&', `Glib::wrap($3)')
 
 _CONVERSION(`Allocation&',`GtkAllocation*',`($2)($3.gobj())')
 _CONVERSION(`const Allocation&',`GtkAllocation*',`($2)($3.gobj())')
