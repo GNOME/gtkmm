@@ -50,6 +50,7 @@ _CONV_ENUM(Gdk,InterpType)
 _CONV_ENUM(Gdk,JoinStyle)
 _CONV_ENUM(Gdk,KeyMatch)
 _CONV_ENUM(Gdk,LineStyle)
+_CONV_INCLASS_ENUM(Gdk,MemoryTexture,Format,GdkMemoryFormat)
 _CONV_ENUM(Gdk,ModifierType)
 _CONV_ENUM(Gdk,NotifyType)
 _CONV_ENUM(Gdk,OverlapType)
@@ -274,12 +275,6 @@ _CONVERSION(`const char*const*',`const char**',`const_cast<const char**>($3)',`$
 _CONVERSION(`GdkTimeCoord**&',`GdkTimeCoord***',`&($3)')
 
 dnl _CONVERSION(GdkBitmap*,Gdk::Bitmap&,`Glib::unwrap_boxed($3)',`$3')
-
-dnl GdkAtom -> Glib::ustring and std::string and vice versa
-_CONVERSION(`GdkAtom',`Glib::ustring',`Gdk::AtomUstring::to_cpp_type($3)')
-_CONVERSION(`const Glib::ustring&', `GdkAtom', `Gdk::AtomUstring::to_c_type($3)')
-_CONVERSION(`Glib::ustring&',`GdkAtom',`Gdk::AtomUstring::to_c_type($3)')
-_CONVERSION(`const std::string&', `GdkAtom', `Gdk::AtomString::to_c_type($3)')
 
 dnl GdkEvent and GdkEventSequence
 _CONVERSION(`GdkEvent*',`Glib::RefPtr<Event>',`Glib::wrap($3)')

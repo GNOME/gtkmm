@@ -51,6 +51,7 @@ gdkmm_any_hg_ccg_basenames = [
   'frametimings',
   'glcontext',
   'gltexture',
+  'memorytexture',
   'monitor',
   'paintable',
   'pixbuf',
