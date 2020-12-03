@@ -597,6 +597,7 @@ _CONVERSION(`GtkStringObject*',`Glib::RefPtr<StringObject>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Sorter>&', `GtkSorter*', __CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkSorter*',`Glib::RefPtr<Sorter>',`Glib::wrap($3)')
 _CONVERSION(`GtkTreeListRow*',`Glib::RefPtr<TreeListRow>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<TreeListRow>&', `GtkTreeListRow*', __CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Filter>&', `GtkFilter*', __CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkFilter*',`Glib::RefPtr<Filter>',`Glib::wrap($3)')
 

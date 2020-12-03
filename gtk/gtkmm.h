@@ -296,6 +296,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/textview.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/tooltip.h>
+#include <gtkmm/treeexpander.h>
 #include <gtkmm/treelistmodel.h>
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelfilter.h>

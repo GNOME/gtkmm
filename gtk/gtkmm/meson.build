@@ -249,6 +249,7 @@ gtkmm_any_hg_ccg_basenames = [
   'tooltip',
   'treedragdest',
   'treedragsource',
+  'treeexpander',
   'treeiter',
   'treelistmodel',
   'treelistrow',
