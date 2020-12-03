@@ -109,7 +109,6 @@ gtkmm_any_hg_ccg_basenames = [
   'expression',
   'expressionwatch',
   'filechooser',
-  'filechooserbutton',
   'filechooserdialog',
   'filechoosernative',
   'filechooserwidget',
