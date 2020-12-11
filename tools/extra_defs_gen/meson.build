@@ -5,7 +5,7 @@
 # Output: m4_files, install_m4dir
 
 glibmm_generate_extra_defs_dep = cpp_compiler.find_library(
-  'glibmm_generate_extra_defs@0@-2.66'.format(msvc14x_toolset_ver),
+  'glibmm_generate_extra_defs@0@-2.68'.format(msvc14x_toolset_ver),
 )
 
 executable('generate_defs_gdk', 'generate_defs_gdk.cc',

@@ -99,17 +99,17 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 
 # glibmm recently gained Meson build support, so we can try looking
 # for its pkg-config files on Visual Studio as well
-glibmm_req = '>= 2.65.1'
+glibmm_req = '>= 2.67.1'
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
-gtk_req = '>= 3.99.0'
+gtk_req = '>= 3.99.4'
 gtk_dep = dependency('gtk4', version: gtk_req)
 
 cairomm_req = '>= 1.15.4'
 cairomm_dep = dependency('cairomm-1.16', version: cairomm_req)
 
-pangomm_req = '>= 2.43.3'
-pangomm_dep = dependency('pangomm-2.44', version: pangomm_req)
+pangomm_req = '>= 2.47.1'
+pangomm_dep = dependency('pangomm-2.48', version: pangomm_req)
 
 gdk_pixbuf_req = '>= 2.35.5'
 gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: gdk_pixbuf_req)
@@ -119,7 +119,7 @@ epoxy_dep = dependency('epoxy', version: epoxy_req, required: build_demos)
 
 # The -mm libraries do not yet have pkg-config files for MSVC builds,
 # so check for them manually
-glibmm_req_minor_ver = '66'
+glibmm_req_minor_ver = '68'
 
 glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
@@ -134,7 +134,7 @@ gdkmm_requires = [
   'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
   'gtk4', gtk_req,
   'cairomm-1.16', cairomm_req,
-  'pangomm-2.44', cairomm_req,
+  'pangomm-2.48', pangomm_req,
   'gdk-pixbuf-2.0', gdk_pixbuf_req,
 ]
 
