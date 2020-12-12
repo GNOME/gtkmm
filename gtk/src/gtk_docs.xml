@@ -16751,10 +16751,34 @@ and should not be set by applications.
 </description>
 </property>
 
+<property name="GtkWindow:fullscreened">
+<description>
+Whether the window is fullscreen.
+
+Setting this property is the equivalent of calling gtk_window_fullscreen()
+and gtk_window_unfullscreen(); either operation is asynchronous, which
+means you will need to connect to the #GObject::notify signal in order to
+know whether the operation was successful.
+
+</description>
+</property>
+
 <property name="GtkWindow:icon-name">
 <description>
 The :icon-name property specifies the name of the themed icon to
 use as the window icon. See #GtkIconTheme for more details.
+
+</description>
+</property>
+
+<property name="GtkWindow:maximized">
+<description>
+Whether the window is maximized.
+
+Setting this property is the equivalent of calling gtk_window_maximize()
+and gtk_window_unmaximize(); either operation is asynchronous, which
+means you will need to connect to the #GObject::notify signal in order to
+know whether the operation was successful.
 
 </description>
 </property>
@@ -51019,23 +51043,6 @@ See gtk_widget_insert_action_group() for how to add actions to widgets.
 </return>
 </function>
 
-<function name="gtk_native_check_resize">
-<description>
-Reposition and resize a #GtkNative.
-
-Widgets need to call this function on their attached
-native widgets when they receive a new size allocation.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a #GtkNative
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_native_dialog_destroy">
 <description>
 Destroys a dialog.
@@ -84436,9 +84443,18 @@ gtk_widget_class_install_action().
 <function name="gtk_widget_activate">
 <description>
 For widgets that can be “activated” (buttons, menu items, etc.)
-this function activates them. Activation is what happens when you
-press Enter on a widget during key navigation. If @widget isn't
-activatable, the function returns %FALSE.
+this function activates them. The activation will emit the signal
+set using gtk_widget_class_set_activate_signal() during class
+initialization.
+
+Activation is what happens when you press Enter on a widget during
+key navigation.
+
+If you wish to handle the activation keybinding yourself, it is
+recommended to use gtk_widget_class_add_shortcut() with an action
+created with gtk_signal_action_new().
+
+If @widget isn't activatable, the function returns %FALSE.
 
 
 </description>
@@ -85143,6 +85159,24 @@ See also: gtk_accessible_get_accessible_role()
 </return>
 </function>
 
+<function name="gtk_widget_class_get_activate_signal">
+<description>
+Retrieves the signal id for the activation signal set using
+gtk_widget_class_set_activate_signal().
+
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> a #GtkWidgetClass
+</parameter_description>
+</parameter>
+</parameters>
+<return> a signal id, or 0 if the widget class does not
+specify an activation signal
+</return>
+</function>
+
 <function name="gtk_widget_class_get_css_name">
 <description>
 Gets the name used by this class for matching in CSS code. See
@@ -85303,6 +85337,52 @@ differently by assistive technologies.
 </parameter>
 <parameter name="accessible_role">
 <parameter_description> the #GtkAccessibleRole used by the @widget_class
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_class_set_activate_signal">
+<description>
+Sets the #GtkWidgetClass.activate_signal field with the
+given @signal_id; the signal will be emitted when calling
+gtk_widget_activate().
+
+The @signal_id must have been registered with g_signal_new()
+or g_signal_newv() before calling this function.
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> a #GtkWidgetClass
+</parameter_description>
+</parameter>
+<parameter name="signal_id">
+<parameter_description> the id for the activate signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_widget_class_set_activate_signal_from_name">
+<description>
+Sets the #GtkWidgetClass.activate_signal field with the signal id for
+the given @signal_name; the signal will be emitted when calling
+gtk_widget_activate().
+
+The @signal_name of @widget_type must have been registered with
+g_signal_new() or g_signal_newv() before calling this function.
+
+</description>
+<parameters>
+<parameter name="widget_class">
+<parameter_description> a #GtkWidgetClass
+</parameter_description>
+</parameter>
+<parameter name="signal_name">
+<parameter_description> the name of the activate signal of @widget_type
 </parameter_description>
 </parameter>
 </parameters>
@@ -89040,15 +89120,15 @@ Drop the internal reference GTK holds on toplevel windows.
 
 <function name="gtk_window_fullscreen">
 <description>
-Asks to place @window in the fullscreen state. Note that you
-shouldn’t assume the window is definitely full screen afterward,
-because other entities (e.g. the user or
-[window manager][gtk-X11-arch]) could unfullscreen it
-again, and not all window managers honor requests to fullscreen
-windows. But normally the window will end up fullscreen. Just
-don’t write code that crashes if not.
+Asks to place @window in the fullscreen state.
 
-You can track iconification via the #GdkToplevel:state property
+Note that you shouldn’t assume the window is definitely full screen afterward,
+because other entities (e.g. the user or [window manager][gtk-X11-arch]) could
+unfullscreen it again, and not all window managers honor requests to fullscreen
+windows.
+
+You can track the result of this operation via the #GdkToplevel:state property,
+or by listening to notifications of the #GtkWindow:fullscreened property.
 
 </description>
 <parameters>
@@ -89062,10 +89142,15 @@ You can track iconification via the #GdkToplevel:state property
 
 <function name="gtk_window_fullscreen_on_monitor">
 <description>
-Asks to place @window in the fullscreen state. Note that you shouldn't assume
-the window is definitely full screen afterward.
+Asks to place @window in the fullscreen state on the given @monitor.
 
-You can track iconification via the #GdkToplevel:state property
+Note that you shouldn't assume the window is definitely full screen
+afterward, or that the windowing system allows fullscreen windows on
+any given monitor.
+
+You can track the result of this operation via the #GdkToplevel:state
+property, or by listening to notifications of the #GtkWindow:fullscreened
+property.
 
 </description>
 <parameters>
@@ -89149,11 +89234,10 @@ It is only valid until the next call to gtk_window_set_default_icon_name().
 
 <function name="gtk_window_get_default_size">
 <description>
-Gets the default size of the window. A value of -1 for the width or
+Gets the default size of the window. A value of 0 for the width or
 height indicates that a default size has not been explicitly set
 for that dimension, so the “natural” size of the window will be
 used.
-
 
 </description>
 <parameters>
@@ -89364,77 +89448,6 @@ Gets the value set by gtk_window_set_resizable().
 </parameters>
 <return> %TRUE if the user can resize the window
 </return>
-</function>
-
-<function name="gtk_window_get_size">
-<description>
-Obtains the current size of @window.
-
-If @window is not visible on screen, this function return the size GTK
-will suggest to the [window manager][gtk-X11-arch] for the initial window
-size (but this is not reliably the same as the size the window manager
-will actually select). See: gtk_window_set_default_size().
-
-Depending on the windowing system and the window manager constraints,
-the size returned by this function may not match the size set using
-gtk_window_resize(); additionally, since gtk_window_resize() may be
-implemented as an asynchronous operation, GTK cannot guarantee in any
-way that this code:
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-GtkWindow *window = GTK_WINDOW (gtk_window_new ());
-int width = 500;
-int height = 300;
-gtk_window_resize (window, width, height);
-
-int new_width, new_height;
-gtk_window_get_size (window, &amp;new_width, &amp;new_height);
-]|
-
-will result in `new_width` and `new_height` matching `width` and
-`height`, respectively.
-
-This function will return the logical size of the #GtkWindow,
-excluding the widgets used in client side decorations; there is,
-however, no guarantee that the result will be completely accurate
-because client side decoration may include widgets that depend on
-the user preferences and that may not be visible at the time you
-call this function.
-
-The dimensions returned by this function are suitable for being
-stored across sessions; use gtk_window_set_default_size() to
-restore them when before showing the window.
-
-|[&lt;!-- language=&quot;C&quot; --&gt;
-static void
-on_size_allocate (GtkWidget *widget,
-const GtkAllocation *allocation,
-int baseline)
-{
-int new_width, new_height;
-
-gtk_window_get_size (GTK_WINDOW (widget), &amp;new_width, &amp;new_height);
-
-// ...
-}
-]|
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GtkWindow
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> return location for width, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> return location for height, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gtk_window_get_title">
@@ -89657,6 +89670,31 @@ differently in an active window from a widget in an inactive window.
 </return>
 </function>
 
+<function name="gtk_window_is_fullscreen">
+<description>
+Retrieves the current fullscreen state of @window.
+
+Note that since fullscreening is ultimately handled by the window
+manager and happens asynchronously to an application request, you
+shouldn’t assume the return value of this function changing
+immediately (or at all), as an effect of calling
+gtk_window_fullscreen() or gtk_window_unfullscreen().
+
+If the window isn't yet mapped, the value returned will whether the
+initial requested state is fullscreen.
+
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> a #GtkWindow
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the window has a fullscreen state.
+</return>
+</function>
+
 <function name="gtk_window_is_maximized">
 <description>
 Retrieves the current maximized state of @window.
@@ -89666,6 +89704,9 @@ manager and happens asynchronously to an application request, you
 shouldn’t assume the return value of this function changing
 immediately (or at all), as an effect of calling
 gtk_window_maximize() or gtk_window_unmaximize().
+
+If the window isn't yet mapped, the value returned will whether the
+initial requested state is maximized.
 
 
 </description>
@@ -89698,20 +89739,17 @@ then unref all the widgets afterwards.
 
 <function name="gtk_window_maximize">
 <description>
-Asks to maximize @window, so that it becomes full-screen. Note that
-you shouldn’t assume the window is definitely maximized afterward,
-because other entities (e.g. the user or
-[window manager][gtk-X11-arch]) could unmaximize it
-again, and not all window managers support maximization. But
-normally the window will end up maximized. Just don’t write code
-that crashes if not.
+Asks to maximize @window, so that it fills the screen.
 
-It’s permitted to call this function before showing a window,
-in which case the window will be maximized when it appears onscreen
-initially.
+Note that you shouldn’t assume the window is definitely maximized afterward,
+because other entities (e.g. the user or [window manager][gtk-X11-arch])
+could unmaximize it again, and not all window managers support maximization.
+
+It’s permitted to call this function before showing a window, in which case
+the window will be maximized when it appears onscreen initially.
 
 You can track the result of this operation via the #GdkToplevel:state
-property, or by listening to notifications on the #GtkWindow:is-maximized
+property, or by listening to notifications on the #GtkWindow:maximized
 property.
 
 </description>
@@ -89821,56 +89859,6 @@ ready to be shown.
 <parameter name="timestamp">
 <parameter_description> the timestamp of the user interaction (typically a 
 button or key press event) which triggered this call
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_window_resize">
-<description>
-Resizes the window as if the user had done so, obeying geometry
-constraints. The default geometry constraint is that windows may
-not be smaller than their size request; to override this
-constraint, call gtk_widget_set_size_request() to set the window's
-request to a smaller value.
-
-If gtk_window_resize() is called before showing a window for the
-first time, it overrides any default size set with
-gtk_window_set_default_size().
-
-Windows may not be resized smaller than 1 by 1 pixels.
-
-When using client side decorations, GTK will do its best to adjust
-the given size so that the resulting window size matches the
-requested size without the title bar, borders and shadows added for
-the client side decorations, but there is no guarantee that the
-result will be totally accurate because these widgets added for
-client side decorations depend on the theme and may not be realized
-or visible at the time gtk_window_resize() is issued.
-
-If the GtkWindow has a titlebar widget (see gtk_window_set_titlebar()), then
-typically, gtk_window_resize() will compensate for the height of the titlebar
-widget only if the height is known when the resulting GtkWindow configuration
-is issued.
-For example, if new widgets are added after the GtkWindow configuration
-and cause the titlebar widget to grow in height, this will result in a
-window content smaller that specified by gtk_window_resize() and not
-a larger window.
-
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> a #GtkWindow
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width in pixels to resize the window to
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height in pixels to resize the window to
 </parameter_description>
 </parameter>
 </parameters>
@@ -90004,11 +89992,6 @@ resized the window themselves. Users can still shrink the window
 again as they normally would. Setting a default size of -1 means to
 use the “natural” default size (the size request of the window).
 
-For some uses, gtk_window_resize() is a more appropriate function.
-gtk_window_resize() changes the current size of the window, rather
-than the size to be used on initial display. gtk_window_resize() always
-affects the window itself, not the geometry widget.
-
 The default size of a window only affects the first time a window is
 shown; if a window is hidden and re-shown, it will remember the size
 it had prior to hiding, rather than using the default size.
@@ -90018,7 +90001,7 @@ passing 0 for @width and @height is OK, resulting in a 1x1 default size.
 
 If you use this function to reestablish a previously saved window size,
 note that the appropriate size to save is the one returned by
-gtk_window_get_size(). Using the window allocation directly will not
+gtk_window_get_default_size(). Using the window allocation directly will not
 work in all circumstances and can lead to growing or shrinking windows.
 
 </description>
@@ -90270,8 +90253,9 @@ will then disallow lowering the dialog below the parent.
 
 <function name="gtk_window_set_resizable">
 <description>
-Sets whether the user can resize a window. Windows are user resizable
-by default.
+Sets whether the user can resize a window.
+
+Windows are user resizable by default.
 
 </description>
 <parameters>
@@ -90400,15 +90384,17 @@ much as the window manager would have done on X.
 
 <function name="gtk_window_unfullscreen">
 <description>
-Asks to toggle off the fullscreen state for @window. Note that you
-shouldn’t assume the window is definitely not full screen
-afterward, because other entities (e.g. the user or
-[window manager][gtk-X11-arch]) could fullscreen it
-again, and not all window managers honor requests to unfullscreen
-windows. But normally the window will end up restored to its normal
-state. Just don’t write code that crashes if not.
+Asks to remove the fullscreen state for @window, and return to its previous
+state.
 
-You can track iconification via the #GdkToplevel:state property
+Note that you shouldn’t assume the window is definitely not full screen afterward,
+because other entities (e.g. the user or [window manager][gtk-X11-arch]) could
+fullscreen it again, and not all window managers honor requests to unfullscreen
+windows; normally the window will end up restored to its normal state. Just don’t
+write code that crashes if not.
+
+You can track the result of this operation via the #GdkToplevel:state property,
+or by listening to notifications of the #GtkWindow:fullscreened property.
 
 </description>
 <parameters>
@@ -90422,15 +90408,14 @@ You can track iconification via the #GdkToplevel:state property
 
 <function name="gtk_window_unmaximize">
 <description>
-Asks to unmaximize @window. Note that you shouldn’t assume the
-window is definitely unmaximized afterward, because other entities
-(e.g. the user or [window manager][gtk-X11-arch])
-could maximize it again, and not all window
-managers honor requests to unmaximize. But normally the window will
-end up unmaximized. Just don’t write code that crashes if not.
+Asks to unmaximize @window.
+
+Note that you shouldn’t assume the window is definitely unmaximized afterward,
+because other entities (e.g. the user or [window manager][gtk-X11-arch]) could
+maximize it again, and not all window managers honor requests to unmaximize.
 
 You can track the result of this operation via the #GdkToplevel:state
-property, or by listening to notifications on the #GtkWindow:is-maximized
+property, or by listening to notifications on the #GtkWindow:maximized
 property.
 
 </description>
