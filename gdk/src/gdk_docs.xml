@@ -835,10 +835,6 @@ title bar.
 <parameter_description> the keyboard focus has entered or left the surface.
 </parameter_description>
 </parameter>
-<parameter name="GDK_CONFIGURE">
-<parameter_description> the size of the surface has changed.
-</parameter_description>
-</parameter>
 <parameter name="GDK_PROXIMITY_IN">
 <parameter_description> an input device has moved into contact with a sensing
 surface (e.g. a touchscreen or graphics tablet).
@@ -1068,7 +1064,7 @@ correspond to the signals of #GdkFrameClock.
 </parameter_description>
 </parameter>
 <parameter name="GDK_FRAME_CLOCK_PHASE_LAYOUT">
-<parameter_description> corresponds to GdkFrameClock::layout.
+<parameter_description> corresponds to GdkFrameClock::layout. Should not be handled by applicatiosn.
 </parameter_description>
 </parameter>
 <parameter name="GDK_FRAME_CLOCK_PHASE_PAINT">
@@ -1961,22 +1957,6 @@ which must be repeated.
 </parameters>
 </enum>
 
-<signal name="GdkPopup::popup-layout-changed">
-<description>
-Emitted when the layout of a popup surface has changed, e.g. if the popup
-layout was reactive and after the parent moved causing the popover to end
-up partially off-screen.
-
-</description>
-<parameters>
-<parameter name="popup">
-<parameter_description> the #GdkSurface that was laid out
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
 <enum name="GdkScrollDirection">
 <description>
 Specifies the direction for scroll events.
@@ -2207,6 +2187,32 @@ Emitted when GDK receives an input event for @surface.
 </return>
 </signal>
 
+<signal name="GdkSurface::layout">
+<description>
+Emitted when the size of @surface is changed, or when relayout should
+be performed.
+
+Surface size is reported in ”application pixels”, not
+”device pixels” (see gdk_surface_get_scale_factor()).
+
+</description>
+<parameters>
+<parameter name="surface">
+<parameter_description> the #GdkSurface
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the current width
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the current height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GdkSurface::leave-monitor">
 <description>
 Emitted when @surface stops being present on the monitor.
@@ -2243,31 +2249,6 @@ Emitted when part of the surface needs to be redrawn.
 </parameters>
 <return> %TRUE to indicate that the signal has been handled
 </return>
-</signal>
-
-<signal name="GdkSurface::size-changed">
-<description>
-Emitted when the size of @surface is changed.
-
-Surface size is reported in ”application pixels”, not
-”device pixels” (see gdk_surface_get_scale_factor()).
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> the #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> the new width
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> the new height
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </signal>
 
 <property name="GdkSurface:cursor">
@@ -2379,10 +2360,6 @@ any of the per-edge states being set.
 
 </description>
 <parameters>
-<parameter name="GDK_TOPLEVEL_STATE_WITHDRAWN">
-<parameter_description> the surface is not shown
-</parameter_description>
-</parameter>
 <parameter name="GDK_TOPLEVEL_STATE_MINIMIZED">
 <parameter_description> the surface is minimized
 </parameter_description>
@@ -3359,28 +3336,6 @@ ignore.
 </parameters>
 <return> %TRUE if storing was successful.
 </return>
-</function>
-
-<function name="gdk_configure_event_get_size">
-<description>
-Extracts the surface size from a configure event.
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> a configure event
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> return location for surface width
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> return location for surface height
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_content_deserialize_async">
@@ -13418,7 +13373,7 @@ Obtains the position of the popup relative to its parent.
 Gets the current popup rectangle anchor.
 
 The value returned may change after calling gdk_popup_present(),
-or after the &quot;popup-layout-changed&quot; is emitted.
+or after the #GdkSurface::layout signal is emitted.
 
 
 </description>
@@ -13437,7 +13392,7 @@ or after the &quot;popup-layout-changed&quot; is emitted.
 Gets the current popup surface anchor.
 
 The value returned may change after calling gdk_popup_present(),
-or after the &quot;popup-layout-changed&quot; is emitted.
+or after the #GdkSurface::layout signal is emitted.
 
 
 </description>
@@ -13742,13 +13697,16 @@ Present @popup after having processed the #GdkPopupLayout rules.
 If the popup was previously now showing, it will be showed,
 otherwise it will change position according to @layout.
 
-After calling this function, the result of the layout can be queried
-using gdk_popup_get_position_x(), gdk_popup_get_position_y(),
-gdk_surface_get_width(), gdk_surface_get_height(),
-gdk_popup_get_rect_anchor() and gdk_popup_get_surface_anchor().
+After calling this function, the result should be handled in response
+to the #GdkSurface::layout signal being emitted. The resulting popup
+position can be queried using gdk_popup_get_position_x(),
+gdk_popup_get_position_y(), and the resulting size will be sent as
+parameters in the layout signal. Use gdk_popup_get_rect_anchor() and
+gdk_popup_get_surface_anchor() to get the resulting anchors.
 
-Presenting may have fail, for example if it was immediately
-hidden if the @popup was set to autohide.
+Presenting may fail, for example if the @popup is set to autohide
+and is immediately hidden upon being presented. If presenting failed,
+the #GdkSurface::layout signal will not me emitted.
 
 
 </description>
@@ -14801,44 +14759,6 @@ property in your #GtkWidgetClass.css_changed() handler.
 <return></return>
 </function>
 
-<function name="gdk_surface_set_shadow_width">
-<description>
-Newer GTK windows using client-side decorations use extra geometry
-around their frames for effects like shadows and invisible borders.
-Window managers that want to maximize windows or snap to edges need
-to know where the extents of the actual frame lie, so that users
-don’t feel like windows are snapping against random invisible edges.
-
-Note that this property is automatically updated by GTK, so this
-function should only be used by applications which do not use GTK
-to create toplevel surfaces.
-
-</description>
-<parameters>
-<parameter name="surface">
-<parameter_description> a #GdkSurface
-</parameter_description>
-</parameter>
-<parameter name="left">
-<parameter_description> The left extent
-</parameter_description>
-</parameter>
-<parameter name="right">
-<parameter_description> The right extent
-</parameter_description>
-</parameter>
-<parameter name="top">
-<parameter_description> The top extent
-</parameter_description>
-</parameter>
-<parameter name="bottom">
-<parameter_description> The bottom extent
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_surface_translate_coordinates">
 <description>
 Translates the given coordinates from being
@@ -15464,8 +15384,8 @@ GDK may emit the 'compute-size' signal to let the user of this toplevel
 compute the preferred size of the toplevel surface. See
 #GdkToplevel::compute-size for details.
 
-Presenting may fail.
-
+Presenting is asynchronous and the specified layout parameters are not
+guaranteed to be respected.
 
 </description>
 <parameters>
@@ -15478,8 +15398,7 @@ Presenting may fail.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %FALSE if @toplevel failed to be presented, otherwise %TRUE.
-</return>
+<return></return>
 </function>
 
 <function name="gdk_toplevel_restore_system_shortcuts">
@@ -15724,6 +15643,38 @@ gdk_toplevel_size_get_bounds()).
 </parameter>
 <parameter name="min_height">
 <parameter_description> the minimum height
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_toplevel_size_set_shadow_width">
+<description>
+The shadow width corresponds to the part of the computed surface size
+that would consist of the shadow margin surrounding the window, would
+there be any.
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> a #GdkToplevelSize
+</parameter_description>
+</parameter>
+<parameter name="left">
+<parameter_description> width of the left part of the shadow
+</parameter_description>
+</parameter>
+<parameter name="right">
+<parameter_description> width of the right part of the shadow
+</parameter_description>
+</parameter>
+<parameter name="top">
+<parameter_description> height of the top part of the shadow
+</parameter_description>
+</parameter>
+<parameter name="bottom">
+<parameter_description> height of the bottom part of the shadow
 </parameter_description>
 </parameter>
 </parameters>
