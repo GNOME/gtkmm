@@ -2,7 +2,7 @@
 
 # The resource compiler, used in demos/gtk-demo, requires a C compiler.
 project('gtkmm', 'c', 'cpp',
-  version: '3.97.1',
+  version: '4.0.0',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++17'
@@ -99,16 +99,16 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 
 # glibmm recently gained Meson build support, so we can try looking
 # for its pkg-config files on Visual Studio as well
-glibmm_req = '>= 2.67.1'
+glibmm_req = '>= 2.68.0'
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
-gtk_req = '>= 3.99.4'
+gtk_req = '>= 4.0.0'
 gtk_dep = dependency('gtk4', version: gtk_req)
 
 cairomm_req = '>= 1.15.4'
 cairomm_dep = dependency('cairomm-1.16', version: cairomm_req)
 
-pangomm_req = '>= 2.47.1'
+pangomm_req = '>= 2.48.0'
 pangomm_dep = dependency('pangomm-2.48', version: pangomm_req)
 
 gdk_pixbuf_req = '>= 2.35.5'
