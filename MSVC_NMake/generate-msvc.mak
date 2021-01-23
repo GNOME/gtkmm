@@ -61,6 +61,18 @@ gtkmm\gtkmmconfig.h: ..\configure.ac ..\gtk\gtkmmconfig.h.in
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GTKMM_MICRO_VERSION/\#define GTKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
+gtkmm\gtkmm.rc: ..\configure.ac
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy $@.in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MAJOR_VERSION\@/$(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MODULE_NAME\@/gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
+
 pkg-ver.mak: ..\configure.ac
 	@echo Generating version info Makefile Snippet...
 	@$(PERL) -00 -ne "print if /AC_INIT\(/" $** |	\
