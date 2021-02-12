@@ -22,7 +22,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@echo.>>gen_$(@B).bat
 	@echo $(PERL) -- "$(GMMPROC_DIR)\generate_wrap_init.pl" ^^>>gen_$(@B).bat
 	@echo --namespace=Gtk --parent_dir=gtkmm ^^>>gen_$(@B).bat
-	@for %%f in ($(GTKMM_HG_FILES)) do @echo ../gtk/src/%%f ^^>>gen_$(@B).bat
+	@for %%f in ($(GTKMM_HG_FILES:.hg=)) do @echo ../gtk/src/%%f.hg ^^>>gen_$(@B).bat
 	@if not exist ..\gtk\gtkmm\wrap_init.cc call gen_$(@B).bat>$@
 	@del gen_$(@B).bat
 
