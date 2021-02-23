@@ -228,9 +228,9 @@ else # not maintainer_mode
     gdkmm_hg_ccg_basenames,
   )
 
-  built_cc_files = [ src_untracked_gdkmm / 'wrap_init.cc' ]
+  built_cc_files = [ '../..' / untracked_gdkmm / 'wrap_init.cc' ]
   foreach file : gdkmm_used_hg_ccg_basenames
-    built_cc_files += src_untracked_gdkmm / file + '.cc'
+    built_cc_files += '../..' / untracked_gdkmm / file + '.cc'
   endforeach
 
   gdk_gen_sources = built_cc_files
