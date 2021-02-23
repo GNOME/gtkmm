@@ -2,7 +2,7 @@
 
 # The resource compiler, used in demos/gtk-demo, requires a C compiler.
 project('gtkmm', 'c', 'cpp',
-  version: '3.24.3',
+  version: '3.24.4',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++11'
