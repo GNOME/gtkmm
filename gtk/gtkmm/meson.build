@@ -464,9 +464,9 @@ else # not maintainer_mode
     gtkmm_hg_ccg_basenames,
   )
 
-  built_cc_files = [ src_untracked_gtkmm / 'wrap_init.cc' ]
+  built_cc_files = [ '../..' / untracked_gtkmm / 'wrap_init.cc' ]
   foreach file : gtkmm_used_hg_ccg_basenames
-    built_cc_files += src_untracked_gtkmm / file + '.cc'
+    built_cc_files += '../..' / untracked_gtkmm / file + '.cc'
   endforeach
 
   gtk_gen_sources = built_cc_files
