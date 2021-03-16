@@ -69,6 +69,12 @@ EXTRA_DIST = \
   gtk/meson.build \
   gtk/gtkmmconfig.h.meson \
   gtk/gtkmm/meson.build \
+  subprojects/cairomm-1.16.wrap \
+  subprojects/gdk-pixbuf.wrap \
+  subprojects/glibmm-2.68.wrap \
+  subprojects/gtk4.wrap \
+  subprojects/libepoxy.wrap \
+  subprojects/pangomm-2.48.wrap \
   tests/meson.build \
   tools/dummy-header.py \
   tools/extra_defs_gen/meson.build \

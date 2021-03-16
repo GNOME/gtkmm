@@ -1,6 +1,6 @@
 # tests
 
-# Input: gtkmm_dep, build_tests, gui_app_ldflags
+# Input: gtkmm_own_dep, build_tests, gui_app_ldflags
 # Output: -
 
 test_programs = [
@@ -34,7 +34,7 @@ foreach ex : test_programs
   endforeach
 
   exe_file = executable(ex_name, ex_sources,
-    dependencies: gtkmm_dep,
+    dependencies: gtkmm_own_dep,
     gui_app: ex[3],
     build_by_default: build_tests,
     link_args: ex[3] ? gui_app_ldflags : [],

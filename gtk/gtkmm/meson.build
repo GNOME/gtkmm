@@ -6,7 +6,7 @@
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_libname
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
-#         gtkmm_built_h_file_targets, gtkmm_dep
+#         gtkmm_built_h_file_targets, gtkmm_own_dep
 
 gtkmm_defs_basefiles = [
   'gtk.defs',
@@ -519,9 +519,9 @@ if not meson.is_subproject()
   )
 endif
 
-# This is useful in the main project when gtkmm is used as a subproject.
-# It's also used when building demo programs and test programs.
-gtkmm_dep = declare_dependency(
+# This is used when building demo programs and test programs.
+# It's also a part of gtkmm_dep, when gtkmm is a subproject.
+gtkmm_own_dep = declare_dependency(
   sources: gdkmm_used_built_h_file_targets + gtkmm_used_built_h_file_targets,
   link_with: gtkmm_library,
   include_directories: extra_include_dirs,

@@ -7,7 +7,8 @@ project('gtkmm', 'c', 'cpp',
   default_options: [
     'cpp_std=c++17'
   ],
-  meson_version: '>= 0.50.0', # required for python3.path()
+  meson_version: '>= 0.54.0', # required for meson.override_dependency()
+                              # and dep.get_variable(internal:)
 )
 
 gtkmm_api_version = '4.0'
@@ -125,9 +126,9 @@ glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: gl
 giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 
 # Where to find gmmproc and generate_wrap_init.pl.
-gmmproc_dir = glibmm_dep.get_pkgconfig_variable('gmmprocdir')
+gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmprocdir')
 
-gmmproc_extra_m4_dirs = [pangomm_dep.get_pkgconfig_variable('gmmprocm4dir')]
+gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 
 gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
 gdkmm_requires = [
@@ -143,8 +144,15 @@ gtkmm_requires = gdkmm_requires
 
 # not Windows
 if host_machine.system() != 'windows'
-  gtk_unix_print_dep = dependency('gtk4-unix-print')
-  gtkmm_build_dep += [gtk_unix_print_dep]
+  # gtk4-unix-print consists of only header files (no library).
+  # In gtk's source directory, those header files are stored in the same
+  # directory as other gtk/gtk files. No extra directory need be searched for
+  # header files, when gtk is used uninstalled.
+  gtk_unix_print_dep = dependency('gtk4-unix-print',
+                       required: gtk_dep.type_name() != 'internal')
+  if gtk_unix_print_dep.found()
+    gtkmm_build_dep += [gtk_unix_print_dep]
+  endif
   gtkmm_requires += ['gtk4-unix-print', '']
 endif
 
@@ -290,6 +298,20 @@ if not meson.is_subproject()
     'untracked' / 'build_scripts',
     dont_distribute,
   )
+else
+  # This is a subproject.
+  gtkmm_dep = declare_dependency(
+    dependencies: gtkmm_own_dep,
+    variables: {
+      'gmmprocm4dir': project_source_root / 'tools' / 'm4',
+      'doxytagfile': tag_file.full_path(),
+      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    }
+  )
+
+  # A main project that looks for gtkmm_pcname.pc shall find gtkmm_dep.
+  meson.override_dependency(gtkmm_pcname, gtkmm_dep)
 endif
 
 # Print a summary.

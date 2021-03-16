@@ -5,7 +5,7 @@
 #        gtkmm_extra_h_files, gdkmm_built_h_file_targets,
 #        gtkmm_built_h_file_targets, install_datadir, python3,
 #        doc_reference_py, build_documentation
-# Output: install_docdir, install_devhelpdir
+# Output: install_docdir, install_devhelpdir, tag_file
 
 tag_file_modules = [
   'mm-common-libstdc++',
@@ -19,9 +19,9 @@ docinstall_flags = []
 foreach module : tag_file_modules
   depmod = dependency(module, required: false)
   if depmod.found()
-    doxytagfile = depmod.get_pkgconfig_variable('doxytagfile')
-    htmlrefpub = depmod.get_pkgconfig_variable('htmlrefpub', default: '')
-    htmlrefdir = depmod.get_pkgconfig_variable('htmlrefdir', default: '')
+    doxytagfile = depmod.get_variable(pkgconfig: 'doxytagfile', internal: 'doxytagfile')
+    htmlrefpub = depmod.get_variable(pkgconfig: 'htmlrefpub', internal: 'htmlrefpub', default_value: '')
+    htmlrefdir = depmod.get_variable(pkgconfig: 'htmlrefdir', internal: 'htmlrefdir', default_value: '')
     if htmlrefpub == ''
       htmlrefpub = htmlrefdir
     elif htmlrefdir == ''
