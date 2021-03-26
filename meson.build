@@ -7,7 +7,8 @@ project('gtkmm', 'c', 'cpp',
   default_options: [
     'cpp_std=c++11'
   ],
-  meson_version: '>= 0.50.0', # required for python3.path()
+  meson_version: '>= 0.54.0', # required for meson.override_dependency()
+                              # and dep.get_variable(internal:)
 )
 
 gtkmm_api_version = '3.0'
@@ -133,23 +134,35 @@ glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: gl
 giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 
 # Where to find gmmproc and generate_wrap_init.pl.
-gmmproc_dir = glibmm_dep.get_pkgconfig_variable('gmmprocdir')
+gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmprocdir')
 
-gmmproc_extra_m4_dirs = [pangomm_dep.get_pkgconfig_variable('gmmprocm4dir')]
+gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 if atkmm_dep.found()
-  gmmproc_extra_m4_dirs += [atkmm_dep.get_pkgconfig_variable('gmmprocm4dir')]
+  gmmproc_extra_m4_dirs += [atkmm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 endif
 
 # Is X11 backend available?
 if build_x11_api_opt == 'false'
   build_x11_api = false
 else
-  backends = gtk_dep.get_pkgconfig_variable('targets').split()
+  if gtk_dep.type_name() == 'internal'
+    x11_enabled_in_gdk = subproject('gtk+-3.0').get_variable('x11_enabled', fallback: true)
+    if x11_enabled_in_gdk != subproject('gtk+-3.0').get_variable('x11_enabled', fallback: false)
+      if is_host_windows or host_machine.system() == 'darwin'
+        # X11 is never supported on Windows or MacOS.
+        x11_enabled_in_gdk = false
+      else
+        warning('Variable x11_enabled not found in gtk+-3.0. Assuming X11 backend is supported.')
+      endif
+    endif
+  else # gtk_dep from pkgconfig
+    x11_enabled_in_gdk = gtk_dep.get_variable(pkgconfig: 'targets').contains('x11')
+  endif
   if build_x11_api_opt == 'if-enabled-in-gdk'
-    build_x11_api = backends.contains('x11')
+    build_x11_api = x11_enabled_in_gdk
   else # build_x11_api_opt == 'true'
     build_x11_api = true
-    if not backends.contains('x11')
+    if not x11_enabled_in_gdk
       error('Requested X11 backend not supported by installed gdk.')
     endif
   endif
@@ -174,8 +187,15 @@ endif
 
 # not Windows
 if host_machine.system() != 'windows'
-  gtk_unix_print_dep = dependency('gtk+-unix-print-3.0')
-  gtkmm_build_dep += [gtk_unix_print_dep]
+  # gtk+-unix-print-3.0 consists of only header files (no library).
+  # In gtk's source directory, those header files are stored in the same
+  # directory as other gtk/gtk files. No extra directory need be searched for
+  # header files, when gtk is used uninstalled.
+  gtk_unix_print_dep = dependency('gtk+-unix-print-3.0',
+                       required: gtk_dep.type_name() != 'internal')
+  if gtk_unix_print_dep.found()
+    gtkmm_build_dep += [gtk_unix_print_dep]
+  endif
   gtkmm_requires += ['gtk+-unix-print-3.0', '']
 endif
 
@@ -357,6 +377,30 @@ if not meson.is_subproject()
     'untracked' / 'build_scripts',
     dont_distribute,
   )
+else
+  # This is a subproject.
+  gdkmm_dep = declare_dependency(
+    dependencies: gdkmm_own_dep,
+    variables: {
+      'doxytagfile': tag_file.full_path(),
+      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    }
+  )
+  gtkmm_dep = declare_dependency(
+    dependencies: gtkmm_own_dep,
+    variables: {
+      'gmmprocm4dir': project_source_root / 'tools' / 'm4',
+      'doxytagfile': tag_file.full_path(),
+      'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
+      'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    }
+  )
+
+  # A main project that looks for gdkmm_pcname.pc and gtkmm_pcname.pc
+  # shall find gdkmm_dep and gtkmm_dep.
+  meson.override_dependency(gdkmm_pcname, gdkmm_dep)
+  meson.override_dependency(gtkmm_pcname, gtkmm_dep)
 endif
 
 # Print a summary.

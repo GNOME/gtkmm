@@ -6,7 +6,7 @@
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_extra_gendef_cpp_args, gdkmm_libname, macos_darwin_versions
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
-#         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets, gdkmm_dep
+#         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets, gdkmm_own_dep
 
 gdkmm_defs_basefiles = [
   'gdk.defs',
@@ -226,6 +226,7 @@ endif
 if build_shared_libs_directly
   gdkmm_library = library(gdkmm_libname, extra_gdkmm_objects,
     gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gdkmm_cpp_args,
     version: gtkmm_libversion,
@@ -240,6 +241,7 @@ else
   # needed for obtaining the .lib file for the gdkmm DLL
   gdk_int_lib = static_library('gdkmm-int',
     gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
+    implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gdkmm_cpp_args,
     dependencies: gdkmm_build_dep,
@@ -262,6 +264,7 @@ else
     objects: gdk_int_lib.extract_all_objects(),
     version: gtkmm_libversion,
     darwin_versions: macos_darwin_versions,
+    implicit_include_directories: false,
     dependencies: gdkmm_build_dep,
     link_depends: gdkmm_def,
     link_args: gdkmm_extra_link_args,
@@ -288,9 +291,9 @@ if not meson.is_subproject()
   )
 endif
 
-# This is useful in the main project when gdkmm is used as a subproject.
-# It's also used when building demo programs and test programs.
-gdkmm_dep = declare_dependency(
+# This is used when building demo programs and test programs.
+# It's also a part of gdkmm_dep, when gdkmm is a subproject.
+gdkmm_own_dep = declare_dependency(
   sources: gdkmm_used_built_h_file_targets,
   link_with: gdkmm_library,
   include_directories: extra_include_dirs,
