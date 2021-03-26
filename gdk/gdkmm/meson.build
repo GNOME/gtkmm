@@ -246,6 +246,7 @@ endif
 # The objects in this library will be included in gtkmm_library.
 gdkmm_library = static_library('gdkmm',
   gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
+  implicit_include_directories: false,
   include_directories: extra_include_dirs,
   cpp_args: gdkmm_cpp_args,
   dependencies: gdkmm_build_dep,

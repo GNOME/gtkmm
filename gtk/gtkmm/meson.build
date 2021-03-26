@@ -491,6 +491,7 @@ endif
 
 gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
   gtk_gen_sources, built_dummy_h_file_target, gtkmm_extra_used_cc_files,
+  implicit_include_directories: false,
   include_directories: extra_include_dirs,
   cpp_args: gtkmm_cpp_args,
   version: gtkmm_libversion,
