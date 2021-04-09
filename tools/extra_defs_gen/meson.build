@@ -16,11 +16,13 @@ endif
 
 executable('generate_defs_gdk', 'generate_defs_gdk.cc',
   dependencies: [gdkmm_build_dep, glibmm_generate_extra_defs_dep],
+  implicit_include_directories: false,
   install: false,
 )
 
 executable('generate_defs_gtk', 'generate_defs_gtk.cc',
   dependencies: [gtkmm_build_dep, glibmm_generate_extra_defs_dep],
+  implicit_include_directories: false,
   install: false,
 )
 

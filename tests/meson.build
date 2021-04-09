@@ -35,6 +35,7 @@ foreach ex : test_programs
 
   exe_file = executable(ex_name, ex_sources,
     dependencies: ex[3] ? gtkmm_own_dep : gdkmm_own_dep,
+    implicit_include_directories: false,
     gui_app: ex[3],
     build_by_default: build_tests,
     link_args: ex[3] ? gui_app_ldflags : [],
