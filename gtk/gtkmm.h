@@ -261,6 +261,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/selectionfiltermodel.h>
+#include <gtkmm/selectionlistmodelimpl.h>
 #include <gtkmm/settings.h>
 #include <gtkmm/shortcutcontroller.h>
 #include <gtkmm/shortcutlabel.h>

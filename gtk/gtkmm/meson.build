@@ -292,6 +292,7 @@ gtkmm_extra_any_h_cc_basenames = [
   'init',
   'listviewtext',
   'object',
+  'selectionlistmodelimpl',
   'treemodelcolumn',
   'treeview_private',
 ]

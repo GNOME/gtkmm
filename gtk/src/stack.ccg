@@ -16,9 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <gtkmm/selectionlistmodelimpl.h>
 #include <gtk/gtk.h>
 
 namespace Gtk
 {
+
+Glib::RefPtr<SelectionModel> Stack::get_pages()
+{
+  // gtk_stack_get_pages() returns a pointer to a private GObject class that
+  // implements GListModel and GtkSelectionModel.
+  // Such an instance is wrapped in a Gtk::SelectionListModelImpl.
+  // gtk_stack_get_pages() gives us a ref (transfer full).
+  GtkSelectionModel* stack_pages = gtk_stack_get_pages(gobj());
+  if (G_IS_LIST_MODEL(stack_pages))
+  {
+    // Look up current C++ wrapper instance:
+    Glib::ObjectBase* pCppObject = Glib::ObjectBase::_get_current_wrapper((GObject*)stack_pages);
+    if (!pCppObject)
+      pCppObject = new SelectionListModelImpl((GObject*)stack_pages);
+    return Glib::make_refptr_for_instance<SelectionModel>(dynamic_cast<SelectionModel*>(pCppObject));
+  }
+  return Glib::wrap(stack_pages);
+}
 
 } //namespace Gtk
