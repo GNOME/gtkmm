@@ -3,7 +3,8 @@
 # Input: built_files_root, project_source_root, gdkmm_pcname, gtkmm_pcname,
 #        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, build_documentation,
 #        gdkmm_extra_h_files, gtkmm_extra_h_files, gdkmm_built_h_file_targets,
-#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py
+#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py,
+#        can_add_dist_script
 # Output: install_docdir, install_devhelpdir, tag_file
 
 tag_file_modules = [
@@ -161,9 +162,8 @@ endforeach
 
 install_data(image_files, install_dir: install_image_docdir)
 
-if not meson.is_subproject()
+if can_add_dist_script
   # Distribute built files and files copied by mm-common-get.
-  # (add_dist_script() is not allowed in a subproject)
   meson.add_dist_script(
     python3.path(), doc_reference_py, 'dist_doc',
     doctool_dir,

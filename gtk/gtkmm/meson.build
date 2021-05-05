@@ -5,7 +5,7 @@
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, build_x11_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_extra_gendef_cpp_args,
-#        gtkmm_libname, macos_darwin_versions
+#        gtkmm_libname, macos_darwin_versions, can_add_dist_script
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_own_dep
 
@@ -549,9 +549,8 @@ meson.add_install_script(
   gtkmm_used_hg_ccg_basenames
 )
 
-if not meson.is_subproject()
+if can_add_dist_script
   # Distribute built files.
-  # (add_dist_script() is not allowed in a subproject)
   meson.add_dist_script(
     python3.path(), generate_binding_py, 'dist_built_files',
     built_h_cc_dir,

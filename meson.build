@@ -342,6 +342,9 @@ if is_msvc
   gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
+# add_dist_script() is not allowed in a subproject if meson.version() < 0.58.0.
+can_add_dist_script = not meson.is_subproject() or meson.version().version_compare('>= 0.58.0')
+
 subdir('tools/extra_defs_gen')
 subdir('MSVC_NMake/gendef')
 subdir('gdk')
@@ -354,9 +357,8 @@ subdir('tests')
 subdir('demos/gtk-demo')
 subdir('docs/reference')
 
-if not meson.is_subproject()
+if can_add_dist_script
   # Add a ChangeLog file to the distribution directory.
-  # (add_dist_script() is not allowed in a subproject)
   meson.add_dist_script(
     python3.path(), dist_changelog_py,
     project_source_root,
@@ -377,8 +379,9 @@ if not meson.is_subproject()
     'untracked' / 'build_scripts',
     dont_distribute,
   )
-else
-  # This is a subproject.
+endif
+
+if meson.is_subproject()
   gdkmm_dep = declare_dependency(
     dependencies: gdkmm_own_dep,
     variables: {
