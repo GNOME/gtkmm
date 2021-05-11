@@ -36,7 +36,7 @@ namespace Gtk
  *
  * @newin{3,98}
  */
-class GTKMM_API BitsetConstIter
+class BitsetConstIter
 {
 public:
   using iterator_category = std::bidirectional_iterator_tag;
@@ -46,20 +46,20 @@ public:
   using pointer           = void;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  BitsetConstIter() {}
-  BitsetConstIter(const GtkBitset* bitset, bool is_end);
+  GTKMM_API BitsetConstIter() {}
+  GTKMM_API BitsetConstIter(const GtkBitset* bitset, bool is_end);
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-  BitsetConstIter(const BitsetConstIter& other);
-  BitsetConstIter& operator=(const BitsetConstIter& other);
-  BitsetConstIter(BitsetConstIter&& other) noexcept;
-  BitsetConstIter& operator=(BitsetConstIter&& other) noexcept;
+  GTKMM_API BitsetConstIter(const BitsetConstIter& other);
+  GTKMM_API BitsetConstIter& operator=(const BitsetConstIter& other);
+  GTKMM_API BitsetConstIter(BitsetConstIter&& other) noexcept;
+  GTKMM_API BitsetConstIter& operator=(BitsetConstIter&& other) noexcept;
 
-  BitsetConstIter& operator++();
-  BitsetConstIter  operator++(int);
-  BitsetConstIter& operator--();
-  BitsetConstIter  operator--(int);
-  reference operator*() const;
+  GTKMM_API BitsetConstIter& operator++();
+  GTKMM_API BitsetConstIter  operator++(int);
+  GTKMM_API BitsetConstIter& operator--();
+  GTKMM_API BitsetConstIter  operator--(int);
+  GTKMM_API reference operator*() const;
 
   /** Discovers whether the iterator is valid, and not equal to end().
    * For instance,
@@ -68,9 +68,9 @@ public:
    *   do_something();
    * @endcode
    */
-  explicit operator bool() const noexcept;
+  GTKMM_API explicit operator bool() const noexcept;
 
-  bool equal(const BitsetConstIter& other) const noexcept;
+  GTKMM_API bool equal(const BitsetConstIter& other) const noexcept;
 
 private:
   std::unique_ptr<GtkBitsetIter> gobject_;
