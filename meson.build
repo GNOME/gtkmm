@@ -261,7 +261,7 @@ gui_app_ldflags = []
 #       otherwise the program will fail to link unless we defined a WinMain()
 #       for them
 if is_msvc
-  foreach wd : ['/FImsvc_recommended_pragmas.h', '/wd4267', '/wd4530', '/wd4250', '/wd4251', '/wd4273', '/wd4275', '/wd4805']
+  foreach wd : ['/FImsvc_recommended_pragmas.h', '/wd4267', '/EHsc', '/wd4250', '/wd4805']
     disabled_warning = cpp_compiler.get_supported_arguments(wd)
     add_project_arguments(disabled_warning, language: 'cpp')
   endforeach
