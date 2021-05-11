@@ -67,28 +67,28 @@ class GTKMM_API TreeModelColumnBase;
  * sure it's instantiated after Gtk::Main), even when creating multiple models
  * from it.
  */
-class GTKMM_API TreeModelColumnRecord
+class TreeModelColumnRecord
 {
 public:
-  TreeModelColumnRecord();
-  virtual ~TreeModelColumnRecord() noexcept;
+  GTKMM_API TreeModelColumnRecord();
+  GTKMM_API virtual ~TreeModelColumnRecord() noexcept;
 
   /** Adds a TreeModelColumn to this record.
    * add() not only registers the @a column, but also assigns a column
    * index to it.  Once registered, the TreeModelColumn is final, and
    * you're free to pass it around by value.
    */
-  void add(TreeModelColumnBase& column);
+  GTKMM_API void add(TreeModelColumnBase& column);
 
-  unsigned int size()  const;
-  const GType* types() const;
+  GTKMM_API unsigned int size()  const;
+  GTKMM_API const GType* types() const;
 
 private:
   std::vector<GType> column_types_;
 
   // noncopyable
-  TreeModelColumnRecord(const TreeModelColumnRecord&);
-  TreeModelColumnRecord& operator=(const TreeModelColumnRecord&);
+  GTKMM_API TreeModelColumnRecord(const TreeModelColumnRecord&);
+  GTKMM_API TreeModelColumnRecord& operator=(const TreeModelColumnRecord&);
 };
 
 
