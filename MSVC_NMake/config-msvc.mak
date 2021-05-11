@@ -149,8 +149,7 @@ GDKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\gdk /I..\untracked\gdk\gdkmm	\
 	/I..\gdk /I.\gdkmm	\
-	/wd4251 /wd4275 /wd4530	/std:c++17	\
-	/FImsvc_recommended_pragmas.h /utf-8
+	/std:c++17 /EHsc /FImsvc_recommended_pragmas.h /utf-8
 
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
@@ -171,10 +170,20 @@ LIBGTKMM_CFLAGS =	\
 
 GTKMM_DEMO_CFLAGS =	\
 	$(GTKMM_BASE_CFLAGS)	\
-	$(GTKMM_INCLUDES)
+	$(GTKMM_INCLUDES)	\
+	$(CFLAGS)
 
 # We build gtkmm-vc$(VSVER_LIB)-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll or
 #          gtkmm-vc$(VSVER_LIB)-d-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll at least
+
+# With /GL, gtkmm3-demo fails on VS 2015 and 2017 32 bit
+# with an internal compiler error...
+!if $(VSVER) < 16 && "$(PLAT)" == "Win32"
+GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/GL=)
+GTKMM_DEMO_LDFLAGS = $(LDFLAGS_NOLTCG)
+!else
+GTKMM_DEMO_LDFLAGS = $(LDFLAGS)
+!endif
 
 !if $(VSVER) > 14 && "$(USE_COMPAT_LIBS)" != ""
 MESON_VERVER_LIB =

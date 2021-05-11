@@ -67,12 +67,12 @@ $<
 
 {..\demos\gtk-demo\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.obj::
 	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo
-	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
+	$(CXX) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
 $<
 <<
 
 {vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.c{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.obj::
-	$(CC) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
+	$(CC) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
 $<
 <<
 
@@ -102,7 +102,7 @@ $(gdkmm_OBJS) $(gtkmm_OBJS)
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 $(GTKMM4_DEMO): $(GTKMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo $(gtkmm_demo_OBJS)
-	link $(LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
+	link $(GTKMM_DEMO_LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
 $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
