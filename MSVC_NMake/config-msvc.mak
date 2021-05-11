@@ -124,12 +124,10 @@ GTKMM_DEMO_DEP_LIBS = $(GTKMM_DEP_LIBS) $(EPOXY_LIB)
 
 # CXXFLAGS
 GDKMM_BASE_CFLAGS =		\
-	/EHsc	\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\gdk	\
 	/I..\gdk /I.\gdkmm	\
-	/wd4530 /wd4251 /wd4273 /wd4275	\
-	/FImsvc_recommended_pragmas.h
+	/EHsc /FImsvc_recommended_pragmas.h
 
 !if $(VSVER) >= 14
 GDKMM_BASE_CFLAGS =		\
@@ -156,12 +154,16 @@ LIBGTKMM_CFLAGS =	\
 
 GTKMM_DEMO_CFLAGS =	\
 	$(GTKMM_BASE_CFLAGS)	\
-	$(GTKMM_INCLUDES)
+	$(GTKMM_INCLUDES)	\
+	$(CFLAGS)
 
-# With /EHsc, gtkmm3-demo fails on VS 2015 and 2017 32 bit
+# With /GL, gtkmm3-demo fails on VS 2015 and 2017 32 bit
 # with an internal compiler error...
 !if $(VSVER) < 16 && "$(PLAT)" == "Win32"
-GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/EHsc=)
+GTKMM_DEMO_CFLAGS = $(GTKMM_DEMO_CFLAGS:/GL=)
+GTKMM_DEMO_LDFLAGS = $(LDFLAGS_NOLTCG)
+!else
+GTKMM_DEMO_LDFLAGS = $(LDFLAGS)
 !endif
 
 # We build gdkmm-vc$(VSVER_LIB)-$(GTKMM_MAJOR_VERSION)_$(GTKMM_MINOR_VERSION).dll or

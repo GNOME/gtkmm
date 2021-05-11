@@ -64,12 +64,12 @@ $<
 	rc /fo$@ $<
 
 {..\demos\gtk-demo\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
-	$(CXX) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
+	$(CXX) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
 $<
 <<
 
 {vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.c{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\}.obj::
-	$(CC) $(GTKMM_DEMO_CFLAGS) $(CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
+	$(CC) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\ /c @<<
 $<
 <<
 
@@ -111,7 +111,7 @@ $(gtkmm_OBJS)
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 $(GTKMM3_DEMO): $(GTKMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo $(gtkmm_demo_OBJS)
-	link $(LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
+	link $(GTKMM_DEMO_LDFLAGS) $(GTKMM_LIB) $(GDKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
 $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
