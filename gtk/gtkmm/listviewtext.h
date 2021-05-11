@@ -112,7 +112,7 @@ public:
 
 protected:
 
- class GTKMM_API TextModelColumns : public Gtk::TreeModel::ColumnRecord
+ class TextModelColumns : public Gtk::TreeModel::ColumnRecord
   {
   public:
     TextModelColumns(guint columns_count);
