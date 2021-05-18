@@ -16,12 +16,21 @@ tag_file_modules = [
   'atkmm-1.6',
 ]
 doxygen_tagfiles = ''
+doxygen_tag_targets = []
 docinstall_flags = []
 foreach module : tag_file_modules
   depmod = dependency(module, required: false)
   if depmod.found()
     doxytagfile = depmod.get_variable(pkgconfig: 'doxytagfile', internal: 'doxytagfile', default_value: '')
     if doxytagfile != ''
+      if depmod.type_name() == 'internal'
+        # Subprojects must build their tag files before doxygen is called.
+        if module.startswith('mm-common')
+          doxygen_tag_targets += subproject('mm-common').get_variable('global_tag_file_target')
+        else
+          doxygen_tag_targets += subproject(module).get_variable('global_tag_file_target')
+        endif
+      endif
       htmlrefpub = depmod.get_variable(pkgconfig: 'htmlrefpub', internal: 'htmlrefpub', default_value: '')
       htmlrefdir = depmod.get_variable(pkgconfig: 'htmlrefdir', internal: 'htmlrefdir', default_value: '')
       if htmlrefpub == ''
@@ -55,7 +64,7 @@ doc_conf_data.set('abs_top_srcdir', project_source_root)
 doc_conf_data.set('GTKMM_MODULE_NAME', book_name)
 doc_conf_data.set('DOXYGEN_TAGFILES', doxygen_tagfiles)
 
-configure_file(
+doxyfile = configure_file(
   input: 'Doxyfile.in',
   output: '@BASENAME@',
   configuration: doc_conf_data,
@@ -123,6 +132,8 @@ tag_file = custom_target('html_and_tag',
     src_h_files,
     built_h_files,
   ],
+  depend_files: doxyfile,
+  depends: doxygen_tag_targets,
   build_by_default: build_documentation,
   install: true,
   install_dir: install_reference_docdir,
