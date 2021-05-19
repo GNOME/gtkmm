@@ -32,7 +32,7 @@
  * @ref TextView "TextView".
  *
  * See also the
- * <a href="https://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
+ * <a href="https://library.gnome.org/devel/gtkmm-tutorial/3.24/">Programming
  * with gtkmm</a> book.
  *
  * @section features Features

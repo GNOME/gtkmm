@@ -388,7 +388,7 @@ endif
 if meson.is_subproject()
   pkgconfig_vars = {
     'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
-    'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/unstable/'
+    'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/3.24/'
   }
   if build_documentation
     pkgconfig_vars += {'doxytagfile': tag_file.full_path()}
