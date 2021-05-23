@@ -65,6 +65,40 @@ Example_Builder::Example_Builder(
   refActions->add_action("cut", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
   refActions->add_action("paste", sigc::mem_fun(*this, &Example_Builder::on_not_implemented));
   insert_action_group("win", refActions);
+
+  auto controller = Gtk::ShortcutController::create();
+  controller->set_scope(Gtk::ShortcutScope::GLOBAL);
+  add_controller(controller);
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_n, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.new")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_o, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.open")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.save")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK|Gdk::ModifierType::SHIFT_MASK),
+    Gtk::NamedAction::create("win.save-as")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_q, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.quit")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_c, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.copy")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_x, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.cut")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_v, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("win.paste")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_F1),
+    Gtk::NamedAction::create("win.help")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_F7),
+    Gtk::NamedAction::create("win.about")));
 }
 
 Example_Builder::~Example_Builder()
