@@ -41,4 +41,23 @@ Glib::ValueBase DropTarget::get_value() const
   return retvalue;
 }
 
+// We hand-code get_drop().
+// gtk_drop_target_get_drop() is deprecated in gtk 4.4.
+// We can't use the replacement gtk_drop_target_get_current_drop(),
+// which is new in gtk 4.4. This version of gtkmm does not require gtk 4.4.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+Glib::RefPtr<Gdk::Drop> DropTarget::get_drop()
+{
+  auto retvalue = Glib::wrap(gtk_drop_target_get_drop(gobj()));
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+Glib::RefPtr<const Gdk::Drop> DropTarget::get_drop() const
+{
+  return const_cast<DropTarget*>(this)->get_drop();
+}
+G_GNUC_END_IGNORE_DEPRECATIONS
+
 } // namesoace Gtk
