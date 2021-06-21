@@ -104,6 +104,7 @@ gtkmm_any_hg_ccg_basenames = [
   'eventcontroller',
   'eventcontrollerfocus',
   'eventcontrollerkey',
+  'eventcontrollerlegacy',
   'eventcontrollermotion',
   'eventcontrollerscroll',
   'expander',
