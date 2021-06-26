@@ -342,7 +342,7 @@ void Example_TreeView_TreeStore::add_columns()
       pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
 
       pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(50);
+      pColumn->set_fixed_width(60);
       pColumn->set_clickable();
     }
   }
@@ -359,7 +359,7 @@ void Example_TreeView_TreeStore::add_columns()
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(50);
+      pColumn->set_fixed_width(60);
       pColumn->set_clickable();
     }
   }
@@ -377,7 +377,7 @@ void Example_TreeView_TreeStore::add_columns()
       pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
 
       pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(50);
+      pColumn->set_fixed_width(60);
       pColumn->set_clickable();
     }
   }
@@ -394,7 +394,7 @@ void Example_TreeView_TreeStore::add_columns()
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(50);
+      pColumn->set_fixed_width(60);
       pColumn->set_clickable();
     }
   }
@@ -411,7 +411,7 @@ void Example_TreeView_TreeStore::add_columns()
       pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
 
       pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(50);
+      pColumn->set_fixed_width(60);
       pColumn->set_clickable();
     }
   }

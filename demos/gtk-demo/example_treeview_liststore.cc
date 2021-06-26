@@ -175,9 +175,9 @@ void Example_TreeView_ListStore::add_columns()
     int cols_count = m_TreeView.append_column_editable("Fixed?", m_columns.fixed);
     auto pColumn = m_TreeView.get_column(cols_count-1);
 
-    /* set this column to a fixed sizing (of 50 pixels) */
+    /* set this column to a fixed sizing (of 60 pixels) */
     pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-    pColumn->set_fixed_width(50);
+    pColumn->set_fixed_width(60);
     pColumn->set_clickable();
   }
 
