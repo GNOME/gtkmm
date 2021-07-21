@@ -27,6 +27,7 @@ Gtk::Window* do_iconbrowser();
 Gtk::Window* do_iconview();
 Gtk::Window* do_images();
 Gtk::Window* do_listview_applauncher();
+Gtk::Window* do_listview_columnview();
 Gtk::Window* do_overlay();
 Gtk::Window* do_panes();
 Gtk::Window* do_pixbufs();
@@ -51,6 +52,7 @@ Demo child0[] =
 Demo child1[] =
 {
   { "Application launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr },
+  { "Column View", "example_listview_columnview.cc", sigc::ptr_fun(&do_listview_columnview), nullptr },
   { nullptr, nullptr, type_slotDo(), nullptr }
 };
 

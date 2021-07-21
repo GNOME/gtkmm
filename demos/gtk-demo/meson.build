@@ -21,6 +21,7 @@ gtkmm_demo_cc_files = [
   'example_iconview.cc',
   'example_images.cc',
   'example_listview_applauncher.cc',
+  'example_listview_columnview.cc',
   'example_overlay.cc',
   'example_panes.cc',
   'example_pixbufs.cc',
