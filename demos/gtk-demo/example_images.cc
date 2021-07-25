@@ -30,7 +30,8 @@ protected:
   void start_progressive_loading();
 
   //Signal handlers:
-  bool on_timeout();
+  void on_animation_timeout();
+  bool on_progressive_timeout();
   void on_loader_area_prepared();
   void on_loader_area_updated(int x, int y, int width, int height);
   void on_toggle_sensitivity();
@@ -44,6 +45,7 @@ protected:
   Gtk::Frame m_Frame_Image;
   Gtk::Label m_Label_Animation;
   Gtk::Frame m_Frame_Animation;
+  Gtk::Picture m_Picture_Animation;
   Gtk::Label m_Label_ThemedIcon;
   Gtk::Frame m_Frame_ThemedIcon;
   Gtk::Label m_Label_Progressive;
@@ -54,6 +56,7 @@ protected:
   Gtk::Label m_Label_Paintable;
   Gtk::ToggleButton m_ToggleButton;
 
+  Glib::RefPtr<Gdk::PixbufAnimationIter> m_refPixbufAnimationIter;
   Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
   Glib::RefPtr<Gio::InputStream> m_image_stream;
   std::unique_ptr<Gtk::MessageDialog> m_pMessageDialog;
@@ -97,16 +100,19 @@ Example_Images::Example_Images()
 
   /* Animation */
 
-  m_Label_Animation.set_markup("<u>Animation loaded from a file</u>");
+  m_Label_Animation.set_markup("<u>Animation loaded from a resource</u>");
   pVBox->append(m_Label_Animation);
 
   m_Frame_Animation.set_halign(Gtk::Align::CENTER);
   m_Frame_Animation.set_valign(Gtk::Align::CENTER);
   pVBox->append(m_Frame_Animation);
 
-  auto pPicture = Gtk::make_managed<Gtk::Picture>();
-  pPicture->set_resource("/images/floppybuddy.gif");
-  m_Frame_Animation.set_child(*pPicture);
+  auto animation = Gdk::PixbufAnimation::create_from_resource("/images/floppybuddy.gif");
+  m_refPixbufAnimationIter = animation->get_iter();
+  m_Frame_Animation.set_child(m_Picture_Animation);
+
+  // Fill in the first pixbuf and start a timer.
+  on_animation_timeout();
 
   /* Symbolic themed icon */
 
@@ -163,7 +169,7 @@ Example_Images::Example_Images()
   m_Label_Paintable.set_markup("<u>Gtk::WidgetPaintable</u>");
   pVBox->append(m_Label_Paintable);
 
-  pPicture = Gtk::make_managed<Gtk::Picture>();
+  auto pPicture = Gtk::make_managed<Gtk::Picture>();
   auto demo_window = DemoWindow::get_demo_window();
   if (demo_window)
   {
@@ -192,6 +198,18 @@ Example_Images::~Example_Images()
   }
 }
 
+void Example_Images::on_animation_timeout()
+{
+  auto delay = m_refPixbufAnimationIter->get_delay_time();
+  Glib::signal_timeout().connect_once(
+    sigc::mem_fun(*this, &Example_Images::on_animation_timeout), delay);
+
+  m_refPixbufAnimationIter->advance();
+  auto pixbuf = m_refPixbufAnimationIter->get_pixbuf();
+  auto texture = Gdk::Texture::create_for_pixbuf(pixbuf);
+  m_Picture_Animation.set_paintable(texture);
+}
+
 void Example_Images::init_message_dialog()
 {
   if (!m_pMessageDialog)
@@ -207,10 +225,10 @@ void Example_Images::init_message_dialog()
 
 void Example_Images::start_progressive_loading()
 {
-  Glib::signal_timeout().connect(sigc::mem_fun(*this, &Example_Images::on_timeout), 150);
+  Glib::signal_timeout().connect(sigc::mem_fun(*this, &Example_Images::on_progressive_timeout), 150);
 }
 
-bool Example_Images::on_timeout()
+bool Example_Images::on_progressive_timeout()
 {
   /* This shows off fully-paranoid error handling, so looks scary.
    * You could factor out the error handling code into a nice separate
