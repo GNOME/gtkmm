@@ -20,6 +20,20 @@
 
 namespace Gdk
 {
+// We hand-code get_shared_context().
+// gdk_gl_context_get_shared_context()is deprecated in gtk >= 4.3.2.
+// Make it possible to build this version of gtkmm with a new gtk without
+// a deprecation warning.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+Glib::RefPtr<GLContext> GLContext::get_shared_context()
+{
+  auto retvalue = Glib::wrap(gdk_gl_context_get_shared_context(gobj()));
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+G_GNUC_END_IGNORE_DEPRECATIONS
+
 void GLContext::unset_use_es()
 {
   gdk_gl_context_set_use_es(gobj(), -1);
