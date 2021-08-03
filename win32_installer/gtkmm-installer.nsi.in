@@ -23,6 +23,22 @@
 ; Settings
 
 ; !define RUNTIME_ONLY 1
+; !define C_LIBS_MINGW_GETTEXT 1
+; !define C_LIBS_MINGW 1
+; !define CXX_LIBS_MINGW 1
+; !define MSVC_USE_FONTCONFIG 1
+; !define MSVC_USE_LIBTHAI 1
+!define MSVC_USE_ICU 1
+!define ICU_RELEASE 67
+
+!define MSVC_C_VSVER 14
+!define MSVC_CXX_VSVER 140
+
+!if $(MSVC_CXX_VSVER) == 140
+!define LIBXMLPP3_VSVER 141
+!else
+!define LIBXMLPP3_VSVER $(MSVC_CXX_VSVER)
+!endif
 
 !ifndef PRODUCT_VERSION_MAJOR
 !define PRODUCT_VERSION_MAJOR "@GTKMM_MAJOR_VERSION@"
@@ -34,7 +50,7 @@
 !define PRODUCT_VERSION_MICRO "@GTKMM_MICRO_VERSION@"
 !endif
 !ifndef PRODUCT_VERSION_INSTALLER
-!define PRODUCT_VERSION_INSTALLER "2"
+!define PRODUCT_VERSION_INSTALLER "3"
 !endif
 
 !ifdef PRODUCT_API_VERSION
@@ -214,14 +230,9 @@ Section "Runtime" SecGTKRuntime
 
   SetOutPath $INSTDIR\bin
 
+; TODO: MinGW/mingw-w64 DLL listings may be incomplete/incorrect (such as pixman, librsvg, harfbuzz)
+!ifdef C_LIBS_MINGW
   File ${BINDIR}\libgcc_s_sjlj-1.dll
-
-  ; These break when stripped, therefore we always load them from bin/
-  File bin\zlib1.dll
-  File bin\intl.dll
-;  File bin\charset.dll
-;  File bin\iconv.dll
-
   File ${BINDIR}\libxml2-2.dll
 ;  File ${BINDIR}\libjpeg-7.dll
   File ${BINDIR}\libpng14-14.dll
@@ -235,57 +246,155 @@ Section "Runtime" SecGTKRuntime
   File ${BINDIR}\libgthread-2.0-0.dll
   File ${BINDIR}\libgio-2.0-0.dll
   File ${BINDIR}\libcairo-2.dll
+  File ${BINDIR}\libcairo-gobject-2.dll
   File ${BINDIR}\libatk-1.0-0.dll
   File ${BINDIR}\libpango-1.0-0.dll
   File ${BINDIR}\libpangocairo-1.0-0.dll
   File ${BINDIR}\libpangoft2-1.0-0.dll
   File ${BINDIR}\libpangowin32-1.0-0.dll
   File ${BINDIR}\libgailutil-18.dll
-  File ${BINDIR}\libgdk-win32-2.0-0.dll
+  File ${BINDIR}\libgdk-3.0-0.dll
   File ${BINDIR}\libgdk_pixbuf-2.0-0.dll
-  File ${BINDIR}\libgtk-win32-2.0-0.dll
-  File ${BINDIR}\libglade-2.0-0.dll
+  File ${BINDIR}\libgtk-3-0.dll
+!else
+  File ${BINDIR}\pcre.dll
+  File ${BINDIR}\ffi-7.dll
+  File ${BINDIR}\libbz2.dll
+  File ${BINDIR}\brotlicommon.dll
+  File ${BINDIR}\brotlidec.dll
+  File ${BINDIR}\jpeg-8.dll
+  File ${BINDIR}\libpng16.dll
+  File ${BINDIR}\epoxy-0.dll
+  File ${BINDIR}\fribidi-0.dll
+  File ${BINDIR}\freetype.dll
+  File ${BINDIR}\tiff.dll
+  File ${BINDIR}\libxml2.dll
+  File ${BINDIR}\glib-2.0-0.dll
+  File ${BINDIR}\gthread-2.0-0.dll
+  File ${BINDIR}\gobject-2.0-0.dll
+  File ${BINDIR}\gmodule-2.0-0.dll
+  File ${BINDIR}\gio-2.0-0.dll
+  File ${BINDIR}\harfbuzz.dll
+  File ${BINDIR}\pixman-1-0.dll
+  File ${BINDIR}\cairo-2.dll
+  File ${BINDIR}\cairo-gobject-2.dll
+  File ${BINDIR}\atk-1.0-0.dll
+  File ${BINDIR}\pango-1.0-0.dll
+  File ${BINDIR}\pangocairo-1.0-0.dll
+  File ${BINDIR}\pangowin32-1.0-0.dll
+!ifdef MSVC_USE_FONTCONFIG
+  File ${BINDIR}\pangoft2-1.0-0.dll
+  File ${BINDIR}\fontconfig.dll
+  File ${BINDIR}\libexpat.dll
+!endif
+!ifdef MSVC_USE_ICU
+  File ${BINDIR}\icuuc$(ICU_RELEASE).dll
+  File ${BINDIR}\icudt$(ICU_RELEASE).dll
+!endif
+!ifdef MSVC_USE_LIBTHAI
+  File ${BINDIR}\thai.dll
+  File ${BINDIR}\datrie.dll
+!endif
+  File ${BINDIR}\gdk_pixbuf-2.0-0.dll
+  File ${BINDIR}\gdk-3-vs$(MSVC_C_VSVER).dll
+  File ${BINDIR}\gtk-3-vs$(MSVC_C_VSVER).dll
+  File ${BINDIR}\gailutil-3-vs$(MSVC_C_VSVER).dll
+  File ${BINDIR}\rsvg-2.0-vs$(MSVC_C_VSVER).dll
+!endif
+
+  ; These break when stripped, therefore we always load them from bin/
+  File bin\zlib1.dll
+!ifdef C_LIBS_MINGW_GETTEXT
+  File bin\intl-8.dll
+!else
+  File bin\intl.dll
+!endif
+  File bin\charset.dll
+  File bin\iconv.dll
+
   File ${BINDIR}\gspawn-win32-helper.exe
   File ${BINDIR}\gspawn-win32-helper-console.exe
   File ${BINDIR}\gtk-update-icon-cache.exe
-  File ${BINDIR}\gtk-demo.exe
+  File ${BINDIR}\gtk3-demo.exe
+  File ${BINDIR}\gtk3-demo-application.exe
+  File ${BINDIR}\gtk3-widget-factory.exe
 
-  SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0
-  File /r lib\gtk-2.0\2.10.0\engines
+!ifndef RUNTIME_ONLY
+
+; MSVC .pdb files
+  File ${BINDIR}\pcre.pdb
+  File ${BINDIR}\ffi-7.pdb
+  File ${BINDIR}\libbz2.pdb
+  File ${BINDIR}\brotlicommon.pdb
+  File ${BINDIR}\brotlidec.pdb
+  File ${BINDIR}\jpeg-8.pdb
+  File ${BINDIR}\libpng16.pdb
+  File ${BINDIR}\epoxy-0.pdb
+  File ${BINDIR}\fribidi-0.pdb
+  File ${BINDIR}\freetype.pdb
+  File ${BINDIR}\tiff.pdb
+  File ${BINDIR}\libxml2.pdb
+  File ${BINDIR}\glib-2.0-0.pdb
+  File ${BINDIR}\gthread-2.0-0.pdb
+  File ${BINDIR}\gobject-2.0-0.pdb
+  File ${BINDIR}\gmodule-2.0-0.pdb
+  File ${BINDIR}\gio-2.0-0.pdb
+  File ${BINDIR}\harfbuzz.pdb
+  File ${BINDIR}\pixman-1-0.pdb
+  File ${BINDIR}\cairo-2.pdb
+  File ${BINDIR}\cairo-gobject-2.pdb
+  File ${BINDIR}\atk-1.0-0.pdb
+  File ${BINDIR}\pango-1.0-0.pdb
+  File ${BINDIR}\pangocairo-1.0-0.pdb
+  File ${BINDIR}\pangowin32-1.0-0.pdb
+!ifdef MSVC_USE_FONTCONFIG
+  File ${BINDIR}\pangoft2-1.0-0.pdb
+  File ${BINDIR}\fontconfig.pdb
+  File ${BINDIR}\libexpat.pdb
+!endif
+!ifdef MSVC_USE_ICU
+  File ${BINDIR}\icuuc.pdb
+  File ${BINDIR}\icudt.pdb
+!endif
+!ifdef MSVC_USE_LIBTHAI
+  File ${BINDIR}\thai.pdb
+  File ${BINDIR}\datrie.pdb
+!endif
+  File ${BINDIR}\gdk_pixbuf-2.0-0.pdb
+  File ${BINDIR}\gdk-3-vs$(MSVC_C_VSVER).pdb
+  File ${BINDIR}\gtk-3-vs$(MSVC_C_VSVER).pdb
+  File ${BINDIR}\gailutil-3-vs$(MSVC_C_VSVER).pdb
+  File ${BINDIR}\rsvg-2.0-vs$(MSVC_C_VSVER).pdb
+  File bin\zlib1.pdb
+!ifdef C_LIBS_MINGW_GETTEXT
+  File bin\intl-8.pdb
+!else
+  File bin\intl.pdb
+!endif
+  File bin\charset.pdb
+  File bin\iconv.pdb
+!endif
+
+  File ${BINDIR}\gspawn-win32-helper.pdb
+  File ${BINDIR}\gspawn-win32-helper-console.pdb
+  File ${BINDIR}\gtk-update-icon-cache.pdb
+  File ${BINDIR}\gtk3-demo.pdb
+  File ${BINDIR}\gtk3-demo-application.pdb
+  File ${BINDIR}\gtk3-widget-factory.pdb
+!endif
   SetOutPath $INSTDIR\lib\gdk-pixbuf-2.0\2.10.0
   File /r lib\gdk-pixbuf-2.0\2.10.0\loaders
 
-  SetOutPath $INSTDIR\lib\gtk-2.0
-  File /r lib\gtk-2.0\modules
-
-  SetOutPath $INSTDIR\etc
-  File /r etc\gtk-2.0
-  File /r etc\pango
-
-  ; TODO: Add others... libiconv, fontconfig, libxml2, tiff... however note
-  ; that some contain devel-only things.
-  SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-2.26.0
-  File /r share\doc\cairo_1.10.0-1_win32
-  File /r share\doc\pango-1.28.3
-  File /r share\doc\gtk+-2.22.0
-
   SetOutPath $INSTDIR\share
   File /r share\locale
-  File /r share\themes
-; Only required for gtk-demo:
-  File /r share\gtk-2.0
+  File /r share\icons\hicolor
+  File /r share\icons\Adwaita
 
 !ifndef RUNTIME_ONLY
   SetOutPath $INSTDIR\redist
 
+!ifdef C_LIBS_MINGW
   File bin_stripped\libgcc_s_sjlj-1.dll
-
-  ; These are broken when stripped:
-  File bin\zlib1.dll
-  File bin\intl.dll
-;  File bin\charset.dll
-;  File bin\iconv.dll
 
   File bin_stripped\libxml2-2.dll
 ;  File bin_stripped\libjpeg-7.dll
@@ -312,6 +421,56 @@ Section "Runtime" SecGTKRuntime
   File bin_stripped\libglade-2.0-0.dll
   File bin_stripped\gspawn-win32-helper.exe
   File bin_stripped\gspawn-win32-helper-console.exe
+!else
+  File bin_stripped\pcre.dll
+  File bin_stripped\ffi-7.dll
+  File bin_stripped\libbz2.dll
+  File bin_stripped\brotlicommon.dll
+  File bin_stripped\brotlidec.dll
+  File bin_stripped\jpeg-8.dll
+  File bin_stripped\libpng16.dll
+  File bin_stripped\epoxy-0.dll
+  File bin_stripped\fribidi-0.dll
+  File bin_stripped\freetype.dll
+  File bin_stripped\tiff.dll
+  File bin_stripped\libxml2.dll
+  File bin_stripped\glib-2.0-0.dll
+  File bin_stripped\gthread-2.0-0.dll
+  File bin_stripped\gobject-2.0-0.dll
+  File bin_stripped\gmodule-2.0-0.dll
+  File bin_stripped\gio-2.0-0.dll
+  File bin_stripped\harfbuzz.dll
+  File bin_stripped\pixman-1-0.dll
+  File bin_stripped\cairo-2.dll
+  File bin_stripped\cairo-gobject-2.dll
+  File bin_stripped\atk-1.0-0.dll
+  File bin_stripped\pango-1.0-0.dll
+  File bin_stripped\pangocairo-1.0-0.dll
+  File bin_stripped\pangowin32-1.0-0.dll
+!ifdef MSVC_USE_FONTCONFIG
+  File bin_stripped\pangoft2-1.0-0.dll
+  File bin_stripped\fontconfig.dll
+  File bin_stripped\libexpat.dll
+!endif
+!ifdef MSVC_USE_ICU
+  File bin_stripped\icuuc$(ICU_RELEASE).dll
+  File bin_stripped\icudt$(ICU_RELEASE).dll
+!endif
+!ifdef MSVC_USE_LIBTHAI
+  File bin_stripped\thai.dll
+  File bin_stripped\datrie.dll
+!endif
+  File bin_stripped\gdk_pixbuf-2.0-0.dll
+  File bin_stripped\gdk-3-vs$(MSVC_C_VSVER).dll
+  File bin_stripped\gtk-3-vs$(MSVC_C_VSVER).dll
+  File bin_stripped\gailutil-3-vs$(MSVC_C_VSVER).dll
+  File bin_stripped\rsvg-2.0-vs$(MSVC_C_VSVER).dll
+
+  ; These are broken when stripped:
+  File bin\zlib1.dll
+  File bin\intl.dll
+  File bin\charset.dll
+  File bin\iconv.dll
 !endif
 
 SectionEnd
@@ -324,139 +483,176 @@ Section "Development" SecGTKDevelopment
   SetOutPath $INSTDIR\bin
 
   ; Again, we always use the non-stripped version here since stripping breaks it
-;  File bin\iconv.exe
+  File bin\iconv.exe
 
   ; These are only useful to developers
   File ${BINDIR}\pkg-config.exe
-  File ${BINDIR}\glib-genmarshal.exe
-  File ${BINDIR}\glib-gettextize
+  File ${BINDIR}\glib-genmarshal
   File ${BINDIR}\glib-mkenums
   File ${BINDIR}\gobject-query.exe
-  File ${BINDIR}\pango-querymodules.exe
   File ${BINDIR}\gdk-pixbuf-csource.exe
   File ${BINDIR}\gdk-pixbuf-query-loaders.exe
-  File ${BINDIR}\gtk-builder-convert
-  File ${BINDIR}\gtk-query-immodules-2.0.exe
+!ifdef C_LIBS_MINGW
+  File ${BINDIR}\glib-gettextize
+!else
+  File ${BINDIR}\iconv.pdb
+
+  File ${BINDIR}\pkg-config.pdb
+  File ${BINDIR}\gobject-query.pdb
+  File ${BINDIR}\gdk-pixbuf-csource.pdb
+  File ${BINDIR}\gdk-pixbuf-query-loaders.pdb
+!endif
 
   SetOutPath $INSTDIR\include
   File /r include\libxml2
   File /r include\freetype2
+
+!ifdef C_LIBS_MINGW
   File /r include\fontconfig
-  File /r include\libpng14
+  File include\expat.h
+  File include\expat_external.h
+!endif
+!ifdef MSVC_USE_FONTCONFIG
+  File /r include\fontconfig
+  File include\expat.h
+  File include\expat_external.h
+!endif
+!ifdef MSVC_USE_ICU
+  File /r include\unicode
+!endif
   File /r include\glib-2.0
-  File /r include\cairo
+  File /r include\harfbuzz
   File /r include\atk-1.0
   File /r include\pango-1.0
   File /r include\gdk-pixbuf-2.0
-  File /r include\gtk-2.0
-  File /r include\libglade-2.0
-  File /r include\gail-1.0
+  File /r include\gtk-3.0
+  File /r include\gail-3.0
+  File /r include\librsvg-2.0
 
-  File include\expat.h
-  File include\expat_external.h
   File include\ft2build.h
-;  File include\iconv.h
-;  File include\jconfig.h
-;  File include\jerror.h
-;  File include\jmorecfg.h
-;  File include\jpeglib.h
-;  File include\libcharset.h
-;  File include\localcharset.h
+  File include\iconv.h
+  File include\jconfig.h
+  File include\jerror.h
+  File include\jmorecfg.h
+  File include\jpeglib.h
+  File include\libcharset.h
+  File include\localcharset.h
   File include\libintl.h
+  File include\pcre.h
   File include\png.h
   File include\pngconf.h
-;  File include\tiff.h
-;  File include\tiffconf.h
-;  File include\tiffio.h
-;  File include\tiffvers.h
+  File include\tiff.h
+  File include\tiffconf.h
+  File include\tiffio.h
+  File include\tiffvers.h
   File include\zconf.h
   File include\zlib.h
-
-  SetOutPath $INSTDIR\lib\gtk-2.0
-  File /r lib\gtk-2.0\include
 
   SetOutPath $INSTDIR\lib\glib-2.0
   File /r lib\glib-2.0\include
 
-  SetOutPath $INSTDIR\lib\gtk-2.0
-  File /r lib\gtk-2.0\include
-
   SetOutPath $INSTDIR\lib
-  File lib\libxml2.lib
+!ifdef C_LIBS_MINGWs
+; TODO: MinGW C library names may not be accurate!
   File lib\libxml2.dll.a
-;  File lib\charset.lib
-;  File lib\iconv.lib
-;  File lib\libiconv.a
+  File lib\libiconv.a
   File lib\libintl.def
-  File lib\intl.lib
   File lib\libintl.dll.a
 ;  File lib\libtiff.def Is no longer provided by the bundle since 2.16.6
 ;  File lib\libtiff.lib Is no longer provided by the bundle since 2.16.6
 ;  File lib\libtiff.dll.a
   File lib\libpng.def
-  File lib\libpng.lib
   File lib\libpng14.dll.a
   File lib\zlib.def
-  File lib\zdll.lib
   File lib\libz.dll.a
   File lib\libfreetype.dll.a
   File lib\libexpat.def
   File lib\expat.lib
-  File lib\libexpat.dll.a
   File lib\fontconfig.def
   File lib\fontconfig.lib
   File lib\libfontconfig.dll.a
+  File lib\libexpat.dll.a
   File lib\glib-2.0.def
-  File lib\glib-2.0.lib
   File lib\libglib-2.0.dll.a
   File lib\gobject-2.0.def
-  File lib\gobject-2.0.lib
   File lib\libgobject-2.0.dll.a
   File lib\gmodule-2.0.def
-  File lib\gmodule-2.0.lib
   File lib\libgmodule-2.0.dll.a
   File lib\gthread-2.0.def
-  File lib\gthread-2.0.lib
   File lib\libgthread-2.0.dll.a
   File lib\gio-2.0.def
-  File lib\gio-2.0.lib
   File lib\libgio-2.0.dll.a
   File lib\cairo.def
-  File lib\cairo.lib
   File lib\libcairo.dll.a
   File lib\atk-1.0.def
-  File lib\atk-1.0.lib
   File lib\libatk-1.0.dll.a
   File lib\pango-1.0.def
-  File lib\pango-1.0.lib
   File lib\libpango-1.0.dll.a
   File lib\pangocairo-1.0.def
-  File lib\pangocairo-1.0.lib
   File lib\libpangocairo-1.0.dll.a
   File lib\pangoft2-1.0.def
   File lib\pangoft2-1.0.lib
   File lib\libpangoft2-1.0.dll.a
   File lib\pangowin32-1.0.def
-  File lib\pangowin32-1.0.lib
   File lib\libpangowin32-1.0.dll.a
-  File lib\gailutil.lib
   File lib\libgailutil.dll.a
 ; TODO: What about .defs here?
-  File lib\gdk-win32-2.0.lib
-  File lib\libgdk-win32-2.0.dll.a
-  File lib\gdk_pixbuf-2.0.lib
   File lib\libgdk_pixbuf-2.0.dll.a
-  File lib\gtk-win32-2.0.lib
-  File lib\libgtk-win32-2.0.dll.a
-  File lib\glade-2.0.lib
-  File lib\libglade-2.0.dll.a
+  File lib\libgdk-3.dll.a
+  File lib\libgtk-3.dll.a
+  File lib\gdk-3.lib
+  File lib\gtk-3.lib
+!else
+!ifdef MSVC_USE_FONTCONFIG
+  File lib\fontconfig.lib
+  File lib\pangoft2-1.0.lib
+  File lib\expat.lib
+!endif
+!ifdef MSVC_USE_ICU
+  File lib\icuuc.lib
+  File lib\icudt.lib
+!endif
+  File lib\gdk-3.0.lib
+  File lib\gtk-3.0.lib
+!endif
+  File lib\libxml2.lib
+  File lib\charset.lib
+  File lib\iconv.lib
+  File lib\intl.lib
+  File lib\tiff.lib
+  File lib\libpng.lib
+  File lib\zlib1.lib
+  File lib\pcre.lib
+  File lib\ffi.lib
+  File lib\epoxy.lib
+  File lib\glib-2.0.lib
+  File lib\gobject-2.0.lib
+  File lib\gmodule-2.0.lib
+  File lib\gthread-2.0.lib
+  File lib\gio-2.0.lib
+  File lib\cairo.lib
+  File lib\cairo-gobject.lib
+  File lib\harfbuzz.lib
+  File lib\atk-1.0.lib
+  File lib\pango-1.0.lib
+  File lib\pangocairo-1.0.lib
+  File lib\pangowin32-1.0.lib
+  File lib\gailutil-3.0.lib
+  File lib\gdk_pixbuf-2.0.lib
+  File lib\rsvg-2.0.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\libxml-2.0.pc
-  File lib\pkgconfig\libpng.pc
-  File lib\pkgconfig\libpng14.pc
+
+!ifdef C_LIBS_MINGWs
   File lib\pkgconfig\freetype2.pc
   File lib\pkgconfig\fontconfig.pc
+  File lib\pkgconfig\pangoft2.pc
+!endif
+!ifdef MSVC_USE_FONTCONFIG
+  File lib\pkgconfig\fontconfig.pc
+  File lib\pkgconfig\pangoft2.pc
+!endif
   File lib\pkgconfig\glib-2.0.pc
   File lib\pkgconfig\gmodule-2.0.pc
   File lib\pkgconfig\gmodule-no-export-2.0.pc
@@ -473,27 +669,18 @@ Section "Development" SecGTKDevelopment
   File lib\pkgconfig\atk.pc
   File lib\pkgconfig\pango.pc
   File lib\pkgconfig\pangocairo.pc
-  File lib\pkgconfig\pangoft2.pc
   File lib\pkgconfig\pangowin32.pc
-  File lib\pkgconfig\gdk-2.0.pc
+  File lib\pkgconfig\gdk-3.0.pc
   File lib\pkgconfig\gdk-pixbuf-2.0.pc
-  File lib\pkgconfig\gdk-win32-2.0.pc
-  File lib\pkgconfig\gtk+-2.0.pc
-  File lib\pkgconfig\gtk+-win32-2.0.pc
-  File lib\pkgconfig\libglade-2.0.pc
-  File lib\pkgconfig\gail.pc
-
-  SetOutPath $INSTDIR\share\doc
-  File /r share\doc\glib-dev-2.26.0
-  File /r share\doc\pango-dev-1.28.3
-  File /r share\doc\gtk+-dev-2.22.0
-
-  SetOutPath $INSTDIR\share\xml
-  File /r share\xml\libglade
+  File lib\pkgconfig\gdk-win32-3.0.pc
+  File lib\pkgconfig\gtk+-3.0.pc
+  File lib\pkgconfig\gtk+-win32-3.0.pc
+  File lib\pkgconfig\gail-3.0.pc
 
   SetOutPath $INSTDIR\share
   File /r share\glib-2.0
 
+!ifdef C_LIBS_MINGWs
   SetOutPath $INSTDIR\share\aclocal
   File share\aclocal\libxml.m4
   File share\aclocal\freetype2.m4
@@ -501,28 +688,30 @@ Section "Development" SecGTKDevelopment
   File share\aclocal\glib-gettext.m4
   File share\aclocal\gtk-2.0.m4
   File share\aclocal\pkg.m4
+!endif
 SectionEnd
 
-Section "Documentation" SecGTKDocumentation
-  SectionIn 1
-  SetOverwrite ifnewer
+; Don't include the documentation at this point.
+;Section "Documentation" SecGTKDocumentation
+;  SectionIn 1
+;  SetOverwrite ifnewer
   
 ;  SetOutPath $INSTDIR\share\doc
 ;  File /r share\doc\libiconv
 
-  SetOutPath $INSTDIR\share\gtk-doc\html
-  File /r share\gtk-doc\html\libxml2
-  File /r share\gtk-doc\html\glib
-  File /r share\gtk-doc\html\gobject
-  File /r share\gtk-doc\html\cairo
-  File /r share\gtk-doc\html\pango
-  File /r share\gtk-doc\html\gdk
-  File /r share\gtk-doc\html\gdk-pixbuf
-  File /r share\gtk-doc\html\gtk
-  File /r share\gtk-doc\html\libglade
-  File /r share\gtk-doc\html\gail-libgail-util
+;  SetOutPath $INSTDIR\share\gtk-doc\html
+;  File /r share\gtk-doc\html\libxml2
+;  File /r share\gtk-doc\html\glib
+;  File /r share\gtk-doc\html\gobject
+;  File /r share\gtk-doc\html\cairo
+;  File /r share\gtk-doc\html\pango
+;  File /r share\gtk-doc\html\gdk
+;  File /r share\gtk-doc\html\gdk-pixbuf
+;  File /r share\gtk-doc\html\gtk
+;  File /r share\gtk-doc\html\libglade
+;  File /r share\gtk-doc\html\gail-libgail-util
 
-SectionEnd
+;SectionEnd
 !endif
 
 SubSectionEnd 
@@ -538,20 +727,21 @@ Section "Runtime" SecSigcRuntime
   SetOverwrite ifnewer
   
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libsigc-2.0-0.dll
-  File MSVC\sigc-vc80-2_0.dll
-  File MSVC\sigc-vc90-2_0.dll
-  File MSVC\sigc-vc100-2_0.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libsigc-2.0-0.dll
+  !else
+    File MSVC\sigc-2.0-0.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\sigc-2.0-0.pdb
+    !endif
+  !endif
   !ifndef RUNTIME_ONLY
-    File MSVC\sigc-vc80-d-2_0.dll
-    File MSVC\sigc-vc90-d-2_0.dll
-    File MSVC\sigc-vc100-d-2_0.dll
-    File MSVC\sigc-vc80-d-2_0.pdb
-    File MSVC\sigc-vc90-d-2_0.pdb
-    File MSVC\sigc-vc100-d-2_0.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libsigc-2.0-0.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libsigc-2.0-0.dll
+    !else
+      File MSVC\sigc-2.0-0.dll
+    !endif
   !endif
   
 SectionEnd
@@ -565,14 +755,12 @@ Section "Development" SecSigcDevelopment
   File /r include\sigc++-2.0
 
   SetOutPath $INSTDIR\lib
-  File lib\libsigc-2.0.dll.a
+  !ifdef CXX_LIBS_MINGW
+    File lib\libsigc-2.0.dll.a
+  !else
+    File MSVC\sigc-2.0.lib
+  !endif
   File /r lib\sigc++-2.0
-  File MSVC\sigc-vc80-2_0.lib
-  File MSVC\sigc-vc90-2_0.lib
-  File MSVC\sigc-vc100-2_0.lib
-  File MSVC\sigc-vc80-d-2_0.lib
-  File MSVC\sigc-vc90-d-2_0.lib
-  File MSVC\sigc-vc100-d-2_0.lib
   
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\sigc++-2.0.pc
@@ -603,20 +791,21 @@ Section "Runtime" SecCairommRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libcairomm-1.0-1.dll
-  File MSVC\cairomm-vc80-1_0.dll
-  File MSVC\cairomm-vc90-1_0.dll
-  File MSVC\cairomm-vc100-1_0.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libcairomm-1.0-1.dll
+  !else
+    File MSVC\cairomm-vc$(MSVC_CXX_VSVER)-1.0-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\cairomm-vc$(MSVC_CXX_VSVER)-1.0-1.pdb
+    !endif
+  !endif
   !ifndef RUNTIME_ONLY
-    File MSVC\cairomm-vc80-d-1_0.dll
-    File MSVC\cairomm-vc90-d-1_0.dll
-    File MSVC\cairomm-vc100-d-1_0.dll
-    File MSVC\cairomm-vc80-d-1_0.pdb
-    File MSVC\cairomm-vc90-d-1_0.pdb
-    File MSVC\cairomm-vc100-d-1_0.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libcairomm-1.0-1.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libcairomm-1.0-1.dll
+    !else
+      File MSVC\cairomm-vc$(MSVC_CXX_VSVER)-1.0-1.dll
+    !endif
   !endif
   
 SectionEnd
@@ -631,16 +820,14 @@ Section "Development" SecCairommDevelopment
 
   SetOutPath $INSTDIR\lib
   File /r lib\cairomm-1.0
-  File lib\libcairomm-1.0.dll.a
-  File MSVC\cairomm-vc80-1_0.lib
-  File MSVC\cairomm-vc90-1_0.lib
-  File MSVC\cairomm-vc100-1_0.lib
-  File MSVC\cairomm-vc80-d-1_0.lib
-  File MSVC\cairomm-vc90-d-1_0.lib
-  File MSVC\cairomm-vc100-d-1_0.lib
+  !ifdef CXX_LIBS_MINGW
+    File lib\libcairomm-1.0.dll.a
+  !else
+    File MSVC\cairomm-vc$(MSVC_CXX_VSVER)-1.0.lib
+  !endif
 
   SetOutPath $INSTDIR\lib\pkgconfig
-  File lib\pkgconfig\cairomm-1.0.pc
+  File lib\pkgconfig\cairomm-*1.0.pc
   
 SectionEnd
 
@@ -667,32 +854,29 @@ Section "Runtime" SecGlibmmRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libglibmm-2.4-1.dll
-  File ${BINDIR}\libgiomm-2.4-1.dll
-  File ${BINDIR}\libglibmm_generate_extra_defs-2.4-1.dll
-  File MSVC\glibmm-vc80-2_4.dll
-  File MSVC\glibmm-vc90-2_4.dll
-  File MSVC\glibmm-vc100-2_4.dll
-  File MSVC\giomm-vc80-2_4.dll
-  File MSVC\giomm-vc90-2_4.dll
-  File MSVC\giomm-vc100-2_4.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libglibmm-2.4-1.dll
+    File ${BINDIR}\libgiomm-2.4-1.dll
+    File ${BINDIR}\libglibmm_generate_extra_defs-2.4-1.dll
+  !else
+    File MSVC\glibmm-vc$(MSVC_CXX_VSVER)-2.4-1.dll
+    File MSVC\giomm-vc$(MSVC_CXX_VSVER)-2.4-1.dll
+    File MSVC\glibmm_generate_extra_defs-vc$(MSVC_CXX_VSVER)-2.4-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\glibmm-vc$(MSVC_CXX_VSVER)-2.4-1.pdb
+      File MSVC\giomm-vc$(MSVC_CXX_VSVER)-2.4-1.pdb
+      File MSVC\glibmm_generate_extra_defs-vc$(MSVC_CXX_VSVER)-2.4-1.pdb
+    !endif
+  !endif
   !ifndef RUNTIME_ONLY
-    File MSVC\glibmm-vc80-d-2_4.dll
-    File MSVC\glibmm-vc90-d-2_4.dll
-    File MSVC\glibmm-vc100-d-2_4.dll
-    File MSVC\glibmm-vc80-d-2_4.pdb
-    File MSVC\glibmm-vc90-d-2_4.pdb
-    File MSVC\glibmm-vc100-d-2_4.pdb
-    File MSVC\giomm-vc80-d-2_4.dll
-    File MSVC\giomm-vc90-d-2_4.dll
-    File MSVC\giomm-vc100-d-2_4.dll
-    File MSVC\giomm-vc80-d-2_4.pdb
-    File MSVC\giomm-vc90-d-2_4.pdb
-    File MSVC\giomm-vc100-d-2_4.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libglibmm-2.4-1.dll
-    File bin_stripped\libgiomm-2.4-1.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libglibmm-2.4-1.dll
+      File bin_stripped\libgiomm-2.4-1.dll
+    !else
+      File MSVC\glibmm-vc$(MSVC_CXX_VSVER)-2.4-1.dll
+      File MSVC\giomm-vc$(MSVC_CXX_VSVER)-2.4-1.dll
+    !endif
   !endif
   
 SectionEnd
@@ -707,31 +891,21 @@ Section "Development" SecGlibmmDevelopment
   File /r include\giomm-2.4
 
   SetOutPath $INSTDIR\lib
-  File lib\libglibmm-2.4.dll.a
-  File lib\libgiomm-2.4.dll.a
-  File lib\libglibmm_generate_extra_defs-2.4.dll.a
+  !ifdef CXX_LIBS_MINGW
+    File lib\libglibmm-2.4.dll.a
+    File lib\libgiomm-2.4.dll.a
+    File lib\libglibmm_generate_extra_defs-2.4.dll.a
+  !else
+    File MSVC\glibmm-vc$(MSVC_CXX_VSVER)-2.4.lib
+    File MSVC\giomm-vc$(MSVC_CXX_VSVER)-2.4.lib
+    File MSVC\glibmm_generate_extra_defs-vc$(MSVC_CXX_VSVER)-2.4.lib
+  !endif
   File /r lib\glibmm-2.4
   File /r lib\giomm-2.4
-  File MSVC\glibmm-vc80-2_4.lib
-  File MSVC\glibmm-vc90-2_4.lib
-  File MSVC\glibmm-vc100-2_4.lib
-  File MSVC\glibmm-vc80-d-2_4.lib
-  File MSVC\glibmm-vc90-d-2_4.lib
-  File MSVC\glibmm-vc100-d-2_4.lib
-  File MSVC\giomm-vc80-2_4.lib
-  File MSVC\giomm-vc90-2_4.lib
-  File MSVC\giomm-vc100-2_4.lib
-  File MSVC\giomm-vc80-d-2_4.lib
-  File MSVC\giomm-vc90-d-2_4.lib
-  File MSVC\giomm-vc100-d-2_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\glibmm-2.4.pc
   File lib\pkgconfig\giomm-2.4.pc
-  
-  SetOutPath $INSTDIR\share\aclocal
-  File share\aclocal\glibmm_check_perl.m4
-  
 SectionEnd
 
 Section "Documentation" SecGlibmmDocumentation
@@ -759,21 +933,22 @@ Section "Runtime" SecPangommRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libpangomm-1.4-1.dll
-  File MSVC\pangomm-vc80-1_4.dll
-  File MSVC\pangomm-vc90-1_4.dll
-  File MSVC\pangomm-vc100-1_4.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libpangomm-1.4-1.dll
+  !else
+    File MSVC\pangomm-vc$(MSVC_CXX_VSVER)-1.4-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\pangomm-vc$(MSVC_CXX_VSVER)-1.4-1.pdb
+    !endif
+  !endif
 
   !ifndef RUNTIME_ONLY
-    File MSVC\pangomm-vc80-d-1_4.dll
-    File MSVC\pangomm-vc90-d-1_4.dll
-    File MSVC\pangomm-vc100-d-1_4.dll
-    File MSVC\pangomm-vc80-d-1_4.pdb
-    File MSVC\pangomm-vc90-d-1_4.pdb
-    File MSVC\pangomm-vc100-d-1_4.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libpangomm-1.4-1.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libpangomm-1.4-1.dll
+    !else
+      File MSVC\pangomm-vc$(MSVC_CXX_VSVER)-1.4-1.dll
+    !endif
   !endif
 
 SectionEnd
@@ -787,15 +962,12 @@ Section "Development" SecPangommDevelopment
   File /r include\pangomm-1.4
 
   SetOutPath $INSTDIR\lib
-  File lib\libpangomm-1.4.dll.a
+  !ifdef CXX_LIBS_MINGW
+    File lib\libpangomm-1.4.dll.a
+  !else
+    File MSVC\pangomm-vc$(MSVC_CXX_VSVER)-1.4.lib
+  !endif
   File /r lib\pangomm-1.4
-  
-  File MSVC\pangomm-vc80-1_4.lib
-  File MSVC\pangomm-vc90-1_4.lib
-  File MSVC\pangomm-vc100-1_4.lib
-  File MSVC\pangomm-vc80-d-1_4.lib
-  File MSVC\pangomm-vc90-d-1_4.lib
-  File MSVC\pangomm-vc100-d-1_4.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\pangomm-1.4.pc
@@ -828,21 +1000,22 @@ Section "Runtime" SecAtkmmRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libatkmm-1.6-1.dll
-  File MSVC\atkmm-vc80-1_6.dll
-  File MSVC\atkmm-vc90-1_6.dll
-  File MSVC\atkmm-vc100-1_6.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libatkmm-1.6-1.dll
+  !else
+    File MSVC\atkmm-vc$(MSVC_CXX_VSVER)-1.6-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\atkmm-vc$(MSVC_CXX_VSVER)-1.6-1.pdb
+    !endif
+  !endif
 
   !ifndef RUNTIME_ONLY
-    File MSVC\atkmm-vc80-d-1_6.dll
-    File MSVC\atkmm-vc90-d-1_6.dll
-    File MSVC\atkmm-vc100-d-1_6.dll
-    File MSVC\atkmm-vc80-d-1_6.pdb
-    File MSVC\atkmm-vc90-d-1_6.pdb
-    File MSVC\atkmm-vc100-d-1_6.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libatkmm-1.6-1.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libatkmm-1.6-1.dll
+    !else
+      File MSVC\atkmm-vc$(MSVC_CXX_VSVER)-1.6-1.dll
+    !endif
   !endif
 
 SectionEnd
@@ -856,15 +1029,12 @@ Section "Development" SecAtkmmDevelopment
   File /r include\atkmm-1.6
 
   SetOutPath $INSTDIR\lib
-  File lib\libatkmm-1.6.dll.a
+  !ifdef CXX_LIBS_MINGW
+    File lib\libatkmm-1.6.dll.a
+  !else
+    File MSVC\atkmm-vc$(MSVC_CXX_VSVER)-1.6.lib
+  !endif
   File /r lib\atkmm-1.6
-  
-  File MSVC\atkmm-vc80-1_6.lib
-  File MSVC\atkmm-vc90-1_6.lib
-  File MSVC\atkmm-vc100-1_6.lib
-  File MSVC\atkmm-vc80-d-1_6.lib
-  File MSVC\atkmm-vc90-d-1_6.lib
-  File MSVC\atkmm-vc100-d-1_6.lib
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\atkmm-1.6.pc
@@ -897,33 +1067,28 @@ Section "Runtime" SecGtkmmRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libgdkmm-2.4-1.dll
-  File ${BINDIR}\libgtkmm-2.4-1.dll
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libgdkmm-3.0-1.dll
+    File ${BINDIR}\libgtkmm-3.0-1.dll
+  !else
+    File MSVC\gdkmm-vc$(MSVC_CXX_VSVER)-3.0-1.dll
+    File MSVC\gtkmm-vc$(MSVC_CXX_VSVER)-3.0-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\gdkmm-vc$(MSVC_CXX_VSVER)-3.0-1.pdb
+      File MSVC\gtkmm-vc$(MSVC_CXX_VSVER)-3.0-1.pdb
+    !endif
+  !endif
 
-  File MSVC\gdkmm-vc80-2_4.dll
-  File MSVC\gdkmm-vc90-2_4.dll
-  File MSVC\gdkmm-vc100-2_4.dll
-  File MSVC\gtkmm-vc80-2_4.dll
-  File MSVC\gtkmm-vc90-2_4.dll
-  File MSVC\gtkmm-vc100-2_4.dll
 
   !ifndef RUNTIME_ONLY
-    File MSVC\gdkmm-vc80-d-2_4.dll
-    File MSVC\gdkmm-vc90-d-2_4.dll
-    File MSVC\gdkmm-vc100-d-2_4.dll
-    File MSVC\gdkmm-vc80-d-2_4.pdb
-    File MSVC\gdkmm-vc90-d-2_4.pdb
-    File MSVC\gdkmm-vc100-d-2_4.pdb
-    File MSVC\gtkmm-vc80-d-2_4.dll
-    File MSVC\gtkmm-vc90-d-2_4.dll
-    File MSVC\gtkmm-vc100-d-2_4.dll
-    File MSVC\gtkmm-vc80-d-2_4.pdb
-    File MSVC\gtkmm-vc90-d-2_4.pdb
-    File MSVC\gtkmm-vc100-d-2_4.pdb
-
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libgdkmm-2.4-1.dll
-    File bin_stripped\libgtkmm-2.4-1.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libgdkmm-3.0-1.dll
+      File bin_stripped\libgtkmm-3.0-1.dll
+    !else
+      File MSVC\gdkmm-vc$(MSVC_CXX_VSVER)-3.0-1.dll
+      File MSVC\gtkmm-vc$(MSVC_CXX_VSVER)-3.0-1.dll
+    !endif
   !endif
   
 SectionEnd
@@ -938,23 +1103,15 @@ Section "Development" SecGtkmmDevelopment
   File /r include\gdkmm-2.4
 
   SetOutPath $INSTDIR\lib
-  File lib\libgdkmm-2.4.dll.a
-  File lib\libgtkmm-2.4.dll.a
-  File /r lib\gtkmm-2.4
-  File /r lib\gdkmm-2.4
-  
-  File MSVC\gdkmm-vc80-2_4.lib
-  File MSVC\gdkmm-vc90-2_4.lib
-  File MSVC\gdkmm-vc100-2_4.lib
-  File MSVC\gdkmm-vc80-d-2_4.lib
-  File MSVC\gdkmm-vc90-d-2_4.lib
-  File MSVC\gdkmm-vc100-d-2_4.lib
-  File MSVC\gtkmm-vc80-2_4.lib
-  File MSVC\gtkmm-vc90-2_4.lib
-  File MSVC\gtkmm-vc100-2_4.lib
-  File MSVC\gtkmm-vc80-d-2_4.lib
-  File MSVC\gtkmm-vc90-d-2_4.lib
-  File MSVC\gtkmm-vc100-d-2_4.lib
+  !ifdef CXX_LIBS_MINGW
+    File lib\libgdkmm-3.0.dll.a
+    File lib\libgtkmm-3.0.dll.a
+  !else
+    File MSVC\gdkmm-vc$(MSVC_CXX_VSVER)-3.0.lib
+    File MSVC\gtkmm-vc$(MSVC_CXX_VSVER)-3.0.lib
+  !endif
+  File /r lib\gtkmm-3.0
+  File /r lib\gdkmm-3.0
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\gdkmm-2.4.pc
@@ -977,7 +1134,7 @@ Section "Demo" SecGtkmmDemo
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\gtkmm-demo
-  File demo\gtkmm-demo.exe
+  File demo\gtkmm3-demo.exe
   File demo\*.cc
   File demo\*.png
   File demo\*.jpg
@@ -990,75 +1147,10 @@ Section "Documentation" SecGtkmmDocumentation
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\share\doc
-  File /r share\doc\gtkmm-2.4
+  File /r share\doc\gtkmm-3.0
 
   SetOutPath $INSTDIR\share\devhelp\books
-  File /r share\devhelp\books\gtkmm-2.4
-
-SectionEnd
-!endif
-
-SubSectionEnd
-
-SubSection "libglademm"
-
-Section "Runtime" SecLibglademmRuntime
-!ifndef RUNTIME_ONLY
-  SectionIn 1 2
-!endif
-  SetOverwrite ifnewer
-
-  SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libglademm-2.4-1.dll
-  File MSVC\glademm-vc80-2_4.dll
-  File MSVC\glademm-vc90-2_4.dll
-  File MSVC\glademm-vc100-2_4.dll
-  !ifndef RUNTIME_ONLY
-    File MSVC\glademm-vc80-d-2_4.dll
-    File MSVC\glademm-vc90-d-2_4.dll
-    File MSVC\glademm-vc100-d-2_4.dll
-    File MSVC\glademm-vc80-d-2_4.pdb
-    File MSVC\glademm-vc90-d-2_4.pdb
-    File MSVC\glademm-vc100-d-2_4.pdb
-
-    SetOutPath $INSTDIR\redist
-    File bin_stripped\libglademm-2.4-1.dll
-  !endif
-  
-SectionEnd
-
-!ifndef RUNTIME_ONLY
-Section "Development" SecLibglademmDevelopment
-  SectionIn 1
-  SetOverwrite ifnewer
-
-  SetOutPath $INSTDIR\include
-  File /r include\libglademm-2.4
-
-  SetOutPath $INSTDIR\lib
-  File lib\libglademm-2.4.dll.a
-  File /r lib\libglademm-2.4
-  File MSVC\glademm-vc80-2_4.lib
-  File MSVC\glademm-vc90-2_4.lib
-  File MSVC\glademm-vc100-2_4.lib
-  File MSVC\glademm-vc80-d-2_4.lib
-  File MSVC\glademm-vc90-d-2_4.lib
-  File MSVC\glademm-vc100-d-2_4.lib
-
-  SetOutPath $INSTDIR\lib\pkgconfig
-  File lib\pkgconfig\libglademm-2.4.pc
-
-SectionEnd
-
-Section "Documentation" SecLibglademmDocumentation
-  SectionIn 1
-  SetOverwrite ifnewer
-
-  SetOutPath $INSTDIR\share\doc\gnomemm-2.6
-  File /r share\doc\gnomemm-2.6\libglademm-2.4
-  
-  SetOutPath $INSTDIR\share\devhelp\books
-  File /r share\devhelp\books\libglademm-2.4
+  File /r share\devhelp\books\gtkmm-3.0
 
 SectionEnd
 !endif
@@ -1074,20 +1166,27 @@ Section "Runtime" SecLibxmlRuntime
   SetOverwrite ifnewer
 
   SetOutPath $INSTDIR\bin
-  File ${BINDIR}\libxml++-2.6-2.dll
-  File MSVC\xml++-vc80-2_6.dll
-  File MSVC\xml++-vc90-2_6.dll
-  File MSVC\xml++-vc100-2_6.dll
-  !ifndef RUNTIME_ONLY
-    File MSVC\xml++-vc80-d-2_6.dll
-    File MSVC\xml++-vc90-d-2_6.dll
-    File MSVC\xml++-vc100-d-2_6.dll
-    File MSVC\xml++-vc80-d-2_6.pdb
-    File MSVC\xml++-vc90-d-2_6.pdb
-    File MSVC\xml++-vc100-d-2_6.pdb
+  !ifdef CXX_LIBS_MINGW
+    File ${BINDIR}\libxml++-2.6-2.dll
+    File ${BINDIR}\libxml++-3.0-1.dll
+  !else	
+    File MSVC\xml++-2.6-2.dll
+    File MSVC\xml++-vc$(LIBXMLPP3_VSVER)-3.0-1.dll
+    !ifndef RUNTIME_ONLY
+      File MSVC\xml++-2.6-2.pdb
+      File MSVC\xml++-vc$(LIBXMLPP3_VSVER)-3.0-1.pdb
+    !endif
+  !endif
 
+  !ifndef RUNTIME_ONLY
     SetOutPath $INSTDIR\redist
-    File bin_stripped\libxml++-2.6-2.dll
+    !ifdef CXX_LIBS_MINGW
+      File bin_stripped\libxml++-2.6-2.dll
+      File bin_stripped\libxml++-3.0-1.dll
+    !else
+      File MSVC\xml++-2.6-2.dll
+      File MSVC\xml++-vc$(LIBXMLPP3_VSVER)-3.0-1.dll
+    !endif
   !endif
 
 SectionEnd
@@ -1099,19 +1198,21 @@ Section "Development" SecLibxmlDevelopment
 
   SetOutPath $INSTDIR\include
   File /r include\libxml++-2.6
+  File /r include\libxml++-3.0
 
   SetOutPath $INSTDIR\lib
-  File lib\libxml++-2.6.dll.a
+  !ifdef CXX_LIBS_MINGW
+    File lib\libxml++-2.6.dll.a
+  !else
+    File MSVC\xml++-2.6.lib
+    File MSVC\xml++-vc$(LIBXMLPP3_VSVER)-3.0.lib
+  !endif
   File /r lib\libxml++-2.6
-  File MSVC\xml++-vc80-2_6.lib
-  File MSVC\xml++-vc90-2_6.lib
-  File MSVC\xml++-vc100-2_6.lib
-  File MSVC\xml++-vc80-d-2_6.lib
-  File MSVC\xml++-vc90-d-2_6.lib
-  File MSVC\xml++-vc100-d-2_6.lib
+  File /r lib\libxml++-3.0
 
   SetOutPath $INSTDIR\lib\pkgconfig
   File lib\pkgconfig\libxml++-2.6.pc
+  File lib\pkgconfig\libxml++-3.0.pc
 
 SectionEnd
 
@@ -1121,6 +1222,7 @@ Section "Documentation" SecLibxmlDocumentation
 
   SetOutPath $INSTDIR\share\doc
   File /r share\doc\libxml++-2.6
+  File /r share\doc\libxml++-3.0
 
 SectionEnd
 !endif
@@ -1243,16 +1345,16 @@ Section -Post SecPost
   IfFileExists "$INSTDIR\share\doc\libxml++-2.6\reference\html\index.html" "" +2
        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Documentation\libxml++ Reference Manual.lnk" "$INSTDIR\share\doc\libxml++-2.6\reference\html\index.html"
 
-  IfFileExists "$INSTDIR\gtkmm-demo\gtkmm-demo.exe" "" +11
+  IfFileExists "$INSTDIR\gtkmm-demo\gtkmm3-demo.exe" "" +11
        Push $OUTDIR
        SetOutPath "$INSTDIR\gtkmm-demo"
-       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Demo.lnk" "$INSTDIR\gtkmm-demo\gtkmm-demo.exe" "" "$INSTDIR\gtkmm.ico"
+       CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Demo.lnk" "$INSTDIR\gtkmm-demo\gtkmm3-demo.exe" "" "$INSTDIR\gtkmm.ico"
        StrCmp $CONTEXT "1" 0 +4
-       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe" "" "$INSTDIR\gtkmm-demo\gtkmm-demo.exe"
-       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe" "Path" "$INSTDIR\bin"
+       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe" "" "$INSTDIR\gtkmm-demo\gtkmm3-demo.exe"
+       WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe" "Path" "$INSTDIR\bin"
        Goto +3
-       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe" "" "$INSTDIR\gtkmm-demo\gtkmm-demo.exe"
-       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe" "Path" "$INSTDIR\bin"
+       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe" "" "$INSTDIR\gtkmm-demo\gtkmm3-demo.exe"
+       WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe" "Path" "$INSTDIR\bin"
        Pop $OUTDIR
        
 !endif  ; RUNTIME_ONLY
@@ -1354,13 +1456,13 @@ continue:
   
   StrCmp $CONTEXT "1" 0 +8
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}"
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe"
   DeleteRegKey HKLM "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
   DeleteRegKey /ifempty  HKLM "Software\${PRODUCT_PLATFORM_NAME}"
   ReadRegStr $R0 HKLM "Software\GTK\2.0" "PATH"; ???
   Goto +7
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PLATFORM_NAME}"
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm-demo.exe"
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gtkmm3-demo.exe"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\App Paths\gideon.exe"
   DeleteRegKey HKCU "Software\${PRODUCT_PLATFORM_NAME}\${PRODUCT_API_VERSION}"
   DeleteRegKey /ifempty  HKCU "Software\${PRODUCT_PLATFORM_NAME}"
@@ -1700,7 +1802,7 @@ continue:
   RMDir $INSTDIR\MSVC
   
   ; gtkmm-demo
-  Delete $INSTDIR\gtkmm-demo\gtkmm-demo.exe
+  Delete $INSTDIR\gtkmm-demo\gtkmm3-demo.exe
   Delete $INSTDIR\gtkmm-demo\*.cc
   Delete $INSTDIR\gtkmm-demo\*.png
   Delete $INSTDIR\gtkmm-demo\*.jpg
@@ -1840,7 +1942,7 @@ SectionEnd
  
 !ifndef RUNTIME_ONLY
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKDevelopment} "GTK+ development headers and import libraries"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKDocumentation} "GTK+ Documentation"
+;  !insertmacro MUI_DESCRIPTION_TEXT ${SecGTKDocumentation} "GTK+ Documentation"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcDevelopment} "libsigc++ development headers and import libraries"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSigcDocumentation} "libsigc++ Documentation"
 
@@ -1887,7 +1989,7 @@ Function EnableGTKInstaller
   
 !ifndef RUNTIME_ONLY
   !insertmacro UnselectSection ${SecGTKDevelopment}
-  !insertmacro UnselectSection ${SecGTKDocumentation}
+; !insertmacro UnselectSection ${SecGTKDocumentation}
 
   !insertmacro UnselectSection ${SecSigcDevelopment}
   !insertmacro UnselectSection ${SecSigcDocumentation}
@@ -1936,7 +2038,7 @@ Function DisableGTKInstaller
 
 !ifndef RUNTIME_ONLY
   !insertmacro SelectSection ${SecGTKDevelopment}
-  !insertmacro SelectSection ${SecGTKDocumentation}
+; !insertmacro SelectSection ${SecGTKDocumentation}
 
   !insertmacro SelectSection ${SecSigcDevelopment}
   !insertmacro SelectSection ${SecSigcDocumentation}
