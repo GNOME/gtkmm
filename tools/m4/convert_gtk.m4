@@ -181,7 +181,9 @@ _CONVERSION(`const CssLocation&',`const GtkCssLocation*',__FR2P)
 _CONVERSION(`const GtkCssLocation*',`CssLocation',`Glib::wrap($3)')
 
 _CONVERSION(`GtkAssistantPage*',`Glib::RefPtr<AssistantPage>',`Glib::wrap($3)')
+_CONVERSION(`GtkAssistantPage*',`Glib::RefPtr<const AssistantPage>',`Glib::wrap($3)')
 _CONVERSION(`GtkNotebookPage*',`Glib::RefPtr<NotebookPage>',`Glib::wrap($3)')
+_CONVERSION(`GtkNotebookPage*',`Glib::RefPtr<const NotebookPage>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkCellArea*',`Glib::RefPtr<CellArea>',`Glib::wrap($3)')
 _CONVERSION(`GtkCellArea*',`Glib::RefPtr<const CellArea>',`Glib::wrap($3)')
