@@ -1266,7 +1266,13 @@ Indicates which monitor a surface should span over when in fullscreen mode.
 
 <property name="GdkGLContext:shared-context">
 <description>
-The `GdkGLContext` that this context is sharing data with, or %NULL
+Always %NULL
+
+As many contexts can share data now and no single shared context exists
+anymore, this function has been deprecated and now always returns %NULL.
+
+Deprecated: 4.4: Use [method@Gdk.GLContext.is_shared] to check if contexts
+can be shared.
 
 </description>
 </property>
@@ -4415,14 +4421,37 @@ Creates a new `GdkContentFormats` for a given `GType`.
 </return>
 </function>
 
+<function name="gdk_content_formats_parse">
+<description>
+Parses the given @string into `GdkContentFormats` and
+returns the formats. 
+
+Strings printed via [method@Gdk.ContentFormats.to_string]
+can be read in again successfully using this function.
+
+If @string does not describe valid content formats, %NULL
+is returned.
+
+Since: 4.4
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> the string to parse
+</parameter_description>
+</parameter>
+</parameters>
+<return> the content formats if @string is valid
+
+</return>
+</function>
+
 <function name="gdk_content_formats_print">
 <description>
 Prints the given @formats into a string for human consumption.
 
-This is meant for debugging and logging.
-
-The form of the representation may change at any time and is
-not guaranteed to stay identical.
+The result of this function can later be parsed with
+[func@Gdk.ContentFormats.parse].
 
 </description>
 <parameters>
@@ -4457,6 +4486,8 @@ Increases the reference count of a `GdkContentFormats` by one.
 <function name="gdk_content_formats_to_string">
 <description>
 Prints the given @formats into a human-readable string.
+
+The resulting string can be parsed with [func@Gdk.ContentFormats.parse].
 
 This is a small wrapper around [method@Gdk.ContentFormats.print]
 to help when debugging.
@@ -5360,7 +5391,7 @@ Creates a new cursor from a `GdkTexture`.
 </parameter_description>
 </parameter>
 <parameter name="fallback">
-<parameter_description> %NULL or the `GdkCursor` to fall back to when
+<parameter_description> the `GdkCursor` to fall back to when
 this one cannot be supported
 </parameter_description>
 </parameter>
@@ -6006,7 +6037,8 @@ Gets the clipboard used for copy/paste operations.
 Gets the default `GdkDisplay`.
 
 This is a convenience function for:
-`gdk_display_manager_get_default_display (gdk_display_manager_get ())`.
+
+gdk_display_manager_get_default_display (gdk_display_manager_get ())
 
 
 </description>
@@ -6463,6 +6495,41 @@ If opening the display fails, `NULL` is returned.
 </parameter>
 </parameters>
 <return> a `GdkDisplay`
+</return>
+</function>
+
+<function name="gdk_display_prepare_gl">
+<description>
+Checks that OpenGL is available for @self and ensures that it is
+properly initialized.
+When this fails, an @error will be set describing the error and this
+function returns %FALSE.
+
+Note that even if this function succeeds, creating a `GdkGLContext`
+may still fail.
+
+This function is idempotent. Calling it multiple times will just 
+return the same value or error.
+
+You never need to call this function, GDK will call it automatically
+as needed. But you can use it as a check when setting up code that
+might make use of OpenGL.
+
+Since: 4.4
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDisplay`
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a `GError`
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the display supports OpenGL
+
 </return>
 </function>
 
@@ -7244,7 +7311,7 @@ When the operation is finished @callback will be called. You must
 then call [method@Gdk.Drop.read_value_finish] to get the resulting
 `GValue`.
 
-For local drag'n'drop operations that are available in the given
+For local drag-and-drop operations that are available in the given
 `GType`, the value will be copied directly. Otherwise, GDK will
 try to use [func@Gdk.content_deserialize_async] to convert the data.
 
@@ -7312,7 +7379,7 @@ When calling this function, do not restrict the passed in actions to
 the ones provided by [method@Gdk.Drop.get_actions]. Those actions may
 change in the future, even depending on the actions you provide here.
 
-The @preferred action is a hint to the drag'n'drop mechanism about which
+The @preferred action is a hint to the drag-and-drop mechanism about which
 action to use when multiple actions are possible.
 
 This function should be called by drag destinations in response to
@@ -7957,7 +8024,8 @@ Retrieves a `GdkFrameTimings` object holding timing information
 for the current frame or a recent frame.
 
 The `GdkFrameTimings` object may not yet be complete: see
-[method@Gdk.FrameTimings.get_complete].
+[method@Gdk.FrameTimings.get_complete] and
+[method@Gdk.FrameClock.get_history_start].
 
 
 </description>
@@ -7973,8 +8041,7 @@ be received
 </parameter>
 </parameters>
 <return> the `GdkFrameTimings` object
-for the specified frame, or %NULL if it is not available. See
-[method@Gdk.FrameClock.get_history_start].
+for the specified frame, or %NULL if it is not available
 </return>
 </function>
 
@@ -8278,8 +8345,13 @@ See [method@Gdk.GLContext.set_required_version].
 
 <function name="gdk_gl_context_get_shared_context">
 <description>
-Retrieves the `GdkGLContext` that this @context share data with.
+Used to retrieves the `GdkGLContext` that this @context share data with.
 
+As many contexts can share data now and no single shared context exists
+anymore, this function has been deprecated and now always returns %NULL.
+
+Deprecated: 4.4: Use [method@Gdk.GLContext.is_shared] to check if contexts
+can be shared.
 
 </description>
 <parameters>
@@ -8288,7 +8360,8 @@ Retrieves the `GdkGLContext` that this @context share data with.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a `GdkGLContext`
+<return> %NULL
+
 </return>
 </function>
 
@@ -8376,6 +8449,39 @@ kind of shader programs to load.
 </parameter>
 </parameters>
 <return> %TRUE if the GL context is in legacy mode
+</return>
+</function>
+
+<function name="gdk_gl_context_is_shared">
+<description>
+Checks if the two GL contexts can share resources.
+
+When they can, the texture IDs from @other can be used in @self. This
+is particularly useful when passing `GdkGLTexture` objects between
+different contexts.
+
+Contexts created for the same display with the same properties will
+always be compatible, even if they are created for different surfaces.
+For other contexts it depends on the GL backend.
+
+Both contexts must be realized for this check to succeed. If either one
+is not, this function will return %FALSE.
+
+Since: 4.4
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkGLContext`
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> the `GdkGLContext` that should be compatible with @self
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two GL contexts are compatible.
+
 </return>
 </function>
 
