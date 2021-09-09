@@ -44,7 +44,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gtk/$(GTKMM_MODULE_NAME).pc
 
 include $(srcdir)/MSVC_NMake/filelist.am
-include $(srcdir)/win32_installer/filelist.am
+#include $(srcdir)/win32_installer/filelist.am
 
 text_files = COPYING.tools README.SUN README.win32
 msvc_files = $(addprefix MSVC_NMake/,$(msvc_nmake_data))

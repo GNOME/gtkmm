@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [4.2.0],
+AC_INIT([gtkmm], [4.4.0],
         [https://gitlab.gnome.org/GNOME/gtkmm/issues/],
         [gtkmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -153,14 +153,14 @@ AC_CONFIG_FILES([Makefile
                  demos/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_NMake/gtkmm/gtkmm.rc
-                 win32_installer/gtkmm-installer.nsi])
+                 MSVC_NMake/gtkmm/gtkmm.rc])
+#                 win32_installer/gtkmm-installer.nsi])
 
 # Copy the generated configuration headers into the MSVC project directories.
 AC_CONFIG_COMMANDS([MSVC_NMake/gdkmm/gdkmmconfig.h],
                    [cp -f gdk/gdkmmconfig.h MSVC_NMake/gdkmm/gdkmmconfig.h])
 AC_CONFIG_COMMANDS([MSVC_NMake/gtkmm/gtkmmconfig.h],
                    [cp -f gtk/gtkmmconfig.h MSVC_NMake/gtkmm/gtkmmconfig.h])
-AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],
-                   [cp -f "$srcdir/COPYING" win32_installer/lgpl.txt])
+#AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],
+#                   [cp -f "$srcdir/COPYING" win32_installer/lgpl.txt])
 AC_OUTPUT
