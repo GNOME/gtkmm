@@ -32,7 +32,7 @@ class GTKMM_API Object;
  * For instance,
  * @code
  * Gtk::Button* button = Gtk::manage( new Gtk::Button("Hello") );
- * vbox.pack_start(*button); //vbox will delete button when vbox is deleted.
+ * vbox.append(*button); //vbox will delete button when vbox is deleted.
  * @endcode
  *
  * @param obj A Gtk::Object, such as a gtkmm widget.
@@ -52,7 +52,7 @@ T* manage(T* obj)
  * For instance,
  * @code
  * auto button = Gtk::make_managed<Gtk::Button>("Hello");
- * vbox.pack_start(*button); //vbox will delete button when vbox is deleted.
+ * vbox.append(*button); //vbox will delete button when vbox is deleted.
  * @endcode
  *
  * @param args Arguments to pass to the constructor of the given template type.
