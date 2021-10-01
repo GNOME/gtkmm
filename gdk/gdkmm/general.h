@@ -124,6 +124,7 @@ GDKMM_API
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height);
+//TODO: Deprecate draw_from_gl() in master when the gtkmm-4-4 branch has been created.
 
 } //namespace Cairo
 

@@ -52,6 +52,7 @@ void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, cons
   return Gdk::Cairo::wrap(gdk_cairo_region_create_from_surface(surface->cobj()), true);
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height)
@@ -59,6 +60,7 @@ void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   gdk_cairo_draw_from_gl(context->cobj(), surface->gobj(), source, source_type,
     buffer_scale, x, y, width, height);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 } //namespace Cairo
 
