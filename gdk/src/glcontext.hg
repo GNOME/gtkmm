@@ -26,6 +26,7 @@ _PINCLUDE(gdkmm/private/drawcontext_p.h)
 namespace Gdk
 {
 
+_WRAP_ENUM(GLAPI, GdkGLAPI, gtype_func gdk_gl_api_get_type, decl_prefix GDKMM_API)
 _WRAP_GERROR(GLError, GdkGLError, GDK_GL_ERROR, newin "3,18", decl_prefix GDKMM_API)
 
 /** A %Gdk::GLContext is an OpenGL context abstraction.
@@ -47,9 +48,10 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Surface> get_surface(), gdk_gl_context_get_surface, refreturn, newin "3,18")
   _WRAP_METHOD(Glib::RefPtr<const Surface> get_surface() const, gdk_gl_context_get_surface, refreturn, constversion, newin "3,18")
   _WRAP_METHOD(Glib::RefPtr<GLContext> get_shared_context(), gdk_gl_context_get_shared_context, refreturn,
-    newin "3,18", deprecated "Always returns an empty RefPtr.")
+    newin "3,18", deprecated "Always returns an empty RefPtr. Use is_shared() to check if contexts can be shared.")
   _WRAP_METHOD(Glib::RefPtr<const GLContext> get_shared_context() const, gdk_gl_context_get_shared_context,
-    refreturn, constversion, newin "3,18", deprecated "Always returns an empty RefPtr.")
+    refreturn, constversion, newin "3,18",
+     deprecated "Always returns an empty RefPtr. Use is_shared() to check if contexts can be shared.")
   _WRAP_METHOD(void get_version(int& major, int& minor) const, gdk_gl_context_get_version, newin "3,18")
   _WRAP_METHOD(bool is_legacy() const, gdk_gl_context_is_legacy)
   _WRAP_METHOD(bool is_shared(const Glib::RefPtr<const GLContext>& other) const, gdk_gl_context_is_shared, newin "4,4")
@@ -59,42 +61,24 @@ public:
   _WRAP_METHOD(void set_debug_enabled(bool enabled = true), gdk_gl_context_set_debug_enabled, newin "3,18")
   _WRAP_METHOD(bool get_forward_compatible() const, gdk_gl_context_get_forward_compatible, newin "3,18")
   _WRAP_METHOD(void set_forward_compatible(bool compatible = true), gdk_gl_context_set_forward_compatible, newin "3,18")
+  _WRAP_METHOD(void set_allowed_apis(GLAPI apis), gdk_gl_context_set_allowed_apis)
+  _WRAP_METHOD(GLAPI get_allowed_apis() const, gdk_gl_context_get_allowed_apis)
+  _WRAP_METHOD(GLAPI get_api() const, gdk_gl_context_get_api)
+  _WRAP_METHOD(void set_use_es(bool use_es = true), gdk_gl_context_set_use_es,
+    deprecated "Use set_allowed_apis() instead.")
 
-  // We hand-code set_use_es() and unset_use_es().
-  // gdk_gl_context_set_use_es() is deprecated in gtk 4.6.
-  // We can't use the replacement gdk_gl_context_set_allowed_apis(),
-  // which is new in gtk 4.6. This version of gtkmm does not require gtk 4.6.
-  //_WRAP_METHOD(void set_use_es(bool use_es = true), gdk_gl_context_set_use_es,
-  //   deprecated "Use set_allowed_apis() instead.")
-
-  /** Requests that GDK create an OpenGL ES context instead of an OpenGL one,
-   * if the platform and windowing system allows it.
-   *
-   * The %GLContext must not have been realized.
-   *
-   * By default, GDK will attempt to automatically detect whether the
-   * underlying GL implementation is OpenGL or OpenGL ES once the %GLContext
-   * is realized.
-   *
-   * You should check the return value of get_use_es() after
-   * calling realize() to decide whether to use the OpenGL or
-   * OpenGL ES API, extensions, or shaders.
-   *
-   * @newin{3,22}
-   *
-   * @param use_es Whether the context should use OpenGL ES instead of OpenGL.
-   */
-  void set_use_es(bool use_es = true);
-  _IGNORE(gdk_gl_context_set_use_es)
-
+#ifndef GDKMM_DISABLE_DEPRECATED
   /** Undo a previous call to set_use_es().
    *
    * GDK will attempt to automatically detect whether the underlying
    * GL implementation is OpenGL or OpenGL ES once the %GLContext is realized.
    *
    * @newin{3,24}
+   *
+   * @deprecated Use set_allowed_apis() instead.
    */
   void unset_use_es();
+#endif // GDKMM_DISABLE_DEPRECATED
 
   _WRAP_METHOD(bool get_use_es() const, gdk_gl_context_get_use_es)
   _WRAP_METHOD(bool realize(), gdk_gl_context_realize, errthrow, newin "3,18")
@@ -105,6 +89,8 @@ public:
 
   _WRAP_PROPERTY("shared-context", Glib::RefPtr<GLContext>, newin "3,18",
     deprecated "Always returns an empty RefPtr. Use is_shared() to check if contexts can be shared.")
+  _WRAP_PROPERTY("allowed-apis", GLAPI)
+  _WRAP_PROPERTY("api", GLAPI)
 };
 
 } // namespace Gdk

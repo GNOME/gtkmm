@@ -90,6 +90,7 @@ void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, cons
 GDKMM_API
 ::Cairo::RefPtr< ::Cairo::Region> create_region_from_surface(const ::Cairo::RefPtr< ::Cairo::Surface>& surface);
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** This is the main way to draw GL content in gtkmm.
  * It takes a render buffer ID (@a source_type == GL_RENDERBUFFER) or a texture id
  * (@a source_type == GL_TEXTURE) and draws it onto @a context with an OVER operation,
@@ -108,6 +109,12 @@ GDKMM_API
  *
  * Calling this may change the current GL context.
  *
+ * @deprecated The function is overly complex and produces broken output
+ *   in various combinations of arguments. If you want to draw with GL textures
+ *   in Gtkmm, use Gdk::GLTexture::create(); if you want to use that texture in
+ *   %Cairo, use Gdk::Texture::download() to download the data into a %Cairo
+ *   image surface.
+ *
  * @param context A cairo context.
  * @param surface The surface we're rendering for (not necessarily into).
  * @param source The GL ID of the source buffer.
@@ -124,7 +131,7 @@ GDKMM_API
 void draw_from_gl(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<Gdk::Surface>& surface, int source, int source_type,
   int buffer_scale, int x, int y, int width, int height);
-//TODO: Deprecate draw_from_gl() in master when the gtkmm-4-4 branch has been created.
+#endif // GDKMM_DISABLE_DEPRECATED
 
 } //namespace Cairo
 
