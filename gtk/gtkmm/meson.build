@@ -465,6 +465,7 @@ else # not maintainer_mode
     meson.current_build_dir(),
     src_untracked_gtkmm,
     gtkmm_hg_ccg_basenames,
+    check: true,
   )
 
   built_cc_files = [ '../..' / untracked_gtkmm / 'wrap_init.cc' ]

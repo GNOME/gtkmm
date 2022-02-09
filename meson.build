@@ -61,7 +61,7 @@ import os
 import sys
 sys.exit(os.path.isdir("@0@") or os.path.isfile("@0@"))
 '''.format(project_source_root / '.git')
-is_git_build = run_command(python3, '-c', cmd_py).returncode() != 0
+is_git_build = run_command(python3, '-c', cmd_py, check: false).returncode() != 0
 
 # Are we testing a dist tarball while it's being built?
 # There ought to be a better way. https://github.com/mesonbuild/meson/issues/6866
@@ -185,14 +185,16 @@ dist_build_scripts_py = script_dir / 'dist-build-scripts.py'
 if maintainer_mode
   # Copy files to untracked/build_scripts and untracked/doc.
   run_command(mm_common_get, '--force', script_dir,
-    project_source_root / 'untracked' / 'docs')
+    project_source_root / 'untracked' / 'docs',
+    check: true,
+  )
 else
   cmd_py = '''
 import os
 import sys
 sys.exit(os.path.isfile("@0@"))
 '''.format(generate_binding_py)
-  file_exists = run_command(python3, '-c', cmd_py).returncode() != 0
+  file_exists = run_command(python3, '-c', cmd_py, check: false).returncode() != 0
   if not file_exists
     error('Missing files in untracked/. You must enable maintainer-mode.')
   endif
