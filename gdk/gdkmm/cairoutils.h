@@ -36,8 +36,9 @@ namespace Cairo
 /** Creates a Cairo::RefPtr with a C++ wrapper for the C instance.
  *
  * @param cobject The C instance.
- * @param has_reference Whether we already have a reference. Otherwise, the
- *        function will take an extra reference.
+ * @param has_reference If true, then the wrapper object takes ownership of
+ *        the C instance without increasing its reference count. It reference
+ *        count is decreased in the destructor in all cases.
  * @returns A C++ instance that wraps this C instance. If @a cobject is a nullptr,
  *          returns an empty Cairo::RefPtr.
  *
@@ -49,8 +50,9 @@ GDKMM_API
 /** Creates a Cairo::RefPtr with a C++ wrapper for the C instance.
  *
  * @param cobject The C instance.
- * @param has_reference Whether we already have a reference. Otherwise, the
- *        function will take an extra reference.
+ * @param has_reference If true, then the wrapper object takes ownership of
+ *        the C instance without increasing its reference count. It reference
+ *        count is decreased in the destructor in all cases.
  * @returns A C++ instance that wraps this C instance. If @a cobject is a nullptr,
  *          returns an empty Cairo::RefPtr.
  *
@@ -63,8 +65,9 @@ GDKMM_API
  *
  * @tparam T Cairo::Surface or a subclass of Cairo::Surface.
  * @param cobject The C instance.
- * @param has_reference Whether we already have a reference. Otherwise, the
- *        function will take an extra reference.
+ * @param has_reference If true, then the wrapper object takes ownership of
+ *        the C instance without increasing its reference count. It reference
+ *        count is decreased in the destructor in all cases.
  * @returns A C++ instance that wraps this C instance. If @a cobject is a nullptr,
  *          returns an empty Cairo::RefPtr.
  *
