@@ -7,8 +7,7 @@ project('gtkmm', 'c', 'cpp',
   default_options: [
     'cpp_std=c++11'
   ],
-  meson_version: '>= 0.54.0', # required for meson.override_dependency()
-                              # and dep.get_variable(internal:)
+  meson_version: '>= 0.56.0', # required for executable(win_subsystem:)
 )
 
 gtkmm_api_version = '3.0'
@@ -47,7 +46,7 @@ project_build_root = meson.current_build_dir()
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-python3 = import('python').find_installation('python3')
+python3 = import('python').find_installation()
 
 python_version = python3.language_version()
 python_version_req = '>= 3.5'
@@ -62,7 +61,7 @@ import os
 import sys
 sys.exit(os.path.isdir("@0@") or os.path.isfile("@0@"))
 '''.format(project_source_root / '.git')
-is_git_build = run_command(python3, '-c', cmd_py).returncode() != 0
+is_git_build = run_command(python3, '-c', cmd_py, check: false).returncode() != 0
 
 # Are we testing a dist tarball while it's being built?
 # There ought to be a better way. https://github.com/mesonbuild/meson/issues/6866
@@ -229,14 +228,16 @@ check_dllexport_usage_py = script_dir / 'check-dllexport-usage.py'
 if maintainer_mode
   # Copy files to untracked/build_scripts and untracked/doc.
   run_command(mm_common_get, '--force', script_dir,
-    project_source_root / 'untracked' / 'docs')
+    project_source_root / 'untracked' / 'docs',
+    check: true,
+  )
 else
   cmd_py = '''
 import os
 import sys
 sys.exit(os.path.isfile("@0@"))
 '''.format(generate_binding_py)
-  file_exists = run_command(python3, '-c', cmd_py).returncode() != 0
+  file_exists = run_command(python3, '-c', cmd_py, check: false).returncode() != 0
   if not file_exists
     error('Missing files in untracked/. You must enable maintainer-mode.')
   endif
@@ -275,7 +276,7 @@ if is_msvc
 
   # Enable __declspec(dllexport) if the gtkmm headers generated from the .hg files
   # were generated using a recent enough gmmproc
-  build_shared_libs_directly = run_command(check_gmmproc_ver_cmd).returncode() == 0
+  build_shared_libs_directly = run_command(check_gmmproc_ver_cmd, check: false).returncode() == 0
   message('Using __declspec(dllexport) to build gtkmm: @0@'.format(build_shared_libs_directly ? 'YES' : 'NO'))
   if not build_shared_libs_directly
     gdkmm_extra_gendef_cpp_args += '-DGDKMM_USE_GENDEF'
@@ -366,7 +367,7 @@ subdir('docs/reference')
 if can_add_dist_script
   # Add a ChangeLog file to the distribution directory.
   meson.add_dist_script(
-    python3.path(), dist_changelog_py,
+    python3, dist_changelog_py,
     project_source_root,
   )
 
@@ -380,7 +381,7 @@ if can_add_dist_script
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
-    python3.path(), dist_build_scripts_py,
+    python3, dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
     dont_distribute,

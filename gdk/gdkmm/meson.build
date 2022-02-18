@@ -199,6 +199,7 @@ else # not maintainer_mode
     meson.current_build_dir(),
     src_untracked_gdkmm,
     gdkmm_hg_ccg_basenames,
+    check: true,
   )
 
   built_cc_files = [ '../..' / untracked_gdkmm / 'wrap_init.cc' ]
@@ -275,7 +276,7 @@ endif
 
 # Install built .h and _p.h files.
 meson.add_install_script(
-  python3.path(), generate_binding_py, 'install_built_h_files',
+  python3, generate_binding_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / gdkmm_pcname / 'gdkmm', # subdir below {prefix}
   gdkmm_used_hg_ccg_basenames
@@ -284,7 +285,7 @@ meson.add_install_script(
 if can_add_dist_script
   # Distribute built files.
   meson.add_dist_script(
-    python3.path(), generate_binding_py, 'dist_built_files',
+    python3, generate_binding_py, 'dist_built_files',
     built_h_cc_dir,
     untracked_gdkmm,
     gdkmm_hg_ccg_basenames,

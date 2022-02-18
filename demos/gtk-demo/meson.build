@@ -48,7 +48,7 @@ if epoxy_dep.found()
     gtkmm_demo_cc_files, demo_resources,
     dependencies: [gtkmm_own_dep, epoxy_dep],
     implicit_include_directories: false,
-    gui_app: true,
+    win_subsystem: 'windows',
     build_by_default: build_demos,
     link_args: gui_app_ldflags,
     cpp_args: gtkmm_extra_gendef_cpp_args,
