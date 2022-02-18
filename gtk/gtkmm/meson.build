@@ -507,7 +507,7 @@ gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
 
 # Install built .h and _p.h files.
 meson.add_install_script(
-  python3.path(), generate_binding_py, 'install_built_h_files',
+  python3, generate_binding_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / gtkmm_pcname / 'gtkmm', # subdir below {prefix}
   gtkmm_used_hg_ccg_basenames
@@ -516,7 +516,7 @@ meson.add_install_script(
 if can_add_dist_script
   # Distribute built files.
   meson.add_dist_script(
-    python3.path(), generate_binding_py, 'dist_built_files',
+    python3, generate_binding_py, 'dist_built_files',
     built_h_cc_dir,
     untracked_gtkmm,
     gtkmm_hg_ccg_basenames,

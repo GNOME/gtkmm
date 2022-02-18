@@ -7,8 +7,7 @@ project('gtkmm', 'c', 'cpp',
   default_options: [
     'cpp_std=c++17'
   ],
-  meson_version: '>= 0.54.0', # required for meson.override_dependency()
-                              # and dep.get_variable(internal:)
+  meson_version: '>= 0.56.0', # required for executable(win_subsystem:)
 )
 
 gtkmm_api_version = '4.0'
@@ -46,7 +45,7 @@ project_build_root = meson.current_build_dir()
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-python3 = import('python').find_installation('python3')
+python3 = import('python').find_installation()
 
 python_version = python3.language_version()
 python_version_req = '>= 3.5'
@@ -289,7 +288,7 @@ subdir('docs/reference')
 if can_add_dist_script
   # Add a ChangeLog file to the distribution directory.
   meson.add_dist_script(
-    python3.path(), dist_changelog_py,
+    python3, dist_changelog_py,
     project_source_root,
   )
 
@@ -304,7 +303,7 @@ if can_add_dist_script
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
   meson.add_dist_script(
-    python3.path(), dist_build_scripts_py,
+    python3, dist_build_scripts_py,
     project_source_root,
     'untracked' / 'build_scripts',
     dont_distribute,
