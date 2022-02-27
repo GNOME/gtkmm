@@ -169,7 +169,6 @@ if maintainer_mode and not mm_common_get.found()
   mm_common_get = find_program('mm-common-get', required: true)
 endif
 m4 = find_program('m4', required: maintainer_mode) # Used by gmmproc (in glibmm)
-perl = find_program('perl', required: maintainer_mode or build_documentation)
 doxygen = find_program('doxygen', required: build_documentation)
 dot = find_program('dot', required: build_documentation) # Used by Doxygen
 xsltproc = find_program('xsltproc', required: build_documentation)
@@ -198,6 +197,21 @@ sys.exit(os.path.isfile("@0@"))
     error('Missing files in untracked/. You must enable maintainer-mode.')
   endif
 endif
+
+# Check if perl is required and available.
+doc_perl_prop = run_command(
+  python3, doc_reference_py, 'get_script_property',
+  '', # MMDOCTOOLDIR is not used
+  'requires_perl',
+  check: false,
+)
+doc_requires_perl = true
+if doc_perl_prop.returncode() == 0 and doc_perl_prop.stdout() == 'false'
+  doc_requires_perl = false
+endif
+
+perl = find_program('perl', required: maintainer_mode or \
+  (build_documentation and doc_requires_perl))
 
 # gtkmm's own script files.
 gtkmm_script_dir = project_source_root / 'tools'
