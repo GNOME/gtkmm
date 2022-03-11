@@ -25,14 +25,54 @@ _PINCLUDE(gdkmm/private/drawcontext_p.h)
 
 namespace Gdk
 {
+#ifdef GDKMM_BUILD
+// Make sure GLAPI is not defined when gdkmm is built.
+#undef GLAPI
+#endif
 
+//TODO: In gtkmm 4.8.0, deprecate all API with GLAPI and add GLApi similar to GLAPI.
+//      Note: Can't have both _WRAP_PROPERTY("xxx", GLAPI) and _WRAP_PROPERTY("xxx", GLApi).
+//TODO: When we can break API/ABI, remove all API with GLAPI.
+#ifndef GLAPI
+/** @enum GLAPI
+ * @note Name clash! GLAPI is defined as a preprocessor macro in epoxy/gl.h.
+ * If you include epoxy/gl.h and want to use API with %Gdk::GLAPI, you must undef GLAPI.
+ * @code
+ * #include <gdkmm/glcontext.h> // or <gtkmm.h>
+ * #include <epoxy/gl.h>
+ * #undef GLAPI
+ * @endcode
+ * or
+ * @code
+ * #include <epoxy/gl.h>
+ * #undef GLAPI
+ * #include <gdkmm/glcontext.h> // or <gtkmm.h>
+ * @endcode
+ *
+ */
 _WRAP_ENUM(GLAPI, GdkGLAPI, gtype_func gdk_gl_api_get_type, decl_prefix GDKMM_API)
+#endif // GLAPI
 _WRAP_GERROR(GLError, GdkGLError, GDK_GL_ERROR, newin "3,18", decl_prefix GDKMM_API)
 
 /** A %Gdk::GLContext is an OpenGL context abstraction.
  *
  * It's a low-level object, used to implement high-level objects such
- * as Gtk::GLArea on the GTK+ level.
+ * as Gtk::GLArea on the GTK level.
+ *
+ * @note Name clash! GLAPI is defined as a preprocessor macro in epoxy/gl.h.
+ * If you include epoxy/gl.h and want to use API with Gdk::GLAPI, you must undef GLAPI.
+ * @code
+ * #include <gdkmm/glcontext.h> // or <gtkmm.h>
+ * #include <epoxy/gl.h>
+ * #undef GLAPI
+ * @endcode
+ * or
+ * @code
+ * #include <epoxy/gl.h>
+ * #undef GLAPI
+ * #include <gdkmm/glcontext.h> // or <gtkmm.h>
+ * @endcode
+ *
  * @newin{3,18}
  */
 class GDKMM_API GLContext : public DrawContext
@@ -61,9 +101,11 @@ public:
   _WRAP_METHOD(void set_debug_enabled(bool enabled = true), gdk_gl_context_set_debug_enabled, newin "3,18")
   _WRAP_METHOD(bool get_forward_compatible() const, gdk_gl_context_get_forward_compatible, newin "3,18")
   _WRAP_METHOD(void set_forward_compatible(bool compatible = true), gdk_gl_context_set_forward_compatible, newin "3,18")
+#ifndef GLAPI
   _WRAP_METHOD(void set_allowed_apis(GLAPI apis), gdk_gl_context_set_allowed_apis)
   _WRAP_METHOD(GLAPI get_allowed_apis() const, gdk_gl_context_get_allowed_apis)
   _WRAP_METHOD(GLAPI get_api() const, gdk_gl_context_get_api)
+#endif // GLAPI
   _WRAP_METHOD(void set_use_es(bool use_es = true), gdk_gl_context_set_use_es,
     deprecated "Use set_allowed_apis() instead.")
 
@@ -89,8 +131,10 @@ public:
 
   _WRAP_PROPERTY("shared-context", Glib::RefPtr<GLContext>, newin "3,18",
     deprecated "Always returns an empty RefPtr. Use is_shared() to check if contexts can be shared.")
+#ifndef GLAPI
   _WRAP_PROPERTY("allowed-apis", GLAPI)
   _WRAP_PROPERTY("api", GLAPI)
+#endif // GLAPI
 };
 
 } // namespace Gdk
