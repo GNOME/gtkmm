@@ -1,4 +1,4 @@
-# 2022-02-27: ubuntu:latest = 20.04, ubuntu:rolling = 21.10, ubuntu:devel = 22.04
+# 2022-03-18: ubuntu:latest = 20.04, ubuntu:rolling = 21.10, ubuntu:devel = 22.04
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:devel
 
@@ -25,7 +25,7 @@ variables:
                   ninja-build
                   glib-networking
 
-  # If libgtk-4-dev is too old, gtk4 is built as a subproject to gtkmm-4.0.
+  # If libgtk-4-dev is too old, gtk4 is built as a subproject of gtkmm-4.0.
   GTK4_BUILD_DEPS: libgstreamer1.0-dev
                    libgstreamer-plugins-base1.0-dev
                    libgstreamer-plugins-good1.0-dev
@@ -58,48 +58,54 @@ build_deps:
   extends: .build_default
   stage: deps
   variables:
-    DEPENDENCIES: $MESON_GCC_DEPS
+    DEPENDENCIES: $MESON_GCC_DEPS docbook5-xml docbook-xsl
   script:
     # Build and cache dependencies that can't be installed with apt.
+    # Install to ./installdir, with the contents of the installed files
+    # (notably .pc files) suited for installation to /usr.
+    - export DESTDIR=`pwd`/installdir
     # Build libsigc++3
     - if test ! -d libsigc; then
     - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
     - cd libsigc
     - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuildtype=release
+    - meson --prefix=/usr --libdir=lib -Dvalidation=false -Dbuild-examples=false -Dbuildtype=release
     - meson compile
-    - meson install
     - cd ../..
     - fi
+    - ninja -C libsigc/_build install
+    - cp -r installdir/usr /
     # Build glibmm-2.68
     - if test ! -d glibmm; then
     - git clone --branch 2.70.0 --depth 1 https://gitlab.gnome.org/GNOME/glibmm.git glibmm
     - cd glibmm
     - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuildtype=release
+    - meson --prefix=/usr --libdir=lib -Dbuild-examples=false -Dbuildtype=release
     - meson compile
-    - meson install
     - cd ../..
     - fi
+    - ninja -C glibmm/_build install
     # Build cairomm-1.16
     - if test ! -d cairomm; then
     - git clone --branch 1.16.1 --depth 1 https://gitlab.freedesktop.org/cairo/cairomm.git cairomm
     - cd cairomm
     - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuild-examples=false -Dbuild-tests=false -Dbuildtype=release
+    - meson --prefix=/usr --libdir=lib -Dbuild-examples=false -Dbuild-tests=false -Dbuildtype=release
     - meson compile
-    - meson install
     - cd ../..
     - fi
+    - ninja -C cairomm/_build install
+    - cp -r installdir/usr /
     # Build pangomm-2.48
     - if test ! -d pangomm; then
     - git clone --branch 2.50.0 --depth 1 https://gitlab.gnome.org/GNOME/pangomm.git pangomm
     - cd pangomm
     - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-documentation=false -Dbuildtype=release
+    - meson --prefix=/usr --libdir=lib -Dbuildtype=release
     - meson compile
     - cd ../..
     - fi
+    - ninja -C pangomm/_build install
   cache:
     key: build-deps
     paths:
@@ -108,6 +114,13 @@ build_deps:
       - cairomm/
       - pangomm/
     policy: pull-push
+  # Transfer the installed part of the built dependencies to later stages
+  # as artifacts. The cache does not always work.
+  # https://gitlab.gnome.org/Infrastructure/Infrastructure/-/issues/775
+  artifacts:
+    paths:
+      - installdir/
+    expire_in: 1 day
 
 release_gcc_build:
   extends: .build_default
@@ -115,10 +128,7 @@ release_gcc_build:
   variables:
     DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS
   script:
-    - ninja -C libsigc/_build install
-    - ninja -C glibmm/_build install
-    - ninja -C cairomm/_build install
-    - ninja -C pangomm/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
@@ -129,14 +139,6 @@ release_gcc_build:
     # Skip tests. Most test cases are not executed anyway, only built by 'meson compile'.
     # - meson test
     - meson install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-      - glibmm/
-      - cairomm/
-      - pangomm/
-    policy: pull
   artifacts:
     when: always
     paths:
@@ -150,10 +152,7 @@ release_clang_build:
   variables:
     DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS clang
   script:
-    - ninja -C libsigc/_build install
-    - ninja -C glibmm/_build install
-    - ninja -C cairomm/_build install
-    - ninja -C pangomm/_build install
+    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     - CC=clang CXX=clang++ meson --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
@@ -162,14 +161,6 @@ release_clang_build:
     # - meson test
     - meson install
   allow_failure: true
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-      - glibmm/
-      - cairomm/
-      - pangomm/
-    policy: pull
   artifacts:
     when: on_failure
     paths:
