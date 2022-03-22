@@ -298,15 +298,9 @@ int Application::make_window_and_run(int argc, char** argv, T_Args&&... args)
   
   signal_activate().connect([this, &args...] () {
     // The created window is managed. Thus, the C++ wrapper is deleted
-    // by Gtk::Object::destroy_notify_() when the window is destroyed.
+    // by Gtk::Object::destroy_notify_() when the C window is destroyed.
     // https://gitlab.gnome.org/GNOME/gtkmm/-/issues/114
-    //TODO: Simplify when Gtk::Window::set_manage() can make a Gtk::Window managed.
-    //auto window = make_managed<T_Window>(std::forward<T_Args>(args)...);
-    auto window = new T_Window(std::forward<T_Args>(args)...);
-    bool was_floating = g_object_is_floating(window->gobj());
-    window->Gtk::Object::set_manage();
-    if (!was_floating && g_object_is_floating(window->gobj()))
-      g_object_ref_sink(window->gobj());
+    auto window = make_managed<T_Window>(std::forward<T_Args>(args)...);
     m_run_window = window;
     add_window(*window);
     window->show();
@@ -315,8 +309,8 @@ int Application::make_window_and_run(int argc, char** argv, T_Args&&... args)
   signal_window_removed().connect([this] (Window* window) {
     if (window == m_run_window)
     {
-      if (window && window->gobj())
-        gtk_window_destroy(window->gobj());
+      if (window)
+        window->destroy();
       m_run_window = nullptr;
     }
   });
