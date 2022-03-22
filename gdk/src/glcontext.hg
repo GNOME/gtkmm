@@ -25,14 +25,14 @@ _PINCLUDE(gdkmm/private/drawcontext_p.h)
 
 namespace Gdk
 {
+//TODO: When we can break API/ABI, remove all API with GLAPI
+// and rename get_allowed_apis2() and get_api2().
 #ifdef GDKMM_BUILD
 // Make sure GLAPI is not defined when gdkmm is built.
 #undef GLAPI
 #endif
 
-//TODO: In gtkmm 4.8.0, deprecate all API with GLAPI and add GLApi similar to GLAPI.
-//      Note: Can't have both _WRAP_PROPERTY("xxx", GLAPI) and _WRAP_PROPERTY("xxx", GLApi).
-//TODO: When we can break API/ABI, remove all API with GLAPI.
+_WRAP_ENUM(GLApi, GdkGLAPI, gtype_func gdk_gl_api_get_type, newin "4,8", decl_prefix GDKMM_API)
 #ifndef GLAPI
 /** @enum GLAPI
  * @note Name clash! GLAPI is defined as a preprocessor macro in epoxy/gl.h.
@@ -50,7 +50,8 @@ namespace Gdk
  * @endcode
  *
  */
-_WRAP_ENUM(GLAPI, GdkGLAPI, gtype_func gdk_gl_api_get_type, decl_prefix GDKMM_API)
+_WRAP_ENUM(GLAPI, GdkGLAPI, gtype_func gdk_gl_api_get_type, decl_prefix GDKMM_API,
+  deprecated "Use Gdk::GLApi instead.")
 #endif // GLAPI
 _WRAP_GERROR(GLError, GdkGLError, GDK_GL_ERROR, newin "3,18", decl_prefix GDKMM_API)
 
@@ -60,6 +61,7 @@ _WRAP_GERROR(GLError, GdkGLError, GDK_GL_ERROR, newin "3,18", decl_prefix GDKMM_
  * as Gtk::GLArea on the GTK level.
  *
  * @note Name clash! GLAPI is defined as a preprocessor macro in epoxy/gl.h.
+ * Use GLApi instead of GLAPI.
  * If you include epoxy/gl.h and want to use API with Gdk::GLAPI, you must undef GLAPI.
  * @code
  * #include <gdkmm/glcontext.h> // or <gtkmm.h>
@@ -102,12 +104,21 @@ public:
   _WRAP_METHOD(bool get_forward_compatible() const, gdk_gl_context_get_forward_compatible, newin "3,18")
   _WRAP_METHOD(void set_forward_compatible(bool compatible = true), gdk_gl_context_set_forward_compatible, newin "3,18")
 #ifndef GLAPI
-  _WRAP_METHOD(void set_allowed_apis(GLAPI apis), gdk_gl_context_set_allowed_apis)
-  _WRAP_METHOD(GLAPI get_allowed_apis() const, gdk_gl_context_get_allowed_apis)
-  _WRAP_METHOD(GLAPI get_api() const, gdk_gl_context_get_api)
+  _WRAP_METHOD(void set_allowed_apis(GLAPI apis), gdk_gl_context_set_allowed_apis,
+    deprecated "Use set_allowed_apis(GLApi apis) instead.")
+  _WRAP_METHOD(GLAPI get_allowed_apis() const, gdk_gl_context_get_allowed_apis,
+    deprecated "Use get_allowed_apis2() instead.")
+  _WRAP_METHOD(GLAPI get_api() const, gdk_gl_context_get_api,
+    deprecated "Use get_api2() instead.")
 #endif // GLAPI
+  _WRAP_METHOD(void set_allowed_apis(GLApi apis), gdk_gl_context_set_allowed_apis, newin "4,8")
+  dnl// _CONVERSION()s are case-insensitive. Can't have conversions
+  dnl//  GdkGLAPI -> GLAPI and GdkGLAPI -> GLApi active at the same time.
+#m4 _CONVERSION(`GdkGLAPI', `GLApi', `static_cast<GLApi>($3)')
+  _WRAP_METHOD(GLApi get_allowed_apis2() const, gdk_gl_context_get_allowed_apis, newin "4,8")
+  _WRAP_METHOD(GLApi get_api2() const, gdk_gl_context_get_api, newin "4,8")
   _WRAP_METHOD(void set_use_es(bool use_es = true), gdk_gl_context_set_use_es,
-    deprecated "Use set_allowed_apis() instead.")
+    deprecated "Use set_allowed_apis(GLApi apis) instead.")
 
 #ifndef GDKMM_DISABLE_DEPRECATED
   /** Undo a previous call to set_use_es().
@@ -117,7 +128,7 @@ public:
    *
    * @newin{3,24}
    *
-   * @deprecated Use set_allowed_apis() instead.
+   * @deprecated Use set_allowed_apis(GLApi apis) instead.
    */
   void unset_use_es();
 #endif // GDKMM_DISABLE_DEPRECATED
@@ -132,8 +143,10 @@ public:
   _WRAP_PROPERTY("shared-context", Glib::RefPtr<GLContext>, newin "3,18",
     deprecated "Always returns an empty RefPtr. Use is_shared() to check if contexts can be shared.")
 #ifndef GLAPI
-  _WRAP_PROPERTY("allowed-apis", GLAPI)
-  _WRAP_PROPERTY("api", GLAPI)
+  //TODO: When we can break API/ABI, change GLAPI to GLApi.
+  // Can't have both _WRAP_PROPERTY("xxx", GLAPI) and _WRAP_PROPERTY("xxx", GLApi).
+  _WRAP_PROPERTY("allowed-apis", GLAPI, deprecated "Use set/get-methods instead.")
+  _WRAP_PROPERTY("api", GLAPI, deprecated "Use get_api2() instead.")
 #endif // GLAPI
 };
 

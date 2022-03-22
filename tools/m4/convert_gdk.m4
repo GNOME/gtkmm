@@ -44,6 +44,9 @@ _CONV_INCLASS_ENUM(Gdk,FrameClock,Phase)
 _CONV_ENUM(Gdk,FullscreenMode)
 _CONV_ENUM(Gdk,Function)
 _CONV_ENUM(Gdk,GLAPI)
+#TODO: When we can break ABI, remove _CONV_ENUM(Gdk,GLAPI) and activate the
+# following _CONV_ENUM. See glcontext.hg. The conversions are case-insensitive.
+#_CONV_ENUM(Gdk,GLApi,GdkGLAPI)
 _CONV_ENUM(Gdk,Gravity)
 _CONV_ENUM(Gdk,InputCondition)
 _CONV_ENUM(Gdk,InputSource)
