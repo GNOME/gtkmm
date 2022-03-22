@@ -98,7 +98,9 @@ void Window::on_window_hide()
 
 void Window::set_manage()
 {
-  g_warning("gtkmm: Attempt to call Gtk::manage() on a Gtk::Window, but a Gtk::Window has no parent container to manage its lifetime.\n");
+  // This C++ wrapper is deleted by Gtk::Object::destroy_notify_() when the
+  // underlying C instance is destroyed.
+  referenced_ = false; // Managed
 }
 
 void Window::destroy_()
@@ -207,6 +209,14 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Window_Class::dispose_vfunc_callback(): after calling base->dispose.");
   #endif
+}
+
+void Window::destroy()
+{
+  // Don't crash if destroy() is called twice.
+  // gobj() can be nullptr after the first call to destroy().
+  if (gobj())
+    gtk_window_destroy(gobj());
 }
 
 void Window::unset_focus()

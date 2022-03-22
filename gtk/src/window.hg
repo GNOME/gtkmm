@@ -45,8 +45,6 @@ class GTKMM_API WindowGroup;
  * This represents all widgets which are physical windows controlled
  * by the window manager.
  *
- * Gtk::manage() has no effect on Windows because they have no parent containers.
- *
  * The window will be destroyed when the window manager's close button is clicked.
  * Call set_hide_on_close() if you want it to be hidden instead.
  *
@@ -62,9 +60,6 @@ class GTKMM_API Window : public Widget, public Native, public ShortcutManager, p
   _IMPLEMENTS_INTERFACE(ShortcutManager)
   _IMPLEMENTS_INTERFACE(Root)
   _UNMANAGEABLE
-  _IGNORE(gtk_window_destroy, gtk_window_set_destroy_with_parent)
-
-  //TODO: Use gtk_window_set_destroy_with_parent() to allow use of Gtk::manage() with top-level windows, using the transient-parent?
 
 public:
   // Disambiguate calls to get_display(). Use Root::get_display(), not Widget::get_display().
@@ -156,12 +151,31 @@ dnl
   _WRAP_METHOD(Window* get_transient_for(), gtk_window_get_transient_for)
   _WRAP_METHOD(const Window* get_transient_for() const, gtk_window_get_transient_for, constversion)
 
-  //_WRAP_METHOD(void set_destroy_with_parent(bool setting = true), gtk_window_set_destroy_with_parent)
-  // I don't that that this is ever a good thing for C++.murrayc.
-
-  //TODO: Remove?
+  _WRAP_METHOD(void set_destroy_with_parent(bool setting = true),
+    gtk_window_set_destroy_with_parent, newin "4,8")
   _WRAP_METHOD(bool get_destroy_with_parent() const, gtk_window_get_destroy_with_parent)
-  // I don't that that this is ever a good thing for C++.murrayc.
+
+  /** Drop the internal reference GTK holds on toplevel windows.
+   *
+   * If this window is managed, this C++ wrapper will be deleted when the
+   * underlying C instance is destroyed.
+   *
+   * After a call to %destroy(), don't call any method that accesses the
+   * underlying C instance.
+   *
+   * If the C++ wrapper is deleted, the underlying C instance will be destroyed.
+   * If the C instance is destroyed and the C++ wrapper is managed, the wrapper
+   * will be deleted. The difference is in the order in which actions are taken.
+   * That may or may not be important. If the C instance is destroyed before
+   * the wrapper is deleted, C++ signal handlers can be called during the destruction.
+   * For instance, if you connect to Gtk::Widget::signal_unrealize() or override
+   * Gtk::Widget::on_unrealize(), those signal handlers can be called only if
+   * the wrapper still exists when the signal is emitted.
+   *
+   * @newin{4,8}
+   */
+  void destroy();
+  _IGNORE(gtk_window_destroy)
 
   _WRAP_METHOD(void set_hide_on_close(bool setting = true), gtk_window_set_hide_on_close)
   _WRAP_METHOD(bool get_hide_on_close() const, gtk_window_get_hide_on_close)
@@ -277,7 +291,11 @@ dnl
   //TODO: _WRAP_METHOD(void show_uri(const Glib::ustring& uri, guint32 timestamp), gtk_show_uri)
   // gtk_show_uri_full[_finish]()
 
-  ///Overriden to warn that it doesn't make sense to use Gtk::manage() on this class because it has no parent container.
+  /** Used by Gtk::manage() and Gtk::make_managed(). You should not need to use this directly.
+   * Overridden because a %Gtk::Window is not managed by a container.
+   * Beginning with gtkmm 4.8, a %Gtk::Window can be managed. If managed, it's
+   * deleted when its underlying C instance is destroyed.
+   */
   void set_manage() override;
 
 protected:

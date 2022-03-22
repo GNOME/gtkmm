@@ -35,6 +35,11 @@ class GTKMM_API Object;
  * vbox.append(*button); //vbox will delete button when vbox is deleted.
  * @endcode
  *
+ * Beginning with gtkmm 4.8, a Gtk::Window can be managed, although it has no parent.
+ * A managed Gtk::Window is deleted when its underlying C instance is destroyed.
+ * The C instance will be destroyed when the window manager's close button
+ * is clicked, unless Gtk::Window::set_hide_on_close() has been called.
+ *
  * @param obj A Gtk::Object, such as a gtkmm widget.
  * @result The Gtk::Object passed as the @a obj parameter.
  */
@@ -47,7 +52,7 @@ T* manage(T* obj)
 
 /** Create a Gtk::Object such as a widget and Gtk::manage() it in a single step.
  * This matches standard functions like std::make_unique<T>(args) and avoids you
- * manually invoking the new operator, which is discouraged in modern C++ style.
+ * manually invoking the @c new operator, which is discouraged in modern C++ style.
  *
  * For instance,
  * @code
@@ -55,6 +60,7 @@ T* manage(T* obj)
  * vbox.append(*button); //vbox will delete button when vbox is deleted.
  * @endcode
  *
+ * @tparam T The type of object to create.
  * @param args Arguments to pass to the constructor of the given template type.
  * @result A new, managed object of that type, constructed with those arguments.
  */
@@ -115,7 +121,7 @@ public:
 
 public:
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  /** Used by Gtk::manage(). You should not need to use this directly.
+  /** Used by Gtk::manage() and Gtk::make_managed(). You should not need to use this directly.
    */
   void set_manage() override;
   #endif //DOXYGEN_SHOULD_SKIP_THIS
