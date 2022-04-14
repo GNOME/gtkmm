@@ -20,7 +20,6 @@
 #include <glibmm/quark.h>
 #include <gtk/gtk.h>
 
-
 namespace Gtk
 {
 
@@ -93,12 +92,20 @@ void Object::_release_c_instance()
     g_assert(G_IS_OBJECT(object));
     bool prevent_creation_of_another_wrapper = true;
 
-    if(referenced_)
+    if (referenced_ || (GTK_IS_WIDGET(object) && !gtk_widget_get_parent(GTK_WIDGET(object))))
     {
-      //It's not manage()ed so we just unref to destroy it
+      // It's not manage()d or it's an orphan widget, so we just unref to destroy it.
       #ifdef GLIBMM_DEBUG_REFCOUNTING
       g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
       #endif
+
+      if (!referenced_ && g_object_is_floating(object))
+      {
+        GLIBMM_DEBUG_REFERENCE(this, object);
+        // It's floating if it's a managed widget which is not stored in a container.
+        // GTK prints a warning if a widget with a floating ref is finalized.
+        g_object_ref_sink(object); // Stop it from being floating.
+      }
 
       GLIBMM_DEBUG_UNREFERENCE(this, object);
       g_object_unref(object);
@@ -125,6 +132,9 @@ void Object::_release_c_instance()
           // It can't be safely destroyed, unless you know which container it
           // was added to and remove it from there. That may or may not be its
           // immediate parent, returned by gtk_widget_get_parent().
+          // https://bugzilla.gnome.org/show_bug.cgi?id=773642, comments 20-22
+          // a.k.a. https://gitlab.gnome.org/GNOME/gtkmm/-/issues/13
+          // https://bugzilla.gnome.org/show_bug.cgi?id=786048, comment 5
           // Accept that another wrapper is possibly created if a signal
           // is emitted or a vfunc is called.
           // The widget will be destroyed, when the container widget is destroyed.
@@ -361,6 +371,5 @@ GType Object::get_base_type()
 {
   return g_object_get_type();
 }
-
 
 } // namespace Gtk
