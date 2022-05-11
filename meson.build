@@ -377,6 +377,7 @@ subdir('gtk/gtkmm')
 subdir('tests')
 subdir('demos/gtk-demo')
 subdir('docs/reference')
+subdir('win32_installer')
 
 if can_add_dist_script
   # Add a ChangeLog file to the distribution directory.
@@ -390,7 +391,6 @@ if can_add_dist_script
     'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
     'examples.moved_to_gtkmm_documentation_module',
     'HACKING',
-    'win32_installer',
   ]
   # Add build scripts to the distribution directory, and delete .gitignore
   # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
