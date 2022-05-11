@@ -1,7 +1,7 @@
 # win32_installer
 
-# Input: pkg_conf_data
-# Output: gtkmm_installer_nsi
+# Input: pkg_conf_data, lgpl_license
+# Output: gtkmm_installer_nsi, lgpl_license_txt
 
 if host_machine.system() != 'windows'
   message('NSIS installer is only possible on Windows')
@@ -23,6 +23,8 @@ installer_data_files = [
 foreach f: installer_data_files
   configure_file(input: f, output: f, copy: true)
 endforeach
+
+lgpl_license_txt = configure_file(input: lgpl_license, output: 'lgpl.txt', copy: true)
 
 subdir('NSISLibrary')
 subdir('translations')

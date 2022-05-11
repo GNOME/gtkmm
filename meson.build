@@ -366,6 +366,9 @@ endif
 # add_dist_script() is not allowed in a subproject if meson.version() < 0.58.0.
 can_add_dist_script = not meson.is_subproject() or meson.version().version_compare('>= 0.58.0')
 
+# Used for building the Windows NSIS installer
+lgpl_license = files(['COPYING'])
+
 subdir('tools/extra_defs_gen')
 subdir('MSVC_NMake/gendef')
 subdir('gdk')
