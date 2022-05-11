@@ -1,0 +1,419 @@
+# NMake Makefile for building the gtkmm installer
+
+IS_MESON_BUILD = @IS_MESON_BUILD@
+IS_SOURCES_REGEN = @IS_SOURCES_REGEN@
+
+!if "$(IS_MESON_BUILD)" == "1"
+SOURCEROOT = @top_srcdir@
+!else
+SOURCEROOT = ..
+!endif
+
+!include $(SOURCEROOT)\MSVC_NMake\detectenv-msvc.mak
+
+!if "$(IS_MESON_BUILD)" == "1"
+BUILDROOT = @top_builddir@
+GDKMM_CONFIG_H_DIR = $(BUILDROOT)\gdk
+GTKMM_CONFIG_H_DIR = $(BUILDROOT)\gtk
+GDKMM_BINDIR = $(GDKMM_CONFIG_H_DIR)\gdkmm
+GTKMM_BINDIR = $(GTKMM_CONFIG_H_DIR)\gtkmm
+GTKMM_DEMO_BINDIR = $(BUILDROOT)\demos\gtk-demo
+!else
+BUILDROOT = ..\MSVC_NMake\vs$(VSVER)\$(CFG)\$(PLAT)
+GDKMM_CONFIG_H_DIR = ..\MSVC_NMake\gdkmm
+GTKMM_CONFIG_H_DIR = ..\MSVC_NMake\gtkmm
+GDKMM_BINDIR = $(BUILDROOT)
+GTKMM_BINDIR = $(BUILDROOT)
+GTKMM_DEMO_BINDIR = $(BUILDROOT)
+!endif
+
+!if "$(IS_SOURCES_REGEN)" == "1"
+GEN_SOURCEROOT = $(BUILDROOT)
+!if "$(IS_MESON_BUILD)" == "1"
+GEN_GDKMM_SOURCEROOT = $(GEN_SOURCEROOT)\gdk
+GEN_GTKMM_SOURCEROOT = $(GEN_SOURCEROOT)\gtk
+!else
+GEN_GDKMM_SOURCEROOT = $(GEN_SOURCEROOT)
+GEN_GTKMM_SOURCEROOT = $(GEN_SOURCEROOT)
+!endif
+!else
+GEN_SOURCEROOT = $(SOURCEROOT)\untracked
+GEN_GDKMM_SOURCEROOT = $(GEN_SOURCEROOT)\gdk
+GEN_GTKMM_SOURCEROOT = $(GEN_SOURCEROOT)\gtk
+!endif
+
+GLIB_API_VER = 2.0
+ATK_API_VER = 1.0
+PANGO_API_VER = 1.0
+GDK_PIXBUF_API_VER = 2.0
+LIBRSVG_API_VER = 2.0
+GTK_API_VER = 3.0
+
+SIGC_API_VER = 2.0
+CAIROMM_API_VER = 1.0
+GLIBMM_API_VER = 2.4
+ATKMM_API_VER = 1.6
+PANGOMM_API_VER = 1.4
+GTKMM_API_VER = $(GTK_API_VER)
+
+!if $(VSVER) == 14
+MM_TOOLSET_VER = 140
+!elseif $(VSVER) == 15
+MM_TOOLSET_VER = 141
+!elseif $(VSVER) == 16
+MM_TOOLSET_VER = 142
+!elseif $(VSVER) == 16
+MM_TOOLSET_VER = 143
+!endif
+
+!ifndef LOWEST_C_COMPAT_VER
+!if "$(PLAT)" == "arm64"
+LOWEST_C_COMPAT_VER = 15
+!else
+LOWEST_C_COMPAT_VER = 14
+!endif
+!endif
+
+!ifndef MSVC_C_PROJECT_VER
+!ifdef USE_LOWEST_C_COMPAT_VER
+MSVC_C_PROJECT_VER = $(LOWEST_C_COMPAT_VER)
+!else
+MSVC_C_PROJECT_VER = $(VSVER)
+!endif
+!endif
+
+# libxml++ 3.0 can be built with VS2017 or later, not 2015
+!if $(VSVER) == 14
+LIBXMLPP3_TOOLSET_VER = 141
+!else
+LIBXMLPP3_TOOLSET_VER = $(MM_TOOLSET_VER)
+!endif
+
+!if "$(IS_MESON_BUILD)" == "1"
+SIGC_LIB_NAME = sigc-2.0
+SIGC_DLL_NAME = $(SIGC_LIB_NAME)-0
+LIBXMLPP_26_LIB_NAME = xml++-2.6
+LIBXMLPP_26_DLL_NAME = $(LIBXMLPP_26_LIB_NAME)-2
+LIBXMLPP_30_LIB_NAME = xml++-vc$(LIBXMLPP3_TOOLSET_VER)-3.0
+LIBXMLPP_30_DLL_NAME = $(LIBXMLPP_30_LIB_NAME)-1
+!else
+SIGC_LIB_NAME = sigc-vc140-2_0
+SIGC_DLL_NAME = $(SIGC_LIB_NAME)
+LIBXMLPP_26_LIB_NAME = xml++-vc$(MM_TOOLSET_VER)-2_6
+LIBXMLPP_26_DLL_NAME = $(LIBXMLPP_26_LIB_NAME)
+LIBXMLPP_30_LIB_NAME = xml++-$(LIBXMLPP3_TOOLSET_VER)-3_0
+LIBXMLPP_30_LIB_NAME = $(LIBXMLPP_30_LIB_NAME)
+!endif
+
+GLIBMM_LIB_NAME = glibmm-vc$(MM_TOOLSET_VER)-$(GLIBMM_API_VER)
+GIOMM_LIB_NAME = giomm-vc$(MM_TOOLSET_VER)-$(GLIBMM_API_VER)
+CAIROMM_LIB_NAME = cairomm-vc$(MM_TOOLSET_VER)-$(CAIROMM_API_VER)
+ATKMM_LIB_NAME = atkmm-vc$(MM_TOOLSET_VER)-$(ATKMM_API_VER)
+PANGOMM_LIB_NAME = pangomm-vc$(MM_TOOLSET_VER)-$(PANGOMM_API_VER)
+GDKMM_LIB_NAME = gdkmm-vc$(MM_TOOLSET_VER)-$(GTKMM_API_VER)
+GTKMM_LIB_NAME = gtkmm-vc$(MM_TOOLSET_VER)-$(GTKMM_API_VER)
+
+!if "$(IS_MESON_BUILD)" == "1"
+GLIBMM_DLL_NAME = $(GLIBMM_LIB_NAME)-1
+GIOMM_DLL_NAME = $(GIOMM_LIB_NAME)-1
+ATKMM_DLL_NAME = $(ATKMM_LIB_NAME)-1
+CAIROMM_DLL_NAME = $(CAIROMM_LIB_NAME)-1
+PANGOMM_DLL_NAME = $(PANGOMM_LIB_NAME)-1
+GDKMM_DLL_NAME = $(GDKMM_LIB_NAME)-1
+GTKMM_DLL_NAME = $(GTKMM_LIB_NAME)-1
+GTKMM_DEMO_NAME = gtkmm-demo
+!else
+GLIBMM_LIB_NAME = $(GLIBMM_LIB_NAME:.=_)
+GIOMM_LIB_NAME = $(GIOMM_LIB_NAME:.=_)
+ATKMM_DLL_NAME = $(ATKMM_LIB_NAME:.=_)
+CAIROMM_LIB_NAME = $(CAIROMM_LIB_NAME:.=_)
+PANGOMM_LIB_NAME = $(PANGOMM_LIB_NAME:.=_)
+GDKMM_LIB_NAME = $(GDKMM_LIB_NAME:.=_)
+GTKMM_LIB_NAME = $(GTKMM_LIB_NAME:.=_)
+
+GLIBMM_DLL_NAME = $(GLIBMM_LIB_NAME)
+GIOMM_DLL_NAME = $(GIOMM_LIB_NAME)
+CAIROMM_DLL_NAME = $(CAIROMM_LIB_NAME)
+PANGOMM_DLL_NAME = $(PANGOMM_LIB_NAME)
+GDKMM_DLL_NAME = $(GDKMM_LIB_NAME)
+GTKMM_DLL_NAME = $(GTKMM_LIB_NAME)
+GTKMM_DEMO_NAME = gtkmm$(GTKMM_API_VER:.0=)-demo
+!endif
+
+!ifndef DEP_PREFIX
+DEP_PREFIX = $(PREFIX)
+!endif
+
+!ifndef INCLUDEDIR
+INCLUDEDIR = $(DEP_PREFIX)\include
+!endif
+
+!ifndef LIBDIR
+LIBDIR = $(DEP_PREFIX)\lib
+!endif
+
+!ifndef BINDIR
+BINDIR = $(DEP_PREFIX)\bin
+!endif
+
+!ifndef CAIRO_INCLUDE_DIR
+CAIRO_INCLUDE_DIR = $(INCLUDEDIR)
+!endif
+
+!ifndef FREETYPE2_INCLUDE_DIR
+FREETYPE2_INCLUDE_DIR = $(INCLUDEDIR)\freetype2
+!endif
+
+!ifndef PNG_API_VER
+PNG_API_VER = 16
+!endif
+
+!ifndef JPEG_API_VER
+JPEG_API_VER = 8
+!endif
+
+# Use MinGW builds of non-GNOME/non-Harfbuzz deps
+!ifdef USE_MINGW_DEPS
+DEP_LIB_PREFIX = lib
+!endif
+
+!ifdef USE_LIBTOOL_NAME
+CHARSET_DLL_SUFFIX = -1
+ICONV_DLL_SUFFIX = -2
+INTL_DLL_SUFFIX = -8
+FREETYPE_DLL_SUFFIX = -6
+!endif
+
+!ifndef FREETYPE_DLL_NAME
+FREETYPE_DLL_NAME = $(DEP_LIB_PREFIX)freetype$(FREETYPE_DLL_SUFFIX)
+!endif
+
+CHARSET_DLL_NAME = $(DEP_LIB_PREFIX)charset$(CHARSET_DLL_SUFFIX)
+ICONV_DLL_NAME = $(DEP_LIB_PREFIX)iconv$(ICONV_DLL_SUFFIX)
+INTL_DLL_NAME = $(DEP_LIB_PREFIX)intl$(INTL_DLL_SUFFIX)
+
+!ifndef CAIRO_DLL_NAME
+CAIRO_DLL_NAME = cairo-2
+!endif
+!ifndef CAIRO_GOBJECT_DLL_NAME
+CAIRO_GOBJECT_DLL_NAME = cairo-gobject-2
+!endif
+
+# We are bundling the ICU DLLs just in case libxml2 and/or HarfBuzz used it
+!ifndef ICU_VER
+ICU_VER=70
+!endif
+
+# gspawn helpers EXE names vary by whether a 32-bit or 64-bit build is used
+!if "$(PLAT)" == "arm64" || "$(PLAT)" == "x64"
+SPAWN_HELPER_ARCH = win64
+!else
+SPAWN_HELPER_ARCH = win32
+!endif
+
+all:
+
+copy-bin:
+	@if not exist $(PLAT)\bin\ mkdir $(PLAT)\bin
+# Create and copy the DLLs and needed executables and PDBs for the various dependencies
+# zlib, libpng, PCRE, libepoxy
+	@for %f in (zlib1 libpng$(PNG_API_VER) pcre epoxy-0) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# libiconv, gettext
+	@for %f in ($(CHARSET_DLL_NAME) $(ICONV_DLL_NAME) $(INTL_DLL_NAME)) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# libjpeg, libtiff
+	@for %f in (jpeg$(JPEG_API_VER) tiff) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# liblzma, brotli, libbz2
+	@for %f in (liblzma brotlienc brotlidec brotlicommon libbz2) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# FreeType2
+	@for %f in ($(FREETYPE_DLL_NAME)) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# FontConfig
+	@for %f in (fontconfig) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# Cairo, HarfBuzz, libxml2, fribidi
+	@for %f in ($(CAIRO_DLL_NAME) $(CAIRO_GOBJECT_DLL_NAME) harfbuzz-icu harfbuzz-gobject harfbuzz libxml2 fribidi-0) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin\
+
+# ICU, libffi, libthai, libdatrie, pixman, libwebp, zstd-Runtime DLLs only!
+	@for %f in (icuin icuuc icudt) do @for %x in (dll) do @if exist $(BINDIR)\%f$(ICU_VER).%x copy /b $(BINDIR)\%f$(ICU_VER).%x $(PLAT)\bin
+	@for %f in (icuin icuuc icudt) do @for %x in (pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin
+	@for %f in (ffi-7 pixman-1-0) do @for %x in (dll pdb) do @copy /b $(BINDIR)\%f.%x $(PLAT)\bin
+	@for %f in (thai datrie zstd libwebp) do @for %x in (dll pdb) do @if exist $(BINDIR)\%f.%x copy /b $(BINDIR)\%f.%x $(PLAT)\bin
+
+# GLib
+	@for %f in (gio gobject gmodule gthread glib) do @for %x in (dll pdb) do @copy /b $(BINDIR)\%f-2.0-0.%x $(PLAT)\bin
+	@for %f in (gdbus gio gio-querymodules glib-compile-resources glib-compile-schemas glib-print gobject-query gresource gsettings gspawn-$(SPAWN_HELPER_ARCH)-helper-console gspawn-$(SPAWN_HELPER_ARCH)-helper) do @for %x in (exe pdb) do @copy /b $(BINDIR)\%f.%x $(PLAT)\bin
+
+# ATK
+	@for %f in (atk) do @for %x in (dll pdb) do @copy /b $(BINDIR)\%f-1.0-0.%x $(PLAT)\bin
+
+# Pango
+	@for %t in (cairo ft2 win32) do @for %x in (dll pdb) do @copy /b $(BINDIR)\pango%t-1.0-0.%x $(PLAT)\bin
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\pango-1.0-0.%x $(PLAT)\bin
+	@for %x in (exe pdb) do @copy /b $(BINDIR)\pango-*.%x $(PLAT)\bin
+
+# GdkPixbuf
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\gdk_pixbuf-2.0-0.%x $(PLAT)\bin
+	@for %x in (exe pdb) do @copy /b $(BINDIR)\gdk-pixbuf-*.%x $(PLAT)\bin
+	@if not exist $(PLAT)\lib\gdk-pixbuf-2.0\2.10.0\loaders\ mkdir $(PLAT)\lib\gdk-pixbuf-2.0\2.10.0\loaders
+
+# librsvg
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\rsvg-2.0-vs$(MSVC_C_PROJECT_VER).%x $(PLAT)\bin
+	@copy /b $(BINDIR)\rsvg-convert.exe $(PLAT)\bin
+	@copy /b $(BINDIR)\rsvg_convert.pdb $(PLAT)\bin
+	@for %x in (dll pdb) do @copy /b $(LIBDIR)\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-svg.%x $(PLAT)\lib\gdk-pixbuf-2.0\2.10.0\loaders
+
+# gtk
+	@for %f in (gdk gtk gailutil) do @for %x in (dll pdb) do @copy /b $(BINDIR)\%f-3-vs$(MSVC_C_PROJECT_VER).%x $(PLAT)\bin
+	@for %f in (builder-tool encode-symbolic-svg query-settings update-icon-cache) do @for %x in (exe pdb) do @copy /b $(BINDIR)\gtk-%f.%x $(PLAT)\bin
+	@for %f in (demo demo-application) do @for %x in (exe pdb) do @copy /b $(BINDIR)\gtk3-%f.%x $(PLAT)\bin
+
+# sigc
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\$(SIGC_DLL_NAME).%x $(PLAT)\bin
+
+# glibmm
+	@for %f in ($(GLIBMM_DLL_NAME) $(GIOMM_DLL_NAME)) do @for %x in (dll pdb) do @copy /b $(BINDIR)\%f.%x $(PLAT)\bin
+
+# libxml++
+	@for %f in ($(LIBXMLPP_26_DLL_NAME) $(LIBXMLPP_30_DLL_NAME)) do @for %x in (dll pdb) do @copy /b "$(BINDIR)\%f.%x" $(PLAT)\bin
+
+# atkmm
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\$(ATKMM_DLL_NAME).%x $(PLAT)\bin
+
+# cairomm
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\$(CAIROMM_DLL_NAME).%x $(PLAT)\bin
+
+# pangomm
+	@for %x in (dll pdb) do @copy /b $(BINDIR)\$(PANGOMM_DLL_NAME).%x $(PLAT)\bin
+
+# gtkmm
+	@for %x in (dll pdb) do @copy /b $(GDKMM_BINDIR)\$(GDKMM_DLL_NAME).%x $(PLAT)\bin
+	@for %x in (dll pdb) do @copy /b $(GTKMM_BINDIR)\$(GTKMM_DLL_NAME).%x $(PLAT)\bin
+	@for %x in (exe pdb) do @copy /b $(GTKMM_DEMO_BINDIR)\$(GTKMM_DEMO_NAME).%x $(PLAT)\bin
+
+copy-headers:
+	@if not exist include mkdir include
+# Create and copy the headers for the various dependencies
+# Copy the headers of the non-GNOME basic dependencies
+
+# zlib, libpng, PCRE, libepoxy
+	@for %f in (zlib.h png.h pngconf.h pnglibconf.h pcre.h) do @copy $(INCLUDEDIR)\%f include
+	@if not exist include\epoxy mkdir include\epoxy
+	@copy $(INCLUDEDIR)\epoxy\* include\epoxy
+
+# libiconv, libintl (may not be there-proxy-intl might be used)
+	@for %f in (charset.h localcharset.h iconv.h libintl.h) do @if exist $(INCLUDEDIR)\%f copy $(INCLUDEDIR)\%f include
+
+# libjpeg and libtiff (may not be there-GDK-Pixbuf might not be built with those)
+	@for %f in (jpeglib.h tiff.h tiffconf.h tiffio.h tiffvers.h) do @if exist $(INCLUDEDIR)\%f copy $(INCLUDEDIR)\%f include
+
+# liblzma (may not be there, optional for libxml2)
+	@if not exist include\lzma mkdir include\lzma
+	@for %f in (lzma.h) do @if exist $(INCLUDEDIR)\%f copy $(INCLUDEDIR)\%f include
+	@for %f in ($(INCLUDEDIR)\lzma\*.h) do @copy %f include\lzma
+
+# FreeType2 (may not be there-HarfBuzz, Pango and Cairo might not be built with those)
+# May also be built with brotlidec and libbz2
+	@for %f in (ft2build.h) do @if exist $(FREETYPE2_INCLUDE_DIR)\%f mkdir include\freetype2 & copy $(FREETYPE2_INCLUDE_DIR)\%f include\freetype2
+	@for %d in (. config internal internal\services) do @if exist $(FREETYPE2_INCLUDE_DIR)\ft2build.h mkdir include\freetype2\freetype\%d & copy $(FREETYPE2_INCLUDE_DIR)\freetype\%d\* include\freetype2\freetype\%d
+	@for %f in (bzlib.h) do @if exist $(FREETYPE2_INCLUDE_DIR)\ft2build.h if exist $(INCLUDEDIR)\%f copy $(INCLUDEDIR)\%f include
+	@for %d in (brotli) do @if exist $(FREETYPE2_INCLUDE_DIR)\ft2build.h if exist $(INCLUDEDIR)\brotli mkdir include\brotli & copy $(INCLUDEDIR)\brotli\* include\brotli
+
+# FontConfig (may not be there-Pango and Cairo might not be built with those)
+	@if exist $(INCLUDEDIR)\include\fontconfig\ do @if not exist include\fontconfig\ md include\fontconfig
+
+# cairo
+	@for %f in ($(CAIRO_INCLUDE_DIR)\cairo.h $(CAIRO_INCLUDE_DIR)\cairo-*.h) do @copy %f include
+
+# fribidi
+	@if not exist include\fribidi\ mkdir include\fribidi
+	@for %f in ($(INCLUDEDIR)\fribidi\*.h) do @copy %f include\fribidi
+
+# HarfBuzz (should be there unless we are using Pango 1.42.x or earlier)
+	@if not exist include\harfbuzz mkdir include\harfbuzz
+	@for %f in ($(INCLUDEDIR)\harfbuzz\*.h) do @copy %f include\harfbuzz
+
+# libxml2
+	@if not exist include\libxml2\libxml mkdir include\libxml2\libxml
+	@for %f in ($(INCLUDEDIR)\libxml2\libxml\*.h) do @copy %f include\libxml2\libxml
+
+# GLib
+	@for %d in (glib glib\deprecated gobject gio) do @if not exist include\glib-$(GLIB_API_VER)\%d\ mkdir include\glib-$(GLIB_API_VER)\%d
+	@for %d in (gio) do @if not exist include\gio-win32-$(GLIB_API_VER)\%d\ mkdir include\gio-win32-$(GLIB_API_VER)\%d
+	@if not exist $(PLAT)\lib\glib-$(GLIB_API_VER)\include mkdir $(PLAT)\lib\glib-$(GLIB_API_VER)\include
+	@for %d in (. glib glib\deprecated gobject gio) do @copy $(INCLUDEDIR)\glib-$(GLIB_API_VER)\%d\* include\glib-$(GLIB_API_VER)\%d
+	@for %d in (gio) do @copy $(INCLUDEDIR)\gio-win32-$(GLIB_API_VER)\%d\* include\gio-win32-$(GLIB_API_VER)\%d
+	@copy $(LIBDIR)\glib-$(GLIB_API_VER)\include\glibconfig.h $(PLAT)\lib\glib-$(GLIB_API_VER)\include
+
+# ATK
+	@for %d in (atk) do if not exist include\%d-$(ATK_API_VER)\%d\ mkdir include\%d-$(ATK_API_VER)\%d
+	@for %d in (atk) do copy $(INCLUDEDIR)\%d-$(ATK_API_VER)\%d\* include\%d-$(ATK_API_VER)\%d
+
+# Pango
+	@for %d in (pango) do if not exist include\%d-$(PANGO_API_VER)\%d\ mkdir include\%d-$(PANGO_API_VER)\%d
+	@for %d in (pango) do copy $(INCLUDEDIR)\%d-$(PANGO_API_VER)\%d\* include\%d-$(PANGO_API_VER)\%d
+
+# Gdk-Pixbuf
+	@for %d in (gdk-pixbuf) do if not exist include\%d-$(GDK_PIXBUF_API_VER)\%d\ mkdir include\%d-$(GDK_PIXBUF_API_VER)\%d
+	@for %d in (gdk-pixbuf) do copy $(INCLUDEDIR)\%d-$(GDK_PIXBUF_API_VER)\%d\* include\%d-$(GDK_PIXBUF_API_VER)\%d
+
+# librsvg
+	@for %d in (librsvg) do if not exist include\%d-$(LIBRSVG_API_VER)\%d\ mkdir include\%d-$(LIBRSVG_API_VER)\%d
+	@for %d in (librsvg) do copy $(INCLUDEDIR)\%d-$(LIBRSVG_API_VER)\%d\* include\%d-$(GDK_PIXBUF_API_VER)\%d
+
+# GTK (may not have broadway support)
+	@for %d in (gdk gdk\win32 gdk\deprecated) do if not exist include\gtk-$(GTK_API_VER)\%d\ mkdir include\gtk-$(GTK_API_VER)\%d
+	@for %d in (gdk\broadway) do if exist $(INCLUDEDIR)\gtk-$(GTK_API_VER)\gdk\%d\ if not exist include\gtk-$(GTK_API_VER)\%d\ mkdir include\gtk-$(GTK_API_VER)\%d
+	@for %d in (gtk gtk\a11y gtk\deprecated) do @if not exist include\gtk-$(GTK_API_VER)\%d\ mkdir include\gtk-$(GTK_API_VER)\%d
+	@for %d in (.  win32 deprecated) do @copy $(INCLUDEDIR)\gtk-$(GTK_API_VER)\gdk\%d\* include\gtk-$(GTK_API_VER)\gdk\%d
+	@for %d in (broadway) do @if exist $(INCLUDEDIR)\gtk-$(GTK_API_VER)\gdk\%d\ copy $(INCLUDEDIR)\gtk-$(GTK_API_VER)\gdk\%d\* include\gtk-$(GTK_API_VER)\gdk\%d
+	@for %d in (.  a11y deprecated) do @copy $(INCLUDEDIR)\gtk-$(GTK_API_VER)\gtk\%d\* include\gtk-$(GTK_API_VER)\gtk\%d
+
+# libsigc++
+	@for %t in (sigc++) do @for %d in (adaptors adaptors\lambda functors) do @if not exist include\%t-$(SIGC_API_VER)\%t\%d\ mkdir include\%t-$(SIGC_API_VER)\%t\%d
+	@for %d in (sigc++) do if not exist lib\%d-$(SIGC_API_VER)\include\ md lib\%d-$(SIGC_API_VER)\include
+	@for %t in (sigc++) do @for %d in (. adaptors adaptors\lambda functors) do @copy "$(INCLUDEDIR)\%t-$(SIGC_API_VER)\%t\%d\*" "include\%t-$(SIGC_API_VER)\%t\%d"
+	@for %d in (sigc++) do copy "$(LIBDIR)\%d-$(SIGC_API_VER)\include\%dconfig.h" "lib\%d-$(SIGC_API_VER)\include"
+
+# cairomm
+	@for %t in (cairo) do @if not exist include\%tmm-$(CAIROMM_API_VER)\%tmm mkdir include\%tmm-$(CAIROMM_API_VER)\%tmm
+	@for %d in (cairo) do if not exist lib\%dmm-$(CAIROMM_API_VER)\include\ md lib\%dmm-$(CAIROMM_API_VER)\include
+	@for %t in (cairo) do @copy $(INCLUDEDIR)\%tmm-$(CAIROMM_API_VER)\%tmm\*
+	@for %t in (cairo) do @copy $(LIBDIR)\%tmm-$(CAIROMM_API_VER)\include\%tmmconfig.h lib\%tmm-$(CAIROMM_API_VER)\include
+
+# glibmm
+	@for %t in (glib gio) do @for %d in (%tmm-$(GLIBMM_API_VER)\%tmm\private) do @if not exist include\%d\ mkdir include\%d
+	@for %t in (glib gio) do @if not exist lib\%tmm-$(GLIBMM_API_VER)\include\ mkdir lib\%tmm-$(GLIBMM_API_VER)\include
+	@for %t in (glib gio) do @for %d in (%tmm-$(GLIBMM_API_VER) %tmm-$(GLIBMM_API_VER)\%tmm\private) do @copy $(INCLUDEDIR)\%d\* include\%d
+	@for %t in (glib gio) do @copy $(LIBDIR)\%tmm-$(GLIBMM_API_VER)\include\%tmmconfig.h lib\%tmm-$(GLIBMM_API_VER)\include
+
+# libxml++
+	for %t in (libxml++) do @for %v in (2.6 3.0) do @for /f %d in ('dir /ad /b $(INCLUDEDIR)\%t-%v\%t') do @if not exist include\%t-%v\%t\%d\ mkdir include\%t-%v\%t\%d
+	@for %d in (libxml++) do @for %v in (2.6 3.0) do @if not exist lib\%d-%v\include\ md lib\%d-%v\include
+	@for %t in (libxml++) do @for %v in (2.6 3.0) do @copy "$(INCLUDEDIR)\%t-%v\%t\*" "include\%t-%v\%t"
+	@for %t in (libxml++) do @for %v in (2.6 3.0) do @for /f %d in ('dir /ad /b $(INCLUDEDIR)\%t-%v\%t') do @copy "$(INCLUDEDIR)\%t-%v\%t\%d\*" "include\%t-%v\%t\%d"
+	@for %d in (libxml++) do @for %v in (2.6 3.0) do @copy "$(LIBDIR)\%d-%v\include\%dconfig.h" "lib\%d-%v\include"
+
+# atkmm
+	@for %t in (atk) do @for %d in (%tmm-$(ATKMM_API_VER)\%tmm\private) do @if not exist include\%d\ mkdir include\%d
+	@for %t in (atk) do @if not exist lib\%tmm-$(ATKMM_API_VER)\include\ mkdir lib\%tmm-$(ATKMM_API_VER)\include
+	@for %t in (atk) do @for %d in (%tmm-$(ATKMM_API_VER) %tmm-$(ATKMM_API_VER)\%tmm\private) do @copy $(INCLUDEDIR)\%d\* include\%d
+	@for %t in (atk) do @copy $(LIBDIR)\%tmm-$(ATKMM_API_VER)\include\%tmmconfig.h lib\%tmm-$(ATKMM_API_VER)\include
+
+# pangomm
+	@for %t in (pango) do @for %d in (%tmm-$(PANGOMM_API_VER)\%tmm\private) do @if not exist include\%d\ mkdir include\%d
+	@for %t in (pango) do @if not exist lib\%tmm-$(PANGOMM_API_VER)\include\ mkdir lib\%tmm-$(PANGOMM_API_VER)\include
+	@for %t in (pango) do @for %d in (%tmm-$(PANGOMM_API_VER) %tmm-$(PANGOMM_API_VER)\%tmm\private) do @copy $(INCLUDEDIR)\%d\* include\%d
+	@for %t in (pango) do @copy $(LIBDIR)\%tmm-$(PANGOMM_API_VER)\include\%tmmconfig.h lib\%tmm-$(PANGOMM_API_VER)\include
+
+# gtkmm
+	@for %t in (gdk gtk) do @for %d in (%tmm-$(GTKMM_API_VER)\%tmm\private) do @if not exist include\%d\ mkdir include\%d
+	@for %t in (gdk gtk) do @if not exist lib\%tmm-$(GTKMM_API_VER)\include\ mkdir lib\%tmm-$(GTKMM_API_VER)\include
+	@for %t in (gdk gtk) do @for %d in (. %tmm %tmm\private) do @copy $(SOURCEROOT)\%t\%d\*.h include\%tmm-$(GTKMM_API_VER)\%d
+	@for %t in (gdk) do @for %d in (%tmm %tmm\private) do @copy $(GEN_GDKMM_SOURCEROOT)\%d\*.h include\%tmm-$(GTKMM_API_VER)\%d
+	@for %t in (gtk) do @for %d in (%tmm %tmm\private) do @copy $(GEN_GTKMM_SOURCEROOT)\%d\*.h include\%tmm-$(GTKMM_API_VER)\%d
+	@copy $(GDKMM_CONFIG_H_DIR)\gdkmmconfig.h lib\gdkmm-$(GTKMM_API_VER)\include
+	@copy $(GTKMM_CONFIG_H_DIR)\gtkmmconfig.h lib\gtkmm-$(GTKMM_API_VER)\include
