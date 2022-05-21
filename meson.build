@@ -5,7 +5,8 @@ project('gtkmm', 'c', 'cpp',
   version: '3.24.6',
   license: 'LGPLv2.1+',
   default_options: [
-    'cpp_std=c++11'
+    'cpp_std=c++11',
+    'warning_level=1',
   ],
   meson_version: '>= 0.56.0', # required for executable(win_subsystem:)
 )
@@ -43,6 +44,7 @@ macos_darwin_versions = [
 project_source_root = meson.current_source_dir()
 project_build_root = meson.current_build_dir()
 
+c_compiler = meson.get_compiler('c')
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
@@ -75,10 +77,12 @@ maintainer_mode = maintainer_mode_opt == 'true' or \
 if is_dist_check
   message('Looks like a tarball is being tested. ' + \
   'Option "dist-warnings" is used instead of "warnings".')
-  warning_level = get_option('dist-warnings')
+  cpp_warnings = get_option('dist-warnings')
 else
-  warning_level = get_option('warnings')
+  cpp_warnings = get_option('warnings')
 endif
+warning_level = get_option('warning_level').to_int()
+werror = get_option('werror')
 build_deprecated_api = get_option('build-deprecated-api')
 build_atkmm_api = get_option('build-atkmm-api')
 build_x11_api_opt = get_option('build-x11-api')
@@ -318,24 +322,25 @@ gtkmm_libname = meson.project_name() + msvc14x_toolset_ver + '-' + gtkmm_api_ver
 gdkmm_libname = 'gdkmm' + msvc14x_toolset_ver + '-' + gtkmm_api_version
 
 # Set compiler warnings.
+# Meson warns if any of the /W1, /W2, /W3, /W4, /Wall, -Wall, -Wextra, -Werror
+# compiler options are added with add_project_arguments().
+# Avoid such warnings, when possible.
+# See _warn_about_builtin_args() in meson/mesonbuild/interpreter/interpreter.py.
 warning_flags = []
-if warning_level == 'min'
-  if is_msvc
-    warning_flags = ['/W3']
-  else
-    warning_flags = ['-Wall']
+if cpp_warnings == 'min'
+  if warning_level == 0
+    warning_flags = is_msvc ? ['/W2'] : ['-Wall']
   endif
-elif warning_level == 'max' or warning_level == 'fatal'
-  if is_msvc
-    warning_flags = ['/W4']
-  else
-    warning_flags = '-pedantic -Wall -Wextra -Wformat-security -Wsuggest-override -Wshadow -Wno-long-long'.split()
+elif cpp_warnings == 'max' or cpp_warnings == 'fatal'
+  if warning_level < 3
+    warning_flags = is_msvc ? ['/W4'] : ['-pedantic', '-Wall', '-Wextra']
   endif
-  if warning_level == 'fatal'
-    if is_msvc
-      warning_flags += ['/WX']
-    else
-      warning_flags += ['-Werror']
+  if not is_msvc
+    warning_flags += '-Wformat-security -Wsuggest-override -Wshadow -Wno-long-long'.split()
+  endif
+  if cpp_warnings == 'fatal'
+    if not werror
+      warning_flags += is_msvc ? ['/WX'] : ['-Werror']
     endif
     deprecations = 'G PANGO ATK GDK GDK_PIXBUF GTK GLIBMM ATKMM PANGOMM CAIROMM SIGCXX'.split()
     foreach d : deprecations
@@ -346,6 +351,11 @@ endif
 
 warning_flags = cpp_compiler.get_supported_arguments(warning_flags)
 add_project_arguments(warning_flags, language: 'cpp')
+
+# Don't warn about a long string in a C file.
+# gnome.compile_resources() generates such a file.
+c_warning_flags = is_msvc ? [] : ['-Wno-overlength-strings']
+add_project_arguments(c_compiler.get_supported_arguments(c_warning_flags), language: 'c')
 
 gui_app_ldflags = []
 
@@ -451,7 +461,8 @@ summary = [
   meson.project_name() + ' ' + meson.project_version(),
   '',
   '         Maintainer mode: @0@@1@'.format(maintainer_mode_opt, real_maintainer_mode),
-  '       Compiler warnings: @0@'.format(warning_level),
+  '       Compiler warnings: @0@ (warning_level: @1@, werror: @2@)'. \
+                             format(cpp_warnings, warning_level, werror),
   '    Build deprecated API: @0@'.format(build_deprecated_api),
   '         Build atkmm API: @0@'.format(build_atkmm_api),
   '           Build X11 API: @0@@1@'.format(build_x11_api_opt, real_build_x11_api),
