@@ -121,6 +121,12 @@ gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: gdk_pixbuf_req)
 epoxy_req = '>= 1.2'
 epoxy_dep = dependency('epoxy', version: epoxy_req, required: build_demos)
 
+# Vulkan (optional, but needed here if GTK was built with Vulkan support for its headers)
+# Uses meson's custom vulkan dependency searching. Set the VULKAN_SDK env var
+# to use a custom path for the Vulkan SDK. Bugs that are found with it should
+# be reported upstream and fixed.
+vulkan_dep = dependency('vulkan', required: false)
+
 # The -mm libraries do not yet have pkg-config files for MSVC builds,
 # so check for them manually
 glibmm_req_minor_ver = '68'
@@ -133,7 +139,7 @@ gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmpro
 
 gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 
-gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
+gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep, vulkan_dep]
 gdkmm_requires = [
   'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
   'gtk4', gtk_req,
