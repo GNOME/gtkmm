@@ -275,8 +275,6 @@ use_msvc14x_toolset_ver = get_option('msvc14x-parallel-installable')
 msvc14x_toolset_ver = ''
 
 if is_msvc
-  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: ['cpp','c'])
-
   # Check for the first line in a file generated with gmmproc,
   # to see which gmmproc version was used
   if maintainer_mode
@@ -369,6 +367,7 @@ if is_msvc
     '/FImsvc_recommended_pragmas.h', # Turn off harmless warnings but make potentially
                                      # dangerous ones glaring, distributed with GLib
     '/EHsc',  # avoid warnings caused by exception handling model used
+    '/utf-8', # Avoid C4819 unicode conversion warnings when building on CJK locales
     '/wd4152', # nonstandard extension, function/data pointer conversion in expression
     '/wd4245', # 'argument': conversion from 'int' to 'guint', signed/unsigned mismatch
     '/wd4250', # 'class1' : inherits 'class2::member' via dominance
