@@ -227,8 +227,7 @@ use_msvc14x_toolset_ver = get_option('msvc14x-parallel-installable')
 msvc14x_toolset_ver = ''
 
 if is_msvc
-  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
-  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
+  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: ['cpp','c'])
 
   if use_msvc14x_toolset_ver
     if cpp_compiler.version().version_compare('>=19.30')
@@ -288,7 +287,18 @@ gui_app_ldflags = []
 #       otherwise the program will fail to link unless we defined a WinMain()
 #       for them
 if is_msvc
-  foreach wd : ['/FImsvc_recommended_pragmas.h', '/wd4267', '/EHsc', '/wd4250', '/wd4805']
+  disable_warnings_list = [
+    '/FImsvc_recommended_pragmas.h', # Turn off harmless warnings but make potentially
+                                     # dangerous ones glaring, distributed with GLib
+    '/EHsc',  # avoid warnings caused by exception handling model used
+    '/wd4250', # 'class1' : inherits 'class2::member' via dominance
+    '/wd4805' # unsafe mix of type 'type' and type 'type' in operation
+  ]
+  if host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64'
+  # 'var' : conversion from 'size_t' to 'type', possible loss of data (applies on 64-bit builds)
+    disable_warnings_list += '/wd4267'
+  endif
+  foreach wd : disable_warnings_list
     disabled_warning = cpp_compiler.get_supported_arguments(wd)
     add_project_arguments(disabled_warning, language: 'cpp')
   endforeach
