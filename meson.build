@@ -379,10 +379,10 @@ if is_msvc
   # 'var' : conversion from 'size_t' to 'type', possible loss of data (applies on 64-bit builds)
     disable_warnings_list += '/wd4267'
   endif
-  foreach wd : disable_warnings_list
-    disabled_warning = cpp_compiler.get_supported_arguments(wd)
-    add_project_arguments(disabled_warning, language: ['cpp', 'c'])
-  endforeach
+  add_project_arguments(
+    cpp_compiler.get_supported_arguments(disable_warnings_list),
+    language: ['cpp', 'c']
+  )
   gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
