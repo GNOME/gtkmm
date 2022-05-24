@@ -275,9 +275,6 @@ use_msvc14x_toolset_ver = get_option('msvc14x-parallel-installable')
 msvc14x_toolset_ver = ''
 
 if is_msvc
-  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8', '/wd4828']), language: 'cpp')
-  add_project_arguments(cpp_compiler.get_supported_arguments([ '/utf-8']), language: 'c')
-
   # Check for the first line in a file generated with gmmproc,
   # to see which gmmproc version was used
   if maintainer_mode
@@ -366,10 +363,26 @@ gui_app_ldflags = []
 #       otherwise the program will fail to link unless we defined a WinMain()
 #       for them
 if is_msvc
-  foreach wd : ['/FImsvc_recommended_pragmas.h', '/wd4267', '/EHsc', '/wd4250', '/wd4805']
-    disabled_warning = cpp_compiler.get_supported_arguments(wd)
-    add_project_arguments(disabled_warning, language: 'cpp')
-  endforeach
+  disable_warnings_list = [
+    '/FImsvc_recommended_pragmas.h', # Turn off harmless warnings but make potentially
+                                     # dangerous ones glaring, distributed with GLib
+    '/EHsc',  # avoid warnings caused by exception handling model used
+    '/utf-8', # Avoid C4819 unicode conversion warnings when building on CJK locales
+    '/wd4152', # nonstandard extension, function/data pointer conversion in expression
+    '/wd4245', # 'argument': conversion from 'int' to 'guint', signed/unsigned mismatch
+    '/wd4250', # 'class1' : inherits 'class2::member' via dominance
+    '/wd4702', # unreachable code
+    '/wd4706', # assignment within conditional expression
+    '/wd4805' # unsafe mix of type 'type' and type 'type' in operation
+  ]
+  if host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64'
+  # 'var' : conversion from 'size_t' to 'type', possible loss of data (applies on 64-bit builds)
+    disable_warnings_list += '/wd4267'
+  endif
+  add_project_arguments(
+    cpp_compiler.get_supported_arguments(disable_warnings_list),
+    language: ['cpp', 'c']
+  )
   gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
