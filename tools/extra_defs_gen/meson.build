@@ -29,6 +29,7 @@ executable('generate_defs_gtk', 'generate_defs_gtk.cc',
 # Install m4 files for reuse by other *mm projects, when building from git.
 m4_basefiles = [
   'class_gtkobject.m4',
+  'class_shared.m4',
   'convert.m4',
   'convert_gdk.m4',
   'convert_gtk.m4',
