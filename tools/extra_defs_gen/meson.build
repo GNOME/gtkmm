@@ -30,6 +30,7 @@ executable('generate_defs_gtk', 'generate_defs_gtk.cc',
 m4_basefiles = [
   'child_property.m4',
   'class_gtkobject.m4',
+  'class_shared.m4',
   'convert.m4',
   'convert_gdk.m4',
   'convert_gtk.m4',
