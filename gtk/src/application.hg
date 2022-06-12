@@ -192,14 +192,17 @@ public:
    */
   int run();
 
-  /** Starts the application, creates and shows a window.
+  /** Starts the application, creates and presents a window.
    *
    * A window of type T_Window is constructed and added to the application
    * in a signal_activate() handler. The window is deleted when it is hidden
    * or removed from the application. The method returns when the window is hidden,
    * unless other windows have been added but not removed.
    *
-   * @tparam T_Window The type of window to show. Must be Gtk::Window or a class type
+   * The window is only constructed on the first activate signal. Any activations
+   * thereafter only cause the window to be raised.
+   *
+   * @tparam T_Window The type of window to present. Must be Gtk::Window or a class type
    *                  that inherits from Gtk::Window.
    * @param argc The argc from main() (or 0 if @a argv is <tt>nullptr</tt>).
    * @param argv The argv from main(), or <tt>nullptr</tt>.
@@ -295,15 +298,20 @@ template <typename T_Window, typename... T_Args>
 int Application::make_window_and_run(int argc, char** argv, T_Args&&... args)
 {
   static_assert(std::is_base_of<Window, T_Window>::value);
-  
+
   signal_activate().connect([this, &args...] () {
-    // The created window is managed. Thus, the C++ wrapper is deleted
-    // by Gtk::Object::destroy_notify_() when the C window is destroyed.
-    // https://gitlab.gnome.org/GNOME/gtkmm/-/issues/114
-    auto window = make_managed<T_Window>(std::forward<T_Args>(args)...);
-    m_run_window = window;
-    add_window(*window);
-    window->show();
+    if (!m_run_window)
+    {
+      // The created window is managed. Thus, the C++ wrapper is deleted
+      // by Gtk::Object::destroy_notify_() when the C window is destroyed.
+      // https://gitlab.gnome.org/GNOME/gtkmm/-/issues/114
+      auto window = make_managed<T_Window>(std::forward<T_Args>(args)...);
+      m_run_window = window;
+      add_window(*window);
+      window->present();
+    } else {
+      m_run_window->present();
+    }
   });
 
   signal_window_removed().connect([this] (Window* window) {
