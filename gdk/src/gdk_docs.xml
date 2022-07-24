@@ -505,8 +505,6 @@ This is only relevant for keyboard devices.
 <description>
 Source type for the device.
 
-Deprecated: 4.6: Use GdkDeviceTool:tool-type instead
-
 </description>
 </property>
 
@@ -1075,6 +1073,11 @@ is determined by its phase field.
 </parameter>
 <parameter name="GDK_PAD_GROUP_MODE">
 <parameter_description> A tablet pad group mode change.
+</parameter_description>
+</parameter>
+<parameter name="GDK_TOUCHPAD_HOLD">
+<parameter_description> A touchpad hold gesture event, the current state
+is determined by its phase field. Since: 4.6
 </parameter_description>
 </parameter>
 <parameter name="GDK_EVENT_LAST">
@@ -2404,6 +2407,41 @@ in scroll events. See gdk_scroll_event_get_deltas()
 </parameters>
 </enum>
 
+<enum name="GdkScrollUnit">
+<description>
+Specifies the unit of scroll deltas.
+
+When you get %GDK_SCROLL_UNIT_WHEEL, a delta of 1.0 means 1 wheel detent
+click in the south direction, 2.0 means 2 wheel detent clicks in the south
+direction... This is the same logic for negative values but in the north
+direction.
+
+If you get %GDK_SCROLL_UNIT_SURFACE, are managing a scrollable view and get a
+value of 123, you have to scroll 123 surface logical pixels right if it's
+@delta_x or down if it's @delta_y. This is the same logic for negative values
+but you have to scroll left instead of right if it's @delta_x and up instead
+of down if it's @delta_y.
+
+1 surface logical pixel is equal to 1 real screen pixel multiplied by the
+final scale factor of your graphical interface (the product of the desktop
+scale factor and eventually a custom scale factor in your app).
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="GDK_SCROLL_UNIT_WHEEL">
+<parameter_description> The delta is in number of wheel clicks.
+</parameter_description>
+</parameter>
+<parameter name="GDK_SCROLL_UNIT_SURFACE">
+<parameter_description> The delta is in surface pixels to scroll directly
+on screen.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GdkSeat::device-added">
 <description>
 Emitted when a new input device is related to this seat.
@@ -3116,6 +3154,10 @@ Sets the workspace on which applications will be launched.
 This only works when running under a window manager that
 supports multiple workspaces, as described in the
 [Extended Window Manager Hints](http://www.freedesktop.org/Standards/wm-spec).
+Specifically this sets the `_NET_WM_DESKTOP` property described
+in that spec.
+
+This only works when using the X11 backend.
 
 When the workspace is not specified or @desktop is set to -1,
 it is up to the window manager to pick one, typically it will
@@ -5784,7 +5826,6 @@ Returns the `GdkSeat` the device belongs to.
 <description>
 Determines the type of the device.
 
-Deprecated: 4.6: Use gdk_device_tool_get_tool_type() instead
 
 </description>
 <parameters>
@@ -5794,7 +5835,6 @@ Deprecated: 4.6: Use gdk_device_tool_get_tool_type() instead
 </parameter>
 </parameters>
 <return> a `GdkInputSource`
-
 </return>
 </function>
 
@@ -8566,7 +8606,10 @@ See [method@Gdk.GLContext.set_forward_compatible].
 
 <function name="gdk_gl_context_get_required_version">
 <description>
-Retrieves required OpenGL version.
+Retrieves required OpenGL version set as a requirement for the @context
+realization. It will not change even if a greater OpenGL version is supported
+and used after the @context is realized. See
+[method@Gdk.GLContext.get_version] for the real version in use.
 
 See [method@Gdk.GLContext.set_required_version].
 
@@ -8638,7 +8681,9 @@ Checks whether the @context is using an OpenGL or OpenGL ES profile.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the `GdkGLContext` is using an OpenGL ES profile
+<return> %TRUE if the `GdkGLContext` is using an OpenGL ES profile;
+%FALSE if other profile is in use of if the @context has not yet
+been realized.
 </return>
 </function>
 
@@ -8647,6 +8692,10 @@ Checks whether the @context is using an OpenGL or OpenGL ES profile.
 Retrieves the OpenGL version of the @context.
 
 The @context must be realized prior to calling this function.
+
+If the @context has never been made current, the version cannot
+be known and it will return 0 for both @major and @minor.
+
 
 </description>
 <parameters>
@@ -8848,7 +8897,10 @@ Sets the major and minor version of OpenGL to request.
 
 Setting @major and @minor to zero will use the default values.
 
-The `GdkGLContext` must not be realized or made current prior to calling
+Setting @major and @minor lower than the minimum versions required
+by GTK will result in the context choosing the minimum version.
+
+The @context must not be realized or made current prior to calling
 this function.
 
 </description>
@@ -8937,7 +8989,8 @@ are released
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-created `GdkTexture`
+<return> A newly-created
+`GdkTexture`
 </return>
 </function>
 
@@ -9325,7 +9378,7 @@ in upper case or it is not subject to case conversion.
 <description>
 Creates a new texture for a blob of image data.
 
-The `GBytes` must contain @stride x @height pixels
+The `GBytes` must contain @stride × @height pixels
 in the given format.
 
 
@@ -14845,6 +14898,9 @@ Extracts the scroll deltas of a scroll event.
 The deltas will be zero unless the scroll direction
 is %GDK_SCROLL_SMOOTH.
 
+For the representation unit of these deltas, see
+[method@Gdk.ScrollEvent.get_unit].
+
 </description>
 <parameters>
 <parameter name="event">
@@ -14876,6 +14932,27 @@ Extracts the direction of a scroll event.
 </parameter>
 </parameters>
 <return> the scroll direction of @event
+</return>
+</function>
+
+<function name="gdk_scroll_event_get_unit">
+<description>
+Extracts the scroll delta unit of a scroll event.
+
+The unit will always be %GDK_SCROLL_UNIT_WHEEL if the scroll direction is not
+%GDK_SCROLL_SMOOTH.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a scroll event.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the scroll unit.
+
 </return>
 </function>
 
@@ -15737,7 +15814,7 @@ Returns the width of @texture, in pixels.
 Creates a new texture object representing the `GdkPixbuf`.
 
 This function is threadsafe, so that you can e.g. use GTask
-and g_task_run_in_thread() to avoid blocking the main thread
+and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
 
 
@@ -15756,7 +15833,7 @@ while loading a big image.
 <description>
 Creates a new texture object representing the surface.
 
-@surface must be an image surface with format CAIRO_FORMAT_ARGB32.
+@surface must be an image surface with format `CAIRO_FORMAT_ARGB32`.
 
 
 </description>
@@ -15780,7 +15857,7 @@ are PNG and JPEG, though more formats might be available.
 If %NULL is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
-and g_task_run_in_thread() to avoid blocking the main thread
+and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
 
 Since: 4.6
@@ -15811,7 +15888,7 @@ are PNG and JPEG, though more formats might be available.
 If %NULL is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
-and g_task_run_in_thread() to avoid blocking the main thread
+and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
 
 
@@ -15840,7 +15917,7 @@ are PNG and JPEG, though more formats might be available.
 If %NULL is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
-and g_task_run_in_thread() to avoid blocking the main thread
+and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
 
 Since: 4.6
@@ -15874,7 +15951,7 @@ If you are unsure about the validity of a resource, use
 [ctor@Gdk.Texture.new_from_file] to load it.
 
 This function is threadsafe, so that you can e.g. use GTask
-and g_task_run_in_thread() to avoid blocking the main thread
+and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
 
 
@@ -15895,7 +15972,7 @@ Store the given @texture to the @filename as a PNG file.
 
 This is a utility function intended for debugging and testing.
 If you want more control over formats, proper error handling or
-want to store to a `GFile` or other location, you might want to
+want to store to a [iface@Gio.File] or other location, you might want to
 use [method@Gdk.Texture.save_to_png_bytes] or look into the
 gdk-pixbuf library.
 
