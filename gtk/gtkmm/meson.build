@@ -147,6 +147,7 @@ gtkmm_any_hg_ccg_basenames = [
   'iconview',
   'image',
   'infobar',
+  'inscription',
   'label',
   'layoutchild',
   'layoutmanager',
