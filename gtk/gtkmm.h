@@ -32,7 +32,7 @@
  * @ref TextView "TextView".
  *
  * See also the
- * <a href="https://library.gnome.org/devel/gtkmm-tutorial/stable/">Programming
+ * <a href="https://gnome.pages.gitlab.gnome.org/gtkmm-documentation/">Programming
  * with gtkmm</a> book.
  *
  * @section features Features
@@ -202,6 +202,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
 #include <gtkmm/infobar.h>
+#include <gtkmm/inscription.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/label.h>
 #include <gtkmm/layoutchild.h>
