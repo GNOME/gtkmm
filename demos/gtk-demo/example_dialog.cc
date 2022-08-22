@@ -4,8 +4,7 @@
  */
 
 #include <gtkmm.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
+#include <memory>
 
 class Dialog_Interactive;
 
@@ -19,19 +18,24 @@ protected:
   //Signal handlers:
   void on_button_message();
   void on_button_interactive();
+  void on_button_non_modal();
   void on_message_response(int response_id, Gtk::MessageDialog* dialog);
   void on_interactive_response(int response_id, Dialog_Interactive* dialog);
+  void on_non_modal_response(int response_id);
 
   //Member widgets:
   Gtk::Frame m_Frame;
   Gtk::Box m_VBox, m_VBox2;
   Gtk::Box m_HBox, m_HBox2;
-  Gtk::Button m_Button_Message, m_Button_Interactive;
+  Gtk::Button m_Button_Message;
+  Gtk::Button m_Button_Interactive;
+  Gtk::Button m_Button_NonModal;
   Gtk::Grid m_Grid;
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
 
   gint m_count;
+  std::unique_ptr<Gtk::MessageDialog> m_non_modal_dialog;
 };
 
 class Dialog_Interactive : public Gtk::Dialog
@@ -66,6 +70,7 @@ Example_Dialog::Example_Dialog()
   m_HBox2(Gtk::Orientation::HORIZONTAL, 8),
   m_Button_Message("_Message Dialog", true),
   m_Button_Interactive("_Interactive Dialog", true),
+  m_Button_NonModal("_Non-modal Dialog", true),
   m_Label1("_Entry 1", true),
   m_Label2("E_ntry 2", true)
 {
@@ -79,20 +84,18 @@ Example_Dialog::Example_Dialog()
   m_VBox.set_margin(8);
   m_Frame.set_child(m_VBox);
 
-
   /* Standard message dialog */
   m_VBox.append(m_HBox);
   m_Button_Message.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_message));
   m_HBox.append(m_Button_Message);
   m_VBox.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL));
 
-
   /* Interactive dialog*/
   m_VBox.append(m_HBox2);
   m_Button_Interactive.signal_clicked().connect(sigc::mem_fun(*this, &Example_Dialog::on_button_interactive));
   m_HBox2.append(m_VBox2);
   m_VBox2.append(m_Button_Interactive);
-
+  m_VBox.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::HORIZONTAL));
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
@@ -105,6 +108,12 @@ Example_Dialog::Example_Dialog()
   m_Grid.attach(m_Label2, 0, 1);
   m_Grid.attach(m_Entry2, 1, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
+
+  // Non-modal message dialog,
+  // i.e. a dialog that does not freeze the rest of the application.
+  m_VBox.append(m_Button_NonModal);
+  m_Button_NonModal.signal_clicked().connect(sigc::mem_fun(
+    *this, &Example_Dialog::on_button_non_modal));
 }
 
 Example_Dialog::~Example_Dialog()
@@ -132,6 +141,16 @@ void Example_Dialog::on_button_interactive()
   pDialog->show();
 }
 
+void Example_Dialog::on_button_non_modal()
+{
+  const Glib::ustring strMessage = "Non-modal message box.";
+  m_non_modal_dialog = std::make_unique<Gtk::MessageDialog>(*this, strMessage,
+    /* use_markup= */ false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, /* modal= */ false);
+  m_non_modal_dialog->signal_response().connect(
+    sigc::mem_fun(*this, &Example_Dialog::on_non_modal_response));
+  m_non_modal_dialog->show();
+}
+
 void Example_Dialog::on_message_response(int /* response_id */, Gtk::MessageDialog* dialog)
 {
   m_count++;
@@ -146,6 +165,14 @@ void Example_Dialog::on_interactive_response(int response_id, Dialog_Interactive
     m_Entry2.set_text(dialog->get_entry2());
   }
   delete dialog;
+}
+
+void Example_Dialog::on_non_modal_response(int /* response_id */)
+{
+  // Delete the non-modal dialog.
+  // If the Example_Dialog is deleted without first responding to the non-modal
+  // dialog, the non-modal dialog is deleted when m_non_modal_dialog is deleted.
+  m_non_modal_dialog.reset();
 }
 
 Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
@@ -191,4 +218,3 @@ Glib::ustring Dialog_Interactive::get_entry2() const
 Dialog_Interactive::~Dialog_Interactive()
 {
 }
-
