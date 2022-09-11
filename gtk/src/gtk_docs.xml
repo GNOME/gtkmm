@@ -4078,6 +4078,43 @@ Domain for VFL parsing errors.
 </parameters>
 </enum>
 
+<enum name="GtkContentFit">
+<description>
+Controls how a content should be made to fit inside an allocation.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="GTK_CONTENT_FIT_FILL">
+<parameter_description> Make the content fill the entire allocation,
+without taking its aspect ratio in consideration. The resulting
+content will appear as stretched if its aspect ratio is different
+from the allocation aspect ratio.
+</parameter_description>
+</parameter>
+<parameter name="GTK_CONTENT_FIT_CONTAIN">
+<parameter_description> Scale the content to fit the allocation,
+while taking its aspect ratio in consideration. The resulting
+content will appear as letterboxed if its aspect ratio is different
+from the allocation aspect ratio.
+</parameter_description>
+</parameter>
+<parameter name="GTK_CONTENT_FIT_COVER">
+<parameter_description> Cover the entire allocation, while taking
+the content aspect ratio in consideration. The resulting content
+will appear as clipped if its aspect ratio is different from the
+allocation aspect ratio.
+</parameter_description>
+</parameter>
+<parameter name="GTK_CONTENT_FIT_SCALE_DOWN">
+<parameter_description> The content is scaled down to fit the
+allocation, if needed, otherwise its original size is used.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkCornerType">
 <description>
 Specifies which corner a child widget should be placed in when packed into
@@ -9975,6 +10012,15 @@ of text changes would be distracting, e.g. in a statusbar.
 </description>
 </property>
 
+<property name="GtkLabel:tabs">
+<description>
+Custom tabs for this label.
+
+Since: 4.8
+
+</description>
+</property>
+
 <property name="GtkLabel:use-markup">
 <description>
 %TRUE if the text of the label includes Pango markup.
@@ -12087,6 +12133,15 @@ If the `GtkPicture` can be made smaller than the natural size of its contents.
 </description>
 </property>
 
+<property name="GtkPicture:content-fit">
+<description>
+How the content should be resized to fit inside the `GtkPicture`.
+
+Since: 4.8
+
+</description>
+</property>
+
 <property name="GtkPicture:file">
 <description>
 The `GFile` that is displayed or %NULL if none.
@@ -12098,6 +12153,8 @@ The `GFile` that is displayed or %NULL if none.
 <description>
 Whether the GtkPicture will render its contents trying to preserve the aspect
 ratio.
+
+Deprecated: 4.8: Use [property@Gtk.Picture:content-fit] instead.
 
 </description>
 </property>
@@ -26617,6 +26674,11 @@ custom callbacks via [method@Gtk.BuilderCScope.add_callback_symbol].
 Add @object to the @builder object pool so it can be
 referenced just like any other object built by builder.
 
+Only a single object may be added using @name. However,
+it is not an error to expose the same object under multiple
+names. `gtk_builder_get_object()` may be used to determine
+if an object has already been added with @name.
+
 </description>
 <parameters>
 <parameter name="builder">
@@ -26640,8 +26702,8 @@ referenced just like any other object built by builder.
 Main private entry point for building composite components
 from template XML.
 
-This is exported purely to let `gtk-builder-tool` validate
-templates, applications have no need to call this function.
+Most likely you do not need to call this function in applications as
+templates are handled by `GtkWidget`.
 
 
 </description>
@@ -40041,6 +40103,26 @@ performed, but other additional gesture maintenance will.
 <return></return>
 </function>
 
+<function name="gtk_event_controller_set_static_name">
+<description>
+Sets a name on the controller that can be used for debugging.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="controller">
+<parameter_description> a `GtkEventController`
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a name for @controller, must be a static string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_every_filter_new">
 <description>
 Creates a new empty &quot;every&quot; filter.
@@ -50803,6 +50885,29 @@ Returns whether the label is in single line mode.
 </return>
 </function>
 
+<function name="gtk_label_get_tabs">
+<description>
+Gets the tabs for @self.
+
+The returned array will be %NULL if “standard” (8-space) tabs are used.
+Free the return value with [method@Pango.TabArray.free].
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkLabel`
+</parameter_description>
+</parameter>
+</parameters>
+<return> copy of default tab array,
+or %NULL if standard tabs are used; must be freed with
+[method@Pango.TabArray.free].
+
+</return>
+</function>
+
 <function name="gtk_label_get_text">
 <description>
 Fetches the text from a label.
@@ -51337,6 +51442,26 @@ Sets whether the label is in single line mode.
 </parameter>
 <parameter name="single_line_mode">
 <parameter_description> %TRUE if the label should be in single line mode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_label_set_tabs">
+<description>
+Sets the default tab stops for paragraphs in @self.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkLabel`
+</parameter_description>
+</parameter>
+<parameter name="tabs">
+<parameter_description> tabs as a `PangoTabArray`
 </parameter_description>
 </parameter>
 </parameters>
@@ -60007,6 +60132,26 @@ Returns whether the `GtkPicture` respects its contents size.
 </return>
 </function>
 
+<function name="gtk_picture_get_content_fit">
+<description>
+Returns the fit mode for the content of the `GtkPicture`.
+
+See [enum@Gtk.ContentFit] for details.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkPicture`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the content fit mode
+
+</return>
+</function>
+
 <function name="gtk_picture_get_file">
 <description>
 Gets the `GFile` currently displayed if @self is displaying a file.
@@ -60030,6 +60175,9 @@ If @self is not displaying a file, for example when
 <description>
 Returns whether the `GtkPicture` preserves its contents aspect ratio.
 
+Deprecated: 4.8: Use [method@Gtk.Picture.get_content_fit] instead. This will
+now return `FALSE` only if [property@Gtk.Picture:content-fit] is
+`GTK_CONTENT_FIT_FILL`. Returns `TRUE` otherwise.
 
 </description>
 <parameters>
@@ -60039,6 +60187,7 @@ Returns whether the `GtkPicture` preserves its contents aspect ratio.
 </parameter>
 </parameters>
 <return> %TRUE if the self tries to keep the contents' aspect ratio
+
 </return>
 </function>
 
@@ -60222,6 +60371,28 @@ because the grow behavior can be controlled via
 <return></return>
 </function>
 
+<function name="gtk_picture_set_content_fit">
+<description>
+Sets how the content should be resized to fit the `GtkPicture`.
+
+See [enum@Gtk.ContentFit] for details.
+
+Since: 4.8
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkPicture`
+</parameter_description>
+</parameter>
+<parameter name="content_fit">
+<parameter_description> the content fit mode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_picture_set_file">
 <description>
 Makes @self load and display @file.
@@ -60272,6 +60443,11 @@ left/right of @self.
 
 If set to %FALSE or if the contents provide no aspect ratio,
 the contents will be stretched over the picture's whole area.
+
+Deprecated: 4.8: Use [method@Gtk.Picture.set_content_fit] instead. If still
+used, this method will always set the [property@Gtk.Picture:content-fit]
+property to `GTK_CONTENT_FIT_CONTAIN` if @keep_aspect_ratio is true,
+otherwise it will set it to `GTK_CONTENT_FIT_FILL`.
 
 </description>
 <parameters>
@@ -91101,7 +91277,7 @@ behavior.
 The default `focus()` virtual function for a widget should return `TRUE` if
 moving in @direction left the focus on a focusable location inside that
 widget, and `FALSE` if moving in @direction moved the focus outside the
-widget. When returning `TRUE`, widgets normallycall [method@Gtk.Widget.grab_focus]
+widget. When returning `TRUE`, widgets normally call [method@Gtk.Widget.grab_focus]
 to place the focus accordingly; when returning `FALSE`, they don’t modify
 the current focus location.
 
