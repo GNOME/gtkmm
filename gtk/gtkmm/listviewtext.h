@@ -18,6 +18,8 @@
 #ifndef _GTKMM_LISTVIEW_TEXT_H
 #define _GTKMM_LISTVIEW_TEXT_H
 
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
+
 #include <gtkmm/treeview.h>
 #include <gtkmm/liststore.h>
 
@@ -35,8 +37,8 @@ namespace Gtk
  * @ingroup Widgets
  * @ingroup Containers
  * @ingroup TreeView
- *
- * @newin{2,10}
+ * @deprecated 4.10: Use Gtk::ListView for lists, and Gtk::ColumnView
+ *   for tabular lists.
  */
 class GTKMM_API ListViewText : public Gtk::TreeView
 {
@@ -112,7 +114,7 @@ public:
 
 protected:
 
- class TextModelColumns : public Gtk::TreeModel::ColumnRecord
+  class TextModelColumns : public Gtk::TreeModel::ColumnRecord
   {
   public:
     TextModelColumns(guint columns_count);
@@ -132,5 +134,6 @@ protected:
 
 } //namespace Gtk
 
-#endif //_GTKMM_LISTVIEW_TEXT_H
+#endif // GTKMM_DISABLE_DEPRECATED
 
+#endif //_GTKMM_LISTVIEW_TEXT_H

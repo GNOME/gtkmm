@@ -1,8 +1,24 @@
+// Gtk::TreeModel and Gtk::TreeIter are deprecated, but let's keep the test.
+// The recommended replacement is Gio::ListModel which requires no test here.
+#undef GTKMM_DISABLE_DEPRECATED
+
 #include <gtkmm.h>
 #include <gtkmm/init.h>
 #include <iostream>
 #include <cassert>
 #include <cstdlib>
+
+#ifdef GTKMM_DISABLE_DEPRECATED
+int
+main(int, char**)
+{
+  // If gtkmm is configured with build-deprecated-api=false, GTKMM_DISABLE_DEPRECATED
+  // is defined in gtkmm.h (actually in gtkmmconfig.h). The undef at the start of
+  // this file has no effect.
+  return 77; // Tell Meson's test harness to skip this test.
+}
+
+#else
 
 static void
 test_const_conversion() {
@@ -42,3 +58,4 @@ int main(int /* argc */, char** /* argv */)
 
   return EXIT_SUCCESS;
 }
+#endif // GTKMM_DISABLE_DEPRECATED

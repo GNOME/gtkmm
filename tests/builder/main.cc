@@ -103,8 +103,10 @@ public:
   {
     std::cout << "DerivedButton::ctor" << std::endl;
 
+#ifndef GTKMM_DISABLE_DEPRECATED
     get_style_context()->add_provider(
       m_cssProvider_background, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+#endif
 
     apply_background();
     property_background().signal_changed().connect(

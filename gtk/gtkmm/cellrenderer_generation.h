@@ -1,7 +1,5 @@
 #ifndef _GTKMM_CELLRENDERER_GENERATION_H
 #define _GTKMM_CELLRENDERER_GENERATION_H
-/* $Id$ */
-
 /* cellrenderer_generation.h
  *
  * Copyright(C) 2003 The gtkmm Development Team
@@ -20,6 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/cellrendererpixbuf.h>
@@ -63,5 +63,6 @@ GTKMM_API CellRenderer* generate_cellrenderer<AccelKey>(bool editable);
 
 } // namespace Gtk
 
+#endif // GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_CELLRENDERER_GENERATION_H */

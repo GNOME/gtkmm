@@ -1,8 +1,5 @@
 #ifndef _GTKMM_TREEVIEW_PRIVATE_H
 #define _GTKMM_TREEVIEW_PRIVATE_H
-/* $Id$ */
-
-
 /* treeview.h
  *
  * Copyright(C) 2001-2002 The gtkmm Development Team
@@ -21,6 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
 #include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/treeview.h>
@@ -43,11 +42,11 @@ gboolean SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter*
 GTKMM_API
 void SignalProxy_RowSeparator_gtk_callback_destroy(void* data);
 
-
 } /* namespace TreeView_Private */
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 } /* namespace Gtk */
 
+#endif // GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_TREEVIEW_PRIVATE_H */

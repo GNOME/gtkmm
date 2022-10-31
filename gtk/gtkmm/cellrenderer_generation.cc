@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright(C) 2003 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -17,8 +15,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmm/cellrenderer_generation.h>
+#undef GTK_DISABLE_DEPRECATED
+#define GDK_DISABLE_DEPRECATION_WARNINGS 1
 
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
+
+#include <gtkmm/cellrenderer_generation.h>
 
 //template specializations:
 
@@ -59,5 +61,6 @@ CellRenderer* generate_cellrenderer<AccelKey>(bool editable)
 
 } //CellRenderer_Generation
 
-
 } //namespace Gtk
+
+#endif // GTKMM_DISABLE_DEPRECATED
