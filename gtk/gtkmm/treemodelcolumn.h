@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
+
 #include <gtkmmconfig.h>
 #include <glibmm/value.h>
 #include <glib-object.h>
@@ -136,6 +138,6 @@ public:
 
 } // namespace Gtk
 
+#endif // GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_TREEMODELCOLUMN_H */
-

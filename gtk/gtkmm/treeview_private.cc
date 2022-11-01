@@ -15,9 +15,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#undef GTK_DISABLE_DEPRECATED
-#define GDK_DISABLE_DEPRECATION_WARNINGS 1
-
 #ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
 #include <glibmm.h>

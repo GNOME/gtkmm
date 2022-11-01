@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* Copyright (c) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -17,8 +15,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <gtkmm/treemodelcolumn.h>
+#ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
+#include <gtkmm/treemodelcolumn.h>
 
 namespace Gtk
 {
@@ -66,3 +65,4 @@ TreeModelColumnBase::TreeModelColumnBase(GType g_type)
 
 } // namespace Gtk
 
+#endif // GTKMM_DISABLE_DEPRECATED

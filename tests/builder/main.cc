@@ -86,6 +86,32 @@ void on_adjustment_deleted(sigc::notifiable* /* data */)
   std::cout << "Gtk::Adjustment deleted" << std::endl;
 }
 
+class BackgroundArea : public Gtk::DrawingArea
+{
+public:
+  BackgroundArea()
+  {
+    set_draw_func(sigc::mem_fun(*this, &BackgroundArea::on_draw));
+    set_size_request(-1, 30);
+    set_hexpand(true);
+  }
+  virtual ~BackgroundArea() {} 
+
+  double m_red{1.0};
+  double m_green{1.0};
+  double m_blue{1.0};
+
+protected:
+  void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
+  {
+    // Fill The drawing area with the selected color.
+    cr->set_source_rgb(m_red, m_green, m_blue);
+    cr->rectangle(0, 0, width, height);
+    cr->fill();
+  }
+
+}; // BackgroundArea
+
 class DerivedButton : public Gtk::Button
 {
 public:
@@ -99,21 +125,25 @@ public:
                 const Glib::ustring& icon_name = {})
   : Glib::ObjectBase(s_type_name)
   , Gtk::Button(cobject)
-  , m_cssProvider_background{ Gtk::CssProvider::create() }
+  , m_backgroundArea()
   {
     std::cout << "DerivedButton::ctor" << std::endl;
-
-#ifndef GTKMM_DISABLE_DEPRECATED
-    get_style_context()->add_provider(
-      m_cssProvider_background, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-#endif
 
     apply_background();
     property_background().signal_changed().connect(
       sigc::mem_fun(*this, &DerivedButton::apply_background));
 
-    if (!icon_name.empty())
-      set_icon_name(icon_name);
+    if (icon_name.empty())
+      set_child(m_backgroundArea);
+    else
+    {
+      auto box = Gtk::make_managed<Gtk::Box>();
+      set_child(*box);
+      auto icon = Gtk::make_managed<Gtk::Image>();
+      icon->set_from_icon_name(icon_name);
+      box->append(*icon);
+      box->append(m_backgroundArea);
+    }
   }
 
   auto property_background() const -> Glib::PropertyProxy_ReadOnly<Glib::ustring> { return m_property_background.get_proxy(); }
@@ -130,7 +160,7 @@ private:
   static constexpr auto s_type_name = "DerivedButton";
   Glib::Property<Glib::ustring> m_property_background{*this, "background"};
 
-  const Glib::RefPtr<Gtk::CssProvider> m_cssProvider_background;
+  BackgroundArea m_backgroundArea;
 
   DerivedButton()
   : Glib::ObjectBase(s_type_name)
@@ -143,16 +173,20 @@ private:
     const auto background = get_background();
     std::cout << "apply_background(\"" << background << "\")" << std::endl;
 
-    const auto css = background.empty() ? Glib::ustring()
-                     : Glib::ustring::compose("button { background: %1; }", background);
-
-    try {
-      m_cssProvider_background->load_from_data(css);
-    } catch (const Gtk::CssParserError&) {
-      std::cout << "invalid CSS, but I let you keep typing!" << std::endl;
+    Gdk::RGBA color;
+    if (color.set(background))
+    {
+      m_backgroundArea.m_red = color.get_red();
+      m_backgroundArea.m_green = color.get_green();
+      m_backgroundArea.m_blue = color.get_blue();
     }
+    else
+    {
+      std::cout << "invalid background color, but I let you keep typing!" << std::endl;
+    }
+    m_backgroundArea.queue_draw();
   }
-};
+}; // DerivedButton
 
 class MainWindow : public Gtk::Window
 {
@@ -191,7 +225,8 @@ public:
 private:
   DerivedButton* m_pDerivedButton = nullptr;
   Gtk::Button* m_pStandardButton = nullptr;
-};
+
+}; // MainWindow
 
 } // end of anonymous namespace
 

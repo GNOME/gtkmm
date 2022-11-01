@@ -1,20 +1,20 @@
 #include <gtkmm.h>
 #include <iostream>
 
-void on_property_rgba_changed()
+void on_property_text_changed()
 {
-  std::cout << "rgba property changed" << std::endl;
+  std::cout << "text property changed" << std::endl;
 }
 
-void on_property_rgba_changed_nicer_api()
+void on_property_text_changed_nicer_api()
 {
-  std::cout << "rgba property changed (nicer API)" << std::endl;
+  std::cout << "text property changed (nicer API)" << std::endl;
 }
 
-void on_property_name_changed()
+void on_property_editable_changed()
 {
   //Check that we don't get notification of the wrong property:
-  std::cout << "name property changed" << std::endl;
+  std::cout << "editable property changed (should not happen)" << std::endl;
 }
 
 class TestWindow : public Gtk::Window
@@ -22,15 +22,19 @@ class TestWindow : public Gtk::Window
 public:
   TestWindow()
   {
-    button.connect_property_changed("rgba", sigc::ptr_fun(&on_property_rgba_changed));
-    button.property_rgba().signal_changed().connect(sigc::ptr_fun(&on_property_rgba_changed_nicer_api));
-    button.connect_property_changed("name", sigc::ptr_fun(&on_property_name_changed));
+    set_default_size(200, 100);
 
-    set_child(button);
+    m_label.connect_property_changed("text", sigc::ptr_fun(&on_property_text_changed));
+    m_label.property_text().signal_changed().connect(sigc::ptr_fun(&on_property_text_changed_nicer_api));
+    m_label.connect_property_changed("editable", sigc::ptr_fun(&on_property_editable_changed));
+    m_label.set_halign(Gtk::Align::CENTER);
+    m_label.set_valign(Gtk::Align::CENTER);
+
+    set_child(m_label);
   }
 
 protected:
-  Gtk::ColorButton button;
+  Gtk::EditableLabel m_label {"Editable text"};
 };
 
 int main (int argc, char **argv)
