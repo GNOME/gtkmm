@@ -1,9 +1,8 @@
-# 2022-05-11: ubuntu:latest = 22.04, ubuntu:rolling = 22.04, ubuntu:devel = 22.10
+# 2022-11-01: ubuntu:latest = 22.04, ubuntu:rolling = 22.10, ubuntu:devel = ??
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
 
 stages:
-  - deps
   - build
   - deploy
 
@@ -20,6 +19,10 @@ variables:
                   libpango1.0-dev
                   libgtk-4-dev
                   mm-common
+                  libsigc++-3.0-dev
+                  libglibmm-2.68-dev
+                  libcairomm-1.16-dev
+                  libpangomm-2.48-dev
                   libxml-libxml-perl
                   meson
                   ninja-build
@@ -42,96 +45,12 @@ variables:
     - export DEBIAN_FRONTEND=noninteractive
     - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
 
-# Clear the cache manually.
-clear_cache:
-  stage: deps
-  when: manual
-  script:
-    - echo Clearing the build-deps cache
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-      - glibmm/
-      - cairomm/
-      - pangomm/
-    policy: push
-
-build_deps:
-  extends: .build_default
-  stage: deps
-  variables:
-    DEPENDENCIES: $MESON_GCC_DEPS docbook5-xml docbook-xsl
-  script:
-    # Build and cache dependencies that can't be installed with apt.
-    # Install to ./installdir, with the contents of the installed files
-    # (notably .pc files) suited for installation to /usr.
-    - export DESTDIR=`pwd`/installdir
-    # Build libsigc++3
-    - if test ! -d libsigc; then
-    - git clone --branch 3.2.0 --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git libsigc
-    - cd libsigc
-    - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dvalidation=false -Dbuild-examples=false -Dbuildtype=release
-    - meson compile
-    - cd ../..
-    - fi
-    - ninja -C libsigc/_build install
-    - cp -r installdir/usr /
-    # Build glibmm-2.68
-    - if test ! -d glibmm; then
-    - git clone --branch 2.72.1 --depth 1 https://gitlab.gnome.org/GNOME/glibmm.git glibmm
-    - cd glibmm
-    - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-examples=false -Dbuildtype=release
-    - meson compile
-    - cd ../..
-    - fi
-    - ninja -C glibmm/_build install
-    # Build cairomm-1.16
-    - if test ! -d cairomm; then
-    - git clone --branch 1.16.1 --depth 1 https://gitlab.freedesktop.org/cairo/cairomm.git cairomm
-    - cd cairomm
-    - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuild-examples=false -Dbuild-tests=false -Dbuildtype=release
-    - meson compile
-    - cd ../..
-    - fi
-    - ninja -C cairomm/_build install
-    - cp -r installdir/usr /
-    # Build pangomm-2.48
-    - if test ! -d pangomm; then
-    - git clone --branch 2.50.0 --depth 1 https://gitlab.gnome.org/GNOME/pangomm.git pangomm
-    - cd pangomm
-    - mkdir _build && cd _build
-    - meson --prefix=/usr --libdir=lib -Dbuildtype=release
-    - meson compile
-    - cd ../..
-    - fi
-    - ninja -C pangomm/_build install
-  cache:
-    key: build-deps
-    paths:
-      - libsigc/
-      - glibmm/
-      - cairomm/
-      - pangomm/
-    policy: pull-push
-  # Transfer the installed part of the built dependencies to later stages
-  # as artifacts. The cache does not always work.
-  # https://gitlab.gnome.org/Infrastructure/Infrastructure/-/issues/775
-  artifacts:
-    paths:
-      - installdir/
-    expire_in: 1 day
-
 release_gcc_build:
   extends: .build_default
   stage: build
   variables:
     DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS
   script:
-    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
@@ -157,7 +76,6 @@ release_clang_build:
   variables:
     DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS clang
   script:
-    - cp -r installdir/usr /
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
