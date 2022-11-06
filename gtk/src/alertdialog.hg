@@ -1,0 +1,98 @@
+/* Copyright (C) 2022 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <gtk/gtk.h>
+#include <vector>
+
+namespace Gtk
+{
+class Window;
+
+/** A %Gtk::AlertDialog object collects the arguments that
+ * are needed to present a message to the user.
+ *
+ * The message is shown with the choose() method. This API follows the GIO
+ * async pattern, and the result can be obtained by calling choose_finish().
+ *
+ * If you don't need to wait for a button to be clicked, you can use show().
+ *
+ * @ingroup Dialogs
+ * @newin{4,10}
+ */
+class GTKMM_API AlertDialog : public Glib::Object
+{
+   _CLASS_GOBJECT(AlertDialog, GtkAlertDialog, GTK_ALERT_DIALOG, Glib::Object, GObject, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkAlertDialog is a final type
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT
+
+  /** Creates a new %Gtk::AlertDialog with the given message.
+   * @param message The message.
+   */
+  _WRAP_CTOR(AlertDialog(const Glib::ustring& message), gtk_alert_dialog_new)
+
+public:
+  _WRAP_CREATE()
+
+  /** Creates a new %Gtk::AlertDialog with the given message.
+   * @param message The message.
+   */
+  _WRAP_CREATE(const Glib::ustring& message)
+
+  _WRAP_METHOD(bool get_modal() const, gtk_alert_dialog_get_modal)
+  _WRAP_METHOD(void set_modal(bool modal = true), gtk_alert_dialog_set_modal)
+  _WRAP_METHOD(Glib::ustring get_message() const, gtk_alert_dialog_get_message)
+  _WRAP_METHOD(void set_message(const Glib::ustring& message), gtk_alert_dialog_set_message)
+  _WRAP_METHOD(Glib::ustring get_detail() const, gtk_alert_dialog_get_detail)
+  _WRAP_METHOD(void set_detail(const Glib::ustring& detail), gtk_alert_dialog_set_detail)
+
+#m4 _CONVERSION(`const char* const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_buttons() const, gtk_alert_dialog_get_buttons)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const char*-const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data ()')
+  _WRAP_METHOD(void set_buttons(const std::vector<Glib::ustring>& labels) const, gtk_alert_dialog_set_buttons)
+
+  _WRAP_METHOD(int get_cancel_button() const, gtk_alert_dialog_get_cancel_button)
+  _WRAP_METHOD(void set_cancel_button(int button), gtk_alert_dialog_set_cancel_button)
+  _WRAP_METHOD(int get_default_button() const, gtk_alert_dialog_get_default_button)
+  _WRAP_METHOD(void set_default_button(int button), gtk_alert_dialog_set_default_button)
+
+  _WRAP_METHOD(void choose(Window& parent{?},
+    const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_alert_dialog_choose, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(int choose_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_alert_dialog_choose_finish)
+
+  _WRAP_METHOD(void show(Window& parent{?}), gtk_alert_dialog_show)
+
+  _WRAP_PROPERTY("modal", bool)
+  _WRAP_PROPERTY("message", Glib::ustring)
+  _WRAP_PROPERTY("detail", Glib::ustring)
+  _WRAP_PROPERTY("buttons", std::vector<Glib::ustring>)
+  _WRAP_PROPERTY("cancel-button", int)
+  _WRAP_PROPERTY("default-button", int)
+};
+
+} // namespace Gtk

@@ -1,0 +1,106 @@
+/* Copyright (C) 2022 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <gtkmm/columnviewcolumn.h>
+#include <gtkmm/sorter.h>
+#include <utility> // std::pair
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/sorter_p.h)
+
+namespace Gtk
+{
+
+/** A sorter implementation that is geared towards the needs of Gtk::ColumnView.
+ *
+ * The sorter returned by Gtk::ColumnView::get_sorter() is
+ * a %Gtk::ColumnViewSorter.
+ *
+ * In column views, sorting can be configured by associating
+ * sorters with columns, and users can invert sort order by clicking
+ * on column headers. The API of %Gtk::ColumnViewSorter is designed
+ * to allow saving and restoring this configuration.
+ *
+ * If you are only interested in the primary sort column (i.e. the
+ * column where a sort indicator is shown in the header), then
+ * you can just look at property_primary_sort_column()
+ * and property_primary_sort_order().
+ *
+ * If you want to store the full sort configuration, including
+ * secondary sort columns that are used for tie breaking, then
+ * you can use get_nth_sort_column().
+ * To get notified about changes, use Gtk::Sorter::signal_changed().
+ *
+ * To restore a saved sort configuration on a Gtk::ColumnView, use code like:
+ * @code
+ * auto sorter = column_view->get_sorter();
+ * auto column_view_sorter = std::dynamic_pointer_cast<Gtk::ColumnViewSorter>(sorter);
+ * if (column_view_sorter)
+ * {
+ *   for (unsigned int i = column_view_sorter->get_n_sort_columns(); i > 0; --i)
+ *   {
+ *     auto [column, sort_order] = column_view_sorter->get_nth_sort_column(i-1);
+ *     column_view->sort_by_column(column, sort_order);
+ *   }
+ * }
+ * @endcode
+ *
+ * @newin{4,10}
+ */
+class GTKMM_API ColumnViewSorter : public Sorter
+{
+  _CLASS_GOBJECT(ColumnViewSorter, GtkColumnViewSorter, GTK_COLUMN_VIEW_SORTER, Gtk::Sorter, GtkSorter, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkColumnViewSorter is a final type
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+#m4 _CONVERSION(`GtkColumnViewColumn*',`Glib::RefPtr<ColumnViewColumn>',`Glib::wrap($3)')
+  _WRAP_METHOD(Glib::RefPtr<ColumnViewColumn> get_primary_sort_column(),
+    gtk_column_view_sorter_get_primary_sort_column, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const ColumnViewColumn> get_primary_sort_column() const,
+    gtk_column_view_sorter_get_primary_sort_column, refreturn, constversion)
+  _WRAP_METHOD(SortType get_primary_sort_order() const, gtk_column_view_sorter_get_primary_sort_order)
+  _WRAP_METHOD(unsigned int get_n_sort_columns() const, gtk_column_view_sorter_get_n_sort_columns)
+
+  /** Gets the @a position'th sort column and its associated sort order.
+   *
+   * Use the Gtk::Sorter::signal_changed() signal to get notified
+   * when sort columns change.
+   *
+   * @newin{4,10}
+   *
+   * @param position The position of the sort column to retrieve (0 for the
+   *                 primary sort column).
+   * @return {sort_column, sort_order} The @a position's sort column and sort order.
+   */
+  std::pair<Glib::RefPtr<ColumnViewColumn>, SortType>
+  get_nth_sort_column(unsigned int position);
+  _IGNORE(gtk_column_view_sorter_get_nth_sort_column)
+
+  /// See the non-const get_nth_sort_column().
+  std::pair<Glib::RefPtr<const ColumnViewColumn>, SortType>
+  get_nth_sort_column(unsigned int position) const;
+
+  _WRAP_PROPERTY("primary-sort-column", Glib::RefPtr<ColumnViewColumn>)
+  _WRAP_PROPERTY("primary-sort-order", SortType)
+};
+
+} // namespace Gtk

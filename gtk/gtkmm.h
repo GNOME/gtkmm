@@ -109,6 +109,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/actionable.h>
 #include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>
+#include <gtkmm/alertdialog.h>
 #include <gtkmm/appchooserbutton.h>
 #include <gtkmm/appchooserdialog.h>
 #include <gtkmm/appchooserwidget.h>
@@ -142,7 +143,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorbutton.h>
 #include <gtkmm/colorchooser.h>
 #include <gtkmm/colorchooserdialog.h>
+#include <gtkmm/colordialogbutton.h>
 #include <gtkmm/columnview.h>
+#include <gtkmm/columnviewsorter.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/constraintlayout.h>
@@ -162,6 +165,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/entry.h>
 #include <gtkmm/expander.h>
 #include <gtkmm/enums.h>
+#include <gtkmm/error.h>
 #include <gtkmm/eventcontroller.h>
 #include <gtkmm/eventcontrollerfocus.h>
 #include <gtkmm/eventcontrollerkey.h>
@@ -171,6 +175,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/filechoosernative.h>
 #include <gtkmm/filechooserwidget.h>
+#include <gtkmm/filedialog.h>
 #include <gtkmm/filefilter.h>
 #include <gtkmm/filterlistmodel.h>
 #include <gtkmm/fixed.h>
@@ -181,6 +186,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontchooser.h>
 #include <gtkmm/fontchooserdialog.h>
 #include <gtkmm/fontchooserwidget.h>
+#include <gtkmm/fontdialogbutton.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/gesture.h>
 #include <gtkmm/gestureclick.h>

@@ -1,0 +1,39 @@
+/* Copyright 2022 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <giomm/slot_async.h>
+#include <gtkmm/window.h>
+
+namespace Gtk
+{
+std::tuple<Pango::FontDescription, Glib::ustring, Pango::Language>
+  FontDialog::choose_font_and_features_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const
+{
+  GError* gerror = nullptr;
+  PangoFontDescription* font_desc = nullptr;
+  char* font_features = nullptr;
+  PangoLanguage* language = nullptr;
+
+  // If the function returns FALSE, gerror will be set. No reason to test the return value.
+  (void)gtk_font_dialog_choose_font_and_features_finish(const_cast<GtkFontDialog*>(gobj()),
+    Glib::unwrap(result), &font_desc, &font_features, &language, &gerror);
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return {Glib::wrap(font_desc),
+    Glib::convert_return_gchar_ptr_to_ustring(font_features), Glib::wrap(language)};
+}
+}

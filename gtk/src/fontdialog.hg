@@ -1,0 +1,151 @@
+/* Copyright (C) 2022 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <pangomm/fontdescription.h>
+#include <pangomm/fontface.h>
+#include <pangomm/fontfamily.h>
+#include <pangomm/fontmap.h>
+#include <pangomm/language.h>
+#include <gtkmm/filter.h>
+#include <gtk/gtk.h>
+#include <tuple>
+
+namespace Gtk
+{
+class Window;
+
+/** A %Gtk::FontDialog object collects the arguments that
+ * are needed to present a font chooser dialog to the
+ * user, such as a title for the dialog and whether it
+ * should be modal.
+ *
+ * The dialog is shown with the choose_font() method or its variants.
+ * This API follows the GIO async pattern,
+ * and the result can be obtained by calling the corresponding
+ * finish method, such as choose_font_finish().
+ *
+ * See Gtk::FontDialogButton for a convenient control
+ * that uses %Gtk::FontDialog and presents the results.
+ *
+ * @ingroup Dialogs
+ * @newin{4,10}
+ */
+class GTKMM_API FontDialog : public Glib::Object
+{
+   _CLASS_GOBJECT(FontDialog, GtkFontDialog, GTK_FONT_DIALOG, Glib::Object, GObject, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkFontDialog is a final type
+  _STRUCT_NOT_HIDDEN
+  _IGNORE(gtk_font_dialog_button_new) dnl// gmmproc thinks this is a FontDialog method.
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(Glib::ustring get_title() const, gtk_font_dialog_get_title)
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), gtk_font_dialog_set_title)
+  _WRAP_METHOD(bool get_modal() const, gtk_font_dialog_get_modal)
+  _WRAP_METHOD(void set_modal(bool modal = true), gtk_font_dialog_set_modal)
+  _WRAP_METHOD(Pango::Language get_language() const, gtk_font_dialog_get_language)
+#m4 _CONVERSION(`const Pango::Language&',`PangoLanguage*',`const_cast<PangoLanguage*>(`($3).gobj()')')
+  _WRAP_METHOD(void set_language(const Pango::Language& language), gtk_font_dialog_set_language)
+
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontMap> get_font_map(), gtk_font_dialog_get_font_map, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Pango::FontMap> get_font_map() const, gtk_font_dialog_get_font_map, refreturn, constversion)
+  _WRAP_METHOD(void set_font_map(const Glib::RefPtr<Pango::FontMap>& fontmap), gtk_font_dialog_set_font_map)
+
+  _WRAP_METHOD(Glib::RefPtr<Filter> get_filter(), gtk_font_dialog_get_filter, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Filter> get_filter() const, gtk_font_dialog_get_filter, refreturn, constversion)
+  _WRAP_METHOD(void set_filter(const Glib::RefPtr<Filter>& filter), gtk_font_dialog_set_filter)
+
+#m4 _CONVERSION(`const Glib::RefPtr<Pango::FontFamily>&',`PangoFontFamily*',__CONVERT_REFPTR_TO_P)
+  _WRAP_METHOD(void choose_family(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Pango::FontFamily>& initial_value{.} = {},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_font_dialog_choose_family, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontFamily> choose_family_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_font_dialog_choose_family_finish, errthrow)
+
+#m4 _CONVERSION(`const Glib::RefPtr<Pango::FontFace>&',`PangoFontFace*',__CONVERT_REFPTR_TO_P)
+  _WRAP_METHOD(void choose_face(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Pango::FontFace>& initial_value{.} = {},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_font_dialog_choose_face, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::RefPtr<Pango::FontFace> choose_face_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_font_dialog_choose_face_finish, errthrow)
+
+  _WRAP_METHOD(void choose_font(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Pango::FontDescription& initial_value{.?},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_font_dialog_choose_font, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+#m4 _CONVERSION(`PangoFontDescription*',`Pango::FontDescription',`Glib::wrap($3, false)')
+  _WRAP_METHOD(Pango::FontDescription choose_font_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_font_dialog_choose_font_finish, errthrow)
+
+  _WRAP_METHOD(void choose_font_and_features(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Pango::FontDescription& initial_value{.?},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_font_dialog_choose_font_and_features, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+
+  /** Finishes the choose_font_and_features() call
+   * and returns the resulting font description and font features.
+   *
+   * You can use structured binding or std::tie() to get the return value.
+   * @code
+   * auto [font_desc, font_features, language] =
+   *   font_dialog->choose_font_and_features_finish(result);
+   *
+   * // or
+   * Pango::FontDescription font_desc;
+   * Glib::ustring font_features;
+   * Pango::Language language;
+   * std::tie(font_desc, font_features, language) =
+   *   font_dialog->choose_font_and_features_finish(result);
+   *
+   * // or, if you don't need all return values, for instance
+   * std::tie(font_desc, font_features, std::ignore) =
+   *   font_dialog->choose_font_and_features_finish(result);
+   * @endcode
+   * 
+   * @newin{4,10}
+   * 
+   * @param result A Gio::AsyncResult.
+   * @return {font_desc, font_features, language} A Pango::FontDescription,
+   *   a Glib::ustring with font features, and a Pango::Language.
+   *
+   * @throws Glib::Error
+   */
+  std::tuple<Pango::FontDescription, Glib::ustring, Pango::Language>
+  choose_font_and_features_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const;
+  _IGNORE(gtk_font_dialog_choose_font_and_features_finish)
+
+  _WRAP_PROPERTY("title", Glib::ustring)
+  _WRAP_PROPERTY("modal", bool)
+  _WRAP_PROPERTY("language", Pango::Language)
+  _WRAP_PROPERTY("font-map", Glib::RefPtr<Pango::FontMap>)
+  _WRAP_PROPERTY("filter", Glib::RefPtr<Filter>)
+};
+
+} // namespace Gtk

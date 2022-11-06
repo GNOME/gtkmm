@@ -1,0 +1,79 @@
+/* Copyright (C) 2022 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <gdkmm/rgba.h>
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+class Window;
+
+/** A %Gtk::ColorDialog object collects the arguments that
+ * are needed to present a color chooser dialog to the
+ * user, such as a title for the dialog and whether it
+ * should be modal.
+ *
+ * The dialog is shown with the choose_rgba() method.
+ * This API follows the GIO async pattern, and the
+ * result can be obtained by calling choose_rgba_finish().
+ *
+ * See Gtk::ColorDialogButton for a convenient control
+ * that uses %Gtk::ColorDialog and presents the results.
+ *
+ * @ingroup Dialogs
+ * @newin{4,10}
+ */
+class GTKMM_API ColorDialog : public Glib::Object
+{
+   _CLASS_GOBJECT(ColorDialog, GtkColorDialog, GTK_COLOR_DIALOG, Glib::Object, GObject, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkColorDialog is a final type
+  _STRUCT_NOT_HIDDEN
+  _IGNORE(gtk_color_dialog_button_new) dnl// gmmproc thinks this is a ColorDialog method.
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(Glib::ustring get_title() const, gtk_color_dialog_get_title)
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), gtk_color_dialog_set_title)
+  _WRAP_METHOD(bool get_modal() const, gtk_color_dialog_get_modal)
+  _WRAP_METHOD(void set_modal(bool modal = true), gtk_color_dialog_set_modal)
+  _WRAP_METHOD(bool get_with_alpha() const, gtk_color_dialog_get_with_alpha)
+  _WRAP_METHOD(void set_with_alpha(bool with_alpha = true), gtk_color_dialog_set_with_alpha)
+
+  _WRAP_METHOD(void choose_rgba(Window& parent{?}, const Gdk::RGBA& initial_color{?},
+    const Gio::SlotAsyncReady& slot{callback}, const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_color_dialog_choose_rgba, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+#m4 _CONVERSION(`GdkRGBA*',`Gdk::RGBA',`Glib::wrap($3, false)')
+  _WRAP_METHOD(Gdk::RGBA choose_rgba_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_color_dialog_choose_rgba_finish, errthrow)
+
+  _WRAP_PROPERTY("title", Glib::ustring)
+  _WRAP_PROPERTY("modal", bool)
+  _WRAP_PROPERTY("with-alpha", bool)
+};
+
+} // namespace Gtk
