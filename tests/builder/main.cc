@@ -95,20 +95,25 @@ public:
     set_size_request(-1, 30);
     set_hexpand(true);
   }
-  virtual ~BackgroundArea() {} 
+  virtual ~BackgroundArea() {}
 
-  double m_red{1.0};
-  double m_green{1.0};
-  double m_blue{1.0};
+  bool set_color(const Glib::ustring& spec)
+  {
+    bool success = m_color.set(spec);
+    if (success)
+      queue_draw();
+    return success;
+  }
 
 protected:
-  void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height)
+  void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int /* width */, int /* height */)
   {
     // Fill The drawing area with the selected color.
-    cr->set_source_rgb(m_red, m_green, m_blue);
-    cr->rectangle(0, 0, width, height);
-    cr->fill();
+    Gdk::Cairo::set_source_rgba(cr, m_color);
+    cr->paint();
   }
+
+  Gdk::RGBA m_color{1.0, 1.0, 1.0};
 
 }; // BackgroundArea
 
@@ -173,18 +178,8 @@ private:
     const auto background = get_background();
     std::cout << "apply_background(\"" << background << "\")" << std::endl;
 
-    Gdk::RGBA color;
-    if (color.set(background))
-    {
-      m_backgroundArea.m_red = color.get_red();
-      m_backgroundArea.m_green = color.get_green();
-      m_backgroundArea.m_blue = color.get_blue();
-    }
-    else
-    {
+    if (!m_backgroundArea.set_color(background))
       std::cout << "invalid background color, but I let you keep typing!" << std::endl;
-    }
-    m_backgroundArea.queue_draw();
   }
 }; // DerivedButton
 
