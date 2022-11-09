@@ -42,7 +42,8 @@ foreach ex : test_programs
     install: false,
   )
 
-  if ex[4]
+  # If exe_file is a test program, it is built by default unconditionally.
+  if ex[4] and build_tests
     test(ex_name, exe_file)
   endif
 endforeach

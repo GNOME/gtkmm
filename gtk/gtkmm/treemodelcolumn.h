@@ -33,7 +33,7 @@ class GTKMM_API TreeModelColumnBase;
 
 /** Typedefed as TreeModel::ColumnRecord.
  * Keeps a record of @link TreeModelColumn TreeModelColumns@endlink.
- * @ingroup TreeView
+ *
  * ColumnRecord objects are used to setup a new instance of a TreeModel
  * (or rather, a new instance of an implementation of the model, such as Gtk::ListStore
  * or Gtk::TreeStore).  It is convenient to do that by deriving from
@@ -68,6 +68,9 @@ class GTKMM_API TreeModelColumnBase;
  * Thus TreeModel::ColumnRecord can be made a singleton (as long as you make
  * sure it's instantiated after Gtk::Main), even when creating multiple models
  * from it.
+ *
+ * @ingroup TreeView
+ * @deprecated 4.10: Gtk::TreeModel has been deprecated in favor of Gio::ListModel.
  */
 class TreeModelColumnRecord
 {
@@ -96,6 +99,7 @@ private:
 
 /** Base class of TreeModelColumn templates.
  * @ingroup TreeView
+ * @deprecated 4.10: Gtk::TreeModel has been deprecated in favor of Gio::ListModel.
  */
 class GTKMM_API TreeModelColumnBase
 {
@@ -125,6 +129,7 @@ inline bool operator!=(const TreeModelColumnBase& lhs, const TreeModelColumnBase
 /** A Gtk::TreeModelColumn describes the C++ type of the data in a model column, and identifies that column in the model.
  * See @link TreeModelColumnRecord Gtk::TreeModel::Columns@endlink for a usage example.
  * @ingroup TreeView
+ * @deprecated 4.10: Gtk::TreeModel has been deprecated in favor of Gio::ListModel.
  */
 template <class T>
 class TreeModelColumn : public TreeModelColumnBase
