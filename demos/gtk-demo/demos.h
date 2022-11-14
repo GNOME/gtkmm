@@ -1,9 +1,14 @@
 #ifndef _DEMOS_H
 #define _DEMOS_H
 
-#include "demowindow.h"
+#include <sigc++/slot.h>
 
-typedef sigc::slot<Gtk::Window*()> type_slotDo;
+namespace Gtk
+{
+class Window;
+}
+
+using type_slotDo = sigc::slot<Gtk::Window*()>;
 
 struct Demo
 {

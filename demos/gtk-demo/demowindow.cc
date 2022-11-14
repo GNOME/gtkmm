@@ -11,25 +11,21 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "demowindow.h"
-
 #include "demos.h"
-#include "textwidget.h"
+#include "demowindow.h"
 
 #include <glibmm/bytes.h>
 #include <glibmm/convert.h>
+#include <giomm/liststore.h>
 #include <giomm/resource.h>
-#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/treelistmodel.h>
+#include <gtkmm/signallistitemfactory.h>
+#include <gtkmm/treeexpander.h>
+#include <gtkmm/treelistrow.h>
 #include <gtkmm/image.h>
-#include <gtkmm/treeviewcolumn.h>
 #include <gtkmm/video.h>
 
 #include <cstddef>
@@ -42,27 +38,36 @@ using std::strlen;
 namespace
 {
 
-struct DemoColumns : public Gtk::TreeModelColumnRecord
+class DemoColumns : public Glib::Object
 {
-  Gtk::TreeModelColumn<Glib::ustring> title;
-  Gtk::TreeModelColumn<Glib::ustring> filename;
-  Gtk::TreeModelColumn<type_slotDo>   slot;
-  Gtk::TreeModelColumn<bool>          italic;
+public:
+  Glib::ustring m_title;
+  std::string m_filename;
+  type_slotDo m_slot; // The method to call.
+  const Demo* m_children{nullptr};
 
-  DemoColumns() { add(title); add(filename); add(slot); add(italic); }
+  static Glib::RefPtr<DemoColumns> create(const Demo& demo)
+  {
+    return Glib::make_refptr_for_instance<DemoColumns>(new DemoColumns(demo));
+  }
+  
+protected:
+  DemoColumns(const Demo& demo)
+  : m_title(demo.title), m_filename(demo.filename), m_slot(demo.slot),
+    m_children(demo.children)
+  { }
 };
-
-// Singleton accessor function.
-const auto& demo_columns()
-{
-  static DemoColumns column_record;
-  return column_record;
-}
 
 } // anonymous namespace
 
 //static
 DemoWindow* DemoWindow::m_pDemoWindow = nullptr;
+
+//static
+DemoWindow* DemoWindow::get_demo_window()
+{
+  return m_pDemoWindow;
+}
 
 DemoWindow::DemoWindow()
 : m_RunButton("Run"),
@@ -70,7 +75,6 @@ DemoWindow::DemoWindow()
   m_TextWidget_Info(false),
   m_TextWidget_Source(true)
 {
-  m_pWindow_Example = nullptr;
   m_pDemoWindow = this;
 
   configure_header_bar();
@@ -78,22 +82,31 @@ DemoWindow::DemoWindow()
   set_child(m_HBox);
 
   //Tree:
-  m_refTreeStore = Gtk::TreeStore::create(demo_columns());
-  m_TreeView.set_model(m_refTreeStore);
+  auto root = create_demo_model();
+  auto tree_model = Gtk::TreeListModel::create(root,
+    sigc::mem_fun(*this, &DemoWindow::create_demo_model), false, true);
+  m_refSingleSelection = Gtk::SingleSelection::create(tree_model);
+  m_refSingleSelection->signal_selection_changed().connect(
+    sigc::mem_fun(*this, &DemoWindow::on_selection_changed));
 
-  m_refTreeSelection = m_TreeView.get_selection();
-  m_refTreeSelection->set_mode(Gtk::SelectionMode::BROWSE);
-  m_refTreeSelection->set_select_function( sigc::ptr_fun(&DemoWindow::select_function) );
+  auto factory = Gtk::SignalListItemFactory::create();
+  factory->signal_setup().connect(
+    sigc::mem_fun(*this, &DemoWindow::on_setup_listitem));
+  factory->signal_bind().connect(
+    sigc::mem_fun(*this, &DemoWindow::on_bind_listitem));
 
-  m_TreeView.set_size_request(200, -1);
+  m_ListView.set_model(m_refSingleSelection);
+  m_ListView.set_factory(factory);
+  m_ListView.signal_activate().connect(
+    sigc::mem_fun(*this, &DemoWindow::on_listview_row_activated));
 
-  fill_tree();
+  m_ListView.set_size_request(200, -1);
 
   //SideBar
   m_SideBar.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
-  m_SideBar.get_style_context()->add_class("sidebar");
+  m_SideBar.add_css_class("sidebar");
   m_SideBar.set_hexpand(false);
-  m_SideBar.set_child(m_TreeView);
+  m_SideBar.set_child(m_ListView);
   m_HBox.append(m_SideBar);
 
   //Notebook:
@@ -107,15 +120,16 @@ DemoWindow::DemoWindow()
   m_HBox.append(m_Notebook);
   m_HBox.set_vexpand(true);
 
-  set_default_size (800, 600);
+  set_default_size(800, 600);
 
-  load_file (testgtk_demos[0].filename);
+  load_file(testgtk_demos[0].filename);
 }
 
-//static
-DemoWindow* DemoWindow::get_demo_window()
+DemoWindow::~DemoWindow()
 {
-  return m_pDemoWindow;
+  on_example_window_hide(); //delete the example window if there is one.
+  if (m_pDemoWindow == this)
+    m_pDemoWindow = nullptr;
 }
 
 void DemoWindow::configure_header_bar()
@@ -123,118 +137,107 @@ void DemoWindow::configure_header_bar()
   m_HeaderBar.set_show_title_buttons();
   m_HeaderBar.pack_start(m_RunButton);
 
-  m_RunButton.get_style_context()->add_class("suggested-action");
+  m_RunButton.add_css_class("suggested-action");
   m_RunButton.signal_clicked().connect(sigc::mem_fun(*this, &DemoWindow::on_run_button_clicked));
 
   set_titlebar(m_HeaderBar);
 }
 
-void DemoWindow::fill_tree()
+Glib::RefPtr<Gio::ListModel> DemoWindow::create_demo_model(
+  const Glib::RefPtr<Glib::ObjectBase>& item)
 {
-  const auto& columns = demo_columns();
+  auto col = std::dynamic_pointer_cast<DemoColumns>(item);
+  if (col && !col->m_children)
+    // An item without children, i.e. a leaf in the tree. 
+    return {};
 
-  /* this code only supports 1 level of children. If we
-   * want more we probably have to use a recursing function.
-   */
-  for (auto d = testgtk_demos; d->title; ++d)
-  {
-    auto row = *(m_refTreeStore->append());
-
-    row[columns.title]    = d->title;
-    row[columns.filename] = d->filename;
-    row[columns.slot]     = d->slot;
-    row[columns.italic]   = false;
-
-    for (auto child = d->children; child && child->title; ++child)
-    {
-      auto child_row = *(m_refTreeStore->append(row.children()));
-
-      child_row[columns.title]    = child->title;
-      child_row[columns.filename] = child->filename;
-      child_row[columns.slot]     = child->slot;
-      child_row[columns.italic]   = false;
-    }
-  }
-
-  auto pCell = Gtk::make_managed<Gtk::CellRendererText>();
-  pCell->property_style() = Pango::Style::ITALIC;
-
-  auto pColumn = new Gtk::TreeViewColumn("Widget (double click for demo)", *pCell);
-  pColumn->add_attribute(pCell->property_text(), columns.title);
-  pColumn->add_attribute(pCell->property_style_set(), columns.italic);
-
-  m_TreeView.append_column(*pColumn);
-
-  m_refTreeSelection->signal_changed().connect(sigc::mem_fun(*this, &DemoWindow::on_treeselection_changed));
-  m_TreeView.signal_row_activated().connect(sigc::mem_fun(*this, &DemoWindow::on_treeview_row_activated));
-
-  m_TreeView.expand_all();
+  auto result = Gio::ListStore<DemoColumns>::create();
+  const Demo* demo = col ? col->m_children : testgtk_demos;
+  for (; demo->title; ++demo)
+    result->append(DemoColumns::create(*demo));
+  return result;
 }
 
-DemoWindow::~DemoWindow()
+void DemoWindow::on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
-  on_example_window_hide(); //delete the example window if there is one.
+  // Each ListItem contains a TreeExpander, which contains a Label.
+  // The Label shows the ColumnView::m_title. That's done in on_bind_listitem(). 
+  auto expander = Gtk::make_managed<Gtk::TreeExpander>();
+  auto label = Gtk::make_managed<Gtk::Label>();
+  expander->set_child(*label);
+  list_item->set_child(*expander);
+}
+
+void DemoWindow::on_bind_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
+{
+  auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(list_item->get_item());
+  if (!row)
+    return;
+  // Only leaves in the tree can be selected.
+  // on_selection_changed() assumes that col->m_filename contains a filename.
+  list_item->set_selectable(!row->is_expandable());
+  auto col = std::dynamic_pointer_cast<DemoColumns>(row->get_item());
+  if (!col)
+    return;
+  auto expander = dynamic_cast<Gtk::TreeExpander*>(list_item->get_child());
+  if (!expander)
+    return;
+  expander->set_list_row(row);
+  auto label = dynamic_cast<Gtk::Label*>(expander->get_child());
+  if (!label)
+    return;
+  label->set_text(col->m_title);
+}
+
+void DemoWindow::on_selection_changed(unsigned int /*position*/, unsigned int /*n_items*/)
+{
+  auto item = m_refSingleSelection->get_selected_item();
+  auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(item);
+  if (!row)
+    return;
+  auto col = std::dynamic_pointer_cast<DemoColumns>(row->get_item());
+  if (!col)
+    return;
+  load_file(col->m_filename);
+  set_title(col->m_title);
+}
+
+void DemoWindow::on_listview_row_activated(unsigned int position)
+{
+  auto item = std::dynamic_pointer_cast<Gio::ListModel>(m_ListView.get_model())->get_object(position);
+  run_example(item);
 }
 
 void DemoWindow::on_run_button_clicked()
 {
-  if(m_pWindow_Example == nullptr) //Don't open a second window.
-  {
-    if(const auto iter = m_refTreeSelection->get_selected())
-    {
-      m_TreePath = m_refTreeStore->get_path(iter);
-
-      run_example(*iter);
-    }
-  }
+  auto item = m_refSingleSelection->get_selected_item();
+  run_example(item);
 }
 
-void DemoWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* model */)
+void DemoWindow::run_example(const Glib::RefPtr<Glib::ObjectBase>& item)
 {
-  m_TreePath = path;
+  auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(item);
+  if (!row)
+    return;
+  auto col = std::dynamic_pointer_cast<DemoColumns>(row->get_item());
+  if (!col)
+    return;
+  const type_slotDo& slot = col->m_slot;
 
-  if(m_pWindow_Example == nullptr) //Don't open a second window.
+  if (slot && (m_pWindow_Example = slot()))
   {
-    if(const auto iter = m_TreeView.get_model()->get_iter(m_TreePath))
-    {
-      run_example(*iter);
-    }
-  }
-}
-
-void DemoWindow::run_example(Gtk::TreeModel::Row& row)
-{
-  const auto& columns = demo_columns();
-
-  const type_slotDo& slot = row[columns.slot];
-
-  if(slot && (m_pWindow_Example = slot()))
-  {
-    row[columns.italic] = true;
-
+    m_pWindow_Example->set_transient_for(*this);
+    m_pWindow_Example->set_modal(true);
     m_pWindow_Example->set_hide_on_close(true);
     m_pWindow_Example->signal_hide().connect(sigc::mem_fun(*this, &DemoWindow::on_example_window_hide));
     m_pWindow_Example->show();
   }
 }
 
-bool DemoWindow::select_function(const Glib::RefPtr<Gtk::TreeModel>& model,
-                                 const Gtk::TreeModel::Path& path, bool)
+void DemoWindow::on_example_window_hide()
 {
-  const auto iter = model->get_iter(path);
-  return iter->children().empty(); // only allow leaf nodes to be selected
-}
-
-void DemoWindow::on_treeselection_changed()
-{
-  if(const auto iter = m_refTreeSelection->get_selected())
-  {
-    const auto filename = (*iter)[demo_columns().filename];
-    const auto title = (*iter)[demo_columns().title];
-
-    load_file(Glib::filename_from_utf8(filename));
-    set_title(title);
-  }
+  delete m_pWindow_Example;
+  m_pWindow_Example = nullptr;
 }
 
 void DemoWindow::load_file(const std::string& filename)
@@ -471,18 +474,3 @@ void DemoWindow::remove_data_tabs()
     m_Notebook.remove_page(i);
   }
 }
-
-void DemoWindow::on_example_window_hide()
-{
-  if(m_pWindow_Example)
-  {
-    if(const auto iter = m_refTreeStore->get_iter(m_TreePath))
-    {
-      (*iter)[demo_columns().italic] = false;
-
-      delete m_pWindow_Example;
-      m_pWindow_Example = nullptr;
-    }
-  }
-}
-

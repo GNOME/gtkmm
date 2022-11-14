@@ -11,8 +11,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _DEMOWINDOW_H
@@ -24,11 +23,10 @@
 #include <gtkmm/notebook.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/box.h>
-
-#include <gtkmm/treestore.h>
-#include <gtkmm/treeview.h>
+#include <gtkmm/listview.h>
+#include <gtkmm/singleselection.h>
+#include <gtkmm/listitem.h>
 #include "textwidget.h"
-#include <stdio.h>
 
 class DemoWindow : public Gtk::Window
 {
@@ -40,21 +38,22 @@ public:
   static DemoWindow* get_demo_window();
 
 protected:
-  void run_example(Gtk::TreeModel::Row& row);
   void configure_header_bar();
-
-  void fill_tree();
+  Glib::RefPtr<Gio::ListModel> create_demo_model(
+    const Glib::RefPtr<Glib::ObjectBase>& item = {});
+  void run_example(const Glib::RefPtr<Glib::ObjectBase>& item);
 
   void load_file(const std::string& filename);
   void add_data_tabs(const std::string& filename);
   void remove_data_tabs();
 
   //Signal handlers:
-  static bool select_function(const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::Path& path, bool currently_selected);
-  virtual void on_treeselection_changed();
-  virtual void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
-  virtual void on_example_window_hide();
-  virtual void on_run_button_clicked();
+  void on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_bind_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_selection_changed(unsigned int position, unsigned int n_items);
+  void on_listview_row_activated(unsigned int position);
+  void on_run_button_clicked();
+  void on_example_window_hide();
 
   //Member widgets:
   Gtk::HeaderBar m_HeaderBar;
@@ -63,14 +62,13 @@ protected:
   Gtk::ScrolledWindow m_SideBar;
   Gtk::Box m_HBox;
 
-  Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
-  Gtk::TreeView m_TreeView;
-  Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
-  Gtk::TreeModel::Path m_TreePath;
+  Gtk::ListView m_ListView;
+  Glib::RefPtr<Gtk::SingleSelection> m_refSingleSelection;
 
-  TextWidget m_TextWidget_Info, m_TextWidget_Source;
+  TextWidget m_TextWidget_Info;
+  TextWidget m_TextWidget_Source;
 
-  Gtk::Window* m_pWindow_Example;
+  Gtk::Window* m_pWindow_Example{nullptr};
 
   std::string m_current_filename;
 
@@ -78,4 +76,3 @@ protected:
 };
 
 #endif //_DEMOWINDOW_H
-
