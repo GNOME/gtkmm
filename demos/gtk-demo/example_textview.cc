@@ -4,7 +4,6 @@
  * can be displayed by multiple Gtk::TextViews. This demo has two views
  * displaying a single buffer, and shows off the widget's text
  * formatting features.
- *
  */
 
 #include <gtkmm.h>
@@ -391,30 +390,29 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
     }
     else if (i == 1)
     {
-      auto pCombo = Gtk::make_managed<Gtk::ComboBoxText>();
-      pCombo->append("Option 1");
-      pCombo->append("Option 2");
-      pCombo->append("Option 3");
-
-      pWidget = pCombo;
+      const std::vector<Glib::ustring> options{"Option 1", "Option 2", "Option 3"};
+      auto pDropDown = Gtk::make_managed<Gtk::DropDown>(options);
+      pWidget = pDropDown;
     }
     else if (i == 2)
     {
       auto pHScale = Gtk::make_managed<Gtk::Scale>(Gtk::Orientation::HORIZONTAL);
       pHScale->set_range(0, 100);
       pHScale->set_size_request(70, -1);
-
       pWidget = pHScale;
     }
     else if (i == 3)
-      {
-        auto pImage = Gtk::make_managed<Gtk::Image>();
-        pImage->set_from_resource("/textview/floppybuddy.gif");
-        pWidget = pImage;
-      }
+    {
+      auto pImage = Gtk::make_managed<Gtk::Image>();
+      pImage->set_from_resource("/textview/floppybuddy.gif");
+      pImage->set_size_request(40, 40);
+      pWidget = pImage;
+    }
     else if (i == 4)
     {
-      pWidget = Gtk::make_managed<Gtk::Entry>();
+      auto pEntry = Gtk::make_managed<Gtk::Entry>();
+      pEntry->set_size_request(70, -1);
+      pWidget = pEntry;
     }
     else
     {

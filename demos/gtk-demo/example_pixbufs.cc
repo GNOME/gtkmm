@@ -14,7 +14,6 @@
 #include <gtkmm.h>
 #include <cmath>
 #include <algorithm>
-#include <memory>
 
 namespace
 {
@@ -60,7 +59,7 @@ protected:
   guint m_back_width = 0;
   guint m_back_height = 0;
   gint64 m_start_time = 0;
-  std::unique_ptr<Gtk::MessageDialog> m_pMessageDialog;
+  Glib::RefPtr<Gtk::AlertDialog> m_pAlertDialog;
 };
 
 //Called by DemoWindow;
@@ -88,20 +87,13 @@ Example_Pixbufs::Example_Pixbufs()
   }
   catch (const Glib::Error& error)
   {
-    if (!m_pMessageDialog)
-    {
-      m_pMessageDialog.reset(new Gtk::MessageDialog(
-        "", false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE, true));
-      m_pMessageDialog->set_transient_for(*this);
-      m_pMessageDialog->set_hide_on_close(true);
-      m_pMessageDialog->signal_response().connect(
-        sigc::hide(sigc::mem_fun(*m_pMessageDialog, &Gtk::Widget::hide)));
-    }
+    if (!m_pAlertDialog)
+      m_pAlertDialog = Gtk::AlertDialog::create();
 
     Glib::ustring strMsg = "Failed to load an image: ";
     strMsg += error.what();
-    m_pMessageDialog->set_message(strMsg);
-    m_pMessageDialog->show();
+    m_pAlertDialog->set_message(strMsg);
+    m_pAlertDialog->show(*this);
   }
 }
 

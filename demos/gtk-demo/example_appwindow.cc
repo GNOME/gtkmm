@@ -1,6 +1,13 @@
 /* Application main window
  *
  * Demonstrates a typical application window, with menubar, toolbar, statusbar.
+ *
+ * Despite its name, this demo uses a Gtk::Window and not a Gtk::ApplicationWindow.
+ *
+ * There are several examples in the gtkmm tutorial, showing slightly different
+ * ways of constructing similar application windows.
+ *
+ * https://gnome.pages.gitlab.gnome.org/gtkmm-documentation
  */
 
 #include <gtkmm.h>
@@ -13,19 +20,20 @@ public:
 
 protected:
   //Signal handlers:
-  virtual void on_menu_item();
-  virtual void on_text_changed();
-  virtual void on_text_mark_set(const Gtk::TextBuffer::iterator& new_location, const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
+  void on_menu_item();
+  void on_text_changed();
+  void on_text_mark_set(const Gtk::TextBuffer::iterator& new_location,
+    const Glib::RefPtr<Gtk::TextBuffer::Mark>& mark);
+  void on_file_quit();
 
   //Member widgets:
-  Gtk::Grid m_Grid;
-  //Gtk::Menu m_Menubar;
+  Gtk::Box m_VBox;
+  Gtk::PopoverMenuBar m_Menubar;
   Gtk::Box m_Toolbar;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Statusbar m_Statusbar;
   Gtk::TextView m_TextView;
 };
-
 
 //Called by DemoWindow;
 Gtk::Window* do_appwindow()
@@ -35,90 +43,119 @@ Gtk::Window* do_appwindow()
 
 
 Example_AppWindow::Example_AppWindow()
+: m_VBox(Gtk::Orientation::VERTICAL),
+  m_Toolbar(Gtk::Orientation::HORIZONTAL)
 {
   set_title("Application Window");
+  set_default_size(350, 150);
 
-  set_child(m_Grid);
+  set_child(m_VBox);
 
-/*
-  //Menu:
+  // Create the menu:
+  auto win_menu = Gio::Menu::create();
+
+  // File menu:
+  auto menu_file = Gio::Menu::create();
+  win_menu->append_submenu("_File", menu_file);
+  auto file_section1 = Gio::Menu::create();
+  file_section1->append("_New", "example.new");
+  file_section1->append("_Open", "example.open");
+  file_section1->append("_Save", "example.save");
+  file_section1->append("Save _As", "example.saveas");
+  menu_file->append_section(file_section1);
+  auto file_section2 = Gio::Menu::create();
+  file_section2->append("_Quit", "example.quit");
+  menu_file->append_section(file_section2);
+
+  // Preferences menu:
+  auto menu_pref = Gio::Menu::create();
+  win_menu->append_submenu("_Preferences", menu_pref);
+
+  // Color submenu:
+  auto submenu_color = Gio::Menu::create();
+  submenu_color->append("_Red", "example.red");
+  submenu_color->append("_Green", "example.green");
+  submenu_color->append("_Blue", "example.blue");
+  menu_pref->append_submenu("_Color", submenu_color);
+
+  // Shape submenu:
+  auto submenu_shape = Gio::Menu::create();
+  submenu_shape->append("_Square", "example.square");
+  submenu_shape->append("_Rectangle", "example.rectangle");
+  submenu_shape->append("_Circle", "example.circle");
+  menu_pref->append_submenu("_Shape", submenu_shape);
+
+  // Help menu:
+  auto menu_help = Gio::Menu::create();
+  menu_help->append("_About", "example.about");
+  win_menu->append_submenu("_Help", menu_help);
+
+  // Add the menu to the menubar.
+  m_Menubar.set_menu_model(win_menu);
+
+  // Add the menubar to the VBox:
+  m_VBox.append(m_Menubar);
+
+  // Define the actions:
+  auto action_group = Gio::SimpleActionGroup::create();
+  action_group->add_action("new", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("open", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("save", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("saveas", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("quit", sigc::mem_fun(*this, &Example_AppWindow::on_file_quit));
+  action_group->add_action("red", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("green", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("blue", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("square", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("rectangle", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("circle", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  action_group->add_action("about", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item));
+  insert_action_group("example", action_group);
+
+  // Set accelerator keys:
+  auto app = get_application();
+  if (app)
   {
-    using namespace Gtk::Menu_Helpers;
-
-    //File menu:
-    auto pMenuFile = Gtk::make_managed<Gtk::Menu>();
-    MenuList& list_file = pMenuFile->items();
-    list_file.push_back( MenuElem("_New", "<control>N", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_file.push_back( MenuElem("_Open", "<control>O", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_file.push_back( MenuElem("_Save", "<control>S", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_file.push_back( MenuElem("Save _As", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_file.push_back(SeparatorElem());
-    list_file.push_back( MenuElem("_Quit", "<control>Q", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-
-    //Preferences menu:
-    auto pMenuPreferences = Gtk::make_managed<Gtk::Menu>();
-    MenuList& list_preferences = pMenuPreferences->items();
-
-    // Create a submenu
-    auto pMenuSub_Color = Gtk::make_managed<Gtk::Menu>();
-    MenuList& list_sub = pMenuSub_Color->items();
-    list_sub.push_back( MenuElem("_Red", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_sub.push_back( MenuElem("_Green", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_sub.push_back( MenuElem("_Blue", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-
-    list_preferences.push_back( MenuElem("_Color", *pMenuSub_Color) );
-
-    // Create a submenu
-    auto pMenuSub_Shape = Gtk::make_managed<Gtk::Menu>();
-    list_sub = pMenuSub_Shape->items();
-    list_sub.push_back( MenuElem("_Square", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_sub.push_back( MenuElem("_Rectangle", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-    list_sub.push_back( MenuElem("_Oval", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-
-    list_preferences.push_back( MenuElem("_Shape", *pMenuSub_Shape) );
-
-    //Help menu:
-    auto pMenuHelp = Gtk::make_managed<Gtk::Menu>();
-    MenuList& list_help = pMenuHelp->items();
-    list_help.push_back( MenuElem("_About", sigc::mem_fun(*this, &Example_AppWindow::on_menu_item)) );
-
-
-    //Create the menu bar
-    MenuList& list_bar = m_Menubar.items();
-    list_bar.push_front(MenuElem("_Help", *pMenuHelp));
-    list_bar.front()->set_right_justified();
-    list_bar.push_front(MenuElem("_Preferences", *pMenuPreferences));
-    list_bar.push_front(MenuElem("_File", *pMenuFile));
-
-    //Add the menu bar to the Grid:
-    //                       left  top  width  height
-    m_Grid.attach(m_Menubar, 0,    0,   1,     1);
-  } //menu
-
-*/
-  //Toolbar:
-  {
-    m_Toolbar.set_hexpand();
-    //                       left  top  width  height
-    m_Grid.attach(m_Toolbar, 0,    1,   1,     1);
+    app->set_accel_for_action("example.new", "<Primary>n");
+    app->set_accel_for_action("example.open", "<Primary>o");
+    app->set_accel_for_action("example.save", "<Primary>s");
+    app->set_accel_for_action("example.quit", "<Primary>q");
   }
 
+  // Toolbar:
+  m_Toolbar.set_hexpand();
+  m_VBox.append(m_Toolbar);
+  auto toolbar_button = Gtk::make_managed<Gtk::Button>();
+  toolbar_button->set_icon_name("document-new");
+  toolbar_button->set_tooltip_text("New");
+  toolbar_button->set_action_name("example.new");
+  m_Toolbar.append(*toolbar_button);
 
+  toolbar_button = Gtk::make_managed<Gtk::Button>();
+  toolbar_button->set_icon_name("document-open");
+  toolbar_button->set_tooltip_text("Open");
+  toolbar_button->set_action_name("example.open");
+  m_Toolbar.append(*toolbar_button);
+
+  m_Toolbar.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::VERTICAL));
+
+  toolbar_button = Gtk::make_managed<Gtk::Button>();
+  toolbar_button->set_icon_name("application-exit");
+  toolbar_button->set_tooltip_text("Quit");
+  toolbar_button->set_action_name("example.quit");
+  m_Toolbar.append(*toolbar_button);
+
+  // Scrolled window for the text view.
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   m_ScrolledWindow.set_has_frame(true);
-  //                              left  top  width  height
-  m_Grid.attach(m_ScrolledWindow, 0,    2,   1,     1);
-
-  set_default_size(200, 200);
-
+  m_VBox.append(m_ScrolledWindow);
   m_ScrolledWindow.set_child(m_TextView);
 
-  /* Create statusbar */
+  // Statusbar:
   m_Statusbar.set_hexpand();
-  //                         left  top  width  height
-  m_Grid.attach(m_Statusbar, 0,    3,   1,     1);
+  m_VBox.append(m_Statusbar);
 
-  /* Show text widget info in the statusbar */
+  // Show text widget info in the statusbar.
   auto refTextBuffer = m_TextView.get_buffer();
   refTextBuffer->signal_changed().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_changed));
   refTextBuffer->signal_mark_set().connect(sigc::mem_fun(*this, &Example_AppWindow::on_text_mark_set));
@@ -131,11 +168,8 @@ Example_AppWindow::~Example_AppWindow()
 
 void Example_AppWindow::on_menu_item()
 {
-  Gtk::MessageDialog dialog(*this, "You selected or toggled the menu item", false,
-                            Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE, true);
-  // This is not by itself an acceptable replacement for the removed Gtk::Dialog::run().
-  // Won't be fixed now. All uses of on_menu_item() are commented out.
-  dialog.show();
+  auto dialog = Gtk::AlertDialog::create("You selected or toggled a menu item");
+  dialog->show(*this);
 }
 
 void Example_AppWindow::on_text_changed()
@@ -150,15 +184,17 @@ void Example_AppWindow::on_text_changed()
   gint row = iter.get_line();
   gint col = iter.get_line_offset();
 
-  gchar* msg = g_strdup_printf ("Cursor at row %d column %d - %d chars in document",
-                         row, col, count);
-  m_Statusbar.push(msg);
-  g_free (msg);
+  m_Statusbar.push(Glib::ustring::sprintf(
+    "Cursor at row %d column %d - %d chars in document", row, col, count));
 }
 
-
-void Example_AppWindow::on_text_mark_set(const Gtk::TextBuffer::iterator&, const Glib::RefPtr<Gtk::TextBuffer::Mark>&)
+void Example_AppWindow::on_text_mark_set(const Gtk::TextBuffer::iterator&,
+  const Glib::RefPtr<Gtk::TextBuffer::Mark>&)
 {
   on_text_changed();
 }
 
+void Example_AppWindow::on_file_quit()
+{
+  hide();
+}

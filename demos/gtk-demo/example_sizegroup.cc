@@ -13,7 +13,6 @@
  */
 
 #include <gtkmm.h>
-#include <list>
 
 class Example_SizeGroup : public Gtk::Window
 {
@@ -26,10 +25,8 @@ protected:
   void on_checkbutton_toggled();
   void on_close();
 
-  using type_listStrings = std::list<Glib::ustring>;
   void add_row(Gtk::Grid& grid, int row, const Glib::RefPtr<Gtk::SizeGroup>& size_group,
-    const Glib::ustring& label_text, const std::list<Glib::ustring>& options);
-  Gtk::ComboBoxText* create_combobox(const std::list<Glib::ustring>& strings);
+    const Glib::ustring& label_text, const std::vector<Glib::ustring>& options);
 
   //Member widgets:
   Gtk::Frame m_Frame_Color, m_Frame_Line;
@@ -69,7 +66,7 @@ Example_SizeGroup::Example_SizeGroup()
   m_Grid_Color.set_column_spacing(10);
   m_Frame_Color.set_child(m_Grid_Color);
 
-  const type_listStrings color_options{"Red", "Green", "Blue"};
+  const std::vector<Glib::ustring> color_options{"Red", "Green", "Blue"};
   add_row(m_Grid_Color, 0, m_refSizeGroup, "_Foreground", color_options);
   add_row(m_Grid_Color, 1, m_refSizeGroup, "_Background", color_options);
 
@@ -81,10 +78,10 @@ Example_SizeGroup::Example_SizeGroup()
   m_Grid_Line.set_column_spacing(10);
   m_Frame_Line.set_child(m_Grid_Line);
 
-  const type_listStrings dash_options{"Solid", "Dashed", "Dotted"};
+  const std::vector<Glib::ustring> dash_options{"Solid", "Dashed", "Dotted"};
   add_row(m_Grid_Line, 0, m_refSizeGroup, "_Dashing", dash_options);
 
-  const type_listStrings end_options{"Square", "Round", "Double Arrow"};
+  const std::vector<Glib::ustring> end_options{"Square", "Round", "Double Arrow"};
   add_row(m_Grid_Line, 1, m_refSizeGroup, "_Line ends", end_options);
 
   // and a check button to turn grouping on and off
@@ -116,33 +113,20 @@ void Example_SizeGroup::on_checkbutton_toggled()
 void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
                                 const Glib::RefPtr<Gtk::SizeGroup>& size_group,
                                 const Glib::ustring& label_text,
-                                const std::list<Glib::ustring>& options)
+                                const std::vector<Glib::ustring>& options)
 {
   auto pLabel = Gtk::make_managed<Gtk::Label>(label_text, Gtk::Align::START, Gtk::Align::BASELINE, true);
 
   pLabel->set_hexpand();
   grid.attach(*pLabel, 0, row);
 
-  auto pComboBoxText = create_combobox(options);
-  pLabel->set_mnemonic_widget(*pComboBoxText);
-  pComboBoxText->set_halign(Gtk::Align::END);
-  pComboBoxText->set_valign(Gtk::Align::BASELINE);
-  size_group->add_widget(*pComboBoxText);
-  grid.attach(*pComboBoxText, 1, row);
-}
-
-// Convenience function to create an option menu holding a number of strings
-Gtk::ComboBoxText* Example_SizeGroup::create_combobox(const std::list<Glib::ustring>& strings)
-{
-  auto pCombo = Gtk::make_managed<Gtk::ComboBoxText>();
-
-  for(const auto& str : strings)
-  {
-    pCombo->append(str);
-  }
-  pCombo->set_active(0);
-
-  return pCombo;
+  auto pDropDown = Gtk::make_managed<Gtk::DropDown>(options);
+  pDropDown->set_selected(0);
+  pLabel->set_mnemonic_widget(*pDropDown);
+  pDropDown->set_halign(Gtk::Align::END);
+  pDropDown->set_valign(Gtk::Align::BASELINE);
+  size_group->add_widget(*pDropDown);
+  grid.attach(*pDropDown, 1, row);
 }
 
 void Example_SizeGroup::on_close()

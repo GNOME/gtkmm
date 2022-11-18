@@ -79,7 +79,7 @@ void Example_HeaderBar::configure_send_receive_button()
 
 void Example_HeaderBar::configure_arrow_buttons()
 {
-  m_arrow_buttons_box.get_style_context()->add_class("linked");
+  m_arrow_buttons_box.add_css_class("linked");
 
   m_left_arrow_button.set_image_from_icon_name("pan-start-symbolic", Gtk::IconSize::INHERIT, true);
   m_right_arrow_button.set_image_from_icon_name("pan-end-symbolic", Gtk::IconSize::INHERIT, true);

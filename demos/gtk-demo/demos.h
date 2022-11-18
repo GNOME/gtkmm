@@ -27,9 +27,9 @@ Gtk::Window* do_dropdown();
 Gtk::Window* do_flowbox();
 Gtk::Window* do_gestures();
 Gtk::Window* do_glarea();
+Gtk::Window* do_gridview();
 Gtk::Window* do_headerbar();
 Gtk::Window* do_iconbrowser();
-Gtk::Window* do_iconview();
 Gtk::Window* do_images();
 Gtk::Window* do_listview_applauncher();
 Gtk::Window* do_listview_columnview();
@@ -56,7 +56,7 @@ Demo child0[] =
 
 Demo child1[] =
 {
-  { "Application launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr },
+  { "Application Launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr },
   { "Column View", "example_listview_columnview.cc", sigc::ptr_fun(&do_listview_columnview), nullptr },
   { nullptr, nullptr, type_slotDo(), nullptr }
 };
@@ -71,9 +71,9 @@ Demo testgtk_demos[] =
   { "Drop Downs", "example_dropdown.cc", sigc::ptr_fun(&do_dropdown), nullptr },
   { "Flow Box", "example_flowbox.cc",  sigc::ptr_fun(&do_flowbox), nullptr },
   { "Gestures", "example_gestures.cc",  sigc::ptr_fun(&do_gestures), nullptr },
+  { "Grid View", "example_gridview.cc", sigc::ptr_fun(&do_gridview), nullptr },
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), nullptr },
   { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), nullptr },
-  { "Icon View", "example_iconview.cc", sigc::ptr_fun(&do_iconview), nullptr },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), nullptr },
   { "Lists", "", type_slotDo(), child1 },
   { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), nullptr },

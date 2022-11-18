@@ -1,10 +1,15 @@
  /* Color Chooser
- *
- * Gtk::ColorChooserDialog lets the user choose a color.
- *
- */
+  *
+  * Gtk::ColorDialog lets the user choose a color.
+  *
+  * Gtk::ColorDialog is not a widget.
+  * Gtk::ColorDialog::choose_rgba() shows a dialog.
+  *
+  * Sometimes it's easier to use Gtk::ColorDialogButton, which is a widget.
+  */
 
 #include <gtkmm.h>
+#include <iostream>
 
 class Example_ColorSel : public Gtk::Window
 {
@@ -15,7 +20,7 @@ public:
 protected:
   //Signal handlers:
   void on_button_clicked();
-  void on_dialog_response(int response_id);
+  void on_dialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result);
 
   //Drawing function:
   void on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);
@@ -26,7 +31,7 @@ protected:
   Gtk::DrawingArea m_DrawingArea;
   Gtk::Button m_Button;
   Gdk::RGBA m_Color;
-  std::unique_ptr<Gtk::ColorChooserDialog> m_pDialog;
+  Glib::RefPtr<Gtk::ColorDialog> m_pDialog;
 };
 
 //Called by DemoWindow;
@@ -37,7 +42,7 @@ Gtk::Window* do_colorsel()
 
 Example_ColorSel::Example_ColorSel()
 : m_VBox(Gtk::Orientation::VERTICAL, 8),
-  m_Button("_Change the above color", true)
+  m_Button("_Change the color above", true)
 {
   set_title("Color Chooser");
   set_resizable(false);
@@ -75,25 +80,24 @@ void Example_ColorSel::on_button_clicked()
 {
   if (!m_pDialog)
   {
-    m_pDialog.reset(new Gtk::ColorChooserDialog("Changing color"));
-    m_pDialog->set_transient_for(*this);
-    m_pDialog->set_hide_on_close(true);
-    m_pDialog->set_modal(true);
-    m_pDialog->signal_response().connect(
-      sigc::mem_fun(*this, &Example_ColorSel::on_dialog_response));
+    m_pDialog = Gtk::ColorDialog::create();
+    m_pDialog->set_title("Choose a color");
   }
-  m_pDialog->set_rgba(m_Color);
-  m_pDialog->show();
+  m_pDialog->choose_rgba(*this, m_Color,
+    sigc::mem_fun(*this, &Example_ColorSel::on_dialog_finish));
 }
 
-void Example_ColorSel::on_dialog_response(int response_id)
+void Example_ColorSel::on_dialog_finish(const Glib::RefPtr<Gio::AsyncResult>& result)
 {
-  if (response_id == Gtk::ResponseType::OK)
+  try
   {
-    m_Color = m_pDialog->get_rgba();
+    m_Color = m_pDialog->choose_rgba_finish(result);
     m_DrawingArea.queue_draw();
   }
-  m_pDialog->hide();
+  catch (const Glib::Error& err)
+  {
+    std::cout << "No color selected. " << err.what() << std::endl;
+  }
 }
 
 void Example_ColorSel::on_drawing_area_draw(const Cairo::RefPtr<Cairo::Context>& cr, int, int)

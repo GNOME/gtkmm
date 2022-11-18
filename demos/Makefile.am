@@ -45,9 +45,9 @@ GTK_DEMOS = \
   gtk-demo/example_flowbox.cc \
   gtk-demo/example_gestures.cc \
   gtk-demo/example_glarea.cc \
+  gtk-demo/example_gridview.cc \
   gtk-demo/example_headerbar.cc \
   gtk-demo/example_iconbrowser.cc \
-  gtk-demo/example_iconview.cc \
   gtk-demo/example_images.cc \
   gtk-demo/example_listview_applauncher.cc \
   gtk-demo/example_listview_columnview.cc \

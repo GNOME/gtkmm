@@ -22,7 +22,7 @@ protected:
   void activate(guint position);
 
   Gtk::ListView* m_list;
-  std::unique_ptr<Gtk::MessageDialog> m_error_dialog;
+  Glib::RefPtr<Gtk::AlertDialog> m_error_dialog;
 };
 
 Gtk::Window* do_listview_applauncher()
@@ -120,17 +120,11 @@ void Example_ListView_AppLauncher::activate(guint position)
        * We display an error dialog that something went wrong.
        */
       if (!m_error_dialog)
-      {
-        m_error_dialog.reset(new Gtk::MessageDialog(
-          *this, "", false, Gtk::MessageType::ERROR, Gtk::ButtonsType::CLOSE, true));
-        m_error_dialog->set_hide_on_close();
-        m_error_dialog->signal_response().connect(
-          sigc::hide(sigc::mem_fun(*m_error_dialog, &Gtk::Widget::hide)));
-      }
-      m_error_dialog->set_message(
-        Glib::ustring::sprintf("Could not launch %s", app_info->get_display_name()));
-      m_error_dialog->set_secondary_text(error.what());
-      m_error_dialog->show();
+        m_error_dialog = Gtk::AlertDialog::create();
+
+      m_error_dialog->set_message("Could not launch " + app_info->get_display_name());
+      m_error_dialog->set_detail(error.what());
+      m_error_dialog->show(*this);
     }
   }
 }
