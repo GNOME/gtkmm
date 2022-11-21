@@ -233,8 +233,7 @@ void Example_GridView::fill_store()
 
 void Example_GridView::on_gridview_item_activated(unsigned int position)
 {
-  auto item = std::dynamic_pointer_cast<Gio::ListModel>(m_GridView.get_model())->get_object(position);
-  auto col = std::dynamic_pointer_cast<ModelColumns>(item);
+  auto col = m_dir_model->get_item(position);
   if (!col)
     return;
   const bool is_dir = col->m_is_directory;

@@ -61,7 +61,7 @@ Example_AppWindow::Example_AppWindow()
   file_section1->append("_New", "example.new");
   file_section1->append("_Open", "example.open");
   file_section1->append("_Save", "example.save");
-  file_section1->append("Save _As", "example.saveas");
+  file_section1->append("Save _As...", "example.saveas");
   menu_file->append_section(file_section1);
   auto file_section2 = Gio::Menu::create();
   file_section2->append("_Quit", "example.quit");
@@ -113,28 +113,44 @@ Example_AppWindow::Example_AppWindow()
   insert_action_group("example", action_group);
 
   // Set accelerator keys:
-  auto app = get_application();
-  if (app)
-  {
-    app->set_accel_for_action("example.new", "<Primary>n");
-    app->set_accel_for_action("example.open", "<Primary>o");
-    app->set_accel_for_action("example.save", "<Primary>s");
-    app->set_accel_for_action("example.quit", "<Primary>q");
-  }
+  auto controller = Gtk::ShortcutController::create();
+  controller->set_scope(Gtk::ShortcutScope::LOCAL);
+  add_controller(controller);
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_n, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("example.new")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_o, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("example.open")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_s, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("example.save")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_q, Gdk::ModifierType::CONTROL_MASK),
+    Gtk::NamedAction::create("example.quit")));
+  controller->add_shortcut(Gtk::Shortcut::create(
+    Gtk::KeyvalTrigger::create(GDK_KEY_F7),
+    Gtk::NamedAction::create("example.about")));
 
   // Toolbar:
   m_Toolbar.set_hexpand();
   m_VBox.append(m_Toolbar);
   auto toolbar_button = Gtk::make_managed<Gtk::Button>();
   toolbar_button->set_icon_name("document-new");
-  toolbar_button->set_tooltip_text("New");
+  toolbar_button->set_tooltip_text("Create a new file");
   toolbar_button->set_action_name("example.new");
   m_Toolbar.append(*toolbar_button);
 
   toolbar_button = Gtk::make_managed<Gtk::Button>();
   toolbar_button->set_icon_name("document-open");
-  toolbar_button->set_tooltip_text("Open");
+  toolbar_button->set_tooltip_text("Open a file");
   toolbar_button->set_action_name("example.open");
+  m_Toolbar.append(*toolbar_button);
+
+  toolbar_button = Gtk::make_managed<Gtk::Button>();
+  toolbar_button->set_icon_name("document-save");
+  toolbar_button->set_tooltip_text("Save a file");
+  toolbar_button->set_action_name("example.save");
   m_Toolbar.append(*toolbar_button);
 
   m_Toolbar.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::VERTICAL));

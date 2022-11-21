@@ -2,7 +2,7 @@
  *
  * Demonstrates many named icons.
  *
- * This demo shows Gtk::HeaderBar, Gtk::ListBox, Gtk::IconView and
+ * This demo shows Gtk::HeaderBar, Gtk::ListBox, Gtk::GridView and
  * Gtk::SearchBar in action, but its primary aim is to show an assortment
  * of named icons.
  *
@@ -38,51 +38,32 @@ private:
 
 }; // end IconContextLabel
 
-// A ListStore that stores names, descriptions and context ids of icons.
-class IconInfoStore : public Gtk::ListStore
+// A Gio::ListStore item that stores name, description and context id of an icon.
+class ModelColumns : public Glib::Object
 {
 public:
-  static Glib::RefPtr<IconInfoStore> create();
-  ~IconInfoStore() override;
+  Glib::ustring m_name;
+  Glib::ustring m_description;
+  Glib::ustring m_context_id;
+  bool m_symbolic;
 
-  void set_text_column(bool symbolic)
-  { m_text_column = symbolic ? m_columns.symbolic_name : m_columns.name; }
-
-  Gtk::TreeModelColumn<Glib::ustring> get_text_column() const
-  { return m_text_column; }
-
-  struct ModelColumns : public Gtk::TreeModelColumnRecord
+  static Glib::RefPtr<ModelColumns> create(const Glib::ustring& name,
+    const Glib::ustring& description, const Glib::ustring& context_id, bool symbolic)
   {
-    Gtk::TreeModelColumn<Glib::ustring> name;
-    Gtk::TreeModelColumn<Glib::ustring> symbolic_name;
-    Gtk::TreeModelColumn<Glib::ustring> description;
-    Gtk::TreeModelColumn<Glib::ustring> context_id;
-
-    ModelColumns()
-    {
-      add(name);
-      add(symbolic_name);
-      add(description);
-      add(context_id);
-    }
-  };
-
-  const ModelColumns m_columns;
-
+    return Glib::make_refptr_for_instance<ModelColumns>(
+      new ModelColumns(name, description, context_id, symbolic));
+  }
+  
 protected:
-  IconInfoStore();
-
-  // Overridden virtual function:
-  Glib::RefPtr<Gdk::ContentProvider> drag_data_get_vfunc(
-    const Gtk::TreeModel::Path& path) const override;
-
-private:
-  Gtk::TreeModelColumn<Glib::ustring> m_text_column;
-
-}; // end IconInfoStore
+  ModelColumns(const Glib::ustring& name, const Glib::ustring& description,
+    const Glib::ustring& context_id, bool symbolic)
+  : m_name(name), m_description(description), m_context_id(context_id),
+    m_symbolic(symbolic)
+  { }
+}; // ModelColumns
 
 // Dialog box, showing icon details.
-class DetailDialog : public Gtk::Dialog
+class DetailDialog : public Gtk::Window
 {
 public:
   explicit DetailDialog(Gtk::Window& parent);
@@ -93,7 +74,8 @@ public:
 protected:
   // Signal handler:
   void on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& drag, int size_index);
-  Glib::RefPtr<Gdk::ContentProvider> on_image_prepare_texture(double x, double y, int size_index);
+  Glib::RefPtr<Gdk::ContentProvider> on_image_prepare_texture(
+    double x, double y, int size_index);
 
   Glib::RefPtr<const Gtk::IconPaintable> get_icon_paintable(int size_index);
 
@@ -123,9 +105,9 @@ protected:
   // Signal handlers:
   void on_symbolic_radio_toggled();
   void on_context_list_selected_rows_changed();
-  void on_icon_view_item_activated(const Gtk::TreeModel::Path& path);
-  bool on_icon_view_query_tooltip(int x, int y,
-    bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+  void on_icon_view_item_activated(unsigned int position);
+  void on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_bind_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item);
   void on_search_bar_search_mode_enabled_changed();
   void on_search_entry_search_changed();
 
@@ -134,7 +116,8 @@ protected:
     const Glib::ustring& name, const Glib::ustring& description);
   void add_icon(const Glib::ustring& name,
     const Glib::ustring& description, const Glib::ustring& context_id);
-  bool is_icon_visible(const Gtk::TreeModel::const_iterator& iter) const;
+  void filter_changed();
+  bool is_icon_visible(const Glib::RefPtr<Glib::ObjectBase>& item) const;
 
   // Child widgets, header bar:
   Gtk::HeaderBar m_header;
@@ -148,23 +131,23 @@ protected:
   // Child widgets, main part of window:
   Gtk::Box m_hbox;
   Gtk::ListBox m_context_list;
-  Gtk::Separator m_vseparator;
   Gtk::Box m_vcontent_box;
   Gtk::SearchBar m_search_bar;
   Gtk::SearchEntry m_search_entry;
   Gtk::ScrolledWindow m_scrolled_window;
-  Gtk::IconView m_icon_view;
-
-  Gtk::CellRendererPixbuf m_icon_cell;
-  Gtk::CellRendererText m_text_cell;
+  Gtk::GridView m_icon_view;
 
   // Dialog box, showing icon details:
   DetailDialog m_details;
 
   Glib::RefPtr<Glib::Binding> m_binding_search_button_search_entry;
   Glib::ustring m_current_context_id;
-  Glib::RefPtr<Gtk::TreeModelFilter> m_filter_model;
-  Glib::RefPtr<IconInfoStore> m_store;
+  bool m_current_symbolic{false};
+  Glib::RefPtr<Gio::ListStore<ModelColumns>> m_store;
+  Glib::RefPtr<Gtk::BoolFilter> m_filter;
+  Glib::RefPtr<Gtk::FilterListModel> m_filter_model;
+  Glib::RefPtr<Gtk::NoSelection> m_selection_model;
+  Glib::RefPtr<Gtk::SignalListItemFactory> m_factory;
 
 }; // end Example_IconBrowser
 
@@ -181,15 +164,18 @@ Example_IconBrowser::Example_IconBrowser()
   m_normal_radio("Normal"),
   m_symbolic_radio("Symbolic"),
   m_hbox(Gtk::Orientation::HORIZONTAL, 0),
-  m_vseparator(Gtk::Orientation::VERTICAL),
   m_vcontent_box(Gtk::Orientation::VERTICAL, 0),
   m_details(*this)
 {
   //set_title("Icon Browser"); // Not shown when header bar is shown
   set_default_size(600, 800);
 
-  m_store = IconInfoStore::create();
-  m_filter_model = Gtk::TreeModelFilter::create(m_store);
+  m_store = Gio::ListStore<ModelColumns>::create();
+  // The BoolFilter's Expression is in filter_changed().
+  m_filter = Gtk::BoolFilter::create({});
+  m_filter_model = Gtk::FilterListModel::create(m_store, m_filter);
+  m_selection_model = Gtk::NoSelection::create(m_filter_model);
+  m_factory = Gtk::SignalListItemFactory::create();
 
   // The header bar.
   set_titlebar(m_header);
@@ -199,6 +185,7 @@ Example_IconBrowser::Example_IconBrowser()
   m_search_button.set_image_from_icon_name("edit-find-symbolic");
   m_header.pack_end(m_header_radio_button_box);
   m_normal_radio.set_expand();
+  m_normal_radio.set_active();
   m_header_radio_button_box.append(m_normal_radio);
   m_symbolic_radio.set_expand();
   m_header_radio_button_box.append(m_symbolic_radio);
@@ -213,7 +200,7 @@ Example_IconBrowser::Example_IconBrowser()
   set_child(m_hbox);
   m_hbox.append(m_context_list);
   m_context_list.set_selection_mode(Gtk::SelectionMode::SINGLE);
-  m_hbox.append(m_vseparator);
+  m_hbox.append(*Gtk::make_managed<Gtk::Separator>(Gtk::Orientation::VERTICAL));
   m_vcontent_box.set_expand();
   m_hbox.append(m_vcontent_box);
   m_vcontent_box.append(m_search_bar);
@@ -227,25 +214,9 @@ Example_IconBrowser::Example_IconBrowser()
   m_vcontent_box.append(m_scrolled_window);
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER, Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.set_child(m_icon_view);
-  m_icon_view.set_model(m_filter_model);
-  m_icon_view.set_selection_mode(Gtk::SelectionMode::NONE);
-  m_icon_view.set_activate_on_single_click(true);
-  m_icon_view.pack_start(m_icon_cell);
-  m_icon_view.pack_start(m_text_cell);
-  m_icon_cell.set_padding(10, 10);
-  m_icon_cell.property_icon_size() = Gtk::IconSize::LARGE;
-  m_text_cell.set_padding(10, 10);
-  m_text_cell.set_alignment(0.5, 0.5);
-
-  // Enable dragging an icon name, and copying it to another program.
-  const GType ustring_type = Glib::Value<Glib::ustring>::value_type();
-  auto content_formats = Gdk::ContentFormats::create(ustring_type);
-  m_icon_view.enable_model_drag_source(
-    content_formats, Gdk::ModifierType::BUTTON1_MASK, Gdk::DragAction::COPY);
-
-  m_icon_view.set_has_tooltip(true);
-  m_filter_model->set_visible_func(
-    sigc::mem_fun(*this, &Example_IconBrowser::is_icon_visible));
+  m_icon_view.set_model(m_selection_model);
+  m_icon_view.set_factory(m_factory);
+  m_icon_view.set_single_click_activate(true);
 
   // Hook the search bar to key presses.
   m_search_bar.set_key_capture_widget(*this);
@@ -255,10 +226,12 @@ Example_IconBrowser::Example_IconBrowser()
     sigc::mem_fun(*this, &Example_IconBrowser::on_symbolic_radio_toggled));
   m_context_list.signal_selected_rows_changed().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_context_list_selected_rows_changed));
-  m_icon_view.signal_item_activated().connect(
+  m_icon_view.signal_activate().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_icon_view_item_activated));
-  m_icon_view.signal_query_tooltip().connect(
-    sigc::mem_fun(*this, &Example_IconBrowser::on_icon_view_query_tooltip), false);
+  m_factory->signal_setup().connect(
+    sigc::mem_fun(*this, &Example_IconBrowser::on_setup_listitem));
+  m_factory->signal_bind().connect(
+    sigc::mem_fun(*this, &Example_IconBrowser::on_bind_listitem));
   m_search_bar.property_search_mode_enabled().signal_changed().connect(
     sigc::mem_fun(*this, &Example_IconBrowser::on_search_bar_search_mode_enabled_changed));
   m_search_entry.signal_search_changed().connect(
@@ -266,6 +239,7 @@ Example_IconBrowser::Example_IconBrowser()
 
   on_symbolic_radio_toggled();
   populate();
+  filter_changed();
 }
 
 Example_IconBrowser::~Example_IconBrowser()
@@ -274,13 +248,8 @@ Example_IconBrowser::~Example_IconBrowser()
 
 void Example_IconBrowser::on_symbolic_radio_toggled()
 {
-  const bool symbolic = m_symbolic_radio.get_active();
-  m_store->set_text_column(symbolic);
-  m_icon_view.clear_attributes(m_icon_cell);
-  m_icon_view.add_attribute(m_icon_cell, "icon-name", m_store->get_text_column());
-  m_icon_view.clear_attributes(m_text_cell);
-  m_icon_view.add_attribute(m_text_cell, "text", m_store->get_text_column());
-  m_filter_model->refilter();
+  m_current_symbolic = m_symbolic_radio.get_active();
+  filter_changed();
   m_icon_view.queue_draw();
 }
 
@@ -296,44 +265,62 @@ void Example_IconBrowser::on_context_list_selected_rows_changed()
   if (label)
   {
     m_current_context_id = label->get_id();
-    m_filter_model->refilter();
+    filter_changed();
   }
   else
     std::cout << "on_context_list_selected_rows_changed(): Unexpected child type." << std::endl;
 }
 
-void Example_IconBrowser::on_icon_view_item_activated(const Gtk::TreeModel::Path& path)
+void Example_IconBrowser::on_icon_view_item_activated(unsigned int position)
 {
-  auto iter = m_filter_model->get_iter(path);
-  const auto row = *iter;
-  const Glib::ustring name = row[m_store->get_text_column()];
-  const Glib::ustring description = row[m_store->m_columns.description];
+  auto col = std::dynamic_pointer_cast<ModelColumns>(m_filter_model->get_object(position));
+  if (!col)
+    return;
+  const Glib::ustring name = col->m_name;
   if (name.empty() || !Gtk::IconTheme::get_for_display(get_display())->has_icon(name))
     return;
-
   m_details.set_title(name);
-  m_details.set_image(name, description);
+  m_details.set_image(name, col->m_description);
   m_details.present();
 }
 
-bool Example_IconBrowser::on_icon_view_query_tooltip(int x, int y,
-  bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+void Example_IconBrowser::on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
-  // Very similar to what Gtk::IconView::set_tooltip_column() does.
-  // The important difference is that Gtk::Tooltip::set_text() is called
-  // instead of Gtk::Tooltip::set_markup().
-  Gtk::TreeModel::iterator iter;
-  if (!m_icon_view.get_tooltip_context_iter(x, y, keyboard_tooltip, iter))
-    return false;
+  // Each ListItem contains a vertical Box with an Image and a Label.
+  auto vBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+  auto image = Gtk::make_managed<Gtk::Image>();
+  image->set_icon_size(Gtk::IconSize::LARGE);
+  vBox->append(*image);
+  vBox->append(*Gtk::make_managed<Gtk::Label>());
+  list_item->set_child(*vBox);
+}
 
-  const auto row = *iter;
-  const Glib::ustring description = row[m_store->m_columns.description];
-  if (description.empty())
-    return false;
+void Example_IconBrowser::on_bind_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
+{
+  auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
+  if (!col)
+    return;
+  auto vBox = dynamic_cast<Gtk::Box*>(list_item->get_child());
+  if (!vBox)
+    return;
+  auto image = dynamic_cast<Gtk::Image*>(vBox->get_first_child());
+  if (!image)
+    return;
+  auto label = dynamic_cast<Gtk::Label*>(image->get_next_sibling());
+  if (!label)
+    return;
+  image->set_from_icon_name(col->m_name);
+  label->set_text(col->m_name);
+  vBox->set_tooltip_text(col->m_description);
 
-  tooltip->set_text(description);
-  m_icon_view.set_tooltip_item(tooltip, m_filter_model->get_path(iter));
-  return true;
+  // The grid item is a drag source. It can drag the icon's name.
+  auto dnd_source = Gtk::DragSource::create();
+  Glib::Value<Glib::ustring> value;
+  value.init(value.value_type());
+  value.set(col->m_name);
+  dnd_source->set_content(Gdk::ContentProvider::create(value));
+  dnd_source->set_actions(Gdk::DragAction::COPY);
+  vBox->add_controller(dnd_source);
 }
 
 void Example_IconBrowser::on_search_bar_search_mode_enabled_changed()
@@ -345,7 +332,7 @@ void Example_IconBrowser::on_search_bar_search_mode_enabled_changed()
 void Example_IconBrowser::on_search_entry_search_changed()
 {
   if (!m_search_entry.get_text().empty())
-    m_filter_model->refilter();
+    filter_changed();
 }
 
 void Example_IconBrowser::populate()
@@ -830,7 +817,7 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
 {
   IconContextLabel* row = Gtk::make_managed<IconContextLabel>(id, name);
   row->show();
-  row->set_margin(10);
+  row->set_margin(5);
   m_context_list.append(*row);
 
   // Set the tooltip on the list box row.
@@ -844,27 +831,36 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
 void Example_IconBrowser::add_icon(const Glib::ustring& name,
   const Glib::ustring& description, const Glib::ustring& context_id)
 {
+  // Add up to two new items to m_store (which is a Gio::ListStore).
   auto regular_name = name;
-  if (!Gtk::IconTheme::get_for_display(get_display())->has_icon(regular_name))
-    regular_name.clear();
+  if (Gtk::IconTheme::get_for_display(get_display())->has_icon(regular_name))
+    m_store->append(ModelColumns::create(
+      regular_name, description, context_id, false));
 
   auto symbolic_name = name + "-symbolic";
-  if (!Gtk::IconTheme::get_for_display(get_display())->has_icon(symbolic_name))
-    symbolic_name.clear();
-
-  // Add a new row to the IconInfoStore (which is a ListStore).
-  auto row = *(m_store->append());
-  row[m_store->m_columns.name] = regular_name;
-  row[m_store->m_columns.symbolic_name] = symbolic_name;
-  row[m_store->m_columns.description] = description;
-  row[m_store->m_columns.context_id] = context_id;
+  if (Gtk::IconTheme::get_for_display(get_display())->has_icon(symbolic_name))
+    m_store->append(ModelColumns::create(
+      symbolic_name, description, context_id, true));
 }
 
-bool Example_IconBrowser::is_icon_visible(const Gtk::TreeModel::const_iterator& iter) const
+void Example_IconBrowser::filter_changed()
 {
-  const auto row = *iter;
-  const Glib::ustring name = row[m_store->get_text_column()];
+  // When a new expression is set in the BoolFilter, it emits signal_changed(),
+  // and the FilterListModel re-evaluates the filter.
+  auto expression = Gtk::ClosureExpression<bool>::create(
+    sigc::mem_fun(*this, &Example_IconBrowser::is_icon_visible));
+  m_filter->set_expression(expression);
+}
+
+bool Example_IconBrowser::is_icon_visible(const Glib::RefPtr<Glib::ObjectBase>& item) const
+{
+  auto col = std::dynamic_pointer_cast<ModelColumns>(item);
+  if (!col)
+    return false;
+  const Glib::ustring name = col->m_name;
   if (name.empty())
+    return false;
+  if (col->m_symbolic != m_current_symbolic)
     return false;
 
   const bool search = m_search_button.get_active();
@@ -876,8 +872,7 @@ bool Example_IconBrowser::is_icon_visible(const Gtk::TreeModel::const_iterator& 
   }
   else
   {
-    const Glib::ustring context_id = row[m_store->m_columns.context_id];
-    visible = context_id == m_current_context_id;
+    visible = col->m_context_id == m_current_context_id;
   }
   return visible;
 }
@@ -890,11 +885,12 @@ const int DetailDialog::m_icon_size[n_icon_sizes] = { 16, 24, 32, 48, 64 };
 
 // Definition of detail dialog methods.
 DetailDialog::DetailDialog(Gtk::Window& parent)
-: Gtk::Dialog("", parent, true /* modal */, true /* use_header_bar */)
 {
+  set_transient_for(parent);
+  set_modal();
   set_resizable(false);
   set_hide_on_close();
-  get_content_area()->append(m_grid);
+  set_child(m_grid);
   m_grid.set_expand();
   m_grid.set_margin(10);
   m_grid.set_row_spacing(10);
@@ -1001,40 +997,4 @@ Glib::RefPtr<const Gtk::IconPaintable> DetailDialog::get_icon_paintable(int size
 {
   return Gtk::IconTheme::get_for_display(get_display())->lookup_icon(
     m_icon_name, m_icon_size[size_index]);
-}
-
-IconInfoStore::IconInfoStore()
-{
-  // We can't call Gtk::ListStore(m_columns) in the initializer list
-  // because m_columns does not exist when the base class constructor runs.
-  // And we can't have a static m_columns instance, because that would be
-  // instantiated before the gtkmm type system.
-  // So, we use this method, which should only be used just after creation:
-  set_column_types(m_columns);
-
-  set_text_column(false);
-}
-
-IconInfoStore::~IconInfoStore()
-{
-}
-
-Glib::RefPtr<IconInfoStore> IconInfoStore::create()
-{
-  return Glib::RefPtr<IconInfoStore>(new IconInfoStore());
-}
-
-Glib::RefPtr<Gdk::ContentProvider> IconInfoStore::drag_data_get_vfunc(
-  const Gtk::TreeModel::Path& path) const
-{
-  const auto iter = get_iter(path);
-  if (!iter)
-    return {};
-
-  const auto row = *iter;
-  const auto name = row[m_text_column];
-  Glib::Value<Glib::ustring> name_value;
-  name_value.init(name_value.value_type());
-  name_value.set(name);
-  return Gdk::ContentProvider::create(name_value);
 }

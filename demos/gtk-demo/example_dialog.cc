@@ -1,9 +1,17 @@
 /* Dialog and Message Boxes
  *
  * Dialog widgets are used to pop up a transient window for user feedback.
+ *
+ * Gtk::AlertDialog can show a simple dialog with a few lines of text and
+ * one or more buttons.
+ *
+ * Gtk::AboutDialog, ColorDialog, FileDialog, FontDialog are more
+ * specialized dialog classes (not shown in this demo).
  */
 
 #include <gtkmm.h>
+#include <iostream>
+#include <vector>
 
 class Dialog_Interactive;
 
@@ -18,9 +26,9 @@ protected:
   void on_button_message();
   void on_button_interactive();
   void on_button_non_modal();
-  void on_message_response(int response_id, Gtk::MessageDialog* dialog);
-  void on_interactive_response(int response_id, Dialog_Interactive* dialog);
-  void on_non_modal_response(int response_id, Gtk::MessageDialog* dialog);
+  void on_message_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
+    const Glib::RefPtr<Gtk::AlertDialog>& dialog);
+  void on_interactive_response(const Glib::ustring& response, Dialog_Interactive* dialog);
 
   //Member widgets:
   Gtk::Frame m_Frame;
@@ -33,27 +41,31 @@ protected:
   Gtk::Label m_Label1, m_Label2;
   Gtk::Entry m_Entry1, m_Entry2;
 
-  gint m_count;
-};
+  int m_count{0};
+}; // Example_Dialog
 
-class Dialog_Interactive : public Gtk::Dialog
+class Dialog_Interactive : public Gtk::Window
 {
 public:
   Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2);
   ~Dialog_Interactive() override;
 
+  void buttons_clicked_connect(const sigc::slot<void(const Glib::ustring&)>& slot);
   Glib::ustring get_entry1() const;
   Glib::ustring get_entry2() const;
 
 protected:
   //Member widgets:
-  Gtk::Box m_HBox;
   Gtk::Grid m_Grid;
-  Gtk::Label m_Label1, m_Label2;
-  Gtk::Entry m_Entry1, m_Entry2;
   Gtk::Image m_Image;
-};
-
+  Gtk::Label m_Label1;
+  Gtk::Label m_Label2;
+  Gtk::Entry m_Entry1;
+  Gtk::Entry m_Entry2;
+  Gtk::Box m_ButtonBox;
+  Gtk::Button m_Button_OK;
+  Gtk::Button m_Button_Cancel;
+}; // Dialog_Interactive
 
 //Called by DemoWindow;
 Gtk::Window* do_dialog()
@@ -72,8 +84,6 @@ Example_Dialog::Example_Dialog()
   m_Label1("_Entry 1", true),
   m_Label2("E_ntry 2", true)
 {
-  m_count = 0;
-
   set_title("Dialogs");
 
   m_Frame.set_margin(8);
@@ -120,21 +130,24 @@ Example_Dialog::~Example_Dialog()
 
 void Example_Dialog::on_button_message()
 {
-  Glib::ustring strMessage = "This message box has been popped up the following\n"
-                             "number of times:\n\n";
+  Glib::ustring strMessage =
+    "This message box has been closed with OK\n"
+    "the following number of times:\n\n";
   strMessage += Glib::ustring::format(m_count);
-
-  auto dialog = new Gtk::MessageDialog(*this, strMessage, false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, true); //true = modal
-  dialog->signal_response().connect(sigc::bind(
-    sigc::mem_fun(*this, &Example_Dialog::on_message_response), dialog));
-  dialog->show();
+  auto dialog = Gtk::AlertDialog::create(strMessage);
+  dialog->set_modal(true);
+  dialog->set_buttons(std::vector<Glib::ustring>{"OK", "Cancel"});
+  dialog->set_default_button(0);
+  dialog->set_cancel_button(1);
+  dialog->choose(*this,
+    sigc::bind(sigc::mem_fun(*this, &Example_Dialog::on_message_finish), dialog));
 }
 
 void Example_Dialog::on_button_interactive()
 {
   Dialog_Interactive* pDialog = new Dialog_Interactive(*this, m_Entry1.get_text(), m_Entry2.get_text());
   pDialog->set_modal(true);
-  pDialog->signal_response().connect(sigc::bind(
+  pDialog->buttons_clicked_connect(sigc::bind(
     sigc::mem_fun(*this, &Example_Dialog::on_interactive_response), pDialog));
   pDialog->show();
 }
@@ -142,23 +155,28 @@ void Example_Dialog::on_button_interactive()
 void Example_Dialog::on_button_non_modal()
 {
   const Glib::ustring strMessage = "Non-modal message box.";
-  auto dialog = Gtk::make_managed<Gtk::MessageDialog>(*this, strMessage,
-    /* use_markup= */ false, Gtk::MessageType::INFO, Gtk::ButtonsType::OK, /* modal= */ false);
-  dialog->set_destroy_with_parent(true);
-  dialog->signal_response().connect(sigc::bind(
-    sigc::mem_fun(*this, &Example_Dialog::on_non_modal_response), dialog));
-  dialog->show();
+  auto dialog = Gtk::AlertDialog::create(strMessage);
+  dialog->set_modal(false);
+  dialog->show(*this);
 }
 
-void Example_Dialog::on_message_response(int /* response_id */, Gtk::MessageDialog* dialog)
+void Example_Dialog::on_message_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
+  const Glib::RefPtr<Gtk::AlertDialog>& dialog)
 {
-  m_count++;
-  delete dialog;
+  try
+  {
+    if (dialog->choose_finish(result) == 0)
+      m_count++;
+  }
+  catch (const Glib::Error& err)
+  {
+    std::cout << err.what() << std::endl;
+  }
 }
 
-void Example_Dialog::on_interactive_response(int response_id, Dialog_Interactive* dialog)
+void Example_Dialog::on_interactive_response(const Glib::ustring& response, Dialog_Interactive* dialog)
 {
-  if (response_id == Gtk::ResponseType::OK)
+  if (response == "OK")
   {
     m_Entry1.set_text(dialog->get_entry1());
     m_Entry2.set_text(dialog->get_entry2());
@@ -166,43 +184,51 @@ void Example_Dialog::on_interactive_response(int response_id, Dialog_Interactive
   delete dialog;
 }
 
-void Example_Dialog::on_non_modal_response(int /* response_id */, Gtk::MessageDialog* dialog)
-{
-  // Delete the non-modal dialog.
-  // If the Example_Dialog is deleted without first responding to the non-modal
-  // dialog, the non-modal dialog is deleted with Example_Dialog, because it's
-  // a managed widget which is destroyed with its parent.
-  delete dialog;
-}
+//***** Interactive dialog ******
 
-Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent, const Glib::ustring& entry1, const Glib::ustring& entry2)
-: Gtk::Dialog("Interactive Dialog", parent, true),
-  m_HBox(Gtk::Orientation::HORIZONTAL, 8),
-  m_Label1("_Entry 1", true), m_Label2("E_ntry 2", true),
-  m_Image()
+Dialog_Interactive::Dialog_Interactive(Gtk::Window& parent,
+  const Glib::ustring& entry1, const Glib::ustring& entry2)
+: m_Label1("_Entry 1", true),
+  m_Label2("E_ntry 2", true),
+  m_ButtonBox(Gtk::Orientation::HORIZONTAL, 5),
+  m_Button_OK("_OK", true),
+  m_Button_Cancel("_Cancel", true)
 {
-  m_Image.set_from_icon_name("dialog-question");
-  m_Image.set_icon_size(Gtk::IconSize::LARGE);
-  add_button("_OK", Gtk::ResponseType::OK);
-  add_button("_Cancel", Gtk::ResponseType::CANCEL);
+  set_transient_for(parent);
+  set_destroy_with_parent(true);
 
-  get_content_area()->append(m_HBox);
-  m_HBox.append(m_Image);
+  set_title("Interactive Dialog");
+  set_child(m_Grid);
 
   m_Grid.set_row_spacing(4);
   m_Grid.set_column_spacing(4);
   m_Grid.set_expand(true);
-  m_HBox.append(m_Grid);
 
-  m_Grid.attach(m_Label1, 0, 0);
+  m_Image.set_from_icon_name("dialog-question");
+  m_Image.set_icon_size(Gtk::IconSize::LARGE);
+  m_Grid.attach(m_Image, 0, 0, 1, 2);
+
+  m_Grid.attach(m_Label1, 1, 0);
   m_Entry1.set_text(entry1);
-  m_Grid.attach(m_Entry1, 1, 0);
+  m_Grid.attach(m_Entry1, 2, 0);
   m_Label1.set_mnemonic_widget(m_Entry1);
 
-  m_Grid.attach(m_Label2, 0, 1);
+  m_Grid.attach(m_Label2, 1, 1);
   m_Entry2.set_text(entry2);
-  m_Grid.attach(m_Entry2, 1, 1);
+  m_Grid.attach(m_Entry2, 2, 1);
   m_Label2.set_mnemonic_widget(m_Entry2);
+
+  m_Grid.attach(m_ButtonBox, 0, 2, 3, 1);
+  m_ButtonBox.set_halign(Gtk::Align::END);
+  m_ButtonBox.append(m_Button_OK);
+  m_ButtonBox.append(m_Button_Cancel);
+}
+
+void Dialog_Interactive::buttons_clicked_connect(
+  const sigc::slot<void(const Glib::ustring&)>& slot)
+{
+  m_Button_OK.signal_clicked().connect(sigc::bind(slot, "OK"));
+  m_Button_Cancel.signal_clicked().connect(sigc::bind(slot, "Cancel"));
 }
 
 Glib::ustring Dialog_Interactive::get_entry1() const

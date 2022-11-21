@@ -123,6 +123,8 @@ DemoWindow::DemoWindow()
   set_default_size(800, 600);
 
   load_file(testgtk_demos[0].filename);
+  m_refSingleSelection->set_selected(0);
+  m_ListView.grab_focus();
 }
 
 DemoWindow::~DemoWindow()
