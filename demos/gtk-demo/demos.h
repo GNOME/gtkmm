@@ -33,6 +33,9 @@ Gtk::Window* do_iconbrowser();
 Gtk::Window* do_images();
 Gtk::Window* do_listview_applauncher();
 Gtk::Window* do_listview_columnview();
+Gtk::Window* do_listview_editable_cells();
+Gtk::Window* do_listview_liststore();
+Gtk::Window* do_listview_treelist();
 Gtk::Window* do_overlay();
 Gtk::Window* do_panes();
 Gtk::Window* do_pixbufs();
@@ -42,22 +45,13 @@ Gtk::Window* do_stack();
 Gtk::Window* do_stacksidebar();
 Gtk::Window* do_textview();
 
-Gtk::Window* do_treeview_editable_cells();
-Gtk::Window* do_treeview_liststore();
-Gtk::Window* do_treeview_treestore();
-
 Demo child0[] =
-{
-  { "Editable Cells", "example_treeview_editable_cells.cc", sigc::ptr_fun(&do_treeview_editable_cells), nullptr },
-  { "List Store", "example_treeview_liststore.cc", sigc::ptr_fun(&do_treeview_liststore), nullptr },
-  { "Tree Store", "example_treeview_treestore.cc", sigc::ptr_fun(&do_treeview_treestore), nullptr },
-  { nullptr, nullptr, type_slotDo(), nullptr }
-};
-
-Demo child1[] =
 {
   { "Application Launcher", "example_listview_applauncher.cc", sigc::ptr_fun(&do_listview_applauncher), nullptr },
   { "Column View", "example_listview_columnview.cc", sigc::ptr_fun(&do_listview_columnview), nullptr },
+  { "Editable Cells", "example_listview_editable_cells.cc", sigc::ptr_fun(&do_listview_editable_cells), nullptr },
+  { "List Store", "example_listview_liststore.cc", sigc::ptr_fun(&do_listview_liststore), nullptr },
+  { "Tree List", "example_listview_treelist.cc", sigc::ptr_fun(&do_listview_treelist), nullptr },
   { nullptr, nullptr, type_slotDo(), nullptr }
 };
 
@@ -75,7 +69,7 @@ Demo testgtk_demos[] =
   { "Header Bar", "example_headerbar.cc",  sigc::ptr_fun(&do_headerbar), nullptr },
   { "Icon Browser", "example_iconbrowser.cc", sigc::ptr_fun(&do_iconbrowser), nullptr },
   { "Images", "example_images.cc", sigc::ptr_fun(&do_images), nullptr },
-  { "Lists", "", type_slotDo(), child1 },
+  { "Lists", "", type_slotDo(), child0 },
   { "OpenGL Area", "example_glarea.cc", sigc::ptr_fun(&do_glarea), nullptr },
   { "Overlay", "example_overlay.cc", sigc::ptr_fun(&do_overlay), nullptr },
   { "Paned Widgets", "example_panes.cc", sigc::ptr_fun(&do_panes), nullptr },
@@ -85,7 +79,6 @@ Demo testgtk_demos[] =
   { "Stack", "example_stack.cc", sigc::ptr_fun(&do_stack), nullptr },
   { "Stack Sidebar", "example_stacksidebar.cc", sigc::ptr_fun(&do_stacksidebar), nullptr },
   { "Text Widget", "example_textview.cc", sigc::ptr_fun(&do_textview), nullptr },
-  { "Tree View", "", type_slotDo(), child0 },
   { nullptr, nullptr, type_slotDo(), nullptr }
 };
 

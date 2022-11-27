@@ -22,6 +22,9 @@ gtkmm_demo_cc_files = [
   'example_images.cc',
   'example_listview_applauncher.cc',
   'example_listview_columnview.cc',
+  'example_listview_editable_cells.cc',
+  'example_listview_liststore.cc',
+  'example_listview_treelist.cc',
   'example_overlay.cc',
   'example_panes.cc',
   'example_pixbufs.cc',
@@ -30,9 +33,6 @@ gtkmm_demo_cc_files = [
   'example_stack.cc',
   'example_stacksidebar.cc',
   'example_textview.cc',
-  'example_treeview_editable_cells.cc',
-  'example_treeview_liststore.cc',
-  'example_treeview_treestore.cc',
 ]
 
 gnome = import('gnome')

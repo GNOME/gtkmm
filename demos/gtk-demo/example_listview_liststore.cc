@@ -55,11 +55,11 @@ protected:
 
 } // anonymous namespace
 
-class Example_TreeView_ListStore : public Gtk::Window
+class Example_ListView_ListStore : public Gtk::Window
 {
 public:
-  Example_TreeView_ListStore();
-  ~Example_TreeView_ListStore() override;
+  Example_ListView_ListStore();
+  ~Example_ListView_ListStore() override;
 
 protected:
   void create_model();
@@ -87,13 +87,13 @@ protected:
 
 
 //Called by DemoWindow;
-Gtk::Window* do_treeview_liststore()
+Gtk::Window* do_listview_liststore()
 {
-  return new Example_TreeView_ListStore();
+  return new Example_ListView_ListStore();
 }
 
 
-Example_TreeView_ListStore::Example_TreeView_ListStore()
+Example_ListView_ListStore::Example_ListView_ListStore()
 : m_VBox(Gtk::Orientation::VERTICAL, 8),
   m_Label("This is the bug list (note: not based on real data).")
 {
@@ -123,11 +123,11 @@ Example_TreeView_ListStore::Example_TreeView_ListStore()
   m_ScrolledWindow.set_child(m_ColumnView);
 }
 
-Example_TreeView_ListStore::~Example_TreeView_ListStore()
+Example_ListView_ListStore::~Example_ListView_ListStore()
 {
 }
 
-void Example_TreeView_ListStore::create_model()
+void Example_ListView_ListStore::create_model()
 {
   m_ListStore = Gio::ListStore<ModelColumns>::create();
 
@@ -147,22 +147,22 @@ void Example_TreeView_ListStore::create_model()
   liststore_add_item(false, 1,     "Normal",     "First bug :=)");
 }
 
-void Example_TreeView_ListStore::liststore_add_item(bool fixed, unsigned int number,
+void Example_ListView_ListStore::liststore_add_item(bool fixed, unsigned int number,
   const Glib::ustring& severity, const Glib::ustring& description)
 {
   m_ListStore->append(ModelColumns::create(fixed, number, severity, description));
 }
 
-void Example_TreeView_ListStore::add_columns()
+void Example_ListView_ListStore::add_columns()
 {
   /* column for fixed toggles */
   auto factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_setup_checkbutton));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_setup_checkbutton));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_bind_fixed));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_bind_fixed));
   factory->signal_unbind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_unbind_fixed));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_unbind_fixed));
   auto column = Gtk::ColumnViewColumn::create("Fixed?", factory);
   column->set_fixed_width(60);
   m_ColumnView.append_column(column);
@@ -170,32 +170,32 @@ void Example_TreeView_ListStore::add_columns()
   /* column for bug numbers */
   factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(sigc::bind(sigc::mem_fun(*this,
-    &Example_TreeView_ListStore::on_setup_label), Gtk::Align::END));
+    &Example_ListView_ListStore::on_setup_label), Gtk::Align::END));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_bind_number));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_bind_number));
   column = Gtk::ColumnViewColumn::create("Bug number", factory);
   m_ColumnView.append_column(column);
 
   /* column for severities */
   factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(sigc::bind(sigc::mem_fun(*this,
-    &Example_TreeView_ListStore::on_setup_label), Gtk::Align::START));
+    &Example_ListView_ListStore::on_setup_label), Gtk::Align::START));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_bind_severity));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_bind_severity));
   column = Gtk::ColumnViewColumn::create("Severity", factory);
   m_ColumnView.append_column(column);
 
   /* column for descriptions */
   factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(sigc::bind(sigc::mem_fun(*this,
-    &Example_TreeView_ListStore::on_setup_label), Gtk::Align::START));
+    &Example_ListView_ListStore::on_setup_label), Gtk::Align::START));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_ListStore::on_bind_description));
+    sigc::mem_fun(*this, &Example_ListView_ListStore::on_bind_description));
   column = Gtk::ColumnViewColumn::create("Description", factory);
   m_ColumnView.append_column(column);
 }
 
-void Example_TreeView_ListStore::on_setup_checkbutton(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_setup_checkbutton(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
   checkbutton->set_halign(Gtk::Align::CENTER);
@@ -203,13 +203,13 @@ void Example_TreeView_ListStore::on_setup_checkbutton(const Glib::RefPtr<Gtk::Li
   list_item->set_child(*checkbutton);
 }
 
-void Example_TreeView_ListStore::on_setup_label(
+void Example_ListView_ListStore::on_setup_label(
   const Glib::RefPtr<Gtk::ListItem>& list_item, Gtk::Align halign)
 {
   list_item->set_child(*Gtk::make_managed<Gtk::Label>("", halign));
 }
 
-void Example_TreeView_ListStore::on_bind_fixed(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_bind_fixed(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
   if (!col)
@@ -229,7 +229,7 @@ void Example_TreeView_ListStore::on_bind_fixed(const Glib::RefPtr<Gtk::ListItem>
     Glib::Binding::Flags::BIDIRECTIONAL);
 }
 
-void Example_TreeView_ListStore::on_unbind_fixed(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_unbind_fixed(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
   if (!col)
@@ -239,7 +239,7 @@ void Example_TreeView_ListStore::on_unbind_fixed(const Glib::RefPtr<Gtk::ListIte
   col->m_binding_to_checkbutton.reset();
 }
 
-void Example_TreeView_ListStore::on_bind_number(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_bind_number(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
   if (!col)
@@ -250,7 +250,7 @@ void Example_TreeView_ListStore::on_bind_number(const Glib::RefPtr<Gtk::ListItem
   label->set_text(Glib::ustring::format(col->m_number));
 }
 
-void Example_TreeView_ListStore::on_bind_severity(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_bind_severity(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
   if (!col)
@@ -261,7 +261,7 @@ void Example_TreeView_ListStore::on_bind_severity(const Glib::RefPtr<Gtk::ListIt
   label->set_text(col->m_severity);
 }
 
-void Example_TreeView_ListStore::on_bind_description(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_ListStore::on_bind_description(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
   if (!col)

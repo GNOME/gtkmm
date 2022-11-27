@@ -1,4 +1,4 @@
-/* Column View, Tree List Model
+/* Column View, Tree List
  *
  * The Gtk::TreeListModel is used for storing data in tree form, to be
  * used later on by a Gtk::ListView or a Gtk::ColumnView to display it.
@@ -66,11 +66,11 @@ const bool is_european_hacker[CheckColumns::N_COLS] = {
 
 } // anonymous namespace
 
-class Example_TreeView_TreeStore : public Gtk::Window
+class Example_ListView_TreeList : public Gtk::Window
 {
 public:
-  Example_TreeView_TreeStore();
-  ~Example_TreeView_TreeStore() override;
+  Example_ListView_TreeList();
+  ~Example_ListView_TreeList() override;
 
 protected:
   class ModelColumns : public Glib::Object
@@ -139,13 +139,13 @@ CellItem_Holiday::CellItem_Holiday(Glib::ustring holiday_name,
 
 
 //Called by DemoWindow:
-Gtk::Window* do_treeview_treestore()
+Gtk::Window* do_listview_treelist()
 {
-  return new Example_TreeView_TreeStore();
+  return new Example_ListView_TreeList();
 }
 
 
-Example_TreeView_TreeStore::Example_TreeView_TreeStore()
+Example_ListView_TreeList::Example_ListView_TreeList()
 : m_VBox(Gtk::Orientation::VERTICAL, 8),
   m_Label("Jonathan's Holiday Card Planning Sheet"),
   m_ButtonBox(Gtk::Orientation::HORIZONTAL, 5)
@@ -168,7 +168,7 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
 
   /* create column view */
   m_TreeListModel = Gtk::TreeListModel::create(root,
-    sigc::mem_fun(*this, &Example_TreeView_TreeStore::create_model), false, true);
+    sigc::mem_fun(*this, &Example_ListView_TreeList::create_model), false, true);
   m_TreeSelection = Gtk::MultiSelection::create(m_TreeListModel);
   m_ColumnView.set_model(m_TreeSelection);
 
@@ -184,16 +184,16 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
     m_ShowButtons[button].set_label(check_column_name[button]);
     m_ShowButtons[button].set_active(true);
     m_ShowButtons[button].signal_toggled().connect(sigc::bind(sigc::mem_fun(
-      *this, &Example_TreeView_TreeStore::on_show_button_toggled), button));
+      *this, &Example_ListView_TreeList::on_show_button_toggled), button));
     m_ButtonBox.append(m_ShowButtons[button]);
   }
 }
 
-Example_TreeView_TreeStore::~Example_TreeView_TreeStore()
+Example_ListView_TreeList::~Example_ListView_TreeList()
 {
 }
 
-void Example_TreeView_TreeStore::add_items()
+void Example_ListView_TreeList::add_items()
 {
   std::vector<CellItem_Holiday> january;
   january.push_back( CellItem_Holiday("New Years Day", true, true, true, true, false, true) );
@@ -274,7 +274,7 @@ void Example_TreeView_TreeStore::add_items()
   m_vecItems.push_back( CellItem_Holiday("December", december) );
 }
 
-Glib::RefPtr<Gio::ListModel> Example_TreeView_TreeStore::create_model(
+Glib::RefPtr<Gio::ListModel> Example_ListView_TreeList::create_model(
   const Glib::RefPtr<Glib::ObjectBase>& item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(item);
@@ -289,14 +289,14 @@ Glib::RefPtr<Gio::ListModel> Example_TreeView_TreeStore::create_model(
   return result;
 }
 
-void Example_TreeView_TreeStore::add_columns()
+void Example_ListView_TreeList::add_columns()
 {
   /* column for holiday names */
   auto factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(
-    sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_setup_holiday));
+    sigc::mem_fun(*this, &Example_ListView_TreeList::on_setup_holiday));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_bind_holiday));
+    sigc::mem_fun(*this, &Example_ListView_TreeList::on_bind_holiday));
   auto column = Gtk::ColumnViewColumn::create("Holiday", factory);
   m_ColumnView.append_column(column);
 
@@ -305,21 +305,21 @@ void Example_TreeView_TreeStore::add_columns()
   {
     factory = Gtk::SignalListItemFactory::create();
     factory->signal_setup().connect(
-      sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_setup_checkbutton));
+      sigc::mem_fun(*this, &Example_ListView_TreeList::on_setup_checkbutton));
     factory->signal_bind().connect(sigc::bind(
-      sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_bind_checkbutton), check_column));
+      sigc::mem_fun(*this, &Example_ListView_TreeList::on_bind_checkbutton), check_column));
     m_ViewColumns[check_column] = Gtk::ColumnViewColumn::create(check_column_name[check_column], factory);
     m_ViewColumns[check_column]->set_fixed_width(60);
     m_ColumnView.append_column(m_ViewColumns[check_column]);
   }
 }
 
-void Example_TreeView_TreeStore::on_show_button_toggled(int button)
+void Example_ListView_TreeList::on_show_button_toggled(int button)
 {
   m_ViewColumns[button]->set_visible(m_ShowButtons[button].get_active());
 }
 
-void Example_TreeView_TreeStore::on_setup_holiday(
+void Example_ListView_TreeList::on_setup_holiday(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   // Each ListItem contains a TreeExpander, which contains a Label.
@@ -331,7 +331,7 @@ void Example_TreeView_TreeStore::on_setup_holiday(
   list_item->set_child(*expander);
 }
 
-void Example_TreeView_TreeStore::on_setup_checkbutton(
+void Example_ListView_TreeList::on_setup_checkbutton(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
@@ -340,7 +340,7 @@ void Example_TreeView_TreeStore::on_setup_checkbutton(
   list_item->set_child(*checkbutton);
 }
 
-void Example_TreeView_TreeStore::on_bind_holiday(
+void Example_ListView_TreeList::on_bind_holiday(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(list_item->get_item());
@@ -359,7 +359,7 @@ void Example_TreeView_TreeStore::on_bind_holiday(
   label->set_text(col->m_holiday_name);
 }
 
-void Example_TreeView_TreeStore::on_bind_checkbutton(
+void Example_ListView_TreeList::on_bind_checkbutton(
   const Glib::RefPtr<Gtk::ListItem>& list_item, int check_column)
 {
   auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(list_item->get_item());

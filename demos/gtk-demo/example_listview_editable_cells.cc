@@ -8,11 +8,11 @@
 #include <iostream>
 #include <gtkmm.h>
 
-class Example_TreeView_EditableCells : public Gtk::Window
+class Example_ListView_EditableCells : public Gtk::Window
 {
 public:
-  Example_TreeView_EditableCells();
-  ~Example_TreeView_EditableCells() override;
+  Example_ListView_EditableCells();
+  ~Example_ListView_EditableCells() override;
 
 protected:
   class ModelColumns : public Glib::Object
@@ -62,13 +62,13 @@ protected:
 
 
 //Called by DemoWindow;
-Gtk::Window* do_treeview_editable_cells()
+Gtk::Window* do_listview_editable_cells()
 {
-  return new Example_TreeView_EditableCells();
+  return new Example_ListView_EditableCells();
 }
 
 
-Example_TreeView_EditableCells::Example_TreeView_EditableCells()
+Example_ListView_EditableCells::Example_ListView_EditableCells()
 : m_VBox(Gtk::Orientation::VERTICAL, 5),
   m_Label("Shopping list (you can edit the cells!)"),
   m_HBox(Gtk::Orientation::HORIZONTAL, 4),
@@ -107,19 +107,19 @@ Example_TreeView_EditableCells::Example_TreeView_EditableCells()
   m_HBox.append(m_Button_Add);
   m_Button_Add.set_expand();
   m_Button_Add.signal_clicked().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_add_clicked));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_button_add_clicked));
 
   m_HBox.append(m_Button_Remove);
   m_Button_Remove.set_expand();
   m_Button_Remove.signal_clicked().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_button_remove_clicked));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_button_remove_clicked));
 }
 
-Example_TreeView_EditableCells::~Example_TreeView_EditableCells()
+Example_ListView_EditableCells::~Example_ListView_EditableCells()
 {
 }
 
-void Example_TreeView_EditableCells::create_model()
+void Example_ListView_EditableCells::create_model()
 {
   m_ListStore = Gio::ListStore<ModelColumns>::create();
 
@@ -130,13 +130,13 @@ void Example_TreeView_EditableCells::create_model()
   liststore_add_item(6, "eggs");
 }
 
-void Example_TreeView_EditableCells::liststore_add_item(
+void Example_ListView_EditableCells::liststore_add_item(
   int number, const Glib::ustring& product)
 {
   m_ListStore->append(ModelColumns::create(number, product));
 }
 
-void Example_TreeView_EditableCells::on_number_edited(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_EditableCells::on_number_edited(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto label = dynamic_cast<Gtk::EditableLabel*>(list_item->get_child());
   if (!label)
@@ -164,7 +164,7 @@ void Example_TreeView_EditableCells::on_number_edited(const Glib::RefPtr<Gtk::Li
   label->set_text(Glib::ustring::format(new_value));
 }
 
-void Example_TreeView_EditableCells::on_product_edited(const Glib::RefPtr<Gtk::ListItem>& list_item)
+void Example_ListView_EditableCells::on_product_edited(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto label = dynamic_cast<Gtk::EditableLabel*>(list_item->get_child());
   if (!label)
@@ -179,48 +179,48 @@ void Example_TreeView_EditableCells::on_product_edited(const Glib::RefPtr<Gtk::L
   col->m_product = label->get_text();
 }
 
-void Example_TreeView_EditableCells::add_columns()
+void Example_ListView_EditableCells::add_columns()
 {
   /* column for numbers */
   auto factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_setup_number));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_setup_number));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_bind_number));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_bind_number));
   auto column = Gtk::ColumnViewColumn::create("Number", factory);
   m_ColumnView.append_column(column);
 
   /* column for products */
   factory = Gtk::SignalListItemFactory::create();
   factory->signal_setup().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_setup_product));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_setup_product));
   factory->signal_bind().connect(
-    sigc::mem_fun(*this, &Example_TreeView_EditableCells::on_bind_product));
+    sigc::mem_fun(*this, &Example_ListView_EditableCells::on_bind_product));
   column = Gtk::ColumnViewColumn::create("Product", factory);
   m_ColumnView.append_column(column);
 }
 
-void Example_TreeView_EditableCells::on_setup_number(
+void Example_ListView_EditableCells::on_setup_number(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto label = Gtk::make_managed<Gtk::EditableLabel>();
   label->set_alignment(1.0);
   label->property_editing().signal_changed().connect(sigc::bind(sigc::mem_fun(
-    *this, &Example_TreeView_EditableCells::on_number_edited), list_item));
+    *this, &Example_ListView_EditableCells::on_number_edited), list_item));
   list_item->set_child(*label);
 }
 
-void Example_TreeView_EditableCells::on_setup_product(
+void Example_ListView_EditableCells::on_setup_product(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto label = Gtk::make_managed<Gtk::EditableLabel>();
   label->set_alignment(0.0);
   label->property_editing().signal_changed().connect(sigc::bind(sigc::mem_fun(
-    *this, &Example_TreeView_EditableCells::on_product_edited), list_item));
+    *this, &Example_ListView_EditableCells::on_product_edited), list_item));
   list_item->set_child(*label);
 }
 
-void Example_TreeView_EditableCells::on_bind_number(
+void Example_ListView_EditableCells::on_bind_number(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
@@ -232,7 +232,7 @@ void Example_TreeView_EditableCells::on_bind_number(
   label->set_text(Glib::ustring::format(col->m_number));
 }
 
-void Example_TreeView_EditableCells::on_bind_product(
+void Example_ListView_EditableCells::on_bind_product(
   const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   auto col = std::dynamic_pointer_cast<ModelColumns>(list_item->get_item());
@@ -244,12 +244,12 @@ void Example_TreeView_EditableCells::on_bind_product(
   label->set_text(col->m_product);
 }
 
-void Example_TreeView_EditableCells::on_button_add_clicked()
+void Example_ListView_EditableCells::on_button_add_clicked()
 {
   liststore_add_item(0, "Description here");
 }
 
-void Example_TreeView_EditableCells::on_button_remove_clicked()
+void Example_ListView_EditableCells::on_button_remove_clicked()
 {
   // If an item is selected, remove it from the ListStore.
   auto position = m_selection_model->get_selected();

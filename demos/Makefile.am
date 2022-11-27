@@ -51,6 +51,9 @@ GTK_DEMOS = \
   gtk-demo/example_images.cc \
   gtk-demo/example_listview_applauncher.cc \
   gtk-demo/example_listview_columnview.cc \
+  gtk-demo/example_listview_editable_cells.cc \
+  gtk-demo/example_listview_liststore.cc \
+  gtk-demo/example_listview_treelist.cc \
   gtk-demo/example_overlay.cc \
   gtk-demo/example_panes.cc \
   gtk-demo/example_pixbufs.cc \
@@ -58,10 +61,7 @@ GTK_DEMOS = \
   gtk-demo/example_sizegroup.cc \
   gtk-demo/example_stack.cc \
   gtk-demo/example_stacksidebar.cc \
-  gtk-demo/example_textview.cc \
-  gtk-demo/example_treeview_editable_cells.cc \
-  gtk-demo/example_treeview_liststore.cc \
-  gtk-demo/example_treeview_treestore.cc
+  gtk-demo/example_textview.cc
 
 GTK_DEMO_RESOURCES = \
   gtk-demo/example_builder.ui \
