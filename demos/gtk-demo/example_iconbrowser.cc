@@ -21,6 +21,8 @@
 #include <sstream>
 #include <iostream>
 
+namespace
+{
 // Labels in the ListBox with icon context names.
 // The icon context ids in this program are not the same as in the Icon Naming Specification
 // at http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html.
@@ -93,6 +95,8 @@ protected:
   Glib::RefPtr<Gtk::DragSource> m_image_drag_source[n_icon_sizes];
 
 }; // end DetailDialog
+
+} // anonymous namespace
 
 // Main window.
 class Example_IconBrowser : public Gtk::Window

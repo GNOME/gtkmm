@@ -1,4 +1,4 @@
-/* Lists/Application launcher
+/* List View, Application launcher
  *
  * This demo uses the Gtk::ListView widget as a fancy application launcher.
  *

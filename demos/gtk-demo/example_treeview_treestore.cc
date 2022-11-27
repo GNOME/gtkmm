@@ -1,34 +1,70 @@
-/* Tree View/Tree Store
+/* Column View, Tree List Model
  *
- * The GtkTreeStore is used to store data in tree form, to be
- * used later on by a GtkTreeView to display it. This demo builds
- * a simple GtkTreeStore and displays it. If you're new to the
- * GtkTreeView widgets and associates, look into the GtkListStore
- * example first.
+ * The Gtk::TreeListModel is used for storing data in tree form, to be
+ * used later on by a Gtk::ListView or a Gtk::ColumnView to display it.
+ * This demo builds a simple Gtk::TreeListModel and displays it.
+ * If you're new to the Gtk::ListView widget and associates,
+ * look into the Gio::ListStore example first.
  *
+ * The view contains check buttons that you can check and uncheck.
+ * The changes you make in the view are not copied to the model in
+ * this demo. To see how changes in the GUI can be copied to the model,
+ * see the List Store and the Editable Cells demos.
  */
-
+ 
 #include <gtkmm.h>
 
+namespace
+{
 class CellItem_Holiday
 {
 public:
-  CellItem_Holiday();
-  CellItem_Holiday(Glib::ustring label, bool alex, bool havoc, bool tim, bool owen, bool dave, bool world_holiday);
-  CellItem_Holiday(Glib::ustring label, const std::vector<CellItem_Holiday>& children);
-  CellItem_Holiday(const CellItem_Holiday& src);
-  ~CellItem_Holiday();
-  CellItem_Holiday& operator=(const CellItem_Holiday& src);
+  CellItem_Holiday() = default;
+  CellItem_Holiday(Glib::ustring holiday_name, bool alex, bool havoc, bool tim, bool owen, bool dave, bool world_holiday);
+  CellItem_Holiday(Glib::ustring holiday_name, const std::vector<CellItem_Holiday>& children);
+  CellItem_Holiday(const CellItem_Holiday& src) = default;
+  CellItem_Holiday(CellItem_Holiday&& src) = default;
+  CellItem_Holiday& operator=(const CellItem_Holiday& src) = default;
+  CellItem_Holiday& operator=(CellItem_Holiday&& src) = default;
+  ~CellItem_Holiday() = default;
 
-  Glib::ustring m_label;
-  bool m_alex;
-  bool m_havoc;
-  bool m_tim;
-  bool m_owen;
-  bool m_dave;
-  bool m_world_holiday; /* shared by the European hackers */
+  Glib::ustring m_holiday_name;
+  bool m_alex{false};
+  bool m_havoc{false};
+  bool m_tim{false};
+  bool m_owen{false};
+  bool m_dave{false};
+  bool m_world_holiday{false}; /* shared by the European hackers */
   std::vector<CellItem_Holiday> m_children;
+}; // CellItem_Holiday
+
+// Columns with check buttons.
+namespace CheckColumns
+{
+enum {
+  ALEX,
+  HAVOC,
+  TIM,
+  OWEN,
+  DAVE,
+  N_COLS
 };
+} // namespace CheckColumns
+
+const Glib::ustring check_column_name[CheckColumns::N_COLS] = {
+ "Alex",
+ "Havoc",
+ "Tim",
+ "Owen",
+ "Dave"
+};
+
+const bool is_european_hacker[CheckColumns::N_COLS] = {
+// Alex, Havoc, Tim,  Owen,  Dave
+   true, false, true, false, false
+};
+
+} // anonymous namespace
 
 class Example_TreeView_TreeStore : public Gtk::Window
 {
@@ -37,107 +73,72 @@ public:
   ~Example_TreeView_TreeStore() override;
 
 protected:
-  //vfunc overrides:
-  void on_realize() override;
+  class ModelColumns : public Glib::Object
+  {
+  public:
+    Glib::ustring m_holiday_name;
+    bool m_alex;
+    bool m_havoc;
+    bool m_tim;
+    bool m_owen;
+    bool m_dave;
+    bool m_world_holiday; /* shared by the European hackers */
+    std::vector<CellItem_Holiday> m_children;
 
-  virtual void create_model();
-  virtual void add_columns();
-  virtual void add_items();
-  virtual void treestore_add_item(const CellItem_Holiday& foo);
+    static Glib::RefPtr<ModelColumns> create(const CellItem_Holiday& item)
+    {
+      return Glib::make_refptr_for_instance<ModelColumns>(new ModelColumns(item));
+    }
+    
+  protected:
+    ModelColumns(const CellItem_Holiday& item)
+    : m_holiday_name(item.m_holiday_name), m_alex(item.m_alex), m_havoc(item.m_havoc),
+      m_tim(item.m_tim), m_owen(item.m_owen), m_dave(item.m_dave),
+      m_world_holiday(item.m_world_holiday), m_children(item.m_children)
+    { }
+  }; // ModelColumns
+
+  Glib::RefPtr<Gio::ListModel> create_model(
+    const Glib::RefPtr<Glib::ObjectBase>& item = {});
+  void add_columns();
+  void add_items();
 
   //Member widgets:
   Gtk::Box m_VBox;
   Gtk::ScrolledWindow m_ScrolledWindow;
   Gtk::Label m_Label;
-  Gtk::TreeView m_TreeView;
-  Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
+  Gtk::ColumnView m_ColumnView;
+  Gtk::Box m_ButtonBox;
+  Gtk::ToggleButton m_ShowButtons[CheckColumns::N_COLS];
+
+  Glib::RefPtr<Gtk::TreeListModel> m_TreeListModel;
+  Glib::RefPtr<Gtk::MultiSelection> m_TreeSelection;
+  Glib::RefPtr<Gtk::ColumnViewColumn> m_ViewColumns[CheckColumns::N_COLS];
+
+  // Signal handlers:
+  void on_show_button_toggled(int button);
+  void on_setup_holiday(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_setup_checkbutton(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_bind_holiday(const Glib::RefPtr<Gtk::ListItem>& list_item);
+  void on_bind_checkbutton(const Glib::RefPtr<Gtk::ListItem>& list_item, int check_column);
 
   std::vector<CellItem_Holiday> m_vecItems;
-
-  struct ModelColumns : public Gtk::TreeModelColumnRecord
-  {
-    Gtk::TreeModelColumn<Glib::ustring>  holiday_name;
-    Gtk::TreeModelColumn<bool>           alex;
-    Gtk::TreeModelColumn<bool>           havoc;
-    Gtk::TreeModelColumn<bool>           tim;
-    Gtk::TreeModelColumn<bool>           owen;
-    Gtk::TreeModelColumn<bool>           dave;
-    Gtk::TreeModelColumn<bool>           visible;
-    Gtk::TreeModelColumn<bool>           world;
-
-    ModelColumns();
-  };
-
-  const ModelColumns m_columns;
 };
 
 
-Example_TreeView_TreeStore::ModelColumns::ModelColumns()
-{
-  add(holiday_name);
-  add(alex); add(havoc); add(tim); add(owen); add(dave);
-  add(visible); add(world);
-}
+CellItem_Holiday::CellItem_Holiday(Glib::ustring holiday_name,
+  bool alex, bool havoc, bool tim, bool owen, bool dave, bool world_holiday)
+: m_holiday_name(holiday_name), m_alex(alex), m_havoc(havoc), m_tim(tim),
+  m_owen(owen), m_dave(dave), m_world_holiday(world_holiday)
+{ }
+
+CellItem_Holiday::CellItem_Holiday(Glib::ustring holiday_name,
+  const std::vector<CellItem_Holiday>& children)
+: m_holiday_name(holiday_name), m_children(children)
+{ }
 
 
-CellItem_Holiday::CellItem_Holiday()
-{
-  m_alex = false;
-  m_havoc = false;
-  m_tim = false;
-  m_owen = false;
-  m_dave = false;
-  m_world_holiday = false;
-}
-
-CellItem_Holiday::CellItem_Holiday(Glib::ustring label, bool alex, bool havoc, bool tim, bool owen, bool dave, bool world_holiday)
-{
-  m_label = label;
-  m_alex = alex;
-  m_havoc = havoc;
-  m_tim = tim;
-  m_owen = owen;
-  m_dave = dave;
-  m_world_holiday = world_holiday;
-}
-
-CellItem_Holiday::CellItem_Holiday(Glib::ustring label, const std::vector<CellItem_Holiday>& children)
-{
-  m_label = label;
-  m_alex = false;
-  m_havoc = false;
-  m_tim = false;
-  m_owen = false;
-  m_dave = false;
-  m_world_holiday = false;
-  m_children = children;
-}
-
-CellItem_Holiday::CellItem_Holiday(const CellItem_Holiday& src)
-{
-  operator=(src);
-}
-
-CellItem_Holiday::~CellItem_Holiday()
-{
-}
-
-CellItem_Holiday& CellItem_Holiday::operator=(const CellItem_Holiday& src)
-{
-  m_label = src.m_label;
-  m_alex = src.m_alex;
-  m_havoc = src.m_havoc;
-  m_tim = src.m_tim;
-  m_owen = src.m_owen;
-  m_dave = src.m_dave;
-  m_world_holiday = src.m_world_holiday;
-  m_children = src.m_children;
-
-  return *this;
-}
-
-
-//Called by DemoWindow;
+//Called by DemoWindow:
 Gtk::Window* do_treeview_treestore()
 {
   return new Example_TreeView_TreeStore();
@@ -146,7 +147,8 @@ Gtk::Window* do_treeview_treestore()
 
 Example_TreeView_TreeStore::Example_TreeView_TreeStore()
 : m_VBox(Gtk::Orientation::VERTICAL, 8),
-  m_Label("Jonathan's Holiday Card Planning Sheet")
+  m_Label("Jonathan's Holiday Card Planning Sheet"),
+  m_ButtonBox(Gtk::Orientation::HORIZONTAL, 5)
 {
   set_title("Card planning sheet");
   set_default_size(650, 400);
@@ -160,16 +162,31 @@ Example_TreeView_TreeStore::Example_TreeView_TreeStore()
   m_ScrolledWindow.set_expand();
   m_VBox.append(m_ScrolledWindow);
 
-  /* create model */
-  create_model();
+  /* create root model */
+  add_items();
+  auto root = create_model();
 
-  /* create tree view */
-  m_TreeView.set_model(m_refTreeStore);
-  auto refTreeSelection = m_TreeView.get_selection();
-  refTreeSelection->set_mode(Gtk::SelectionMode::MULTIPLE);
+  /* create column view */
+  m_TreeListModel = Gtk::TreeListModel::create(root,
+    sigc::mem_fun(*this, &Example_TreeView_TreeStore::create_model), false, true);
+  m_TreeSelection = Gtk::MultiSelection::create(m_TreeListModel);
+  m_ColumnView.set_model(m_TreeSelection);
 
   add_columns();
-  m_ScrolledWindow.set_child(m_TreeView);
+  m_ScrolledWindow.set_child(m_ColumnView);
+
+  // Buttons for showing or hiding columns.
+  m_VBox.append(m_ButtonBox);
+  m_ButtonBox.set_halign(Gtk::Align::END);
+  m_ButtonBox.append(*Gtk::make_managed<Gtk::Label>("Show columns"));
+  for (int button = 0; button < CheckColumns::N_COLS; ++button)
+  {
+    m_ShowButtons[button].set_label(check_column_name[button]);
+    m_ShowButtons[button].set_active(true);
+    m_ShowButtons[button].signal_toggled().connect(sigc::bind(sigc::mem_fun(
+      *this, &Example_TreeView_TreeStore::on_show_button_toggled), button));
+    m_ButtonBox.append(m_ShowButtons[button]);
+  }
 }
 
 Example_TreeView_TreeStore::~Example_TreeView_TreeStore()
@@ -257,170 +274,124 @@ void Example_TreeView_TreeStore::add_items()
   m_vecItems.push_back( CellItem_Holiday("December", december) );
 }
 
-void Example_TreeView_TreeStore::create_model()
+Glib::RefPtr<Gio::ListModel> Example_TreeView_TreeStore::create_model(
+  const Glib::RefPtr<Glib::ObjectBase>& item)
 {
-  m_refTreeStore = Gtk::TreeStore::create(m_columns);
+  auto col = std::dynamic_pointer_cast<ModelColumns>(item);
+  if (col && col->m_children.empty())
+    // An item without children, i.e. a leaf in the tree. 
+    return {};
 
-  add_items();
-
-  std::for_each(
-      m_vecItems.begin(), m_vecItems.end(),
-      sigc::mem_fun(*this, &Example_TreeView_TreeStore::treestore_add_item));
-
-#if 0 /* testing code: should work, try it out if you like */
-
-  auto children = m_refTreeStore->children();
-
-  for(auto node : children)
-  {
-    g_print("outer loop\n");
-
-    for(auto row : node.children())
-    {
-      g_print("inner loop\n");
-      row = m_refTreeStore->erase(row);
-    }
-  }
-
-#endif /* testing code */
-}
-
-void Example_TreeView_TreeStore::treestore_add_item(const CellItem_Holiday& foo)
-{
-  auto row = *(m_refTreeStore->append());
-
-  row[m_columns.holiday_name] = foo.m_label;
-  row[m_columns.alex]         = foo.m_alex;
-  row[m_columns.havoc]        = foo.m_havoc;
-  row[m_columns.tim]          = foo.m_tim;
-  row[m_columns.owen]         = foo.m_owen;
-  row[m_columns.dave]         = foo.m_dave;
-  row[m_columns.visible]      = false;
-  row[m_columns.world]        = foo.m_world_holiday;
-
-  //Add Children:
-  for(const auto& child : foo.m_children)
-  {
-    auto child_row = *(m_refTreeStore->append(row.children()));
-
-    child_row[m_columns.holiday_name] = child.m_label;
-    child_row[m_columns.alex]         = child.m_alex;
-    child_row[m_columns.havoc]        = child.m_havoc;
-    child_row[m_columns.tim]          = child.m_tim;
-    child_row[m_columns.owen]         = child.m_owen;
-    child_row[m_columns.dave]         = child.m_dave;
-    child_row[m_columns.visible]      = true;
-    child_row[m_columns.world]        = child.m_world_holiday;
-  }
+  auto result = Gio::ListStore<ModelColumns>::create();
+  const std::vector<CellItem_Holiday>& children = col ? col->m_children : m_vecItems;
+  for (const auto& child : children)
+    result->append(ModelColumns::create(child));
+  return result;
 }
 
 void Example_TreeView_TreeStore::add_columns()
 {
   /* column for holiday names */
+  auto factory = Gtk::SignalListItemFactory::create();
+  factory->signal_setup().connect(
+    sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_setup_holiday));
+  factory->signal_bind().connect(
+    sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_bind_holiday));
+  auto column = Gtk::ColumnViewColumn::create("Holiday", factory);
+  m_ColumnView.append_column(column);
+
+  /* columns for Alex and other friends */
+  for (int check_column = 0; check_column < CheckColumns::N_COLS; ++check_column)
   {
-    int cols_count = m_TreeView.append_column("Holiday",  m_columns.holiday_name);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = pColumn->get_first_cell();
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->set_clickable();
-    }
-  }
-
-  /* column for Alex */
-  {
-    int cols_count = m_TreeView.append_column_editable("Alex", m_columns.alex);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-      pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
-
-      pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(60);
-      pColumn->set_clickable();
-    }
-  }
-
-  /* column for Havoc */
-  {
-    int cols_count = m_TreeView.append_column_editable("Havoc", m_columns.havoc);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-
-      pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(60);
-      pColumn->set_clickable();
-    }
-  }
-
-  /* column for Tim */
-  {
-    int cols_count = m_TreeView.append_column_editable("Tim", m_columns.tim);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-      pColumn->add_attribute(pRenderer->property_activatable(), m_columns.world);
-
-      pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(60);
-      pColumn->set_clickable();
-    }
-  }
-
-  /* column for Owen */
-  {
-    int cols_count = m_TreeView.append_column_editable("Owen", m_columns.owen);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-
-      pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(60);
-      pColumn->set_clickable();
-    }
-  }
-
-  /* column for Dave */
-  {
-    int cols_count = m_TreeView.append_column("Dave", m_columns.dave);
-    auto pColumn = m_TreeView.get_column(cols_count-1);
-    if(pColumn)
-    {
-      auto pRenderer = static_cast<Gtk::CellRendererToggle*>(pColumn->get_first_cell());
-      pRenderer->property_xalign().set_value(0.0);
-
-      pColumn->add_attribute(pRenderer->property_visible(), m_columns.visible);
-
-      pColumn->set_sizing(Gtk::TreeViewColumn::Sizing::FIXED);
-      pColumn->set_fixed_width(60);
-      pColumn->set_clickable();
-    }
+    factory = Gtk::SignalListItemFactory::create();
+    factory->signal_setup().connect(
+      sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_setup_checkbutton));
+    factory->signal_bind().connect(sigc::bind(
+      sigc::mem_fun(*this, &Example_TreeView_TreeStore::on_bind_checkbutton), check_column));
+    m_ViewColumns[check_column] = Gtk::ColumnViewColumn::create(check_column_name[check_column], factory);
+    m_ViewColumns[check_column]->set_fixed_width(60);
+    m_ColumnView.append_column(m_ViewColumns[check_column]);
   }
 }
 
-
-void Example_TreeView_TreeStore::on_realize()
+void Example_TreeView_TreeStore::on_show_button_toggled(int button)
 {
-  m_TreeView.expand_all();
-  //call base class:
-  Window::on_realize();
+  m_ViewColumns[button]->set_visible(m_ShowButtons[button].get_active());
+}
+
+void Example_TreeView_TreeStore::on_setup_holiday(
+  const Glib::RefPtr<Gtk::ListItem>& list_item)
+{
+  // Each ListItem contains a TreeExpander, which contains a Label.
+  // The Label shows the ModelColumns::m_holiday_name. That's done in on_bind_holiday(). 
+  auto expander = Gtk::make_managed<Gtk::TreeExpander>();
+  auto label = Gtk::make_managed<Gtk::Label>();
+  label->set_halign(Gtk::Align::START);
+  expander->set_child(*label);
+  list_item->set_child(*expander);
+}
+
+void Example_TreeView_TreeStore::on_setup_checkbutton(
+  const Glib::RefPtr<Gtk::ListItem>& list_item)
+{
+  auto checkbutton = Gtk::make_managed<Gtk::CheckButton>();
+  checkbutton->set_halign(Gtk::Align::CENTER);
+  checkbutton->set_valign(Gtk::Align::CENTER);
+  list_item->set_child(*checkbutton);
+}
+
+void Example_TreeView_TreeStore::on_bind_holiday(
+  const Glib::RefPtr<Gtk::ListItem>& list_item)
+{
+  auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(list_item->get_item());
+  if (!row)
+    return;
+  auto col = std::dynamic_pointer_cast<ModelColumns>(row->get_item());
+  if (!col)
+    return;
+  auto expander = dynamic_cast<Gtk::TreeExpander*>(list_item->get_child());
+  if (!expander)
+    return;
+  expander->set_list_row(row);
+  auto label = dynamic_cast<Gtk::Label*>(expander->get_child());
+  if (!label)
+    return;
+  label->set_text(col->m_holiday_name);
+}
+
+void Example_TreeView_TreeStore::on_bind_checkbutton(
+  const Glib::RefPtr<Gtk::ListItem>& list_item, int check_column)
+{
+  auto row = std::dynamic_pointer_cast<Gtk::TreeListRow>(list_item->get_item());
+  if (!row)
+    return;
+  auto checkbutton = dynamic_cast<Gtk::CheckButton*>(list_item->get_child());
+  if (!checkbutton)
+    return;
+  if (row->is_expandable())
+  {
+    checkbutton->hide();
+    return;
+  }
+  auto col = std::dynamic_pointer_cast<ModelColumns>(row->get_item());
+  if (!col)
+    return;
+  checkbutton->show();
+  const bool is_activatable = col->m_world_holiday || !is_european_hacker[check_column];
+  list_item->set_activatable(is_activatable);
+  if (is_activatable)
+  {
+    bool active = false;
+    switch (check_column)
+    {
+    case CheckColumns::ALEX: active = col->m_alex; break;
+    case CheckColumns::HAVOC: active = col->m_havoc; break;
+    case CheckColumns::TIM: active = col->m_tim; break;
+    case CheckColumns::OWEN: active = col->m_owen; break;
+    case CheckColumns::DAVE: active = col->m_dave; break;
+    }
+    checkbutton->set_active(active);
+  }
+  else
+    checkbutton->set_inconsistent(true);
 }

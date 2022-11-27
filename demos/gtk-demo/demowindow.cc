@@ -163,7 +163,7 @@ Glib::RefPtr<Gio::ListModel> DemoWindow::create_demo_model(
 void DemoWindow::on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
 {
   // Each ListItem contains a TreeExpander, which contains a Label.
-  // The Label shows the ColumnView::m_title. That's done in on_bind_listitem(). 
+  // The Label shows the DemoColumns::m_title. That's done in on_bind_listitem().
   auto expander = Gtk::make_managed<Gtk::TreeExpander>();
   auto label = Gtk::make_managed<Gtk::Label>();
   expander->set_child(*label);
@@ -176,7 +176,6 @@ void DemoWindow::on_bind_listitem(const Glib::RefPtr<Gtk::ListItem>& list_item)
   if (!row)
     return;
   // Only leaves in the tree can be selected.
-  // on_selection_changed() assumes that col->m_filename contains a filename.
   list_item->set_selectable(!row->is_expandable());
   auto col = std::dynamic_pointer_cast<DemoColumns>(row->get_item());
   if (!col)
@@ -200,8 +199,9 @@ void DemoWindow::on_selection_changed(unsigned int /*position*/, unsigned int /*
   auto col = std::dynamic_pointer_cast<DemoColumns>(row->get_item());
   if (!col)
     return;
-  load_file(col->m_filename);
   set_title(col->m_title);
+  if (!col->m_filename.empty())
+    load_file(col->m_filename);
 }
 
 void DemoWindow::on_listview_row_activated(unsigned int position)
@@ -282,7 +282,7 @@ void DemoWindow::load_file(const std::string& filename)
     auto start = refBufferInfo->get_iter_at_offset(0);
     for (std::size_t i = 0; lines[i] != NULL; i++)
     {
-      /* Make sure \r is stripped at the end for the poor windows people */
+      /* Make sure \r is stripped at the end for the poor Windows people */
       lines[i] = g_strchomp(lines[i]);
 
       gchar *p = lines[i];
