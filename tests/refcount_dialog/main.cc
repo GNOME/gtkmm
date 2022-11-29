@@ -1,15 +1,26 @@
 #include <gtkmm.h>
-#include <gtk/gtk.h>
 #include <iostream>
-#include <list>
 
-
-class MyDialog : public Gtk::Dialog {
+// Gtk::Dialog is deprecated since 4.10.
+// A class that derives from Gtk::Window can act as a dialog.
+class MyDialog : public Gtk::Window
+{
 public:
   MyDialog()
-   {
-     add_button("Ok", 0);
-   }
+  : m_ButtonBox(Gtk::Orientation::HORIZONTAL),
+    m_ButtonOK("OK")
+  {
+    set_child(m_ButtonBox);
+    m_ButtonBox.append(m_ButtonOK);
+    m_ButtonBox.set_halign(Gtk::Align::END);
+  }
+  Gtk::Button& get_button_ok()
+  {
+    return m_ButtonOK;
+  }
+protected:
+  Gtk::Box m_ButtonBox;
+  Gtk::Button m_ButtonOK;
 };
 
 class MyWindow : public Gtk::Window
@@ -18,24 +29,21 @@ public:
   MyWindow();
 
   void on_button_clicked();
-  void on_dialog_response(int response_id);
+  void on_dialog_response();
 
 protected:
-  Gtk::Box m_Box;
   Gtk::Button m_Button;
   std::unique_ptr<MyDialog> m_Dialog;
 };
 
 MyWindow::MyWindow()
-: m_Box(Gtk::Orientation::HORIZONTAL),
-  m_Button("Show Dialog")
+: m_Button("Show Dialog")
 {
-  set_size_request(200, 200);
+  set_size_request(150, 100);
 
   m_Button.signal_clicked().connect( sigc::mem_fun(*this, &MyWindow::on_button_clicked) );
   m_Button.set_expand(true);
-  m_Box.append(m_Button);
-  set_child(m_Box);
+  set_child(m_Button);
 }
 
 void MyWindow::on_button_clicked()
@@ -50,18 +58,23 @@ void MyWindow::on_button_clicked()
   m_Dialog->set_transient_for(*this);
   m_Dialog->set_modal();
   m_Dialog->set_hide_on_close();
-  m_Dialog->signal_response().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
+  m_Dialog->get_button_ok().signal_clicked().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
+  m_Dialog->signal_hide().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
   m_Dialog->show();
   std::cout << "After m_Dialog->show()" << std::endl;
 }
 
-void MyWindow::on_dialog_response(int /* response_id */)
+void MyWindow::on_dialog_response()
 {
-  std::cout << "before list_toplevels 2" << std::endl;
-  std::vector<Gtk::Window*> toplevelwindows = list_toplevels();
-  std::cout << "after list_toplevels" << std::endl;
-  std::cout << "toplevelwindows.size = " << toplevelwindows.size() << std::endl;
-  m_Dialog->hide();
+  if (m_Dialog->is_visible())
+    m_Dialog->hide();
+  else
+  {
+    std::cout << "before list_toplevels 2" << std::endl;
+    std::vector<Gtk::Window*> toplevelwindows = list_toplevels();
+    std::cout << "after list_toplevels" << std::endl;
+    std::cout << "toplevelwindows.size = " << toplevelwindows.size() << std::endl;
+  }
 }
 
 int main(int argc, char* argv[])

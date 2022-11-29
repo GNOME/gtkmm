@@ -19,7 +19,7 @@ test_programs = [
   [['refcount_dialog'], 'test', ['main.cc'], true, false],
   [['scrolledwindow'], 'test', ['main.cc'], true, false],
   [['tree_model_iterator'], 'test', ['main.cc'], false, true],
-  [['wrap_existing'], 'test', ['main.cc'], true, false],
+  [['wrap_existing'], 'test', ['main.cc'], false, true],
 ]
 
 foreach ex : test_programs

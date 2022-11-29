@@ -1,21 +1,20 @@
 #include <gtkmm.h>
-
+#include <iostream>
 
 GQuark quark_test = 0;
 
 void initialize_quark()
 {
-  if(!quark_test)
+  if (!quark_test)
   {
-    //g_warning("initializing quark.");
+    std::cout << "Initializing quark\n";
     quark_test = g_quark_from_static_string("quarktestmurrayc");
   }
 }
 
 void on_object_qdata_destroyed(gpointer data)
 {
-  //This doesn't seem to be called:
-  g_warning("on_object_qdata_destroyed():  c instance=%p", (void*)data);
+  std::cout << "on_object_qdata_destroyed(): C instance=" << data << "\n";
 }
 
 int main(int /* argc */, char** /* argv */)
@@ -23,19 +22,24 @@ int main(int /* argc */, char** /* argv */)
   auto app = Gtk::Application::create();
   app->register_application();
 
-  auto pDialog = new Gtk::Dialog();
-  Gtk::Box* pBox = pDialog->get_content_area();
+  // pButton points at a widget that was first created by GTK.
+  // A C++ wrapper was later added to it.
+  auto pScaleButton = new Gtk::ScaleButton(0.0, 1.0, 0.1);
+  Gtk::Button* pButton = pScaleButton->get_plus_button();
+  Gtk::Button m_Button;
+  std::cout << "pButton  GType name: " << G_OBJECT_TYPE_NAME(pButton->gobj()) << "\n";
+  std::cout << "m_Button GType name: " << G_OBJECT_TYPE_NAME(m_Button.gobj()) << "\n";
 
   //Set a quark and a callback:
   initialize_quark();
   int a = 0; // (This doesn't work unless we have a non-null value for the 3rd parameter.)
-  g_object_set_qdata_full((GObject*)pBox->gobj(), quark_test, &a, &on_object_qdata_destroyed);
+  g_object_set_qdata_full((GObject*)pButton->gobj(), quark_test, &a, &on_object_qdata_destroyed);
 
-  g_warning("vbox refcount=%d", G_OBJECT(pBox->gobj())->ref_count);
+  std::cout << "pButton refcount=" << G_OBJECT(pButton->gobj())->ref_count << "\n";
 
-  delete pDialog;
+  delete pScaleButton;
 
-  g_warning("after delete");
+  std::cout << "After delete\n";
 
   return 0;
 }
