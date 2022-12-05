@@ -368,15 +368,12 @@ void Example_ListView_TreeList::on_bind_checkbutton(
   auto checkbutton = dynamic_cast<Gtk::CheckButton*>(list_item->get_child());
   if (!checkbutton)
     return;
+  checkbutton->set_visible(!row->is_expandable());
   if (row->is_expandable())
-  {
-    checkbutton->hide();
     return;
-  }
   auto col = std::dynamic_pointer_cast<ModelColumns>(row->get_item());
   if (!col)
     return;
-  checkbutton->show();
   const bool is_activatable = col->m_world_holiday || !is_european_hacker[check_column];
   list_item->set_activatable(is_activatable);
   if (is_activatable)

@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
   app->signal_activate().connect([&app, main_win] ()
   {
     app->add_window(*main_win);
-    main_win->show();
+    main_win->set_visible(true);
   });
   main_win->signal_hide().connect([&] ()
   {

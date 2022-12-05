@@ -149,7 +149,7 @@ void Example_Dialog::on_button_interactive()
   pDialog->set_modal(true);
   pDialog->buttons_clicked_connect(sigc::bind(
     sigc::mem_fun(*this, &Example_Dialog::on_interactive_response), pDialog));
-  pDialog->show();
+  pDialog->set_visible(true);
 }
 
 void Example_Dialog::on_button_non_modal()

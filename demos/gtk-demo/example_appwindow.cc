@@ -212,5 +212,5 @@ void Example_AppWindow::on_text_mark_set(const Gtk::TextBuffer::iterator&,
 
 void Example_AppWindow::on_file_quit()
 {
-  hide();
+  set_visible(false);
 }

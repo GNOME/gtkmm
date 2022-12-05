@@ -168,7 +168,7 @@ void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item
   auto popup = title->get_ancestor(GTK_TYPE_POPOVER);
   if (popup && popup->is_ancestor(*dropdown))
   {
-    checkmark->show();
+    checkmark->set_visible(true);
     auto connection = dropdown->property_selected_item().signal_changed().connect(
       sigc::bind(sigc::mem_fun(*this, &Example_DropDown::selected_item_changed),
                  dropdown, item));
@@ -178,7 +178,7 @@ void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item
   }
   else
   {
-    checkmark->hide();
+    checkmark->set_visible(false);
   }
 }
 

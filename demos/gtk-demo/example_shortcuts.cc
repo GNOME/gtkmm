@@ -120,5 +120,5 @@ void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::u
   else
     pOverlay->property_view_name() = view;
 
-  pOverlay->show();
+  pOverlay->set_visible(true);
 }

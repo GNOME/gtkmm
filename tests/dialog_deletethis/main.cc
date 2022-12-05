@@ -28,7 +28,7 @@ class Dlg : public sigc::trackable
       hBox->append(*btn);
       btn->signal_clicked().connect(sigc::mem_fun(*this, &Dlg::on_response));
       dlg_->signal_hide().connect(sigc::mem_fun(*this, &Dlg::on_response));
-      dlg_->show();
+      dlg_->set_visible(true);
     }
 
     ~Dlg()

@@ -820,7 +820,6 @@ void Example_IconBrowser::add_context(const Glib::ustring& id,
   const Glib::ustring& name, const Glib::ustring& description)
 {
   IconContextLabel* row = Gtk::make_managed<IconContextLabel>(id, name);
-  row->show();
   row->set_margin(5);
   m_context_list.append(*row);
 
@@ -943,13 +942,8 @@ void DetailDialog::set_image(
     m_image[i].set_from_icon_name(icon_name);
     m_image[i].set_pixel_size(m_icon_size[i]);
   }
-  if (description.empty())
-    m_description.hide();
-  else
-  {
-    m_description.set_text(description);
-    m_description.show();
-  }
+  m_description.set_text(description);
+  m_description.set_visible(!description.empty());
 }
 
 void DetailDialog::on_image_drag_begin(const Glib::RefPtr<Gdk::Drag>& /* drag */, int size_index)

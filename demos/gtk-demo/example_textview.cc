@@ -453,7 +453,7 @@ Window_EasterEgg::Window_EasterEgg()
   set_child(m_ScrolledWindow);
   m_ScrolledWindow.set_child(*m_pTextView);
 
-  hide();
+  set_visible(false);
 }
 
 Window_EasterEgg::~Window_EasterEgg()

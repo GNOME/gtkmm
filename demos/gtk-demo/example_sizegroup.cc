@@ -131,5 +131,5 @@ void Example_SizeGroup::add_row(Gtk::Grid& grid, int row,
 
 void Example_SizeGroup::on_close()
 {
-  hide();
+  set_visible(false);
 }

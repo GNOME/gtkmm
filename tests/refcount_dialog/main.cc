@@ -60,14 +60,14 @@ void MyWindow::on_button_clicked()
   m_Dialog->set_hide_on_close();
   m_Dialog->get_button_ok().signal_clicked().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
   m_Dialog->signal_hide().connect(sigc::mem_fun(*this, &MyWindow::on_dialog_response));
-  m_Dialog->show();
-  std::cout << "After m_Dialog->show()" << std::endl;
+  m_Dialog->set_visible(true);
+  std::cout << "After m_Dialog->set_visible(true)" << std::endl;
 }
 
 void MyWindow::on_dialog_response()
 {
   if (m_Dialog->is_visible())
-    m_Dialog->hide();
+    m_Dialog->set_visible(false);
   else
   {
     std::cout << "before list_toplevels 2" << std::endl;

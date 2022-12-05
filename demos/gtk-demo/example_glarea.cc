@@ -203,20 +203,14 @@ Gtk::Box* Example_GLArea::create_axis_slider_box(int axis)
 
   auto label = Gtk::manage(new Gtk::Label{text});
   box->append(*label);
-  label->show();
 
   auto adj = Gtk::Adjustment::create(0.0, 0.0, 360.0, 1.0, 12.0, 0.0);
 
-  adj->signal_value_changed().connect(
-    sigc::bind(sigc::mem_fun(*this, &Example_GLArea::on_axis_value_change), axis, adj)
-                                      );
+  adj->signal_value_changed().connect(sigc::bind(
+    sigc::mem_fun(*this, &Example_GLArea::on_axis_value_change), axis, adj));
   auto slider = Gtk::manage(new Gtk::Scale{adj, Gtk::Orientation::HORIZONTAL});
   box->append(*slider);
   slider->set_hexpand(true);
-  slider->show();
-
-  box->show();
-
   return box;
 }
 

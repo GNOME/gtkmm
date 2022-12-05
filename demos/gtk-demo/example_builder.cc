@@ -107,7 +107,7 @@ Example_Builder::~Example_Builder()
 
 void Example_Builder::on_file_quit()
 {
-  hide();
+  set_visible(false);
 }
 
 void Example_Builder::on_help_about()
