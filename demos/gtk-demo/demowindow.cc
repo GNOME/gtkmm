@@ -232,7 +232,7 @@ void DemoWindow::run_example(const Glib::RefPtr<Glib::ObjectBase>& item)
     m_pWindow_Example->set_modal(true);
     m_pWindow_Example->set_hide_on_close(true);
     m_pWindow_Example->signal_hide().connect(sigc::mem_fun(*this, &DemoWindow::on_example_window_hide));
-    m_pWindow_Example->show();
+    m_pWindow_Example->set_visible(true);
   }
 }
 

@@ -171,23 +171,24 @@ void Window_Class::dispose_vfunc_callback(GObject* self)
     g_return_if_fail(pWidget == GTK_WIDGET(self));
 
     #ifdef GLIBMM_DEBUG_REFCOUNTING
-    g_warning("Window_Class::dispose_vfunc_callback(): before gtk_widget_hide().");
+    g_warning("Window_Class::dispose_vfunc_callback(): before gtk_widget_set_visible(pWidget, false).");
     #endif
 
     // The window may have been hidden with a call to the static (i.e. private)
     // gtk_window_hide(), which does not send the "hide" signal.
-    // In that case gtk_widget_hide() has no effect, and on_window_hide()
-    // won't be called indirectly from gtk_widget_hide().
+    // In that case gtk_widget_set_visible(pWidget, false) has no effect,
+    // and on_window_hide() won't be called indirectly from
+    // gtk_widget_set_visible(pWidget, false).
     const auto win = dynamic_cast<Window*>(obj);
     if (win)
       win->on_window_hide();
 
     // Now hide the widget.  The C++ object must _not_ be accessed anymore
     // after this call, because a signal_hide() handler might delete it.
-    gtk_widget_hide(pWidget);
+    gtk_widget_set_visible(pWidget, false);
 
     #ifdef GLIBMM_DEBUG_REFCOUNTING
-    g_warning("Window_Class::dispose_vfunc_callback(): after gtk_widget_hide().");
+    g_warning("Window_Class::dispose_vfunc_callback(): after gtk_widget_set_visible(pWidget, false).");
     #endif
   }
 
