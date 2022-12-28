@@ -177,6 +177,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filechooserwidget.h>
 #include <gtkmm/filedialog.h>
 #include <gtkmm/filefilter.h>
+#include <gtkmm/filelauncher.h>
 #include <gtkmm/filterlistmodel.h>
 #include <gtkmm/fixed.h>
 #include <gtkmm/flattenlistmodel.h>

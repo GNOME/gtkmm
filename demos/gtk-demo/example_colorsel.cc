@@ -94,9 +94,13 @@ void Example_ColorSel::on_dialog_finish(const Glib::RefPtr<Gio::AsyncResult>& re
     m_Color = m_pDialog->choose_rgba_finish(result);
     m_DrawingArea.queue_draw();
   }
-  catch (const Glib::Error& err)
+  catch (const Gtk::DialogError& err)
   {
     std::cout << "No color selected. " << err.what() << std::endl;
+  }
+  catch (const Glib::Error& err)
+  {
+    std::cout << "Unexpected exception. " << err.what() << std::endl;
   }
 }
 

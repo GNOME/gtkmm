@@ -168,9 +168,13 @@ void Example_Dialog::on_message_finish(const Glib::RefPtr<Gio::AsyncResult>& res
     if (dialog->choose_finish(result) == 0)
       m_count++;
   }
+  catch (const Gtk::DialogError& err)
+  {
+    std::cout << "Gtk::DialogError. " << err.what() << std::endl;
+  }
   catch (const Glib::Error& err)
   {
-    std::cout << err.what() << std::endl;
+    std::cout << "Unexpected exception. " << err.what() << std::endl;
   }
 }
 

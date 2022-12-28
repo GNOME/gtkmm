@@ -93,6 +93,7 @@ gtkmm_any_hg_ccg_basenames = [
   'expressionwatch',
   'filedialog',
   'filefilter',
+  'filelauncher',
   'filter',
   'filterlistmodel',
   'fixed',
