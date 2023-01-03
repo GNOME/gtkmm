@@ -6,7 +6,7 @@
 #        is_os_cocoa, cpp_compiler, gtkmm_major_version, gtkmm_minor_version,
 #        gtkmm_micro_version, build_atkmm_api, build_x11_api,
 #        msvc14x_toolset_ver
-# Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h
+# Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
 pkg_conf_data.set('prefix', install_prefix)
@@ -71,9 +71,10 @@ configure_file(
   configuration: gdkmm_pkg_uninst_conf_data,
 )
 
+gdkmmconfig_h_meson = files('gdkmmconfig.h.meson')
 install_gdkmmconfigdir = install_libdir / gdkmm_pcname / 'include'
-gdkmmconfig_h = configure_file(
-  input: 'gdkmmconfig.h.meson',
+configure_file(
+  input: gdkmmconfig_h_meson,
   output: 'gdkmmconfig.h',
   configuration: pkg_conf_data,
   install_dir: install_gdkmmconfigdir,
