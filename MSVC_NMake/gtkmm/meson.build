@@ -1,6 +1,6 @@
 # MSVC_NMake/gtkmm
 
-# Input: pkg_conf_data, gtkmmconfig_h
+# Input: pkg_conf_data, gtkmmconfig_h_meson
 # Output: gtkmm_rc
 
 gtkmm_rc = configure_file(
@@ -9,9 +9,9 @@ gtkmm_rc = configure_file(
   configuration: pkg_conf_data,
 )
 
-# Copy the generated configuration header into the MSVC project directory.
+# Make a copy of the generated configuration header in the MSVC project directory.
 configure_file(
-  input: gtkmmconfig_h,
+  input: gtkmmconfig_h_meson,
   output: 'gtkmmconfig.h',
-  copy: true,
+  configuration: pkg_conf_data,
 )

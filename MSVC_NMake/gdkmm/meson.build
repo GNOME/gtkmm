@@ -1,11 +1,11 @@
 # MSVC_NMake/gdkmm
 
-# Input: gdkmmconfig_h
+# Input: gdkmmconfig_h_meson, pkg_conf_data
 # Output: -
 
-# Copy the generated configuration header into the MSVC project directory.
+# Make a copy of the generated configuration header in the MSVC project directory.
 configure_file(
-  input: gdkmmconfig_h,
+  input: gdkmmconfig_h_meson,
   output: 'gdkmmconfig.h',
-  copy: true,
+  configuration: pkg_conf_data,
 )

@@ -4,7 +4,7 @@
 #        gtkmm_pcname, gtkmm_api_version, gtkmm_requires, build_deprecated_api,
 #        cpp_compiler, gtkmm_major_version, gtkmm_minor_version,
 #        gtkmm_micro_version, msvc14x_toolset_ver
-# Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h
+# Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
 pkg_conf_data.set('prefix', install_prefix)
@@ -42,9 +42,10 @@ if library_build_type == 'static'
   pkg_conf_data.set('GTKMM_STATIC_LIB', 1)
 endif
 
+gdkmmconfig_h_meson = files('gdkmmconfig.h.meson')
 install_gdkmmconfigdir = install_libdir / gtkmm_pcname / 'include'
-gdkmmconfig_h = configure_file(
-  input: 'gdkmmconfig.h.meson',
+configure_file(
+  input: gdkmmconfig_h_meson,
   output: 'gdkmmconfig.h',
   configuration: pkg_conf_data,
   install_dir: install_gdkmmconfigdir,

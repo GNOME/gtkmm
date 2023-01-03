@@ -1,7 +1,7 @@
 # gtk
 
 # Input: pkg_conf_data, gtkmm_pcname, install_pkgconfigdir, install_libdir
-# Output: install_gtkmmconfigdir, gtkmmconfig_h
+# Output: install_gtkmmconfigdir, gtkmmconfig_h_meson
 
 configure_file(
   input: 'gtkmm.pc.in',
@@ -20,9 +20,10 @@ configure_file(
   configuration: gtkmm_pkg_uninst_conf_data,
 )
 
+gtkmmconfig_h_meson = files('gtkmmconfig.h.meson')
 install_gtkmmconfigdir = install_libdir / gtkmm_pcname / 'include'
-gtkmmconfig_h = configure_file(
-  input: 'gtkmmconfig.h.meson',
+configure_file(
+  input: gtkmmconfig_h_meson,
   output: 'gtkmmconfig.h',
   configuration: pkg_conf_data,
   install_dir: install_gtkmmconfigdir,
