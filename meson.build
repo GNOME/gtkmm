@@ -47,13 +47,7 @@ c_compiler = meson.get_compiler('c')
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-python3 = import('python').find_installation()
-
-python_version = python3.language_version()
-python_version_req = '>= 3.5'
-if not python_version.version_compare(python_version_req)
-  error('Requires Python @0@, found @1@.'.format(python_version_req, python_version))
-endif
+python3 = find_program('python3', version: '>=3.5')
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
