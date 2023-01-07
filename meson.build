@@ -38,10 +38,9 @@ macos_darwin_versions = [
   '@0@.@1@'.format(libtool_soversion[0] + 1, libtool_soversion[1])
 ]
 
-# Use these instead of meson.source_root() and meson.build_root() in subdirectories.
-# source_root() and build_root() are not useful, if this is a subproject.
-project_source_root = meson.current_source_dir()
-project_build_root = meson.current_build_dir()
+# Source and build root directories of the current (sub)project.
+project_source_root = meson.project_source_root()
+project_build_root = meson.project_build_root()
 
 c_compiler = meson.get_compiler('c')
 cpp_compiler = meson.get_compiler('cpp')
@@ -197,16 +196,8 @@ if maintainer_mode
     project_source_root / 'untracked' / 'docs',
     check: true,
   )
-else
-  cmd_py = '''
-import os
-import sys
-sys.exit(os.path.isfile("@0@"))
-'''.format(generate_binding_py)
-  file_exists = run_command(python3, '-c', cmd_py, check: false).returncode() != 0
-  if not file_exists
-    error('Missing files in untracked/. You must enable maintainer-mode.')
-  endif
+elif not import('fs').is_file(generate_binding_py)
+  error('Missing files in untracked/. You must enable maintainer-mode.')
 endif
 
 # Check if perl is required and available.
