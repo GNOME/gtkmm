@@ -76,6 +76,7 @@ Example_Images::Example_Images()
   m_image_stream()
 {
   set_title("Images");
+  set_default_size(650, 400);
 
   m_BaseVBox.set_margin(16);
   set_child(m_BaseVBox);
@@ -178,9 +179,11 @@ Example_Images::Example_Images()
   }
   pPicture->set_size_request(100, 100);
   pPicture->set_valign(Gtk::Align::START);
+  pPicture->set_expand(true);
   pVBox->append(*pPicture);
 
   /* Sensitivity control */
+  m_ToggleButton.set_halign(Gtk::Align::CENTER);
   m_BaseVBox.append(m_ToggleButton);
   m_ToggleButton.signal_toggled().connect(sigc::mem_fun(*this, &Example_Images::on_toggle_sensitivity));
 }

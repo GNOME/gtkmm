@@ -135,7 +135,9 @@ void Example_GridView::on_setup_listitem(const Glib::RefPtr<Gtk::ListItem>& list
 {
   // Each ListItem contains a vertical Box with an Image and a Label.
   auto vBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
-  vBox->append(*Gtk::make_managed<Gtk::Image>());
+  auto image = Gtk::make_managed<Gtk::Image>();
+  image->set_icon_size(Gtk::IconSize::LARGE);
+  vBox->append(*image);
   vBox->append(*Gtk::make_managed<Gtk::Label>());
   list_item->set_child(*vBox);
 }
