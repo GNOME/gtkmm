@@ -1,6 +1,6 @@
 /* Application main window
  *
- * Demonstrates a typical application window, with menubar, toolbar, statusbar.
+ * Demonstrates a typical application window, with menubar and toolbar.
  *
  * Despite its name, this demo uses a Gtk::Window and not a Gtk::ApplicationWindow.
  *
@@ -31,7 +31,7 @@ protected:
   Gtk::PopoverMenuBar m_Menubar;
   Gtk::Box m_Toolbar;
   Gtk::ScrolledWindow m_ScrolledWindow;
-  Gtk::Statusbar m_Statusbar;
+  Gtk::Label m_Statusbar;
   Gtk::TextView m_TextView;
 };
 
@@ -167,7 +167,7 @@ Example_AppWindow::Example_AppWindow()
   m_VBox.append(m_ScrolledWindow);
   m_ScrolledWindow.set_child(m_TextView);
 
-  // Statusbar:
+  // Statusbar (Actually a Label. The Gtk::Statusbar widget is deprecated.)
   m_Statusbar.set_hexpand();
   m_VBox.append(m_Statusbar);
 
@@ -190,8 +190,6 @@ void Example_AppWindow::on_menu_item()
 
 void Example_AppWindow::on_text_changed()
 {
-  m_Statusbar.pop();
-
   auto refBuffer = m_TextView.get_buffer();
   gint count = refBuffer->get_char_count();
 
@@ -200,8 +198,8 @@ void Example_AppWindow::on_text_changed()
   gint row = iter.get_line();
   gint col = iter.get_line_offset();
 
-  m_Statusbar.push(Glib::ustring::sprintf(
-    "Cursor at row %d column %d - %d chars in document", row, col, count));
+  m_Statusbar.set_text(Glib::ustring::sprintf(
+    "Cursor at row %d column %d; %d chars in document", row, col, count));
 }
 
 void Example_AppWindow::on_text_mark_set(const Gtk::TextBuffer::iterator&,
