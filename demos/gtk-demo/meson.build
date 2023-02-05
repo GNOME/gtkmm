@@ -46,6 +46,8 @@ if epoxy_dep.found()
 
   executable('gtkmm-demo',
     gtkmm_demo_cc_files, demo_resources,
+    cpp_args: ['-DGLIBMM_DISABLE_DEPRECATED', '-DGIOMM_DISABLE_DEPRECATED',
+               '-DGDKMM_DISABLE_DEPRECATED', '-DGTKMM_DISABLE_DEPRECATED'],
     dependencies: [gtkmm_own_dep, epoxy_dep],
     implicit_include_directories: false,
     win_subsystem: 'windows',

@@ -139,7 +139,7 @@ AC_CHECK_FUNCS([mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -Wformat-security -Wshadow -Wsuggest-override -Wno-long-long -DGSEAL_ENABLE],
-                       [G PANGO GDK GDK_PIXBUF GTK GLIBMM PANGOMM CAIROMM SIGCXX])
+                       [G PANGO GDK GDK_PIXBUF GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile

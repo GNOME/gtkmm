@@ -261,7 +261,7 @@ elif cpp_warnings == 'max' or cpp_warnings == 'fatal'
     if not werror
       warning_flags += is_msvc ? ['/WX'] : ['-Werror']
     endif
-    deprecations = 'G PANGO GDK GDK_PIXBUF GTK GLIBMM PANGOMM CAIROMM SIGCXX'.split()
+    deprecations = 'G PANGO GDK GDK_PIXBUF GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX'.split()
     foreach d : deprecations
       warning_flags += '-D@0@_DISABLE_DEPRECATED'.format(d)
     endforeach
