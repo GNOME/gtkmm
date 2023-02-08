@@ -1,0 +1,77 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <gtk/gtk.h>
+
+namespace Gtk
+{
+class Window;
+
+ /** A %Gtk::UriLauncher object collects the arguments that are needed to open
+  * a uri with an application.
+ *
+ * Depending on system configuration, user preferences and available APIs, this
+ * may or may not show an app chooser dialog or launch the default application
+ * right away.
+ *
+ * The operation is started with the launch() method. This API follows the GIO
+ * async pattern, and the result can be obtained by calling launch_finish().
+ *
+ * To launch a file, use Gtk::FileLauncher.
+ *
+ * @newin{4,10}
+ */
+class GTKMM_API UriLauncher : public Glib::Object
+{
+   _CLASS_GOBJECT(UriLauncher, GtkUriLauncher, GTK_URI_LAUNCHER, Glib::Object, GObject, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkUriLauncher is a final type
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  explicit UriLauncher(const Glib::ustring& uri);
+
+public:
+  /** Creates a new %Gtk::UriLauncher object.
+   *
+   * @newin{4,10}
+   *
+   * @param uri The uri to open, or an empty string to specify the uri later
+   *            with set_uri().
+   * @return The new %Gtk::UriLauncher.
+   */
+  _WRAP_CREATE(const Glib::ustring& uri = {})
+
+  _WRAP_METHOD(Glib::ustring get_uri() const, gtk_uri_launcher_get_uri)
+  _WRAP_METHOD(void set_uri(const Glib::ustring& uri{NULL}), gtk_uri_launcher_set_uri)
+
+  _WRAP_METHOD(void launch(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}) const,
+    gtk_uri_launcher_launch, slot_name slot, slot_callback Gio::SignalProxy_async_callback)
+  _WRAP_METHOD(bool launch_finish(const Glib::RefPtr<Gio::AsyncResult>& result) const,
+    gtk_uri_launcher_launch_finish, errthrow "Gtk::DialogError, Gio::Error")
+
+  _WRAP_PROPERTY("uri", Glib::ustring)
+};
+
+} // namespace Gtk
