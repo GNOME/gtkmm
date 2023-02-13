@@ -225,7 +225,6 @@ gtkmm_any_hg_ccg_basenames = [
   'urilauncher',
   'video',
   'viewport',
-  'volumebutton',
   'widget',
   'widgetpaintable',
   'window',
@@ -296,6 +295,7 @@ gtkmm_deprecated_hg_ccg_basenames = [
   'treestore',
   'treeview',
   'treeviewcolumn',
+  'volumebutton',
 ]
 
 # Pairs of hand-coded .h and .cc files.
