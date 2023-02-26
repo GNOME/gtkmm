@@ -96,6 +96,7 @@ Example_ListView_EditableCells::Example_ListView_EditableCells()
   m_selection_model->set_can_unselect(true);
   m_ColumnView.set_model(m_selection_model);
   m_ColumnView.set_reorderable(false);
+  m_ColumnView.add_css_class("data-table");
   add_columns();
 
   m_ScrolledWindow.set_child(m_ColumnView);

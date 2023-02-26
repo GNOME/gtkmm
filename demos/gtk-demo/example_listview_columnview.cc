@@ -73,6 +73,7 @@ Example_Listview_ColumnView::Example_Listview_ColumnView()
   store->append(MyObject::create("Danny", "Jones"));
 
   m_ColumnView.set_model(Gtk::SingleSelection::create(store));
+  m_ColumnView.add_css_class("data-table");
   set_child(m_ColumnView);
 
   // First column

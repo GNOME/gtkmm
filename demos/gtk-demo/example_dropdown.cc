@@ -69,8 +69,6 @@ protected:
   Gtk::DropDown* drop_down_new_from_strings(const std::vector<Glib::ustring>& titles,
                                             const std::vector<Glib::ustring>& icons,
                                             const std::vector<Glib::ustring>& descriptions);
-  Glib::ustring get_family_name(const Glib::RefPtr<Glib::ObjectBase>& item);
-  Glib::ustring get_title(const Glib::RefPtr<Glib::ObjectBase>& item);
 
   Gtk::Box m_box;
   Gtk::CheckButton m_check;
@@ -251,17 +249,6 @@ Gtk::DropDown* Example_DropDown::drop_down_new_from_strings(
   return dropdown;
 }
 
-Glib::ustring Example_DropDown::get_family_name(const Glib::RefPtr<Glib::ObjectBase>& item)
-{
-  auto family = std::dynamic_pointer_cast<Pango::FontFamily>(item);
-  return family ? family->get_name() : "";
-}
-
-Glib::ustring Example_DropDown::get_title(const Glib::RefPtr<Glib::ObjectBase>& item)
-{
-  return std::dynamic_pointer_cast<StringHolder>(item)->m_title;
-}
-
 Example_DropDown::Example_DropDown()
 :
   m_box(Gtk::Orientation::VERTICAL, 10),
@@ -299,7 +286,11 @@ Example_DropDown::Example_DropDown()
   dropdown->set_selected(0);
 
   auto expression = Gtk::ClosureExpression<Glib::ustring>::create(
-    sigc::mem_fun(*this, &Example_DropDown::get_family_name));
+    [](const Glib::RefPtr<Glib::ObjectBase>& item)->Glib::ustring
+    {
+      auto family = std::dynamic_pointer_cast<Pango::FontFamily>(item);
+      return family ? family->get_name() : "";
+    });
   dropdown->set_expression(expression);
   m_box.append(*dropdown);
 
@@ -324,7 +315,10 @@ Example_DropDown::Example_DropDown()
   dropdown = drop_down_new_from_strings(many_times, {}, {});
   dropdown->set_enable_search();
   expression = Gtk::ClosureExpression<Glib::ustring>::create(
-    sigc::mem_fun(*this, &Example_DropDown::get_title));
+    [](const Glib::RefPtr<Glib::ObjectBase>& item)->Glib::ustring
+    {
+      return std::dynamic_pointer_cast<StringHolder>(item)->m_title;
+    });
   dropdown->set_expression(expression);
   m_box.append(*dropdown);
 

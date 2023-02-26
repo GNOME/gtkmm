@@ -171,6 +171,7 @@ Example_ListView_TreeList::Example_ListView_TreeList()
     sigc::mem_fun(*this, &Example_ListView_TreeList::create_model), false, true);
   m_TreeSelection = Gtk::MultiSelection::create(m_TreeListModel);
   m_ColumnView.set_model(m_TreeSelection);
+  m_ColumnView.add_css_class("data-table");
 
   add_columns();
   m_ScrolledWindow.set_child(m_ColumnView);
