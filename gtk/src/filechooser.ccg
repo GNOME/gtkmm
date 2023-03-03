@@ -20,8 +20,25 @@
 
 using Action = Gtk::FileChooser::Action;
 
+namespace
+{
+template <typename CppType, typename CType = typename CppType::BaseObjectType>
+std::vector<Glib::RefPtr<CppType>> listmodel_to_vector(GListModel* listmodel)
+{
+  std::vector<Glib::RefPtr<CppType>> result;
+  const guint n_items = g_list_model_get_n_items(listmodel);
+  for (guint pos = 0; pos < n_items; ++pos)
+    // g_list_model_get_object() gives us a reference.
+    result.push_back(Glib::wrap((CType*)g_list_model_get_object(listmodel, pos)));
+  // The caller had a reference that's no longer needed.
+  g_object_unref(listmodel);
+  return result;
+}
+} // anonymous namespace
+
 namespace Gtk
 {
+
 void FileChooser::add_choice(const Glib::ustring& id, const Glib::ustring& label)
 {
   gtk_file_chooser_add_choice(gobj(), id.c_str(), label.c_str(), nullptr, nullptr);
