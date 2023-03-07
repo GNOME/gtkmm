@@ -25,6 +25,7 @@ check_PROGRAMS =			\
 	child_widget_managed/test	\
 	delete_cpp_child/test		\
 	dialog_deletethis/test		\
+	filedialog/test \
 	gdk_rgba/test \
 	main_with_options/test		\
 	object_move/test		\
@@ -48,6 +49,7 @@ child_widget2_test_SOURCES         = child_widget2/main.cc
 child_widget_managed_test_SOURCES  = child_widget_managed/main.cc
 delete_cpp_child_test_SOURCES      = delete_cpp_child/main.cc
 dialog_deletethis_test_SOURCES     = dialog_deletethis/main.cc
+filedialog_test_SOURCES            = filedialog/main.cc
 gdk_rgba_test_SOURCES              = gdk_rgba/main.cc
 main_with_options_test_SOURCES     = main_with_options/main.cc
 object_move_test_SOURCES           = object_move/main.cc
