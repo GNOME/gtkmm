@@ -3,7 +3,7 @@
 // Gtk::FileDialog::open_multiple_finish() after the issue has been fixed.
 // Test Gio::ListModel::get_typed_object(), if glibmm >= 2.76.0.
 
-// Gtk::FileChooser::get_files() is deprecated
+// Gtk::FileChooser is deprecated
 #undef GTKMM_DISABLE_DEPRECATED
 
 #include <gtkmm.h>
@@ -18,18 +18,24 @@
 class ExampleWindow : public Gtk::Window
 {
 public:
+  // If gtkmm is configured with build-deprecated-api=false,
+  // GTKMM_DISABLE_DEPRECATED is defined in gtkmm.h (actually in gtkmmconfig.h).
+  // The undef at the start of this file has no effect.
   ExampleWindow()
-  : m_FileChooserDialog(*this, "Choose files"),
-    m_vBox(Gtk::Orientation::VERTICAL),
-    m_Button_FileDialog("DialogFile"),
+  : m_vBox(Gtk::Orientation::VERTICAL),
+    m_Button_FileDialog("DialogFile")
+#ifndef GTKMM_DISABLE_DEPRECATED
+  , m_FileChooserDialog(*this, "Choose files"),
     m_Button_FileChooserDialog("DialogChooserFile")
+#endif
   {
     set_title("Gtk::FileSelection example");
     set_child(m_vBox);
     m_vBox.append(m_Button_FileDialog);
-    m_vBox.append(m_Button_FileChooserDialog);
     m_Button_FileDialog.signal_clicked().connect(
       sigc::mem_fun(*this, &ExampleWindow::on_button_file_dialog_clicked));
+#ifndef GTKMM_DISABLE_DEPRECATED
+    m_vBox.append(m_Button_FileChooserDialog);
     m_Button_FileChooserDialog.signal_clicked().connect(
       sigc::mem_fun(*this, &ExampleWindow::on_button_file_chooser_dialog_clicked));
 
@@ -38,6 +44,7 @@ public:
     m_FileChooserDialog.set_select_multiple(true);
     m_FileChooserDialog.add_button("_Cancel", Gtk::ResponseType::CANCEL);
     m_FileChooserDialog.add_button("_Open", Gtk::ResponseType::OK);
+#endif
   }
   virtual ~ExampleWindow() {}
 
@@ -79,6 +86,7 @@ protected:
     }
   }
 
+#ifndef GTKMM_DISABLE_DEPRECATED
   void on_button_file_chooser_dialog_clicked()
   {
     m_FileChooserDialog.set_visible(true);
@@ -88,10 +96,6 @@ protected:
   {
     if (response_id == Gtk::ResponseType::OK)
     {
-      // If gtkmm is configured with build-deprecated-api=false,
-      // GTKMM_DISABLE_DEPRECATED is defined in gtkmm.h (actually in gtkmmconfig.h).
-      // The undef at the start of this file has no effect.
-#ifndef GTKMM_DISABLE_DEPRECATED
       auto list_model = m_FileChooserDialog.get_files();
 
       auto file = std::dynamic_pointer_cast<Gio::File>(list_model->get_object(0));
@@ -118,8 +122,7 @@ protected:
         std::cout << "Gio::FileIcon " << file_icon->get_file()->get_path() << std::endl;
       else
         std::cout << "Expected failure: No fileicon from get_files()\n";
-#endif
-#endif
+#endif // GET_TYPED_OBJECT_EXISTS
       auto file_vector = m_FileChooserDialog.get_files2();
       auto file2 = file_vector[0];
       if (file2)
@@ -133,13 +136,16 @@ protected:
 
     m_FileChooserDialog.set_visible(false);    
   }
+#endif // GTKMM_DISABLE_DEPRECATED
 
 private:
-  Glib::RefPtr<Gtk::FileDialog> m_FileDialog;
-  Gtk::FileChooserDialog m_FileChooserDialog;
   Gtk::Box m_vBox;
+  Glib::RefPtr<Gtk::FileDialog> m_FileDialog;
   Gtk::Button m_Button_FileDialog;
+#ifndef GTKMM_DISABLE_DEPRECATED
+  Gtk::FileChooserDialog m_FileChooserDialog;
   Gtk::Button m_Button_FileChooserDialog;
+#endif
 };
 
 int main(int argc, char* argv[])
