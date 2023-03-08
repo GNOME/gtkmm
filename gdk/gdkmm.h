@@ -53,6 +53,7 @@
 #include <gdkmm/snapshot.h>
 #include <gdkmm/surface.h>
 #include <gdkmm/texture.h>
+#include <gdkmm/texturedownloader.h>
 #include <gdkmm/toplevel.h>
 #include <gdkmm/toplevelsurfaceimpl.h>
 

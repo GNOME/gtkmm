@@ -67,6 +67,7 @@ gdkmm_any_hg_ccg_basenames = [
   'snapshot',
   'surface',
   'texture',
+  'texturedownloader',
   'timecoord',
   'toplevel',
   'toplevellayout',
