@@ -27,8 +27,9 @@ using std::strlen;
 
 namespace
 {
-
-char* SignalProxy_Scale_format_value_callback(GtkScale* /* scale */,
+extern "C"
+{
+static char* SignalProxy_Scale_format_value_callback(GtkScale* /* scale */,
   double value, gpointer user_data)
 {
   auto the_slot = static_cast<Gtk::Scale::SlotFormatValue*>(user_data);
@@ -44,6 +45,11 @@ char* SignalProxy_Scale_format_value_callback(GtkScale* /* scale */,
   return g_strdup("?");
 }
 
+static void SignalProxy_Scale_format_value_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::Scale::SlotFormatValue*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
@@ -65,12 +71,12 @@ void Scale::set_format_value_func(const SlotFormatValue& slot)
 {
   // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's data parameter. It will be deleted
-  // when Glib::destroy_notify_delete<SlotFormatValue> is called.
+  // when SignalProxy_Scale_format_value_callback_destroy() is called.
   auto slot_copy = new SlotFormatValue(slot);
 
   gtk_scale_set_format_value_func(gobj(),
     &SignalProxy_Scale_format_value_callback, slot_copy,
-    &Glib::destroy_notify_delete<SlotFormatValue>);
+    &SignalProxy_Scale_format_value_callback_destroy);
 }
 
 void Scale::unset_format_value_func()

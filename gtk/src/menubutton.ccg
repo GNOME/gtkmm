@@ -19,8 +19,9 @@
 
 namespace
 {
-
-void SignalProxy_MenuButton_create_popup_callback(
+extern "C"
+{
+static void SignalProxy_MenuButton_create_popup_callback(
   GtkMenuButton* /* menu_button */, gpointer user_data)
 {
   auto the_slot = static_cast<Gtk::MenuButton::SlotCreatePopup*>(user_data);
@@ -36,6 +37,11 @@ void SignalProxy_MenuButton_create_popup_callback(
   return;
 }
 
+static void SignalProxy_MenuButton_create_popup_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::MenuButton::SlotCreatePopup*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
@@ -55,12 +61,12 @@ void MenuButton::set_create_popup_func(const SlotCreatePopup& slot)
 {
   // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's user_data parameter. It will be deleted
-  // when Glib::destroy_notify_delete<SlotCreatePopup> is called.
+  // when SignalProxy_MenuButton_create_popup_callback_destroy() is called.
   auto slot_copy = new SlotCreatePopup(slot);
 
   gtk_menu_button_set_create_popup_func(gobj(),
     &SignalProxy_MenuButton_create_popup_callback, slot_copy,
-    &Glib::destroy_notify_delete<SlotCreatePopup>);
+    &SignalProxy_MenuButton_create_popup_callback_destroy);
 }
 
 void MenuButton::unset_create_popup_func()

@@ -19,7 +19,9 @@
 
 namespace
 {
-gboolean SlotShortcut_callback(GtkWidget* widget, GVariant* args, gpointer user_data)
+extern "C"
+{
+static gboolean SlotShortcut_callback(GtkWidget* widget, GVariant* args, gpointer user_data)
 {
   auto the_slot = static_cast<Gtk::CallbackAction::SlotShortcut*>(user_data);
 
@@ -34,6 +36,11 @@ gboolean SlotShortcut_callback(GtkWidget* widget, GVariant* args, gpointer user_
   return false;
 }
 
+static void SlotShortcut_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::CallbackAction::SlotShortcut*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
@@ -45,9 +52,9 @@ CallbackAction::CallbackAction(const SlotShortcut& slot)
   Glib::ObjectBase(nullptr),
   // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's user_data parameter. It will be deleted
-  // when Glib::destroy_notify_delete<SlotShortcut>() is called.
+  // when SlotShortcut_callback_destroy() is called.
   ShortcutAction(gtk_callback_action_new(&SlotShortcut_callback, new SlotShortcut(slot),
-    &Glib::destroy_notify_delete<SlotShortcut>))
+    &SlotShortcut_callback_destroy))
 {
 }
 

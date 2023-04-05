@@ -33,11 +33,21 @@
 
 namespace //anonymous
 {
+using Widget_dispose_vfunc_functype = void (*)(GObject* self);
+
+Widget_dispose_vfunc_functype Widget_dispose_vfunc_funcptr;
+
+extern "C"
+{
+static void Widget_dispose_vfunc_c_callback(GObject* self)
+{
+  Widget_dispose_vfunc_funcptr(self);
+}
 
 // This signal callback is custom implemented, so that we can refrain from calling
 // the signal handler if the C++ wrapper is being deleted.
 // https://bugzilla.gnome.org/show_bug.cgi?id=605728#c5
-void Widget_signal_hide_callback(GObject* self, void* data)
+static void Widget_signal_hide_callback(GObject* self, void* data)
 {
   const auto obj = Glib::ObjectBase::_get_current_wrapper(self);
 
@@ -59,7 +69,7 @@ void Widget_signal_hide_callback(GObject* self, void* data)
   }
 }
 
-gboolean SlotTick_gtk_callback(GtkWidget* self, GdkFrameClock* frame_clock, void* data)
+static gboolean SlotTick_gtk_callback(GtkWidget* self, GdkFrameClock* frame_clock, void* data)
 {
   // Do not try to call a signal on a disassociated wrapper.
   if (Glib::ObjectBase::_get_current_wrapper((GObject*)self))
@@ -77,6 +87,11 @@ gboolean SlotTick_gtk_callback(GtkWidget* self, GdkFrameClock* frame_clock, void
   return false;
 }
 
+static void SlotTick_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::Widget::SlotTick*>(data);
+}
+} // extern "C"
 } //anonymous
 
 namespace Gtk
@@ -421,11 +436,11 @@ guint Widget::add_tick_callback(const SlotTick& slot)
 {
   // Create a copy of the slot object. A pointer to this will be passed
   // through the callback's data parameter. It will be deleted
-  // when Glib::destroy_notify_delete<SlotTick>() is called.
+  // when SlotTick_gtk_callback_destroy() is called.
   auto slot_copy = new SlotTick(slot);
 
   return gtk_widget_add_tick_callback(gobj(), &SlotTick_gtk_callback, slot_copy,
-    &Glib::destroy_notify_delete<SlotTick>);
+    &SlotTick_gtk_callback_destroy);
 }
 
 void Widget::insert_at_start(Widget& parent)

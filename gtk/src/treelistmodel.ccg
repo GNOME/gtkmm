@@ -18,8 +18,9 @@
 
 namespace
 {
-
-GListModel* TreeListModel_CreateModelFunc(gpointer item, gpointer user_data)
+extern "C"
+{
+static GListModel* TreeListModel_CreateModelFunc(gpointer item, gpointer user_data)
 {
   auto slot = static_cast<Gtk::TreeListModel::SlotCreateModel*>(user_data);
   auto result = (*slot)(Glib::wrap(G_OBJECT(item), true));
@@ -29,6 +30,11 @@ GListModel* TreeListModel_CreateModelFunc(gpointer item, gpointer user_data)
     return nullptr;
 }
 
+static void TreeListModel_CreateModelFunc_destroy(void* data)
+{
+  delete static_cast<Gtk::TreeListModel::SlotCreateModel*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
@@ -44,8 +50,8 @@ TreeListModel::TreeListModel(const Glib::RefPtr<Gio::ListModel>& root,
       G_LIST_MODEL(root->gobj_copy()), passthrough, autoexpand,
       &TreeListModel_CreateModelFunc,
       new SlotCreateModel(slot_create),
-      &Glib::destroy_notify_delete<SlotCreateModel>)))
+      &TreeListModel_CreateModelFunc_destroy)))
 {
 }
 
-}
+} // namespace Gtk

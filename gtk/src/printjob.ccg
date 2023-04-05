@@ -18,8 +18,9 @@
 #include <gtk/gtkunixprint.h>
 #include <gdkmm/cairoutils.h>
 
+extern "C"
+{
 // This Signal Proxy allows the C++ coder to specify a sigc::slot instead of a static function.
-
 static void SignalProxy_Custom_gtk_callback(GtkPrintJob* print_job, gpointer data, const GError* gerror)
 {
   const auto the_slot = static_cast<Gtk::PrintJob::SlotPrintJobComplete*>(data);
@@ -39,17 +40,23 @@ static void SignalProxy_Custom_gtk_callback(GtkPrintJob* print_job, gpointer dat
   }
 }
 
+static void SignalProxy_Custom_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::PrintJob::SlotPrintJobComplete*>(data);
+}
+} // extern "C"
+
 namespace Gtk
 {
 
 void PrintJob::send(const SlotPrintJobComplete& slot)
 {
   // Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  // It will be deleted when Glib::destroy_notify_delete<SlotPrintJobComplete>() is called.
+  // It will be deleted when SignalProxy_Custom_gtk_callback_destroy() is called.
   auto slot_copy = new SlotPrintJobComplete(slot);
 
   gtk_print_job_send(gobj(), &SignalProxy_Custom_gtk_callback, slot_copy,
-   &Glib::destroy_notify_delete<SlotPrintJobComplete>);
+   &SignalProxy_Custom_gtk_callback_destroy);
 }
 
 std::vector<PageRange> PrintJob::get_page_ranges() const
