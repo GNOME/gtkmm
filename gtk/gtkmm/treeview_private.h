@@ -30,15 +30,30 @@ namespace Gtk
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace TreeView_Private
 {
+extern "C"
+{
+GTKMM_API
+void gtkmm_SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
+                           GtkTreeModel* model, GtkTreeIter* iter, void* data);
+GTKMM_API
+void gtkmm_SignalProxy_CellData_gtk_callback_destroy(void* data);
 
 GTKMM_API
-void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn*, GtkCellRenderer* cell,
+gboolean gtkmm_SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data);
+
+GTKMM_API
+void gtkmm_SignalProxy_RowSeparator_gtk_callback_destroy(void* data);
+} // extern "C"
+
+GTKMM_API
+void SignalProxy_CellData_gtk_callback(GtkTreeViewColumn* column, GtkCellRenderer* cell,
                            GtkTreeModel* model, GtkTreeIter* iter, void* data);
 GTKMM_API
 void SignalProxy_CellData_gtk_callback_destroy(void* data);
 
 GTKMM_API
 gboolean SignalProxy_RowSeparator_gtk_callback(GtkTreeModel* model, GtkTreeIter* iter, void* data);
+
 GTKMM_API
 void SignalProxy_RowSeparator_gtk_callback_destroy(void* data);
 

@@ -28,6 +28,8 @@
 
 using GridLines = Gtk::TreeView::GridLines;
 
+extern "C"
+{
 static void SignalProxy_Mapping_gtk_callback(GtkTreeView* tree_view, GtkTreePath* path, void* data)
 {
   auto the_slot = static_cast<Gtk::TreeView::SlotMapping*>(data);
@@ -87,6 +89,7 @@ static void SignalProxy_ColumnDrop_gtk_callback_destroy(void* data)
 {
   delete static_cast<Gtk::TreeView::SlotColumnDrop*>(data);
 }
+} // extern "C"
 
 namespace Gtk
 {
@@ -94,13 +97,13 @@ namespace Gtk
 int TreeView::insert_column_with_data_func(int position, const Glib::ustring& title, CellRenderer& cell, const SlotTreeCellData& slot)
 {
   //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  //It will be deleted when TreeView_Private::SignalProxy_CellData_gtk_callback_destroy() is called.
+  //It will be deleted when TreeView_Private::gtkmm_SignalProxy_CellData_gtk_callback_destroy() is called.
   auto slot_copy = new SlotTreeCellData(slot);
 
   return gtk_tree_view_insert_column_with_data_func(
       gobj(), position, title.c_str(), cell.gobj(),
-      &TreeView_Private::SignalProxy_CellData_gtk_callback, slot_copy,
-      &TreeView_Private::SignalProxy_CellData_gtk_callback_destroy);
+      &TreeView_Private::gtkmm_SignalProxy_CellData_gtk_callback, slot_copy,
+      &TreeView_Private::gtkmm_SignalProxy_CellData_gtk_callback_destroy);
 }
 
 void TreeView::set_cursor(const TreeModel::Path& path)
@@ -322,8 +325,8 @@ void TreeView::set_row_separator_func(const SlotRowSeparator& slot)
   auto slot_copy = new SlotRowSeparator(slot);
 
   gtk_tree_view_set_row_separator_func(gobj(),
-      &TreeView_Private::SignalProxy_RowSeparator_gtk_callback, slot_copy,
-      &TreeView_Private::SignalProxy_RowSeparator_gtk_callback_destroy);
+      &TreeView_Private::gtkmm_SignalProxy_RowSeparator_gtk_callback, slot_copy,
+      &TreeView_Private::gtkmm_SignalProxy_RowSeparator_gtk_callback_destroy);
 }
 
 bool TreeView::get_visible_range(TreeModel::Path& start_path, TreeModel::Path& end_path) const
