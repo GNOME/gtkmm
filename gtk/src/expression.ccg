@@ -15,14 +15,59 @@
  */
 
 #include <gtkmm/expression.h>
-
+#include <utility> // std::swap()
 
 namespace Gtk
 {
 
 namespace Expression_Private
 {
-  
+extern "C"
+{
+// A function with external linkage and C linkage does not get a mangled name.
+// Even though gtkmm_Expression_watch_callback() is declared in a named namespace,
+// the linker does not see the namespace name.
+// Therefore the function name shall have a prefix, hopefully unique.
+void gtkmm_Expression_watch_callback(gpointer data)
+{
+  auto slot = static_cast<ExpressionBase::SlotNotify*>(data);
+  (*slot)();
+}
+
+void gtkmm_Expression_watch_callback_destroy(gpointer data)
+{
+  delete static_cast<ExpressionBase::SlotNotify*>(data);
+}
+
+void gtkmm_Expression_closure_callback_func()
+{}
+
+void gtkmm_Expression_closure_marshal(GClosure* closure,
+                     GValue* return_value,
+                     guint n_param_values,
+                     const GValue* param_values,
+                     gpointer invocation_hint,
+                     gpointer user_data)
+{
+  auto marshal_data = static_cast<ExpressionClosureData*>(closure->data);
+  std::swap(marshal_data->data, closure->data);
+  (*marshal_data->func)(closure, return_value, n_param_values, param_values,
+    invocation_hint, user_data);
+  std::swap(marshal_data->data, closure->data);
+}
+
+void gtkmm_Expression_closure_destroy(gpointer data, GClosure* closure)
+{
+  auto marshal_data = static_cast<ExpressionClosureData*>(closure->data);
+  // Delete the Invoker.
+  std::swap(marshal_data->data, closure->data);
+  (*marshal_data->destroy_func)(data, closure);
+  std::swap(marshal_data->data, closure->data);
+  // Delete the ExpressionClosureData.
+  delete marshal_data;
+}
+} // extern "C"
+
 void watch_callback(gpointer data)
 {
   auto slot = static_cast<sigc::slot<void()>*>(data);

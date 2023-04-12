@@ -27,6 +27,31 @@ _PINCLUDE(gtkmm/private/widget_p.h)
 
 namespace Gtk
 {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+GTKMM_API
+GtkWidget* gtkmm_ListBox_create_widget_callback(void* item, void* data);
+
+GTKMM_API
+void gtkmm_ListBox_create_widget_callback_destroy(void* data);
+
+} // extern "C"
+
+// Like GtkListBoxCreateWidgetFunc and GDestroyNotify, but with C++ linkage.
+using ListBoxCreateWidgetFuncType = GtkWidget* (*)(void* item, void* data);
+using ListBoxCreateWidgetDestroyFuncType = void (*)(void* data);
+
+// A ListBoxCreateWidgetDestroyFuncType destroys the data in ListBoxCreateWidgetData.
+// gtkmm_ListBox_create_widget_callback_destroy() also destroys the ListBoxCreateWidgetData.
+struct ListBoxCreateWidgetData
+{
+  ListBoxCreateWidgetFuncType func;
+  ListBoxCreateWidgetDestroyFuncType destroy_func;
+  void* data; // A SlotCreateWidget<T_item>
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 class Adjustment;
 
 /** A %ListBox is a vertical container that contains ListBoxRow
@@ -344,10 +369,13 @@ void ListBox::bind_list_store(const Glib::RefPtr<Gio::ListStore<T_item>>& store,
   // It will be deleted by Glib::destroy_notify_delete<SlotCreateWidget>.
   auto slot_copy = new SlotCreateWidget<T_item>(std::forward<T_slot>(slot_create_widget));
 
+  auto create_widget_data =
+    new ListBoxCreateWidgetData{&proxy_bind_list_store_create_widget_callback<T_item>,
+    &Glib::destroy_notify_delete<SlotCreateWidget<T_item>>, slot_copy};
   gtk_list_box_bind_model(gobj(),
     store ? store->Gio::ListModel::gobj() : nullptr,
-    &proxy_bind_list_store_create_widget_callback<T_item>,
-    slot_copy, &Glib::destroy_notify_delete<SlotCreateWidget<T_item>>);
+    &gtkmm_ListBox_create_widget_callback, create_widget_data,
+    &gtkmm_ListBox_create_widget_callback_destroy);
 }
 
 template <typename T_item>

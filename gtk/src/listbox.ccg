@@ -19,8 +19,9 @@
 
 namespace
 {
-
-gboolean SignalProxy_Filter_gtk_callback(GtkListBoxRow* row, void* data)
+extern "C"
+{
+static gboolean SignalProxy_Filter_gtk_callback(GtkListBoxRow* row, void* data)
 {
   auto the_slot = static_cast<Gtk::ListBox::SlotFilter*>(data);
 
@@ -35,12 +36,12 @@ gboolean SignalProxy_Filter_gtk_callback(GtkListBoxRow* row, void* data)
   }
 }
 
-void SignalProxy_Filter_gtk_callback_destroy(void* data)
+static void SignalProxy_Filter_gtk_callback_destroy(void* data)
 {
   delete static_cast<Gtk::ListBox::SlotFilter*>(data);
 }
 
-int SignalProxy_Sort_gtk_callback(GtkListBoxRow* row1, GtkListBoxRow* row2, void* data)
+static int SignalProxy_Sort_gtk_callback(GtkListBoxRow* row1, GtkListBoxRow* row2, void* data)
 {
   auto the_slot = static_cast<Gtk::ListBox::SlotSort*>(data);
 
@@ -55,12 +56,12 @@ int SignalProxy_Sort_gtk_callback(GtkListBoxRow* row1, GtkListBoxRow* row2, void
   }
 }
 
-void SignalProxy_Sort_gtk_callback_destroy(void* data)
+static void SignalProxy_Sort_gtk_callback_destroy(void* data)
 {
   delete static_cast<Gtk::ListBox::SlotSort*>(data);
 }
 
-void SignalProxy_UpdateHeader_gtk_callback(GtkListBoxRow* row, GtkListBoxRow* before, void* data)
+static void SignalProxy_UpdateHeader_gtk_callback(GtkListBoxRow* row, GtkListBoxRow* before, void* data)
 {
   auto the_slot = static_cast<Gtk::ListBox::SlotUpdateHeader*>(data);
 
@@ -74,7 +75,7 @@ void SignalProxy_UpdateHeader_gtk_callback(GtkListBoxRow* row, GtkListBoxRow* be
   }
 }
 
-void SignalProxy_UpdateHeader_gtk_callback_destroy(void* data)
+static void SignalProxy_UpdateHeader_gtk_callback_destroy(void* data)
 {
   delete static_cast<Gtk::ListBox::SlotUpdateHeader*>(data);
 }
@@ -115,10 +116,36 @@ static GtkWidget* proxy_bind_model_create_widget_callback(void* item, void* data
   return nullptr;
 }
 
+static void proxy_bind_model_create_widget_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::ListBox::SlotCreateWidget<Glib::Object>*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
 {
+extern "C"
+{
+// A function with external linkage and C linkage does not get a mangled name.
+// Even though gtkmm_ListBox_create_widget_callback() is declared in a named
+// namespace, the linker does not see the namespace name.
+// Therefore the function name shall have a prefix, hopefully unique.
+GtkWidget* gtkmm_ListBox_create_widget_callback(void* item, void* data)
+{
+  auto create_widget_data = reinterpret_cast<ListBoxCreateWidgetData*>(data);
+  return (*create_widget_data->func)(item, create_widget_data->data);
+}
+
+void gtkmm_ListBox_create_widget_callback_destroy(void* data)
+{
+  auto create_widget_data = reinterpret_cast<ListBoxCreateWidgetData*>(data);
+  // Delete the slot.
+  (*create_widget_data->destroy_func)(create_widget_data->data);
+  // Delete the ListBoxCreateWidgetData.
+  delete create_widget_data;
+}
+} // extern "C"
 
 void ListBox::unselect_row()
 {
@@ -191,11 +218,11 @@ void ListBox::bind_model(const Glib::RefPtr<Gio::ListModel>& model,
   const SlotCreateWidget<Glib::Object>& slot_create_widget)
 {
   // Create a copy of the slot.
-  // It will be deleted by Glib::destroy_notify_delete<SlotCreateWidget>.
+  // It will be deleted by proxy_bind_model_create_widget_callback_destroy().
   auto slot_copy = new SlotCreateWidget<Glib::Object>(slot_create_widget);
 
   gtk_list_box_bind_model(gobj(), Glib::unwrap(model), &proxy_bind_model_create_widget_callback,
-    slot_copy, &Glib::destroy_notify_delete<SlotCreateWidget<Glib::Object>>);
+    slot_copy, &proxy_bind_model_create_widget_callback_destroy);
 }
 
 } //namespace Gtk

@@ -43,7 +43,7 @@ public:
 
   _WRAP_METHOD(GType get_value_type() const, gtk_expression_get_value_type)
   _WRAP_METHOD(bool is_static() const, gtk_expression_is_static)
-};
+}; // ExpressionBase
 
 /** Expressions to values.
  *
@@ -158,7 +158,7 @@ public:
   template<class T2>
   Glib::RefPtr<ExpressionWatch<T>> bind(const Glib::PropertyProxy_WriteOnly<T2>& property,
                                         const Glib::RefPtr<Glib::ObjectBase>& this_ = nullptr);
-};
+}; // Expression<T>
 
 template<class T>
 class PropertyExpression final : public Expression<T>
@@ -220,7 +220,7 @@ public:
   static Glib::RefPtr<PropertyExpression> create(GType this_type,
                                                  const Glib::RefPtr<OT>& expression,
                                                  const Glib::ustring& property_name);
-};
+}; // PropertyExpression<T>
 
 template<class T>
 class ConstantExpression final : public Expression<T>
@@ -245,7 +245,7 @@ public:
    * @return A new Gtk::Expression.
    */
   static Glib::RefPtr<ConstantExpression<T>> create_for_value(const Glib::Value<T>& value);
-};
+}; // ConstantExpression<T>
 
 template<class T>
 class ObjectExpression final : public Expression<T>
@@ -265,7 +265,7 @@ public:
    * @return A new Gtk::Expression.
    */
   static Glib::RefPtr<ObjectExpression<T>> create(const T& object);
-};
+}; // ObjectExpression<T>
 
 template<class T>
 class ClosureExpression final : public Expression<T>
@@ -307,15 +307,24 @@ private:
                           const Glib::RefPtr<ATs>&... eas);
 
   static void fill_params(GtkExpression** gparams);
-};
+}; // ClosureExpression<T>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Expression_Private
 {
-
+//TODO: Remove watch_callback() when we can break ABI.
 GTKMM_API
 void watch_callback(gpointer data);
+
+extern "C"
+{
+GTKMM_API
+void gtkmm_Expression_watch_callback(gpointer data);
+
+GTKMM_API
+void gtkmm_Expression_watch_callback_destroy(gpointer data);
+} // extern "C"
 
 template<class T, class... ATs>
 class Invoker
@@ -333,7 +342,7 @@ private:
   template<std::size_t... I>
   void invoke(const GValue* param_values, GValue* return_value,
               std::index_sequence<I...>);
-};
+}; // Invoker<T, ATs...>
 
 
 template<class TI>
@@ -344,11 +353,41 @@ void closure_marshal(GClosure* closure,
                      gpointer invocation_hint,
                      gpointer marshal_data);
 
+//TODO: Remove closure_callback_func() when we can break ABI.
 GTKMM_API
 void closure_callback_func();
 
 template<class TI>
 void closure_destroy(gpointer data, GClosure* closure);
+
+extern "C"
+{
+GTKMM_API
+void gtkmm_Expression_closure_marshal(GClosure* closure,
+                     GValue* return_value,
+                     guint n_param_values,
+                     const GValue* param_values,
+                     gpointer invocation_hint,
+                     gpointer marshal_data);
+GTKMM_API
+void gtkmm_Expression_closure_callback_func();
+
+GTKMM_API
+void gtkmm_Expression_closure_destroy(gpointer data, GClosure* closure);
+} // extern "C"
+
+// Like GClosureMarshal and GClosureNotify, but with C++ linkage.
+using ExpressionClosureMarshalFuncType = void (*)(GClosure* closure,
+   GValue* return_value, guint n_param_values, const GValue* param_values,
+   gpointer invocation_hint, gpointer marshal_data);
+using ExpressionClosureDestroyFuncType = void (*)(gpointer data, GClosure* closure);
+
+struct ExpressionClosureData
+{
+  ExpressionClosureMarshalFuncType func;
+  ExpressionClosureDestroyFuncType destroy_func;
+  void* data; // An Invoker<>
+};
 
 } // namespace Expression_Private
 
@@ -376,8 +415,8 @@ Glib::RefPtr<ExpressionWatch<T>> Expression<T>::watch(const Glib::RefPtr<Glib::O
 {
   auto slot_copy = new SlotNotify(notify);
   return Glib::wrap<T>(gtk_expression_watch(gobj(), this_ ? this_->gobj() : nullptr,
-                                            &Expression_Private::watch_callback, slot_copy,
-                                            &Glib::destroy_notify_delete<SlotNotify>), true);
+    &Expression_Private::gtkmm_Expression_watch_callback, slot_copy,
+    &Expression_Private::gtkmm_Expression_watch_callback_destroy), true);
 }
 
 template<class T>
@@ -499,14 +538,18 @@ Glib::RefPtr<ClosureExpression<T>> ClosureExpression<T>::create(S slot,
   auto gparams = new GtkExpression*[n_params];
   fill_params(gparams, params...);
 
+  auto marshal_data = new Expression_Private::ExpressionClosureData{
+    &Expression_Private::closure_marshal<TI>,
+    &Expression_Private::closure_destroy<TI>,
+    invoker};
   auto object = gtk_cclosure_expression_new(
     Glib::Value<T>::value_type(),
-    Expression_Private::closure_marshal<TI>,
+    &Expression_Private::gtkmm_Expression_closure_marshal,
     n_params,
     gparams,
-    Expression_Private::closure_callback_func,
-    invoker,
-    Expression_Private::closure_destroy<TI>);
+    &Expression_Private::gtkmm_Expression_closure_callback_func,
+    marshal_data,
+    &Expression_Private::gtkmm_Expression_closure_destroy);
   delete[] gparams;
 
   return Glib::make_refptr_for_instance<Gtk::ClosureExpression<T>>(

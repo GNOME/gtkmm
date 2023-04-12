@@ -19,7 +19,8 @@
 
 namespace
 {
-
+extern "C"
+{
 static void FuncProxy_Foreach_gtk_callback(GtkFlowBox* box, GtkFlowBoxChild* child, void* data)
 {
   auto the_slot = static_cast<Gtk::FlowBox::SlotSelectedForeach*>(data);
@@ -94,10 +95,36 @@ static GtkWidget* proxy_bind_model_create_widget_callback(void* item, void* data
   return nullptr;
 }
 
+static void proxy_bind_model_create_widget_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::FlowBox::SlotCreateWidget<Glib::Object>*>(data);
+}
+} // extern "C"
 } // anonymous namespace
 
 namespace Gtk
 {
+extern "C"
+{
+// A function with external linkage and C linkage does not get a mangled name.
+// Even though gtkmm_FlowBox_create_widget_callback() is declared in a named
+// namespace, the linker does not see the namespace name.
+// Therefore the function name shall have a prefix, hopefully unique.
+GtkWidget* gtkmm_FlowBox_create_widget_callback(void* item, void* data)
+{
+  auto create_widget_data = reinterpret_cast<FlowBoxCreateWidgetData*>(data);
+  return (*create_widget_data->func)(item, create_widget_data->data);
+}
+
+void gtkmm_FlowBox_create_widget_callback_destroy(void* data)
+{
+  auto create_widget_data = reinterpret_cast<FlowBoxCreateWidgetData*>(data);
+  // Delete the slot.
+  (*create_widget_data->destroy_func)(create_widget_data->data);
+  // Delete the FlowBoxCreateWidgetData.
+  delete create_widget_data;
+}
+} // extern "C"
 
 void FlowBox::selected_foreach(const SlotSelectedForeach& slot)
 {
@@ -145,11 +172,11 @@ void FlowBox::bind_model(const Glib::RefPtr<Gio::ListModel>& model,
   const SlotCreateWidget<Glib::Object>& slot_create_widget)
 {
   // Create a copy of the slot.
-  // It will be deleted by Glib::destroy_notify_delete<SlotCreateWidget>.
+  // It will be deleted by proxy_bind_model_create_widget_callback_destroy().
   auto slot_copy = new SlotCreateWidget<Glib::Object>(slot_create_widget);
 
   gtk_flow_box_bind_model(gobj(), Glib::unwrap(model), &proxy_bind_model_create_widget_callback,
-    slot_copy, &Glib::destroy_notify_delete<SlotCreateWidget<Glib::Object>>);
+    slot_copy, &proxy_bind_model_create_widget_callback_destroy);
 }
 
 } //namespace Gtk
