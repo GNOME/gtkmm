@@ -83,6 +83,7 @@ gdkmm_extra_any_h_cc_basenames = [
   'dragsurfaceimpl',
   'general',
   'popupsurfaceimpl',
+  'slot_async',
   'toplevelsurfaceimpl',
   'value_cairo',
 ]
