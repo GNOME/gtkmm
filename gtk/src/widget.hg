@@ -17,6 +17,7 @@
 
 _CONFIGINCLUDE(gtkmmconfig.h)
 
+#include <optional>
 #include <vector>
 
 #include <pangomm/context.h>
@@ -32,6 +33,7 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>
 #include <gdkmm/rgba.h>
+#include <gdkmm/graphene_rect.h>
 #include <gtkmm/requisition.h>
 #include <gtkmm/stylecontext.h>
 #include <giomm/actiongroup.h>
@@ -218,6 +220,45 @@ public:
   Allocation get_allocation() const;
   _IGNORE(gtk_widget_get_allocation)
 
+  /** Computes the bounds for the widget in the coordinate space of @a target.
+   *
+   * The bounds of widget are (the bounding box of) the region that it is
+   * expected to draw in.
+   *
+   * If the operation is successful, a std::optional<Gdk::Graphene::Rect>
+   * that contains a value is returned. If the widget has no bounds or the
+   * bounds cannot be expressed in @a target's coordinate space (for example
+   * if both widgets are in different windows), the returned std::optional
+   * is empty.
+   *
+   * It is valid for the widget and @a target to be the same widget.
+   *
+   * @newin{4,12}
+   *
+   * @param target The `Gtk::Widget`.
+   * @return A std::optional<Gdk::Graphene::Rect>, containing a value if the
+   *         bounds could be computed.
+   */
+  std::optional<Gdk::Graphene::Rect> compute_bounds(const Widget& target) const;
+  _IGNORE(gtk_widget_compute_bounds)
+
+  /** Translates the given @a point in the widget's coordinates to coordinates
+   * relative to @a target’s coordinate system.
+   *
+   * In order to perform this operation, both widgets must share a
+   * common ancestor.
+   *
+   * @newin{4,12}
+   *
+   * @param target The `Gtk::Widget` to transform into.
+   * @param point A point in the widget's coordinate system.
+   * @return A std::optional<Gdk::Graphene::Point>, containing a value if the
+   *         point could be determined.
+   */
+  std::optional<Gdk::Graphene::Point> compute_point(
+    const Widget& target, const Gdk::Graphene::Point& point) const;
+  _IGNORE(gtk_widget_compute_point)
+
   _WRAP_METHOD(int get_width() const, gtk_widget_get_width)
   _WRAP_METHOD(int get_height() const, gtk_widget_get_height)
   _WRAP_METHOD(int get_size(Orientation orientation) const, gtk_widget_get_size)
@@ -299,7 +340,8 @@ public:
 
   _WRAP_METHOD(bool translate_coordinates(Widget& dest_widget,
                double src_x, double src_y,
-               double& dest_x, double& dest_y), gtk_widget_translate_coordinates)
+               double& dest_x, double& dest_y), gtk_widget_translate_coordinates,
+               deprecated "Use compute_point() instead")
 
   _WRAP_METHOD(bool contains(double x, double y) const, gtk_widget_contains)
   _WRAP_METHOD(Widget* pick(double x, double y, PickFlags flags = PickFlags::DEFAULT), gtk_widget_pick)

@@ -16,6 +16,7 @@
 
 #include <gdkmm/snapshot.h>
 #include <gdkmm/rectangle.h>
+#include <gdkmm/graphene_rect.h>
 #include <gtkmm/stylecontext.h>
 
 _DEFS(gtkmm,gtk)
@@ -25,6 +26,7 @@ typedef struct _graphene_rect_t graphene_rect_t;
 
 namespace Gdk
 {
+class GTKMM_API Paintable;
 class GTKMM_API RGBA;
 class GTKMM_API Texture;
 }
@@ -62,6 +64,10 @@ public:
   // gtk_snapshot_new() does more than call g_object_new().
   _WRAP_METHOD(static Glib::RefPtr<Snapshot> create(), gtk_snapshot_new)
 
+  _WRAP_METHOD(Glib::RefPtr<Gdk::Paintable> to_paintable(const Gdk::Graphene::Size& size{?}),
+    gtk_snapshot_to_paintable, newin "4,12")
+  _IGNORE(gtk_snapshot_free_to_paintable)
+
   /** Creates a new debug node.
    *
    * @newin{3,94}
@@ -75,11 +81,19 @@ public:
   _WRAP_METHOD(void push_blur(double radius), gtk_snapshot_push_blur)
 
 #m4 _CONVERSION(`const Gdk::Rectangle&',`const graphene_rect_t*', `gdk_rect_to_graphene_rect($3).get()')
-  _WRAP_METHOD(void push_repeat(const graphene_rect_t* bounds, const graphene_rect_t* child_bounds), gtk_snapshot_push_repeat)
-  _WRAP_METHOD(void push_repeat(const Gdk::Rectangle& bounds, const Gdk::Rectangle& child_bounds{?}), gtk_snapshot_push_repeat)
+  _WRAP_METHOD(void push_repeat(const graphene_rect_t* bounds, const graphene_rect_t* child_bounds),
+    gtk_snapshot_push_repeat, deprecated "Use push_repeat() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void push_repeat(const Gdk::Rectangle& bounds, const Gdk::Rectangle& child_bounds{?}),
+    gtk_snapshot_push_repeat, deprecated "Use push_repeat() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void push_repeat(const Gdk::Graphene::Rect& bounds, const Gdk::Graphene::Rect& child_bounds{?}),
+    gtk_snapshot_push_repeat, newin "4,12")
 
-  _WRAP_METHOD(void push_clip(const graphene_rect_t* bounds), gtk_snapshot_push_clip)
-  _WRAP_METHOD(void push_clip(const Gdk::Rectangle& bounds), gtk_snapshot_push_clip)
+  _WRAP_METHOD(void push_clip(const graphene_rect_t* bounds), gtk_snapshot_push_clip,
+    deprecated "Use push_clip() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void push_clip(const Gdk::Rectangle& bounds), gtk_snapshot_push_clip,
+    deprecated "Use push_clip() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void push_clip(const Gdk::Graphene::Rect& bounds),
+    gtk_snapshot_push_clip, newin "4,12")
 
   _WRAP_METHOD(void push_cross_fade(double progress), gtk_snapshot_push_cross_fade)
 
@@ -89,23 +103,35 @@ public:
   _WRAP_METHOD(void save(), gtk_snapshot_save)
   _WRAP_METHOD(void restore(), gtk_snapshot_restore)
 
+  _WRAP_METHOD(void translate(const Gdk::Graphene::Point& point),
+    gtk_snapshot_translate, newin "4,12")
   _WRAP_METHOD(void rotate(float angle), gtk_snapshot_rotate)
   _WRAP_METHOD(void scale(float factor_x, float factor_y), gtk_snapshot_scale)
   _WRAP_METHOD(void scale(float factor_x, float factor_y, float factor_z), gtk_snapshot_scale_3d)
   _WRAP_METHOD(void perspective(float depth), gtk_snapshot_perspective)
 
-  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const graphene_rect_t* bounds), gtk_snapshot_append_cairo)
-  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const Gdk::Rectangle& bounds), gtk_snapshot_append_cairo)
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const graphene_rect_t* bounds),
+    gtk_snapshot_append_cairo, deprecated "Use append_cairo() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const Gdk::Rectangle& bounds),
+    gtk_snapshot_append_cairo, deprecated "Use append_cairo() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(Cairo::RefPtr<Cairo::Context> append_cairo(const Gdk::Graphene::Rect& bounds),
+    gtk_snapshot_append_cairo, newin "4,12")
 
   _WRAP_METHOD(void append_texture(const Glib::RefPtr<Gdk::Texture>& texture,
-    const graphene_rect_t* bounds), gtk_snapshot_append_texture)
+    const graphene_rect_t* bounds), gtk_snapshot_append_texture,
+    deprecated "Use append_texture() with Gdk::Graphene::Rect instead.")
   _WRAP_METHOD(void append_texture(const Glib::RefPtr<Gdk::Texture>& texture,
-    const Gdk::Rectangle& bounds), gtk_snapshot_append_texture)
+    const Gdk::Rectangle& bounds), gtk_snapshot_append_texture,
+    deprecated "Use append_texture() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void append_texture(const Glib::RefPtr<Gdk::Texture>& texture,
+    const Gdk::Graphene::Rect& bounds), gtk_snapshot_append_texture, newin "4,12")
 
   _WRAP_METHOD(void append_color(const Gdk::RGBA& color, const graphene_rect_t* bounds),
-    gtk_snapshot_append_color)
+    gtk_snapshot_append_color, deprecated "Use append_color() with Gdk::Graphene::Rect instead.")
   _WRAP_METHOD(void append_color(const Gdk::RGBA& color, const Gdk::Rectangle& bounds),
-    gtk_snapshot_append_color)
+    gtk_snapshot_append_color, deprecated "Use append_color() with Gdk::Graphene::Rect instead.")
+  _WRAP_METHOD(void append_color(const Gdk::RGBA& color, const Gdk::Graphene::Rect& bounds),
+    gtk_snapshot_append_color, newin "4,12")
   _WRAP_METHOD(void append_layout(const Glib::RefPtr<Pango::Layout>& layout,
     const Gdk::RGBA& color), gtk_snapshot_append_layout)
 

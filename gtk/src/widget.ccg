@@ -30,6 +30,8 @@
 #include <gtkmm/snapshot.h>
 #include <gtkmm/layoutmanager.h>
 #include <gtk/gtk.h>
+#include <graphene.h>
+#include <memory> // std::unique_ptr
 
 namespace //anonymous
 {
@@ -302,6 +304,31 @@ Allocation Widget::get_allocation() const
   Allocation allocation;
   gtk_widget_get_allocation(const_cast<GtkWidget*>(gobj()), allocation.gobj());
   return allocation;
+}
+
+std::optional<Gdk::Graphene::Rect> Widget::compute_bounds(const Widget& target) const
+{
+  std::unique_ptr<graphene_rect_t, decltype(&graphene_rect_free)>
+    out_bounds(graphene_rect_alloc(), &graphene_rect_free); 
+  const gboolean result = gtk_widget_compute_bounds(const_cast<GtkWidget*>(gobj()),
+    const_cast<GtkWidget*>(target.gobj()), out_bounds.get());
+  if (result)
+    return Gdk::Graphene::Rect(out_bounds.release(), false);
+  else
+    return {};
+}
+
+std::optional<Gdk::Graphene::Point> Widget::compute_point(
+  const Widget& target, const Gdk::Graphene::Point& point) const
+{
+  std::unique_ptr<graphene_point_t, decltype(&graphene_point_free)>
+    out_point(graphene_point_alloc(), &graphene_point_free); 
+  const gboolean result = gtk_widget_compute_point(const_cast<GtkWidget*>(gobj()),
+    const_cast<GtkWidget*>(target.gobj()), point.gobj(), out_point.get());
+  if (result)
+    return Gdk::Graphene::Point(out_point.release(), false);
+  else
+    return {};
 }
 
 void Widget_Class::dispose_vfunc_callback(GObject* self)
