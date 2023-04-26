@@ -303,3 +303,11 @@ _CONVERSION(`GdkDrag*',`Glib::RefPtr<Gdk::Drag>',Glib::wrap($3))
 _CONVERSION(`GdkDrop*',`Glib::RefPtr<Drop>',Glib::wrap($3))
 _CONVERSION(`GdkDrop*',`Glib::RefPtr<Gdk::Drop>',Glib::wrap($3))
 
+# Graphene
+_CONVERSION(`const Point&',`const graphene_point_t*',`($3).gobj()')
+_CONVERSION(`const Gdk::Graphene::Point&',`const graphene_point_t*',`($3).gobj()')
+_CONVERSION(`const Rect&',`const graphene_rect_t*',`($3).gobj()')
+_CONVERSION(`const Gdk::Graphene::Rect&',`const graphene_rect_t*',`($3).gobj()')
+_CONVERSION(`const Size&',`const graphene_size_t*',`($3).gobj()')
+_CONVERSION(`const Gdk::Graphene::Size&',`const graphene_size_t*',`($3).gobj()')
+

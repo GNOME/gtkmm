@@ -13,6 +13,7 @@ test_programs = [
   [['delete_cpp_child'], 'test', ['main.cc'], true, false],
   [['dialog_deletethis'], 'test', ['main.cc'], true, false],
   [['filedialog'], 'test', ['main.cc'], true, false],
+  [['gdk_graphene'], 'test', ['main.cc'], false, true],
   [['gdk_rgba'], 'test', ['main.cc'], false, true],
   [['main_with_options'], 'test', ['main.cc'], true, false],
   [['object_move'], 'test', ['main.cc'], false, true],

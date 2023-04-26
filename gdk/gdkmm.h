@@ -39,6 +39,7 @@
 #include <gdkmm/general.h>
 #include <gdkmm/glcontext.h>
 #include <gdkmm/gltexture.h>
+#include <gdkmm/graphene_rect.h>
 #include <gdkmm/memorytexture.h>
 #include <gdkmm/monitor.h>
 #include <gdkmm/paintable.h>
