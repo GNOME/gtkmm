@@ -30,6 +30,8 @@ then
                  "$gtk_build_prefix"/gdk/gdk*.h > "$out_dir"/gdk_methods.defs
   "$gen_methods" "$pixbuf_source_prefix"/gdk-pixbuf/gdk!(*private).h \
                  "$pixbuf_build_prefix"/gdk-pixbuf/gdk*.h > "$out_dir"/gdk_pixbuf_methods.defs
+  "$gen_methods" "$graphene_source_prefix"/include/graphene-*.h \
+                 "$graphene_build_prefix"/include/graphene-*.h > "$out_dir"/gdk_graphene_methods.defs
   # patch version 2.7.5 does not like directory names.
   cd "$out_dir"
   patch_options="--backup --version-control=simple --suffix=.orig"

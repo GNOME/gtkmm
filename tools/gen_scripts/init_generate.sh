@@ -43,9 +43,12 @@ gtk_source_prefix="$GMMPROC_GEN_SOURCE_DIR/gtk"
 gtk_build_prefix="$GMMPROC_GEN_BUILD_DIR/gtk"
 pixbuf_source_prefix="$GMMPROC_GEN_SOURCE_DIR/gdk-pixbuf"
 pixbuf_build_prefix="$GMMPROC_GEN_BUILD_DIR/gdk-pixbuf"
+graphene_source_prefix="$GMMPROC_GEN_SOURCE_DIR/graphene"
+graphene_build_prefix="$GMMPROC_GEN_BUILD_DIR/graphene"
 if [ "$GMMPROC_GEN_SOURCE_DIR" == "$GMMPROC_GEN_BUILD_DIR" ]; then
   # gtk and gdk-pixbuf are built with meson, which requires non-source-dir builds.
   # This is what jhbuild does, if neccesary, to force non-source-dir builds.
   gtk_build_prefix="$gtk_build_prefix/build"
   pixbuf_build_prefix="$pixbuf_build_prefix/build"
+  graphene_build_prefix="$graphene_build_prefix/build"
 fi

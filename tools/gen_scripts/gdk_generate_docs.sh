@@ -9,7 +9,8 @@ out_dir="$root_dir/gdk/src"
 
 params="--with-properties --no-recursion"
 for dir in "$gtk_source_prefix"/{gdk,gdk/deprecated} "$gtk_build_prefix"/gdk \
-           "$pixbuf_source_prefix"/gdk-pixbuf "$pixbuf_build_prefix"/gdk-pixbuf; do
+           "$pixbuf_source_prefix"/gdk-pixbuf "$pixbuf_build_prefix"/gdk-pixbuf \
+           "$graphene_source_prefix"/src "$graphene_build_prefix"/src; do
   if [ -d "$dir" ]; then
     params="$params -s $dir"
   fi
