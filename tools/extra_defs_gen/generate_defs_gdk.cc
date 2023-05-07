@@ -46,6 +46,7 @@ int main(int /* argc */, char** /* argv */)
             << get_defs( GDK_TYPE_DISPLAY_MANAGER )
 #endif /* G_OS_WIN32 */
             << get_defs( GDK_TYPE_DRAG )
+            << get_defs( GDK_TYPE_DRAG_SURFACE )
             << get_defs( GDK_TYPE_DRAW_CONTEXT )
             << get_defs( GDK_TYPE_DROP )
             << get_defs( GDK_TYPE_FRAME_CLOCK )
