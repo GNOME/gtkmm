@@ -44,6 +44,7 @@ gdkmm_any_hg_ccg_basenames = [
   'displaymanager',
   'drag',
   'dragsurface',
+  'dragsurfacesize',
   'drawcontext',
   'drop',
   'enums',

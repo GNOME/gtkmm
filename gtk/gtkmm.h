@@ -146,6 +146,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorchooserdialog.h>
 #include <gtkmm/colordialogbutton.h>
 #include <gtkmm/columnview.h>
+#include <gtkmm/columnviewcell.h>
+#include <gtkmm/columnviewrow.h>
 #include <gtkmm/columnviewsorter.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>

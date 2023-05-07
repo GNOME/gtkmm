@@ -15,3 +15,35 @@
  */
 
 #include <gdk/gdk.h>
+
+namespace
+{
+extern "C"
+{
+// Hand-coded because the slot can't be called with a non-const temporary DragSurfaceSize.
+static void DragSurface_signal_compute_size_callback(GdkDragSurface* self, GdkDragSurfaceSize* p0,void* data)
+{
+  using namespace Gdk;
+  using SlotType = sigc::slot<void(DragSurfaceSize&)>;
+
+  auto obj = dynamic_cast<DragSurface*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
+  // Do not try to call a signal on a disassociated wrapper.
+  if(obj)
+  {
+    try
+    {
+      if (const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        // This works because Gdk::DragSurfaceSize neither copies nor deletes *p0.
+        DragSurfaceSize dragsurfacesize(p0);
+        (*static_cast<SlotType*>(slot))(dragsurfacesize);
+      }
+    }
+    catch (...)
+    {
+       Glib::exception_handlers_invoke();
+    }
+  }
+}
+} // extern "C"
+} // anonymous namespace
