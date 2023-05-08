@@ -40,8 +40,6 @@
 #define GTK_VERSION_GT_MICRO(major,minor,micro) \
   ((GTK_MAJOR_VERSION>major)|| \
   (GTK_MAJOR_VERSION==major)&&(GTK_MINOR_VERSION>minor)||\
-  (GTK_MAJOR_VERSION==major)&&(GTK_MINOR_VERSION==minor)&&(GTK_MICRO_VERSION>minor))
-
+  (GTK_MAJOR_VERSION==major)&&(GTK_MINOR_VERSION==minor)&&(GTK_MICRO_VERSION>micro))
 
 #endif /* _GTKMM_BASE_H */
-
