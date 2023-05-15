@@ -53,6 +53,7 @@ gdkmm_any_hg_ccg_basenames = [
   'frametimings',
   'glcontext',
   'gltexture',
+  'gltexturebuilder',
   'graphene_point',
   'graphene_rect',
   'graphene_size',

@@ -220,6 +220,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/levelbar.h>
 #include <gtkmm/listbox.h>
 #include <gtkmm/listboxrow.h>
+#include <gtkmm/listheader.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/listview.h>
 #include <gtkmm/listviewtext.h>
@@ -271,6 +272,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/searchbar.h>
 #include <gtkmm/searchentry.h>
 #include <gtkmm/separator.h>
+#include <gtkmm/sectionmodel.h>
 #include <gtkmm/selectionfiltermodel.h>
 #include <gtkmm/selectionlistmodelimpl.h>
 #include <gtkmm/settings.h>

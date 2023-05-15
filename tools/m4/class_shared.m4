@@ -60,7 +60,9 @@ ifelse(`$2',,,`
 _POP()
 ')
 
-dnl Use if the C base type is declared G_DECLARE_FINAL_TYPE.
+dnl Use if the C base type is declared G_DECLARE_FINAL_TYPE
+dnl or GDK_DECLARE_INTERNAL_TYPE.
+dnl https://gitlab.gnome.org/GNOME/glib/-/issues/2661
 define(`_DO_NOT_DERIVE_GTYPE',`dnl
 _PUSH()
 dnl Define this macro to be tested for later.

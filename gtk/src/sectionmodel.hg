@@ -1,0 +1,89 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <glibmm/interface.h>
+#include <utility> // std::pair
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+typedef struct _GtkSectionModelInterface GtkSectionModelInterface;
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gtk
+{
+ /** Interface that adds support for section to list models.
+ *
+ * This support is then used by widgets using list models to be able to group their
+ * items into sections.
+ *
+ * Many GTK list models support sections inherently, or they pass through the sections
+ * of a model they are wrapping.
+ *
+ * A %Gtk::SectionModel groups successive items into so-called sections. List widgets
+ * like Gtk::ListView then allow displaying section headers for these sections.
+ *
+ * When the section groupings of a model changes, the model will emit
+ * signal_sections_changed() by calling the sections_changed() function.
+ * All sections in the given range now need to be queried again.  
+ * Gio::ListModel::signal_items_changed() has the same effect, all sections in
+ * that range are invalidated, too.
+ *
+ * @see Gio::ListModel, Gtk::ListView
+ * @newin{4,12}
+ */
+class GTKMM_API SectionModel : public Glib::Interface
+{
+  _CLASS_INTERFACE(SectionModel, GtkSectionModel, GTK_SECTION_MODEL, GtkSectionModelInterface, , , GTKMM_API)
+
+public:
+  /** Query the section that covers the given position.
+   *
+   * The number of items in the section can be computed by @a out_end - @a out_start.
+   *
+   * If the position is larger than the number of items, a single
+   * range from n_items to G_MAXUINT will be returned.
+   *
+   * @newin{4,12}
+   *
+   * @param position The position of the item to query.
+   * @return {out_start, out_end} The position of the first item in the section,
+   *         and the position of the first item not part of the section anymore.
+   */
+  std::pair<guint, guint> get_section(guint position) const;
+  _IGNORE(gtk_section_model_get_section)
+
+  _WRAP_METHOD(void sections_changed(guint position, guint n_items), gtk_section_model_sections_changed)
+
+  // no_default_handler because the wrapped C signal has no default handler.
+  _WRAP_SIGNAL(void sections_changed(guint position, guint n_items), "sections-changed", no_default_handler)
+
+protected:
+#m4 _CONVERSION(`guint*',`guint&',`*($3)')
+  /** Return the section that covers the given position.
+   * If the position is outside the number of items, returns a single range from
+   * n_items to G_MAXUINT.
+   */
+  _WRAP_VFUNC(void get_section(guint position, guint& out_start, guint& out_end), get_section)
+};
+
+} // namespace Gtk
