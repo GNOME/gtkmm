@@ -27,15 +27,15 @@ namespace Gtk
 /** %Gtk::SelectionListModelImpl is an object that implements the Gio::ListModel
  * and Gtk::SelectionModel interfaces.
  *
- * gtk_stack_get_pages() returns an object of a class that implements both
- * GListModel and GtkSelectionModel. Since that C class is not public,
- * it's not wrapped in a C++ class. A C object of such a class can be wrapped
+ * gtk_notebook_get_pages() and gtk_stack_get_pages() return an object of a class
+ * that implements both GListModel and GtkSelectionModel. Since that C class is not
+ * public, it's not wrapped in a C++ class. A C object of such a class can be wrapped
  * in a %Gtk::SelectionListModelImpl object. %Gtk::SelectionListModelImpl does not
  * directly correspond to any GTK class.
  *
  * This class is intended only for wrapping C objects returned from GTK functions.
  *
- * @see Gtk::Stack::get_pages()
+ * @see Gtk::Notebook::get_pages(), Gtk::Stack::get_pages()
  * @newin{4,2}
  */
 
@@ -49,6 +49,7 @@ public:
 
 protected:
   explicit SelectionListModelImpl(GObject* castitem);
+  friend class Notebook;
   friend class Stack;
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

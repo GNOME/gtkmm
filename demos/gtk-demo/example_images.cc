@@ -338,13 +338,13 @@ void Example_Images::on_loader_area_prepared()
    * isn't filled in yet.
    */
   refPixbuf->fill(0xaaaaaaff);
-  m_Picture_Progressive.set_pixbuf(refPixbuf);
+  m_Picture_Progressive.set_paintable(Gdk::Texture::create_for_pixbuf(refPixbuf));
 }
 
 void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, int/*height*/)
 {
   const auto refPixbuf = m_refPixbufLoader->get_pixbuf();
-  m_Picture_Progressive.set_pixbuf(refPixbuf);
+  m_Picture_Progressive.set_paintable(Gdk::Texture::create_for_pixbuf(refPixbuf));
 }
 
 void Example_Images::on_toggle_sensitivity()

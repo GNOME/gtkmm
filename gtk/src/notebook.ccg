@@ -17,6 +17,7 @@
 
 #include <gtk/gtk.h>
 #include <gtkmm/label.h>
+#include <gtkmm/selectionlistmodelimpl.h>
 #include <algorithm>
 
 namespace Gtk
@@ -81,6 +82,24 @@ int Notebook::append_page(Widget& child)
 int Notebook::insert_page(Widget& child, int position)
 {
   return gtk_notebook_insert_page(gobj(), child.gobj(), nullptr /* see GTK+ docs */, position);
+}
+
+Glib::RefPtr<Gio::ListModel> Notebook::get_pages()
+{
+  // gtk_notebook_get_pages() returns a pointer to a private GObject class
+  // that implements GListModel and GtkSelectionModel.
+  // Such an instance is wrapped in a Gtk::SelectionListModelImpl.
+  // gtk_notebook_get_pages() gives us a ref (transfer full).
+  GListModel* notebook_pages = gtk_notebook_get_pages(gobj());
+  if (GTK_IS_SELECTION_MODEL(notebook_pages))
+  {
+    // Look up current C++ wrapper instance:
+    Glib::ObjectBase* pCppObject = Glib::ObjectBase::_get_current_wrapper((GObject*)notebook_pages);
+    if (!pCppObject)
+      pCppObject = new SelectionListModelImpl((GObject*)notebook_pages);
+    return Glib::make_refptr_for_instance<Gio::ListModel>(dynamic_cast<Gio::ListModel*>(pCppObject));
+  }
+  return Glib::wrap(notebook_pages);
 }
 
 } //namespace Gtk
