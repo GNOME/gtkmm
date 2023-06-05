@@ -28,7 +28,7 @@
  * Highlights include typesafe callbacks, and a comprehensive set of widgets
  * that are easily extensible via inheritance.
  *
- * For instance, see @ref Widgets, @ref Dialogs, @ref TreeView "TreeView" and
+ * For instance, see @ref Widgets, @ref Dialogs, @ref ListView "ListView" and
  * @ref TextView "TextView".
  *
  * See also the
