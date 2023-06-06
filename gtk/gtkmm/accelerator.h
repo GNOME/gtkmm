@@ -57,13 +57,13 @@ namespace Accelerator
 
   /** Parses a string representing an accelerator.
    *
-   * The format looks like “<Control>a” or “<Shift><Alt>F1”.
+   * The format looks like “\<Control\>a” or “\<Shift\>\<Alt\>F1”.
    *
    * The parser is fairly liberal and allows lower or upper case, and also
-   * abbreviations such as “<Ctl>” and “<Ctrl>”. Key names are parsed using
+   * abbreviations such as “\<Ctl\>” and “\<Ctrl\>”. Key names are parsed using
    * gdk_keyval_from_name(). For character keys the name is not the symbol,
-   * but the lowercase name, e.g. one would use “<Ctrl>minus” instead of
-   * “<Ctrl>-”.
+   * but the lowercase name, e.g. one would use “\<Ctrl\>minus” instead of
+   * “\<Ctrl\>-”.
    *
    * If the parse fails, @a accelerator_key and @a accelerator_mods will
    * be set to 0 (zero).
@@ -81,7 +81,7 @@ namespace Accelerator
    * into a string parseable by parse().
    *
    * For example, if you pass in 'q' and Gdk::ModifierType::CONTROL_MASK,
-   * it returns "<Control>q".
+   * it returns "\<Control\>q".
    *
    * If you need to display accelerators in the user interface, see get_label().
    *
