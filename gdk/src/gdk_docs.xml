@@ -1777,6 +1777,44 @@ the alpha value. Since: 4.6
 alpha. Since: 4.6
 </parameter_description>
 </parameter>
+<parameter name="GDK_MEMORY_G8A8_PREMULTIPLIED">
+<parameter_description> 2 bytes; for grayscale, alpha. The color
+values are premultiplied with the alpha value. Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_G8A8">
+<parameter_description> 2 bytes; for grayscale, alpha. Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_G8">
+<parameter_description> One byte; for grayscale. The data is opaque.
+Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_G16A16_PREMULTIPLIED">
+<parameter_description> 2 guint16 values; for grayscale, alpha.
+The color values are premultiplied with the alpha value. Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_G16A16">
+<parameter_description> 2 guint16 values; for grayscale, alpha. Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_G16">
+<parameter_description> One guint16 value; for grayscale. The data is opaque.
+Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_A8">
+<parameter_description> One byte; for alpha.
+Since: 4.12
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_A16">
+<parameter_description> One guint16 value; for alpha.
+Since: 4.12
+</parameter_description>
+</parameter>
 <parameter name="GDK_MEMORY_N_FORMATS">
 <parameter_description> The number of formats. This value will change as
 more formats get added, so do not rely on its concrete integer.
@@ -9397,9 +9435,17 @@ Sets the format of the texture. The default is `GDK_MEMORY_R8G8B8A8_PREMULTIPLIE
 The format is the preferred format the texture data should be downloaded to. The
 format must be supported by the GL version of [property@Gdk.GLTextureBuilder:context].
 
+GDK's texture download code assumes that the format corresponds to the storage
+parameters of the GL texture in an obvious way. For example, a format of
+`GDK_MEMORY_R16G16B16A16_PREMULTIPLIED` is expected to be stored as `GL_RGBA16`
+texture, and `GDK_MEMORY_G8A8` is expected to be stored as `GL_RG8` texture.
+
 Setting the right format is particularly useful when using high bit depth textures
 to preserve the bit depth, to set the correct value for unpremultiplied textures
 and to make sure opaque textures are treated as such.
+
+Non-RGBA textures need to have swizzling parameters set up properly to be usable
+in GSK's shaders.
 
 Since: 4.12
 
@@ -12279,6 +12325,8 @@ This allows you to efficiently read individual pixels from cairo surfaces.
 This function will create an RGB pixbuf with 8 bits per channel.
 The pixbuf will contain an alpha channel if the @surface contains one.
 
+Deprecated: 4.12: Use [class@Gdk.Texture] and subclasses instead
+cairo surfaces and pixbufs
 
 </description>
 <parameters>
@@ -12305,6 +12353,7 @@ The pixbuf will contain an alpha channel if the @surface contains one.
 </parameters>
 <return> A newly-created pixbuf with a
 reference count of 1
+
 </return>
 </function>
 
@@ -12316,6 +12365,8 @@ This should generally not be used in newly written code as later
 stages will almost certainly convert the pixbuf back into a texture
 to draw it on screen.
 
+Deprecated: 4.12: Use [class@Gdk.Texture] and subclasses instead
+cairo surfaces and pixbufs
 
 </description>
 <parameters>
@@ -12325,6 +12376,7 @@ to draw it on screen.
 </parameter>
 </parameters>
 <return> a new `GdkPixbuf`
+
 </return>
 </function>
 
@@ -15492,7 +15544,7 @@ Parses a textual representation of a color.
 
 The string can be either one of:
 
-- A standard name (Taken from the Css specification).
+- A standard name (Taken from the CSS specification).
 - A hexadecimal value in the form “\#rgb”, “\#rrggbb”,
 “\#rrrgggbbb” or ”\#rrrrggggbbbb”
 - A hexadecimal value in the form “\#rgba”, “\#rrggbbaa”,
@@ -15500,6 +15552,8 @@ or ”\#rrrrggggbbbbaaaa”
 - A RGB color in the form “rgb(r,g,b)” (In this case the color
 will have full opacity)
 - A RGBA color in the form “rgba(r,g,b,a)”
+- A HSL color in the form &quot;hsl(hue, saturation, lightness)&quot;
+- A HSLA color in the form &quot;hsla(hue, saturation, lightness, alpha)&quot;
 
 Where “r”, “g”, “b” and “a” are respectively the red, green,
 blue and alpha color values. In the last two cases, “r”, “g”,
@@ -16496,9 +16550,9 @@ Downloads the given texture pixels into a `GBytes`. The rowstride will
 be stored in the stride value.
 
 This function will abort if it tries to download a large texture and
-fails to allocate memory. If you think that may happen, you should
-handle memory allocation yourself and use
-gdk_texture_downloader_download_into() once allocation succeeded.
+fails to allocate memory. If you think that may happen, you should handle
+memory allocation yourself and use [method@Gdk.TextureDownloader.download_into]
+once allocation succeeded.
 
 Since: 4.10
 
@@ -16509,11 +16563,11 @@ Since: 4.10
 </parameter_description>
 </parameter>
 <parameter name="out_stride">
-<parameter_description> The stride of the resulting data in bytes.
+<parameter_description> The stride of the resulting data in bytes
 </parameter_description>
 </parameter>
 </parameters>
-<return> The downloaded pixels.
+<return> The downloaded pixels
 
 </return>
 </function>
