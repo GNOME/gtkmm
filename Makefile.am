@@ -46,7 +46,7 @@ pkgconfig_DATA = gdk/$(GDKMM_MODULE_NAME).pc gtk/$(GTKMM_MODULE_NAME).pc
 include $(srcdir)/MSVC_NMake/filelist.am
 include $(srcdir)/win32_installer/filelist.am
 
-text_files = COPYING.tools README.SUN README.win32
+text_files = COPYING.tools README.SUN README.win32.md
 msvc_files = $(addprefix MSVC_NMake/,$(msvc_nmake_data))
 winstall_files = $(addprefix win32_installer/,$(windows_installer_files))
 
