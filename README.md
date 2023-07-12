@@ -1,6 +1,35 @@
 # gtkmm
 This is gtkmm, the C++ API for GTK. 
-See http://www.gtkmm.org/
+
+# General information
+
+gtkmm-3.0 and gtkmm-4.0 are different parallel-installable ABIs.
+This file describes gtkmm-4.0.
+
+Web site
+ - https://www.gtkmm.org
+
+Download location
+ - https://download.gnome.org/sources/gtkmm
+
+Reference documentation
+ - https://gnome.pages.gitlab.gnome.org/gtkmm
+
+Tarballs contain reference documentation. In tarballs generated with Meson,
+see the untracked/docs/reference/html directory.
+
+Discussion on GNOME's discourse forum
+ - https://discourse.gnome.org/tag/cplusplus
+ - https://discourse.gnome.org/c/platform
+
+Git repository
+ - https://gitlab.gnome.org/GNOME/gtkmm
+
+Bugs can be reported to
+ - https://gitlab.gnome.org/GNOME/gtkmm/issues
+
+Patches can be submitted to
+ - https://gitlab.gnome.org/GNOME/gtkmm/merge_requests
 
 # Building
 
@@ -9,7 +38,7 @@ supplier of your operating system, such as your Linux distribution.
 
 ## Building on Windows
 
-See README.win32.md
+See [README.win32](README.win32.md)
 
 ## Building from a release tarball
 
