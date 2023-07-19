@@ -300,6 +300,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stringsorter.h>
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/switch.h>
+#include <gtkmm/symbolicpaintable.h>
 #include <gtkmm/text.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>

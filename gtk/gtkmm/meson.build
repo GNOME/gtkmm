@@ -213,6 +213,7 @@ gtkmm_any_hg_ccg_basenames = [
   'stringsorter',
   'styleprovider',
   'switch',
+  'symbolicpaintable',
   'text',
   'textbuffer',
   'textchildanchor',
