@@ -65,6 +65,7 @@ _CONV_ENUM(Gtk,IconSize)
 _CONV_INCLASS_ENUM(Gtk,Inscription,Overflow)
 _CONV_ENUM(Gtk,Justification)
 _CONV_ENUM(Gtk,License)
+_CONV_ENUM(Gtk,ListScrollFlags)
 _CONV_ENUM(Gtk,ListTabBehavior)
 _CONV_ENUM(Gtk,MessageType)
 _CONV_ENUM(Gtk,MovementStep)
@@ -575,6 +576,8 @@ _CONVERSION(`const Glib::RefPtr<const Bitset>&',`GtkBitset*',__CONVERT_CONST_REF
 _CONVERSION(`const Glib::RefPtr<const Bitset>&',`const GtkBitset*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GtkBitset*',`Glib::RefPtr<const Bitset>',`Glib::wrap($3)')
 _CONVERSION(`GtkBitset*',`Glib::RefPtr<Bitset>',`Glib::wrap($3)')
+
+_CONVERSION(`GtkScrollInfo*',`Glib::RefPtr<ScrollInfo>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Gio::ActionGroup>&',`GActionGroup*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::ActionGroup))
 _CONVERSION(`GActionGroup*',`Glib::RefPtr<Gio::ActionGroup>',`Glib::wrap($3)')

@@ -176,6 +176,7 @@ gtkmm_any_hg_ccg_basenames = [
   'scalebutton',
   'scrollable',
   'scrollbar',
+  'scrollinfo',
   'scrolledwindow',
   'searchbar',
   'searchentry',
