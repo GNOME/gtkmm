@@ -3471,15 +3471,20 @@ radio nodes; the value of this style property is ignored.
 
 <signal name="GtkClipboard::owner-change">
 <description>
+The ::owner-change signal is emitted when GTK+ receives an
+event that indicates that the ownership of the selection
+associated with @clipboard has changed.
+
+Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> the #GtkClipboard on which the signal is emitted
 </parameter_description>
 </parameter>
 <parameter name="event">
-<parameter_description>
+<parameter_description> the @GdkEventOwnerChange event
 </parameter_description>
 </parameter>
 </parameters>
@@ -35802,15 +35807,21 @@ clipboard may be owned by someone else.
 
 <function name="gtk_clipboard_get">
 <description>
+Returns the clipboard object for the given selection.
+See gtk_clipboard_get_for_display() for complete details.
+
 
 </description>
 <parameters>
 <parameter name="selection">
-<parameter_description>
+<parameter_description> a #GdkAtom which identifies the clipboard to use
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> the appropriate clipboard object. If no clipboard
+already exists, a new one will be created. Once a clipboard
+object has been created, it is persistent and, since it is
+owned by GTK+, must not be freed or unreffed.
 </return>
 </function>
 
@@ -35835,83 +35846,135 @@ Since: 3.16
 
 <function name="gtk_clipboard_get_display">
 <description>
+Gets the #GdkDisplay associated with @clipboard
+
+Since: 2.2
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> the #GdkDisplay associated with @clipboard
+
 </return>
 </function>
 
 <function name="gtk_clipboard_get_for_display">
 <description>
+Returns the clipboard object for the given selection.
+Cut/copy/paste menu items and keyboard shortcuts should use
+the default clipboard, returned by passing %GDK_SELECTION_CLIPBOARD for @selection.
+(%GDK_NONE is supported as a synonym for GDK_SELECTION_CLIPBOARD
+for backwards compatibility reasons.)
+The currently-selected object or text should be provided on the clipboard
+identified by #GDK_SELECTION_PRIMARY. Cut/copy/paste menu items
+conceptually copy the contents of the #GDK_SELECTION_PRIMARY clipboard
+to the default clipboard, i.e. they copy the selection to what the
+user sees as the clipboard.
+
+(Passing #GDK_NONE is the same as using `gdk_atom_intern
+(&quot;CLIPBOARD&quot;, FALSE)`.
+
+See the
+[FreeDesktop Clipboard Specification](http://www.freedesktop.org/Standards/clipboards-spec)
+for a detailed discussion of the “CLIPBOARD” vs. “PRIMARY”
+selections under the X window system. On Win32 the
+#GDK_SELECTION_PRIMARY clipboard is essentially ignored.)
+
+It’s possible to have arbitrary named clipboards; if you do invent
+new clipboards, you should prefix the selection name with an
+underscore (because the ICCCM requires that nonstandard atoms are
+underscore-prefixed), and namespace it as well. For example,
+if your application called “Foo” has a special-purpose
+clipboard, you might call it “_FOO_SPECIAL_CLIPBOARD”.
+
+Since: 2.2
 
 </description>
 <parameters>
 <parameter name="display">
-<parameter_description>
+<parameter_description> the #GdkDisplay for which the clipboard is to be retrieved or created.
 </parameter_description>
 </parameter>
 <parameter name="selection">
-<parameter_description>
+<parameter_description> a #GdkAtom which identifies the clipboard to use.
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> the appropriate clipboard object. If no
+clipboard already exists, a new one will be created. Once a clipboard
+object has been created, it is persistent and, since it is owned by
+GTK+, must not be freed or unrefd.
+
 </return>
 </function>
 
 <function name="gtk_clipboard_get_owner">
 <description>
+If the clipboard contents callbacks were set with
+gtk_clipboard_set_with_owner(), and the gtk_clipboard_set_with_data() or
+gtk_clipboard_clear() has not subsequently called, returns the owner set
+by gtk_clipboard_set_with_owner().
+
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> the owner of the clipboard, if any;
+otherwise %NULL.
 </return>
 </function>
 
 <function name="gtk_clipboard_get_selection">
 <description>
+Gets the selection that this clipboard is for.
+
 Since: 3.22
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the selection
+
+</return>
 </function>
 
 <function name="gtk_clipboard_request_contents">
 <description>
+Requests the contents of clipboard as the given target.
+When the results of the result are later received the supplied callback
+will be called.
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description>
+<parameter_description> an atom representing the form into which the clipboard
+owner should convert the selection.
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> A function to call when the results are received
+(or the retrieval fails). If the retrieval fails the length field of
+@selection_data will be negative.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback
 </parameter_description>
 </parameter>
 </parameters>
@@ -35920,19 +35983,31 @@ Since: 3.22
 
 <function name="gtk_clipboard_request_image">
 <description>
+Requests the contents of the clipboard as image. When the image is
+later received, it will be converted to a #GdkPixbuf, and
+@callback will be called.
+
+The @pixbuf parameter to @callback will contain the resulting
+#GdkPixbuf if the request succeeded, or %NULL if it failed. This
+could happen for various reasons, in particular if the clipboard
+was empty or if the contents of the clipboard could not be
+converted into an image.
+
+Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> a function to call when the image is received,
+or the retrieval fails. (It will always be called one way or the other.)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback.
 </parameter_description>
 </parameter>
 </parameters>
@@ -35941,23 +36016,34 @@ Since: 3.22
 
 <function name="gtk_clipboard_request_rich_text">
 <description>
+Requests the contents of the clipboard as rich text. When the rich
+text is later received, @callback will be called.
+
+The @text parameter to @callback will contain the resulting rich
+text if the request succeeded, or %NULL if it failed. The @length
+parameter will contain @text’s length. This function can fail for
+various reasons, in particular if the clipboard was empty or if the
+contents of the clipboard could not be converted into rich text form.
+
+Since: 2.10
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description>
+<parameter_description> a #GtkTextBuffer
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> a function to call when the text is received,
+or the retrieval fails. (It will always be called one way or the other.)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback.
 </parameter_description>
 </parameter>
 </parameters>
@@ -35966,19 +36052,28 @@ Since: 3.22
 
 <function name="gtk_clipboard_request_targets">
 <description>
+Requests the contents of the clipboard as list of supported targets.
+When the list is later received, @callback will be called.
+
+The @targets parameter to @callback will contain the resulting targets if
+the request succeeded, or %NULL if it failed.
+
+Since: 2.4
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> a function to call when the targets are
+received, or the retrieval fails. (It will always be called
+one way or the other.)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback.
 </parameter_description>
 </parameter>
 </parameters>
@@ -35987,19 +36082,28 @@ Since: 3.22
 
 <function name="gtk_clipboard_request_text">
 <description>
+Requests the contents of the clipboard as text. When the text is
+later received, it will be converted to UTF-8 if necessary, and
+@callback will be called.
+
+The @text parameter to @callback will contain the resulting text if
+the request succeeded, or %NULL if it failed. This could happen for
+various reasons, in particular if the clipboard was empty or if the
+contents of the clipboard could not be converted into text form.
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> a function to call when the text is received,
+or the retrieval fails. (It will always be called one way or the other.)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback.
 </parameter_description>
 </parameter>
 </parameters>
@@ -36008,19 +36112,29 @@ Since: 3.22
 
 <function name="gtk_clipboard_request_uris">
 <description>
+Requests the contents of the clipboard as URIs. When the URIs are
+later received @callback will be called.
+
+The @uris parameter to @callback will contain the resulting array of
+URIs if the request succeeded, or %NULL if it failed. This could happen
+for various reasons, in particular if the clipboard was empty or if the
+contents of the clipboard could not be converted into URI form.
+
+Since: 2.14
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description>
+<parameter_description> a function to call when the URIs are received,
+or the retrieval fails. (It will always be called one way or the other.)
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @callback.
 </parameter_description>
 </parameter>
 </parameters>
@@ -36029,19 +36143,29 @@ Since: 3.22
 
 <function name="gtk_clipboard_set_can_store">
 <description>
+Hints that the clipboard data should be stored somewhere when the
+application exits or when gtk_clipboard_store () is called.
+
+This value is reset when the clipboard owner changes.
+Where the clipboard data is stored is platform dependent,
+see gdk_display_store_clipboard () for more information.
+
+Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description>
+<parameter_description> array containing
+information about which forms should be stored or %NULL
+to indicate that all forms should be stored.
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description>
+<parameter_description> number of elements in @targets
 </parameter_description>
 </parameter>
 </parameters>
@@ -36099,64 +36223,93 @@ the length will be determined with strlen().
 
 <function name="gtk_clipboard_set_with_data">
 <description>
+Virtually sets the contents of the specified clipboard by providing
+a list of supported formats for the clipboard data and a function
+to call to get the actual data when it is requested.
+
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description>
+<parameter_description> array containing information
+about the available forms for the clipboard data
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description>
+<parameter_description> number of elements in @targets
 </parameter_description>
 </parameter>
 <parameter name="get_func">
-<parameter_description>
+<parameter_description> function to call to get the actual clipboard data
 </parameter_description>
 </parameter>
 <parameter name="clear_func">
-<parameter_description>
+<parameter_description> when the clipboard contents are set again,
+this function will be called, and @get_func will not be subsequently
+called.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description>
+<parameter_description> user data to pass to @get_func and @clear_func.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if setting the clipboard data succeeded.
+If setting the clipboard data failed the provided callback
+functions will be ignored.
+</return>
 </function>
 
 <function name="gtk_clipboard_set_with_owner">
 <description>
+Virtually sets the contents of the specified clipboard by providing
+a list of supported formats for the clipboard data and a function
+to call to get the actual data when it is requested.
+
+The difference between this function and gtk_clipboard_set_with_data()
+is that instead of an generic @user_data pointer, a #GObject is passed
+in.
+
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description>
+<parameter_description> array containing information
+about the available forms for the clipboard data
+</parameter_description>
+</parameter>
+<parameter name="n_targets">
+<parameter_description> number of elements in @targets
 </parameter_description>
 </parameter>
 <parameter name="get_func">
-<parameter_description>
+<parameter_description> function to call to get the actual clipboard data
 </parameter_description>
 </parameter>
 <parameter name="clear_func">
-<parameter_description>
+<parameter_description> when the clipboard contents are set again,
+this function will be called, and @get_func will not be subsequently
+called
 </parameter_description>
 </parameter>
 <parameter name="owner">
-<parameter_description>
+<parameter_description> an object that “owns” the data. This object will be passed
+to the callbacks when called
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if setting the clipboard data succeeded.
+If setting the clipboard data failed the provided callback
+functions will be ignored.
+</return>
 </function>
 
 <function name="gtk_clipboard_store">
@@ -36178,112 +36331,172 @@ Since: 2.6
 
 <function name="gtk_clipboard_wait_for_contents">
 <description>
+Requests the contents of the clipboard using the given target.
+This function waits for the data to be received using the main 
+loop, so events, timeouts, etc, may be dispatched during the wait.
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description>
+<parameter_description> an atom representing the form into which the clipboard
+owner should convert the selection.
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> a newly-allocated #GtkSelectionData object or %NULL
+if retrieving the given target failed. If non-%NULL,
+this value must be freed with gtk_selection_data_free() 
+when you are finished with it.
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_image">
 <description>
+Requests the contents of the clipboard as image and converts
+the result to a #GdkPixbuf. This function waits for
+the data to be received using the main loop, so events,
+timeouts, etc, may be dispatched during the wait.
+
+Since: 2.6
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> a newly-allocated #GdkPixbuf
+object which must be disposed with g_object_unref(), or
+%NULL if retrieving the selection data failed. (This could
+happen for various reasons, in particular if the clipboard
+was empty or if the contents of the clipboard could not be
+converted into an image.)
+
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_rich_text">
 <description>
+Requests the contents of the clipboard as rich text.  This function
+waits for the data to be received using the main loop, so events,
+timeouts, etc, may be dispatched during the wait.
+
+Since: 2.10
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description>
+<parameter_description> a #GtkTextBuffer
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description>
+<parameter_description> return location for the format of the returned data
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description>
+<parameter_description> return location for the length of the returned data
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> a
+newly-allocated binary block of data which must be
+freed with g_free(), or %NULL if retrieving the
+selection data failed. (This could happen for various
+reasons, in particular if the clipboard was empty or
+if the contents of the clipboard could not be
+converted into text form.)
+
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_targets">
 <description>
+Returns a list of targets that are present on the clipboard, or %NULL
+if there aren’t any targets available. The returned list must be
+freed with g_free().
+This function waits for the data to be received using the main
+loop, so events, timeouts, etc, may be dispatched during the wait.
+
+Since: 2.4
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 <parameter name="targets">
-<parameter_description>
+<parameter_description> location
+to store an array of targets. The result stored here must
+be freed with g_free().
 </parameter_description>
 </parameter>
 <parameter name="n_targets">
-<parameter_description>
+<parameter_description> location to store number of items in @targets.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if any targets are present on the clipboard,
+otherwise %FALSE.
+
+</return>
 </function>
 
 <function name="gtk_clipboard_wait_for_text">
 <description>
+Requests the contents of the clipboard as text and converts
+the result to UTF-8 if necessary. This function waits for
+the data to be received using the main loop, so events,
+timeouts, etc, may be dispatched during the wait.
+
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
-</parameter_description>
-</parameter>
-<parameter name="target">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
-<return>
+<return> a newly-allocated UTF-8 string which must
+be freed with g_free(), or %NULL if retrieving
+the selection data failed. (This could happen
+for various reasons, in particular if the
+clipboard was empty or if the contents of the
+clipboard could not be converted into text form.)
 </return>
 </function>
 
 <function name="gtk_clipboard_wait_for_uris">
 <description>
+Requests the contents of the clipboard as URIs. This function waits
+for the data to be received using the main loop, so events,
+timeouts, etc, may be dispatched during the wait.
+
+Since: 2.14
 
 </description>
 <parameters>
 <parameter name="clipboard">
-<parameter_description>
+<parameter_description> a #GtkClipboard
 </parameter_description>
 </parameter>
 </parameters>
 <return>
+a newly-allocated %NULL-terminated array of strings which must
+be freed with g_strfreev(), or %NULL if retrieving the
+selection data failed. (This could happen for various reasons,
+in particular if the clipboard was empty or if the contents of
+the clipboard could not be converted into URI form.)
+
 </return>
 </function>
 

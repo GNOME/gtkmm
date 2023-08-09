@@ -17,8 +17,10 @@ for dir in "$gtk_source_prefix"/{gtk,gtk/deprecated} "$gtk_build_dir"; do
   fi
 done
 
-# Exclude gtkdnd-quartz.c. Function descriptions in gtkdnd-quartz.c can
-# replace better descriptions in gtkdnd.c, if gtkdnd-quartz.c is processed.
+# Exclude gtkclipboard-quartz.c and gtkdnd-quartz.c. Function descriptions in
+# those files can replace better descriptions in gtkclipboard.c and gtkdnd.c,
+# if they are processed.
+params="$params -x $gtk_source_prefix/gtk/gtkclipboard-quartz.c"
 params="$params -x $gtk_source_prefix/gtk/gtkdnd-quartz.c"
 
 "$gen_docs" $params > "$out_dir/gtk_docs.xml"
