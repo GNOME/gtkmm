@@ -15,6 +15,7 @@ test_programs = [
   [['filedialog'], 'test', ['main.cc'], true, false],
   [['gdk_graphene'], 'test', ['main.cc'], false, true],
   [['gdk_rgba'], 'test', ['main.cc'], false, true],
+  [['get_children'], 'test', ['main.cc'], true, true],
   [['main_with_options'], 'test', ['main.cc'], true, false],
   [['object_move'], 'test', ['main.cc'], false, true],
   [['property_notification'], 'test', ['main.cc'], true, false],
