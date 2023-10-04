@@ -20,7 +20,6 @@
 #include <glibmm/utility.h>
 #include <gtk/gtk.h>
 
-
 namespace Gtk
 {
 
@@ -48,22 +47,46 @@ TreePath::TreePath(const Glib::ustring& path)
     gobject_ = gtk_tree_path_new();
 }
 
-TreePath::TreePath(const TreeModel::iterator& iter)
+// helper for the two following constructors
+TreePath::TreePath(const GtkTreeModel* model, const GtkTreeIter* iter)
 :
   // The GtkTreePath* is always newly created.
-  gobject_(gtk_tree_model_get_path(
-    const_cast<GtkTreeModel*>(iter.get_model_gobject()),
-    const_cast<GtkTreeIter*>(iter.gobj())))
+  gobject_(gtk_tree_model_get_path(const_cast<GtkTreeModel*>(model),
+                                   const_cast<GtkTreeIter*>(iter)))
 {
   if (!gobject_)
     gobject_ = gtk_tree_path_new();
 }
 
-TreePath& TreePath::operator=(const TreeModel::iterator& iter)
+TreePath::TreePath(const TreeModel::iterator& iter)
+:
+  TreePath(iter.get_model_gobject(), iter.gobj())
+{
+}
+
+TreePath::TreePath(const TreeModel::const_iterator& iter)
+:
+  TreePath(iter.get_model_gobject(), iter.gobj())
+{
+}
+
+// helper for the two following assignment operators
+template <typename Iter>
+static TreePath& assign_(TreePath& self, const Iter& iter)
 {
   TreePath temp(iter);
-  swap(temp);
-  return *this;
+  self.swap(temp);
+  return self;
+}
+
+TreePath& TreePath::operator=(const TreeModel::iterator& iter)
+{
+  return assign_(*this, iter);
+}
+
+TreePath& TreePath::operator=(const TreeModel::const_iterator& iter)
+{
+  return assign_(*this, iter);
 }
 
 void TreePath::clear()

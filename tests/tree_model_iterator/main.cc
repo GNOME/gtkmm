@@ -48,6 +48,26 @@ test_assignment_to_const() {
 }
 */
 
+// https://gitlab.gnome.org/GNOME/gtkmm/-/issues/145#note_1858930
+static void
+test_convertibility_to_path()
+{
+  Gtk::TreeModel::      iterator non_const_iter;
+  Gtk::TreeModel::const_iterator     const_iter;
+
+  assert(Gtk::TreePath{non_const_iter}.to_string() == "");
+  assert(Gtk::TreePath{    const_iter}.to_string() == "");
+
+  Gtk::TreePath path("42");
+  assert(path.to_string() == "42");
+
+  path = non_const_iter;
+  assert(path.to_string() == "");
+
+  path =     const_iter;
+  assert(path.to_string() == "");
+}
+
 int main(int /* argc */, char** /* argv */)
 {
   gtk_init();
@@ -55,6 +75,8 @@ int main(int /* argc */, char** /* argv */)
 
   test_const_conversion();
   test_assignment_from_const();
+
+  test_convertibility_to_path();
 
   return EXIT_SUCCESS;
 }
