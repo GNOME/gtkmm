@@ -28,6 +28,7 @@ check_PROGRAMS =			\
 	filedialog/test \
 	gdk_graphene/test \
 	gdk_rgba/test \
+	get_children/test \
 	main_with_options/test		\
 	object_move/test		\
 	property_notification/test	\
@@ -54,6 +55,7 @@ dialog_deletethis_test_SOURCES     = dialog_deletethis/main.cc
 filedialog_test_SOURCES            = filedialog/main.cc
 gdk_graphene_test_SOURCES          = gdk_graphene/main.cc
 gdk_rgba_test_SOURCES              = gdk_rgba/main.cc
+get_children_test_SOURCES          = get_children/main.cc
 main_with_options_test_SOURCES     = main_with_options/main.cc
 object_move_test_SOURCES           = object_move/main.cc
 property_notification_test_SOURCES = property_notification/main.cc
