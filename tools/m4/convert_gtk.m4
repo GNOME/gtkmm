@@ -264,10 +264,11 @@ _CONVERSION(`Gtk::Entry&',`GtkEntry*',__FR2P)
 _CONVERSION(`Stack&',`GtkStack*',__FR2P)
 _CONVERSION(`CheckButton&',`GtkCheckButton*',__FR2P)
 _CONVERSION(`ToggleButton&',`GtkToggleButton*',__FR2P)
-
 _CONVERSION(`const Widget&',`GtkWidget*',__FCR2P)
-
 _CONVERSION(`int&',`int*',`&$3',`*$3')
+_CONVERSION(`ShortcutsSection&',`GtkShortcutsSection*',__FR2P)
+_CONVERSION(`ShortcutsGroup&',`GtkShortcutsGroup*',__FR2P)
+_CONVERSION(`ShortcutsShortcut&',`GtkShortcutsShortcut*',__FR2P)
 
 dnl
 dnl # TODO: These are for fixmegtkconst
