@@ -231,6 +231,7 @@ _CONVERSION(`GdkSeat*',`Glib::RefPtr<Gdk::Seat>', `Glib::wrap($3)')
 _CONVERSION(`GdkSeat*',`Glib::RefPtr<const Seat>', `Glib::wrap($3)')
 _CONVERSION(`GdkSeat*',`Glib::RefPtr<const Gdk::Seat>', `Glib::wrap($3)')
 
+_CONVERSION(`GdkDmabufFormats*',`Glib::RefPtr<DmabufFormats>', `Glib::wrap($3)')
 _CONVERSION(`GdkTexture*',`Glib::RefPtr<Texture>', `Glib::wrap($3)')
 _CONVERSION(`GdkTexture*',`Glib::RefPtr<Gdk::Texture>', `Glib::wrap($3)')
 _CONVERSION(`GdkTexture*',`Glib::RefPtr<const Texture>', `Glib::wrap($3)')

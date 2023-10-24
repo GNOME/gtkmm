@@ -31,6 +31,9 @@
 #include <gdkmm/devicewithpad.h>
 #include <gdkmm/display.h>
 #include <gdkmm/displaymanager.h>
+#include <gdkmm/dmabufformats.h>
+#include <gdkmm/dmabuftexture.h>
+#include <gdkmm/dmabuftexturebuilder.h>
 #include <gdkmm/dragsurface.h>
 #include <gdkmm/dragsurfaceimpl.h>
 #include <gdkmm/drop.h>

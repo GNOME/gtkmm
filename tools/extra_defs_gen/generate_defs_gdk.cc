@@ -45,6 +45,7 @@ int main(int /* argc */, char** /* argv */)
 #if !defined(G_OS_WIN32)
             << get_defs( GDK_TYPE_DISPLAY_MANAGER )
 #endif /* G_OS_WIN32 */
+            << get_defs( GDK_TYPE_DMABUF_TEXTURE_BUILDER )
             << get_defs( GDK_TYPE_DRAG )
             << get_defs( GDK_TYPE_DRAG_SURFACE )
             << get_defs( GDK_TYPE_DRAW_CONTEXT )

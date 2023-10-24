@@ -1,0 +1,86 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gdkmmconfig.h)
+
+_DEFS(gdkmm,gdk)
+
+#include <glibmm/refptr.h>
+#include <glibmm/value.h>
+#include <gdk/gdk.h> // For GdkDmabufFormats
+
+namespace Gdk
+{
+/** %Gdk::DmabufFormats provides information about supported DMA buffer formats.
+ *
+ * You can query whether a given format is supported with contains()
+ * and you can iterate over the list of all supported formats with
+ * get_n_formats() and get_format().
+ *
+ * The list of supported formats is sorted by preference,
+ * with the best formats coming first.
+ *
+ * See Gdk::DmabufTextureBuilder for more information about DMA buffers.
+ *
+ * Get a %DmabufFormats object with Gdk::Display::get_dmabuf_formats().
+ *
+ * Note that DMA buffers only exist on Linux.
+ *
+ * @newin{4,14}
+ */
+class GDKMM_API DmabufFormats final
+{
+  // GdkDmabufFormats is registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(DmabufFormats, GdkDmabufFormats, NONE, gdk_dmabuf_formats_ref, gdk_dmabuf_formats_unref, GDKMM_API)
+  _IGNORE(gdk_dmabuf_formats_ref, gdk_dmabuf_formats_unref)
+
+public:
+  _WRAP_METHOD(gsize get_n_formats() const, gdk_dmabuf_formats_get_n_formats)
+
+  /** Gets the fourcc code and modifier for a format.
+   *
+   * @newin{4,14}
+   *
+   * @param idx The index of the format to return.
+   * @return {fourcc, modifier} The format code and the format modifier.
+   */
+  std::pair<guint32, guint64> get_format(gsize idx) const;
+  _IGNORE(gdk_dmabuf_formats_get_format)
+
+  _WRAP_METHOD(bool contains(guint32 fourcc, guint64 modifier) const,
+    gdk_dmabuf_formats_contains)
+};
+
+} // namespace Gdk
+
+namespace Glib
+{
+// This is needed so Glib::RefPtr<Gdk::DmabufFormats> can be used with
+// Glib::Value and _WRAP_PROPERTY in Gdk::Display.
+template <>
+class GDKMM_API Value<Glib::RefPtr<Gdk::DmabufFormats>> : public ValueBase_Boxed
+{
+public:
+  typedef Glib::RefPtr<Gdk::DmabufFormats> CppType;
+  typedef GdkDmabufFormats* CType;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+} // namespace Glib
