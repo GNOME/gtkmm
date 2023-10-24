@@ -747,6 +747,115 @@ The default display.
 </description>
 </property>
 
+<enum name="GdkDmabufError">
+<description>
+Error enumeration for `GdkDmabufTexture`.
+
+</description>
+<parameters>
+<parameter name="GDK_DMABUF_ERROR_NOT_AVAILABLE">
+<parameter_description> Dmabuf support is not available, because the OS
+is not Linux, or it was explicitly disabled at compile- or runtime
+</parameter_description>
+</parameter>
+<parameter name="GDK_DMABUF_ERROR_UNSUPPORTED_FORMAT">
+<parameter_description> The requested format is not supported
+</parameter_description>
+</parameter>
+<parameter name="GDK_DMABUF_ERROR_CREATION_FAILED">
+<parameter_description> GTK failed to create the resource for other
+reasons
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<property name="GdkDmabufTextureBuilder:display">
+<description>
+The display that this texture will be used on.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:fourcc">
+<description>
+The format of the texture, as a fourcc value.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:height">
+<description>
+The height of the texture.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:modifier">
+<description>
+The modifier.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:n-planes">
+<description>
+The number of planes of the texture.
+
+Note that you can set properties for other planes,
+but they will be ignored when constructing the texture.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:premultiplied">
+<description>
+Whether the alpha channel is premultiplied into the others.
+
+Only relevant if the format has alpha.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:update-region">
+<description>
+The update region for [property@Gdk.GLTextureBuilder:update-texture].
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:update-texture">
+<description>
+The texture [property@Gdk.GLTextureBuilder:update-region] is an update for.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GdkDmabufTextureBuilder:width">
+<description>
+The width of the texture.
+
+Since: 4.14
+
+</description>
+</property>
+
 <signal name="GdkDrag::cancel">
 <description>
 Emitted when the drag operation is cancelled.
@@ -1706,6 +1815,11 @@ The color values are premultiplied with the alpha value.
 The color values are premultiplied with the alpha value.
 </parameter_description>
 </parameter>
+<parameter name="GDK_MEMORY_A8B8G8R8_PREMULTIPLIED">
+<parameter_description> 4 bytes; for alpha, blue, green, red,
+The color values are premultiplied with the alpha value. Since 4.14
+</parameter_description>
+</parameter>
 <parameter name="GDK_MEMORY_B8G8R8A8">
 <parameter_description> 4 bytes; for blue, green, red, alpha.
 </parameter_description>
@@ -1720,6 +1834,22 @@ The color values are premultiplied with the alpha value.
 </parameter>
 <parameter name="GDK_MEMORY_A8B8G8R8">
 <parameter_description> 4 bytes; for alpha, blue, green, red.
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_B8G8R8X8">
+<parameter_description> 4 bytes; for blue, green, red, unused. Since 4.14
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_X8R8G8B8">
+<parameter_description> 4 bytes; for unused, red, green, blue. Since 4.14
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_R8G8B8X8">
+<parameter_description> 4 bytes; for red, green, blue, unused. Since 4.14
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_X8B8G8R8">
+<parameter_description> 4 bytes; for unused, blue, green, red. Since 4.14
 </parameter_description>
 </parameter>
 <parameter name="GDK_MEMORY_R8G8B8">
@@ -6466,6 +6596,30 @@ this function will return %NULL.
 </return>
 </function>
 
+<function name="gdk_display_get_dmabuf_formats">
+<description>
+Returns the dma-buf formats that are supported on this display.
+
+GTK may use OpenGL or Vulkan to support some formats.
+Calling this function will then initialize them if they aren't yet.
+
+The formats returned by this function can be used for negotiating
+buffer formats with producers such as v4l, pipewire or GStreamer.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="display">
+<parameter_description> a `GdkDisplay`
+</parameter_description>
+</parameter>
+</parameters>
+<return> a `GdkDmabufFormats` object
+
+</return>
+</function>
+
 <function name="gdk_display_get_monitor_at_surface">
 <description>
 Gets the monitor in which the largest area of @surface
@@ -7061,6 +7215,686 @@ to determine the group or level
 </parameters>
 <return> %TRUE if there was a keyval bound to keycode/state/group.
 </return>
+</function>
+
+<function name="gdk_dmabuf_formats_contains">
+<description>
+Returns whether a given format is contained in @formats.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a `GdkDmabufFormats`
+</parameter_description>
+</parameter>
+<parameter name="fourcc">
+<parameter_description> a format code
+</parameter_description>
+</parameter>
+<parameter name="modfier">
+<parameter_description> a format modifier
+</parameter_description>
+</parameter>
+</parameters>
+<return> `TRUE` if the format specified by the arguments
+is part of @formats
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_formats_get_format">
+<description>
+Gets the fourcc code and modifier for a format
+that is contained in @formats.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a `GdkDmabufFormats`
+</parameter_description>
+</parameter>
+<parameter name="idx">
+<parameter_description> the index of the format to return
+</parameter_description>
+</parameter>
+<parameter name="fourcc">
+<parameter_description> return location for the format code
+</parameter_description>
+</parameter>
+<parameter name="modifier">
+<parameter_description> return location for the format modifier
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_formats_get_n_formats">
+<description>
+Returns the number of formats that the @formats object
+contains.
+
+Note that DMA buffers are a Linux concept, so on other
+platforms, [method@Gdk.DmabufFormats.get_n_formats] will
+always return zero.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a `GdkDmabufFormats`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of formats
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_formats_ref">
+<description>
+Increases the reference count of @formats.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a `GdkDmabufFormats`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the passed-in object
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_formats_unref">
+<description>
+Decreases the reference count of @formats.
+
+When the reference count reaches zero,
+the object is freed.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="formats">
+<parameter_description> a `GdkDmabufFormats`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_build">
+<description>
+Builds a new `GdkTexture` with the values set up in the builder.
+
+It is a programming error to call this function if any mandatory
+property has not been set.
+
+If the dmabuf is not supported by GTK, %NULL will be returned and @error will be set.
+
+The `destroy` function gets called when the returned texture gets released.
+
+It is possible to call this function multiple times to create multiple textures,
+possibly with changing properties in between.
+
+It is the responsibility of the caller to keep the file descriptors for the planes
+open until the created texture is no longer used, and close them afterwards (possibly
+using the @destroy notify).
+
+Not all formats defined in the `drm_fourcc.h` header are supported. You can use
+[method@Gdk.Display.get_dmabuf_formats] to get a list of supported formats.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> destroy function to be called when the texture is
+released
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> user data to pass to the destroy function
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly built `GdkTexture` or `NULL`
+if the format is not supported
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_display">
+<description>
+Returns the display that this texture builder is
+associated with.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder
+</parameter_description>
+</parameter>
+</parameters>
+<return> the display
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_fd">
+<description>
+Gets the file descriptor for a plane.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to get the fd for
+</parameter_description>
+</parameter>
+</parameters>
+<return> the file descriptor
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_fourcc">
+<description>
+Gets the format previously set via gdk_dmabuf_texture_builder_set_fourcc()
+or 0 if the format wasn't set.
+
+The format is specified as a fourcc code.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The format
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_height">
+<description>
+Gets the height previously set via gdk_dmabuf_texture_builder_set_height() or
+0 if the height wasn't set.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The height
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_modifier">
+<description>
+Gets the modifier value.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the modifier
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_n_planes">
+<description>
+Gets the number of planes.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of planes
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_offset">
+<description>
+Gets the offset value for a plane.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to get the offset for
+</parameter_description>
+</parameter>
+</parameters>
+<return> the offset
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_premultiplied">
+<description>
+Whether the data is premultiplied.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the data is premultiplied
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_stride">
+<description>
+Gets the stride value for a plane.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to get the stride for
+</parameter_description>
+</parameter>
+</parameters>
+<return> the stride
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_update_region">
+<description>
+Gets the region previously set via gdk_dmabuf_texture_builder_set_update_region() or
+%NULL if none was set.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The region
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_update_texture">
+<description>
+Gets the texture previously set via gdk_dmabuf_texture_builder_set_update_texture() or
+%NULL if none was set.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The texture
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_get_width">
+<description>
+Gets the width previously set via gdk_dmabuf_texture_builder_set_width() or
+0 if the width wasn't set.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The width
+
+</return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_display">
+<description>
+Sets the display that this texture builder is
+associated with.
+
+The display is used to determine the supported
+dma-buf formats.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder
+</parameter_description>
+</parameter>
+<parameter name="display">
+<parameter_description> the display
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_fd">
+<description>
+Sets the file descriptor for a plane.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to set the fd for
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> the file descriptor
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_fourcc">
+<description>
+Sets the format of the texture.
+
+The format is specified as a fourcc code.
+
+The format must be set before calling [method@Gdk.GLTextureBuilder.build].
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="fourcc">
+<parameter_description> the texture's format or 0 to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_height">
+<description>
+Sets the height of the texture.
+
+The height must be set before calling [method@Gdk.GLTextureBuilder.build].
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the texture's height or 0 to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_modifier">
+<description>
+Sets the modifier.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="modifier">
+<parameter_description> the modifier value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_n_planes">
+<description>
+Sets the number of planes of the texture.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="n_planes">
+<parameter_description> the number of planes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_offset">
+<description>
+Sets the offset for a plane.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to set the offset for
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_premultiplied">
+<description>
+Sets whether the data is premultiplied.
+
+Unless otherwise specified, all formats including alpha channels are assumed
+to be premultiplied.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="premultiplied">
+<parameter_description> whether the data is premultiplied
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_stride">
+<description>
+Sets the stride for a plane.
+
+The stride must be set for all planes before calling [method@Gdk.GLTextureBuilder.build].
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to set the stride for
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> the stride value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_update_region">
+<description>
+Sets the region to be updated by this texture. Together with
+[property@Gdk.DmabufTextureBuilder:update-texture] this describes an
+update of a previous texture.
+
+When rendering animations of large textures, it is possible that
+consecutive textures are only updating contents in parts of the texture.
+It is then possible to describe this update via these two properties,
+so that GTK can avoid rerendering parts that did not change.
+
+An example would be a screen recording where only the mouse pointer moves.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="region">
+<parameter_description> the region to update
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_update_texture">
+<description>
+Sets the texture to be updated by this texture. See
+[method@Gdk.DmabufTextureBuilder.set_update_region] for an explanation.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> the texture to update
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_dmabuf_texture_builder_set_width">
+<description>
+Sets the width of the texture.
+
+The width must be set before calling [method@Gdk.GLTextureBuilder.build].
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkDmabufTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> The texture's width or 0 to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gdk_dnd_event_get_drop">
