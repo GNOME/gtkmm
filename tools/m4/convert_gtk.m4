@@ -499,6 +499,9 @@ _CONVERSION(`const PrintSettings&',`GtkPrintSettings*',__FCR2P)
 _CONVERSION(`GtkPrintSettings*',`Glib::RefPtr<PrintSettings>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PrintSettings>&',`GtkPrintSettings*',__CONVERT_REFPTR_TO_P)
 
+_CONVERSION(`GtkPrintSetup*',`Glib::RefPtr<PrintSetup>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<PrintSetup>&',`GtkPrintSetup*',__CONVERT_REFPTR_TO_P)
+
 #PrintContext
 _CONVERSION(`const Glib::RefPtr<PrintContext>',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
 _CONVERSION(`const Glib::RefPtr<PrintContext>&',`GtkPrintContext*',__CONVERT_REFPTR_TO_P($3))
@@ -555,6 +558,7 @@ _CONVERSION(`GFile*',`Glib::RefPtr<const Gio::File>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GOutputStream*',`Glib::RefPtr<Gio::OutputStream>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<Gio::AppInfo>&',`GAppInfo*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::AppInfo))
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<Gio::AppInfo>',`Glib::wrap($3)')

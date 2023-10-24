@@ -1,0 +1,101 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <giomm/file.h>
+#include <giomm/outputstream.h>
+#include <gtkmm/printsetup.h>
+
+namespace Gtk
+{
+class Window;
+
+/** A %Gtk::PrintDialog object collects the arguments that
+ * are needed to present a print dialog to the user, such
+ * as a title for the dialog and whether it should be modal.
+ *
+ * The dialog is shown with the setup() function.
+ * The actual printing can be done with print() or print_file().
+ * These APIs follow the GIO async pattern, and the results can be obtained
+ * by calling the corresponding finish methods.
+ *
+ * @ingroup Dialogs
+ * @ingroup Printing
+ * @newin{4,14}
+ */
+class GTKMM_API PrintDialog : public Glib::Object
+{
+   _CLASS_GOBJECT(PrintDialog, GtkPrintDialog, GTK_PRINT_DIALOG, Glib::Object, GObject, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkPrintDialog is a final type
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(Glib::ustring get_title() const, gtk_print_dialog_get_title)
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), gtk_print_dialog_set_title)
+  _WRAP_METHOD(Glib::ustring get_accept_label() const, gtk_print_dialog_get_accept_label)
+  _WRAP_METHOD(void set_accept_label(const Glib::ustring& accept_label), gtk_print_dialog_set_accept_label)
+  _WRAP_METHOD(bool get_modal() const, gtk_print_dialog_get_modal)
+  _WRAP_METHOD(void set_modal(bool modal = true), gtk_print_dialog_set_modal)
+
+  _WRAP_METHOD(Glib::RefPtr<PageSetup> get_page_setup(), gtk_print_dialog_get_page_setup, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const PageSetup> get_page_setup() const, gtk_print_dialog_get_page_setup, refreturn, constversion)
+  _WRAP_METHOD(void set_page_setup(const Glib::RefPtr<PageSetup>& page_setup), gtk_print_dialog_set_page_setup)
+
+  _WRAP_METHOD(Glib::RefPtr<PrintSettings> get_print_settings(), gtk_print_dialog_get_print_settings, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const PrintSettings> get_print_settings() const, gtk_print_dialog_get_print_settings, refreturn, constversion)
+  _WRAP_METHOD(void set_print_settings(const Glib::RefPtr<PrintSettings>& print_settings), gtk_print_dialog_set_print_settings)
+
+  _WRAP_METHOD(void setup(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}),
+    gtk_print_dialog_setup, slot_name slot, slot_callback Gdk::gdkmm_SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::RefPtr<PrintSetup> setup_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gtk_print_dialog_setup_finish, errthrow "Gtk::DialogError")
+
+  _WRAP_METHOD(void print(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<PrintSetup>& setup{.} = {},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}),
+    gtk_print_dialog_print, slot_name slot, slot_callback Gdk::gdkmm_SignalProxy_async_callback)
+  _WRAP_METHOD(Glib::RefPtr<Gio::OutputStream> print_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gtk_print_dialog_print_finish, errthrow "Gtk::DialogError")
+
+  _WRAP_METHOD(void print_file(Window& parent{?}, const Gio::SlotAsyncReady& slot{callback},
+    const Glib::RefPtr<Gio::File>& file{.},
+    const Glib::RefPtr<PrintSetup>& setup{.} = {},
+    const Glib::RefPtr<Gio::Cancellable>& cancellable{.} = {}),
+    gtk_print_dialog_print_file, slot_name slot, slot_callback Gdk::gdkmm_SignalProxy_async_callback)
+  _WRAP_METHOD(bool print_file_finish(const Glib::RefPtr<Gio::AsyncResult>& result),
+    gtk_print_dialog_print_file_finish, errthrow "Gtk::DialogError")
+
+  _WRAP_PROPERTY("title", Glib::ustring)
+  _WRAP_PROPERTY("accept-label", Glib::ustring)
+  _WRAP_PROPERTY("modal", bool)
+  _WRAP_PROPERTY("page-setup", Glib::RefPtr<PageSetup>)
+  _WRAP_PROPERTY("print-settings", Glib::RefPtr<PrintSettings>)
+};
+
+} // namespace Gtk
