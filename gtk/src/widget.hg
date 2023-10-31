@@ -140,9 +140,32 @@ public:
   _WRAP_METHOD(void size_allocate(const Allocation& allocation, int baseline), gtk_widget_size_allocate)
 
   _WRAP_METHOD(SizeRequestMode get_request_mode() const, gtk_widget_get_request_mode)
+
+  /** Structure holding the minimum and natural sizes of a widget, in some type.
+   * @newin{4,14}
+   */
+  template <typename T> struct MinimumNatural final { T minimum, natural; };
+
   _WRAP_METHOD(void measure(Orientation orientation, int for_size, int& minimum, int& natural,
     int& minimum_baseline, int& natural_baseline) const, gtk_widget_measure)
+  /** Structure returned by the non-output-parameter overload of measure().
+   * @newin{4,14}
+   */
+  struct Measurements final { MinimumNatural<int> sizes, baselines; };
+  /** Like the other overload of measure() but returns a structure holding the sizes/baselines instead of using output parameters.
+   * @newin{4,14}
+   */
+  [[nodiscard]] Measurements measure(Orientation orientation, int for_size = -1) const;
+
   _WRAP_METHOD(void get_preferred_size(Requisition& minimum_size, Requisition& natural_size) const, gtk_widget_get_preferred_size)
+  /** Structure returned by the non-output-parameter overload of get_preferred_size().
+   * @newin{4,14}
+   */
+  using PreferredSize = MinimumNatural<Requisition>;
+  /** Like the other overload of get_preferred_size() but returns a structure holding the sizes instead of using output parameters.
+   * @newin{4,14}
+   */
+  [[nodiscard]] PreferredSize get_preferred_size() const;
 
   _WRAP_METHOD_DOCS_ONLY(gtk_widget_set_layout_manager)
   void set_layout_manager(const Glib::RefPtr<LayoutManager>& layout_manager);
@@ -298,6 +321,10 @@ _DEPRECATE_IFDEF_END
 
   _WRAP_METHOD(void set_size_request(int width = -1, int  height = -1), gtk_widget_set_size_request)
   _WRAP_METHOD(void get_size_request(int& width, int& height) const, gtk_widget_get_size_request)
+  /** Like the other overload of get_size_request() but returns a structure holding the sizes instead of using output parameters.
+   * @newin{4,14}
+   */
+  [[nodiscard]] Requisition get_size_request() const;
 
   _WRAP_METHOD(void set_opacity(double opacity), gtk_widget_set_opacity)
   _WRAP_METHOD(double get_opacity() const, gtk_widget_get_opacity)
