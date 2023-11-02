@@ -137,7 +137,7 @@ protected:
   Gtk::ListBox m_context_list;
   Gtk::Box m_vcontent_box;
   Gtk::SearchBar m_search_bar;
-  Gtk::SearchEntry m_search_entry;
+  Gtk::SearchEntry2 m_search_entry;
   Gtk::ScrolledWindow m_scrolled_window;
   Gtk::GridView m_icon_view;
 
