@@ -80,7 +80,11 @@ if is_dist_check
 else
   cpp_warnings = get_option('warnings')
 endif
-warning_level = get_option('warning_level').to_int()
+if get_option('warning_level') == 'everything'
+  warning_level = 99 # should be high enough…!
+else
+  warning_level = get_option('warning_level').to_int()
+endif
 werror = get_option('werror')
 build_deprecated_api = get_option('build-deprecated-api')
 build_documentation_opt = get_option('build-documentation')
