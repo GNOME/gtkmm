@@ -112,20 +112,25 @@ test_assignment_from_const()
 static void
 test_convertibility_to_path()
 {
-  Gtk::TreeModel::      iterator non_const_iter;
-  Gtk::TreeModel::const_iterator     const_iter;
-
-  assert(Gtk::TreePath{non_const_iter}.to_string() == "");
-  assert(Gtk::TreePath{    const_iter}.to_string() == "");
-
+  // Tterators must have models (canʼt be empty/invalid) or GtkTreePath errors
+  const auto model = create_model();
+  const Gtk::TreeModel::iterator   non_const_iter = model->children().begin();
+  const Gtk::TreeModel::const_iterator const_iter = model->children().begin();
+  // TreePaths constructed from non-const & const iterators
+  assert(Gtk::TreePath{non_const_iter}.to_string() == "0");
+  assert(Gtk::TreePath{    const_iter}.to_string() == "0");
+  // Set a path manually & test OK
   Gtk::TreePath path("42");
   assert(path.to_string() == "42");
-
+  // Ensure changed via assignment – from non-const iterator
   path = non_const_iter;
-  assert(path.to_string() == "");
-
+  assert(path.to_string() == "0");
+  // Set a path manually & test OK
+  path = Gtk::TreePath{"99"};
+  assert(path.to_string() == "99");
+  // Ensure changed via assignment – from const iterator
   path =     const_iter;
-  assert(path.to_string() == "");
+  assert(path.to_string() == "0");
 }
 
 int main(int /* argc */, char** /* argv */)
