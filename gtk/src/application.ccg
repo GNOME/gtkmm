@@ -27,9 +27,15 @@
 #include <locale>
 #include <clocale>
 #include <stdexcept>
+// For the wrap_new() functions in init_gtkmm_internals()
+#include <gtkmm/searchentry.h>
+#include <gtkmm/searchentry2.h>
+#include <gtkmm/private/searchentry_p.h>
+#include <gtkmm/private/searchentry2_p.h>
 
 namespace
 {
+static bool will_use_search_entry2 = false;
 
 static void init_gtkmm_internals()
 {
@@ -48,6 +54,15 @@ static void init_gtkmm_internals()
     // Shall gtk_init() set the global C locale to the user's preferred locale?
     if (!Glib::get_init_to_users_preferred_locale())
       gtk_disable_setlocale();
+
+#ifndef GTKMM_DISABLE_DEPRECATED
+    // If gtkmm is built without deprecated API, there is no Gtk::SearchEntry.
+    // The wrap_new() function registered in wrap_init.cc will be used.
+    if (will_use_search_entry2)
+      Glib::wrap_register(gtk_search_entry_get_type(), &Gtk::SearchEntry2_Class::wrap_new);
+    else
+      Glib::wrap_register(gtk_search_entry_get_type(), &Gtk::SearchEntry_Class::wrap_new);
+#endif // GTKMM_DISABLE_DEPRECATED
 
     init_done = true;
   }
@@ -75,6 +90,12 @@ static void set_cxx_locale_to_c_locale()
 
 namespace Gtk
 {
+
+//static
+void Application::wrap_in_search_entry2(bool search_entry2)
+{
+  will_use_search_entry2 = search_entry2;
+}
 
 const Glib::Class& Application::custom_class_init()
 {

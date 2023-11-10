@@ -272,6 +272,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/searchbar.h>
 #include <gtkmm/searchentry.h>
+#include <gtkmm/searchentry2.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/sectionmodel.h>
 #include <gtkmm/selectionfiltermodel.h>

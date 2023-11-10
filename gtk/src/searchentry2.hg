@@ -1,0 +1,121 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/editable.h>
+#include <gtkmm/widget.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/widget_p.h)
+
+namespace Gtk
+{
+//TODO: When we can break ABI:
+// Remove SearchEntry. Rename SearchEntry2 to SearchEntry.
+// Remove _DO_NOT_DERIVE_GTYPE, _NO_WRAP_FUNCTION and wrap2().
+
+/** %Gtk::SearchEntry2 is an entry widget that has been tailored for use
+ * as a search entry.
+ *
+ * The main API for interacting with a %Gtk::SearchEntry2 as entry
+ * is the Gtk::Editable interface.
+ *
+ * It will show an inactive symbolic “find” icon when the search
+ * entry is empty, and a symbolic “clear” icon when there is text.
+ * Clicking on the “clear” icon will empty the search entry.
+ *
+ * To make filtering appear more reactive, it is a good idea to
+ * not react to every change in the entry text immediately, but
+ * only after a short delay. To support this, %Gtk::SearchEntry2
+ * emits the signal_search_changed() which
+ * can be used instead of the Gtk::Editable::signal_changed().
+ *
+ * signal_previous_match(), signal_next_match() and signal_stop_search() can
+ * be used to implement moving between search results and ending the search.
+ *
+ * Often, %Gtk::SearchEntry2 will be fed events by means of being
+ * placed inside a Gtk::SearchBar. If that is not the case,
+ * you can use set_key_capture_widget() to
+ * let it capture key input from another widget.
+ *
+ * %Gtk::SearchEntry2 provides only minimal API and should be used with
+ * the Gtk::Editable API.
+ *
+ * @note
+ * In an application that uses %Gtk::SearchEntry2, call
+ * Gtk::Application::wrap_in_search_entry2() in the main() function.
+ *
+ * @ingroup Widgets
+ * @newin{4,14}
+ */
+class GTKMM_API SearchEntry2 : public Widget, public Editable
+{
+  _CLASS_GTKOBJECT(SearchEntry2, GtkSearchEntry, GTK_SEARCH_ENTRY, Gtk::Widget, GtkWidget, , , GTKMM_API)
+  _IMPLEMENTS_INTERFACE(Editable)
+  // SearchEntry derives GType gtkmm__GtkSearchEntry, so SearchEntry2 can't.
+  // GtkSearchEntryClass is private. There is no need for a derived GType.
+  // There can't be a Gtk::SearchEntry2* wrap(GtkSearchEntry* object, bool take_copy)
+  // when there is a Gtk::SearchEntry* wrap(GtkSearchEntry* object, bool take_copy).
+  _DO_NOT_DERIVE_GTYPE
+  _NO_WRAP_FUNCTION
+public:
+
+  _CTOR_DEFAULT
+
+  _WRAP_METHOD(void set_key_capture_widget(Widget& widget), gtk_search_entry_set_key_capture_widget)
+  _WRAP_METHOD(Widget* get_key_capture_widget(), gtk_search_entry_get_key_capture_widget)
+  _WRAP_METHOD(const Widget* get_key_capture_widget() const, gtk_search_entry_get_key_capture_widget, constversion)
+  void unset_key_capture_widget();
+
+  _WRAP_METHOD(void set_search_delay(unsigned int delay), gtk_search_entry_set_search_delay)
+  _WRAP_METHOD(unsigned int get_search_delay() const, gtk_search_entry_get_search_delay)
+
+  _WRAP_METHOD(void set_placeholder_text(const Glib::ustring& text), gtk_search_entry_set_placeholder_text)
+  _WRAP_METHOD(Glib::ustring get_placeholder_text() const, gtk_search_entry_get_placeholder_text)
+
+  // no_default_handler because GtkSearchEntryClass is private.
+  _IGNORE_SIGNAL("activate")dnl// Action signal
+  _WRAP_SIGNAL(void search_changed(), "search-changed", no_default_handler)
+  // Although next-match, previous-match and stop-search are keybinding signals,
+  // applications shall connect to them.
+  _WRAP_SIGNAL(void next_match(), "next-match", no_default_handler)
+  _WRAP_SIGNAL(void previous_match(), "previous-match", no_default_handler)
+  _WRAP_SIGNAL(void stop_search(), "stop-search", no_default_handler)
+  _WRAP_SIGNAL(void search_started(), "search-started", no_default_handler)
+
+  _WRAP_PROPERTY("placeholder-text", Glib::ustring)
+  _WRAP_PROPERTY("activates-default", bool)
+  _WRAP_PROPERTY("search-delay", unsigned int)
+};
+
+} /* namespace Gtk */
+
+namespace Glib
+{
+  /** A Glib::wrap() method for this object.
+   *
+   * It's not called %wrap() because there is a<br>
+   * Gtk::SearchEntry* wrap(GtkSearchEntry* object, bool take_copy = false);
+   *
+   * @param object The C instance.
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   *
+   * @relates Gtk::SearchEntry2
+   */
+  GTKMM_API
+  Gtk::SearchEntry2* wrap2(GtkSearchEntry* object, bool take_copy = false);
+
+} //namespace Glib

@@ -182,6 +182,7 @@ gtkmm_any_hg_ccg_basenames = [
   'scrolledwindow',
   'searchbar',
   'searchentry',
+  'searchentry2',
   'sectionmodel',
   'selectionfiltermodel',
   'selectionmodel',
