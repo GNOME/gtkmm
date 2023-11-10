@@ -195,6 +195,10 @@ protected:
  * long as the node it refers to is valid (most notably the Gtk::TreeStore and
  * Gtk::ListStore).
  *
+ * One can convert an iterator to a TreeRow or TreeConstRow, as appropriate, by
+ * dereferencing it via TreeIter::operator*() or TreeIter::operator->(). The row
+ * classes can give nicer syntax by avoiding repeatedly dereferencing iterators.
+ *
  * Although generally uninteresting, as one always has to
  * allow for the case where iterators do not persist beyond a signal, some very
  * important performance enhancements were made in the sort model. As a result,
@@ -213,12 +217,22 @@ class TreeIter : public TreeIterBase3
                 "TreeIter can only iterate over TreeRow or TreeConstRow");
 
 public:
+  /** TreeIter instances can be incremented and decremented.
+   */
   using iterator_category = std::bidirectional_iterator_tag;
+  /** The TreeRow or TreeConstRow type to which the iterator refers.
+   */
   using value_type        = T;
+  /// This is not used.
   using difference_type   = int;
+  /** A reference to the TreeRow or TreeConstRow type, as yielded by operator*()
+   */
   using reference         = T&;
+  /** A pointer to the TreeRow or TreeConstRow type, as yielded by operator->()
+   */
   using pointer           = T*;
 
+  /// Default constructor creates an invalid iterator, not referring to a model.
   TreeIter();
 
   /// iterator to const_iterator conversion.
@@ -236,18 +250,32 @@ public:
   TreeIter(GtkTreeModel* model, const GtkTreeIter* iter); // used by signal proxies
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+  /** Increment the iterator to refer to the next position in the model, and
+   * return a reference to the iterator as it is after the increment.
+   */
   TreeIter& operator++();
+  /** Increment the iterator to refer to the next position in the model, but
+   * return a copy of the iterator as it was before the increment.
+   */
   TreeIter  operator++(int);
 
   /** Note that this is very slow compared to operator++().
+   * Decrement the iterator to refer to the previous position in the model, and
+   * return a reference to the iterator as it is after the decrement.
    */
   TreeIter& operator--();
 
   /** Note that this is very slow compared to operator++(int).
+   * Decrement the iterator to refer to the previous position in the model, but
+   * return a copy of the iterator as it was before the decrement.
    */
   TreeIter operator--(int);
 
+  /** Dereference the iterator to get a TreeRow or TreeConstRow, as appropriate.
+   */
   inline reference operator*()  const;
+  /** Dereference the iterator to get a TreeRow or TreeConstRow, as appropriate.
+   */
   inline pointer   operator->() const;
 
   /** Discover whether the iterator is valid, and not equal to end().
