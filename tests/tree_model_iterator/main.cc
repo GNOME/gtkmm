@@ -32,7 +32,7 @@ static const Columns columns;
 create_model()
 {
   auto model = Gtk::ListStore::create(columns);
-  auto& row = *model->append();
+  auto row = *model->append();
   row[columns.m_int] = 42;
   return model;
 }
