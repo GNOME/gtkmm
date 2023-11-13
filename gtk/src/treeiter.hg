@@ -198,6 +198,7 @@ protected:
  * One can convert an iterator to a TreeRow or TreeConstRow, as appropriate, by
  * dereferencing it via TreeIter::operator*() or TreeIter::operator->(). The row
  * classes can give nicer syntax by avoiding repeatedly dereferencing iterators.
+ * But see the warning re: reference safety in the doc of TreeIter::operator*().
  *
  * Although generally uninteresting, as one always has to
  * allow for the case where iterators do not persist beyond a signal, some very
@@ -272,6 +273,12 @@ public:
   TreeIter operator--(int);
 
   /** Dereference the iterator to get a TreeRow or TreeConstRow, as appropriate.
+   * Warning: The returned reference is implemented by casting from `*this`, and
+   * so the returned reference is only valid while this iter is. Thus, if you do
+   * something like `auto& row = *model->append()`, you get a dangling reference
+   * to the returned temporary and undefined behaviour. Thus for such cases, you
+   * must copy the returned row via `auto row = *model->append()` or equivalent.
+   * This risk cannot be mitigated in gtkmm v4, and the class will not be in v5.
    */
   inline reference operator*()  const;
   /** Dereference the iterator to get a TreeRow or TreeConstRow, as appropriate.
