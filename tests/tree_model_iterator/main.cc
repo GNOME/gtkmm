@@ -32,6 +32,7 @@ static const Columns columns;
 create_model()
 {
   auto model = Gtk::ListStore::create(columns);
+  // NOT `auto&` – see https://gitlab.gnome.org/GNOME/gtkmm/-/merge_requests/88#note_1908596
   auto row = *model->append();
   row[columns.m_int] = 42;
   return model;
