@@ -41,11 +41,20 @@ namespace Gtk
 
 // All constructors are hand-coded, because they connect a signal handler
 // that removes the window from its application when the window is closed (hidden).
+//
+// All constructors add an extra reference. This reference stops the underlying
+// C object from being finalized and freed while the C++ wrapper still exists.
+// The extra reference is needed only for windows which are not managed.
+// All widgets are constructed as not managed.
+// From the documentation of gtk_window_new(): Due to GTK keeping a
+// reference to the window internally, gtk_window_new() does not
+// return a reference to the caller.
 Window::Window(const Glib::ConstructParams& construct_params)
 :
   Gtk::Widget(construct_params)
 {
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+  reference();
 }
 
 Window::Window(GtkWindow* castitem)
@@ -53,6 +62,7 @@ Window::Window(GtkWindow* castitem)
   Gtk::Widget((GtkWidget*)castitem)
 {
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+  reference();
 }
 
 Window::Window(Window&& src) noexcept
@@ -63,6 +73,7 @@ Window::Window(Window&& src) noexcept
   try
   {
     signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+    reference();
   }
   catch (...)
   {
@@ -73,7 +84,7 @@ Window::Window(Window&& src) noexcept
 }
 
 // The move assignment is identical to the one that gmmproc can generate.
-// _CUSTOM_MOVE_OPERATIONS() suppresses both move contructor and move assignment. 
+// _CUSTOM_MOVE_OPERATIONS() suppresses both move constructor and move assignment.
 Window& Window::operator=(Window&& src) noexcept
 {
   Gtk::Widget::operator=(std::move(src));
@@ -86,6 +97,7 @@ Window::Window()
 : _CONSTRUCT()
 {
   signal_hide().connect(sigc::mem_fun(*this, &Window::on_window_hide));
+  reference();
 }
 
 void Window::on_window_hide()
@@ -112,9 +124,15 @@ void Window::on_window_hide()
 
 void Window::set_manage()
 {
-  // This C++ wrapper is deleted by Gtk::Object::destroy_notify_() when the
-  // underlying C instance is destroyed.
-  referenced_ = false; // Managed
+  if (referenced_) // Not managed
+  {
+    // Drop the extra reference, added in the constructor.
+    unreference();
+
+    // This C++ wrapper is deleted by Gtk::Object::destroy_notify_() when the
+    // underlying C instance is destroyed.
+    referenced_ = false; // Managed
+  }
 }
 
 void Window::destroy_()
@@ -155,8 +173,15 @@ void Window::_release_c_instance()
   // remove our hook.
   if (gobj())
   {
-    //Windows can not be unrefed. They are "self-owning".
-    gtk_window_destroy(gobj());
+    // If this window is not managed, drop the extra reference,
+    // added in the constructor.
+    if (referenced_) // Not managed
+      unreference();
+
+    // If the window is not managed and the underlying GtkWindow had been
+    // destroyed earlier, unreference() might have dropped its last reference.
+    if (gobj())
+      gtk_window_destroy(gobj());
 
     //If the GObject still exists, disconnect the C++ wrapper from it.
     //The C++ wrapper is being deleted right now.
