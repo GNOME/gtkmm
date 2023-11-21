@@ -1,0 +1,90 @@
+/* Copyright (C) 2023 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <gtkmm/enums.h>
+#include <gtkmm/widget.h>
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/widget_p.h)
+
+namespace Gtk
+{
+
+/** A widget that allows to bypass gsk rendering for its child by passing
+ * the content directly to the compositor.
+ *
+ * Graphics offload is an optimization to reduce overhead and battery use that is
+ * most useful for video content. It only works on some platforms and in certain
+ * situations. GTK will automatically fall back to normal rendering if it doesn't.
+ *
+ * Graphics offload is most efficient if there are no controls drawn on top of the
+ * video content.
+ *
+ * You should consider using graphics offload for your main widget if it shows
+ * frequently changing content (such as a video, or a VM display) and you provide
+ * the content in the form of dmabuf textures (see Gdk::DmabufTextureBuilder),
+ * in particular if it may be fullscreen.
+ *
+ * Numerous factors can prohibit graphics offload:
+ *
+ * - Unsupported platforms. Currently, graphics offload only works on Linux with Wayland.
+ *
+ * - Clipping, such as rounded corners that cause the video content to not be rectangular
+ *
+ * - Unsupported dmabuf formats (see Gdk::Display::get_dmabuf_formats())
+ *
+ * - Translucent video content (content with an alpha channel, even if it isn't used)
+ *
+ * - Transforms that are more complex than translations and scales
+ *
+ * - Filters such as opacity, grayscale or similar
+ *
+ * To investigate problems related graphics offload, GTK offers debug flags to print
+ * out information about graphics offload and dmabuf use:
+ *
+ *     GDK_DEBUG=offload
+ *     GDK_DEBUG=dmabuf
+ *
+ * The GTK inspector provides a visual debugging tool for graphics offload.
+ *
+ * @ingroup Widgets
+ *
+ * @newin{4,14}
+ */
+class GTKMM_API GraphicsOffload : public Widget
+{
+  _CLASS_GTKOBJECT(GraphicsOffload, GtkGraphicsOffload, GTK_GRAPHICS_OFFLOAD, Gtk::Widget, GtkWidget, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkGraphicsOffload is a final type
+  _STRUCT_NOT_HIDDEN
+
+public:
+  _CTOR_DEFAULT
+
+  _WRAP_METHOD(void set_child(Widget& child), gtk_graphics_offload_set_child)
+  void unset_child();
+  _WRAP_METHOD(Widget* get_child(), gtk_graphics_offload_get_child)
+  _WRAP_METHOD(const Widget* get_child() const, gtk_graphics_offload_get_child, constversion)
+
+  _WRAP_METHOD(void set_enabled(GraphicsOffloadEnabled enabled), gtk_graphics_offload_set_enabled)
+  _WRAP_METHOD(GraphicsOffloadEnabled get_enabled() const, gtk_graphics_offload_get_enabled)
+
+  _WRAP_PROPERTY("child", Widget*)
+  _WRAP_PROPERTY("enabled", GraphicsOffloadEnabled)
+
+  // There are no signals or vfuncs.
+};
+
+} //namespace Gtk

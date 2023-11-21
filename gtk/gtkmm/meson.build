@@ -115,6 +115,7 @@ gtkmm_any_hg_ccg_basenames = [
   'gestureswipe',
   'gesturezoom',
   'glarea',
+  'graphicsoffload',
   'grid',
   'gridlayout',
   'gridlayoutchild',
