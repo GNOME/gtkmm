@@ -203,6 +203,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gestureswipe.h>
 #include <gtkmm/gesturezoom.h>
 #include <gtkmm/glarea.h>
+#include <gtkmm/graphicsoffload.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/gridlayout.h>
 #include <gtkmm/gridlayoutchild.h>
