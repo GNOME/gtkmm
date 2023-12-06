@@ -34,6 +34,7 @@ m4_basefiles = [
   'convert_gdk.m4',
   'convert_gtk.m4',
   'convert_gtkmm.m4',
+  'enum.m4',
 ]
 m4_files = []
 foreach file : m4_basefiles
