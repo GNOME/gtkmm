@@ -28,19 +28,45 @@ class GTKMM_API Scrollbar;
 
 /** Adds scrollbars to its child widget.
  *
- * This container accepts a single child widget. It adds scrollbars to the child widget and optionally draws a beveled frame around the child widget.
- * The scrolled window can work in two ways:
- * <OL>
- * <LI>Some widgets have native scrolling support; these widgets handle certain Gtk::Adjustment signals. Widgets with native scroll support include Gtk::TreeView, Gtk::TextView, and Gtk::Layout.</LI>
- * <LI>For widgets that lack native scrolling support, such as Gtk::Grid, Gtk::Box, and so on, the widget will be placed inside a Gtk::Viewport.</LI>
- * </OL>
+ * This container accepts a single child widget and makes that child scrollable
+ * using either internally added scrollbars or externally associated adjustments.
  *
- * The position of the scrollbars is controlled by the scroll adjustments. See Gtk::Adjustment for the fields in an adjustment - for Gtk::Scrollbar, used by Gtk::ScrolledWindow,
- * the "value" field represents the position of the scrollbar, which must be between the "lower" field and "upper - page_size."
- * The "page_size" field represents the size of the visible scrollable area.
- * The "step_increment" and "page_increment" fields are used when the user asks to step down (using the small stepper arrows) or page down (using for example the PageDown key).
+ * Widgets with native scrolling support, i.e. those whose classes implement the
+ * Gtk::Scrollable interface, are added directly. For other types of widget, the
+ * class Gtk::Viewport acts as an adaptor, giving scrollability to other widgets.
+ * %Gtk::ScrolledWindow’s implementation of Gtk::Container::add() intelligently
+ * accounts for whether or not the added child is a %Gtk::Scrollable. If it isn’t,
+ * %Gtk::ScrolledWindow wraps the child in a %Gtk::Viewport and adds that for you.
+ * Therefore, you can just add any child widget and not worry about the details.
  *
- * If a Gtk::ScrolledWindow doesn't behave quite as you would like, or doesn't have exactly the right layout, it's very possible to set up your own scrolling with Gtk::Scrollbar and, for example, a Gtk::Grid.
+ * Unless property_hscrollbar_policy() and property_vscrollbar_policy() are
+ * Gtk::POLICY_NEVER or Gtk::POLICY_EXTERNAL,
+ * %Gtk::ScrolledWindow adds internal Gtk::Scrollbar widgets around its child. The
+ * scroll position of the child, and if applicable the scrollbars, is controlled
+ * by the property_hadjustment() and property_vadjustment()
+ * that are associated with the %Gtk::ScrolledWindow. See the docs on Gtk::Scrollbar
+ * for the details, but note that the “step_increment” and “page_increment”
+ * fields are only effective if the policy causes scrollbars to be present.
+ *
+ * If a %Gtk::ScrolledWindow doesn’t behave quite as you would like, or
+ * doesn’t have exactly the right layout, it’s very possible to set up
+ * your own scrolling with Gtk::Scrollbar and for example a Gtk::Grid.
+ *
+ * # Touch support
+ *
+ * %Gtk::ScrolledWindow has built-in support for touch devices. When a
+ * touchscreen is used, swiping will move the scrolled window, and will
+ * expose 'kinetic' behavior. This can be turned off with
+ * property_kinetic_scrolling() if it is undesired.
+ *
+ * %Gtk::ScrolledWindow also displays visual 'overshoot' indication when
+ * the content is pulled beyond the end, and this situation can be
+ * captured with signal_edge_overshot().
+ *
+ * If no mouse device is present, the scrollbars will be overlayed as
+ * narrow, auto-hiding indicators over the content. If traditional
+ * scrollbars are desired although no mouse is present, this behavior
+ * can be turned off with property_overlay_scrolling().
  *
  * @ingroup Widgets
  * @ingroup Containers
