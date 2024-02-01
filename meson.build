@@ -2,7 +2,7 @@
 
 # The resource compiler, used in demos/gtk-demo, requires a C compiler.
 project('gtkmm', 'c', 'cpp',
-  version: '4.13.2',
+  version: '4.13.3',
   license: 'LGPLv2.1+',
   default_options: [
     'cpp_std=c++17',
@@ -337,7 +337,6 @@ if can_add_dist_script
   dont_distribute = [
     'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
     'examples.moved_to_gtkmm_documentation_module',
-    'HACKING',
     'win32_installer',
     '.gitlab-ci.yml',
   ]
