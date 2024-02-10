@@ -19,7 +19,8 @@ public:
   ~Window_EasterEgg() override;
 
 protected:
-  virtual void recursive_attach_view(int depth, Gtk::TextView& view, Glib::RefPtr<Gtk::TextChildAnchor> refAnchor);
+  void recursive_attach_view(int depth, Gtk::TextView& view,
+                             Glib::RefPtr<Gtk::TextChildAnchor> refAnchor);
 
   //Member widgets:
   Gtk::TextView* m_pTextView;
@@ -33,20 +34,20 @@ public:
   ~Example_TextView() override;
 
 protected:
-  virtual void create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer);
-  virtual void insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer);
-  virtual void attach_widgets(Gtk::TextView& text_view);
-  virtual bool find_anchor(Gtk::TextBuffer::iterator& iter);
+  void create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer);
+  void insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer);
+  void attach_widgets(Gtk::TextView& text_view);
+  bool find_anchor(Gtk::TextBuffer::iterator& iter);
 
   //Signal handlers:
-  virtual void on_button_clicked();
-
+  void on_button_clicked();
 
   //Member widgets
   Gtk::Paned m_VPaned;
   Gtk::TextView m_View1;
   Gtk::TextView* m_pView2;
-  Gtk::ScrolledWindow m_ScrolledWindow1, m_ScrolledWindow2;
+  Gtk::ScrolledWindow m_ScrolledWindow1;
+  Gtk::ScrolledWindow m_ScrolledWindow2;
 
   Window_EasterEgg m_WindowEasterEgg;
 };
@@ -431,12 +432,13 @@ void Example_TextView::attach_widgets(Gtk::TextView& text_view)
 
 void Example_TextView::on_button_clicked()
 {
+  m_WindowEasterEgg.set_transient_for(*this);
   m_WindowEasterEgg.present();
 }
 
 Window_EasterEgg::Window_EasterEgg()
 {
-  set_default_size(300, 400);
+  set_default_size(330, 400);
 
   auto refBuffer = Gtk::TextBuffer::create();
   auto iter = refBuffer->end();
@@ -449,6 +451,8 @@ Window_EasterEgg::Window_EasterEgg()
 
   recursive_attach_view(0, *m_pTextView, refAnchor);
 
+  set_hide_on_close(true);
+  set_modal(true);
   m_ScrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
   set_child(m_ScrolledWindow);
   m_ScrolledWindow.set_child(*m_pTextView);
@@ -466,6 +470,7 @@ void Window_EasterEgg::recursive_attach_view(int depth, Gtk::TextView& view, Gli
     return;
 
   auto pChildView = Gtk::make_managed<Gtk::TextView>(view.get_buffer());
+  pChildView->set_size_request(260 - 20 * depth, -1);
 
   /* Frame is to add a black border around each child view */
   auto pFrame = Gtk::make_managed<Gtk::Frame>();
