@@ -246,6 +246,36 @@ The accessible role cannot be changed once set.
 </description>
 </property>
 
+<enum name="GtkAccessibleAnnouncementPriority">
+<description>
+The priority of an accessibility announcement.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="GTK_ANNOUNCEMENT_PRIORITY_LOW">
+<parameter_description> The announcement is low priority, and might be read only
+on the user's request.
+</parameter_description>
+</parameter>
+<parameter name="GTK_ANNOUNCEMENT_PRIORITY_MEDIUM">
+<parameter_description> The announcement is of medium priority, and is usually
+spoken at the next opportunity, such as at the end of speaking the current sentence
+or when the user pauses typing.
+</parameter_description>
+</parameter>
+<parameter name="GTK_ANNOUNCEMENT_PRIORITY_HIGH">
+<parameter_description> The announcement is of high priority, and is usually
+spoken immediately. Because an interruption might disorient users or cause them to
+not complete their current task, authors SHOULD NOT use high priority announcements
+unless the interruption is imperative. An example would be a notification about a
+critical battery power level.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkAccessibleAutocomplete">
 <description>
 The possible values for the %GTK_ACCESSIBLE_PROPERTY_AUTOCOMPLETE
@@ -979,6 +1009,68 @@ enumeration
 <parameter name="GTK_ACCESSIBLE_STATE_SELECTED">
 <parameter_description> A “selected” state; set when a widget
 is selected. Value type: boolean or undefined
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GtkAccessibleTextContentChange">
+<description>
+The type of contents change operation.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_INSERT">
+<parameter_description> contents change as the result of
+an insert operation
+</parameter_description>
+</parameter>
+<parameter name="GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_REMOVE">
+<parameter_description> contents change as the result of
+a remove operation
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GtkAccessibleTextGranularity">
+<description>
+The granularity for queries about the text contents of a [iface@Gtk.AccessibleText]
+implementation.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="GTK_ACCESSIBLE_TEXT_GRANULARITY_CHARACTER">
+<parameter_description> Use the boundary between
+characters (including non-printing characters)
+</parameter_description>
+</parameter>
+<parameter name="GTK_ACCESSIBLE_TEXT_GRANULARITY_WORD">
+<parameter_description> Use the boundary between words,
+starting from the beginning of the current word and ending at the
+beginning of the next word
+</parameter_description>
+</parameter>
+<parameter name="GTK_ACCESSIBLE_TEXT_GRANULARITY_SENTENCE">
+<parameter_description> Use the boundary between
+sentences, starting from the beginning of the current sentence and
+ending at the beginning of the next sentence
+</parameter_description>
+</parameter>
+<parameter name="GTK_ACCESSIBLE_TEXT_GRANULARITY_LINE">
+<parameter_description> Use the boundary between lines,
+starting from the beginning of the current line and ending at the
+beginning of the next line
+</parameter_description>
+</parameter>
+<parameter name="GTK_ACCESSIBLE_TEXT_GRANULARITY_PARAGRAPH">
+<parameter_description> Use the boundary between
+paragraphs, starting from the beginning of the current paragraph and
+ending at the beginning of the next paragraph
 </parameter_description>
 </parameter>
 </parameters>
@@ -10264,7 +10356,7 @@ An enum for determining where a dropped item goes.
 
 <property name="GtkImage:file">
 <description>
-The `GFile` to display.
+A path to the file to display.
 
 </description>
 </property>
@@ -13526,15 +13618,8 @@ The model should only contain submenus as toplevel elements.
 Flags that affect how [class@Gtk.PopoverMenu] widgets built from
 a [class@Gio.MenuModel] are created and displayed.
 
-Since: 4.14
-
 </description>
 <parameters>
-<parameter name="GTK_POPOVER_MENU_SLIDING">
-<parameter_description> Submenus are presented as sliding submenus that
-replace the main menu.
-</parameter_description>
-</parameter>
 <parameter name="GTK_POPOVER_MENU_NESTED">
 <parameter_description> Submenus are presented as traditional, nested
 popovers.
@@ -15295,6 +15380,15 @@ The `GtkAdjustment` that is used as the model.
 </description>
 </property>
 
+<property name="GtkScaleButton:has-frame">
+<description>
+If the scale button has a frame.
+
+Since: 4.14
+
+</description>
+</property>
+
 <property name="GtkScaleButton:icons">
 <description>
 The names of the icons to be used by the scale button.
@@ -15867,6 +15961,26 @@ The default bindings for this signal is Escape.
 <property name="GtkSearchEntry:activates-default">
 <description>
 Whether to activate the default widget when Enter is pressed.
+
+</description>
+</property>
+
+<property name="GtkSearchEntry:input-hints">
+<description>
+The hints about input for the `GtkSearchEntry` used to alter the
+behaviour of input methods.
+
+Since: 4.14
+
+</description>
+</property>
+
+<property name="GtkSearchEntry:input-purpose">
+<description>
+The purpose for the `GtkSearchEntry` input used to alter the
+behaviour of input methods.
+
+Since: 4.14
 
 </description>
 </property>
@@ -16555,6 +16669,9 @@ hintmedium, hintfull.
 The type of subpixel antialiasing to use.
 
 The possible values are none, rgb, bgr, vrgb, vbgr.
+
+Note that GSK does not support subpixel antialiasing, and this
+setting has no effect on font rendering in GTK.
 
 </description>
 </property>
@@ -17500,12 +17617,10 @@ static gboolean
 on_output (GtkSpinButton *spin,
 gpointer       data)
 {
-GtkAdjustment *adjustment;
 char *text;
 int value;
 
-adjustment = gtk_spin_button_get_adjustment (spin);
-value = (int)gtk_adjustment_get_value (adjustment);
+value = gtk_spin_button_get_value_as_int (spin);
 text = g_strdup_printf (&quot;%02d&quot;, value);
 gtk_editable_set_text (GTK_EDITABLE (spin), text):
 g_free (text);
@@ -23154,6 +23269,38 @@ the %GDK_KEY_Control_L keyval as an accelerator.
 </return>
 </function>
 
+<function name="gtk_accessible_announce">
+<description>
+Requests the user's screen reader to announce the given message.
+
+This kind of notification is useful for messages that
+either have only a visual representation or that are not
+exposed visually at all, e.g. a notification about a
+successful operation.
+
+Also, by using this API, you can ensure that the message
+does not interrupts the user's current screen reader output.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkAccessible`
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> the string to announce
+</parameter_description>
+</parameter>
+<parameter name="priority">
+<parameter_description> the priority of the announcement
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_accessible_get_accessible_parent">
 <description>
 Retrieves the accessible parent for an accessible object.
@@ -23310,6 +23457,61 @@ Since: 4.10
 </return>
 </function>
 
+<function name="gtk_accessible_list_get_objects">
+<description>
+Gets the list of objects this boxed type holds
+
+Since: 4.14
+
+</description>
+<parameters>
+</parameters>
+<return> a shallow copy of the objects
+
+</return>
+</function>
+
+<function name="gtk_accessible_list_new_from_array">
+<description>
+Allocates a new list of accessible instances.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="accessibles">
+<parameter_description> array of GtkAccessible
+</parameter_description>
+</parameter>
+<parameter name="n_accessibles">
+<parameter_description> length of @accessibles array
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created list of accessible instances
+
+</return>
+</function>
+
+<function name="gtk_accessible_list_new_from_list">
+<description>
+Allocates a new `GtkAccessibleList`, doing a shallow copy of the
+passed list of `GtkAccessible` instances.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a reference to a `GList` containing a list of accessible values
+</parameter_description>
+</parameter>
+</parameters>
+<return> the list of accessible instances
+
+</return>
+</function>
+
 <function name="gtk_accessible_property_init_value">
 <description>
 Initializes @value with the appropriate type for the @property.
@@ -23453,6 +23655,82 @@ with gtk_accessible_update_relation_state().
 </parameter>
 <parameter name="value">
 <parameter_description> an uninitialized `GValue`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accessible_text_update_caret_position">
+<description>
+Updates the position of the caret.
+
+Implementations of the `GtkAccessibleText` interface should call this
+function every time the caret has moved, in order to notify assistive
+technologies.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accessible_text_update_contents">
+<description>
+Notifies assistive technologies of a change in contents.
+
+Implementations of the `GtkAccessibleText` interface should call this
+function every time their contents change as the result of an operation,
+like an insertion or a removal.
+
+Note: If the change is a deletion, this function must be called *before*
+removing the contents, if it is an insertion, it must be called *after*
+inserting the new contents.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+<parameter name="change">
+<parameter_description> the type of change in the contents
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> the starting offset of the change, in characters
+</parameter_description>
+</parameter>
+<parameter name="end">
+<parameter_description> the end offset of the change, in characters
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accessible_text_update_selection_bound">
+<description>
+Updates the boundary of the selection.
+
+Implementations of the `GtkAccessibleText` interface should call this
+function every time the selection has moved, in order to notify assistive
+technologies.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
 </parameter_description>
 </parameter>
 </parameters>
@@ -29828,7 +30106,25 @@ The returned date is in the local time zone.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the `GDate` representing the shown date
+<return> the `GDateTime` representing the shown date
+</return>
+</function>
+
+<function name="gtk_calendar_get_day">
+<description>
+Gets the day of the selected date.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the day of the selected date.
+
 </return>
 </function>
 
@@ -29849,6 +30145,24 @@ Returns if the @day of the @calendar is already marked.
 </parameter>
 </parameters>
 <return> whether the day is marked.
+</return>
+</function>
+
+<function name="gtk_calendar_get_month">
+<description>
+Gets the month of the selected date.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The month of the selected date (as a number between 0 and 11).
+
 </return>
 </function>
 
@@ -29911,6 +30225,24 @@ Return: Whether the calendar is showing week numbers.
 <return></return>
 </function>
 
+<function name="gtk_calendar_get_year">
+<description>
+Gets the year of the selected date.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the year of the selected date.
+
+</return>
+</function>
+
 <function name="gtk_calendar_mark_day">
 <description>
 Places a visual marker on a particular day of the current month.
@@ -29953,6 +30285,52 @@ Switches to @date's year and month and select its day.
 </parameter>
 <parameter name="date">
 <parameter_description> a `GDateTime` representing the day to select
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_calendar_set_day">
+<description>
+Sets the day for the selected date.
+
+The new date must be valid. For example, setting 31 for the day when the
+month is February, fails.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+<parameter name="day">
+<parameter_description> The desired day for the selected date (as a number between 1 and 31).
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_calendar_set_month">
+<description>
+Sets the month for the selected date.
+
+The new date must be valid. For example, setting 1 (February) for the month
+when the day is 31, fails.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+<parameter name="month">
+<parameter_description> The desired month for the selected date (as a number between 0 and 11).
 </parameter_description>
 </parameter>
 </parameters>
@@ -30010,6 +30388,30 @@ Sets whether week numbers are shown in the calendar.
 </parameter>
 <parameter name="value">
 <parameter_description> whether to show week numbers on the left of the days
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_calendar_set_year">
+<description>
+Sets the year for the selected date.
+
+The new date must be valid. For example, setting 2023 for the year when then
+the date is 2024-02-29, fails.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkCalendar`
+</parameter_description>
+</parameter>
+<parameter name="year">
+<parameter_description> The desired year for the selected date (within [struct@GLib.DateTime]
+limits, i.e. from 0001 to 9999).
 </parameter_description>
 </parameter>
 </parameters>
@@ -38651,7 +39053,7 @@ Returns a newly created `GtkCssProvider`.
 Converts the @provider into a string representation in CSS
 format.
 
-Using [method@Gtk.CssProvider.load_from_data] with the return
+Using [method@Gtk.CssProvider.load_from_string] with the return
 value from this function on a new provider created with
 [ctor@Gtk.CssProvider.new] will basically create a duplicate
 of this @provider.
@@ -55073,6 +55475,32 @@ Deprecated: 4.10: Use [class@Gtk.GridView] instead
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_im_context_activate_osk">
+<description>
+Requests the platform to show an on-screen keyboard for user input.
+
+This method will return %TRUE if this request was actually performed
+to the platform, other environmental factors may result in an on-screen
+keyboard effectively not showing up.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a `GtkIMContext`
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a [class@Gdk.Event]
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if an on-screen keyboard could be requested to the platform.
+
+</return>
 </function>
 
 <function name="gtk_im_context_delete_surrounding">
@@ -75353,6 +75781,24 @@ See [method@Gtk.Range.get_adjustment] for details.
 </return>
 </function>
 
+<function name="gtk_scale_button_get_has_frame">
+<description>
+Returns whether the button has a frame.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="button">
+<parameter_description> a `GtkScaleButton`
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the button has a frame
+
+</return>
+</function>
+
 <function name="gtk_scale_button_get_minus_button">
 <description>
 Retrieves the minus button of the `GtkScaleButton`.
@@ -75468,6 +75914,26 @@ See [method@Gtk.Range.set_adjustment] for details.
 </parameter>
 <parameter name="adjustment">
 <parameter_description> a `GtkAdjustment`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_scale_button_set_has_frame">
+<description>
+Sets the style of the button.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="button">
+<parameter_description> a `GtkScaleButton`
+</parameter_description>
+</parameter>
+<parameter name="has_frame">
+<parameter_description> whether the button should have a visible frame
 </parameter_description>
 </parameter>
 </parameters>
@@ -76978,6 +77444,42 @@ of the toggle button.
 <return></return>
 </function>
 
+<function name="gtk_search_entry_get_input_hints">
+<description>
+Gets the input purpose for @entry.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a `GtkSearchEntry`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The input hints
+
+</return>
+</function>
+
+<function name="gtk_search_entry_get_input_purpose">
+<description>
+Gets the input purpose of @entry.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a `GtkSearchEntry`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The input hints
+
+</return>
+</function>
+
 <function name="gtk_search_entry_get_key_capture_widget">
 <description>
 Gets the widget that @entry is capturing key events from.
@@ -77041,6 +77543,46 @@ Creates a `GtkSearchEntry`.
 </parameters>
 <return> a new `GtkSearchEntry`
 </return>
+</function>
+
+<function name="gtk_search_entry_set_input_hints">
+<description>
+Sets the input hints for @entry.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a `GtkSearchEntry`
+</parameter_description>
+</parameter>
+<parameter name="hints">
+<parameter_description> the new input hints
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_search_entry_set_input_purpose">
+<description>
+Sets the input purpose of @entry.
+
+Since: 4.14
+
+</description>
+<parameters>
+<parameter name="entry">
+<parameter_description> a `GtkSearchEntry`
+</parameter_description>
+</parameter>
+<parameter name="purpose">
+<parameter_description> the new input purpose
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gtk_search_entry_set_key_capture_widget">
