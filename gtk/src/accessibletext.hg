@@ -1,0 +1,180 @@
+/* Copyright (C) 2024 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gtkmmconfig.h)
+
+#include <glibmm/interface.h>
+#include <glibmm/bytes.h>
+#include <vector>
+#include <gtk/gtk.h> // for GtkAccessibleTextRange
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C"
+{
+typedef struct _GtkAccessibleTextInterface GtkAccessibleTextInterface;
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gtk
+{
+class GTKMM_API Widget;
+
+/** An interface for accessible objects containing formatted text.
+ *
+ * The %Gtk::AccessibleText interface is meant to be implemented by accessible
+ * objects that have text formatted with attributes, or non-trivial text contents.
+ *
+ * You should use the Gtk::Accessible::Property::LABEL or the
+ * Gtk::Accessible::Property::DESCRIPTION properties for accessible
+ * objects containing simple, unformatted text.
+ *
+ * @newin{4,14}
+ */
+class GTKMM_API AccessibleText : public Glib::Interface
+{
+  _CLASS_INTERFACE(AccessibleText, GtkAccessibleText, GTK_ACCESSIBLE_TEXT, GtkAccessibleTextInterface, , , GTKMM_API)
+
+public:
+  _WRAP_ENUM(Granularity, GtkAccessibleTextGranularity, decl_prefix GTKMM_API)
+  _WRAP_ENUM(ContentChange, GtkAccessibleTextContentChange, decl_prefix GTKMM_API)
+
+  _WRAP_METHOD(void update_caret_position(), gtk_accessible_text_update_caret_position)
+  _WRAP_METHOD(void update_selection_bound(), gtk_accessible_text_update_selection_bound)
+  _WRAP_METHOD(void update_contents(ContentChange change,
+    unsigned int start, unsigned int end), gtk_accessible_text_update_contents)
+
+protected:
+#m4 _CONVERSION(`Glib::RefPtr<Glib::Bytes>',`GBytes*',`Glib::unwrap_copy($3)')
+  /** Retrieve the current contents of the accessible object within
+   * the given range.
+   *
+   * If @a end is G_MAXUINT, the end of the range is the full content
+   * of the accessible object.
+   *
+   * @param start The beginning of the range, in characters.
+   * @param end The end of the range, in characters.
+   * @returns The requested slice of the contents of the
+   *   accessible object, as UTF-8. Note that the slice does not have to
+   *   be NUL-terminated.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Glib::Bytes> get_contents(unsigned int start, unsigned int end) const, get_contents)
+
+  /** Retrieve the current contents of the accessible object starting
+   * from the given offset, and using the given granularity.
+   *
+   * The @a start and @a end values contain the boundaries of the text.
+   *
+   * @param offset The offset, in characters.
+   * @param granularity The granularity of the query.
+   * @param[out] start The start of the range, in characters.
+   * @param[out] end The end of the range, in characters.
+   * @returns The requested slice of the contents of the
+   *   accessible object, as UTF-8. Note that the slice does not have to
+   *   be NUL-terminated.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Glib::Bytes> get_contents_at(unsigned int offset, Granularity granularity,
+    unsigned int* start, unsigned int* end) const, get_contents_at)
+
+  /** Retrieves the position of the caret inside the accessible object.
+   *
+   * @returns The position of the caret, in characters.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(unsigned int get_caret_position() const, get_caret_position)
+
+  /** Retrieves the selection ranges in the accessible object.
+   *
+   * If this function returns <tt>true</tt>, @a n_ranges will be set to a value
+   * greater than or equal to one, and @a ranges will be set to a newly
+   * allocated array of struct GtkAccessibleTextRange.
+   *
+   * @param[out] n_ranges The number of selection ranges.
+   * @param[out] ranges (optional) (array length=n_ranges) (transfer container) The selection ranges.
+   * @returns <tt>true</tt> if there is at least one selection inside the
+   *   accessible object, and <tt>false</tt> otherwise.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(bool get_selection(gsize* n_ranges, GtkAccessibleTextRange** ranges) const, get_selection)
+
+  /** Retrieves the text attributes inside the accessible object.
+   *
+   * Each attribute is composed by:
+   *
+   * - a range
+   * - a name
+   * - a value
+   *
+   * It is left to the implementation to determine the serialization format
+   * of the value to a string.
+   *
+   * GTK provides support for various text attribute names and values, but
+   * implementations of this interface are free to add their own attributes.
+   *
+   * If this function returns <tt>true</tt>, @a n_ranges will be set to a value
+   * greater than or equal to one, @a ranges will be set to a newly
+   * allocated array of struct GtkAccessibleTextRange.
+   *
+   * @param offset The offset, in characters.
+   * @param[out] n_ranges The number of attributes.
+   * @param[out] ranges (array length=n_ranges) (optional) (transfer container)
+   *             The ranges of the attributes inside the accessible object.
+   * @param[out] attribute_names (array zero-terminated=1) (optional) (transfer full)
+   *             The names of the attributes inside the accessible object.
+   * @param[out] attribute_values (array zero-terminated=1) (optional) (transfer full)
+   *             The values of the attributes inside the accessible object.
+   * @returns <tt>true</tt> if the accessible object has at least one attribute,
+   *   and <tt>false</tt> otherwise.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(bool get_attributes(unsigned int offset,
+    gsize* n_ranges, GtkAccessibleTextRange** ranges,
+    char*** attribute_names, char*** attribute_values) const, get_attributes)
+
+  /** Retrieves the default text attributes inside the accessible object.
+   *
+   * Each attribute is composed by:
+   *
+   * - a name
+   * - a value
+   *
+   * It is left to the implementation to determine the serialization format
+   * of the value to a string.
+   *
+   * GTK provides support for various text attribute names and values, but
+   * implementations of this interface are free to add their own attributes.
+   *
+   * @param[out] attribute_names (array zero-terminated=1) (optional) (transfer full)
+   *             The names of the default attributes inside the accessible object.
+   * @param[out] attribute_values (array zero-terminated=1) (optional) (transfer full)
+   *             The values of the default attributes inside the accessible object.
+   *
+   * @newin{4,14}
+   */
+  _WRAP_VFUNC(void get_default_attributes(
+    char*** attribute_names, char*** attribute_values) const, get_default_attributes)
+};
+
+} // namespace Gtk

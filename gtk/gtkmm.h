@@ -106,6 +106,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/aboutdialog.h>
 #include <gtkmm/accelerator.h>
 #include <gtkmm/accelkey.h>
+#include <gtkmm/accessibletext.h>
 #include <gtkmm/actionable.h>
 #include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>

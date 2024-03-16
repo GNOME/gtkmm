@@ -29,6 +29,7 @@ endforeach
 gtkmm_any_hg_ccg_basenames = [
   'aboutdialog',
   'accessible',
+  'accessibletext',
   'actionable',
   'actionbar',
   'adjustment',
