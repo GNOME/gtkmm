@@ -311,6 +311,7 @@ if is_msvc
                                      # dangerous ones glaring, distributed with GLib
     '/EHsc',  # avoid warnings caused by exception handling model used
     '/wd4152', # nonstandard extension, function/data pointer conversion in expression
+    '/wd4201', # warning C4201: nonstandard extension used: nameless struct/union
     '/wd4245', # 'argument': conversion from 'int' to 'guint', signed/unsigned mismatch
     '/wd4250', # 'class1' : inherits 'class2::member' via dominance
     '/wd4702', # unreachable code
