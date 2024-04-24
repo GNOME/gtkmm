@@ -17,8 +17,45 @@
  */
 
 #include <gdk/gdk.h>
+namespace
+{
+extern "C"
+{
+static GdkTexture* SlotGetTexture_gdk_callback(GdkCursor* /* cursor */,
+  int cursor_size, double scale, int* width, int* height,
+  int* hotspot_x, int* hotspot_y, void* data)
+{
+  auto the_slot = static_cast<Gdk::Cursor::SlotGetTexture*>(data);
+
+  try
+  {
+    return Glib::unwrap_copy((*the_slot)(cursor_size, scale, *width, *height, *hotspot_x, *hotspot_y));
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return nullptr;
+}
+
+static void SlotGetTexture_gdk_callback_destroy(void* data)
+{
+  delete static_cast<Gdk::Cursor::SlotGetTexture*>(data);
+}
+} // extern "C"
+} // anonymous namespace
 
 namespace Gdk
 {
+Glib::RefPtr<Cursor> Cursor::create(const SlotGetTexture& slot, const Glib::RefPtr<Cursor>& fallback)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SlotGetTexture_gdk_callback_destroy() is called.
+  auto slot_copy = new SlotGetTexture(slot);
 
+  return Glib::wrap(gdk_cursor_new_from_callback(
+    &SlotGetTexture_gdk_callback, slot_copy,
+    &SlotGetTexture_gdk_callback_destroy, Glib::unwrap(fallback)));
+}
 } //namespace Gdk

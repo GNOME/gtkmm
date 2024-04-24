@@ -24,7 +24,39 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gdk
 {
 
-/** This represents a cursor.
+/**  %Gdk::Cursor is used to create and destroy cursors.
+ *
+ * Cursors are immutable objects, so once you created them, there is no way
+ * to modify them later. You should create a new cursor when you want to change
+ * something about it.
+ *
+ * Cursors by themselves are not very interesting: they must be bound to a
+ * window for users to see them. This is done with Gdk::Surface::set_cursor()
+ * or Gdk::Surface::set_device_cursor(). Applications will typically
+ * use higher-level GTK functions such as Gtk::Widget::set_cursor() instead.
+ *
+ * Cursors are not bound to a given Gdk::Display, so they can be shared.
+ * However, the appearance of cursors may vary when used on different platforms.
+ *
+ * ## Named and texture cursors
+ *
+ * There are multiple ways to create cursors. The platform's own cursors can be
+ * created with create(const Glib::ustring& name, const Glib::RefPtr<Cursor>& fallback).
+ * That function lists the commonly available names that are shared with the CSS
+ * specification. Other names may be available, depending on the platform in use.
+ * On some platforms, what images are used for named cursors may be influenced by
+ * the cursor theme.
+ *
+ * Another option to create a cursor is to use
+ * create(const Glib::RefPtr<const Texture>& texture, int hotspot_x, int hotspot_y, const Glib::RefPtr<Cursor>& fallback)
+ * and provide an image to use for the cursor.
+ *
+ * To ease work with unsupported cursors, a fallback cursor can be provided.
+ * If a Gdk::Surface cannot use a cursor, it will try the fallback cursor.
+ * Fallback cursors can themselves have fallback cursors again, so it is possible
+ * to provide a chain of progressively easier to support cursors. If none of
+ * the provided cursors can be supported, the default cursor will be the ultimate
+ * fallback.
  */
 class GDKMM_API Cursor : public Glib::Object
 {
@@ -41,6 +73,49 @@ public:
   //because they do more than just call g_object_new().
   _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::RefPtr<const Texture>& texture, int hotspot_x, int hotspot_y, const Glib::RefPtr<Cursor>& fallback = {}), gdk_cursor_new_from_texture)
   _WRAP_METHOD(static Glib::RefPtr<Cursor> create(const Glib::ustring& name, const Glib::RefPtr<Cursor>& fallback = {}), gdk_cursor_new_from_name)
+
+  /** Callback used by a dynamic %Gdk::Cursor to generate
+   * a texture for the cursor image at the given @a cursor_size and @a scale.
+   *
+   * The actual cursor size in application pixels may be different
+   * from @a cursor_size x @a cursor_size, and will be returned in
+   * @a width, @a height. The returned texture should have a size that
+   * corresponds to the actual cursor size, in device pixels (i.e.
+   * application pixels, multiplied by @a scale).
+   *
+   * This function may fail and return an empty RefPtr, in which case
+   * the fallback cursor will be used.
+   *
+   * @param cursor_size The nominal cursor size, in application pixels.
+   * @param scale The device scale.
+   * @param[out] width Return location for the actual cursor width,
+   *   in application pixels.
+   * @param[out] height Return location for the actual cursor height,
+   *   in application pixels.
+   * @param[out] hotspot_x Return location for the hotspot X position,
+   *   in application pixels.
+   * @param[out] hotspot_y Return location for the hotspot Y position,
+   *   in application pixels.
+   * @return The cursor image, or an empty RefPtr if none could be produced..
+   *
+   * @newin{4,16}
+   */
+  using SlotGetTexture = sigc::slot<Glib::RefPtr<Texture>(int, double,
+    int&, int&, int&, int&)>;
+
+  /** Creates a new callback-based cursor object.
+   *
+   * Cursors of this kind produce textures for the cursor
+   * image on demand, when the @a slot is called.
+   *
+   * @newin{4,16}
+   *
+   * @param slot Callback that lets you create a suitable texture.
+   * @param fallback The %Gdk::Cursor to fall back to when this one cannot be supported.
+   * @return A new %Gdk::Cursor.
+   */
+  static Glib::RefPtr<Cursor> create(const SlotGetTexture& slot, const Glib::RefPtr<Cursor>& fallback = {});
+  _IGNORE(gdk_cursor_new_from_callback)
 
   _WRAP_METHOD(Glib::RefPtr<Cursor> get_fallback(), gdk_cursor_get_fallback, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Cursor> get_fallback() const, gdk_cursor_get_fallback, refreturn, constversion)
