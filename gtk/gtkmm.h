@@ -31,9 +31,8 @@
  * For instance, see @ref Widgets, @ref Dialogs, @ref TreeView "TreeView" and
  * @ref TextView "TextView".
  *
- * See also the
- * <a href="https://library.gnome.org/devel/gtkmm-tutorial/3.24/">Programming
- * with gtkmm</a> book.
+ * See also the <i>Programming with gtkmm</i> book. It can be downloaded from
+ * <a href="https://download.gnome.org/sources/gtkmm-documentation/3.24/">here</a>.
  *
  * @section features Features
  *
