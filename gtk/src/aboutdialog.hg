@@ -26,24 +26,35 @@ _CONFIGINCLUDE(gtkmmconfig.h)
 _DEFS(gtkmm,gtk)
 _PINCLUDE(gtkmm/private/window_p.h)
 
+// Shadow BSD macro (from sys/param.h in MacOS).
+// It interferes with Gtk::License::BSD.
+// This trick works because the BSD macro expands to an integer.
+// See https://gitlab.gnome.org/GNOME/gtkmm/-/issues/157
+#if defined(BSD) && !defined(GTKMM_MACRO_SHADOW_BSD)
+enum { GTKMM_MACRO_DEFINITION_BSD = BSD };
+#undef BSD
+enum { BSD = GTKMM_MACRO_DEFINITION_BSD };
+#define BSD BSD
+#define GTKMM_MACRO_SHADOW_BSD 1
+#endif
+
 namespace Gtk
 {
-
 _WRAP_ENUM(License, GtkLicense, s#^0BSD$#BSD_0#, decl_prefix GTKMM_API)
 
-/** The AboutDialog offers a simple way to display information about a program like its logo, name, copyright,
+/** The %AboutDialog offers a simple way to display information about a program like its logo, name, copyright,
  * website and license. It is also possible to give credits to the authors, documenters, translators and artists
  * who have worked on the program. An about dialog is typically opened when the user selects the About option
  * from the Help menu. All parts of the dialog are optional.
  *
- * About dialogs often contain links and email addresses. Gtk::AboutDialog displays these as clickable links.
+ * About dialogs often contain links and email addresses. %Gtk::AboutDialog displays these as clickable links.
  * By default, it calls Gtk::FileLauncher::launch() when a user clicks one.
- * The behaviour can be overridden with the activate_link signal.
+ * The behaviour can be overridden with signal_activate_link().
  * Email addresses in the authors, documenters and artists properties are recognized by looking
- * for \<user\@host\>, URLs are recognized by looking for http://url, with the URL extending to the next space,
+ * for \<user\@host\>, URLs are recognized by looking for %http://url, with the URL extending to the next space,
  * tab or line break.
  *
- * An AboutDialog looks like this:
+ * An %AboutDialog looks like this:
  * @image html aboutdialog1.png
  *
  * @ingroup Dialogs
