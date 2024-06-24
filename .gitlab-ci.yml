@@ -1,4 +1,4 @@
-# 2023-02-13: ubuntu:latest = 22.04, ubuntu:rolling = 22.10, ubuntu:devel = 23.04
+# 2024-06-11: ubuntu:latest = 24.04, ubuntu:rolling = 24.04, ubuntu:devel = 24.10
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
 
@@ -42,6 +42,11 @@ variables:
                    libxml2-dev
                    glslc
 
+  GTK4_MESON_OPTIONS: -Dgtk4:build-demos=false
+                      -Dgtk4:build-testsuite=false
+                      -Dgtk4:build-examples=false
+                      -Dgtk4:build-tests=false
+
   GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
   GIT_SUBMODULE_STRATEGY: normal
 
@@ -62,14 +67,14 @@ release_gcc_build:
     # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
     # Don't use warnings=fatal. Accept that functions can be deprecated in gtk but not in gtkmm.
     # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
-    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max $GTK4_MESON_OPTIONS
     - meson compile
     # Some tests fail with
     #   Unable to init Broadway server: Could not connect: No such file or directory
     #   Gtk-WARNING **: 14:38:45.180: cannot open display:
     # Skip tests. Most test cases are not executed anyway, only built by 'meson compile'.
     # - meson test
-    - meson install
+    - meson install --quiet
   artifacts:
     when: always
     paths:
@@ -89,11 +94,11 @@ release_clang_build:
     # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
     # Don't use warnings=fatal. Accept that functions can be deprecated in gtk but not in gtkmm.
     # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
-    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max
+    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=max $GTK4_MESON_OPTIONS
     - meson compile
     # See comment in the release_gcc_build job.
     # - meson test
-    - meson install
+    - meson install --quiet
   allow_failure: true
   artifacts:
     when: on_failure
