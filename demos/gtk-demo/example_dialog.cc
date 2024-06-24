@@ -29,6 +29,7 @@ protected:
   void on_message_finish(const Glib::RefPtr<Gio::AsyncResult>& result,
     const Glib::RefPtr<Gtk::AlertDialog>& dialog);
   void on_interactive_response(const Glib::ustring& response, Dialog_Interactive* dialog);
+  bool on_interactive_close_request(Dialog_Interactive* dialog);
 
   //Member widgets:
   Gtk::Frame m_Frame;
@@ -147,8 +148,12 @@ void Example_Dialog::on_button_interactive()
 {
   Dialog_Interactive* pDialog = new Dialog_Interactive(*this, m_Entry1.get_text(), m_Entry2.get_text());
   pDialog->set_modal(true);
+  // Either on_interactive_response() or on_interactive_close_request(),
+  // but not both, will be called.
   pDialog->buttons_clicked_connect(sigc::bind(
     sigc::mem_fun(*this, &Example_Dialog::on_interactive_response), pDialog));
+  pDialog->signal_close_request().connect(sigc::bind(
+    sigc::mem_fun(*this, &Example_Dialog::on_interactive_close_request), pDialog), false);
   pDialog->set_visible(true);
 }
 
@@ -180,12 +185,20 @@ void Example_Dialog::on_message_finish(const Glib::RefPtr<Gio::AsyncResult>& res
 
 void Example_Dialog::on_interactive_response(const Glib::ustring& response, Dialog_Interactive* dialog)
 {
+  std::cout << "Interactive response: " << response << "\n";
   if (response == "OK")
   {
     m_Entry1.set_text(dialog->get_entry1());
     m_Entry2.set_text(dialog->get_entry2());
   }
   delete dialog;
+}
+
+bool Example_Dialog::on_interactive_close_request(Dialog_Interactive* dialog)
+{
+  std::cout << "Interactive close request\n";
+  delete dialog;
+  return false;
 }
 
 //***** Interactive dialog ******
