@@ -197,8 +197,11 @@ void Example_Dialog::on_interactive_response(const Glib::ustring& response, Dial
 bool Example_Dialog::on_interactive_close_request(Dialog_Interactive* dialog)
 {
   std::cout << "Interactive close request\n";
+  // When Gtk::Window::set_hide_on_close() is not called, the window
+  // is destroyed on close. Destroying (in GTK parlance) does not necessarily
+  // lead to deletion.
   delete dialog;
-  return false;
+  return true; // Don't call other signal handlers.
 }
 
 //***** Interactive dialog ******
