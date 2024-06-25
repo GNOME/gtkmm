@@ -13,10 +13,7 @@ Download location
  - https://download.gnome.org/sources/gtkmm
 
 Reference documentation
- - https://developer-old.gnome.org/gtkmm/3.24/
-
-This reference documentation does not document the latest release. If you want
-newer documentation, download a tarball. Tarballs contain reference documentation.
+ - Download a tarball. Tarballs contain reference documentation.
 In tarballs generated with Meson, see the untracked/docs/reference/html directory.
 
 Discussion on GNOME's discourse forum
