@@ -13,8 +13,12 @@ Download location
  - https://download.gnome.org/sources/gtkmm
 
 Reference documentation
- - Download a tarball. Tarballs contain reference documentation.
-In tarballs generated with Meson, see the untracked/docs/reference/html directory.
+ - https://gnome.pages.gitlab.gnome.org/gtkmm
+
+The documentation on the web describes gtkmm-4.0.
+If you want documentation of gtkmm-3.0, download a tarball.
+Tarballs contain reference documentation. In tarballs generated with Meson,
+see the untracked/docs/reference/html directory.
 
 Discussion on GNOME's discourse forum
  - https://discourse.gnome.org/tag/cplusplus

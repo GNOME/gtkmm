@@ -47,7 +47,7 @@ c_compiler = meson.get_compiler('c')
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-python3 = find_program('python3', version: '>=3.5')
+python3 = find_program('python3', version: '>=3.7')
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
@@ -424,7 +424,7 @@ endif
 if meson.is_subproject()
   pkgconfig_vars = {
     'htmlrefdir': install_prefix / install_docdir / 'reference' / 'html',
-    'htmlrefpub': 'http://library.gnome.org/devel/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME') + '/3.24/'
+    'htmlrefpub': 'https://gnome.pages.gitlab.gnome.org/' + pkg_conf_data.get_unquoted('PACKAGE_TARNAME')
   }
   if build_documentation
     pkgconfig_vars += {'doxytagfile': tag_file.full_path()}
