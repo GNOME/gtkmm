@@ -144,9 +144,16 @@ gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmpro
 
 gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 
-gtkmm_pc_requires = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
-gdkmm_build_dep = gtkmm_pc_requires + [vulkan_dep]
+gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep, vulkan_dep]
 gtkmm_build_dep = gdkmm_build_dep
+
+gtkmm_pc_requires = [
+  'giomm-2.@0@'.format(glibmm_req_minor_ver) + glibmm_req,
+  'gtk4' + gtk_req,
+  'cairomm-1.16' + cairomm_req,
+  'pangomm-2.48' + pangomm_req,
+  'gdk-pixbuf-2.0' + gdk_pixbuf_req,
+]
 
 # not Windows
 if host_machine.system() != 'windows'
@@ -156,8 +163,10 @@ if host_machine.system() != 'windows'
   # header files, when gtk is used uninstalled.
   gtk_unix_print_dep = dependency('gtk4-unix-print',
                        required: gtk_dep.type_name() != 'internal')
-  gtkmm_build_dep += [gtk_unix_print_dep]
-  gtkmm_pc_requires += [gtk_unix_print_dep]
+  if gtk_unix_print_dep.found()
+    gtkmm_build_dep += [gtk_unix_print_dep]
+    gtkmm_pc_requires += ['gtk4-unix-print']
+  endif
 endif
 
 # Some dependencies are required only in maintainer mode and/or if
