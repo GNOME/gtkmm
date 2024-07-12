@@ -1,24 +1,12 @@
 # gdk
 
-# Input: install_prefix, install_libdir, install_datadir, install_includedir,
-#        gtkmm_pcname, gtkmm_api_version, gtkmm_requires, build_deprecated_api,
-#        cpp_compiler, gtkmm_major_version, gtkmm_minor_version,
-#        gtkmm_micro_version, msvc14x_toolset_ver
+# Input: install_libdir, gtkmm_pcname, build_deprecated_api, cpp_compiler,
+#        gtkmm_major_version, gtkmm_minor_version, gtkmm_micro_version
 # Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
-pkg_conf_data.set('prefix', install_prefix)
-pkg_conf_data.set('exec_prefix', '${prefix}')
-pkg_conf_data.set('libdir', '${exec_prefix}' / install_libdir)
-pkg_conf_data.set('datarootdir', '${prefix}' / install_datadir)
-pkg_conf_data.set('datadir', '${datarootdir}')
-pkg_conf_data.set('includedir', '${prefix}' / install_includedir)
-pkg_conf_data.set('PACKAGE_TARNAME', meson.project_name())
 pkg_conf_data.set('PACKAGE_VERSION', meson.project_version())
 pkg_conf_data.set('GTKMM_MODULE_NAME', gtkmm_pcname)
-pkg_conf_data.set('GTKMM_API_VERSION', gtkmm_api_version)
-pkg_conf_data.set('GTKMM_MODULES', gtkmm_requires)
-pkg_conf_data.set('MSVC_TOOLSET_VER', msvc14x_toolset_ver)
 if not build_deprecated_api
   pkg_conf_data.set('GDKMM_DISABLE_DEPRECATED', 1)
   pkg_conf_data.set('GTKMM_DISABLE_DEPRECATED', 1)

@@ -8,7 +8,7 @@ project('gtkmm', 'c', 'cpp',
     'cpp_std=c++17',
     'warning_level=1',
   ],
-  meson_version: '>= 0.56.0', # required for executable(win_subsystem:)
+  meson_version: '>= 0.62.0', # required for variables in pkgconfig.generate()
 )
 
 gtkmm_api_version = '4.0'
@@ -144,17 +144,9 @@ gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmpro
 
 gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
 
-gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep, vulkan_dep]
-gdkmm_requires = [
-  'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
-  'gtk4', gtk_req,
-  'cairomm-1.16', cairomm_req,
-  'pangomm-2.48', pangomm_req,
-  'gdk-pixbuf-2.0', gdk_pixbuf_req,
-]
-
+gtkmm_pc_requires = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
+gdkmm_build_dep = gtkmm_pc_requires + [vulkan_dep]
 gtkmm_build_dep = gdkmm_build_dep
-gtkmm_requires = gdkmm_requires
 
 # not Windows
 if host_machine.system() != 'windows'
@@ -164,14 +156,9 @@ if host_machine.system() != 'windows'
   # header files, when gtk is used uninstalled.
   gtk_unix_print_dep = dependency('gtk4-unix-print',
                        required: gtk_dep.type_name() != 'internal')
-  if gtk_unix_print_dep.found()
-    gtkmm_build_dep += [gtk_unix_print_dep]
-  endif
-  gtkmm_requires += ['gtk4-unix-print', '']
+  gtkmm_build_dep += [gtk_unix_print_dep]
+  gtkmm_pc_requires += [gtk_unix_print_dep]
 endif
-
-gdkmm_requires = ' '.join(gdkmm_requires)
-gtkmm_requires = ' '.join(gtkmm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.
@@ -312,9 +299,6 @@ if is_msvc
   gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
-# add_dist_script() is not allowed in a subproject if meson.version() < 0.58.0.
-can_add_dist_script = not meson.is_subproject() or meson.version().version_compare('>= 0.58.0')
-
 subdir('tools/extra_defs_gen')
 subdir('gdk')
 subdir('MSVC_NMake/gdkmm')
@@ -326,29 +310,27 @@ subdir('tests')
 subdir('demos/gtk-demo')
 subdir('docs/reference')
 
-if can_add_dist_script
-  # Add a ChangeLog file to the distribution directory.
-  meson.add_dist_script(
-    python3, dist_changelog_py,
-    project_source_root,
-  )
+# Add a ChangeLog file to the distribution directory.
+meson.add_dist_script(
+  python3, dist_changelog_py,
+  project_source_root,
+)
 
-  # Don't distribute these files and directories.
-  dont_distribute = [
-    'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
-    'examples.moved_to_gtkmm_documentation_module',
-    'win32_installer',
-    '.gitlab-ci.yml',
-  ]
-  # Add build scripts to the distribution directory, and delete .gitignore
-  # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
-  meson.add_dist_script(
-    python3, dist_build_scripts_py,
-    project_source_root,
-    'untracked' / 'build_scripts',
-    dont_distribute,
-  )
-endif
+# Don't distribute these files and directories.
+dont_distribute = [
+  'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
+  'examples.moved_to_gtkmm_documentation_module',
+  'win32_installer',
+  '.gitlab-ci.yml',
+]
+# Add build scripts to the distribution directory, and delete .gitignore
+# files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
+meson.add_dist_script(
+  python3, dist_build_scripts_py,
+  project_source_root,
+  'untracked' / 'build_scripts',
+  dont_distribute,
+)
 
 if meson.is_subproject()
   pkgconfig_vars = {

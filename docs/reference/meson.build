@@ -4,7 +4,7 @@
 #        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, gdkmm_extra_h_files,
 #        gtkmm_extra_h_files, gdkmm_built_h_file_targets,
 #        gtkmm_built_h_file_targets, install_datadir, python3,
-#        doc_reference_py, build_documentation, can_add_dist_script
+#        doc_reference_py, build_documentation
 # Output: install_docdir, install_devhelpdir, if build_documentation: tag_file
 
 tag_file_modules = [
@@ -174,14 +174,12 @@ endforeach
 
 install_data(image_files, install_dir: install_image_docdir)
 
-if can_add_dist_script
-  # Distribute built files and files copied by mm-common-get.
-  meson.add_dist_script(
-    python3, doc_reference_py, 'dist_doc',
-    doctool_dir,
-    doctool_dist_dir,
-    meson.current_build_dir(),
-    tag_file.full_path(),
-    devhelp_file.full_path(),
-  )
-endif
+# Distribute built files and files copied by mm-common-get.
+meson.add_dist_script(
+  python3, doc_reference_py, 'dist_doc',
+  doctool_dir,
+  doctool_dist_dir,
+  meson.current_build_dir(),
+  tag_file.full_path(),
+  devhelp_file.full_path(),
+)

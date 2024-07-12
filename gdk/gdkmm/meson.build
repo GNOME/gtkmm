@@ -3,7 +3,7 @@
 # Input: gdkmm_build_dep, gtkmm_pcname, maintainer_mode, project_source_root,
 #        generate_binding_py, m4_files, install_includedir, python3,
 #        dummy_header_py, gmmproc_dir, build_deprecated_api,
-#        gmmproc_extra_m4_dirs, can_add_dist_script
+#        gmmproc_extra_m4_dirs
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
 #         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets,
 #         gdkmm_library
@@ -273,15 +273,13 @@ meson.add_install_script(
   gdkmm_used_hg_ccg_basenames
 )
 
-if can_add_dist_script
-  # Distribute built files.
-  meson.add_dist_script(
-    python3, generate_binding_py, 'dist_built_files',
-    built_h_cc_dir,
-    untracked_gdkmm,
-    gdkmm_hg_ccg_basenames,
-  )
-endif
+# Distribute built files.
+meson.add_dist_script(
+  python3, generate_binding_py, 'dist_built_files',
+  built_h_cc_dir,
+  untracked_gdkmm,
+  gdkmm_hg_ccg_basenames,
+)
 
 # We don't define gdkmm_dep = declare_dependency() with gdkmm_library,
 # which is an internal library.

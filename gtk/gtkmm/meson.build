@@ -5,7 +5,7 @@
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, macos_darwin_versions,
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_libname,
-#        can_add_dist_script
+#        gtkmm_pc_requires
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_own_dep
 
@@ -530,6 +530,36 @@ gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
   install: true,
 )
 
+# Generate .pc files, used by pkg-config.
+pkg_config = import('pkgconfig')
+pc_common_variables = [
+  'doxytagfile=${docdir}/reference/' + gtkmm_pcname + '.tag',
+  'htmlrefdir=${docdir}/reference/html',
+  'htmlrefpub=https://gnome.pages.gitlab.gnome.org/' + meson.project_name(),
+]
+pc_variables = [
+  'exec_prefix=${prefix}',
+  'datarootdir=${datadir}',
+  'gmmprocm4dir=${libdir}/' + gtkmm_pcname + '/proc/m4',
+  'docdir=${datadir}/doc/' + gtkmm_pcname,
+] + pc_common_variables
+pc_uninstalled_variables = [
+  'gmmprocm4dir=${srcdir}/tools/m4',
+  'docdir=${prefix}/docs',
+] + pc_common_variables
+
+pkg_config.generate(gtkmm_library,
+  filebase: gtkmm_pcname,
+  variables: pc_variables,
+  uninstalled_variables: pc_uninstalled_variables,
+  name: meson.project_name(),
+  description: 'C++ binding for the GTK toolkit',
+  url: 'https://www.gtkmm.org/',
+  requires: gtkmm_pc_requires,
+  subdirs: [gtkmm_pcname],
+  extra_cflags: ['-I${libdir}/' + gtkmm_pcname + '/include'],
+)
+
 # Install built .h and _p.h files.
 meson.add_install_script(
   python3, generate_binding_py, 'install_built_h_files',
@@ -538,15 +568,13 @@ meson.add_install_script(
   gtkmm_used_hg_ccg_basenames
 )
 
-if can_add_dist_script
-  # Distribute built files.
-  meson.add_dist_script(
-    python3, generate_binding_py, 'dist_built_files',
-    built_h_cc_dir,
-    untracked_gtkmm,
-    gtkmm_hg_ccg_basenames,
-  )
-endif
+# Distribute built files.
+meson.add_dist_script(
+  python3, generate_binding_py, 'dist_built_files',
+  built_h_cc_dir,
+  untracked_gtkmm,
+  gtkmm_hg_ccg_basenames,
+)
 
 # This is used when building demo programs and test programs.
 # It's also a part of gtkmm_dep, when gtkmm is a subproject.
