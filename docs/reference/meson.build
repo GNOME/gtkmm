@@ -20,7 +20,7 @@ docinstall_flags = []
 foreach module : tag_file_modules
   depmod = dependency(module, required: false)
   if depmod.found()
-    doxytagfile = depmod.get_variable(pkgconfig: 'doxytagfile', internal: 'doxytagfile', default_value: '')
+    doxytagfile = depmod.get_variable('doxytagfile', default_value: '')
     if doxytagfile != ''
       if depmod.type_name() == 'internal'
         # Subprojects must build their tag files before doxygen is called.
@@ -30,8 +30,8 @@ foreach module : tag_file_modules
           doxygen_tag_targets += subproject(module).get_variable('global_tag_file_target')
         endif
       endif
-      htmlrefpub = depmod.get_variable(pkgconfig: 'htmlrefpub', internal: 'htmlrefpub', default_value: '')
-      htmlrefdir = depmod.get_variable(pkgconfig: 'htmlrefdir', internal: 'htmlrefdir', default_value: '')
+      htmlrefpub = depmod.get_variable('htmlrefpub', default_value: '')
+      htmlrefdir = depmod.get_variable('htmlrefdir', default_value: '')
       if htmlrefpub == ''
         htmlrefpub = htmlrefdir
       elif htmlrefdir == ''
