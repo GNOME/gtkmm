@@ -23,8 +23,10 @@
 
 #include <gdkmm/applaunchcontext.h>
 #include <gdkmm/cairocontext.h>
+#include <gdkmm/cicpparams.h>
 #include <gdkmm/contentformatsbuilder.h>
 #include <gdkmm/clipboard.h>
+#include <gdkmm/colorstate.h>
 #include <gdkmm/cursor.h>
 #include <gdkmm/devicepad.h>
 #include <gdkmm/devicetool.h>
@@ -45,6 +47,7 @@
 #include <gdkmm/gltexturebuilder.h>
 #include <gdkmm/graphene_rect.h>
 #include <gdkmm/memorytexture.h>
+#include <gdkmm/memorytexturebuilder.h>
 #include <gdkmm/monitor.h>
 #include <gdkmm/paintable.h>
 #include <gdkmm/pixbuf.h>

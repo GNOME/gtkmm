@@ -32,7 +32,9 @@ endforeach
 gdkmm_any_hg_ccg_basenames = [
   'applaunchcontext',
   'cairocontext',
+  'cicpparams',
   'clipboard',
+  'colorstate',
   'contentformats',
   'contentformatsbuilder',
   'contentprovider',
@@ -61,6 +63,7 @@ gdkmm_any_hg_ccg_basenames = [
   'graphene_rect',
   'graphene_size',
   'memorytexture',
+  'memorytexturebuilder',
   'monitor',
   'paintable',
   'pixbuf',

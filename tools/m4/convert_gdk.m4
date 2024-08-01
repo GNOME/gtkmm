@@ -29,6 +29,7 @@ _CONV_ENUM(Gdk,AnchorHints)
 _CONV_ENUM(Gdk,AxisFlags)
 _CONV_ENUM(Gdk,AxisUse)
 _CONV_ENUM(Gdk,CapStyle)
+_CONV_INCLASS_ENUM(Gdk,CicpParams,Range,GdkCicpRange)
 _CONV_ENUM(Gdk,Colorspace)
 _CONV_ENUM(Gdk,CrossingMode)
 _CONV_INCLASS_ENUM(Gdk,Device,Type)
@@ -249,6 +250,11 @@ _CONVERSION(`GdkClipboard*',`Glib::RefPtr<Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GdkClipboard*',`Glib::RefPtr<Gdk::Clipboard>',`Glib::wrap($3)')
 _CONVERSION(`GdkClipboard*',`Glib::RefPtr<const Gdk::Clipboard>',`Glib::wrap($3)')
+
+# CicpParams, ColorState
+_CONVERSION(`GdkCicpParams*',`Glib::RefPtr<CicpParams>',`Glib::wrap($3)')
+_CONVERSION(`GdkColorState*',`Glib::RefPtr<ColorState>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const ColorState>&',`GdkColorState*',__CONVERT_CONST_REFPTR_TO_P)
 
 # ContentFormats, ContentFormatsBuilder
 _CONVERSION(`const Glib::RefPtr<ContentFormats>&',`GdkContentFormats*',__CONVERT_REFPTR_TO_P)

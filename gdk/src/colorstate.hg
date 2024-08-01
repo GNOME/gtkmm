@@ -1,0 +1,82 @@
+/* Copyright (C) 2024 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gdkmmconfig.h)
+
+_DEFS(gdkmm,gdk)
+
+#include <glibmm/refptr.h>
+#include <glibmm/value.h>
+#include <gdk/gdk.h> // For GdkColorState
+
+namespace Gdk
+{
+class GDKMM_API CicpParams;
+
+/** A %Gdk::ColorState object provides the information to interpret
+ * colors and pixels in a variety of ways.
+ *
+ * They are also known as
+ * [*color spaces*](https://en.wikipedia.org/wiki/Color_space).
+ *
+ * Crucially, GTK knows how to convert colors from one color state to another.
+ *
+ * %ColorState objects are immutable and therefore threadsafe.
+ *
+ * @newin{4,16}
+ */
+class GDKMM_API ColorState final
+{
+  // GdkColorState is registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(ColorState, GdkColorState, NONE, gdk_color_state_ref, gdk_color_state_unref, GDKMM_API)
+  _IGNORE(gdk_color_state_ref, gdk_color_state_unref)
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<ColorState> get_srgb(),
+    gdk_color_state_get_srgb, refreturn)
+  _WRAP_METHOD(static Glib::RefPtr<ColorState> get_srgb_linear(),
+    gdk_color_state_get_srgb_linear, refreturn)
+  _WRAP_METHOD(static Glib::RefPtr<ColorState> get_rec2100_pq(),
+    gdk_color_state_get_rec2100_pq, refreturn)
+  _WRAP_METHOD(static Glib::RefPtr<ColorState> get_rec2100_linear(),
+    gdk_color_state_get_rec2100_linear, refreturn)
+
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<const ColorState>& other) const,
+    gdk_color_state_equal)
+  _WRAP_METHOD(Glib::RefPtr<CicpParams> create_cicp_params() const,
+    gdk_color_state_create_cicp_params)
+};
+
+} // namespace Gdk
+
+namespace Glib
+{
+// This is needed so Glib::RefPtr<Gdk::ColorState> can be used with
+// Glib::Value and _WRAP_PROPERTY in Gdk::DmabufTextureBuilder and elsewhere.
+template <>
+class GDKMM_API Value<Glib::RefPtr<Gdk::ColorState>> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::RefPtr<Gdk::ColorState>;
+  using CType = GdkColorState*;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+} // namespace Glib
