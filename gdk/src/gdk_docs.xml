@@ -194,7 +194,6 @@ Supported values:
 - 5: PAL
 - 6,7: BT.601 / NTSC
 - 9: BT.2020
-- 10: CIE XYZ
 - 12: Display P3
 
 Since: 4.16
@@ -3472,10 +3471,6 @@ being set.
 </parameter>
 <parameter name="GDK_TOPLEVEL_STATE_LEFT_RESIZABLE">
 <parameter_description> whether the left edge is resizable
-</parameter_description>
-</parameter>
-<parameter name="GDK_TOPLEVEL_STATE_SUSPENDED">
-<parameter_description> the surface is not visible to the user
 </parameter_description>
 </parameter>
 </parameters>
@@ -8837,6 +8832,9 @@ gdk_draw_context_begin_frame() and gdk_draw_context_end_frame() via the
 use of [GskRenderer](../gsk4/class.Renderer.html)s, so application code
 does not need to call these functions explicitly.
 
+Deprecated: 4.16: Drawing directly to the surface is no longer recommended.
+Use `GskRenderNode` and `GskRenderer`.
+
 </description>
 <parameters>
 <parameter name="context">
@@ -8862,6 +8860,9 @@ See [method@Gdk.DrawContext.begin_frame] for more details about drawing.
 When using a [class@Gdk.GLContext], this function may call `glFlush()`
 implicitly before returning; it is not recommended to call `glFlush()`
 explicitly before calling this function.
+
+Deprecated: 4.16: Drawing directly to the surface is no longer recommended.
+Use `GskRenderNode` and `GskRenderer`.
 
 </description>
 <parameters>
@@ -8900,6 +8901,8 @@ surface that the @context determined needs to be repainted.
 If @context is not in between calls to [method@Gdk.DrawContext.begin_frame]
 and [method@Gdk.DrawContext.end_frame], %NULL will be returned.
 
+Deprecated: 4.16: Drawing directly to the surface is no longer recommended.
+Use `GskRenderNode` and `GskRenderer`.
 
 </description>
 <parameters>
@@ -8909,6 +8912,7 @@ and [method@Gdk.DrawContext.end_frame], %NULL will be returned.
 </parameter>
 </parameters>
 <return> a Cairo region
+
 </return>
 </function>
 
@@ -8936,6 +8940,8 @@ This is the case between calls to [method@Gdk.DrawContext.begin_frame]
 and [method@Gdk.DrawContext.end_frame]. In this situation, drawing commands
 may be effecting the contents of the @context's surface.
 
+Deprecated: 4.16: Drawing directly to the surface is no longer recommended.
+Use `GskRenderNode` and `GskRenderer`.
 
 </description>
 <parameters>
@@ -8946,6 +8952,7 @@ may be effecting the contents of the @context's surface.
 </parameters>
 <return> %TRUE if the context is between [method@Gdk.DrawContext.begin_frame]
 and [method@Gdk.DrawContext.end_frame] calls.
+
 </return>
 </function>
 
@@ -9565,9 +9572,13 @@ Returns whether a `GdkEvent` should trigger a context menu,
 according to platform conventions.
 
 The right mouse button typically triggers context menus.
+On macOS, Control+left mouse button also triggers.
 
 This function should always be used instead of simply checking for
-event-&gt;button == %GDK_BUTTON_SECONDARY.
+
+```c
+event-&gt;button == GDK_BUTTON_SECONDARY
+```
 
 
 </description>
@@ -18297,6 +18308,9 @@ is opaque, as we know where the opaque regions are. If your surface
 background is not opaque, please update this property in your
 [GtkWidgetClass.css_changed](../gtk4/vfunc.Widget.css_changed.html) handler.
 
+Deprecated: 4.16: GDK can figure out the opaque parts of a window itself
+by inspecting the contents that are drawn.
+
 </description>
 <parameters>
 <parameter name="surface">
@@ -20071,6 +20085,787 @@ Registers an error quark for [class@Gdk.VulkanContext] errors.
 </return>
 </function>
 
+<function name="graphene_box2d_alloc">
+<description>
+Allocates a new #graphene_box2d_t.
+
+The contents of the returned structure are undefined.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> the newly allocated #graphene_box2d_t structure.
+Use graphene_box2d_free() to free the resources allocated by this function
+
+</return>
+</function>
+
+<function name="graphene_box2d_contains_box">
+<description>
+Checks whether the #graphene_box2d_t @a contains the given
+#graphene_box2d_t @b.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> `true` if the box is contained in the given box
+
+</return>
+</function>
+
+<function name="graphene_box2d_contains_point">
+<description>
+Checks whether @box contains the given @point.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the coordinates to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> `true` if the point is contained in the given box
+
+</return>
+</function>
+
+<function name="graphene_box2d_contains_rect">
+<description>
+Checks whether @box contains the given @rect.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> the rectangle to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> `true` if the rectangle is contained in the given box
+
+</return>
+</function>
+
+<function name="graphene_box2d_empty">
+<description>
+A degenerate #graphene_box2d_t that can only be expanded.
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_equal">
+<description>
+Checks whether the two given boxes are equal.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> `true` if the boxes are equal
+
+</return>
+</function>
+
+<function name="graphene_box2d_expand">
+<description>
+Expands the dimensions of @box to include the coordinates at @point.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the coordinates of the point to include
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> return location for the expanded box
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_expand_scalar">
+<description>
+Expands the dimensions of @box by the given @scalar value.
+
+If @scalar is positive, the #graphene_box2d_t will grow; if @scalar is
+negative, the #graphene_box2d_t will shrink.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="scalar">
+<parameter_description> a scalar value
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> return location for the expanded box
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_expand_vec2">
+<description>
+Expands the dimensions of @box to include the coordinates of the
+given vector.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="vec">
+<parameter_description> the coordinates of the point to include, as a #graphene_vec2_t
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> return location for the expanded box
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_free">
+<description>
+Frees the resources allocated by graphene_box2d_alloc().
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_center">
+<description>
+Retrieves the coordinates of the center of a #graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="center">
+<parameter_description> return location for the coordinates of
+the center
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_height">
+<description>
+Retrieves the size of the @box on the Y axis.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the height of the box
+
+</return>
+</function>
+
+<function name="graphene_box2d_get_max">
+<description>
+Retrieves the coordinates of the maximum point of the given
+#graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> return location for the maximum point
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_min">
+<description>
+Retrieves the coordinates of the minimum point of the given
+#graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> return location for the minimum point
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_minmax">
+<description>
+Retrieves the coordinates of the minimum and maximum points of the
+given #graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> return location for the minimum point
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> return location for the maximum point
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_size">
+<description>
+Retrieves the size of the box on all three axes, and stores
+it into the given @size vector.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> return location for the size
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_vertices">
+<description>
+Computes the vertices of the given #graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="vertices">
+<parameter_description> return location for an array
+of 4 #graphene_vec2_t
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_get_width">
+<description>
+Retrieves the size of the @box on the X axis.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the width of the box
+
+</return>
+</function>
+
+<function name="graphene_box2d_infinite">
+<description>
+A degenerate #graphene_box2d_t that cannot be expanded.
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init">
+<description>
+Initializes the given #graphene_box2d_t with two vertices.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> the coordinates of the minimum vertex
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> the coordinates of the maximum vertex
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init_from_box">
+<description>
+Initializes the given #graphene_box2d_t with the vertices of
+another #graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="src">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init_from_points">
+<description>
+Initializes the given #graphene_box2d_t with the given array
+of vertices.
+
+If @n_points is 0, the returned box is initialized with
+graphene_box2d_empty().
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="n_points">
+<parameter_description> the number #graphene_point_t in the @points array
+</parameter_description>
+</parameter>
+<parameter name="points">
+<parameter_description> an array of #graphene_point_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init_from_rect">
+<description>
+Initializes the given #graphene_box2d_t with the origin and
+size of a #graphene_rect_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="src">
+<parameter_description> a #graphene_rect_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init_from_vec2">
+<description>
+Initializes the given #graphene_box2d_t with two vertices
+stored inside #graphene_vec2_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> the coordinates of the minimum vertex
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> the coordinates of the maximum vertex
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_init_from_vectors">
+<description>
+Initializes the given #graphene_box2d_t with the given array
+of vertices.
+
+If @n_vectors is 0, the returned box is initialized with
+graphene_box2d_empty().
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> the #graphene_box2d_t to initialize
+</parameter_description>
+</parameter>
+<parameter name="n_vectors">
+<parameter_description> the number #graphene_vec2_t in the @vectors array
+</parameter_description>
+</parameter>
+<parameter name="vectors">
+<parameter_description> an array of #graphene_vec2_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the initialized #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_intersection">
+<description>
+Intersects the two given #graphene_box2d_t.
+
+If the two boxes do not intersect, @res will contain a degenerate box
+initialized with graphene_box2d_empty().
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> return location for the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the two boxes intersect
+
+</return>
+</function>
+
+<function name="graphene_box2d_intersects">
+<description>
+Checks whether two boxes intersect.
+
+See also: graphene_box2d_intersection()
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the boxes intersect, and false otherwise
+
+</return>
+</function>
+
+<function name="graphene_box2d_minus_one">
+<description>
+A #graphene_box2d_t with the minimum vertex set at (-1, -1) and the
+maximum vertex set at (0, 0).
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_one">
+<description>
+A #graphene_box2d_t with the minimum vertex set at (0, 0) and the
+maximum vertex set at (1, 1).
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_one_minus_one">
+<description>
+A #graphene_box2d_t with the minimum vertex set at (-1, -1) and the
+maximum vertex set at (1, 1).
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
+<function name="graphene_box2d_scale_offset">
+<description>
+Applies a scale and an offset to the vertices of the given box.
+
+If @scale is %NULL, the box will be scaled by (1.0, 1.0).
+
+If @offset is %NULL, the box will be offset by (0.0, 0.0).
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="scale">
+<parameter_description> a vector with two scaling factors to be applied to the box
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset to apply to the box
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> the transformed box
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_to_float">
+<description>
+Stores the minimum and maximum vertices of the given #graphene_box2d_t
+into an array.
+
+The array layout is:
+
+- min_x
+- min_y
+- max_x
+- max_y
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="v">
+<parameter_description> return location
+for an array of floating point values with at least 4 elements
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_to_rect">
+<description>
+Stores the minimum and maximum vertices of the given #graphene_box2d_t
+into a rectangle of equivalent origin and size.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="rect">
+<parameter_description> the rectangle to initialize
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_union">
+<description>
+Unions the two given #graphene_box2d_t.
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_box2d_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the box to union to @a
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> return location for the result
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box2d_zero">
+<description>
+A #graphene_box2d_t with both the minimum and maximum vertices set at (0, 0).
+
+The returned value is owned by Graphene and should not be modified or freed.
+
+Since: 1.12
+
+</description>
+<parameters>
+</parameters>
+<return> a #graphene_box2d_t
+
+</return>
+</function>
+
 <function name="graphene_box_alloc">
 <description>
 Allocates a new #graphene_box_t.
@@ -20377,6 +21172,31 @@ Since: 1.2
 </parameter>
 <parameter name="min">
 <parameter_description> return location for the minimum point
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="graphene_box_get_minmax">
+<description>
+Retrieves the coordinates of the minimum and maximum points of the
+given #graphene_box_t
+
+Since: 1.12
+
+</description>
+<parameters>
+<parameter name="box">
+<parameter_description> a #graphene_box_t
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> return location for the minimum point
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> return location for the maximum point
 </parameter_description>
 </parameter>
 </parameters>
@@ -26894,6 +27714,32 @@ Since: 1.0
 <parameters>
 </parameters>
 <return> the initialized #graphene_simd4f_t
+
+</return>
+</function>
+
+<function name="graphene_simd4f_madd">
+<description>
+Adds @a to the product of @m1 and @m2.
+
+Since: 1.0
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> a #graphene_simd4f_t
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> a #graphene_simd4f_t
+</parameter_description>
+</parameter>
+<parameter name="c">
+<parameter_description> a #graphene_simd4f_t
+</parameter_description>
+</parameter>
+</parameters>
+<return> the result vector
 
 </return>
 </function>

@@ -20279,6 +20279,38 @@ see [method@Gtk.TextBuffer.get_text] for more information.
 </description>
 </property>
 
+<enum name="GtkTextBufferNotifyFlags">
+<description>
+Values for [callback@Gtk.TextBufferCommitNotify] to denote the
+point of the notification.
+
+Since: 4.16
+
+</description>
+<parameters>
+<parameter name="GTK_TEXT_BUFFER_NOTIFY_BEFORE_INSERT">
+<parameter_description> Be notified before text
+is inserted into the underlying buffer.
+</parameter_description>
+</parameter>
+<parameter name="GTK_TEXT_BUFFER_NOTIFY_AFTER_INSERT">
+<parameter_description> Be notified after text
+has been inserted into the underlying buffer.
+</parameter_description>
+</parameter>
+<parameter name="GTK_TEXT_BUFFER_NOTIFY_BEFORE_DELETE">
+<parameter_description> Be notified before text
+is deleted from the underlying buffer.
+</parameter_description>
+</parameter>
+<parameter name="GTK_TEXT_BUFFER_NOTIFY_AFTER_DELETE">
+<parameter_description> Be notified after text
+has been deleted from the underlying buffer.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkTextDirection">
 <description>
 Reading directions for text.
@@ -80904,7 +80936,8 @@ If the list does not have an item at @position or
 value of the [property@Gtk.SingleSelection:autoselect] property:
 If it is set, no change will occur and the old item will stay
 selected. If it is unset, the selection will be unset and no item
-will be selected.
+will be selected. This also applies if [property@Gtk.SingleSelection:can-unselect]
+is set to %FALSE.
 
 </description>
 <parameters>
@@ -86120,6 +86153,52 @@ if the reference count reaches 0.
 <return></return>
 </function>
 
+<function name="gtk_text_buffer_add_commit_notify">
+<description>
+Adds a [callback@Gtk.TextBufferCommitNotify] to be called when a change
+is to be made to the [type@Gtk.TextBuffer].
+
+Functions are explicitly forbidden from making changes to the
+[type@Gtk.TextBuffer] from this callback. It is intended for tracking
+changes to the buffer only.
+
+It may be advantageous to use [callback@Gtk.TextBufferCommitNotify] over
+connecting to the [signal@Gtk.TextBuffer::insert-text] or
+[signal@Gtk.TextBuffer::delete-range] signals to avoid ordering issues with
+other signal handlers which may further modify the [type@Gtk.TextBuffer].
+
+Since: 4.16
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a [type@Gtk.TextBuffer]
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> which notifications should be dispatched to @callback
+</parameter_description>
+</parameter>
+<parameter name="commit_notify">
+<parameter_description> a
+[callback@Gtk.TextBufferCommitNotify] to call for commit notifications
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> closure data for @commit_notify
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> a callback to free @user_data when @commit_notify is removed
+</parameter_description>
+</parameter>
+</parameters>
+<return> a handler id which may be used to remove the commit notify
+callback using [method@Gtk.TextBuffer.remove_commit_notify].
+
+</return>
+</function>
+
 <function name="gtk_text_buffer_add_mark">
 <description>
 Adds the mark at position @where.
@@ -87794,6 +87873,31 @@ code sections that add tags.
 </parameter>
 <parameter name="end">
 <parameter_description> other bound of range to be untagged
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_text_buffer_remove_commit_notify">
+<description>
+Removes the `GtkTextBufferCommitNotify` handler previously registered
+with [method@Gtk.TextBuffer.add_commit_notify].
+
+This may result in the `user_data_destroy` being called that was passed when registering
+the commit notify functions.
+
+Since: 4.16
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a `GtkTextBuffer`
+</parameter_description>
+</parameter>
+<parameter name="commit_notify_handler">
+<parameter_description> the notify handler identifier returned from
+[method@Gtk.TextBuffer.add_commit_notify].
 </parameter_description>
 </parameter>
 </parameters>
@@ -108443,6 +108547,14 @@ Opens or closes the [interactive debugger](running.html#interactive-debugging).
 
 The debugger offers access to the widget hierarchy of the application
 and to useful debugging tools.
+
+This function allows applications that already use
+&lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;Shift&lt;/kbd&gt;+&lt;kbd&gt;I&lt;/kbd&gt;
+(or &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;Shift&lt;/kbd&gt;+&lt;kbd&gt;D&lt;/kbd&gt;)
+for their own key shortcuts to add a different shortcut to open the Inspector.
+
+If you are not overriding the default key shortcuts for the Inspector,
+you should not use this function.
 
 </description>
 <parameters>
