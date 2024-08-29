@@ -22,6 +22,33 @@
 #include <gtkmm/textmark.h>
 #include <gtkmm/textiter.h>
 
+namespace
+{
+extern "C"
+{
+static void SignalProxy_CommitNotify_gtk_callback(GtkTextBuffer* /* buffer */,
+  GtkTextBufferNotifyFlags flags, guint position, guint length,
+  void* user_data)
+{
+  auto the_slot = static_cast<Gtk::TextBuffer::SlotCommitNotify*>(user_data);
+
+  try
+  {
+    (*the_slot)(static_cast<Gtk::TextBuffer::NotifyFlags>(flags), position, length);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void SignalProxy_CommitNotify_gtk_callback_destroy(void* data)
+{
+  delete static_cast<Gtk::TextBuffer::SlotCommitNotify*>(data);
+}
+} // extern "C"
+} // anonymous namespace
+
 namespace Gtk
 {
 
@@ -501,6 +528,19 @@ Glib::ustring TextBuffer::get_text(bool include_hidden_chars) const
 {
   auto unconst = const_cast<TextBuffer*>(this); //Because begin() and end() are not const.
   return get_text(unconst->begin(), unconst->end(), include_hidden_chars);
+}
+
+guint TextBuffer::add_commit_notify(NotifyFlags flags, const SlotCommitNotify& slot)
+{
+  // Create a copy of the slot object. A pointer to this will be passed
+  // through the callback's data parameter. It will be deleted
+  // when SignalProxy_CommitNotify_gtk_callback_destroy() is called.
+  auto slot_copy = new SlotCommitNotify(slot);
+
+  return gtk_text_buffer_add_commit_notify(gobj(),
+    static_cast<GtkTextBufferNotifyFlags>(flags),
+    &SignalProxy_CommitNotify_gtk_callback, slot_copy,
+    &SignalProxy_CommitNotify_gtk_callback_destroy);
 }
 
 } // namespace Gtk

@@ -90,6 +90,8 @@ protected:
   explicit TextBuffer(const Glib::RefPtr<TagTable>& tag_table);
 
 public:
+  _WRAP_ENUM(NotifyFlags, GtkTextBufferNotifyFlags, decl_prefix GTKMM_API)
+
   _WRAP_CREATE()
   _WRAP_CREATE(const Glib::RefPtr<TagTable>& tag_table)
 
@@ -510,6 +512,80 @@ public:
   _WRAP_METHOD(void end_irreversible_action(), gtk_text_buffer_end_irreversible_action)
   _WRAP_METHOD(void begin_user_action(), gtk_text_buffer_begin_user_action)
   _WRAP_METHOD(void end_user_action(), gtk_text_buffer_end_user_action)
+
+/** A notification callback used by add_commit_notify().
+ *
+ * For instance:
+ * @code
+ * void on_commit_notify(NotifyFlags flags, guint position, guint length);
+ * @endcode
+ *
+ * You may not modify the %TextBuffer from a %SlotCommitNotify callback
+ * and that is enforced by the %Gtk::TextBuffer API.
+ *
+ * A %SlotCommitNotify callback may be used to be notified about
+ * changes to the underlying buffer right before-or-after the changes are
+ * committed to the underlying B-Tree. This is useful if you want to observe
+ * changes to the buffer without other signal handlers potentially modifying
+ * state on the way to the default signal handler.
+ *
+ * When @a flags is Gtk::TextBuffer::NotifyFlags::BEFORE_INSERT, @a position is set to
+ * the offset in characters from the start of the buffer where the insertion
+ * will occur. @a length is set to the number of characters to be inserted. You
+ * may not yet retrieve the text until it has been inserted. You may access the
+ * text from Gtk::TextBuffer::NotifyFlags::AFTER_INSERT using get_slice().
+ *
+ * When @a flags is Gtk::TextBuffer::NotifyFlags::AFTER_INSERT, @a position is set to
+ * offset in characters where the insertion occurred and @a length is set
+ * to the number of characters inserted.
+ *
+ * When @a flags is Gtk::TextBuffer::NotifyFlags::BEFORE_DELETE, @a position is set to
+ * offset in characters where the deletion will occur and @a length is set
+ * to the number of characters that will be removed. You may still retrieve
+ * the text from this handler using @a position and @a length.
+ *
+ * When @a flags is Gtk::TextBuffer::NotifyFlags::AFTER_DELETE, @a length is set to
+ * zero to denote that the delete-range has already been committed to the
+ * underlying B-Tree. You may no longer retrieve the text that has been
+ * deleted from the %Gtk::TextBuffer.
+ *
+ * @param flags The type of commit notification.
+ * @param position The position of the text operation.
+ * @param length The length of the text operation in characters.
+ *
+ * @newin{4,16}
+ */
+  using SlotCommitNotify = sigc::slot<void(NotifyFlags, guint, guint)>;
+
+  /** Adds a SlotCommitNotify to be called when a change
+   * is to be made to the %Gtk::TextBuffer.
+   *
+   * Functions are explicitly forbidden from making changes to the
+   * %Gtk::TextBuffer from this callback. It is intended for tracking
+   * changes to the buffer only.
+   *
+   * It may be advantageous to use %add_commit_notify() over connecting
+   * to signal_insert() or signal_erase() to avoid ordering issues with
+   * other signal handlers which may further modify the %Gtk::TextBuffer.
+   *
+   * @newin{4,16}
+   *
+   * @param flags Which notifications should be dispatched to @a slot.
+   * @param slot A SlotCommitNotify to call for commit notifications.
+   * @return A handler id which may be used to remove the commit notify
+   *         callback using remove_commit_notify().
+   */
+  guint add_commit_notify(NotifyFlags flags, const SlotCommitNotify& slot);
+  _IGNORE(gtk_text_buffer_add_commit_notify)
+
+  /** Removes the SlotCommitNotify handler previously registered with add_commit_notify().
+   *
+   * @newin{4,16}
+   *
+   * @param commit_notify_handler The notify handler identifier returned from
+   *        add_commit_notify().
+   */
+  _WRAP_METHOD(void remove_commit_notify(guint commit_notify_handler), gtk_text_buffer_remove_commit_notify)
 
 #m4begin
 dnl // HACK: Override the default conversion to deal correctly
