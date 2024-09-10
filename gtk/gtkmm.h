@@ -173,6 +173,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/eventcontroller.h>
 #include <gtkmm/eventcontrollerfocus.h>
 #include <gtkmm/eventcontrollerkey.h>
+#include <gtkmm/eventcontrollerlegacy.h>
 #include <gtkmm/eventcontrollermotion.h>
 #include <gtkmm/eventcontrollerscroll.h>
 #include <gtkmm/filechooser.h>
