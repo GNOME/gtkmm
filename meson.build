@@ -108,7 +108,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 
 # glibmm recently gained Meson build support, so we can try looking
 # for its pkg-config files on Visual Studio as well
-glibmm_req = '>= 2.68.0'
+glibmm_req = '>= 2.75.0'
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
 gtk_req = '>= 4.15.5'
