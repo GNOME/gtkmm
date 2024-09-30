@@ -49,8 +49,6 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
  * @param pixbuf A Gdk::Pixbuf
  * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
  * @param pixbuf_y Y coordinate of location to place upper left corner of pixbuf.
- *
- * @newin{2,10}
  */
 GDKMM_API
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
@@ -60,8 +58,6 @@ void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
  *
  * @param context A cairo context.
  * @param rectangle A rectangle to add to the path of the context.
- *
- * @newin{2,10}
  */
 GDKMM_API
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle);
@@ -70,8 +66,6 @@ void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, c
  *
  * @param context A cairo context.
  * @param region A region to add to the path of the context.
- *
- * @newin{2,10}
  */
 GDKMM_API
 void add_region_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const ::Cairo::RefPtr< ::Cairo::Region>& region);
