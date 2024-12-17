@@ -17,7 +17,7 @@
 
 AC_INIT([gtkmm], [3.24.9],
         [https://gitlab.gnome.org/GNOME/gtkmm/issues/],
-        [gtkmm], [http://www.gtkmm.org/])
+        [gtkmm], [https://gtkmm.gnome.org/])
 AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([gtk/gtkmm.h])

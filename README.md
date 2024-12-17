@@ -7,7 +7,7 @@ gtkmm-3.0 and gtkmm-4.0 are different parallel-installable ABIs.
 This file describes gtkmm-3.0.
 
 Web site
- - https://www.gtkmm.org
+ - https://gtkmm.gnome.org
 
 Download location
  - https://download.gnome.org/sources/gtkmm
