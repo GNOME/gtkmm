@@ -2,8 +2,12 @@
  *
  * Gtk::ShortcutsWindow is a window that provides a help overlay
  * for shortcuts and gestures in an application.
+ *
+ * Gtk::ShortcutsWindow is deprecated since gtkmm 4.18. It has no replacement
+ * in gtkmm. libadwaita (a C library) has a replacement for GtkShortcutsWindow.
  */
 
+#undef GTKMM_DISABLE_DEPRECATED // ShortcutsWindow is deprecated.
 #include <gtkmm.h>
 #include <iostream> // For std::cout
 
@@ -94,6 +98,7 @@ Example_Shortcuts::~Example_Shortcuts()
 
 void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::ustring& view)
 {
+#ifndef GTKMM_DISABLE_DEPRECATED
   auto builder = Gtk::Builder::create();
   try
   {
@@ -121,4 +126,15 @@ void Example_Shortcuts::on_button_clicked(const Glib::ustring& id, const Glib::u
     pOverlay->property_view_name() = view;
 
   pOverlay->set_visible(true);
+
+#else // GTKMM_DISABLE_DEPRECATED
+
+  // If gtkmm has been built without deprecated API, the #undef before #include <gtkmm.h>
+  // has no effect. GTKMM_DISABLE_DEPRECATED is defined in gtkmm.h.
+  const Glib::ustring strMessage = "gtkmm has been built without deprecated API.";
+  const Glib::ustring strDetail = "Can't show " + id + " " + view + ".";
+  auto dialog = Gtk::AlertDialog::create(strMessage);
+  dialog->set_detail(strDetail);
+  dialog->show(*this);
+#endif
 }
