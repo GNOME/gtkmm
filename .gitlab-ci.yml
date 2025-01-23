@@ -1,10 +1,18 @@
-# 2024-06-11: ubuntu:latest = 24.04, ubuntu:rolling = 24.04, ubuntu:devel = 24.10
+# 2025-01-15: ubuntu:latest = 24.04, ubuntu:rolling = 24.10, ubuntu:devel = 25.04
 # See https://hub.docker.com/_/ubuntu
 image: ubuntu:rolling
+
+include:
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      job-stage: "release"
+      dist-job-name: "build_release_tarball"
+      tarball-artifact-path: "_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
 
 stages:
   - build
   - deploy
+  - release
 
 variables:
   MESON_GCC_DEPS: g++
@@ -20,13 +28,9 @@ variables:
                   libgtk-4-dev
                   mm-common
                   libsigc++-3.0-dev
-                  libsigc++-3.0-doc
                   libglibmm-2.68-dev
-                  libglibmm-2.68-doc
                   libcairomm-1.16-dev
-                  libcairomm-1.16-doc
                   libpangomm-2.48-dev
-                  libpangomm-2.48-doc
                   libxml-libxml-perl
                   meson
                   ninja-build
@@ -117,6 +121,33 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    refs:
-      - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build_release_tarball:
+  extends: .build_default
+  stage: build
+  needs: []
+  rules:
+    - if: $CI_COMMIT_TAG  # Run this job when a tag is created
+    - when: manual        # and when manually triggered.
+      allow_failure: true # Don't block the CI pipeline until triggered.
+  variables:
+    DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS
+  script:
+    - mkdir _build && cd _build
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    - meson setup --buildtype=release $GTK4_MESON_OPTIONS
+    # Must compile before 'meson dist' to generate source code and documentation.
+    - meson compile
+    # Skip tests. See release_gcc_build.
+    # 'meson dist --no-tests' skips compile + test + install.
+    # GTKMM_NO_DIST_TESTS skips only test.
+    - export GTKMM_NO_DIST_TESTS=1
+    - meson dist
+  artifacts:
+    name: "${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/meson-dist/*.tar.xz"
+    expire_in: 1 week
