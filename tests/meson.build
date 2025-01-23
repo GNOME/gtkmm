@@ -1,6 +1,6 @@
 # tests
 
-# Input: gtkmm_own_dep, build_tests, gui_app_ldflags
+# Input: gtkmm_own_dep, build_tests, run_tests, gui_app_ldflags
 # Output: -
 
 test_programs = [
@@ -46,7 +46,7 @@ foreach ex : test_programs
   )
 
   # If exe_file is a test program, it is built by default unconditionally.
-  if ex[4] and build_tests
+  if ex[4] and run_tests
     test(ex_name, exe_file)
   endif
 endforeach

@@ -94,6 +94,23 @@ build_documentation = build_documentation_opt == 'true' or \
 build_demos = get_option('build-demos')
 build_tests = get_option('build-tests')
 
+# When a dist tarball is being built and the environment variable GTKMM_NO_DIST_TESTS
+# is set, tests are not run by 'meson dist' even if they are built.
+run_tests = build_tests
+if run_tests and is_dist_check
+  cmd_py = '''
+import os, sys
+sys.exit(0 if os.getenv('GTKMM_NO_DIST_TESTS') == None else 1)
+'''
+  run_tests = run_command(
+    python3, '-c', cmd_py,
+    check: false,
+  ).returncode() == 0
+  if not run_tests
+    message('Test programs will be built but not run.')
+  endif
+endif
+
 # Installation directories are relative to {prefix}.
 install_prefix = get_option('prefix')
 install_includedir = get_option('includedir')
@@ -330,6 +347,7 @@ dont_distribute = [
   'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
   'examples.moved_to_gtkmm_documentation_module',
   'win32_installer',
+  'gtkmm.doap',
   '.gitlab-ci.yml',
 ]
 # Add build scripts to the distribution directory, and delete .gitignore
