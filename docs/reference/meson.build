@@ -3,8 +3,7 @@
 # Input: built_files_root, project_source_root, gdkmm_pcname, gtkmm_pcname,
 #        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, build_documentation,
 #        gdkmm_extra_h_files, gtkmm_extra_h_files, gdkmm_built_h_file_targets,
-#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py,
-#        can_add_dist_script
+#        gtkmm_built_h_file_targets, install_datadir, python3, doc_reference_py
 # Output: install_docdir, install_devhelpdir, if build_documentation: tag_file
 
 tag_file_modules = [
@@ -21,7 +20,7 @@ docinstall_flags = []
 foreach module : tag_file_modules
   depmod = dependency(module, required: false)
   if depmod.found()
-    doxytagfile = depmod.get_variable(pkgconfig: 'doxytagfile', internal: 'doxytagfile', default_value: '')
+    doxytagfile = depmod.get_variable('doxytagfile', default_value: '')
     if doxytagfile != ''
       if depmod.type_name() == 'internal'
         # Subprojects must build their tag files before doxygen is called.
@@ -31,8 +30,8 @@ foreach module : tag_file_modules
           doxygen_tag_targets += subproject(module).get_variable('global_tag_file_target')
         endif
       endif
-      htmlrefpub = depmod.get_variable(pkgconfig: 'htmlrefpub', internal: 'htmlrefpub', default_value: '')
-      htmlrefdir = depmod.get_variable(pkgconfig: 'htmlrefdir', internal: 'htmlrefdir', default_value: '')
+      htmlrefpub = depmod.get_variable('htmlrefpub', default_value: '')
+      htmlrefdir = depmod.get_variable('htmlrefdir', default_value: '')
       if htmlrefpub == ''
         htmlrefpub = htmlrefdir
       elif htmlrefdir == ''
@@ -175,14 +174,12 @@ endforeach
 
 install_data(image_files, install_dir: install_image_docdir)
 
-if can_add_dist_script
-  # Distribute built files and files copied by mm-common-get.
-  meson.add_dist_script(
-    python3, doc_reference_py, 'dist_doc',
-    doctool_dir,
-    doctool_dist_dir,
-    meson.current_build_dir(),
-    tag_file.full_path(),
-    devhelp_file.full_path(),
-  )
-endif
+# Distribute built files and files copied by mm-common-get.
+meson.add_dist_script(
+  python3, doc_reference_py, 'dist_doc',
+  doctool_dir,
+  doctool_dist_dir,
+  meson.current_build_dir(),
+  tag_file.full_path(),
+  devhelp_file.full_path(),
+)

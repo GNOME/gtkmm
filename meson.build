@@ -8,7 +8,8 @@ project('gtkmm', 'c', 'cpp',
     'cpp_std=c++11',
     'warning_level=1',
   ],
-  meson_version: '>= 0.56.0', # required for executable(win_subsystem:)
+  meson_version: '>= 0.58.0', # required for meson.add_dist_script() in subproject
+                              # and dependency().get_variable('varname')
 )
 
 gtkmm_api_version = '3.0'
@@ -97,6 +98,23 @@ build_documentation = build_documentation_opt == 'true' or \
 build_demos = get_option('build-demos')
 build_tests = get_option('build-tests')
 
+# When a dist tarball is being built and the environment variable GTKMM_NO_DIST_TESTS
+# is set, tests are not run by 'meson dist' even if they are built.
+run_tests = build_tests
+if run_tests and is_dist_check
+  cmd_py = '''
+import os, sys
+sys.exit(0 if os.getenv('GTKMM_NO_DIST_TESTS') == None else 1)
+'''
+  run_tests = run_command(
+    python3, '-c', cmd_py,
+    check: false,
+  ).returncode() == 0
+  if not run_tests
+    message('Test programs will be built but not run.')
+  endif
+endif
+
 # Installation directories are relative to {prefix}.
 install_prefix = get_option('prefix')
 install_includedir = get_option('includedir')
@@ -142,11 +160,11 @@ glibmm_dep = dependency('glibmm-2.@0@'.format(glibmm_req_minor_ver), version: gl
 giomm_dep = dependency('giomm-2.@0@'.format(glibmm_req_minor_ver), version: glibmm_req)
 
 # Where to find gmmproc and generate_wrap_init.pl.
-gmmproc_dir = glibmm_dep.get_variable(pkgconfig: 'gmmprocdir', internal: 'gmmprocdir')
+gmmproc_dir = glibmm_dep.get_variable('gmmprocdir')
 
-gmmproc_extra_m4_dirs = [pangomm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
+gmmproc_extra_m4_dirs = [pangomm_dep.get_variable('gmmprocm4dir')]
 if atkmm_dep.found()
-  gmmproc_extra_m4_dirs += [atkmm_dep.get_variable(pkgconfig: 'gmmprocm4dir', internal: 'gmmprocm4dir')]
+  gmmproc_extra_m4_dirs += [atkmm_dep.get_variable('gmmprocm4dir')]
 endif
 
 # Is X11 backend available?
@@ -164,7 +182,7 @@ else
       endif
     endif
   else # gtk_dep from pkgconfig
-    x11_enabled_in_gdk = gtk_dep.get_variable(pkgconfig: 'targets').contains('x11')
+    x11_enabled_in_gdk = gtk_dep.get_variable('targets').contains('x11')
   endif
   if build_x11_api_opt == 'if-enabled-in-gdk'
     build_x11_api = x11_enabled_in_gdk
@@ -383,9 +401,6 @@ if is_msvc
   gui_app_ldflags += '-entry:mainCRTStartup'
 endif
 
-# add_dist_script() is not allowed in a subproject if meson.version() < 0.58.0.
-can_add_dist_script = not meson.is_subproject() or meson.version().version_compare('>= 0.58.0')
-
 subdir('tools/extra_defs_gen')
 subdir('MSVC_NMake/gendef')
 subdir('gdk')
@@ -398,28 +413,28 @@ subdir('tests')
 subdir('demos/gtk-demo')
 subdir('docs/reference')
 
-if can_add_dist_script
-  # Add a ChangeLog file to the distribution directory.
-  meson.add_dist_script(
-    python3, dist_changelog_py,
-    project_source_root,
-  )
+# Add a ChangeLog file to the distribution directory.
+meson.add_dist_script(
+  python3, dist_changelog_py,
+  project_source_root,
+)
 
-  # Don't distribute these files and directories.
-  dont_distribute = [
-    'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
-    'examples.moved_to_gtkmm_documentation_module',
-    'win32_installer',
-  ]
-  # Add build scripts to the distribution directory, and delete .gitignore
-  # files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
-  meson.add_dist_script(
-    python3, dist_build_scripts_py,
-    project_source_root,
-    'untracked' / 'build_scripts',
-    dont_distribute,
-  )
-endif
+# Don't distribute these files and directories.
+dont_distribute = [
+  'docs' / 'tutorial.moved_to_gtkmm_documentation_module',
+  'examples.moved_to_gtkmm_documentation_module',
+  'win32_installer',
+  'gtkmm.doap',
+  '.gitlab-ci.yml',
+]
+# Add build scripts to the distribution directory, and delete .gitignore
+# files and an empty $MESON_PROJECT_DIST_ROOT/build/ directory.
+meson.add_dist_script(
+  python3, dist_build_scripts_py,
+  project_source_root,
+  'untracked' / 'build_scripts',
+  dont_distribute,
+)
 
 if meson.is_subproject()
   pkgconfig_vars = {

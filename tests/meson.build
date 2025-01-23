@@ -1,6 +1,7 @@
 # tests
 
-# Input: gdkmm_own_dep, gtkmm_own_dep, build_tests, gui_app_ldflags, gtkmm_extra_gendef_cpp_args
+# Input: gdkmm_own_dep, gtkmm_own_dep, build_tests, run_tests, gui_app_ldflags,
+#        gtkmm_extra_gendef_cpp_args
 # Output: -
 
 test_programs = [
@@ -43,7 +44,7 @@ foreach ex : test_programs
     install: false,
   )
 
-  if ex[4]
+  if ex[4] and run_tests
     test(ex_name, exe_file)
   endif
 endforeach
