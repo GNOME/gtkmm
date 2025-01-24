@@ -1,0 +1,135 @@
+# 2025-01-15: ubuntu:latest = 24.04, ubuntu:rolling = 24.10, ubuntu:devel = 25.04
+# See https://hub.docker.com/_/ubuntu
+image: ubuntu:rolling
+
+include:
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      job-stage: "release"
+      dist-job-name: "build_release_tarball"
+      tarball-artifact-path: "_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
+
+stages:
+  - build
+  - deploy
+  - release
+
+variables:
+  MESON_GCC_DEPS: g++
+                  gettext
+                  git
+                  yelp-tools
+                  gtk-doc-tools
+                  python3-pygments
+                  python3-setuptools
+                  libglib2.0-dev
+                  libcairo2-dev
+                  libpango1.0-dev
+                  libgtk-3-dev
+                  mm-common
+                  libsigc++-2.0-dev
+                  libglibmm-2.4-dev
+                  libcairomm-1.0-dev
+                  libpangomm-1.4-dev
+                  libatkmm-1.6-dev
+                  libxml-libxml-perl
+                  meson
+                  ninja-build
+                  glib-networking
+
+  GIO_EXTRA_MODULES: "/usr/lib/x86_64-linux-gnu/gio/modules"
+  GIT_SUBMODULE_STRATEGY: normal
+
+.build_default:
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt update && apt -y upgrade && apt -y install $DEPENDENCIES
+
+release_gcc_build:
+  extends: .build_default
+  stage: build
+  variables:
+    DEPENDENCIES: $MESON_GCC_DEPS
+  script:
+    - mkdir _build && cd _build
+    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    - meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+    - meson compile
+    # Some tests fail with
+    #   Unable to init Broadway server: Could not connect: No such file or directory
+    #   Gtk-WARNING **: 14:38:45.180: cannot open display:
+    # Skip tests. Most test cases are not executed anyway, only built by 'meson compile'.
+    # - meson test
+    - meson install --quiet
+  artifacts:
+    when: always
+    paths:
+      - _build/docs/reference
+      - _build/meson-logs/testlog.txt
+      - _build/meson-logs/meson-log.txt
+
+release_clang_build:
+  extends: .build_default
+  stage: build
+  variables:
+    DEPENDENCIES: $MESON_GCC_DEPS clang
+  script:
+    - mkdir _build && cd _build
+    # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    # CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal -Dwarning_level=3 -Dwerror=true
+    - CC=clang CXX=clang++ meson setup --prefix=/usr --libdir=lib -Ddebug=false -Doptimization=3 -Dwarnings=fatal
+    - meson compile
+    # See comment in the release_gcc_build job.
+    # - meson test
+    - meson install --quiet
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+      - _build/meson-logs/testlog.txt
+      - _build/meson-logs/meson-log.txt
+    expire_in: 1 week
+
+# Publish reference documentation at gnome.pages.gitlab.gnome.org/gtkmm
+pages:
+  stage: deploy
+  needs: [release_gcc_build]
+  script:
+    - mkdir public
+    - mv _build/docs/reference/html/* public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build_release_tarball:
+  extends: .build_default
+  stage: build
+  needs: []
+  rules:
+    - if: $CI_COMMIT_TAG  # Run this job when a tag is created
+    - when: manual        # and when manually triggered.
+      allow_failure: true # Don't block the CI pipeline until triggered.
+  variables:
+    DEPENDENCIES: $MESON_GCC_DEPS
+  script:
+    - mkdir _build && cd _build
+    # Don't use warning_level and werror. They are applied also to subprojects.
+    - meson setup --buildtype=release
+    # Must compile before 'meson dist' to generate source code and documentation.
+    - meson compile
+    # Skip tests. See release_gcc_build.
+    # 'meson dist --no-tests' skips compile + test + install.
+    # GTKMM_NO_DIST_TESTS skips only test.
+    - export GTKMM_NO_DIST_TESTS=1
+    - meson dist
+  artifacts:
+    name: "${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/meson-dist/*.tar.xz"
+    expire_in: 1 week
