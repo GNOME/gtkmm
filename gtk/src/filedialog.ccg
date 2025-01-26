@@ -34,3 +34,44 @@ std::vector<Glib::RefPtr<CppType>> listmodel_to_vector(GListModel* listmodel)
   return result;
 }
 } // anonymous namespace
+
+namespace Gtk
+{
+std::tuple<Glib::RefPtr<Gio::File>, Glib::ustring> FileDialog::open_text_file_finish(
+  const Glib::RefPtr<Gio::AsyncResult>& result)
+{
+  const char* encoding = nullptr;
+  GError* gerror = nullptr;
+  auto file = Glib::wrap(gtk_file_dialog_open_text_file_finish(gobj(),
+    Glib::unwrap(result), &encoding, &gerror));
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+  return {file, Glib::convert_const_gchar_ptr_to_ustring(encoding)};
+}
+
+std::tuple<std::vector<Glib::RefPtr<Gio::File>>, Glib::ustring>
+FileDialog::open_multiple_text_files_finish(const Glib::RefPtr<Gio::AsyncResult>& result)
+{
+  const char* encoding = nullptr;
+  GError* gerror = nullptr;
+  auto files = listmodel_to_vector<Gio::File>(gtk_file_dialog_open_multiple_text_files_finish(
+    gobj(), Glib::unwrap(result), &encoding, &gerror));
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+  return {files, Glib::convert_const_gchar_ptr_to_ustring(encoding)};
+}
+
+std::tuple<Glib::RefPtr<Gio::File>, Glib::ustring, Glib::ustring>
+FileDialog::save_text_file_finish(const Glib::RefPtr<Gio::AsyncResult>& result)
+{
+  const char* encoding = nullptr;
+  const char* line_ending = nullptr;
+  GError* gerror = nullptr;
+  auto file = Glib::wrap(gtk_file_dialog_save_text_file_finish(gobj(),
+    Glib::unwrap(result), &encoding, &line_ending, &gerror));
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+  return {file, Glib::convert_const_gchar_ptr_to_ustring(encoding),
+          Glib::convert_const_gchar_ptr_to_ustring(line_ending)};
+}
+} // namespace Gtk

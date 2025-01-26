@@ -1,6 +1,6 @@
 // gtkmm#132 FileChooser, FileDialog: Gio::ListModel with Gio::File
 // Test Gtk::FileChooser::get_files(), Gtk::FileChooser::get_files2() and
-// Gtk::FileDialog::open_multiple_finish() after the issue has been fixed.
+// Gtk::FileDialog::open_multiple_text_files_finish() after the issue has been fixed.
 // Test Gio::ListModel::get_typed_object(), if glibmm >= 2.76.0.
 
 // Gtk::FileChooser is deprecated
@@ -23,13 +23,13 @@ public:
   // The undef at the start of this file has no effect.
   ExampleWindow()
   : m_vBox(Gtk::Orientation::VERTICAL),
-    m_Button_FileDialog("DialogFile")
+    m_Button_FileDialog("FileDialog")
 #ifndef GTKMM_DISABLE_DEPRECATED
   , m_FileChooserDialog(*this, "Choose files"),
-    m_Button_FileChooserDialog("DialogChooserFile")
+    m_Button_FileChooserDialog("FileChooserDialog")
 #endif
   {
-    set_title("Gtk::FileSelection example");
+    set_title("Gtk::FileDialog example");
     set_child(m_vBox);
     m_vBox.append(m_Button_FileDialog);
     m_Button_FileDialog.signal_clicked().connect(
@@ -53,7 +53,8 @@ protected:
   {
     m_FileDialog = Gtk::FileDialog::create();
     m_FileDialog->set_modal(true);
-    m_FileDialog->open_multiple(sigc::mem_fun(*this, &ExampleWindow::on_open_multiple));
+    m_FileDialog->open_multiple_text_files(sigc::mem_fun(*this,
+      &ExampleWindow::on_open_multiple_text_files));
 
     auto children = m_vBox.observe_children();
     if (children->get_n_items() > 0)
@@ -67,18 +68,20 @@ protected:
     }
   }
 
-  void on_open_multiple(Glib::RefPtr<Gio::AsyncResult>& result)
+  void on_open_multiple_text_files(Glib::RefPtr<Gio::AsyncResult>& result)
   {
     try
     {
-    // open_multiple_finish() returns a vector of Gio::Files.
-    auto file_vector = m_FileDialog->open_multiple_finish(result);
-    auto file = file_vector[0];
-    if (file)
-      // This should print the first selected file's path and name.
-      std::cout << file->get_path() << std::endl;
-    else
-      std::cout << "No file\n";
+      // open_multiple_text_files_finish() returns a vector of Gio::Files
+      // and the selected encoding.
+      auto [file_vector, encoding] = m_FileDialog->open_multiple_text_files_finish(result);
+      auto file = file_vector[0];
+      if (file)
+        // This should print the first selected file's path and name.
+        std::cout << file->get_path() << std::endl;
+      else
+        std::cout << "No file\n";
+      std::cout << "Encoding: '" << encoding << "'\n";
     }
     catch (const Glib::Error& err)
     {
