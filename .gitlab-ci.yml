@@ -63,8 +63,16 @@ release_gcc_build:
   extends: .build_default
   stage: build
   variables:
-    DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS
+    DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS wget
   script:
+    # Get Doxygen tag files. They are published with the reference documentation.
+    - for module in sigc++-3.0 glibmm-2.68 cairomm-1.16 pangomm-2.48; do
+    - DOXYTAG_PATH=$(pkg-config --variable=doxytagfile $module)
+    - DOXYTAG_FILE=$(basename $DOXYTAG_PATH)
+    - DOXYTAG_DIR=$(dirname $DOXYTAG_PATH)
+    - mkdir --parents $DOXYTAG_DIR
+    - wget --timeout=120 --tries=2 --no-clobber --directory-prefix=$DOXYTAG_DIR $(pkg-config --variable=htmlrefpub $module)/$DOXYTAG_FILE || true
+    - done
     - mkdir _build && cd _build
     # -Ddebug=false + -Doptimization=3 correspond to -Dbuildtype=release
     # Don't use warning_level and werror. They are applied also to subprojects.
@@ -118,6 +126,7 @@ pages:
   script:
     - mkdir public
     - mv _build/docs/reference/html/* public
+    - mv _build/docs/reference/*.tag public
   artifacts:
     paths:
       - public
@@ -133,8 +142,16 @@ build_release_tarball:
     - when: manual        # and when manually triggered.
       allow_failure: true # Don't block the CI pipeline until triggered.
   variables:
-    DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS
+    DEPENDENCIES: $MESON_GCC_DEPS $GTK4_BUILD_DEPS wget
   script:
+    # Get Doxygen tag files. They are published with the reference documentation.
+    - for module in sigc++-3.0 glibmm-2.68 cairomm-1.16 pangomm-2.48; do
+    - DOXYTAG_PATH=$(pkg-config --variable=doxytagfile $module)
+    - DOXYTAG_FILE=$(basename $DOXYTAG_PATH)
+    - DOXYTAG_DIR=$(dirname $DOXYTAG_PATH)
+    - mkdir --parents $DOXYTAG_DIR
+    - wget --timeout=120 --tries=2 --no-clobber --directory-prefix=$DOXYTAG_DIR $(pkg-config --variable=htmlrefpub $module)/$DOXYTAG_FILE || true
+    - done
     - mkdir _build && cd _build
     # Don't use warning_level and werror. They are applied also to subprojects.
     - meson setup --buildtype=release $GTK4_MESON_OPTIONS
