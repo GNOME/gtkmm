@@ -36,5 +36,7 @@ configure_file(
   input: gdkmmconfig_h_meson,
   output: 'gdkmmconfig.h',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_gdkmmconfigdir,
+  install_tag: 'devel',
 )

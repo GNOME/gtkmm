@@ -565,7 +565,8 @@ meson.add_install_script(
   python3, generate_binding_py, 'install_built_h_files',
   built_h_cc_dir,
   install_includedir / gtkmm_pcname / 'gtkmm', # subdir below {prefix}
-  gtkmm_used_hg_ccg_basenames
+  gtkmm_used_hg_ccg_basenames,
+  install_tag: 'devel',
 )
 
 # Distribute built files.

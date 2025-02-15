@@ -136,6 +136,7 @@ tag_file = custom_target('html_and_tag',
   build_by_default: build_documentation,
   install: true,
   install_dir: install_reference_docdir,
+  install_tag: 'doc',
 )
 
 devhelp_file = custom_target('devhelp',
@@ -159,7 +160,8 @@ meson.add_install_script(
   devhelp_file.full_path(),
   install_devhelpdir,
   install_reference_docdir / 'html',
-  docinstall_flags
+  docinstall_flags,
+  install_tag: 'doc',
 )
 
 # Install images.
@@ -172,7 +174,10 @@ foreach file : image_basefiles
   image_files += '..' / 'images' / file
 endforeach
 
-install_data(image_files, install_dir: install_image_docdir)
+install_data(image_files,
+  install_dir: install_image_docdir,
+  install_tag: 'doc',
+)
 
 # Distribute built files and files copied by mm-common-get.
 meson.add_dist_script(

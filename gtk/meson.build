@@ -9,5 +9,7 @@ configure_file(
   input: gtkmmconfig_h_meson,
   output: 'gtkmmconfig.h',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_gtkmmconfigdir,
+  install_tag: 'devel',
 )
