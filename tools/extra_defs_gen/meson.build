@@ -42,4 +42,7 @@ foreach file : m4_basefiles
 endforeach
 m4_files = files(m4_files)
 install_m4dir = install_libdir / gtkmm_pcname / 'proc' / 'm4'
-install_data(m4_files, install_dir: install_m4dir)
+install_data(m4_files,
+  install_dir: install_m4dir,
+  install_tag: 'bin-devel',
+)

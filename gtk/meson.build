@@ -7,7 +7,9 @@ configure_file(
   input: 'gtkmm.pc.in',
   output: gtkmm_pcname + '.pc',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_pkgconfigdir,
+  install_tag: 'devel',
 )
 
 gtkmm_pkg_uninst_conf_data = configuration_data()
@@ -26,5 +28,7 @@ configure_file(
   input: gtkmmconfig_h_meson,
   output: 'gtkmmconfig.h',
   configuration: pkg_conf_data,
+  install: true,
   install_dir: install_gtkmmconfigdir,
+  install_tag: 'devel',
 )

@@ -8,8 +8,7 @@ project('gtkmm', 'c', 'cpp',
     'cpp_std=c++11',
     'warning_level=1',
   ],
-  meson_version: '>= 0.58.0', # required for meson.add_dist_script() in subproject
-                              # and dependency().get_variable('varname')
+  meson_version: '>= 0.60.0', # required for install_tag keyword argument.
 )
 
 gtkmm_api_version = '3.0'
