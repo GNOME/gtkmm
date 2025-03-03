@@ -407,7 +407,6 @@ summary = [
   '              includedir: @0@'.format(install_prefix / install_includedir),
   '         includegtkmmdir: @0@'.format(install_prefix / install_includedir / gtkmm_pcname),
   '                  libdir: @0@'.format(install_prefix / install_libdir),
-  '          gdkmmconfigdir: @0@'.format(install_prefix / install_gdkmmconfigdir),
   '          gtkmmconfigdir: @0@'.format(install_prefix / install_gtkmmconfigdir),
   '                   m4dir: @0@'.format(install_prefix / install_m4dir),
   '            pkgconfigdir: @0@'.format(install_prefix / install_pkgconfigdir),

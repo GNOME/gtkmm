@@ -2,7 +2,7 @@
 
 # Input: install_libdir, gtkmm_pcname, build_deprecated_api, cpp_compiler,
 #        gtkmm_major_version, gtkmm_minor_version, gtkmm_micro_version
-# Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
+# Output: pkg_conf_data, install_gtkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
 pkg_conf_data.set('PACKAGE_VERSION', meson.project_version())
@@ -31,12 +31,12 @@ if library_build_type == 'static'
 endif
 
 gdkmmconfig_h_meson = files('gdkmmconfig.h.meson')
-install_gdkmmconfigdir = install_libdir / gtkmm_pcname / 'include'
+install_gtkmmconfigdir = install_libdir / gtkmm_pcname / 'include'
 configure_file(
   input: gdkmmconfig_h_meson,
   output: 'gdkmmconfig.h',
   configuration: pkg_conf_data,
   install: true,
-  install_dir: install_gdkmmconfigdir,
+  install_dir: install_gtkmmconfigdir,
   install_tag: 'devel',
 )
