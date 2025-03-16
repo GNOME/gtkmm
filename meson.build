@@ -46,7 +46,9 @@ c_compiler = meson.get_compiler('c')
 cpp_compiler = meson.get_compiler('cpp')
 is_msvc = cpp_compiler.get_id() == 'msvc'
 is_host_windows = host_machine.system() == 'windows'
-python3 = find_program('python3', version: '>=3.7')
+
+# Use the Python installation that Meson uses. Its version is >= 3.7.
+python3 = import('python').find_installation()
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
@@ -128,7 +130,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 glibmm_req = '>= 2.75.0'
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
-gtk_req = '>= 4.17.3'
+gtk_req = '>= 4.17.5'
 gtk_dep = dependency('gtk4', version: gtk_req)
 
 cairomm_req = '>= 1.15.4'
