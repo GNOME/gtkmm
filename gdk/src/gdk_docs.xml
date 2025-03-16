@@ -480,6 +480,19 @@ Emitted on pen/eraser devices whenever tools enter or leave proximity.
 <return></return>
 </signal>
 
+<property name="GdkDevice:active-layout-index">
+<description>
+The index of the keyboard active layout of a `GdkDevice`.
+
+Will be -1 if there is no valid active layout.
+
+This is only relevant for keyboard devices.
+
+Since: 4.18
+
+</description>
+</property>
+
 <property name="GdkDevice:caps-lock-state">
 <description>
 Whether Caps Lock is on.
@@ -517,6 +530,17 @@ This is only relevant for keyboard devices.
 <property name="GdkDevice:has-cursor">
 <description>
 Whether the device is represented by a cursor on the screen.
+
+</description>
+</property>
+
+<property name="GdkDevice:layout-names">
+<description>
+The names of the keyboard layouts of a `GdkDevice`.
+
+This is only relevant for keyboard devices.
+
+Since: 4.18
 
 </description>
 </property>
@@ -1908,7 +1932,7 @@ See gdk_keymap_get_caps_lock_state().
 
 <enum name="GdkMemoryFormat">
 <description>
-`GdkMemoryFormat` describes formats that image data can have in memory.
+Describes formats that image data can have in memory.
 
 It describes formats by listing the contents of the memory passed to it.
 So `GDK_MEMORY_A8R8G8B8` will be 1 byte (8 bits) of alpha, followed by a
@@ -3704,6 +3728,8 @@ A call to [method@Gdk.DrawContext.begin_frame] with this
 The returned context is guaranteed to be valid until
 [method@Gdk.DrawContext.end_frame] is called.
 
+Deprecated: 4.18: Drawing content with Cairo should be done via
+Cairo rendernodes, not by using renderers.
 
 </description>
 <parameters>
@@ -3714,12 +3740,13 @@ The returned context is guaranteed to be valid until
 </parameters>
 <return> a Cairo context
 to draw on `GdkSurface
+
 </return>
 </function>
 
 <function name="gdk_cairo_draw_from_gl">
 <description>
-The main way to not draw GL content in GTK.
+Draws GL content onto a cairo context.
 
 It takes a render buffer ID (@source_type == GL_RENDERBUFFER) or a texture
 id (@source_type == GL_TEXTURE) and draws it onto @cr with an OVER operation,
@@ -4814,9 +4841,9 @@ Since: 4.16
 
 <function name="gdk_content_deserialize_async">
 <description>
-Read content from the given input stream and deserialize it, asynchronously.
+Reads content from the given input stream and deserialize it, asynchronously.
 
-The default I/O priority is %G_PRIORITY_DEFAULT (i.e. 0), and lower numbers
+The default I/O priority is `G_PRIORITY_DEFAULT` (i.e. 0), and lower numbers
 indicate a higher priority.
 
 </description>
@@ -6379,17 +6406,45 @@ theme.
 A recommended set of cursor names that will work across different
 platforms can be found in the CSS specification:
 
-| | | | |
-| --- | --- | ---- | --- |
-| &quot;none&quot; | ![](default_cursor.png) &quot;default&quot; | ![](help_cursor.png) &quot;help&quot; | ![](pointer_cursor.png) &quot;pointer&quot; |
-| ![](context_menu_cursor.png) &quot;context-menu&quot; | ![](progress_cursor.png) &quot;progress&quot; | ![](wait_cursor.png) &quot;wait&quot; | ![](cell_cursor.png) &quot;cell&quot; |
-| ![](crosshair_cursor.png) &quot;crosshair&quot; | ![](text_cursor.png) &quot;text&quot; | ![](vertical_text_cursor.png) &quot;vertical-text&quot; | ![](alias_cursor.png) &quot;alias&quot; |
-| ![](copy_cursor.png) &quot;copy&quot; | ![](no_drop_cursor.png) &quot;no-drop&quot; | ![](move_cursor.png) &quot;move&quot; | ![](not_allowed_cursor.png) &quot;not-allowed&quot; |
-| ![](grab_cursor.png) &quot;grab&quot; | ![](grabbing_cursor.png) &quot;grabbing&quot; | ![](all_scroll_cursor.png) &quot;all-scroll&quot; | ![](col_resize_cursor.png) &quot;col-resize&quot; |
-| ![](row_resize_cursor.png) &quot;row-resize&quot; | ![](n_resize_cursor.png) &quot;n-resize&quot; | ![](e_resize_cursor.png) &quot;e-resize&quot; | ![](s_resize_cursor.png) &quot;s-resize&quot; |
-| ![](w_resize_cursor.png) &quot;w-resize&quot; | ![](ne_resize_cursor.png) &quot;ne-resize&quot; | ![](nw_resize_cursor.png) &quot;nw-resize&quot; | ![](sw_resize_cursor.png) &quot;sw-resize&quot; |
-| ![](se_resize_cursor.png) &quot;se-resize&quot; | ![](ew_resize_cursor.png) &quot;ew-resize&quot; | ![](ns_resize_cursor.png) &quot;ns-resize&quot; | ![](nesw_resize_cursor.png) &quot;nesw-resize&quot; |
-| ![](nwse_resize_cursor.png) &quot;nwse-resize&quot; | ![](zoom_in_cursor.png) &quot;zoom-in&quot; | ![](zoom_out_cursor.png) &quot;zoom-out&quot; | |
+| | | |
+| --- | --- | --- |
+|                               | &quot;none&quot;          | No cursor |
+| ![](default_cursor.png)       | &quot;default&quot;       | The default cursor |
+| ![](help_cursor.png)          | &quot;help&quot;          | Help is available |
+| ![](pointer_cursor.png)       | &quot;pointer&quot;       | Indicates a link or interactive element |
+| ![](context_menu_cursor.png)  |&quot;context-menu&quot;   | A context menu is available |
+| ![](progress_cursor.png)      | &quot;progress&quot;      | Progress indicator |
+| ![](wait_cursor.png)          | &quot;wait&quot;          | Busy cursor |
+| ![](cell_cursor.png)          | &quot;cell&quot;          | Cell(s) may be selected |
+| ![](crosshair_cursor.png)     | &quot;crosshair&quot;     | Simple crosshair |
+| ![](text_cursor.png)          | &quot;text&quot;          | Text may be selected |
+| ![](vertical_text_cursor.png) | &quot;vertical-text&quot; | Vertical text may be selected |
+| ![](alias_cursor.png)         | &quot;alias&quot;         | DND: Something will be linked |
+| ![](copy_cursor.png)          | &quot;copy&quot;          | DND: Something will be copied |
+| ![](move_cursor.png)          | &quot;move&quot;          | DND: Something will be moved |
+| ![](dnd_ask_cursor.png)       | &quot;dnd-ask&quot;       | DND: User can choose action to be carried out |
+| ![](no_drop_cursor.png)       | &quot;no-drop&quot;       | DND: Can't drop here |
+| ![](not_allowed_cursor.png)   | &quot;not-allowed&quot;   | DND: Action will not be carried out |
+| ![](grab_cursor.png)          | &quot;grab&quot;          | DND: Something can be grabbed |
+| ![](grabbing_cursor.png)      | &quot;grabbing&quot;      | DND: Something is being grabbed |
+| ![](n_resize_cursor.png)      | &quot;n-resize&quot;      | Resizing: Move north border |
+| ![](e_resize_cursor.png)      | &quot;e-resize&quot;      | Resizing: Move east border |
+| ![](s_resize_cursor.png)      | &quot;s-resize&quot;      | Resizing: Move south border |
+| ![](w_resize_cursor.png)      | &quot;w-resize&quot;      | Resizing: Move west border |
+| ![](ne_resize_cursor.png)     | &quot;ne-resize&quot;     | Resizing: Move north-east corner |
+| ![](nw_resize_cursor.png)     | &quot;nw-resize&quot;     | Resizing: Move north-west corner |
+| ![](sw_resize_cursor.png)     | &quot;sw-resize&quot;     | Resizing: Move south-west corner |
+| ![](se_resize_cursor.png)     | &quot;se-resize&quot;     | Resizing: Move south-east corner |
+| ![](col_resize_cursor.png)    | &quot;col-resize&quot;    | Resizing: Move an item or border horizontally |
+| ![](row_resize_cursor.png)    | &quot;row-resize&quot;    | Resizing: Move an item or border vertically |
+| ![](ew_resize_cursor.png)     | &quot;ew-resize&quot;     | Moving: Something can be moved horizontally |
+| ![](ns_resize_cursor.png)     | &quot;ns-resize&quot;     | Moving: Something can be moved vertically |
+| ![](nesw_resize_cursor.png)   | &quot;nesw-resize&quot;   | Moving: Something can be moved diagonally, north-east to south-west |
+| ![](nwse_resize_cursor.png)   | &quot;nwse-resize&quot;   | Moving: something can be moved diagonally, north-west to south-east |
+| ![](all_resize_cursor.png)    | &quot;all-resize&quot;    | Moving: Something can be moved in any direction |
+| ![](all_scroll_cursor.png)    | &quot;all-scroll&quot;    | Can scroll in any direction |
+| ![](zoom_in_cursor.png)       | &quot;zoom-in&quot;       | Zoom in |
+| ![](zoom_out_cursor.png)      | &quot;zoom-out&quot;      | Zoom out |
 
 
 </description>
@@ -6435,6 +6490,29 @@ this one cannot be supported
 </parameter>
 </parameters>
 <return> a new `GdkCursor`
+</return>
+</function>
+
+<function name="gdk_device_get_active_layout_index">
+<description>
+Retrieves the index of the active layout of the keyboard.
+
+If there is no valid active layout for the `GdkDevice`, this function will
+return -1;
+
+This is only relevant for keyboard devices.
+
+Since: 4.18
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a `GdkDevice`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The layout index of the active layout or -1.
+
 </return>
 </function>
 
@@ -6547,6 +6625,27 @@ don't have a pointer.
 </parameter>
 </parameters>
 <return> %TRUE if the pointer follows device motion
+</return>
+</function>
+
+<function name="gdk_device_get_layout_names">
+<description>
+Retrieves the names of the layouts of the keyboard.
+
+This is only relevant for keyboard devices.
+
+Since: 4.18
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a `GdkDevice`
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+%NULL-terminated array of strings of layouts,
+
 </return>
 </function>
 
@@ -11483,14 +11582,14 @@ but without the leading “GDK_KEY_”.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the corresponding key value, or %GDK_KEY_VoidSymbol
+<return> the corresponding key value, or `GDK_KEY_VoidSymbol`
 if the key name is not a valid key
 </return>
 </function>
 
 <function name="gdk_keyval_is_lower">
 <description>
-Returns %TRUE if the given key value is in lower case.
+Returns true if the given key value is in lower case.
 
 
 </description>
@@ -11500,14 +11599,14 @@ Returns %TRUE if the given key value is in lower case.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @keyval is in lower case, or if @keyval is not
+<return> true if @keyval is in lower case, or if @keyval is not
 subject to case conversion.
 </return>
 </function>
 
 <function name="gdk_keyval_is_upper">
 <description>
-Returns %TRUE if the given key value is in upper case.
+Returns true if the given key value is in upper case.
 
 
 </description>
@@ -11517,7 +11616,7 @@ Returns %TRUE if the given key value is in upper case.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @keyval is in upper case, or if @keyval is not subject to
+<return> true if @keyval is in upper case, or if @keyval is not subject to
 case conversion.
 </return>
 </function>
@@ -11562,12 +11661,12 @@ in lower case or it is not subject to case conversion.
 
 <function name="gdk_keyval_to_unicode">
 <description>
-Convert from a GDK key symbol to the corresponding Unicode
+Converts from a GDK key symbol to the corresponding Unicode
 character.
 
 Note that the conversion does not take the current locale
 into consideration, which might be expected for particular
-keyvals, such as %GDK_KEY_KP_Decimal.
+keyvals, such as `GDK_KEY_KP_Decimal`.
 
 
 </description>
@@ -17815,6 +17914,8 @@ emits a short beep on the display just as [method@Gdk.Display.beep].
 <description>
 Creates a new `GdkCairoContext` for rendering on @surface.
 
+Deprecated: 4.18: Drawing content with Cairo should be done via
+Cairo rendernodes, not by using the Cairo renderer.
 
 </description>
 <parameters>
@@ -17824,6 +17925,7 @@ Creates a new `GdkCairoContext` for rendering on @surface.
 </parameter>
 </parameters>
 <return> the newly created `GdkCairoContext`
+
 </return>
 </function>
 
@@ -19956,7 +20058,7 @@ Extracts the scale from a touchpad pinch event.
 
 <function name="gdk_unicode_to_keyval">
 <description>
-Convert from a Unicode character to a key symbol.
+Converts from a Unicode character to a key symbol.
 
 
 </description>
@@ -19966,8 +20068,8 @@ Convert from a Unicode character to a key symbol.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the corresponding GDK key symbol, if one exists.
-or, if there is no corresponding symbol, wc | 0x01000000
+<return> the corresponding GDK key symbol, if one exists,
+or, if there is no corresponding symbol, `wc | 0x01000000`
 </return>
 </function>
 
