@@ -1,6 +1,6 @@
 # docs/reference
 
-# Input: built_files_root, project_source_root, gdkmm_pcname, gtkmm_pcname,
+# Input: built_files_root, project_source_root, gtkmm_pcname,
 #        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, gdkmm_extra_h_files,
 #        gtkmm_extra_h_files, gdkmm_built_h_file_targets,
 #        gtkmm_built_h_file_targets, install_datadir, python3,

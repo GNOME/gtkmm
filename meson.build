@@ -122,8 +122,8 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 
 # Dependencies. <pkg> = gdk and gtk
 # <pkg>mm_build_dep: Dependencies when building the <pkg>mm library.
-# <pkg>mm_dep (created in <pkg>/<pkg>mm/meson.build):
-#   Dependencies when using the <pkg>mm library.
+# gtkmm_dep (created in gtk/gtkmm/meson.build):
+#   Dependencies when using the gtkmm library.
 
 # glibmm recently gained Meson build support, so we can try looking
 # for its pkg-config files on Visual Studio as well
