@@ -20,6 +20,7 @@ include(class_gtkobject.m4)
 include(convert_base.m4)
 include(convert_gtk.m4)
 include(convert_gdk.m4)
+include(convert_gsk.m4)
 
 # From pangomm: The path to this is obtained in configure.ac or meson.build.
 include(convert_pango.m4)

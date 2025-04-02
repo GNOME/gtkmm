@@ -17,14 +17,18 @@
 
 include $(top_srcdir)/gdk/src/filelist.gmake.am
 include $(top_srcdir)/gdk/gdkmm/filelist.gmake.am
+include $(top_srcdir)/gsk/src/filelist.gmake.am
+include $(top_srcdir)/gsk/gskmm/filelist.gmake.am
 include $(top_srcdir)/gtk/src/filelist.gmake.am
 include $(top_srcdir)/gtk/gtkmm/filelist.gmake.am
 
 gdkmm_files_h = $(gdkmm_files_built_h) $(filter-out wrap_init.h,$(gdkmm_files_extra_h))
+gskmm_files_h = $(gskmm_files_built_h) $(filter-out wrap_init.h,$(gskmm_files_extra_h))
 gtkmm_files_h = $(gtkmm_files_built_h) $(filter-out wrap_init.h,$(gtkmm_files_extra_h))
 
 book_name = $(GTKMM_MODULE_NAME)
 doc_input = $(addprefix $(top_srcdir)/gdk/gdkmm/,$(gdkmm_files_h)) \
+            $(addprefix $(top_srcdir)/gsk/gskmm/,$(gskmm_files_h)) \
             $(addprefix $(top_srcdir)/gtk/gtkmm/,$(gtkmm_files_h)) \
 	    $(top_srcdir)/gtk/gtkmm.h
 

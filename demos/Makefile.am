@@ -98,15 +98,18 @@ gtk-demo/demo_resources.c: gtk-demo/demo.gresource.xml $(GTK_DEMO_RESOURCES) $(G
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
 gdkmm_ldadd    =
 
+gskmm_includes = -I$(top_builddir)/gsk $(if $(srcdir:.=),-I$(top_srcdir)/gsk)
+gskmm_ldadd    =
+
 gtkmm_includes = -I$(top_builddir)/gtk $(if $(srcdir:.=),-I$(top_srcdir)/gtk)
 gtkmm_ldadd    = $(top_builddir)/gtk/gtkmm/libgtkmm-$(GTKMM_API_VERSION).la
 
-local_includes = -I$(top_builddir) $(gdkmm_includes) $(gtkmm_includes)
-local_ldadd    = $(gdkmm_ldadd) $(gtkmm_ldadd)
+local_includes = -I$(top_builddir) $(gdkmm_includes) $(gskmm_includes) $(gtkmm_includes)
+local_ldadd    = $(gdkmm_ldadd) $(gskmm_ldadd) $(gtkmm_ldadd)
 local_cppflags = -DDEMOCODEDIR=\""$(democodedir)"\"
 
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS) $(local_cppflags)
-AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED
+AM_CXXFLAGS = $(GTKMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED -DGDKMM_DISABLE_DEPRECATED -DGSKMM_DISABLE_DEPRECATED -DGTKMM_DISABLE_DEPRECATED
 
 gtk_demo_gtkmm_demo_CPPFLAGS = $(AM_CPPFLAGS) $(GTKMM_DEMOS_EXTRA_CFLAGS)
 gtk_demo_gtkmm_demo_LDADD = $(GTKMM_LIBS) $(GTKMM_DEMOS_EXTRA_LIBS) $(local_ldadd)

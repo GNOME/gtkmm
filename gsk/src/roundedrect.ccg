@@ -1,0 +1,75 @@
+/* Copyright (C) 2025 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace Gsk
+{
+RoundedRect::RoundedRect()
+{
+  graphene_rect_t bounds;
+  (void)graphene_rect_init(&bounds, 0.0f, 0.0f, 0.0f, 0.0f);
+  (void)gsk_rounded_rect_init_from_rect(gobj(), &bounds, 0.0f);
+}
+
+RoundedRect::RoundedRect(const GskRoundedRect* rounded_rect)
+: gobject_(*rounded_rect)
+{}
+
+RoundedRect::RoundedRect(const Gdk::Graphene::Rect& bounds,
+  const Gdk::Graphene::Size& top_left,
+  const Gdk::Graphene::Size& top_right,
+  const Gdk::Graphene::Size& bottom_right,
+  const Gdk::Graphene::Size& bottom_left)
+{
+  (void)gsk_rounded_rect_init(gobj(), bounds.gobj(), top_left.gobj(),
+    top_right.gobj(), bottom_right.gobj(), bottom_left.gobj());
+}
+
+RoundedRect::RoundedRect(const Gdk::Graphene::Rect& bounds, float radius)
+{
+  (void)gsk_rounded_rect_init_from_rect(gobj(), bounds.gobj(), radius);
+}
+
+RoundedRect::RoundedRect(const RoundedRect& other) noexcept
+: gobject_(other.gobject_)
+{
+}
+
+RoundedRect& RoundedRect::operator=(const RoundedRect& other) noexcept
+{
+  gobject_ = other.gobject_;
+  return *this;
+}
+
+RoundedRect::RoundedRect(RoundedRect&& other) noexcept
+: gobject_(std::move(other.gobject_))
+{
+}
+
+RoundedRect& RoundedRect::operator=(RoundedRect&& other) noexcept
+{
+  gobject_ = std::move(other.gobject_);
+  return *this;
+}
+
+std::pair<Gdk::Graphene::Rect, std::array<Gdk::Graphene::Size, 4>> RoundedRect::get() const
+{
+  auto bounds = Gdk::Graphene::Rect(&const_cast<GskRoundedRect*>(gobj())->bounds, true);
+  std::array<Gdk::Graphene::Size, 4> corners;
+  for (int i = 0; i < 4; ++i)
+    corners[i] = Gdk::Graphene::Size(&const_cast<GskRoundedRect*>(gobj())->corner[i], true);
+  return {bounds, corners};
+}
+} // namespace Gsk
