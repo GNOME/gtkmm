@@ -82,6 +82,7 @@ template <typename T = ::Cairo::Surface, typename = std::enable_if<std::is_base_
 } //namespace Cairo
 } //namespace Gdk
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace Glib
 {
 namespace Container_Helpers
@@ -132,5 +133,6 @@ struct TypeTraits<::Cairo::RefPtr<const ::Cairo::Surface>>
 
 } // namespace Container_Helpers
 } // namespace Glib
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif //_GDKMM_CAIROUTILS_H

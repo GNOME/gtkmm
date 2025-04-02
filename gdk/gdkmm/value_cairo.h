@@ -53,10 +53,12 @@ GDKMM_API GType get_base_type<::Cairo::Surface>();
 
 } //namespace Gdk
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace Glib
 {
 /** Specialization of Glib::Value<> for Cairo::RefPtr<Cairo::Region>
  * and Cairo::RefPtr<Cairo::Surface>.
+ * This is needed so they can be used with Glib::Value and _WRAP_PROPERTY.
  */
 template <typename T>
 class Value<::Cairo::RefPtr<T>, typename std::enable_if<
@@ -84,5 +86,6 @@ public:
 };
 
 } //namespace Glib
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif //_GDKMM_VALUE_CAIRO_H
