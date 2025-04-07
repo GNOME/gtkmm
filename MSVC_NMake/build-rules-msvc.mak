@@ -37,6 +37,30 @@ $<
 	@if exist ..\gdk\gdkmm\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
 	@if exist ..\untracked\gdk\gdkmm\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gdk\gdkmm\$(<B).cc
 
+{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
+	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+$<
+<<
+
+{..\untracked\gsk\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gskmm
+	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+$<
+<<
+
+{..\gsk\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
+	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gskmm
+	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+$<
+<<
+
+{..\gsk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj:
+	@if not exist $(@D)\private\ md $(@D)\private
+	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gsk\gskmm\%%~ns.cc if not exist ..\gsk\gskmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
+	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gsk\gskmm\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gsk\gskmm\$(<B).cc
+	@if exist ..\untracked\gsk\gskmm\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gsk\gskmm\$(<B).cc
+
 {vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
 	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
 $<
@@ -87,9 +111,9 @@ $(GTKMM_LIB): $(GTKMM_DLL)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
-$(GTKMM_DLL): $(gdkmm_OBJS) $(gtkmm_OBJS)
+$(GTKMM_DLL): $(gdkmm_OBJS) $(gskmm_OBJS) $(gtkmm_OBJS)
 	link /DLL $(LDFLAGS_NOLTCG) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) -out:$@ @<<
-$(gdkmm_OBJS) $(gtkmm_OBJS)
+$(gdkmm_OBJS) $(gskmm_OBJS) $(gtkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
@@ -125,6 +149,11 @@ clean:
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.cc
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\private\*.h
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.pdb
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.obj
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.cc
+	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.h
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private\*.h
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.pdb
 	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
