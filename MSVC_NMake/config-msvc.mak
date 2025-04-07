@@ -151,12 +151,18 @@ GDKMM_BASE_CFLAGS =		\
 	/I..\gdk /I.\gdkmm	\
 	/std:c++17 /EHsc /FImsvc_recommended_pragmas.h /utf-8
 
+GSKMM_BASE_CFLAGS =		\
+	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gsk /I..\untracked\gsk\gskmm	\
+	/I..\gsk /I.\gskmm	\
+	$(GDKMM_BASE_CFLAGS)
+
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\gtk /I..\untracked\gtk\gtkmm	\
 	/I..\gtk /I.\gtkmm	\
 	/wd4250				\
-	$(GDKMM_BASE_CFLAGS)
+	$(GSKMM_BASE_CFLAGS)
 
 LIBGDKMM_CFLAGS =	\
 	/DGDKMM_BUILD	\
