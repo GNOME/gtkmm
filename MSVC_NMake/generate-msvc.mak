@@ -15,6 +15,10 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
 	@if not exist $(@D)\ md $(@D)
 	@if not exist ..\gdk\gdkmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gdk --parent_dir=gdkmm $(gdkmm_real_hg:\=/)>$@
 
+vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\wrap_init.cc: $(gskmm_real_hg)
+	@if not exist $(@D)\ md $(@D)
+	@if not exist ..\gsk\gskmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gsk --parent_dir=gskmm $(gskmm_real_hg:\=/)>$@
+
 # Avoid the dreaded U1095 command line error... @#$@#!
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@if not exist $(@D)\ md $(@D)
