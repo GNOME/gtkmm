@@ -57,7 +57,7 @@ help:
 	@echo locations under ^$(PREFIX).
 	@echo.
 	@echo A 'prep-git-build' target is supported for building from GIT checkouts, which
-	@echo will generate gtkmm.rc, gdkmmconfig.h and gtkmmconfig.h.  Use this target
+	@echo will generate gtkmm.rc and g[d^|s^|t]kmmconfig.h.  Use this target
 	@echo before building any other targets when building from GIT checkouts.
 	@echo.
 	@echo A 'tests' target is supported to build the gtkmm's test programs.
