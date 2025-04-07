@@ -5,6 +5,7 @@
 
 # Create the build directories
 vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm	\
+vs$(VSVER)\$(CFG)\$(PLAT)\gskmm	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm	\
 vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo:
 	@-mkdir $@
@@ -49,6 +50,17 @@ gdkmm\gdkmmconfig.h: ..\configure.ac ..\gdk\gdkmmconfig.h.in
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GDKMM_MICRO_VERSION/\#define GDKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
+gskmm\gskmmconfig.h: ..\configure.ac ..\gsk\gskmmconfig.h.in
+	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
+	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(DO_REAL_GEN)" == "1" echo Generating $@...
+	@if "$(DO_REAL_GEN)" == "1" copy ..\gsk\$(@F).in $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GSKMM_DISABLE_DEPRECATED/\/\* \#undef GSKMM_DISABLE_DEPRECATED \*\//g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GSKMM_MAJOR_VERSION/\#define GSKMM_MAJOR_VERSION $(PKG_MAJOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GSKMM_MINOR_VERSION/\#define GSKMM_MINOR_VERSION $(PKG_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\#undef GSKMM_MICRO_VERSION/\#define GSKMM_MICRO_VERSION $(PKG_MICRO_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" del $@.bak
+
 gtkmm\gtkmmconfig.h: ..\configure.ac ..\gtk\gtkmmconfig.h.in
 	@if not "$(DO_REAL_GEN)" == "1" if exist pkg-ver.mak del pkg-ver.mak
 	@if not exist pkg-ver.mak $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
@@ -85,4 +97,4 @@ pkg-ver.mak: ..\configure.ac
 	@echo for /f "tokens=1,2,3 delims=." %%%%a IN ("%glibmm_ver%") do (echo PKG_MAJOR_VERSION=%%%%a^& echo PKG_MINOR_VERSION=%%%%b^& echo PKG_MICRO_VERSION=%%%%c)^>$@>>pkg-ver.bat
 	@pkg-ver.bat
 	@del ver.txt pkg-ver.bat
-	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 gdkmm\gdkmmconfig.h gtkmm\gtkmm.rc gtkmm\gtkmmconfig.h
+	$(MAKE) /f Makefile.vc CFG=$(CFG) GENERATE_VERSIONED_FILES=1 gdkmm\gdkmmconfig.h gskmm\gskmmconfig.h gtkmm\gtkmm.rc gtkmm\gtkmmconfig.h
