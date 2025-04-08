@@ -101,6 +101,7 @@ extern const int gtkmm_micro_version;
 #include <giomm.h>
 
 #include <gdkmm.h>
+#include <gskmm.h>
 
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>

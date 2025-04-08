@@ -1,8 +1,9 @@
 # docs/reference
 
 # Input: built_files_root, project_source_root, gtkmm_pcname,
-#        gdkmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames, gdkmm_extra_h_files,
-#        gtkmm_extra_h_files, gdkmm_built_h_file_targets,
+#        gdkmm_hg_ccg_basenames, gskmm_hg_ccg_basenames, gtkmm_hg_ccg_basenames,
+#        gdkmm_extra_h_files, gskmm_extra_h_files, gtkmm_extra_h_files,
+#        gdkmm_built_h_file_targets, gskmm_built_h_file_targets,
 #        gtkmm_built_h_file_targets, install_datadir, python3,
 #        doc_reference_py, build_documentation
 # Output: install_docdir, install_devhelpdir, if build_documentation: tag_file
@@ -86,6 +87,9 @@ built_h_files = []
 foreach file : gdkmm_hg_ccg_basenames
   built_h_files += built_files_root / 'gdk' / 'gdkmm' / file + '.h'
 endforeach
+foreach file : gskmm_hg_ccg_basenames
+  built_h_files += built_files_root / 'gsk' / 'gskmm' / file + '.h'
+endforeach
 foreach file : gtkmm_hg_ccg_basenames
   built_h_files += built_files_root / 'gtk' / 'gtkmm' / file + '.h'
 endforeach
@@ -97,23 +101,29 @@ foreach file : gdkmm_extra_h_files
     src_h_files += project_source_root / 'gdk' / 'gdkmm' / file
   endif
 endforeach
+foreach file : gskmm_extra_h_files
+  if file != 'wrap_init.h'
+    src_h_files += project_source_root / 'gsk' / 'gskmm' / file
+  endif
+endforeach
 foreach file : gtkmm_extra_h_files
   if file != 'wrap_init.h'
     src_h_files += project_source_root / 'gtk' / 'gtkmm' / file
   endif
 endforeach
 src_h_files += project_source_root / 'gdk' / 'gdkmm.h'
+src_h_files += project_source_root / 'gsk' / 'gskmm.h'
 src_h_files += project_source_root / 'gtk' / 'gtkmm.h'
 
 doctool_dir = project_source_root / 'untracked' / 'docs' # MMDOCTOOLDIR
 doctool_dist_dir = 'untracked' / 'docs' # Relative to MESON_DIST_ROOT
 
 doc_h_files = src_h_files
-if gdkmm_built_h_file_targets.length() + gtkmm_built_h_file_targets.length() > 0
+if gdkmm_built_h_file_targets.length() + gskmm_built_h_file_targets.length() + gtkmm_built_h_file_targets.length() > 0
   # .h files have been generated from .hg files (maintainer mode).
   # Use built_h_file_targets instead of built_h_files here, or else Meson won't
   # know that Doxygen must not be executed until the .h files have been built.
-  doc_h_files += gdkmm_built_h_file_targets + gtkmm_built_h_file_targets
+  doc_h_files += gdkmm_built_h_file_targets + gskmm_built_h_file_targets + gtkmm_built_h_file_targets
 else
   # All .h files are stored in the source tree (not maintainer mode).
   doc_h_files += built_h_files

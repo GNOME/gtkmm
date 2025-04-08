@@ -19,7 +19,7 @@ ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
-src_subdirs = gdk/src gtk/src
+src_subdirs = gdk/src gsk/src gtk/src
 else
 src_subdirs =
 endif
@@ -28,12 +28,17 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = tools $(src_subdirs) gdk/gdkmm gtk/gtkmm tests demos $(doc_subdirs)
+SUBDIRS = tools $(src_subdirs) gdk/gdkmm gsk/gskmm gtk/gtkmm tests demos $(doc_subdirs)
 
 gdkmm_includedir = $(includedir)/$(GTKMM_MODULE_NAME)
 gdkmm_include_HEADERS = gdk/gdkmm.h
 gdkmm_libincludedir = $(libdir)/$(GTKMM_MODULE_NAME)/include
 nodist_gdkmm_libinclude_HEADERS = gdk/gdkmmconfig.h
+
+gskmm_includedir = $(includedir)/$(GTKMM_MODULE_NAME)
+gskmm_include_HEADERS = gsk/gskmm.h
+gskmm_libincludedir = $(libdir)/$(GTKMM_MODULE_NAME)/include
+nodist_gskmm_libinclude_HEADERS = gsk/gskmmconfig.h
 
 gtkmm_includedir = $(includedir)/$(GTKMM_MODULE_NAME)
 gtkmm_include_HEADERS = gtk/gtkmm.h
@@ -60,12 +65,16 @@ EXTRA_DIST = \
   meson.build \
   meson_options.txt \
   MSVC_NMake/gdkmm/meson.build \
+  MSVC_NMake/gskmm/meson.build \
   MSVC_NMake/gtkmm/meson.build \
   demos/gtk-demo/meson.build \
   docs/reference/meson.build \
   gdk/meson.build \
   gdk/gdkmmconfig.h.meson \
   gdk/gdkmm/meson.build \
+  gsk/meson.build \
+  gsk/gskmmconfig.h.meson \
+  gsk/gskmm/meson.build \
   gtk/meson.build \
   gtk/gtkmmconfig.h.meson \
   gtk/gtkmm/meson.build \

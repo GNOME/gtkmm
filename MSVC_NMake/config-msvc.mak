@@ -151,16 +151,27 @@ GDKMM_BASE_CFLAGS =		\
 	/I..\gdk /I.\gdkmm	\
 	/std:c++17 /EHsc /FImsvc_recommended_pragmas.h /utf-8
 
+GSKMM_BASE_CFLAGS =		\
+	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
+	/I..\untracked\gsk /I..\untracked\gsk\gskmm	\
+	/I..\gsk /I.\gskmm	\
+	$(GDKMM_BASE_CFLAGS)
+
 GTKMM_BASE_CFLAGS =		\
 	/Ivs$(VSVER)\$(CFG)\$(PLAT)	\
 	/I..\untracked\gtk /I..\untracked\gtk\gtkmm	\
 	/I..\gtk /I.\gtkmm	\
 	/wd4250				\
-	$(GDKMM_BASE_CFLAGS)
+	$(GSKMM_BASE_CFLAGS)
 
 LIBGDKMM_CFLAGS =	\
 	/DGDKMM_BUILD	\
 	$(GDKMM_BASE_CFLAGS)	\
+	$(GTKMM_INCLUDES)
+
+LIBGSKMM_CFLAGS =	\
+	/DGSKMM_BUILD	\
+	$(GSKMM_BASE_CFLAGS)	\
 	$(GTKMM_INCLUDES)
 
 LIBGTKMM_CFLAGS =	\
@@ -229,6 +240,7 @@ GTKMM_INT_EXTRA_HEADERS = $(gtkmm_files_extra_any_h)
 GTKMM_INT_EXTRA_HEADERS_P = $(gtkmm_files_extra_ph:/=\)
 
 GDKMM_HG_FILES = $(gdkmm_files_any_hg)
+GSKMM_HG_FILES = $(gskmm_files_any_hg)
 GTKMM_HG_FILES = $(gtkmm_files_any_hg)
 
 ENABLED_DEPRECATED = no
@@ -238,6 +250,7 @@ GTKMM_INT_EXTRA_SOURCES = $(GTKMM_INT_EXTRA_SOURCES) $(gtkmm_files_extra_depreca
 GTKMM_INT_EXTRA_HEADERS = $(GTKMM_INT_EXTRA_HEADERS) $(gtkmm_files_extra_deprecated_h)
 
 GDKMM_HG_FILES = $(GDKMM_HG_FILES) $(gdkmm_files_deprecated_hg)
+GSKMM_HG_FILES = $(GSKMM_HG_FILES) $(gskmm_files_deprecated_hg)
 GTKMM_HG_FILES = $(GTKMM_HG_FILES) $(gtkmm_files_deprecated_hg)
 ENABLED_DEPRECATED = yes
 !endif
@@ -245,6 +258,7 @@ ENABLED_DEPRECATED = yes
 GDKMM_INT_GENERATED_HEADERS = $(GDKMM_HG_FILES:.hg=.h)
 GDKMM_INT_GENERATED_HEADERS_P = $(GDKMM_HG_FILES:.hg=_p.h)
 GDKMM_INT_GENERATED_SOURCES = $(GDKMM_HG_FILES:.hg=.cc) wrap_init.cc
+GSKMM_INT_GENERATED_SOURCES = $(GSKMM_HG_FILES:.hg=.cc) wrap_init.cc
 GTKMM_INT_GENERATED_SOURCES = $(GTKMM_HG_FILES:.hg=.cc) wrap_init.cc
 
 # Path to glib-compile-resources.exe

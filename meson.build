@@ -120,7 +120,7 @@ install_libdir = get_option('libdir')
 install_datadir = get_option('datadir')
 install_pkgconfigdir = install_libdir / 'pkgconfig'
 
-# Dependencies. <pkg> = gdk and gtk
+# Dependencies. <pkg> = gdk, gsk and gtk
 # <pkg>mm_build_dep: Dependencies when building the <pkg>mm library.
 # gtkmm_dep (created in gtk/gtkmm/meson.build):
 #   Dependencies when using the gtkmm library.
@@ -164,6 +164,7 @@ gmmproc_dir = glibmm_dep.get_variable('gmmprocdir')
 gmmproc_extra_m4_dirs = [pangomm_dep.get_variable('gmmprocm4dir')]
 
 gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep, vulkan_dep]
+gskmm_build_dep = gdkmm_build_dep
 gtkmm_build_dep = gdkmm_build_dep
 
 gtkmm_pc_requires = [
@@ -281,7 +282,7 @@ elif cpp_warnings == 'max' or cpp_warnings == 'fatal'
     if not werror
       warning_flags += is_msvc ? ['/WX'] : ['-Werror']
     endif
-    deprecations = 'G PANGO GDK GDK_PIXBUF GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX'.split()
+    deprecations = 'G PANGO GDK GDK_PIXBUF GSK GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX'.split()
     foreach d : deprecations
       warning_flags += '-D@0@_DISABLE_DEPRECATED'.format(d)
     endforeach
@@ -310,6 +311,7 @@ if is_msvc
                                      # dangerous ones glaring, distributed with GLib
     '/EHsc',  # avoid warnings caused by exception handling model used
     '/wd4152', # nonstandard extension, function/data pointer conversion in expression
+    '/wd4201', # warning C4201: nonstandard extension used: nameless struct/union
     '/wd4245', # 'argument': conversion from 'int' to 'guint', signed/unsigned mismatch
     '/wd4250', # 'class1' : inherits 'class2::member' via dominance
     '/wd4702', # unreachable code
@@ -331,6 +333,9 @@ subdir('tools/extra_defs_gen')
 subdir('gdk')
 subdir('MSVC_NMake/gdkmm')
 subdir('gdk/gdkmm')
+subdir('gsk')
+subdir('MSVC_NMake/gskmm')
+subdir('gsk/gskmm')
 subdir('gtk')
 subdir('MSVC_NMake/gtkmm')
 subdir('gtk/gtkmm')

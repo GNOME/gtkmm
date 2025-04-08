@@ -23,7 +23,7 @@ AC_PREREQ([2.59])
 AC_CONFIG_SRCDIR([gtk/gtkmm.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
-AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gtk/gtkmmconfig.h])
+AC_CONFIG_HEADERS([config.h gdk/gdkmmconfig.h gsk/gskmmconfig.h gtk/gtkmmconfig.h])
 
 AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news no-dist-gzip dist-xz tar-ustar no-define nostdinc foreign])
 # Support silent build rules.
@@ -34,6 +34,7 @@ AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 MM_PREREQ([0.9.12])
 MM_INIT_MODULE([gdkmm-4.0])
+MM_INIT_MODULE([gskmm-4.0])
 MM_INIT_MODULE([gtkmm-4.0])
 
 # Copy the mm-common .pl scripts into docs/,
@@ -96,6 +97,7 @@ AS_IF([test "x$enable_static" = xyes],
 # The extra gdk-pixbuf-2.0 check is because gdkmm requires a newer gdk-pixbuf than gtk4 requires.
 # TODO: Remove the mention of cairomm once pangomm needs to depend on such a new version.
 AC_SUBST([GDKMM_MODULES], ['giomm-2.68 >= 2.75.0 pangomm-2.48 >= 2.50.0 cairomm-1.16 >= 1.15.4 gtk4 >= 4.17.5 gdk-pixbuf-2.0 >= 2.35.5'])
+AC_SUBST([GSKMM_MODULES], [$GDKMM_MODULES])
 
 AS_IF([test "x$gtkmm_host_windows" = xyes],
       [GTKMM_MODULES=$GDKMM_MODULES],
@@ -103,12 +105,13 @@ AS_IF([test "x$gtkmm_host_windows" = xyes],
 
 AC_SUBST([GTKMM_MODULES])
 
-# gtkmm.pc.in can assume that GDKMM_MODULES is a subset of GTKMM_MODULES,
-# not listing GDKMM_MODULES as required modules.
+# gtkmm.pc.in can assume that GDKMM_MODULES and GSKMM_MODULES are subsets of GTKMM_MODULES,
+# not listing GDKMM_MODULES and GSKMM_MODULES as required modules.
 
 AC_SUBST([GTKMM_DEMOS_EXTRA_MODULES], ['epoxy >= 1.2'])
 
 PKG_CHECK_MODULES([GDKMM], [$GDKMM_MODULES])
+PKG_CHECK_MODULES([GSKMM], [$GSKMM_MODULES])
 PKG_CHECK_MODULES([GTKMM], [$GTKMM_MODULES])
 PKG_CHECK_MODULES([GTKMM_DEMOS_EXTRA], [$GTKMM_DEMOS_EXTRA_MODULES])
 
@@ -117,7 +120,7 @@ MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.68])
 MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir pangomm-2.48])
 
-MM_ARG_DISABLE_DEPRECATED_API([GDKMM GTKMM])
+MM_ARG_DISABLE_DEPRECATED_API([GDKMM GSKMM GTKMM])
 
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
@@ -139,12 +142,14 @@ AC_CHECK_FUNCS([mkfifo])
 MM_ARG_ENABLE_WARNINGS([GTKMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -Wformat-security -Wshadow -Wsuggest-override -Wno-long-long -DGSEAL_ENABLE],
-                       [G PANGO GDK GDK_PIXBUF GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX])
+                       [G PANGO GDK GDK_PIXBUF GSK GTK GLIBMM GIOMM PANGOMM CAIROMM SIGCXX])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  gdk/src/Makefile
                  gdk/gdkmm/Makefile
+                 gsk/src/Makefile
+                 gsk/gskmm/Makefile
                  gtk/${GTKMM_MODULE_NAME}.pc:gtk/gtkmm.pc.in
                  gtk/${GTKMM_MODULE_NAME}-uninstalled.pc:gtk/gtkmm-uninstalled.pc.in
                  gtk/src/Makefile
@@ -159,6 +164,8 @@ AC_CONFIG_FILES([Makefile
 # Copy the generated configuration headers into the MSVC project directories.
 AC_CONFIG_COMMANDS([MSVC_NMake/gdkmm/gdkmmconfig.h],
                    [cp -f gdk/gdkmmconfig.h MSVC_NMake/gdkmm/gdkmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_NMake/gskmm/gskmmconfig.h],
+                   [cp -f gsk/gskmmconfig.h MSVC_NMake/gskmm/gskmmconfig.h])
 AC_CONFIG_COMMANDS([MSVC_NMake/gtkmm/gtkmmconfig.h],
                    [cp -f gtk/gtkmmconfig.h MSVC_NMake/gtkmm/gtkmmconfig.h])
 #AC_CONFIG_COMMANDS([win32_installer/lgpl.txt],

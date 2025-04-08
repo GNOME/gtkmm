@@ -67,11 +67,14 @@ wrap_existing_test_SOURCES         = wrap_existing/main.cc
 gdkmm_includes = -I$(top_builddir)/gdk $(if $(srcdir:.=),-I$(top_srcdir)/gdk)
 gdkmm_ldadd    =
 
+gskmm_includes = -I$(top_builddir)/gsk $(if $(srcdir:.=),-I$(top_srcdir)/gsk)
+gskmm_ldadd    =
+
 gtkmm_includes = -I$(top_builddir)/gtk $(if $(srcdir:.=),-I$(top_srcdir)/gtk)
 gtkmm_ldadd    = $(top_builddir)/gtk/gtkmm/libgtkmm-$(GTKMM_API_VERSION).la
 
-local_includes = -I$(top_builddir) $(gdkmm_includes) $(gtkmm_includes)
-local_ldadd    = $(gdkmm_ldadd) $(gtkmm_ldadd)
+local_includes = -I$(top_builddir) $(gdkmm_includes) $(gskmm_includes) $(gtkmm_includes)
+local_ldadd    = $(gdkmm_ldadd) $(gskmm_ldadd) $(gtkmm_ldadd)
 
 AM_CPPFLAGS = $(local_includes) $(GTHREAD_CFLAGS) $(GTKMM_CFLAGS)
 AM_CXXFLAGS = $(GTKMM_WXXFLAGS)

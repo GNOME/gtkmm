@@ -1,0 +1,175 @@
+/* Copyright (C) 2025 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gskmmconfig.h)
+
+_DEFS(gskmm,gsk)
+
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <gdkmm/graphene_point.h>
+#include <gdkmm/graphene_rect.h>
+#include <gsk/gsk.h> // For GskTransform
+
+namespace Gsk
+{
+/** Describes a 3D transform.
+ *
+ * Unlike `graphene_matrix_t`, `%Gsk::Transform` retains the steps in how
+ * a transform was constructed, and allows inspecting them. It is modeled
+ * after the way CSS describes transforms.
+ *
+ * `%Gsk::Transform` objects are immutable and cannot be changed after creation.
+ * This means code can safely expose them as properties of objects without
+ * having to worry about others changing them.
+ *
+ * @newin{4,20}
+ */
+class GSKMM_API Transform final
+{
+  // GskTransform is registered as a boxed type, but it has custom
+  // reference-counting instead of copy/free functions, so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(Transform, GskTransform, gsk_transform_new, gsk_transform_ref, gsk_transform_unref, GSKMM_API)
+  _IGNORE(gsk_transform_ref, gsk_transform_unref)
+
+public:
+  _WRAP_ENUM(Category, GskTransformCategory,
+    s#^3D$#CAT_3D#, s#^2D#CAT_2D#,
+    decl_prefix GSKMM_API, newin "4,20")
+
+  _WRAP_METHOD(Glib::ustring to_string() const, gsk_transform_to_string)
+  _IGNORE(gsk_transform_print)
+
+  /** Parses a given string into a transform.
+   *
+   * Strings printed via to_string()
+   * can be read in again successfully using this function.
+   *
+   * If @a string does not describe a valid transform,
+   * an empty RefPtr is returned.
+   *
+   * @param string The string to parse.
+   * @return A new transform, or an empty RefPtr.
+   */
+  static Glib::RefPtr<Transform> create(const Glib::ustring& string);
+  _IGNORE(gsk_transform_parse)
+
+  _WRAP_METHOD(void to_2d(float& out_xx, float& out_yx, float& out_xy,
+    float& out_yy, float& out_dx, float& out_dy) const, gsk_transform_to_2d)
+  _WRAP_METHOD(void to_2d_components(float& out_skew_x, float& out_skew_y,
+    float& out_scale_x, float& out_scale_y, float& out_angle, float& out_dx,
+    float& out_dy) const, gsk_transform_to_2d_components, newin "4,20")
+  _WRAP_METHOD(void to_affine(float& out_scale_x, float& out_scale_y,
+    float& out_dx, float& out_dy) const, gsk_transform_to_affine)
+  _WRAP_METHOD(void to_translate(float& out_dx, float& out_dy) const,
+    gsk_transform_to_translate)
+
+  _WRAP_METHOD(Category get_category() const, gsk_transform_get_category)
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<const Transform>& second) const, gsk_transform_equal)
+
+  /** Applies all the operations from @a other to this transform.
+   *
+   * @param other Transform to apply.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> transform(const Glib::RefPtr<const Transform>& other) const;
+
+  /** Inverts the given transform.
+   *
+   * If this transform is not invertible, an empty RefPtr is returned.
+   *
+   * @return The inverted transform.
+   */
+  Glib::RefPtr<Transform> invert() const;
+
+  /** Translates this transform in 2-dimensional space by @a point.
+   *
+   * @param point The point to translate the transform by.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> translate(const Gdk::Graphene::Point& point) const;
+
+  /** Applies a skew transform.
+   *
+   * @param skew_x Skew factor, in degrees, on the X axis.
+   * @param skew_y Skew factor, in degrees, on the Y axis.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> skew(float skew_x, float skew_y) const;
+
+  /** Rotates this transform by an angle around the Z axis.
+   *
+   * The rotation happens around the origin point of (0, 0).
+   *
+   * @param angle The rotation angle, in degrees (clockwise).
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> rotate(float angle) const;
+
+  /** Scales this transform in 2-dimensional space by the given factors.
+   *
+   * Use scale_3d() to scale in all 3 dimensions.
+   *
+   * @param factor_x Scaling factor on the X axis.
+   * @param factor_y Scaling factor on the Y axis.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> scale(float factor_x, float factor_y) const;
+
+  /** Scales this transform by the given factors.
+   *
+   * @param factor_x Scaling factor on the X axis.
+   * @param factor_y Scaling factor on the Y axis.
+   * @param factor_z Scaling factor on the Z axis.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> scale_3d(float factor_x, float factor_y, float factor_z) const;
+
+  /** Applies a perspective projection transform.
+   *
+   * This transform scales points in X and Y based on their Z value,
+   * scaling points with positive Z values away from the origin, and
+   * those with negative Z values towards the origin. Points
+   * on the z=0 plane are unchanged.
+   *
+   * @param depth Distance of the z=0 plane. Lower values give a more
+   *        flattened pyramid and therefore a more pronounced perspective effect.
+   * @return The new transform.
+   */
+  Glib::RefPtr<Transform> perspective(float depth) const;
+  _IGNORE(gsk_transform_transform, gsk_transform_invert, gsk_transform_translate,
+    gsk_transform_skew, gsk_transform_rotate, gsk_transform_scale,
+    gsk_transform_scale_3d, gsk_transform_perspective)
+
+  /** Transforms a rectangle using the given transform.
+   *
+   * The result is the bounding box containing the coplanar quad.
+   *
+   * @param rect The rectangle to transform.
+   * @return The transformed rectangle.
+   */
+  Gdk::Graphene::Rect transform_bounds(const Gdk::Graphene::Rect& rect) const;
+
+  /** Transforms a point using the given transform.
+   *
+   * @param point The point to transform.
+   * @return The transformed point.
+   */
+  Gdk::Graphene::Point transform_point(const Gdk::Graphene::Point& point) const;
+  _IGNORE(gsk_transform_transform_bounds, gsk_transform_transform_point)
+};
+
+} // namespace Gsk

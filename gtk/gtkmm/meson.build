@@ -4,7 +4,8 @@
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, macos_darwin_versions,
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
-#        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_libname,
+#        gdkmm_library, gskmm_library, gdkmm_used_built_h_file_targets,
+#        gskmm_used_built_h_file_targets, gtkmm_libname,
 #        gtkmm_pc_requires
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_own_dep
@@ -459,7 +460,7 @@ if maintainer_mode
     install: false,
   )
 
-  extra_include_dirs = ['..', '..' / '..' / 'gdk']
+  extra_include_dirs = ['..', '..' / '..' / 'gdk', '..' / '..' / 'gsk']
 
   gtk_gen_sources = gtkmm_used_built_cc_file_targets
 
@@ -503,6 +504,7 @@ else # not maintainer_mode
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'gtk',
           '..' / '..' / 'gdk', '..' / '..' / 'untracked' / 'gdk',
+          '..' / '..' / 'gsk', '..' / '..' / 'untracked' / 'gsk',
   ]
 
   built_h_cc_dir = src_untracked_gtkmm
@@ -526,7 +528,7 @@ gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
   version: gtkmm_libversion,
   darwin_versions: macos_darwin_versions,
   dependencies: gtkmm_build_dep,
-  link_whole: gdkmm_library,
+  link_whole: [gdkmm_library, gskmm_library],
   install: true,
 )
 
@@ -580,7 +582,7 @@ meson.add_dist_script(
 # This is used when building demo programs and test programs.
 # It's also a part of gtkmm_dep, when gtkmm is a subproject.
 gtkmm_own_dep = declare_dependency(
-  sources: gdkmm_used_built_h_file_targets + gtkmm_used_built_h_file_targets,
+  sources: gdkmm_used_built_h_file_targets + gskmm_used_built_h_file_targets + gtkmm_used_built_h_file_targets,
   link_with: gtkmm_library,
   include_directories: extra_include_dirs,
   dependencies: gtkmm_build_dep,

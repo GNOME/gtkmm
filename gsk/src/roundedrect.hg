@@ -1,0 +1,103 @@
+/* Copyright (C) 2025 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+_CONFIGINCLUDE(gskmmconfig.h)
+
+#include <gdkmm/graphene_point.h>
+#include <gdkmm/graphene_rect.h>
+#include <gdkmm/graphene_size.h>
+#include <array>
+#include <utility> // std::pair
+#include <gsk/gsk.h>
+
+_DEFS(gskmm,gsk)
+
+namespace Gsk
+{
+/** A rectangular region with rounded corners.
+ *
+ * Application code should normalize rectangles using
+ * normalize(); this function will ensure that
+ * the bounds of the rectangle are normalized and ensure that the corner
+ * values are positive and the corners do not overlap.
+ *
+ * All functions taking a `%Gsk::RoundedRect` as an argument will internally
+ * operate on a normalized copy; all functions returning a `%Gsk::RoundedRect`
+ * will always return a normalized one.
+ *
+ * The algorithm used for normalizing corner sizes is described in
+ * [the CSS specification](https://drafts.csswg.org/css-backgrounds-3/#border-radius).
+ *
+ * @newin{4,20}
+ */
+class GSKMM_API RoundedRect
+{
+  _CLASS_GENERIC(RoundedRect, GskRoundedRect)
+  _IGNORE(gsk_rounded_rect_init, gsk_rounded_rect_init_copy, gsk_rounded_rect_init_from_rect)
+
+public:
+  RoundedRect();
+  RoundedRect(const GskRoundedRect* rounded_rect);
+  RoundedRect(const Gdk::Graphene::Rect& bounds,
+    const Gdk::Graphene::Size& top_left,
+    const Gdk::Graphene::Size& top_right,
+    const Gdk::Graphene::Size& bottom_right,
+    const Gdk::Graphene::Size& bottom_left);
+  RoundedRect(const Gdk::Graphene::Rect& bounds, float radius);
+
+  RoundedRect(const RoundedRect& other) noexcept;
+  RoundedRect& operator=(const RoundedRect& other) noexcept;
+
+  RoundedRect(RoundedRect&& other) noexcept;
+  RoundedRect& operator=(RoundedRect&& other) noexcept;
+
+  _WRAP_METHOD(void set(const Gdk::Graphene::Rect& bounds,
+    const Gdk::Graphene::Size& top_left,
+    const Gdk::Graphene::Size& top_right,
+    const Gdk::Graphene::Size& bottom_right,
+    const Gdk::Graphene::Size& bottom_left), gsk_rounded_rect_init)
+  _WRAP_METHOD(void set(const Gdk::Graphene::Rect& bounds, float radius),
+    gsk_rounded_rect_init_from_rect)
+
+  /** Get the bounding rectangle and the corner radii.
+   *
+   * You can use the Gsk::Corner enum to select a corner.
+   * @code
+   * auto [bounds, corners] = rounded_rect.get();
+   * auto top_right = corners[Gsk::Corner::TOP_RIGHT];
+   * @endcode
+   * @return {bounds, corners} The bounding rectangle and the corner radii.
+   */
+  std::pair<Gdk::Graphene::Rect, std::array<Gdk::Graphene::Size, 4>> get() const;
+
+  _WRAP_METHOD(void normalize(), gsk_rounded_rect_normalize)
+  _WRAP_METHOD(void offset(float dx, float dy), gsk_rounded_rect_offset)
+  _WRAP_METHOD(void shrink(float top, float right, float bottom, float left), gsk_rounded_rect_shrink)
+  _WRAP_METHOD(bool is_rectilinear() const, gsk_rounded_rect_is_rectilinear)
+  _WRAP_METHOD(bool contains(const Gdk::Graphene::Point& point) const, gsk_rounded_rect_contains_point)
+  _WRAP_METHOD(bool contains(const Gdk::Graphene::Rect& rect) const, gsk_rounded_rect_contains_rect)
+  _WRAP_METHOD(bool intersects(const Gdk::Graphene::Rect& rect) const, gsk_rounded_rect_intersects_rect)
+
+  /// Provides access to the underlying C GObject.
+  GskRoundedRect*       gobj()       { return &gobject_; }
+  /// Provides access to the underlying C GObject.
+  const GskRoundedRect* gobj() const { return &gobject_; }
+
+protected:
+  GskRoundedRect gobject_;
+};
+
+} // namespace Gsk
