@@ -100,6 +100,8 @@ gtkmm_any_hg_ccg_basenames = [
   'filter',
   'filterlistmodel',
   'fixed',
+  'fixedlayout',
+  'fixedlayoutchild',
   'flattenlistmodel',
   'flowbox',
   'flowboxchild',

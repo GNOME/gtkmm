@@ -186,6 +186,8 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/filelauncher.h>
 #include <gtkmm/filterlistmodel.h>
 #include <gtkmm/fixed.h>
+#include <gtkmm/fixedlayout.h>
+#include <gtkmm/fixedlayoutchild.h>
 #include <gtkmm/flattenlistmodel.h>
 #include <gtkmm/flowbox.h>
 #include <gtkmm/flowboxchild.h>

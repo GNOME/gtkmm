@@ -27,7 +27,9 @@ _CONV_INCLASS_ENUM(Gsk,Transform,Category)
 
 _CONVERSION(`const Gsk::RoundedRect&',`const GskRoundedRect*',($3).gobj())
 
+_CONVERSION(`const Glib::RefPtr<Transform>&',`GskTransform*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Gsk::Transform>&',`GskTransform*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Transform>&',`GskTransform*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Gsk::Transform>&',`GskTransform*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GskTransform*',`Glib::RefPtr<Transform>',`Glib::wrap($3)')
-
+_CONVERSION(`GskTransform*',`Glib::RefPtr<Gsk::Transform>',`Glib::wrap($3)')
