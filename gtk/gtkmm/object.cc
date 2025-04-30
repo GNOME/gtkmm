@@ -1,4 +1,4 @@
-/* Copyright 1998-2010 The gtkmm Development Team
+/* Copyright (C) 1998-2010 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -11,8 +11,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <gtkmm/object.h>
@@ -178,7 +177,6 @@ Object& Object::operator=(Object&& src) noexcept
   return *this;
 }
 
-
 Object::~Object() noexcept
 {
   #ifdef GLIBMM_DEBUG_REFCOUNTING
@@ -334,28 +332,21 @@ const Glib::Class& Object_Class::init()
     register_derived_type(g_object_get_type());
 
     // Add derived versions of interfaces, if the C type implements any interfaces:
-
   }
 
   return *this;
 }
 
-
 void Object_Class::class_init_function(void* g_class, void* class_data)
 {
   BaseClassType *const klass = static_cast<BaseClassType*>(g_class);
   CppClassParent::class_init_function(klass, class_data);
-
-
 }
-
 
 Glib::ObjectBase* Object_Class::wrap_new(GObject* o)
 {
   return manage(new Object((GObject*)(o)));
-
 }
-
 
 /* The implementation: */
 
@@ -365,7 +356,6 @@ GType Object::get_type()
 {
   return object_class_.init().get_type();
 }
-
 
 GType Object::get_base_type()
 {
