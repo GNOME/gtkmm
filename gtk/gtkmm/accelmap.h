@@ -1,6 +1,5 @@
 #ifndef _GTKMM_ACCELMAP_H
 #define _GTKMM_ACCELMAP_H
-
 /* accelmap.h
  *
  * Copyright (C) 2002 The Gtkmm Development Team
@@ -16,8 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <string>
@@ -147,6 +145,4 @@ bool lookup_entry (const Glib::ustring& accel_path, Gtk::AccelKey& key);
 
 } // namespace Gtk
 
-
 #endif /* _GTKMM_ACCELMAP_H */
-

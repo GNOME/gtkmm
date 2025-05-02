@@ -1,6 +1,4 @@
-/* $Id$ */
-
-/* Copyright (c) 2002 The gtkmm Development Team
+/* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,8 +11,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <gtkmm/treemodelcolumn.h>
@@ -55,7 +52,6 @@ const GType* TreeModelColumnRecord::types() const
   return &column_types_.front();
 }
 
-
 /**** Gtk::TreeModelColumnBase *********************************************/
 
 TreeModelColumnBase::TreeModelColumnBase(GType g_type)
@@ -65,4 +61,3 @@ TreeModelColumnBase::TreeModelColumnBase(GType g_type)
 {}
 
 } // namespace Gtk
-

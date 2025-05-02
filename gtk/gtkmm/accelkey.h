@@ -1,7 +1,5 @@
-/* $Id$ */
 #ifndef _GTKMM_ACCELKEY_H
 #define _GTKMM_ACCELKEY_H
-
 /* menu_elems.h
  *
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -17,15 +15,13 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <gtkmmconfig.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gdkmm/types.h>
-
 
 namespace Gtk
 {

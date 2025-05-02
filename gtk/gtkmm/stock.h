@@ -1,10 +1,7 @@
-// -*- c++ -*-
 #ifndef _GTKMM_STOCK_H
 #define _GTKMM_STOCK_H
 
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -19,8 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <gtkmm/stockitem.h>
@@ -342,4 +338,3 @@ std::vector<Gtk::StockID> get_ids();
 #endif // GTKMM_DISABLE_DEPRECATED
 
 #endif /* _GTKMM_STOCK_H */
-
