@@ -11,6 +11,8 @@
  * Look at the Image demo for additional pixbuf usage examples.
  */
 
+//TODO: Remove GDKMM_DISABLE_DEPRECATED when set_source_pixbuf() has been replaced.
+#undef GDKMM_DISABLE_DEPRECATED
 #include <gtkmm.h>
 #include <cmath>
 #include <algorithm>
@@ -95,6 +97,15 @@ Example_Pixbufs::Example_Pixbufs()
     m_pAlertDialog->set_message(strMsg);
     m_pAlertDialog->show(*this);
   }
+#ifdef GDKMM_DISABLE_DEPRECATED
+  // If gtkmm has been built without deprecated API, the #undef before #include <gtkmm.h>
+  // has no effect. GDKMM_DISABLE_DEPRECATED is defined in gtkmm.h.
+  const Glib::ustring strMessage = "gtkmm has been built without deprecated API.";
+  const Glib::ustring strDetail = "Can't show this demo. ";
+  auto dialog = Gtk::AlertDialog::create(strMessage);
+  dialog->set_detail(strDetail);
+  dialog->show(*this);
+#endif
 }
 
 Example_Pixbufs::~Example_Pixbufs()
@@ -128,7 +139,9 @@ void Example_Pixbufs::load_pixbufs()
 /* Draw callback for the drawing area */
 void Example_Pixbufs::on_drawingarea_draw(const Cairo::RefPtr<Cairo::Context>& cr, int, int)
 {
+#ifndef GDKMM_DISABLE_DEPRECATED
   Gdk::Cairo::set_source_pixbuf(cr, m_refPixbuf);
+#endif
   cr->paint();
 }
 

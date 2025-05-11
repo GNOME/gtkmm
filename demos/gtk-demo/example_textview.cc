@@ -168,17 +168,7 @@ void Example_TextView::create_tags(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
 void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 {
-  Glib::RefPtr<Gdk::Texture> refTexture;
-  try
-  {
-    auto refPixbuf = Gdk::Pixbuf::create_from_resource("/textview/gtk-logo-rgb.gif");
-    auto refScaled = refPixbuf->scale_simple(32, 32, Gdk::InterpType::BILINEAR);
-    refTexture = Gdk::Texture::create_for_pixbuf(refScaled);
-  }
-  catch (const Glib::Error& error)
-  {
-    std::cout << "Failed to load image gtk-logo-rgb.gif: " << error.what() << std::endl;
-  }
+  auto refTexture = Gdk::Texture::create_from_resource("/textview/gtk-logo-rgb.png");
 
   /* get start of buffer; each insertion will revalidate the
    * iterator to point to just after the inserted text.
@@ -239,11 +229,8 @@ void Example_TextView::insert_text(Glib::RefPtr<Gtk::TextBuffer>& refBuffer)
 
   iter = refBuffer->insert(iter, "The buffer can have images in it: ");
   if (refTexture)
-  {
     iter = refBuffer->insert_paintable(iter, refTexture);
-    iter = refBuffer->insert_paintable(iter, refTexture);
-    iter = refBuffer->insert_paintable(iter, refTexture);
-  }
+
   iter = refBuffer->insert(iter, " for example.\n\n");
 
   iter = refBuffer->insert_with_tag(iter, "Spacing. ", "heading");

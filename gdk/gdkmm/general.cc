@@ -29,11 +29,14 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
   gdk_cairo_set_source_rgba(context->cobj(), const_cast<GdkRGBA*>(color.gobj()));
 }
 
+#ifndef GDKMM_DISABLE_DEPRECATED
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf, double pixbuf_x, double pixbuf_y)
 {
   gdk_cairo_set_source_pixbuf(context->cobj(), pixbuf->gobj(), pixbuf_x, pixbuf_y);
 }
-
+G_GNUC_END_IGNORE_DEPRECATIONS
+#endif // GDKMM_DISABLE_DEPRECATED
 
 void add_rectangle_to_path(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::Rectangle& rectangle)
 {

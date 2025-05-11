@@ -87,7 +87,7 @@ GTK_DEMO_RESOURCES = \
   gtk-demo/gnome-gmush.png \
   gtk-demo/gnome-gsame.png \
   gtk-demo/gnu-keys.png \
-  gtk-demo/gtk-logo-rgb.gif \
+  gtk-demo/gtk-logo-rgb.png \
   gtk-demo/gtk-logo.webm
 
 DISTCLEANFILES = gtk-demo/demo_resources.c

@@ -41,9 +41,13 @@ namespace Cairo
 GDKMM_API
 void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const Gdk::RGBA& color);
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 /** Sets the given pixbuf as the source pattern for the %Cairo context.
  * The pattern has an extend mode of Cairo::Pattern::Extend::NONE and is aligned
  * so that the origin of @a pixbuf is @a pixbuf_x, @a pixbuf_y.
+ *
+ * @deprecated 4.20: Use Cairo::Context::set_source(const Cairo::RefPtr<Cairo::Surface>& surface, double x, double y) and Gdk::Texture::download().
+ *
  * @param context The cairo context.
  * @param pixbuf A Gdk::Pixbuf
  * @param pixbuf_x X coordinate of location to place upper left corner of pixbuf.
@@ -52,6 +56,7 @@ void set_source_rgba(const ::Cairo::RefPtr< ::Cairo::Context >& context, const G
 GDKMM_API
 void set_source_pixbuf(const ::Cairo::RefPtr< ::Cairo::Context >& context,
   const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf, double pixbuf_x = 0, double pixbuf_y = 0);
+#endif // GDKMM_DISABLE_DEPRECATED
 
 /** Adds the given rectangle to the current path of the context.
  *

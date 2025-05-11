@@ -27,6 +27,7 @@ public:
   ~Example_Images() override;
 
 protected:
+  Glib::RefPtr<Gdk::Texture> create_texture_for_pixbuf(const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf);
   void start_progressive_loading();
 
   //Signal handlers:
@@ -209,7 +210,7 @@ void Example_Images::on_animation_timeout()
 
   m_refPixbufAnimationIter->advance();
   auto pixbuf = m_refPixbufAnimationIter->get_pixbuf();
-  auto texture = Gdk::Texture::create_for_pixbuf(pixbuf);
+  auto texture = create_texture_for_pixbuf(pixbuf);
   m_Picture_Animation.set_paintable(texture);
 }
 
@@ -220,6 +221,17 @@ void Example_Images::show_message_dialog(const Glib::ustring& msg)
 
   m_pMessageDialog->set_message(msg);
   m_pMessageDialog->show(*this);
+}
+
+Glib::RefPtr<Gdk::Texture> Example_Images::create_texture_for_pixbuf(
+  const Glib::RefPtr<const Gdk::Pixbuf>& pixbuf)
+{
+  // Like the deprecated gdk_texture_new_for_pixbuf() and Gdk::Texture::create_for_pixbuf().
+  const auto bytes = Glib::Bytes::create(pixbuf->get_pixels(),
+    pixbuf->get_height() * pixbuf->get_rowstride());
+  return Gdk::MemoryTexture::create(pixbuf->get_width(), pixbuf->get_height(),
+    pixbuf->get_has_alpha() ? Gdk::MemoryTexture::Format::R8G8B8A8 : Gdk::MemoryTexture::Format::R8G8B8,
+    bytes, pixbuf->get_rowstride());
 }
 
 void Example_Images::start_progressive_loading()
@@ -338,13 +350,13 @@ void Example_Images::on_loader_area_prepared()
    * isn't filled in yet.
    */
   refPixbuf->fill(0xaaaaaaff);
-  m_Picture_Progressive.set_paintable(Gdk::Texture::create_for_pixbuf(refPixbuf));
+  m_Picture_Progressive.set_paintable(create_texture_for_pixbuf(refPixbuf));
 }
 
 void Example_Images::on_loader_area_updated(int/*x*/, int/*y*/, int/*width*/, int/*height*/)
 {
   const auto refPixbuf = m_refPixbufLoader->get_pixbuf();
-  m_Picture_Progressive.set_paintable(Gdk::Texture::create_for_pixbuf(refPixbuf));
+  m_Picture_Progressive.set_paintable(create_texture_for_pixbuf(refPixbuf));
 }
 
 void Example_Images::on_toggle_sensitivity()
