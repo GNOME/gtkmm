@@ -189,6 +189,13 @@ if host_machine.system() != 'windows'
   endif
 endif
 
+if get_option('force_fallback_for').contains('mm-common')
+  # Make sure find_program('mm-common-get') finds the command in the subproject.
+  # Use --force-fallback-for=mm-common if you want the latest mm-common version
+  # in the git repository.
+  mm_common_sub = subproject('mm-common')
+endif
+
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.
 mm_common_get = find_program('mm-common-get', required: false)
