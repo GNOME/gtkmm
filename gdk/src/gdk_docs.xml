@@ -208,7 +208,10 @@ The matrix coefficients (for YUV to RGB conversion).
 Supported values:
 
 - 0: RGB
+- 1: BT.709
 - 2: unspecified
+- 5,6: BT.601
+- 9: BT.2020
 
 Since: 4.16
 
@@ -1354,6 +1357,10 @@ is determined by its phase field.
 </parameter>
 <parameter name="GDK_PAD_GROUP_MODE">
 <parameter_description> A tablet pad group mode change.
+</parameter_description>
+</parameter>
+<parameter name="GDK_PAD_DIAL">
+<parameter_description> A tablet pad axis event from a &quot;dial&quot;.
 </parameter_description>
 </parameter>
 <parameter name="GDK_EVENT_LAST">
@@ -3341,6 +3348,15 @@ Whether the toplevel should be modal with respect to its parent.
 </description>
 </property>
 
+<property name="GdkToplevel:capabilities">
+<description>
+The capabilities that are available for this toplevel.
+
+Since: 4.20
+
+</description>
+</property>
+
 <property name="GdkToplevel:decorated">
 <description>
 Whether the window manager should add decorations.
@@ -3358,6 +3374,24 @@ Whether the window manager should allow to close the surface.
 <property name="GdkToplevel:fullscreen-mode">
 <description>
 The fullscreen mode of the surface.
+
+</description>
+</property>
+
+<property name="GdkToplevel:gravity">
+<description>
+The gravity to use when resizing a surface programmatically.
+
+Gravity describes which point of the surface we want to keep
+fixed (meaning that the surface will grow in the opposite direction).
+For example, a gravity of `GDK_GRAVITY_NORTH_EAST` means that we
+want to fix top right corner of the surface.
+
+This property is just a hint that may affect the result when negotiating
+toplevel sizes with the windowing system. It does not affect interactive
+resizes started with [method@Gdk.Toplevel.begin_resize].
+
+Since: 4.20
 
 </description>
 </property>
@@ -3875,6 +3909,8 @@ Sets the given pixbuf as the source pattern for @cr.
 
 The pattern has an extend mode of %CAIRO_EXTEND_NONE and is aligned
 so that the origin of @pixbuf is @pixbuf_x, @pixbuf_y.
+
+Deprecated: 4.20: Use cairo_set_source_surface() and gdk_texture_download()
 
 </description>
 <parameters>
@@ -4678,6 +4714,31 @@ Since: 4.16
 </parameter>
 </parameters>
 <return> %TRUE if the two color states compare equal
+
+</return>
+</function>
+
+<function name="gdk_color_state_equivalent">
+<description>
+Compares two `GdkColorStates` for equivalence.
+
+Two objects that represent the same color state should be equivalent,
+even though they may not be equal in the sense of [method@Gdk.ColorState.equal].
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkColorState`
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> another `GdkColorStatee`
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two color states are equivalent
 
 </return>
 </function>
@@ -5901,6 +5962,10 @@ See [method@Gdk.ContentProvider.write_mime_type_async].
 <description>
 Registers a function to deserialize object of a given type.
 
+Since 4.20, when looking up a deserializer to use, GTK will
+use the last registered deserializer for a given mime type,
+so applications can override the built-in deserializers.
+
 </description>
 <parameters>
 <parameter name="mime_type">
@@ -5930,6 +5995,10 @@ Registers a function to deserialize object of a given type.
 <function name="gdk_content_register_serializer">
 <description>
 Registers a function to serialize objects of a given type.
+
+Since 4.20, when looking up a serializer to use, GTK will
+use the last registered serializer for a given mime type,
+so applications can override the built-in serializers.
 
 </description>
 <parameters>
@@ -9132,11 +9201,11 @@ available via [method@Gdk.Drop.get_actions].
 Returns the possible actions for this `GdkDrop`.
 
 If this value contains multiple actions - i.e.
-[func@Gdk.DragAction.is_unique] returns %FALSE for the result -
+[func@Gdk.DragAction.is_unique] returns false for the result -
 [method@Gdk.Drop.finish] must choose the action to use when
 accepting the drop. This will only happen if you passed
-%GDK_ACTION_ASK as one of the possible actions in
-[method@Gdk.Drop.status]. %GDK_ACTION_ASK itself will not
+`GDK_ACTION_ASK` as one of the possible actions in
+[method@Gdk.Drop.status]. `GDK_ACTION_ASK` itself will not
 be included in the actions returned by this function.
 
 This value may change over the lifetime of the [class@Gdk.Drop]
@@ -9193,7 +9262,7 @@ Gets the `GdkDisplay` that @self was created for.
 If this is an in-app drag-and-drop operation, returns the `GdkDrag`
 that corresponds to this drop.
 
-If it is not, %NULL is returned.
+If it is not, `NULL` is returned.
 
 
 </description>
@@ -9389,7 +9458,7 @@ The @preferred action is a hint to the drag-and-drop mechanism about which
 action to use when multiple actions are possible.
 
 This function should be called by drag destinations in response to
-%GDK_DRAG_ENTER or %GDK_DRAG_MOTION events. If the destination does
+`GDK_DRAG_ENTER` or `GDK_DRAG_MOTION` events. If the destination does
 not yet know the exact actions it supports, it should set any possible
 actions first and then later call this function again.
 
@@ -11698,6 +11767,138 @@ in upper case or it is not subject to case conversion.
 </return>
 </function>
 
+<function name="gdk_memory_format_get_block_height">
+<description>
+Memory and in turn textures are made up of blocks. Each block can
+cover more than one pixel in both directions.
+
+This is mainly the case for compressed and subsampled formats, normal
+formats will have a 1x1 block size.
+
+All allocations in this format must have a height that is a multiple
+of the block height.
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a memory format
+</parameter_description>
+</parameter>
+</parameters>
+<return> The height of a block in pixels
+</return>
+</function>
+
+<function name="gdk_memory_format_get_block_width">
+<description>
+Memory and in turn textures are made up of blocks. Each block can
+cover more than one pixel in both directions.
+
+This is mainly the case for compressed and subsampled formats, normal
+formats will have a 1x1 block size.
+
+All allocations in this format must have a width that is a multiple
+of the block width.
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a memory format
+</parameter_description>
+</parameter>
+</parameters>
+<return> The width of a block in pixels
+</return>
+</function>
+
+<function name="gdk_memory_format_get_plane_block_bytes">
+<description>
+Each texture plane is made up of blocks. The properties of
+those blocks are defined by the format.
+
+This function returns the number of bytes in memory occupied
+pixels occupied by one block of data.
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a memory format
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to query. Must be a valid plane of the
+format
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of bytes required for one block
+</return>
+</function>
+
+<function name="gdk_memory_layout_init_sublayout">
+<description>
+Initializes a new memory layout for the given subarea of an existing layout.
+
+The area bounds must be aligned to the block size.
+
+Keep in mind that this only adjusts the offsets, it doesn't shrink the
+size from the original layout.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> layout to initialize
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> layout to initialize from
+</parameter_description>
+</parameter>
+<parameter name="area">
+<parameter_description> rectangle inside `other`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_memory_layout_offset">
+<description>
+Queries the byte offset to a block of data.
+
+You can set x == 0 to query the offset of a row.
+You can also set y == 0 to query the offset of a plane.
+
+
+</description>
+<parameters>
+<parameter name="layout">
+<parameter_description> a layout
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> the plane to get the offset for
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X coordinate to query the offset for. Must be a multiple of the
+block size
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y coordinate to query the offset for. Must be a multiple of the
+block size
+</parameter_description>
+</parameter>
+</parameters>
+<return> the offset in bytes to the location of the block at the
+given plane and coordinate.
+</return>
+</function>
+
 <function name="gdk_memory_texture_builder_build">
 <description>
 Builds a new `GdkTexture` with the values set up in the builder.
@@ -11796,6 +11997,28 @@ Since: 4.16
 </return>
 </function>
 
+<function name="gdk_memory_texture_builder_get_offset">
+<description>
+Gets the offset previously set via gdk_memory_texture_builder_set_offset().
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkMemoryTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> a plane
+</parameter_description>
+</parameter>
+</parameters>
+<return> The offset associated to a @plane
+
+</return>
+</function>
+
 <function name="gdk_memory_texture_builder_get_stride">
 <description>
 Gets the stride previously set via gdk_memory_texture_builder_set_stride().
@@ -11810,6 +12033,28 @@ Since: 4.16
 </parameter>
 </parameters>
 <return> the stride
+
+</return>
+</function>
+
+<function name="gdk_memory_texture_builder_get_stride_for_plane">
+<description>
+Gets the stride previously set via gdk_memory_texture_builder_set_stride_for_plane().
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkMemoryTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> a plane
+</parameter_description>
+</parameter>
+</parameters>
+<return> The stride associated to a @plane
 
 </return>
 </function>
@@ -11942,7 +12187,8 @@ Since: 4.16
 <description>
 Sets the height of the texture.
 
-The height must be set before calling [method@Gdk.MemoryTextureBuilder.build].
+The height must be set before calling [method@Gdk.MemoryTextureBuilder.build]
+and conform to size requirements of the provided format.
 
 Since: 4.16
 
@@ -11954,6 +12200,30 @@ Since: 4.16
 </parameter>
 <parameter name="height">
 <parameter_description> The texture's height or 0 to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_memory_texture_builder_set_offset">
+<description>
+Sets the offset of the texture for @plane.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkMemoryTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> a plane
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the texture's offset for @plane
 </parameter_description>
 </parameter>
 </parameters>
@@ -11976,6 +12246,30 @@ Since: 4.16
 </parameter>
 <parameter name="stride">
 <parameter_description> the stride or 0 to unset
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_memory_texture_builder_set_stride_for_plane">
+<description>
+Sets the stride of the texture for @plane.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GdkMemoryTextureBuilder`
+</parameter_description>
+</parameter>
+<parameter name="plane">
+<parameter_description> a plane
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> the texture's stride for @plane
 </parameter_description>
 </parameter>
 </parameters>
@@ -12038,7 +12332,8 @@ Since: 4.16
 <description>
 Sets the width of the texture.
 
-The width must be set before calling [method@Gdk.MemoryTextureBuilder.build].
+The width must be set before calling [method@Gdk.MemoryTextureBuilder.build]
+and conform to size requirements of the provided format.
 
 Since: 4.16
 
@@ -15104,12 +15399,14 @@ See also: [ctor@GdkPixbuf.Pixbuf.new_from_bytes]
 </parameter_description>
 </parameter>
 <parameter name="destroy_fn">
-<parameter_description> Function used to free the data when the pixbuf's reference count
-drops to zero, or %NULL if the data should not be freed
+<parameter_description> Function
+used to free the data when the pixbuf's reference count
+drops to zero, or `NULL` if the data should not be freed
 </parameter_description>
 </parameter>
 <parameter name="destroy_fn_data">
-<parameter_description> Closure data to pass to the destroy notification function
+<parameter_description> Closure data to pass to the destroy
+notification function
 </parameter_description>
 </parameter>
 </parameters>
@@ -15689,6 +15986,9 @@ Creates a new pixbuf by parsing XPM data in memory.
 This data is commonly the result of including an XPM file into a
 program's C source.
 
+Deprecated: 2.44: Use [ctor@GdkPixbuf.Pixbuf.new_from_stream] with
+a [class@Gio.MemoryInputStream], making sure to handle errors in
+case the XPM format loader is not available
 
 </description>
 <parameters>
@@ -15698,6 +15998,7 @@ program's C source.
 </parameter>
 </parameters>
 <return> A newly-created pixbuf
+
 </return>
 </function>
 
@@ -16159,20 +16460,20 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="pixbuf">
-<parameter_description> a `GdkPixbuf`.
+<parameter_description> a `GdkPixbuf`
 </parameter_description>
 </parameter>
 <parameter name="save_func">
-<parameter_description> a function that is called to save each block of data that
-the save routine generates.
+<parameter_description> a function that is called to
+save each block of data that the save routine generates
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> user data to pass to the save function.
+<parameter_description> user data to pass to the save function
 </parameter_description>
 </parameter>
 <parameter name="type">
-<parameter_description> name of file format.
+<parameter_description> name of file format
 </parameter_description>
 </parameter>
 <parameter name="option_keys">
@@ -16985,7 +17286,7 @@ Makes a copy of @layout.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -17001,32 +17302,32 @@ Check whether @layout and @other has identical layout properties.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="other">
-<parameter_description> another `GdkPopupLayout`
+<parameter_description> another popup layout
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @layout and @other have identical layout properties,
-otherwise %FALSE.
+<return> true if @layout and @other have identical layout properties,
+otherwise false.
 </return>
 </function>
 
 <function name="gdk_popup_layout_get_anchor_hints">
 <description>
-Get the `GdkAnchorHints`.
+Get the anchor hints.
 
 
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
-<return> the `GdkAnchorHints`
+<return> the anchor hints
 </return>
 </function>
 
@@ -17038,7 +17339,7 @@ Get the anchor rectangle.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -17053,7 +17354,7 @@ Retrieves the offset for the anchor rectangle.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="dx">
@@ -17076,7 +17377,7 @@ Returns the anchor position on the anchor rectangle.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -17093,7 +17394,7 @@ Since: 4.2
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="left">
@@ -17124,7 +17425,7 @@ Returns the anchor position on the popup surface.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -17151,7 +17452,7 @@ position of surface.
 </description>
 <parameters>
 <parameter name="anchor_rect">
-<parameter_description> the anchor `GdkRectangle` to align @surface with
+<parameter_description> the anchor rectangle to align @surface with
 </parameter_description>
 </parameter>
 <parameter name="rect_anchor">
@@ -17175,7 +17476,7 @@ Increases the reference count of @value.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -17189,18 +17490,18 @@ Set new anchor hints.
 
 The set @anchor_hints determines how @surface will be moved
 if the anchor points cause it to move off-screen. For example,
-%GDK_ANCHOR_FLIP_X will replace %GDK_GRAVITY_NORTH_WEST with
-%GDK_GRAVITY_NORTH_EAST and vice versa if @surface extends
+`GDK_ANCHOR_FLIP_X` will replace `GDK_GRAVITY_NORTH_WEST` with
+`GDK_GRAVITY_NORTH_EAST` and vice versa if @surface extends
 beyond the left or right edges of the monitor.
 
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="anchor_hints">
-<parameter_description> the new `GdkAnchorHints`
+<parameter_description> the new anchor hints
 </parameter_description>
 </parameter>
 </parameters>
@@ -17214,7 +17515,7 @@ Set the anchor rectangle.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="anchor_rect">
@@ -17232,7 +17533,7 @@ Offset the position of the anchor rectangle with the given delta.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="dx">
@@ -17254,7 +17555,7 @@ Set the anchor on the anchor rectangle.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="anchor">
@@ -17278,7 +17579,7 @@ Since: 4.2
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="left">
@@ -17308,7 +17609,7 @@ Set the anchor on the popup surface.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 <parameter name="anchor">
@@ -17326,7 +17627,7 @@ Decreases the reference count of @value.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkPopupLayout`
+<parameter_description> a popup layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -18607,6 +18908,9 @@ fails to allocate memory. If you think that may happen, you should handle
 memory allocation yourself and use [method@Gdk.TextureDownloader.download_into]
 once allocation succeeded.
 
+This function cannot be used with a multiplanar format. Use
+[method@Gdk.TextureDownloader.download_bytes_with_planes] for that purpose.
+
 Since: 4.10
 
 </description>
@@ -18625,9 +18929,43 @@ Since: 4.10
 </return>
 </function>
 
+<function name="gdk_texture_downloader_download_bytes_with_planes">
+<description>
+Downloads the given texture pixels into a `GBytes`. The offsets and
+strides of the resulting buffer will be stored in the respective values.
+
+If the format does have less than 4 planes, the remaining offsets and strides will be
+set to `0`.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the downloader
+</parameter_description>
+</parameter>
+<parameter name="out_offsets">
+<parameter_description>
+The offsets of the resulting data planes in bytes
+</parameter_description>
+</parameter>
+<parameter name="out_strides">
+<parameter_description>
+The stride of the resulting data planes in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> The downloaded pixels
+
+</return>
+</function>
+
 <function name="gdk_texture_downloader_download_into">
 <description>
 Downloads the @texture into local memory.
+
+This function cannot be used with a multiplanar format.
 
 Since: 4.10
 
@@ -18899,9 +19237,11 @@ Returns the width of @texture, in pixels.
 Creates a new texture object representing the `GdkPixbuf`.
 
 This function is threadsafe, so that you can e.g. use GTask
-and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
-while loading a big image.
+and [method@Gio.Task.run_in_thread] to avoid blocking the main
+thread while loading a big image.
 
+Deprecated: 4.20: Use e.g. libglycin, which can load many image
+formats into a `GdkTexture`
 
 </description>
 <parameters>
@@ -18911,6 +19251,7 @@ while loading a big image.
 </parameter>
 </parameters>
 <return> a new `GdkTexture`
+
 </return>
 </function>
 
@@ -18921,11 +19262,16 @@ Creates a new texture by loading an image from memory,
 The file format is detected automatically. The supported formats
 are PNG, JPEG and TIFF, though more formats might be available.
 
-If %NULL is returned, then @error will be set.
+If `NULL` is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
 and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
+
+::: warning
+Note that this function should not be used with untrusted data.
+Use a proper image loading framework such as libglycin, which can
+load many image formats into a `GdkTexture`.
 
 Since: 4.6
 
@@ -18952,11 +19298,16 @@ Creates a new texture by loading an image from a file.
 The file format is detected automatically. The supported formats
 are PNG, JPEG and TIFF, though more formats might be available.
 
-If %NULL is returned, then @error will be set.
+If `NULL` is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
 and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
+
+::: warning
+Note that this function should not be used with untrusted data.
+Use a proper image loading framework such as libglycin, which can
+load many image formats into a `GdkTexture`.
 
 
 </description>
@@ -18981,11 +19332,16 @@ Creates a new texture by loading an image from a file.
 The file format is detected automatically. The supported formats
 are PNG, JPEG and TIFF, though more formats might be available.
 
-If %NULL is returned, then @error will be set.
+If `NULL` is returned, then @error will be set.
 
 This function is threadsafe, so that you can e.g. use GTask
 and [method@Gio.Task.run_in_thread] to avoid blocking the main thread
 while loading a big image.
+
+::: warning
+Note that this function should not be used with untrusted data.
+Use a proper image loading framework such as libglycin, which can
+load many image formats into a `GdkTexture`.
 
 Since: 4.6
 
@@ -19010,7 +19366,7 @@ Since: 4.6
 Creates a new texture by loading an image from a resource.
 
 The file format is detected automatically. The supported formats
-are PNG and JPEG, though more formats might be available.
+are PNG, JPEG and TIFF, though more formats might be available.
 
 It is a fatal error if @resource_path does not specify a valid
 image resource and the program will abort if that happens.
@@ -19039,9 +19395,9 @@ Store the given @texture to the @filename as a PNG file.
 
 This is a utility function intended for debugging and testing.
 If you want more control over formats, proper error handling or
-want to store to a [iface@Gio.File] or other location, you might want to
-use [method@Gdk.Texture.save_to_png_bytes] or look into the
-gdk-pixbuf library.
+want to store to a [iface@Gio.File] or other location, you might
+want to use [method@Gdk.Texture.save_to_png_bytes] or look into
+the libglycin library.
 
 
 </description>
@@ -19070,7 +19426,7 @@ portable way to do that.
 
 If you need more control over the generated image, such as
 attaching metadata, you should look into an image handling
-library such as the gdk-pixbuf library.
+library such as the libglycin library.
 
 If you are dealing with high dynamic range float data, you
 might also want to consider [method@Gdk.Texture.save_to_tiff_bytes]
@@ -19242,6 +19598,41 @@ calling this function.
 <return></return>
 </function>
 
+<function name="gdk_toplevel_get_capabilities">
+<description>
+The capabilities that are available for this toplevel.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> a `GdkToplevel`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_toplevel_get_gravity">
+<description>
+Returns the gravity that is used when changing the toplevel
+size programmatically.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> a toplevel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the gravity
+
+</return>
+</function>
+
 <function name="gdk_toplevel_get_state">
 <description>
 Gets the bitwise or of the currently active surface state flags,
@@ -19306,7 +19697,7 @@ Create a new `GdkToplevelLayout` and copy the contents of @layout into it.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -19322,30 +19713,30 @@ Check whether @layout and @other has identical layout properties.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="other">
-<parameter_description> another `GdkToplevelLayout`
+<parameter_description> another toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @layout and @other have identical layout properties,
-otherwise %FALSE.
+<return> true if @layout and @other have identical layout properties,
+otherwise false.
 </return>
 </function>
 
 <function name="gdk_toplevel_layout_get_fullscreen">
 <description>
 If the layout specifies whether to the toplevel should go fullscreen,
-the value pointed to by @fullscreen is set to %TRUE if it should go
-fullscreen, or %FALSE, if it should go unfullscreen.
+the value pointed to by @fullscreen is set to true if it should go
+fullscreen, or false, if it should go unfullscreen.
 
 
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a ``GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="fullscreen">
@@ -19366,7 +19757,7 @@ the surface on.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -19377,18 +19768,18 @@ the surface on.
 <function name="gdk_toplevel_layout_get_maximized">
 <description>
 If the layout specifies whether to the toplevel should go maximized,
-the value pointed to by @maximized is set to %TRUE if it should go
-fullscreen, or %FALSE, if it should go unmaximized.
+the value pointed to by @maximized is set to true if it should go
+maximized, or false, if it should go unmaximized.
 
 
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="maximized">
-<parameter_description> set to %TRUE if the toplevel should be maximized
+<parameter_description> set to true if the toplevel should be maximized
 </parameter_description>
 </parameter>
 </parameters>
@@ -19405,11 +19796,11 @@ to resize the surface.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the layout is resizable
+<return> true if the layout is resizable
 </return>
 </function>
 
@@ -19417,11 +19808,11 @@ to resize the surface.
 <description>
 Create a toplevel layout description.
 
-Used together with gdk_toplevel_present() to describe
+Used together with [method@Gdk.Toplevel.present] to describe
 how a toplevel surface should be placed and behave on-screen.
 
 The size is in ”application pixels”, not
-”device pixels” (see gdk_surface_get_scale_factor()).
+”device pixels” (see [method@Gdk.Surface.get_scale]).
 
 
 </description>
@@ -19439,7 +19830,7 @@ Increases the reference count of @layout.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -19455,11 +19846,11 @@ to be fullscreen when presented.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="fullscreen">
-<parameter_description> %TRUE to fullscreen the surface
+<parameter_description> true to fullscreen the surface
 </parameter_description>
 </parameter>
 <parameter name="monitor">
@@ -19478,11 +19869,11 @@ to be maximized when presented.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="maximized">
-<parameter_description> %TRUE to maximize
+<parameter_description> true to maximize
 </parameter_description>
 </parameter>
 </parameters>
@@ -19497,11 +19888,11 @@ to resize the surface after it has been presented.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 <parameter name="resizable">
-<parameter_description> %TRUE to allow resizing
+<parameter_description> true to allow resizing
 </parameter_description>
 </parameter>
 </parameters>
@@ -19515,7 +19906,7 @@ Decreases the reference count of @layout.
 </description>
 <parameters>
 <parameter name="layout">
-<parameter_description> a `GdkToplevelLayout`
+<parameter_description> a toplevel layout
 </parameter_description>
 </parameter>
 </parameters>
@@ -19640,6 +20031,27 @@ that it should offer the user a way to close the surface.
 </parameter>
 <parameter name="deletable">
 <parameter_description> %TRUE to request a delete button
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_toplevel_set_gravity">
+<description>
+Sets the gravity that is used when changing the toplevel
+size programmatically.
+
+Since: 4.20
+
+</description>
+<parameters>
+<parameter name="toplevel">
+<parameter_description> a toplevel
+</parameter_description>
+</parameter>
+<parameter name="gravity">
+<parameter_description> the new gravity
 </parameter_description>
 </parameter>
 </parameters>
@@ -20224,29 +20636,6 @@ See vkGetPhysicalDeviceQueueFamilyProperties().
 </parameters>
 <return> the index
 </return>
-</function>
-
-<function name="gdk_vulkan_context_set_draw_semaphore">
-<description>
-Sets the Vulkan semaphore that will be used in the immediately following
-gdk_draw_context_begin_frame() call.
-This is essentially an extra argument for that call, but without extending the
-arguments of that generic function with Vulkan-specific things.
-
-This function must be called or begin_frame() will abort.
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a `GdkVulkanContext`
-</parameter_description>
-</parameter>
-<parameter name="semaphore">
-<parameter_description> a `VkSemaphore`
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gdk_vulkan_error_quark">
