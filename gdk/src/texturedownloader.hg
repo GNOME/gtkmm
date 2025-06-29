@@ -18,6 +18,7 @@ _CONFIGINCLUDE(gdkmmconfig.h)
 
 #include <gdkmm/texture.h>
 #include <gdkmm/enums.h>
+#include <array>
 
 _DEFS(gdkmm,gdk)
 
@@ -66,6 +67,16 @@ public:
   _WRAP_METHOD(void download_into(guchar* data, gsize stride) const, gdk_texture_downloader_download_into)
   _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> download_bytes(gsize& out_stride) const,
     gdk_texture_downloader_download_bytes)
+
+  // ArrayPlanes is defined because gmmproc is confused by the comma in std::array<gsize, 4>.
+  /** An array type, used by download_bytes_with_planes().
+   * @newin{4,20}
+   */
+  using ArrayPlanes = std::array<gsize, 4>;
+#m4 _CONVERSION(`ArrayPlanes&',`gsize',`$3.data()')
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> download_bytes_with_planes(
+    ArrayPlanes& out_offsets, ArrayPlanes& out_strides) const,
+    gdk_texture_downloader_download_bytes_with_planes)
 };
 
 } // namespace Gdk
