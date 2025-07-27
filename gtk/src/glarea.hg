@@ -23,7 +23,89 @@ _PINCLUDE(gtkmm/private/widget_p.h)
 namespace Gtk
 {
 
-/** A widget used for drawing with OpenGL.
+/** A widget used for drawing with [OpenGL](https://en.wikipedia.org/wiki/OpenGL).
+ *
+ * %Gtk::GLArea sets up its own Gdk::GLContext, and creates a custom
+ * GL framebuffer that the widget will do GL rendering onto. It also ensures
+ * that this framebuffer is the default GL rendering target when rendering.
+ * The completed rendering is integrated into the larger GTK scene graph as
+ * a texture.
+ *
+ * In order to draw, you have to connect to signal_render().
+ *
+ * The %Gtk::GLArea widget ensures that the Gdk::GLContext is associated with
+ * the widget's drawing area, and it is kept updated when the size and
+ * position of the drawing area changes.
+ *
+ * ## Drawing with Gtk::GLArea
+ *
+ * The simplest way to draw using OpenGL commands in a %Gtk::GLArea is to
+ * create a widget instance and connect to signal_render().
+ *
+ * Your `my_render_handler()` signal handler will be called when the %Gtk::GLArea is ready
+ * for you to draw its content.
+ *
+ * The initial contents of the framebuffer are transparent.
+ *
+ * @code
+ * bool my_render_handler(const Glib::RefPtr<Gdk::GLContext>& context)
+ * {
+ *   // Inside this function it's safe to use GL; the given
+ *   // Gdk::GLContext has been made current to the drawable
+ *   // surface used by the Gtk::GLArea and the viewport has
+ *   // already been set to be the size of the allocation.
+ *
+ *   // We can start by clearing the buffer.
+ *   glClearColor(0, 0, 0, 0);
+ *   glClear(GL_COLOR_BUFFER_BIT);
+ *
+ *   // Draw your object.
+ *   // draw_an_object();
+ *
+ *   // We completed our drawing; the draw commands will be
+ *   // flushed at the end of the signal emission chain, and
+ *   // the buffers will be drawn on the window.
+ *   return true;
+ * }
+ * @endcode
+ *
+ * If you need to initialize OpenGL state, e.g. buffer objects or
+ * shaders, you should use Gtk::Widget::signal_realize();
+ * you can use Gtk::Widget::signal_unrealize() to clean up.
+ * Since the Gdk::GLContext creation and initialization may fail, you
+ * will need to check for errors, using has_error() and/or throw_if_error().
+ *
+ * An example of how to safely initialize the GL state is:
+ *
+ * @code
+ * void my_realize_handler()
+ * {
+ *   // We need to make the context current if we want to call GL API.
+ *   m_GLArea.make_current();
+ *
+ *   try
+ *   {
+ *     // If there were errors during the initialization or
+ *     // when trying to make the context current, this
+ *     // function will throw.
+ *     m_GLArea.throw_if_error();
+ *
+ *     init_buffers();
+ *     init_shaders();
+ *   }
+ *   catch (const Gdk::GLError& gle)
+ *   {
+ *     std::cerr << "An error occured making the context current during realize:" << std::endl;
+ *     std::cerr << gle.domain() << "-" << gle.code() << "-" << gle.what() << std::endl;
+ *   }
+ * }
+ * @endcode
+ *
+ * If you need to change the options for creating the Gdk::GLContext,
+ * you should use signal_create_context().
+ *
+ * A demo program shows the use of %Gtk::GLArea in more detail.
+ *
  * @newin{3,18}
  * @ingroup Widgets
  */
