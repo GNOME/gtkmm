@@ -38,6 +38,7 @@
     '("fill-node" "GSK_FILL_NODE")
     '("stroke-node" "GSK_STROKE_NODE")
     '("subsurface-node" "GSK_SUBSURFACE_NODE")
+    '("component-transfer-node" "GSK_COMPONENT_TRANSFER_NODE")
   )
 )
 
@@ -212,6 +213,18 @@
   )
 )
 
+(define-enum PathIntersection
+  (in-module "Gsk")
+  (c-name "GskPathIntersection")
+  (gtype-id "GSK_TYPE_PATH_INTERSECTION")
+  (values
+    '("none" "GSK_PATH_INTERSECTION_NONE")
+    '("normal" "GSK_PATH_INTERSECTION_NORMAL")
+    '("start" "GSK_PATH_INTERSECTION_START")
+    '("end" "GSK_PATH_INTERSECTION_END")
+  )
+)
+
 
 ;; From gskcairorenderer.h
 
@@ -224,6 +237,86 @@
   (c-name "gsk_cairo_renderer_new")
   (is-constructor-of "GskCairoRenderer")
   (return-type "GskRenderer*")
+)
+
+
+
+;; From gskcomponenttransfer.h
+
+(define-function gsk_component_transfer_get_type
+  (c-name "gsk_component_transfer_get_type")
+  (return-type "GType")
+)
+
+(define-function gsk_component_transfer_new_identity
+  (c-name "gsk_component_transfer_new_identity")
+  (return-type "GskComponentTransfer*")
+)
+
+(define-function gsk_component_transfer_new_levels
+  (c-name "gsk_component_transfer_new_levels")
+  (return-type "GskComponentTransfer*")
+  (parameters
+    '("float" "n")
+  )
+)
+
+(define-function gsk_component_transfer_new_linear
+  (c-name "gsk_component_transfer_new_linear")
+  (return-type "GskComponentTransfer*")
+  (parameters
+    '("float" "m")
+    '("float" "b")
+  )
+)
+
+(define-function gsk_component_transfer_new_gamma
+  (c-name "gsk_component_transfer_new_gamma")
+  (return-type "GskComponentTransfer*")
+  (parameters
+    '("float" "amp")
+    '("float" "exp")
+    '("float" "ofs")
+  )
+)
+
+(define-function gsk_component_transfer_new_discrete
+  (c-name "gsk_component_transfer_new_discrete")
+  (return-type "GskComponentTransfer*")
+  (parameters
+    '("guint" "n")
+    '("float*" "values")
+  )
+)
+
+(define-function gsk_component_transfer_new_table
+  (c-name "gsk_component_transfer_new_table")
+  (return-type "GskComponentTransfer*")
+  (parameters
+    '("guint" "n")
+    '("float*" "values")
+  )
+)
+
+(define-method copy
+  (of-object "GskComponentTransfer")
+  (c-name "gsk_component_transfer_copy")
+  (return-type "GskComponentTransfer*")
+)
+
+(define-method free
+  (of-object "GskComponentTransfer")
+  (c-name "gsk_component_transfer_free")
+  (return-type "none")
+)
+
+(define-function gsk_component_transfer_equal
+  (c-name "gsk_component_transfer_equal")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "self")
+    '("gconstpointer" "other")
+  )
 )
 
 
@@ -985,6 +1078,17 @@
   (parameters
     '("GskPathForeachFlags" "flags")
     '("GskPathForeachFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method foreach_intersection
+  (of-object "GskPath")
+  (c-name "gsk_path_foreach_intersection")
+  (return-type "gboolean")
+  (parameters
+    '("GskPath*" "path2")
+    '("GskPathIntersectionFunc" "func")
     '("gpointer" "user_data")
   )
 )
@@ -2490,6 +2594,41 @@
   )
 )
 
+(define-function gsk_component_transfer_node_get_type
+  (c-name "gsk_component_transfer_node_get_type")
+  (return-type "GType")
+)
+
+(define-function gsk_component_transfer_node_new
+  (c-name "gsk_component_transfer_node_new")
+  (is-constructor-of "GskComponentTransferNode")
+  (return-type "GskRenderNode*")
+  (parameters
+    '("GskRenderNode*" "child")
+    '("const-GskComponentTransfer*" "r")
+    '("const-GskComponentTransfer*" "g")
+    '("const-GskComponentTransfer*" "b")
+    '("const-GskComponentTransfer*" "a")
+  )
+)
+
+(define-function gsk_component_transfer_node_get_child
+  (c-name "gsk_component_transfer_node_get_child")
+  (return-type "GskRenderNode*")
+  (parameters
+    '("const-GskRenderNode*" "node")
+  )
+)
+
+(define-function gsk_component_transfer_node_get_transfer
+  (c-name "gsk_component_transfer_node_get_transfer")
+  (return-type "const-GskComponentTransfer*")
+  (parameters
+    '("const-GskRenderNode*" "node")
+    '("guint" "component")
+  )
+)
+
 (define-function gsk_value_set_render_node
   (c-name "gsk_value_set_render_node")
   (return-type "none")
@@ -2913,6 +3052,20 @@
   )
 )
 
+(define-method matrix_2d
+  (of-object "GskTransform")
+  (c-name "gsk_transform_matrix_2d")
+  (return-type "GskTransform*")
+  (parameters
+    '("float" "xx")
+    '("float" "yx")
+    '("float" "xy")
+    '("float" "yy")
+    '("float" "dx")
+    '("float" "dy")
+  )
+)
+
 (define-method translate
   (of-object "GskTransform")
   (c-name "gsk_transform_translate")
@@ -3085,6 +3238,11 @@
 
 (define-function gsk_path_foreach_flags_get_type
   (c-name "gsk_path_foreach_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gsk_path_intersection_get_type
+  (c-name "gsk_path_intersection_get_type")
   (return-type "GType")
 )
 
