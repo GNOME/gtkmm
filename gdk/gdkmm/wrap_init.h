@@ -25,6 +25,12 @@
 
 namespace Gdk
 {
+#ifdef GLIBMM_INCLUDED_FROM_WRAP_INIT_CC
+// This is needed in wrap_init.cc, but to get it there in a better way than
+// putting it here requires a change in generate_wrap_init.pl.
+// It's required because some gdk_*_get_type() functions are deprecated.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+#endif
 
 GDKMM_API void wrap_init();
 

@@ -17,6 +17,9 @@
  * application binary can be self-contained.
  */
 
+#undef GDKMM_DISABLE_DEPRECATED // PixbufAnimation and PixbufAnimationIter are deprecated.
+// If gtkmm has been built without deprecated API, the #undef before #include <gtkmm.h>
+// has no effect. GDKMM_DISABLE_DEPRECATED is defined in gtkmm.h.
 #include <gtkmm.h>
 #include "demowindow.h"
 
@@ -31,7 +34,9 @@ protected:
   void start_progressive_loading();
 
   //Signal handlers:
+#ifndef GDKMM_DISABLE_DEPRECATED
   void on_animation_timeout();
+#endif
   bool on_progressive_timeout();
   void on_loader_area_prepared();
   void on_loader_area_updated(int x, int y, int width, int height);
@@ -45,8 +50,10 @@ protected:
   Gtk::Label m_Label_Image;
   Gtk::Frame m_Frame_Image;
   Gtk::Label m_Label_Animation;
+#ifndef GDKMM_DISABLE_DEPRECATED
   Gtk::Frame m_Frame_Animation;
   Gtk::Picture m_Picture_Animation;
+#endif
   Gtk::Label m_Label_ThemedIcon;
   Gtk::Frame m_Frame_ThemedIcon;
   Gtk::Label m_Label_Progressive;
@@ -57,7 +64,9 @@ protected:
   Gtk::Label m_Label_Paintable;
   Gtk::ToggleButton m_ToggleButton;
 
+#ifndef GDKMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gdk::PixbufAnimationIter> m_refPixbufAnimationIter;
+#endif
   Glib::RefPtr<Gdk::PixbufLoader> m_refPixbufLoader;
   Glib::RefPtr<Gio::InputStream> m_image_stream;
   Glib::RefPtr<Gtk::AlertDialog> m_pMessageDialog;
@@ -101,7 +110,7 @@ Example_Images::Example_Images()
   m_Frame_Image.set_child(*pImage);
 
   /* Animation */
-
+#ifndef GDKMM_DISABLE_DEPRECATED
   m_Label_Animation.set_markup("<u>Animation loaded from a resource</u>");
   pVBox->append(m_Label_Animation);
 
@@ -115,6 +124,12 @@ Example_Images::Example_Images()
 
   // Fill in the first pixbuf and start a timer.
   on_animation_timeout();
+#else
+  m_Label_Animation.set_markup("<u>Animation loaded from a resource</u>"
+    "\nCan't be shown. Gtkmm has been"
+    "\nbuilt without deprecated API.");
+  pVBox->append(m_Label_Animation);
+#endif
 
   /* Symbolic themed icon */
 
@@ -202,6 +217,7 @@ Example_Images::~Example_Images()
   }
 }
 
+#ifndef GDKMM_DISABLE_DEPRECATED
 void Example_Images::on_animation_timeout()
 {
   auto delay = m_refPixbufAnimationIter->get_delay_time();
@@ -213,6 +229,7 @@ void Example_Images::on_animation_timeout()
   auto texture = create_texture_for_pixbuf(pixbuf);
   m_Picture_Animation.set_paintable(texture);
 }
+#endif
 
 void Example_Images::show_message_dialog(const Glib::ustring& msg)
 {

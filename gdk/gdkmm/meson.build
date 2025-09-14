@@ -67,8 +67,6 @@ gdkmm_any_hg_ccg_basenames = [
   'monitor',
   'paintable',
   'pixbuf',
-  'pixbufanimation',
-  'pixbufanimationiter',
   'pixbufformat',
   'pixbufloader',
   'popup',
@@ -86,7 +84,10 @@ gdkmm_any_hg_ccg_basenames = [
   'toplevelsize',
 ]
 
-gdkmm_deprecated_hg_ccg_basenames = []
+gdkmm_deprecated_hg_ccg_basenames = [
+  'pixbufanimation',
+  'pixbufanimationiter',
+]
 
 # Pairs of hand-coded .h and .cc files.
 gdkmm_extra_any_h_cc_basenames = [
@@ -199,7 +200,7 @@ if maintainer_mode
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
   built_dummy_h_file_target = custom_target('gdkmm-dummy_header.h',
-    input: gdkmm_used_built_h_file_targets,
+    input: gdkmm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
       python3, dummy_header_py,
