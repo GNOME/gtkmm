@@ -135,7 +135,7 @@ if maintainer_mode
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
   built_dummy_h_file_target = custom_target('gskmm-dummy_header.h',
-    input: gskmm_used_built_h_file_targets,
+    input: gskmm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
       python3, dummy_header_py,
