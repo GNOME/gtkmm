@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gtkmm], [4.20.0],
+AC_INIT([gtkmm], [4.21.0],
         [https://gitlab.gnome.org/GNOME/gtkmm/issues/],
         [gtkmm], [https://gtkmm.gnome.org/])
 AC_PREREQ([2.59])
