@@ -310,6 +310,48 @@ appears after the caret in the input.
 </parameters>
 </enum>
 
+<signal name="GtkAccessibleHypertextInterface::get_link">
+<description>
+Retrieve the n-th link in the accessible object.
+
+@index must be smaller than the number of links.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> the index of the link
+</parameter_description>
+</parameter>
+</parameters>
+<return> the link
+
+</return>
+</signal>
+
+<signal name="GtkAccessibleHypertextInterface::get_n_links">
+<description>
+Retrieve the number of links in the accessible object.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of links
+
+</return>
+</signal>
+
 <signal name="GtkAccessibleInterface::get_accessible_parent">
 <description>
 Retrieves the accessible parent of an accessible object.
@@ -570,7 +612,7 @@ Value type: double
 </parameter>
 <parameter name="GTK_ACCESSIBLE_PROPERTY_VALUE_TEXT">
 <parameter_description> Defines the human readable text alternative
-of aria-valuenow for a range widget. Value type: string
+of [enum@Gtk.AccessibleProperty.VALUE_NOW] for a range widget. Value type: string
 </parameter_description>
 </parameter>
 <parameter name="GTK_ACCESSIBLE_PROPERTY_HELP_TEXT">
@@ -701,7 +743,7 @@ Value type: integer
 </parameter>
 <parameter name="GTK_ACCESSIBLE_RELATION_ROW_INDEX_TEXT">
 <parameter_description> Defines a human readable text
-alternative of aria-rowindex. Value type: string
+alternative of [enum@Gtk.AccessibleRelation.ROW_INDEX]. Value type: string
 </parameter_description>
 </parameter>
 <parameter name="GTK_ACCESSIBLE_RELATION_ROW_SPAN">
@@ -1528,6 +1570,32 @@ Since: 4.16
 </return>
 </signal>
 
+<signal name="GtkAccessibleTextInterface::get_link_at">
+<description>
+Retrieves the index of the link at the given character offset.
+
+Note that this method will return `G_MAXUINT` if the object
+does not contain text.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the character offset
+</parameter_description>
+</parameter>
+</parameters>
+<return> index of the link at the given character offset, or
+`G_MAXUINT` if there is no link
+
+</return>
+</signal>
+
 <signal name="GtkAccessibleTextInterface::get_offset">
 <description>
 Gets the text offset at a given point.
@@ -1581,6 +1649,54 @@ Since: 4.14
 </parameters>
 <return> true if there is at least a selection inside the
 accessible object, and false otherwise
+
+</return>
+</signal>
+
+<signal name="GtkAccessibleTextInterface::set_caret_position">
+<description>
+Sets the caret position.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the text offset in characters
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the caret position was updated
+
+</return>
+</signal>
+
+<signal name="GtkAccessibleTextInterface::set_selection">
+<description>
+Sets the caret position.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible object
+</parameter_description>
+</parameter>
+<parameter name="i">
+<parameter_description> the selection to set
+</parameter_description>
+</parameter>
+<parameter name="range">
+<parameter_description> the range to set the selection to
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the selection was updated
 
 </return>
 </signal>
@@ -2093,6 +2209,96 @@ to delay the end of the session until state has been saved.
 <return></return>
 </signal>
 
+<signal name="GtkApplication::restore-state">
+<description>
+Emitted when application state is restored.
+
+The handler for this signal should do the opposite of what the
+corresponding handler for [signal@Gtk.Application::save-state]
+does.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the `GtkApplication` which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> the reason for restoring state
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> an &quot;a{sv}&quot; `GVariant` with state to restore
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
+
+<signal name="GtkApplication::restore-window">
+<description>
+Emitted when application state is restored.
+
+In response to this signal, you should create a new application
+window, and add it to @application. If @reason and @state are passed,
+they should be applied to the newly created window.
+
+`GtkApplication` will call [method@Gtk.Window.present] on the window.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the `GtkApplication` which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> the reason this window is restored
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the state to restore, as saved by a [signal@Gtk.ApplicationWindow::save-state] handler
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkApplication::save-state">
+<description>
+Emitted when the application is saving state.
+
+The handler for this signal should persist any
+global state of @application into @dict.
+
+See [signal@Gtk.Application::restore-state] for how to
+restore global state, and [signal@Gtk.ApplicationWindow::save-state]
+and [signal@Gtk.Application::restore-window] for handling
+per-window state.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the `GtkApplication` which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="dict">
+<parameter_description> a `GVariantDict`
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+   2
+</return>
+</signal>
+
 <signal name="GtkApplication::window-added">
 <description>
 Emitted when a window is added to an application.
@@ -2155,7 +2361,7 @@ Set this property to true to register with the session manager.
 This will make GTK track the session state (such as the
 [property@Gtk.Application:screensaver-active] property).
 
-Deprecated: 4.20: This property is ignored. GTK always registers
+Deprecated: 4.22: This property is ignored. GTK always registers
 with the session manager
 
 </description>
@@ -2171,6 +2377,77 @@ Linux.
 
 </description>
 </property>
+
+<property name="GtkApplication:support-save">
+<description>
+Set this property to true if the application supports
+state saving and restoring.
+
+Since: 4.22
+
+</description>
+</property>
+
+<signal name="GtkApplicationClass::restore_state">
+<description>
+Class closure for the [signal@Application::restore-state] signal.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="reason">
+<parameter_description> the reason for restoring state
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> a dictionary containing the application state to restore
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
+
+<signal name="GtkApplicationClass::restore_window">
+<description>
+Class closure for the [signal@Application::restore-window] signal.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="reason">
+<parameter_description> the reason this window is restored
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the state to restore, as saved by a
+[signal@Gtk.ApplicationWindow::save-state] handler
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkApplicationClass::save_state">
+<description>
+Class closure for the [signal@Application::save-state] signal.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="state">
+<parameter_description> a dictionary where to store the application's state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
 
 <enum name="GtkApplicationInhibitFlags">
 <description>
@@ -2202,6 +2479,35 @@ marked as idle (and possibly locked)
 </parameters>
 </enum>
 
+<signal name="GtkApplicationWindow::save-state">
+<description>
+The handler for this signal should persist any
+application-specific state of @window into @dict.
+
+Note that window management state such as maximized,
+fullscreen, or window size should not be saved as
+part of this, they are handled by GTK.
+
+See [signal@Gtk.Application::restore-window].
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the window on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="dict">
+<parameter_description> a dictionary of type `a{sv}`
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
+
 <property name="GtkApplicationWindow:show-menubar">
 <description>
 If this property is true, the window will display a menubar
@@ -2214,6 +2520,24 @@ of whether the desktop shell is showing it or not.
 
 </description>
 </property>
+
+<signal name="GtkApplicationWindowClass::save_state">
+<description>
+Class closure for the [signal@ApplicationWindow::save-state] signal.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="dict">
+<parameter_description> a dictionary where to store the window's state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
 
 <enum name="GtkArrowType">
 <description>
@@ -5641,7 +5965,7 @@ This setting is be available for media queries in CSS:
 }
 ```
 
-Changing this setting will cause a re-render of the style sheet.
+Changing this setting will reload the style sheet.
 
 Since: 4.20
 
@@ -5667,9 +5991,34 @@ This setting is be available for media queries in CSS:
 }
 ```
 
-Changing this setting will cause a re-render of the style sheet.
+Changing this setting will reload the style sheet.
 
 Since: 4.20
+
+</description>
+</property>
+
+<property name="GtkCssProvider:prefers-reduced-motion">
+<description>
+Define the type of reduced motion to use for the user interface.
+
+When set to [enum@Gtk.ReducedMotion.REDUCE] the UI is rendered in
+with reduced motion animations.
+
+When set to [enum@Gtk.ReducedMotion.NO_PREFERENCE] (the default),
+the user interface will be rendered in default mode.
+
+This setting is be available for media queries in CSS:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+// some style with reduced motion
+}
+```
+
+Changing this setting will reload the style sheet.
+
+Since: 4.22
 
 </description>
 </property>
@@ -10759,6 +11108,28 @@ the cursor.
 </parameter>
 </parameters>
 <return> %TRUE if the signal was handled.
+</return>
+</signal>
+
+<signal name="GtkIMContext::invalid-composition">
+<description>
+Emitted when the filtered keys do not compose to a single valid character.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
+<parameter name="str">
+<parameter_description> the completed character(s) entered by the user
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the IM context avoid beeping on invalid composition
+
 </return>
 </signal>
 
@@ -16548,6 +16919,32 @@ resources file.
 </parameters>
 </enum>
 
+<enum name="GtkReducedMotion">
+<description>
+Values for the [property@Gtk.Settings:gtk-interface-reduced-motion]
+and [property@Gtk.CssProvider:prefers-reduced-motion] properties
+that indicates the preferred level of motion animations.
+
+This information can be used inside CSS via media queries.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="GTK_REDUCED_MOTION_NO_PREFERENCE">
+<parameter_description> The user has made no preference known to the system
+</parameter_description>
+</parameter>
+<parameter name="GTK_REDUCED_MOTION_REDUCE">
+<parameter_description> The user has notified the system that they
+prefer an interface that removes or replaces the types of motion-based
+animation that either trigger discomfort for those with vestibular
+motion sensitivity, or distraction for those with attention deficits
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GtkResponseType">
 <description>
 Predefined values for use as response ids in gtk_dialog_add_button().
@@ -16602,6 +16999,35 @@ or if the dialog gets programmatically hidden or destroyed
 </parameter>
 <parameter name="GTK_RESPONSE_HELP">
 <parameter_description> Returned by Help buttons in GTK dialogs
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GtkRestoreReason">
+<description>
+Enumerates possible reasons for an application to restore saved state.
+
+See [signal@Gtk.Application::restore-state].
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="GTK_RESTORE_REASON_PRISTINE">
+<parameter_description> Don't restore anything
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_LAUNCH">
+<parameter_description> This is normal launch. Restore as little as is reasonable
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_RECOVER">
+<parameter_description> The application has crashed before. Try to restore the previous state
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_RESTORE">
+<parameter_description> This is a session restore. Restore the previous state as far as possible
 </parameter_description>
 </parameter>
 </parameters>
@@ -17886,6 +18312,20 @@ styles can be set with the [property@Gtk.CssProvider:prefers-contrast]
 property.
 
 Since: 4.20
+
+</description>
+</property>
+
+<property name="GtkSettings:gtk-interface-reduced-motion">
+<description>
+Whether animations should be reduced to essential motions.
+
+This setting communicates the system-wide preference.
+The motion level that is actually used when applying CSS
+styles can be set with the [property@Gtk.CssProvider:prefers-reduced-motion]
+property.
+
+Since: 4.22
 
 </description>
 </property>
@@ -19872,6 +20312,132 @@ what changes affect the styles
 </parameters>
 </enum>
 
+<signal name="GtkSvg::error">
+<description>
+Signals that an error occurred.
+
+Errors can occur both during parsing and during rendering.
+
+The expected error values are in the [error@Gtk.SvgError] enumeration,
+context information about the location of parsing errors can
+be obtained with the various `gtk_svg_error` functions.
+
+Parsing errors are never fatal, so the parsing will resume after
+the error. Errors may however cause parts of the given data or
+even all of it to not be parsed at all. So it is a useful idea
+to check that the parsing succeeds by connecting to this signal.
+
+::: note
+This signal is emitted in the middle of parsing or rendering,
+and if you handle it, you must be careful. Logging the errors
+you receive is fine, but modifying the widget hierarchy or
+changing the paintable state definitively isn't.
+
+If in doubt, defer to an idle.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="svg">
+<parameter_description> the SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> the error
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkSvg:playing">
+<description>
+Whether the paintable is currently animating its content.
+
+To set this property, use the [method@Gtk.Svg.play] and
+[method@Gtk.Svg.pause] functions.
+
+Since: 4.22
+
+</description>
+</property>
+
+<property name="GtkSvg:resource">
+<description>
+Construct-only property to create a paintable from
+a resource in ui files.
+
+Since: 4.22
+
+</description>
+</property>
+
+<property name="GtkSvg:state">
+<description>
+The current state of the renderer.
+
+This can be a number between 0 and 63, or the special value
+`(unsigned int) -1` to indicate the 'empty' state in which
+nothing is drawn.
+
+Since: 4.22
+
+</description>
+</property>
+
+<property name="GtkSvg:weight">
+<description>
+If not set to -1, this value overrides the weight used
+when rendering the paintable.
+
+Since: 4.22
+
+</description>
+</property>
+
+<enum name="GtkSvgError">
+<description>
+Error codes in the `GTK_SVG_ERROR` domain for errors
+that happen during parsing or rendering of SVG.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="GTK_SVG_ERROR_INVALID_ELEMENT">
+<parameter_description> An XML element is invalid
+(either because it is not part of SVG, or because it is
+in the wrong place, or because it not implemented in GTK)
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_INVALID_ATTRIBUTE">
+<parameter_description> An XML attribute is invalid
+(either because it is not part of SVG, or because it is
+not implemented in GTK, or its value is problematic)
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_MISSING_ATTRIBUTE">
+<parameter_description> A required attribute is missing
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_INVALID_REFERENCE">
+<parameter_description> A reference does not point to
+a suitable element
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_FAILED_UPDATE">
+<parameter_description> An animation could not be updated
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_FAILED_RENDERING">
+<parameter_description> Rendering is not according to
+expecations
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GtkSwitch::activate">
 <description>
 Emitted to animate the switch.
@@ -19964,6 +20530,12 @@ Since: 4.6
 </parameter>
 <parameter name="GTK_SYMBOLIC_COLOR_SUCCESS">
 <parameter_description> Indication color for success
+</parameter_description>
+</parameter>
+<parameter name="GTK_SYMBOLIC_COLOR_ACCENT">
+<parameter_description>The system accent color.
+
+Since: 4.22
 </parameter_description>
 </parameter>
 </parameters>
@@ -25556,6 +26128,61 @@ Since: 4.10
 </return>
 </function>
 
+<function name="gtk_accessible_hyperlink_new">
+<description>
+Creates an accessible object that represents a hyperlink.
+
+This is meant to be used with an implementation of the
+[iface@Gtk.AccessibleHypertext] interface.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="parent">
+<parameter_description> the parent
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> the index of this link in the parent
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> the uri
+</parameter_description>
+</parameter>
+<parameter name="bounds">
+<parameter_description> the text range that the link occupies (or 0, 0)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_accessible_hyperlink_set_platform_state">
+<description>
+Sets a platform state on the accessible.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the accessible
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the platform state to change
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> the new value for the platform state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_accessible_list_get_objects">
 <description>
 Gets the list of objects this boxed type holds.
@@ -27963,6 +28590,26 @@ GTK will keep the application running as long as it has any windows.
 <return></return>
 </function>
 
+<function name="gtk_application_forget">
+<description>
+Forget state that has been previously saved and prevent
+further automatic state saving.
+
+In order to reenable state saving, call
+[method@Gtk.Application.save].
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a `GtkApplication`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_application_get_accels_for_action">
 <description>
 Gets the accelerators that are currently associated with
@@ -28261,6 +28908,28 @@ function, if the window was the last window of the application.
 </parameter>
 <parameter name="window">
 <parameter_description> a window
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_application_save">
+<description>
+Saves the state of application.
+
+See [method@Gtk.Application.forget] for a way to forget the state.
+
+If [property@Gtk.Application:register-session] is set, `GtkApplication`
+calls this function automatically when the application is closed or
+the session ends.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a `GtkApplication`
 </parameter_description>
 </parameter>
 </parameters>
@@ -86962,6 +87631,413 @@ Deprecated: 4.10: This api will be removed in GTK 5
 </return>
 </function>
 
+<function name="gtk_svg_clear_content">
+<description>
+Resets the paintable to the initial, empty state.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_error_get_attribute">
+<description>
+Returns context information about what XML attribute
+the parsing error occurred in.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> an error in the [error@Gtk.SvgError] domain
+</parameter_description>
+</parameter>
+</parameters>
+<return> the attribute name
+
+</return>
+</function>
+
+<function name="gtk_svg_error_get_element">
+<description>
+Returns context information about what XML element
+the parsing error occurred in.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> an error in the [error@Gtk.SvgError] domain
+</parameter_description>
+</parameter>
+</parameters>
+<return> the element name
+
+</return>
+</function>
+
+<function name="gtk_svg_error_get_end">
+<description>
+Returns context information about the end position
+in the document where the parsing error occurred.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> an error in the [error@Gtk.SvgError] domain
+</parameter_description>
+</parameter>
+</parameters>
+<return> the [struct@Gtk.SvgLocation]
+
+</return>
+</function>
+
+<function name="gtk_svg_error_get_start">
+<description>
+Returns context information about the start position
+in the document where the parsing error occurred.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> an error in the [error@Gtk.SvgError] domain
+</parameter_description>
+</parameter>
+</parameters>
+<return> the [struct@Gtk.SvgLocation]
+
+</return>
+</function>
+
+<function name="gtk_svg_get_n_states">
+<description>
+Gets the number of states defined in the SVG.
+
+Note that there is always an empty state, which does
+not count towards this number. If this function returns
+the value N, the meaningful states of the SVG are
+0, 1, ..., N - 1 and `GTK_SVG_STATE_EMPTY`.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of states
+
+</return>
+</function>
+
+<function name="gtk_svg_get_state">
+<description>
+Gets the current state of the paintable.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the state
+
+</return>
+</function>
+
+<function name="gtk_svg_get_weight">
+<description>
+Gets the value of the weight property.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the weight
+
+</return>
+</function>
+
+<function name="gtk_svg_load_from_bytes">
+<description>
+Loads SVG content into an existing SVG paintable.
+
+To track errors while loading SVG content,
+connect to the [signal@Gtk.Svg::error] signal.
+
+This clears any previously loaded content.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> the data to load
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_new">
+<description>
+Creates a new, empty SVG paintable.
+
+Since: 4.22
+
+</description>
+<parameters>
+</parameters>
+<return> the paintable
+
+</return>
+</function>
+
+<function name="gtk_svg_new_from_bytes">
+<description>
+Parses the SVG data in @bytes and creates a paintable.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="bytes">
+<parameter_description> the data
+</parameter_description>
+</parameter>
+</parameters>
+<return> the paintable
+
+</return>
+</function>
+
+<function name="gtk_svg_new_from_resource">
+<description>
+Parses the SVG data in the resource and creates a paintable.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> the resource path
+</parameter_description>
+</parameter>
+</parameters>
+<return> the paintable
+
+</return>
+</function>
+
+<function name="gtk_svg_pause">
+<description>
+Stop any playing animations.
+
+Animations can be paused and started repeatedly.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_play">
+<description>
+Start playing animations.
+
+Note that this is necessary for state changes as
+well.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_serialize">
+<description>
+Serializes the content of the renderer as SVG.
+
+The SVG will be similar to the orignally loaded one,
+but is not guaranteed to be 100% identical.
+
+This function serializes the DOM, i.e. the results
+of parsing the SVG. It does not reflect the effect
+of applying animations.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the serialized contents
+
+</return>
+</function>
+
+<function name="gtk_svg_set_frame_clock">
+<description>
+Sets a frame clock.
+
+Without a frame clock, GTK has to rely
+on simple timeouts to run animations.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="clock">
+<parameter_description> the frame clock
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_set_playing">
+<description>
+Sets whether the paintable is animating its content.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="playing">
+<parameter_description> the new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_set_state">
+<description>
+Sets the state of the paintable.
+
+Use [method@Gtk.Svg.get_n_states] to find out
+what states @self has.
+
+Note that [method@Gtk.Svg.play] must have been
+called for the SVG paintable to react to state changes.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the state to set, as a value between 0 and 63,
+or `(unsigned int) -1`
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_set_weight">
+<description>
+Sets the weight that is used when rendering.
+
+The default value of -1 means to use the font weight
+from CSS.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="weight">
+<parameter_description> the font weight, as a value between -1 and 1000
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_write_to_file">
+<description>
+Serializes the paintable, and saves the result to a file.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> the file to save to
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> true, unless an error occurred
+
+</return>
+</function>
+
 <function name="gtk_switch_get_active">
 <description>
 Gets whether the `GtkSwitch` is in its “on” or “off” state.
@@ -87051,7 +88127,7 @@ See [signal@Gtk.Switch::state-set] for details.
 <description>
 Snapshots the paintable with the given colors.
 
-If less than 4 colors are provided, GTK will pad the array with default
+If less than 5 colors are provided, GTK will pad the array with default
 colors.
 
 Since: 4.6
@@ -87080,6 +88156,49 @@ Since: 4.6
 </parameter>
 <parameter name="n_colors">
 <parameter_description> The number of colors
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_symbolic_paintable_snapshot_with_weight">
+<description>
+Snapshots the paintable with the given colors and weight.
+
+If less than 5 colors are provided, GTK will pad the array with default
+colors.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="paintable">
+<parameter_description> a `GtkSymbolicPaintable`
+</parameter_description>
+</parameter>
+<parameter name="snapshot">
+<parameter_description> a `GdkSnapshot` to snapshot to
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width to snapshot in
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height to snapshot in
+</parameter_description>
+</parameter>
+<parameter name="colors">
+<parameter_description> a pointer to an array of colors
+</parameter_description>
+</parameter>
+<parameter name="n_colors">
+<parameter_description> The number of colors
+</parameter_description>
+</parameter>
+<parameter name="weight">
+<parameter_description> The font weight to use (from 1 to 1000, with default 400)
 </parameter_description>
 </parameter>
 </parameters>
