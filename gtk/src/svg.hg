@@ -1,0 +1,214 @@
+/* Copyright (C) 2025 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/bytes.h>
+#include <gdkmm/frameclock.h>
+#include <gdkmm/paintable.h>
+#include <gtkmm/symbolicpaintable.h>
+#include <string>
+#include <gtk/gtk.h> // Declares GtkSvg and GtkSvgClass
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gtk
+{
+_WRAP_GERROR(SvgError, GtkSvgError, GTK_SVG_ERROR, decl_prefix GTKMM_API)
+
+/** Extra %SvgError functions.
+ *
+ * %Gtk::SvgErrorExtra provides information not easily reachable directly
+ * from %Gtk::SvgError.
+ *
+ * @newin{4,22}
+ */
+class GTKMM_API SvgErrorExtra : public SvgError
+{
+  _CLASS_GENERIC(SvgErrorExtra, GError)
+public:
+  explicit SvgErrorExtra(GError* gobject);
+
+  _WRAP_METHOD(Glib::ustring get_element() const, gtk_svg_error_get_element)
+  _WRAP_METHOD(Glib::ustring get_attribute() const, gtk_svg_error_get_attribute)
+  _WRAP_METHOD(const GtkSvgLocation* get_start() const, gtk_svg_error_get_start)
+  _WRAP_METHOD(const GtkSvgLocation* get_end() const, gtk_svg_error_get_end)
+};
+
+/** A paintable implementation that renders (a subset of) SVG,
+ * with animations.
+ *
+ * %Gtk::Svg objects are created by parsing a subset of SVG,
+ * including SVG animations.
+ *
+ * The %Gtk::Svg fills or strokes paths with symbolic or fixed
+ * colors. It can have multiple states, and paths can be included
+ * in a subset of the states. The special 'empty' state is always
+ * available. States can have animation, and the transition between
+ * different states can also be animated.
+ *
+ * To find out what states a %Gtk::Svg has, use get_n_states().
+ * To set the current state, use set_state().
+ *
+ * To play the animations in an SVG file, use
+ * set_frame_clock() to connect the paintable to a frame clock,
+ * and then use play() to start the animation.
+ *
+ * ## SVG Extensions
+ *
+ * The paintable supports a number of custom attributes that offer a convenient
+ * way to define states, transitions and animations.
+ * For example,
+ * @code
+ *     <circle cx='5' cy='5' r='5'
+ *             gpa:states='0 1'
+ *             gpa:animation-type='automatic'
+ *             gpa:animation-direction='segment'
+ *             gpa:animation-duration='600ms'/>
+ * @endcode
+ * defines the circle to be shown in states 0 and 1,
+ * and animates a segment of the circle.
+ *
+ * @image html svg-renderer1.svg
+ *
+ * Note that the generated animations assume a `pathLengh` value of 1.
+ * Setting `pathLength` in your SVG is therefore going to break such
+ * generated animations.
+ *
+ * To connect general SVG animations to the states of the paintable,
+ * use the custom `gpa:states(...)` condition in the `begin` and `end`
+ * attributes of SVG animation elements. For example,
+ * @code
+ *     <animate href='path1'
+ *              attributeName='fill'
+ *              begin='gpa:states(0).begin'
+ *              dur='300ms'
+ *              fill='freeze'
+ *              from='black'
+ *              to='magenta'/>
+ * @endcode
+ * will make the fill color of path1 transition from black to
+ * magenta when the renderer enters state 0.
+ *
+ * @image html svg-renderer2.svg
+ *
+ * Symbolic colors can also be specified as a custom paint server
+ * reference, like this: `url(gpa:#warning)`. This works in `fill`
+ * and `stroke` attributes, but also when specifying colors in SVG
+ * animation attributes like `to` or `values`. Note that the SVG
+ * syntax allows for a fallback RGB color to be specified after the
+ * url, for compatibility with other SVG consumers:
+ *
+ *     fill='url(gpa:#warning) orange'
+ *
+ * In contrast to SVG 1.1 and 2.0, we allow the `transform` attribute
+ * to be animated with `<animate>`.
+ *
+ * ## The supported subset of SVG
+ *
+ * The renderer does not support text or images, only paths. From the
+ * shape elements of SVG, only `<circle>`, `<ellipse>`, `<rect>` and
+ * `<path>` are supported, leaving out `<line>`, `<polyline>` and
+ * `<polygon>`.
+ *
+ * In `<defs>`, only `<clipPath>`, `<mask>`, gradients and shapes are
+ * supported, not `<filter>`, `<pattern>` or other things.
+ *
+ * Gradient templating is not implemented, and radial gradients with
+ * `fx,fy != cx,cy` are not supported.
+ *
+ * The support for filters is limited to filter functions minus
+ * `drop-shadow()` plus a custom `alpha-level()` function, which
+ * implements one particular case of feComponentTransfer.
+ *
+ * The `transform-origin` and `transform-box` attributes are not supported.
+ *
+ * The support for the `mask` attribute is limited to just a url
+ * referring to the `<mask>` element by ID.
+ *
+ * In animation elements, the parsing of `begin` and `end` attributes
+ * is limited, and the `by`, `min` and `max` attributes are not supported.
+ *
+ * Lastly, there is no CSS support, and no interactivity.
+ *
+ * ## Error handling
+ *
+ * Loading an SVG into %Gtk::Svg will always produce a (possibly empty)
+ * paintable. GTK will drop things that it can't handle and try to make
+ * sense of the rest.
+ *
+ * To track errors during parsing or rendering, connect to signal_error().
+ *
+ * For parsing errors in the `GTK_SVG_ERROR` domain, the functions
+ * Gtk::SvgErrorExtra::get_start(), Gtk::SvgErrorExtra::get_end(),
+ * Gtk::SvgErrorExtra::get_element() and Gtk::SvgErrorExtra::get_attribute()
+ * can be used to obtain information about where the error occurred.
+ *
+ * @newin{4,22}
+ */
+class GTKMM_API Svg : public Glib::Object, public Gdk::Paintable, public SymbolicPaintable
+{
+  _CLASS_GOBJECT(Svg, GtkSvg, GTK_SVG, Glib::Object, GObject, , , GTKMM_API)
+  _IMPLEMENTS_INTERFACE(Gdk::Paintable)
+  _IMPLEMENTS_INTERFACE(SymbolicPaintable)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkSvg is a final type
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _CTOR_DEFAULT()
+  _WRAP_CTOR(Svg(const std::string& resource), gtk_svg_new_from_resource)
+
+public:
+  /** Creates a new, empty SVG paintable.
+   */
+  _WRAP_CREATE()
+
+  /** Parses the SVG data in the resource and creates a paintable.
+   *
+   * @param resource The resource path.
+   */
+  _WRAP_CREATE(const std::string& resource)
+
+  // gtk_svg_new_from_bytes() does more than call g_object_new().
+  _WRAP_METHOD(static Glib::RefPtr<Svg> create(const Glib::RefPtr<const Glib::Bytes>& bytes),
+    gtk_svg_new_from_bytes)
+
+  _WRAP_METHOD(void load_from_bytes(const Glib::RefPtr<const Glib::Bytes>& bytes),
+    gtk_svg_load_from_bytes)
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> serialize() const, gtk_svg_serialize)
+  _WRAP_METHOD(void write_to_file(const std::string& filename) const,
+    gtk_svg_write_to_file, errthrow)
+  _WRAP_METHOD(void set_weight(double weight), gtk_svg_set_weight)
+  _WRAP_METHOD(double get_weight() const, gtk_svg_get_weight)
+  _WRAP_METHOD(void set_state(unsigned int state), gtk_svg_set_state)
+  _WRAP_METHOD(unsigned int get_state() const, gtk_svg_get_state)
+  _WRAP_METHOD(unsigned int get_n_states() const, gtk_svg_get_n_states)
+  _WRAP_METHOD(void set_frame_clock(const Glib::RefPtr<Gdk::FrameClock>& clock),
+    gtk_svg_set_frame_clock)
+  _WRAP_METHOD(void play(), gtk_svg_play)
+  _WRAP_METHOD(void pause(), gtk_svg_pause)
+
+#m4 _CONVERSION(`GError*',`const SvgErrorExtra&',`SvgErrorExtra(g_error_copy($3))')
+  // no_default_handler because GtkSvgClass is private.
+  _WRAP_SIGNAL(void error(const SvgErrorExtra& error), "error", no_default_handler)
+
+  _IGNORE_PROPERTY("resource") dnl// write-only and construct-only
+  _WRAP_PROPERTY("playing", bool)
+  _WRAP_PROPERTY("weight", double)
+  _WRAP_PROPERTY("state", unsigned int)
+};
+
+} // namespace Gtk

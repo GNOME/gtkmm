@@ -30,6 +30,8 @@ endforeach
 gtkmm_any_hg_ccg_basenames = [
   'aboutdialog',
   'accessible',
+  'accessiblehyperlink',
+  'accessiblehypertext',
   'accessibletext',
   'actionable',
   'actionbar',
@@ -215,6 +217,7 @@ gtkmm_any_hg_ccg_basenames = [
   'stringobject',
   'stringsorter',
   'styleprovider',
+  'svg',
   'switch',
   'symbolicpaintable',
   'text',

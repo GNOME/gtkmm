@@ -92,6 +92,8 @@ _CONV_ENUM(Gtk,ProgressBarOrientation)
 _CONV_ENUM(Gtk,ProgressBarStyle)
 _CONV_ENUM(Gtk,PropagationLimit)
 _CONV_ENUM(Gtk,PropagationPhase)
+_CONV_ENUM(Gtk,ReducedMotion)
+_CONV_ENUM(Gtk,RestoreReason)
 _CONV_ENUM(Gtk,RevealerTransitionType)
 _CONV_ENUM(Gtk,ScrollType)
 _CONV_ENUM(Gtk,SelectionMode)
@@ -382,6 +384,12 @@ _CONVERSION(`GtkTreePath*',`TreeModel::Path', `Gtk::TreePath($3, false)')
 
 _CONVERSION(`GtkAccessible*',`Glib::RefPtr<Accessible>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Accessible>&', `GtkAccessible*', __CONVERT_REFPTR_TO_P)
+_CONVERSION(`GtkAccessibleHyperlink*',`Glib::RefPtr<AccessibleHyperlink>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<AccessibleHypertext>&', `GtkAccessibleHypertext*', __CONVERT_REFPTR_TO_P)
+_CONVERSION(`const GtkAccessibleTextRange&', `GtkAccessibleTextRange*', `const_cast<$2>(&$3)')
+
+_CONVERSION(`GtkSvg*', `Glib::RefPtr<Svg>', `Glib::wrap($3)')
+
 _CONVERSION(`GtkATContext*',`Glib::RefPtr<ATContext>',`Glib::wrap($3)')
 
 _CONVERSION(`GtkCellEditable*',`CellEditable*',`dynamic_cast<$2>(Glib::wrap_auto((GObject*)($3), false))')

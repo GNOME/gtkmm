@@ -34,11 +34,10 @@ typedef struct _GtkWindow GtkWindow;
 
 namespace Gtk
 {
-
-//TODO: Add overview documentation discussing the techniques show in the examples in gtkmm-docmentation.
+//TODO: Add overview documentation discussing the techniques shown in the examples in gtkmm-documentation.
 //TODO: Add the screenshots from the C API?
 
-/** Application class.
+/** %Application class.
  *
  * The %Gtk::Application class handles many important aspects
  * of a GTK+ application in a convenient fashion, without enforcing
@@ -296,17 +295,27 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gio::Menu> get_menu_by_id(const Glib::ustring& id), gtk_application_get_menu_by_id, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gio::Menu> get_menu_by_id(const Glib::ustring& id) const, gtk_application_get_menu_by_id, refreturn, constversion)
+  _WRAP_METHOD(void save(), gtk_application_save)
+  _WRAP_METHOD(void forget(), gtk_application_forget)
 
   _WRAP_PROPERTY("menubar", Glib::RefPtr<Gio::MenuModel>)
   _WRAP_PROPERTY("register-session", bool,
     deprecated "4.20: This property is ignored. GTK always registers with the session manager.")
   _WRAP_PROPERTY("screensaver-active", bool, newin "3,94")
   _WRAP_PROPERTY("active-window", Window*)
+  _WRAP_PROPERTY("support-save", bool)
 
   _WRAP_SIGNAL(void window_added(Window* window), "window-added")
   _WRAP_SIGNAL(void window_removed(Window* window), "window-removed")
   // no_default_handler because the wrapped C signal has no default handler.
   _WRAP_SIGNAL(void query_end(), "query-end", no_default_handler)
+
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GVariantDict*',`const Glib::RefPtr<Glib::VariantDict>&',`Glib::wrap($3, true)')
+  // TODO: Remove the following 3 no_default_handler when we can break ABI.
+  _WRAP_SIGNAL(void restore_window(RestoreReason reason, const Glib::VariantBase& state), "restore-window", no_default_handler)
+  _WRAP_SIGNAL(bool save_state(const Glib::RefPtr<Glib::VariantDict>& dict), "save-state", no_default_handler)
+  _WRAP_SIGNAL(bool restore_state(RestoreReason reason, const Glib::VariantBase& state), "restore-state", no_default_handler)
 
 private:
   /** This is just a way to call Glib::init() before calling a Glib::Object ctor,
