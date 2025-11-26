@@ -101,6 +101,24 @@ namespace Accelerator
   GTKMM_API
   Glib::ustring get_label(guint accelerator_key, Gdk::ModifierType accelerator_mods);
 
+  /** Generates an accessible description of an accelerator.
+   *
+   * This function is similar to get_label() but it is meant
+   * for accessibility layers labels rather than user-facing labels. The output
+   * of this function is fit for Gtk::Accessible::Property::KEY_SHORTCUTS.
+   *
+   * For more information, see the [WAI-ARIA](https://www.w3.org/TR/wai-aria/#aria-keyshortcuts)
+   * reference.
+   *
+   * @param accelerator_key Accelerator keyval.
+   * @param accelerator_mods Accelerator modifier mask.
+   * @return A string representing the accelerator.
+   *
+   * @newin{4,22}
+   */
+  GTKMM_API
+  Glib::ustring get_accessible_label(guint accelerator_key, Gdk::ModifierType accelerator_mods);
+
   /** Gets the modifier mask.
    *
    * The modifier mask determines which modifiers are considered significant

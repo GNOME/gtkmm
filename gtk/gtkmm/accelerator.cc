@@ -54,6 +54,12 @@ Glib::ustring get_label(guint accelerator_key, Gdk::ModifierType accelerator_mod
     accelerator_key, static_cast<GdkModifierType>(accelerator_mods)));
 }
 
+Glib::ustring get_accessible_label(guint accelerator_key, Gdk::ModifierType accelerator_mods)
+{
+  return Glib::convert_return_gchar_ptr_to_ustring(gtk_accelerator_get_accessible_label(
+    accelerator_key, static_cast<GdkModifierType>(accelerator_mods)));
+}
+
 Gdk::ModifierType get_default_mod_mask()
 {
   return static_cast<Gdk::ModifierType>(gtk_accelerator_get_default_mod_mask());
