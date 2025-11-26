@@ -522,9 +522,11 @@ or annotates the current element. Value type: string
 </parameter_description>
 </parameter>
 <parameter name="GTK_ACCESSIBLE_PROPERTY_HAS_POPUP">
-<parameter_description> Indicates the availability and type of
-interactive popup element, such as menu or dialog, that can be triggered
-by an element.
+<parameter_description> Indicates the availability of interactive
+popup element, such as menu or popover, that can be triggered by an
+element. Contrary to “aria-haspopup”, it doesn't indicate the type of the
+element, as such it cannot be used to indicate the availability of more
+complex elements such as dialog. Value type: boolean
 </parameter_description>
 </parameter>
 <parameter name="GTK_ACCESSIBLE_PROPERTY_KEY_SHORTCUTS">
@@ -532,8 +534,14 @@ by an element.
 author has implemented to activate or give focus to an element. Value type:
 string. The format of the value is a space-separated list of shortcuts, with
 each shortcut consisting of one or more modifiers (`Control`, `Alt` or `Shift`),
-followed by a non-modifier key, all separated by `+`.
-Examples: `F2`, `Alt-F`, `Control+Shift+N`
+followed by a non-modifier key, all separated by `+`. The
+[WAI-ARIA](https://www.w3.org/TR/wai-aria/#aria-keyshortcuts) reference
+specifies how to build keyboard shortcuts strings, with specific values
+for each key which are the same regardless of the language, so these
+strings can't be built from localized key names. You can convert an
+accelerator into the matching key shortcuts label with
+[func@Gtk.accelerator_get_accessible_label].
+Examples: `F2`, `Alt+F`, `Control+Shift+N`
 </parameter_description>
 </parameter>
 <parameter name="GTK_ACCESSIBLE_PROPERTY_LABEL">
@@ -2211,7 +2219,7 @@ to delay the end of the session until state has been saved.
 
 <signal name="GtkApplication::restore-state">
 <description>
-Emitted when application state is restored.
+Emitted when application global state is restored.
 
 The handler for this signal should do the opposite of what the
 corresponding handler for [signal@Gtk.Application::save-state]
@@ -2241,13 +2249,27 @@ Since: 4.22
 
 <signal name="GtkApplication::restore-window">
 <description>
-Emitted when application state is restored.
+Emitted when an application's per-window state is restored.
 
 In response to this signal, you should create a new application
-window, and add it to @application. If @reason and @state are passed,
-they should be applied to the newly created window.
+window, add it to @application, apply the provided @state, and present it.
+The application can use the @reason to determine how much of the state
+should be restored.
 
-`GtkApplication` will call [method@Gtk.Window.present] on the window.
+You must be careful to be robust in the face of app upgrades and downgrades:
+the @state might have been created by a previous or occasionally even a future
+version of your app. Do not assume that a given key exists in the state.
+Apps must try to restore state saved by a previous version, but are free to
+discard state if it was written by a future version.
+
+GTK will remember which window the user was using most recently, and will
+emit this signal for that window first. Thus, if you decide that the provided
+@reason means that only one window should be restored, you can reliably
+ignore emissions if a window already exists
+
+Note that this signal is not emitted only during the app's initial launch.
+If all windows are closed but the app keeps running, the signal will be
+emitted the next time a new window is opened.
 
 Since: 4.22
 
@@ -2262,7 +2284,7 @@ Since: 4.22
 </parameter_description>
 </parameter>
 <parameter name="state">
-<parameter_description> the state to restore, as saved by a [signal@Gtk.ApplicationWindow::save-state] handler
+<parameter_description> an &quot;a{sv}&quot; `GVariant` with state to restore, as saved by a [signal@Gtk.ApplicationWindow::save-state] handler
 </parameter_description>
 </parameter>
 </parameters>
@@ -2271,7 +2293,7 @@ Since: 4.22
 
 <signal name="GtkApplication::save-state">
 <description>
-Emitted when the application is saving state.
+Emitted when the application is saving global state.
 
 The handler for this signal should persist any
 global state of @application into @dict.
@@ -2295,7 +2317,7 @@ Since: 4.22
 </parameter>
 </parameters>
 <return> true to stop stop further handlers from running
-   2
+
 </return>
 </signal>
 
@@ -2343,6 +2365,16 @@ or explicitly through [method@Gtk.Application.remove_window].
 <property name="GtkApplication:active-window">
 <description>
 The currently focused window of the application.
+
+</description>
+</property>
+
+<property name="GtkApplication:autosave-interval">
+<description>
+The number of seconds between automatic state saves. Defaults to 15.
+A value of 0 will opt out of automatic state saving.
+
+Since: 4.22
 
 </description>
 </property>
@@ -2487,6 +2519,12 @@ application-specific state of @window into @dict.
 Note that window management state such as maximized,
 fullscreen, or window size should not be saved as
 part of this, they are handled by GTK.
+
+You must be careful to be robust in the face of app upgrades and downgrades:
+the @state might have been created by a previous or occasionally even a future
+version of your app. Do not assume that a given key exists in the state.
+Apps must try to restore state saved by a previous version, but are free to
+discard state if it was written by a future version.
 
 See [signal@Gtk.Application::restore-window].
 
@@ -6129,6 +6167,12 @@ Since: 4.18
 <parameter_description>Show touch UI elements for pointer events.
 
 Since: 4.20
+</parameter_description>
+</parameter>
+<parameter name="GTK_DEBUG_SESSION">
+<parameter_description>Information about session saving.
+
+Since: 4.22
 </parameter_description>
 </parameter>
 </parameters>
@@ -25688,6 +25732,35 @@ automatically wrapped.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_accelerator_get_accessible_label">
+<description>
+Generates an accessible description of an accelerator.
+
+This function is similar to [func@Gtk.accelerator_get_label] but it is meant
+for accessibility layers labels rather than user-facing labels. The output
+of this function is fit for [enum@Gtk.AccessibleProperty.KEY_SHORTCUTS].
+
+For more information, see the [WAI-ARIA](https://www.w3.org/TR/wai-aria/#aria-keyshortcuts)
+reference.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="accelerator_key">
+<parameter_description> accelerator keyval
+</parameter_description>
+</parameter>
+<parameter name="accelerator_mods">
+<parameter_description> accelerator modifier mask
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated string representing the accelerator
+
+</return>
 </function>
 
 <function name="gtk_accelerator_get_default_mod_mask">
@@ -83512,6 +83585,32 @@ Appends an outset shadow node around the box given by @outline.
 <return></return>
 </function>
 
+<function name="gtk_snapshot_append_paste">
+<description>
+Creates a new render node that pastes the contents
+copied by a previous call to [method@Gtk.Snapshot.push_copy]
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a `GtkSnapshot`
+</parameter_description>
+</parameter>
+<parameter name="bounds">
+<parameter_description> the bounds for the new node
+</parameter_description>
+</parameter>
+<parameter name="nth">
+<parameter_description> the index of the copy, with 0 being the latest
+copy, 1 being the copy before that, and so on.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_snapshot_append_radial_gradient">
 <description>
 Appends a radial gradient node with the given stops to @snapshot.
@@ -83985,6 +84084,51 @@ Since: 4.20
 </parameter>
 <parameter name="alpha">
 <parameter_description> the transfer for the alpha component
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_push_composite">
+<description>
+Until the first call to [method@Gtk.Snapshot.pop], the
+mask image for the mask operation will be recorded.
+
+After that call, the child image will be recorded until
+the second call to [method@Gtk.Snapshot.pop].
+
+Calling this function requires 2 subsequent calls to gtk_snapshot_pop().
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a #GtkSnapshot
+</parameter_description>
+</parameter>
+<parameter name="op">
+<parameter_description> The Porter/Duff compositing operator to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_push_copy">
+<description>
+Stores the current rendering state for later pasting via
+[method@Gtk.Snapshot.append_paste].
+
+Pasting is possible until the matching call to [method@Gtk.Snapshot.pop].
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="snapshot">
+<parameter_description> a `GtkSnapshot`
 </parameter_description>
 </parameter>
 </parameters>

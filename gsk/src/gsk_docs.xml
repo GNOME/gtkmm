@@ -669,6 +669,25 @@ Since: 4.14
 Since: 4.20
 </parameter_description>
 </parameter>
+<parameter name="GSK_COPY_NODE">
+<parameter_description>A node that copies the rendering canvas to be pasted later.
+
+Since: 4.22
+</parameter_description>
+</parameter>
+<parameter name="GSK_PASTE_NODE">
+<parameter_description>A node that pastes a previously copied canvas.
+
+Since: 4.22
+</parameter_description>
+</parameter>
+<parameter name="GSK_COMPOSITE_NODE">
+<parameter_description>A node that combines a child with the background using Porter/Duff
+operations.
+
+Since: 4.22
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -1506,7 +1525,7 @@ Since: 4.20
 </description>
 <parameters>
 <parameter name="node">
-<parameter_description> a debug `GskRenderNode`
+<parameter_description> a component transfer `GskRenderNode`
 </parameter_description>
 </parameter>
 </parameters>
@@ -1524,7 +1543,7 @@ Since: 4.20
 </description>
 <parameters>
 <parameter name="node">
-<parameter_description> a debug `GskRenderNode`
+<parameter_description> a component transfer `GskRenderNode`
 </parameter_description>
 </parameter>
 <parameter name="component">
@@ -1565,6 +1584,92 @@ Since: 4.20
 </parameter>
 <parameter name="a">
 <parameter_description> transfer for the alpha component
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new `GskRenderNode`
+
+</return>
+</function>
+
+<function name="gsk_composite_node_get_child">
+<description>
+Gets the child node that is getting composited by the given @node.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a composite `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child `GskRenderNode`
+
+</return>
+</function>
+
+<function name="gsk_composite_node_get_mask">
+<description>
+Gets the mask node that describes the region where the compositing
+applies.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a composite `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the mask `GskRenderNode`
+
+</return>
+</function>
+
+<function name="gsk_composite_node_get_operator">
+<description>
+Gets the compositing operator used by this node.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a composite `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> The compositing operator
+
+</return>
+</function>
+
+<function name="gsk_composite_node_new">
+<description>
+Creates a `GskRenderNode` that will composite the child onto the
+background with the given operator wherever the mask is set.
+
+Note that various operations can modify the background outside of
+the child's bounds, so the mask may cause visual changes outside
+of the child.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="child">
+<parameter_description> The child to composite
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> The mask where the compositing will apply
+</parameter_description>
+</parameter>
+<parameter name="op">
+<parameter_description> The compositing operator
 </parameter_description>
 </parameter>
 </parameters>
@@ -1758,6 +1863,43 @@ The new node will acquire a reference to each of the children.
 </parameter>
 </parameters>
 <return> the new `GskRenderNode`
+</return>
+</function>
+
+<function name="gsk_copy_node_get_child">
+<description>
+Gets the child node that is getting drawn by the given @node.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a copy `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child `GskRenderNode`
+
+</return>
+</function>
+
+<function name="gsk_copy_node_new">
+<description>
+Creates a `GskRenderNode` that copies the current rendering
+canvas for playback by paste nodes that are part of the child.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="child">
+<parameter_description> The child
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new `GskRenderNode`
+
 </return>
 </function>
 
@@ -3215,6 +3357,46 @@ around the box given by @outline.
 </parameter>
 </parameters>
 <return> A new `GskRenderNode`
+</return>
+</function>
+
+<function name="gsk_paste_node_get_depth">
+<description>
+Retrieves the index of the copy that should be pasted.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the index of the copy to paste.
+
+</return>
+</function>
+
+<function name="gsk_paste_node_new">
+<description>
+Creates a `GskRenderNode` that will paste copied contents.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="bounds">
+<parameter_description> the rectangle to render the paste into
+</parameter_description>
+</parameter>
+<parameter name="depth">
+<parameter_description> the index of which copy to paste. This will usually be 0.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new `GskRenderNode`
+
 </return>
 </function>
 
@@ -5338,6 +5520,32 @@ in the snapping not being perfectly exact.
 </return>
 </function>
 
+<function name="gsk_rect_subtract">
+<description>
+Computes the largest rectangle that is fully covered by
+m and does not contain any part of s.
+
+
+</description>
+<parameters>
+<parameter name="m">
+<parameter_description> a valid rectangle for the minuend
+</parameter_description>
+</parameter>
+<parameter name="s">
+<parameter_description> a valid rectangle for the subtrahend
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The result, may be the same as `m` or `s`
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if a rectangle was returned, FALSE if the subtrahend
+fully covers the minuend and no valid rectangle remains.
+</return>
+</function>
+
 <function name="gsk_render_node_deserialize">
 <description>
 Loads data previously created via [method@Gsk.RenderNode.serialize].
@@ -5572,6 +5780,306 @@ node to a file for later inspection.
 </parameters>
 <return> true if saving was successful
 </return>
+</function>
+
+<function name="gsk_render_replay_default">
+<description>
+Replays the node using the default method.
+
+The default method calls [method@Gsk.RenderReplay.filter_node]
+on all its child nodes and the filter functions for all its
+proeprties. If none of them are changed, it returns the passed
+in node. Otherwise it constructs a new node with the changed
+children and properties.
+
+It may not be possible to construct a new node when any of the
+callbacks return NULL. In that case, this function will return
+NULL, too.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="node">
+<parameter_description> the node to replay
+</parameter_description>
+</parameter>
+</parameters>
+<return> The replayed node 
+
+</return>
+</function>
+
+<function name="gsk_render_replay_filter_font">
+<description>
+Filters a font using the current filter function.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="font">
+<parameter_description> The font to filter
+</parameter_description>
+</parameter>
+</parameters>
+<return> the filtered font
+
+</return>
+</function>
+
+<function name="gsk_render_replay_filter_node">
+<description>
+Replays a node using the replay's filter function.
+
+After the replay the node may be unchanged, or it may be
+removed, which will result in %NULL being returned.
+
+This function calls the registered callback in the following order:
+
+1. If a foreach function is set, it is called first. If it returns 
+false, this function immediately exits and returns the passed
+in node.
+
+2. If a node filter is set, it is called and its result is returned.
+
+3. [method@Gsk.RenderReplay.default] is called and its result is
+returned.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="node">
+<parameter_description> the node to replay
+</parameter_description>
+</parameter>
+</parameters>
+<return> The replayed node
+
+</return>
+</function>
+
+<function name="gsk_render_replay_filter_texture">
+<description>
+Filters a texture using the current filter function.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="texture">
+<parameter_description> The texture to filter
+</parameter_description>
+</parameter>
+</parameters>
+<return> the filtered texture
+
+</return>
+</function>
+
+<function name="gsk_render_replay_foreach_node">
+<description>
+Calls the filter and foreach functions for each node.
+
+This function calls [method@Gsk.RenderReplay.filter_node] internally,
+but discards the result assuming no changes were made.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="node">
+<parameter_description> the node to replay
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gsk_render_replay_free">
+<description>
+Frees a `GskRenderReplay`.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay object to free
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gsk_render_replay_new">
+<description>
+Creates a new replay object to replay nodes.
+
+Since: 4.22
+
+</description>
+<parameters>
+</parameters>
+<return> A new replay object to replay nodes
+
+</return>
+</function>
+
+<function name="gsk_render_replay_set_font_filter">
+<description>
+Sets a filter function to be called by [method@Gsk.RenderReplay.default]
+for nodes that contain fonts.
+
+You can call [method@GskRenderReplay.filter_font] to filter
+a font yourself.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="filter">
+<parameter_description> the font filter function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @filter
+</parameter_description>
+</parameter>
+<parameter name="user_destroy">
+<parameter_description> destroy notify that will be called to release
+user_data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gsk_render_replay_set_node_filter">
+<description>
+Sets the function to use as a node filter.
+
+This is the most complex function to use for replaying nodes.
+It can either:
+
+* keep the node and just return it unchanged
+
+* create a replacement node and return that
+
+* discard the node by returning %NULL
+
+* call [method@Gsk.RenderReplay.default] to have the default handler
+run for this node, which calls your function on its children
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="filter">
+<parameter_description> The function to call to replay nodes
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @func
+</parameter_description>
+</parameter>
+<parameter name="user_destroy">
+<parameter_description> destroy notify that will be called to release
+user_data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gsk_render_replay_set_node_foreach">
+<description>
+Sets the function to call for every node.
+
+This function is called before the node filter, so if it returns
+FALSE, the node filter will never be called.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="foreach">
+<parameter_description> the function to call for all nodes
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @func
+</parameter_description>
+</parameter>
+<parameter name="user_destroy">
+<parameter_description> destroy notify that will be called to release
+user_data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gsk_render_replay_set_texture_filter">
+<description>
+Sets a filter function to be called by [method@Gsk.RenderReplay.default]
+for nodes that contain textures.
+
+You can call [method@GskRenderReplay.filter_texture] to filter
+a texture yourself.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the replay
+</parameter_description>
+</parameter>
+<parameter name="filter">
+<parameter_description> the texture filter function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @filter
+</parameter_description>
+</parameter>
+<parameter name="user_destroy">
+<parameter_description> destroy notify that will be called to release
+user_data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gsk_renderer_get_surface">
@@ -7096,7 +7604,7 @@ Since: 4.14
 </description>
 <parameters>
 <parameter name="node">
-<parameter_description> a debug `GskRenderNode`
+<parameter_description> a subsurface `GskRenderNode`
 </parameter_description>
 </parameter>
 </parameters>
@@ -7114,7 +7622,7 @@ Since: 4.14
 </description>
 <parameters>
 <parameter name="node">
-<parameter_description> a debug `GskRenderNode`
+<parameter_description> a subsurface `GskRenderNode`
 </parameter_description>
 </parameter>
 </parameters>
@@ -8097,6 +8605,8 @@ if you want to keep it around.
 Transforms a rectangle using the given transform.
 
 The result is the bounding box containing the coplanar quad.
+
+The input and output rect may point to the same rectangle.
 
 </description>
 <parameters>
