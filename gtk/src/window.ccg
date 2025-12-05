@@ -22,6 +22,8 @@
 
 namespace
 {
+bool remove_on_hide = true;
+
 using Window_dispose_vfunc_functype = void (*)(GObject* self);
 Window_dispose_vfunc_functype Window_dispose_vfunc_funcptr;
 
@@ -36,6 +38,17 @@ static void Window_dispose_vfunc_c_callback(GObject* self)
 
 namespace Gtk
 {
+//static
+void Window::set_remove_on_hide(bool remove)
+{
+  remove_on_hide = remove;
+}
+
+//static
+bool Window::get_remove_on_hide()
+{
+  return remove_on_hide;
+}
 
 // All constructors are hand-coded, because they connect a signal handler
 // that removes the window from its application when the window is closed (hidden).
@@ -77,7 +90,7 @@ Window::Window(Window&& src) noexcept
   {
     // Ignore exceptions.
     // The move ctor shall be noexcept. It can be called from a move ctor
-    // in a subclass, such as Gtk::Dialog.
+    // in a subclass, such as Gtk::ApplicatonWindow.
   }
 }
 
@@ -100,6 +113,9 @@ Window::Window()
 
 void Window::on_window_hide()
 {
+  if (!remove_on_hide)
+    return;
+
   #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Gtk::Window::on_window_hide() gobject_=%p\n", (void*) gobject_);
   #endif
