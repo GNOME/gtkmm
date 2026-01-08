@@ -2,7 +2,7 @@ Building gtkmm on Win32
 =
 
 Currently, both the mingw (native win32) gcc compiler and MS Visual
-Studio 2013 and later are supported. gtkmm can be built with
+Studio 2015 and later are supported. gtkmm can be built with
 mingw32-gcc using the gnu autotools (automake, autoconf, libtool) or
 Meson.  A `C++11`-compliant compiler is required; notice that in order
 to build the gtkmm demo program with Visual Studio, 2015 or later is
@@ -56,14 +56,7 @@ The standard Meson build instructions for *NIX should work, although it
 is untested at the time of writing.  Please see `README.md` for more details.
 
 
-### MS Visual Studio 2013 or later
-
-Note that it is generally not considered safe to link gdkmm/gtkmm built with
-Visual Studio 2013 with items that are built with Visual Studio 2015 and
-later, and packages depending on gdkmm/gtkmm can require Visual Studio 2015 or
-later due to the more comprehensive `C++11` support in the later Visual Studio
-versions. Note also that the gtkmm demo program won't be built with Visual Studio
-2013.
+### MS Visual Studio 2015 or later
 
 #### Building using NMake
 In a Visual Studio command prompt, navigate to the `MSVC_NMake` directory.
@@ -73,7 +66,7 @@ the gtkmm demo program. If a prefix other than
 in the NMake command line.  In order to build the gtkmm demo program, the
 `glib-compile-resources` tool needs to reside in `$(PREFIX)\bin`, or it must be
 specified via passing in `GLIB_COMPILE_RESOURCES=...`  in the NMake command line.
-If building with Visual Studio 2013, note that the gtkmm demo program will not be
+If building with Visual Studio 2015, note that the gtkmm demo program will not be
 built.
 
 If using C++ dependencies that are built with Meson, specify `USE_MESON_LIBS=1`
@@ -81,19 +74,19 @@ in your NMake command line.
 
 The following list lists the `$(VSVER)` and the `vc1xx` in the NMake-built DLL
 and .lib that corresponds to the Visual Studio version used
-(Visual Studio versions at or before 2012 are not supported):
-  * 2013: `12`, `g[d|t]kmm-vc120-3_0.[dll|pdb|lib]`
+(Visual Studio versions at or before 2013 are not supported):
   * 2015: `14`, `g[d|t]kmm-vc140-3_0.[dll|pdb|lib]`
   * 2017: `15`, `g[d|t]kmm-vc141-3_0.[dll|pdb|lib]`
   * 2019: `16`, `g[d|t]kmm-vc142-3_0.[dll|pdb|lib]`
   * 2022: `17`: `g[d|t]kmm-vc143-3_0.[dll|pdb|lib]`
+  * 2026: `18`: `g[d|t]kmm-vc145-3_0.[dll|pdb|lib]`
 
 For Meson, the DLL/PDB filenames and .lib filenames will be like:
-  * 2013: `g[d|t]kmm-vc120-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc120-3.0.lib`
   * 2015: `g[d|t]kmm-vc140-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc140-3.0.lib`
   * 2017: `g[d|t]kmm-vc141-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc141-3.0.lib`
   * 2019: `g[d|t]kmm-vc142-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc142-3.0.lib`
   * 2022: `g[d|t]kmm-vc143-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc143-3.0.lib`
+  * 2026: `g[d|t]kmm-vc145-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc145-3.0.lib`
 
 Notice that this is no longer always the `vc$(VSVER)0` that was used before, to be consistent with other common C++ libraries such as Boost.
 Earlier gtkmm versions may still use the former `vc$(VSVER)0` naming scheme, so for 
@@ -155,8 +148,7 @@ also required.
 
 #### Building Using Meson
 
-Note that one may not be able to fully build with Meson with Visual Studio 2013,
-as the gtkmm demo program requires Visual Studio 2015 or later.
+Visual Studio 2015 or later is required to build gtkmm.
 
 For building with Meson, please see `README.md` for further instructions. Please 
 note that using `-Ddefault_library=[static|both]` for Visual Studio builds is not 
