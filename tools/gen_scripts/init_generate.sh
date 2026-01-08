@@ -32,7 +32,7 @@ fi
 # Scripts in glibmm. These are source files.
 gen_docs="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/docextract_to_xml.py"
 gen_methods="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/h2def.py"
-gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/enum.pl"
+gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/enumextract.py"
 
 # Where to find executables that generate extra defs (signals and properties).
 # gtkmm is built with autotools.

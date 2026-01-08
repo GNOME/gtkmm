@@ -271,6 +271,41 @@ Deprecated: 4.16
 </parameters>
 </enum>
 
+<enum name="GskIsolation">
+<description>
+These flags describe the types of isolations possible with a
+[class@Gsk.IsolationNode].
+
+More isolation options may be added in the future.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="GSK_ISOLATION_NONE">
+<parameter_description> No isolation is defined.
+</parameter_description>
+</parameter>
+<parameter name="GSK_ISOLATION_BACKGROUND">
+<parameter_description> If the background should be made available.
+If the background is not available, future operations will be rendered
+to a transparent background and added to the existing background later.
+</parameter_description>
+</parameter>
+<parameter name="GSK_ISOLATION_COPY_PASTE">
+<parameter_description> If copies should be available to paste nodes.
+If copies are not available, paste nodes can only paste from copies that
+are made inside the isolated contents.
+</parameter_description>
+</parameter>
+<parameter name="GSK_ISOLATION_ALL">
+<parameter_description> Isolate everything. This will include features that
+are added in the future.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GskLineCap">
 <description>
 Specifies how to render the start and end points of contours or
@@ -684,6 +719,24 @@ Since: 4.22
 <parameter name="GSK_COMPOSITE_NODE">
 <parameter_description>A node that combines a child with the background using Porter/Duff
 operations.
+
+Since: 4.22
+</parameter_description>
+</parameter>
+<parameter name="GSK_ISOLATION_NODE">
+<parameter_description>A node that isolated content of its child from previous content.
+
+Since: 4.22
+</parameter_description>
+</parameter>
+<parameter name="GSK_DISPLACEMENT_NODE">
+<parameter_description>A node that displaces content according to some mask.
+
+Since: 4.22
+</parameter_description>
+</parameter>
+<parameter name="GSK_ARITHMETIC_NODE">
+<parameter_description>A node that combines two child nodes in an arithmetic way.
 
 Since: 4.22
 </parameter_description>
@@ -2967,6 +3020,72 @@ into the box given by @outline.
 </return>
 </function>
 
+<function name="gsk_isolation_node_get_child">
+<description>
+Gets the child node that is getting drawn by the given @node.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> an isolation `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the child `GskRenderNode`
+
+</return>
+</function>
+
+<function name="gsk_isolation_node_get_isolations">
+<description>
+Gets the isolation features that are enforced by this node.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> an isolation `GskRenderNode`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the isolation features
+
+</return>
+</function>
+
+<function name="gsk_isolation_node_new">
+<description>
+Creates a `GskRenderNode` that isolates the drawing operations of
+the child from surrounding ones.
+
+You can express &quot;everything but these flags&quot; in a forward compatible
+way by using bit math:
+`GSK_ISOLATION_ALL &amp; ~(GSK_ISOLATION_BACKGROUND | GSK_ISOLATION_COPY_PASTE)`
+will isolate everything but background and copy/paste.
+
+For the available isolations, see [flags@Gsk.Isolation].
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="child">
+<parameter_description> The child
+</parameter_description>
+</parameter>
+<parameter name="isolations">
+<parameter_description> features to isolate
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new `GskRenderNode`
+
+</return>
+</function>
+
 <function name="gsk_linear_gradient_node_get_color_stops">
 <description>
 Retrieves the color stops in the gradient.
@@ -4501,7 +4620,8 @@ Computes the bounds of the given path.
 
 The returned bounds may be larger than necessary, because this
 function aims to be fast, not accurate. The bounds are guaranteed
-to contain the path.
+to contain the path. For accurate bounds, use
+[method@Gsk.Path.get_tight_bounds].
 
 It is possible that the returned rectangle has 0 width and/or height.
 This can happen when the path only describes a point or an
@@ -4594,6 +4714,56 @@ Since: 4.14
 </return>
 </function>
 
+<function name="gsk_path_get_next">
+<description>
+Moves @point to the next vertex.
+
+An empty path has no points, so false
+is returned in this case.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a path
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the current point
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if @point was set
+
+</return>
+</function>
+
+<function name="gsk_path_get_previous">
+<description>
+Moves @point to the previous vertex.
+
+An empty path has no points, so false
+is returned in this case.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a path
+</parameter_description>
+</parameter>
+<parameter name="point">
+<parameter_description> the current point
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if @point was set
+
+</return>
+</function>
+
 <function name="gsk_path_get_start_point">
 <description>
 Gets the start point of the path.
@@ -4648,6 +4818,32 @@ Since: 4.14
 </parameters>
 <return> true if the path has bounds, false if the path is known
 to be empty and have no bounds.
+
+</return>
+</function>
+
+<function name="gsk_path_get_tight_bounds">
+<description>
+Computes the tight bounds of the given path.
+
+This function works harder than [method@Gsk.Path.get_bounds] to
+produce the smallest possible bounds.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a path
+</parameter_description>
+</parameter>
+<parameter name="bounds">
+<parameter_description> return location for the bounds
+</parameter_description>
+</parameter>
+</parameters>
+<return> true if the path has bounds, false if the path is known
+to be empty and have no bounds
 
 </return>
 </function>
@@ -5788,7 +5984,7 @@ Replays the node using the default method.
 
 The default method calls [method@Gsk.RenderReplay.filter_node]
 on all its child nodes and the filter functions for all its
-proeprties. If none of them are changed, it returns the passed
+properties. If none of them are changed, it returns the passed
 in node. Otherwise it constructs a new node with the changed
 children and properties.
 
@@ -5964,7 +6160,8 @@ Since: 4.22
 </parameter_description>
 </parameter>
 <parameter name="filter">
-<parameter_description> the font filter function
+<parameter_description>
+the font filter function
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -5973,7 +6170,7 @@ Since: 4.22
 </parameter>
 <parameter name="user_destroy">
 <parameter_description> destroy notify that will be called to release
-user_data
+the user data parameter
 </parameter_description>
 </parameter>
 </parameters>
@@ -5991,7 +6188,7 @@ It can either:
 
 * create a replacement node and return that
 
-* discard the node by returning %NULL
+* discard the node by returning `NULL`
 
 * call [method@Gsk.RenderReplay.default] to have the default handler
 run for this node, which calls your function on its children
@@ -6001,7 +6198,8 @@ Since: 4.22
 </description>
 <parameters>
 <parameter name="filter">
-<parameter_description> The function to call to replay nodes
+<parameter_description>
+the function to call to replay nodes
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -6010,7 +6208,7 @@ Since: 4.22
 </parameter>
 <parameter name="user_destroy">
 <parameter_description> destroy notify that will be called to release
-user_data
+the user data parameter
 </parameter_description>
 </parameter>
 </parameters>
@@ -6022,7 +6220,7 @@ user_data
 Sets the function to call for every node.
 
 This function is called before the node filter, so if it returns
-FALSE, the node filter will never be called.
+false, the node filter will never be called.
 
 Since: 4.22
 
@@ -6033,7 +6231,8 @@ Since: 4.22
 </parameter_description>
 </parameter>
 <parameter name="foreach">
-<parameter_description> the function to call for all nodes
+<parameter_description>
+the function to call for all nodes
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -6042,7 +6241,7 @@ Since: 4.22
 </parameter>
 <parameter name="user_destroy">
 <parameter_description> destroy notify that will be called to release
-user_data
+the user data parameter
 </parameter_description>
 </parameter>
 </parameters>
@@ -6066,7 +6265,8 @@ Since: 4.22
 </parameter_description>
 </parameter>
 <parameter name="filter">
-<parameter_description> the texture filter function
+<parameter_description>
+the texture filter function
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -6075,7 +6275,7 @@ Since: 4.22
 </parameter>
 <parameter name="user_destroy">
 <parameter_description> destroy notify that will be called to release
-user_data
+the user data parameter
 </parameter_description>
 </parameter>
 </parameters>
@@ -7385,6 +7585,10 @@ Creates a #GskRenderNode that will fill the outline generated by stroking
 the given @path using the attributes defined in @stroke.
 
 The area is filled with @child.
+
+GSK aims to follow the SVG semantics for stroking paths.
+E.g. zero-length contours will get round or square line
+caps drawn, regardless whether they are closed or not.
 
 Since: 4.14
 
