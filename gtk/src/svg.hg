@@ -169,25 +169,23 @@ class GTKMM_API Svg : public Glib::Object, public Gdk::Paintable, public Symboli
 
 protected:
   _CTOR_DEFAULT()
-  _WRAP_CTOR(Svg(const std::string& resource), gtk_svg_new_from_resource)
 
 public:
+  _WRAP_ENUM(Features, GtkSvgFeatures, decl_prefix GTKMM_API)
+
   /** Creates a new, empty SVG paintable.
    */
   _WRAP_CREATE()
 
-  /** Parses the SVG data in the resource and creates a paintable.
-   *
-   * @param resource The resource path.
-   */
-  _WRAP_CREATE(const std::string& resource)
-
-  // gtk_svg_new_from_bytes() does more than call g_object_new().
+  // gtk_svg_new_from_bytes() and gtk_svg_new_from_resource() do more than call g_object_new().
   _WRAP_METHOD(static Glib::RefPtr<Svg> create(const Glib::RefPtr<const Glib::Bytes>& bytes),
     gtk_svg_new_from_bytes)
+  _WRAP_METHOD(static Glib::RefPtr<Svg> create(const std::string& path),
+    gtk_svg_new_from_resource)
 
   _WRAP_METHOD(void load_from_bytes(const Glib::RefPtr<const Glib::Bytes>& bytes),
     gtk_svg_load_from_bytes)
+  _WRAP_METHOD(void load_from_resource(const std::string& path), gtk_svg_load_from_resource)
   _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> serialize() const, gtk_svg_serialize)
   _WRAP_METHOD(void write_to_file(const std::string& filename) const,
     gtk_svg_write_to_file, errthrow)
@@ -200,12 +198,15 @@ public:
     gtk_svg_set_frame_clock)
   _WRAP_METHOD(void play(), gtk_svg_play)
   _WRAP_METHOD(void pause(), gtk_svg_pause)
+  _WRAP_METHOD(void set_features(Features features), gtk_svg_set_features)
+  _WRAP_METHOD(Features get_features() const, gtk_svg_get_features)
 
 #m4 _CONVERSION(`GError*',`const SvgErrorExtra&',`SvgErrorExtra(g_error_copy($3))')
   // no_default_handler because GtkSvgClass is private.
   _WRAP_SIGNAL(void error(const SvgErrorExtra& error), "error", no_default_handler)
 
-  _IGNORE_PROPERTY("resource") dnl// write-only and construct-only
+  _WRAP_PROPERTY("resource", std::string)
+  _WRAP_PROPERTY("features", Features)
   _WRAP_PROPERTY("playing", bool)
   _WRAP_PROPERTY("weight", double)
   _WRAP_PROPERTY("state", unsigned int)

@@ -166,6 +166,7 @@ gtkmm_any_hg_ccg_basenames = [
   'passwordentry',
   'picture',
   'popover',
+  'popoverbin',
   'popovermenu',
   'popovermenubar',
   'printcontext',
