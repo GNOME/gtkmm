@@ -4,24 +4,25 @@
 # one is maintaining the NMake build files.
 
 # Create the build directories
-vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm	\
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo:
+$(OUTDIR)\gdkmm	\
+$(OUTDIR)\gtkmm	\
+$(OUTDIR)\gtkmm3-demo:
 	@-md $@
 
 # Generate .def files
-vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\gdkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm $(gdkmm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GDKMM_DLLNAME).dll vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
+$(OUTDIR)\gdkmm\gdkmm.def: $(GENDEF) $(OUTDIR)\gdkmm $(gdkmm_OBJS)
+	$(OUTDIR)\gendef.exe $@ $(GDKMM_DLLNAME).dll $(OUTDIR)\gdkmm\*.obj
 
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\gtkmm.def: $(GENDEF) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm $(gtkmm_OBJS)
-	vs$(VSVER)\$(CFG)\$(PLAT)\gendef.exe $@ $(GTKMM_DLLNAME).dll vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
+$(OUTDIR)\gtkmm\gtkmm.def: $(GENDEF) $(OUTDIR)\gtkmm $(gtkmm_OBJS)
+	$(OUTDIR)\gendef.exe $@ $(GTKMM_DLLNAME).dll $(OUTDIR)\gtkmm\*.obj
 
 # Generate wrap_init.cc files
-vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
+$(OUTDIR)\gdkmm\wrap_init.cc: $(gdkmm_real_hg)
 	@if not exist ..\gdk\gdkmm\wrap_init.cc $(PERL) -- "$(GMMPROC_DIR)/generate_wrap_init.pl" --namespace=Gdk --parent_dir=gdkmm $(gdkmm_real_hg:\=/)>$@
 
 # Avoid the dreaded U1095 command line error... @#$@#!
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
+$(OUTDIR)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
+	@if not exist $(@D)\ md $(@D)
 	@if exist $@ del $@
 	@echo @echo off>gen_$(@B).bat
 	@echo.>>gen_$(@B).bat
@@ -32,7 +33,7 @@ vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\wrap_init.cc: $(gtkmm_real_hg)
 	@del gen_$(@B).bat
 
 # Generate demo GResource source file
-vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm3-demo\demo_resources.c:	\
+$(OUTDIR)\gtkmm3-demo\demo_resources.c:	\
 $(gtkmm_demo_example_sources)	\
 $(gtkmm_demo_resources)	\
 ..\demos\gtk-demo\demo.gresource.xml
@@ -49,7 +50,7 @@ gdkmm\gdkmm.rc: ..\configure.ac
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GDKMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GDKMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GDKMM_MODULE_NAME\@/gdkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GDKMM_MODULE_NAME\@/gdkmm-$(GTKMM_API_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 gtkmm\gtkmm.rc: ..\configure.ac
@@ -61,7 +62,7 @@ gtkmm\gtkmm.rc: ..\configure.ac
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MINOR_VERSION\@/$(PKG_MINOR_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MICRO_VERSION\@/$(PKG_MICRO_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@PACKAGE_VERSION\@/$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION).$(PKG_MICRO_VERSION)/g" $@
-	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MODULE_NAME\@/gtkmm-$(GTKMM_MAJOR_VERSION).$(GTKMM_MINOR_VERSION)/g" $@
+	@if "$(DO_REAL_GEN)" == "1" $(PERL) -pi.bak -e "s/\@GTKMM_MODULE_NAME\@/gtkmm-$(GTKMM_API_VERSION)/g" $@
 	@if "$(DO_REAL_GEN)" == "1" del $@.bak
 
 # You may change GTKMM_DISABLE_DEPRECATED and GTKMM_STATIC_LIB if you know what you are doing
