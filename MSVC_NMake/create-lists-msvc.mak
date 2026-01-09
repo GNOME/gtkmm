@@ -40,10 +40,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gdkmm_OBJS]
 !endif
 
-!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gdkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gdkmm\%~nc.obj]
+!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gdkmm\%~nc.obj]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -63,10 +63,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gskmm_OBJS]
 !endif
 
-!if [for %c in ($(GSKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gskmm\%~nc.obj]
+!if [for %c in ($(GSKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gskmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gskmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gskmm\%~nc.obj]
+!if [for %c in ($(gskmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gskmm\%~nc.obj]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -85,13 +85,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_OBJS]
 !endif
 
-!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES:.cc=)) do @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES:.cc=)) do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm\gtkmm.res]
+!if [@call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\gtkmm.res]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -110,10 +110,10 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_demo_OBJS]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm4-demo\%~ns.obj]
+!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-demo\%~ns.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm4-demo\demo_resources.obj]
+!if [@call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-demo\demo_resources.obj]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -140,7 +140,7 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_tests]
 !endif
 
-!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^vs$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm3-test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-test-%d.exe]
 !endif
 
 !if [call create-lists.bat footer gtkmm.mak]
@@ -149,13 +149,13 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 !if [call create-lists.bat header gtkmm.mak gtkmm_tests & @(for /f %t in ('dir /ad /b ..\tests') do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer gtkmm.mak]
 !endif
 
-!if [for /f %t in ('dir /ad /b ..\tests') do @for %s in (..\tests\%t\*.cc) do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\gtkmm-tests\%t-%~ns.obj: %s>>gtkmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>gtkmm.mak & @echo.	^$(CXX) ^$(GTKMM_DEMO_CFLAGS) ^$(CFLAGS) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>gtkmm.mak & @echo.>>gtkmm.mak]
+!if [for /f %t in ('dir /ad /b ..\tests') do @for %s in (..\tests\%t\*.cc) do @echo ^$(OUTDIR)\gtkmm-tests\%t-%~ns.obj: %s>>gtkmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>gtkmm.mak & @echo.	^$(CXX) ^$(GTKMM_DEMO_CFLAGS) ^$(LIBGTKMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>gtkmm.mak & @echo.>>gtkmm.mak]
 !endif
 
 !if [for /f %t in ('dir /ad /b ..\tests\') do @call create-lists.bat header gtkmm.mak %t_OBJS & @(for %s in (..\tests\%t\*.cc) do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\%t-%~ns.obj) & @call create-lists.bat footer gtkmm.mak]
 !endif
+!if [for /f %t in ('dir /ad /b ..\tests') do @echo ^$(OUTDIR)\%t.exe: ^$(GTKMM_LIB) ^$(GDKMM_LIB) ^$(%t_OBJS)>>gtkmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(DEP_LDFLAGS) ^$(SIGC_LIB) /out:^$@>>gtkmm.mak & @echo.>>gtkmm.mak]
 
-!if [for /f %t in ('dir /ad /b ..\tests') do @echo vs^$(VSVER)\^$(CFG)\^$(PLAT)\%t.exe: ^$(GTKMM_LIB) ^$(GDKMM_LIB) ^$(%t_OBJS)>>gtkmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(GTKMM_DEMO_DEP_LIBS) ^$(LIBSIGC_LIB) /out:^$@>>gtkmm.mak & @echo.>>gtkmm.mak]
 !endif
 
 !include gtkmm.mak
