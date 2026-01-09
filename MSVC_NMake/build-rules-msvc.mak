@@ -13,90 +13,99 @@
 # 	$(CC)|$(CXX) $(cflags) /Fo$(destdir) /c @<<
 # $<
 # <<
-{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{$(OUTDIR)\gdkmm\}.cc{$(OUTDIR)\gdkmm\}.obj::
+	$(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(OUTDIR)\gdkmm\ /Fd$(OUTDIR)\gdkmm\ /c @<<
 $<
 <<
 
-{..\untracked\gdk\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{..\untracked\gdk\gdkmm\}.cc{$(OUTDIR)\gdkmm\}.obj::
+	@if not exist $(OUTDIR)\gdkmm\ md $(OUTDIR)\gdkmm
+	$(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(OUTDIR)\gdkmm\ /Fd$(OUTDIR)\gdkmm\ /c @<<
 $<
 <<
 
-{..\gdk\gdkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
-	$(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\ /c @<<
+{..\gdk\gdkmm\}.cc{$(OUTDIR)\gdkmm\}.obj::
+	@if not exist $(OUTDIR)\gdkmm\ md $(OUTDIR)\gdkmm
+	$(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(OUTDIR)\gdkmm\ /Fd$(OUTDIR)\gdkmm\ /c @<<
 $<
 <<
 
-{..\gdk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\}.obj:
+{..\gdk\src\}.ccg{$(OUTDIR)\gdkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
+	@if not exist gdkmm\gdkmmconfig.h $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gdk\gdkmm\%%~ns.cc if not exist ..\gdk\gdkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
-	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gdk\gdkmm\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
-	@if exist ..\untracked\gdk\gdkmm\$(<B).cc $(CXX) $(LIBGDKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gdk\gdkmm\$(<B).cc
+	@if exist $(@D)\$(<B).cc $(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gdk\gdkmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\gdk\gdkmm\$(<B).cc
+	@if exist ..\untracked\gdk\gdkmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGDKMM_CXXFLAGS) $(LIBGDKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gdk\gdkmm\$(<B).cc
 
-{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
-	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+{$(OUTDIR)\gskmm\}.cc{$(OUTDIR)\gskmm\}.obj::
+	$(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(OUTDIR)\gskmm\ /Fd$(OUTDIR)\gskmm\ /c @<<
 $<
 <<
 
-{..\untracked\gsk\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gskmm
-	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+{..\untracked\gsk\gskmm\}.cc{$(OUTDIR)\gskmm\}.obj::
+	@if not exist $(OUTDIR)\gskmm\ md $(OUTDIR)\gskmm
+	$(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(OUTDIR)\gskmm\ /Fd$(OUTDIR)\gskmm\ /c @<<
 $<
 <<
 
-{..\gsk\gskmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gskmm
-	$(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gskmm\ /c @<<
+{..\gsk\gskmm\}.cc{$(OUTDIR)\gskmm\}.obj::
+	@if not exist $(OUTDIR)\gskmm\ md $(OUTDIR)\gskmm
+	$(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(OUTDIR)\gskmm\ /Fd$(OUTDIR)\gskmm\ /c @<<
 $<
 <<
 
-{..\gsk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\}.obj:
+{..\gsk\src\}.ccg{$(OUTDIR)\gskmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
+	@if not exist gskmm\gskmmconfig.h $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gsk\gskmm\%%~ns.cc if not exist ..\gsk\gskmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
-	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gsk\gskmm\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gsk\gskmm\$(<B).cc
-	@if exist ..\untracked\gsk\gskmm\$(<B).cc $(CXX) $(LIBGSKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gsk\gskmm\$(<B).cc
+	@if exist $(@D)\$(<B).cc $(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gsk\gskmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\gsk\gskmm\$(<B).cc
+	@if exist ..\untracked\gsk\gskmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGSKMM_CXXFLAGS) $(LIBGSKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gsk\gskmm\$(<B).cc
 
-{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{$(OUTDIR)\gtkmm\}.cc{$(OUTDIR)\gtkmm\}.obj::
+	$(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(OUTDIR)\gtkmm\ /Fd$(OUTDIR)\gtkmm\ /c @<<
 $<
 <<
 
-{..\gtk\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{..\gtk\gtkmm\}.cc{$(OUTDIR)\gtkmm\}.obj::
+	@if not exist $(OUTDIR)\gtkmm\ md $(OUTDIR)\gtkmm
+	$(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(OUTDIR)\gtkmm\ /Fd$(OUTDIR)\gtkmm\ /c @<<
 $<
 <<
 
-{..\untracked\gtk\gtkmm\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
-	$(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\ /c @<<
+{..\untracked\gtk\gtkmm\}.cc{$(OUTDIR)\gtkmm\}.obj::
+	@if not exist $(OUTDIR)\gtkmm\ md $(OUTDIR)\gtkmm
+	$(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(OUTDIR)\gtkmm\ /Fd$(OUTDIR)\gtkmm\ /c @<<
 $<
 <<
 
-{..\gtk\src\}.ccg{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.obj:
+{..\gtk\src\}.ccg{$(OUTDIR)\gtkmm\}.obj:
 	@if not exist $(@D)\private\ md $(@D)\private
+	@if not exist gtkmm\gtkmmconfig.h $(MAKE) /f Makefile.vc CFG=$(CFG) prep-git-build
+	@if "$(UNIX_TOOLS_BINDIR_CHECKED)" == "" echo Warning: m4 is not in %PATH% or specified M4 or UNIX_TOOLS_BINDIR is not valid. Builds may fail!
+	@set PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)
 	@for %%s in ($(<D)\*.ccg) do @if not exist ..\untracked\gtk\gtkmm\%%~ns.cc if not exist ..\gtk\gtkmm\%%~ns.cc if not exist $(@D)\%%~ns.cc $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) --defs $(<D:\=/) %%~ns $(<D:\=/) $(@D)
-	@if exist $(@D)\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
-	@if exist ..\gtk\gtkmm\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
-	@if exist ..\untracked\gtk\gtkmm\$(<B).cc $(CXX) $(LIBGTKMM_CFLAGS) $(CFLAGS_NOGL) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gtk\gtkmm\$(<B).cc
+	@if exist $(@D)\$(<B).cc $(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c $(@D)\$(<B).cc
+	@if exist ..\gtk\gtkmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\gtk\gtkmm\$(<B).cc
+	@if exist ..\untracked\gtk\gtkmm\$(<B).cc $(CXX) $(CFLAGS) $(LIBGTKMM_CXXFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(@D)\ /Fd$(@D)\ /c ..\untracked\gtk\gtkmm\$(<B).cc
 
-{.\gtkmm\}.rc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\}.res:
+{.\gtkmm\}.rc{$(OUTDIR)\gtkmm\}.res:
 	@if not exist $(@D)\ md $(@D)
 	rc /fo$@ $<
 
-{..\demos\gtk-demo\}.cc{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.obj::
-	@if not exist vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ md vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo
-	$(CXX) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
+{..\demos\gtk-demo\}.cc{$(OUTDIR)\gtkmm4-demo\}.obj::
+	@if not exist $(OUTDIR)\gtkmm4-demo\ md $(OUTDIR)\gtkmm4-demo
+	$(CXX) $(GTKMM_DEMO_CFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(OUTDIR)\gtkmm4-demo\ /Fd$(OUTDIR)\gtkmm4-demo\ /c @<<
 $<
 <<
 
-{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.c{vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\}.obj::
-	$(CC) $(GTKMM_DEMO_CFLAGS) /Fovs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /Fdvs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\ /c @<<
+{$(OUTDIR)\gtkmm4-demo\}.c{$(OUTDIR)\gtkmm4-demo\}.obj::
+	$(CC) $(GTKMM_DEMO_CFLAGS) $(LIBGTKMM_INCLUDES) /Fo$(OUTDIR)\gtkmm4-demo\ /Fd$(OUTDIR)\gtkmm4-demo\ /c @<<
 $<
 <<
 
@@ -112,7 +121,7 @@ $(GTKMM_LIB): $(GTKMM_DLL)
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
 
 $(GTKMM_DLL): $(gdkmm_OBJS) $(gskmm_OBJS) $(gtkmm_OBJS)
-	link /DLL $(LDFLAGS_NOLTCG) $(GTKMM_DEP_LIBS) /implib:$(GTKMM_LIB) -out:$@ @<<
+	link /DLL $(LDFLAGS) $(DEP_LDFLAGS) /implib:$(GTKMM_LIB) -out:$@ @<<
 $(gdkmm_OBJS) $(gskmm_OBJS) $(gtkmm_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;2
@@ -125,45 +134,45 @@ $(gdkmm_OBJS) $(gskmm_OBJS) $(gtkmm_OBJS)
 # <<
 # 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
-$(GTKMM4_DEMO): $(GTKMM_LIB) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo $(gtkmm_demo_OBJS)
-	link $(GTKMM_DEMO_LDFLAGS) $(GTKMM_LIB) $(GTKMM_DEMO_DEP_LIBS) -out:$@ @<<
+$(GTKMM4_DEMO): $(GTKMM_LIB) $(OUTDIR)\gtkmm4-demo $(gtkmm_demo_OBJS)
+	link $(GTKMM_DEMO_LDFLAGS) $(GTKMM_LIB) $(DEP_LDFLAGS) -out:$@ @<<
 $(gtkmm_demo_OBJS)
 <<
 	@-if exist $@.manifest mt /manifest $@.manifest /outputresource:$@;1
 
 clean:
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exe
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.dll
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.ilk
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.exp
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\*.lib
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\demo_resources.c
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.res
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.cc
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\private\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.cc
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gskmm\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private\*.h
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.pdb
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.obj
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.cc
-	@-del /f /q vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\*.h
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm4-demo
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm\private
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm\private
-	@-rd vs$(VSVER)\$(CFG)\$(PLAT)\gdkmm
+	@-del /f /q $(OUTDIR)\*.exe
+	@-del /f /q $(OUTDIR)\*.dll
+	@-del /f /q $(OUTDIR)\*.pdb
+	@-del /f /q $(OUTDIR)\*.ilk
+	@-del /f /q $(OUTDIR)\*.exp
+	@-del /f /q $(OUTDIR)\*.lib
+	@-del /f /q $(OUTDIR)\gtkmm-tests\*.pdb
+	@-del /f /q $(OUTDIR)\gtkmm-tests\*.obj
+	@-del /f /q $(OUTDIR)\gtkmm4-demo\demo_resources.c
+	@-del /f /q $(OUTDIR)\gtkmm4-demo\*.pdb
+	@-del /f /q $(OUTDIR)\gtkmm4-demo\*.obj
+	@-del /f /q $(OUTDIR)\gtkmm\private\*.h
+	@-del /f /q $(OUTDIR)\gtkmm\*.res
+	@-del /f /q $(OUTDIR)\gtkmm\*.pdb
+	@-del /f /q $(OUTDIR)\gtkmm\*.obj
+	@-del /f /q $(OUTDIR)\gtkmm\*.cc
+	@-del /f /q $(OUTDIR)\gtkmm\*.h
+	@-del /f /q $(OUTDIR)\gskmm\private\*.h
+	@-del /f /q $(OUTDIR)\gskmm\*.pdb
+	@-del /f /q $(OUTDIR)\gskmm\*.obj
+	@-del /f /q $(OUTDIR)\gskmm\*.cc
+	@-del /f /q $(OUTDIR)\gskmm\*.h
+	@-del /f /q $(OUTDIR)\gdkmm\private\*.h
+	@-del /f /q $(OUTDIR)\gdkmm\*.pdb
+	@-del /f /q $(OUTDIR)\gdkmm\*.obj
+	@-del /f /q $(OUTDIR)\gdkmm\*.cc
+	@-del /f /q $(OUTDIR)\gdkmm\*.h
+	@-rd $(OUTDIR)\gtkmm-tests
+	@-rd $(OUTDIR)\gtkmm4-demo
+	@-rd $(OUTDIR)\gtkmm\private
+	@-rd $(OUTDIR)\gtkmm
+	@-rd $(OUTDIR)\gdkmm\private
+	@-rd $(OUTDIR)\gdkmm
 
 .SUFFIXES: .cc .h .ccg .hg .obj
