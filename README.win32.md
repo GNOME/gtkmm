@@ -101,22 +101,60 @@ program to appropriate locations under `$(PREFIX)`.
   * `clean`: Remove all the built files.  This includes the generated sources
 if building from a GIT checkout, as noted below.
 
-The NMake Makefiles now support building the gtkmm libraries directly from a GIT 
+There are also some options that are supported when building with NMake, use as needed:
+
+ * USE_COMPAT_LIBS: Set this to `1` to use the old `vc140` naming scheme. Use only if
+necessary or when rebuilding code using pangomm is inconvenient.
+ * BASE_INCLUDEDIR: Base directory where headers of needed libraries can be found,
+the default is `$(PREFIX)\include`; can be overridden with [DEP]_INCLUDEDIR as needed,
+as noted below. See [DEP]_INCLUDEDIR for more info.
+ * BASE_LIBDIR: Base directory where .lib's of needed libraries can be found as well as
+their architecture-dependent headers, the default is `$(PREFIX)\lib`; can be overridden
+with [DEP]_LIBDIR as needed, as noted below. See [DEP]_LIBDIR for more info.
+ * [DEP]_INCLUDEDIR: Base directory where headers of [DEP] may be found, default is
+`$(BASE_INCLUDEDIR)`; do not include the subdirectory of the headers here, i.e. use
+`GLIB_INCLUDEDIR=<some_dir>` where the GLib headers are under `<some_dir>\glib-2.0`,
+and so on. [DEP] includes GTK, GDK_PIXBUF, PANGO, PANGOMM, GLIB, GLIBMM, CAIRO, CAIROMM,
+HARFBUZZ, GRAPHENE, FONTCONFIG, FREETYPE, EPOXY and SIGC.
+(notice that HarfBuzz headers, and possibly FreeType/FontConfig headers are being
+included in the process). Use as needed.
+ * [DEP]_LIBDIR: Base directory where .lib's and architecture-dependent headers of [DEP]
+may be found, default is `$(BASE_LIBDIR)`; do not include the subdirectory where the
+architecture-dependent headers are, i.e. use `GLIB_LIBDIR=<some_dir>` where the GLib
+architecture-dependent headers (`glibconfig.h`) is located under `<some_dir>\glib-2.0\include`,
+and so on. [DEP] includes GTK, GDK_PIXBUF, PANGO, PANGOMM, GLIB, GLIBMM, CAIRO, CAIROMM,
+GRAPHENE, EPOXY and SIGC. Use as needed.
+* GMMPROC_DIR: Directory where glibmm's `gmmproc`/`generate_wrap_init.pl` m4/PERL scripts may
+be found, along with their auxiliary m4/PERL scripts, for building from a GIT checkout, default
+is `$(GLIBMM_LIBDIR)\glibmm-2.68\proc`. You need to ensure that `gmmproc`/`generate_wrap_init.pl`
+contain the correct paths that corresponds to your system.
+* GMMPROC_PANGO_DIR: Directory where the .m4 scripts from pangomm can be found, for building
+from a GIT checkout,, default is `$(PANGOMM_LIBDIR)\pangomm-2.48\proc`.
+* PERL, M4: Full paths to your PERL interpreter and the `m4` tool if they are not in `%PATH%`.
+PERL is needed for all builds; if building from a GIT checkout, the `XML::Parser` module (that
+depends on libexpat) is also required, and you are responsible for ensuring that `XML::Parser`
+does indeed load in your build env. `m4` is needed if building from GIT, and it is recommended
+that this `m4` is a part of your Cygwin or MSYS2/MSYS64 installation, as other UNIXy tools may
+be used. As an alternative to using `M4`, you may use `UNIX_TOOLS_BINDIR` to point to the `bin`
+directory of your Cygwin or MSYS2/MSYS64 installation so that `m4` and the other UNIXy tools can
+can be found as well.
+
+The NMake Makefiles now support building the pangomm libraries directly from a GIT 
 checkout with a few manual steps required, namely:
 
   * Ensure that you have a copy of Cygwin or MSYS/MSYS64 installed, including
 `m4.exe` and `sh.exe`.  You should also have a PERL for Windows installation
 as well, and your `%PATH%` should contain the paths to your PERL interpreter
-and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, it is 
-recommended that these paths are towards the end of your `%PATH%`. You need to 
-install the `XML::Parser` PERL module as well for your PERL installation, which 
+and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, or use `PERL`,
+`M4` and/or `UNIX_TOOLS_BINDIR` as noted above. If including these in `%PATH%`, it
+is recommended that these paths are towards the end of your `%PATH%`. You need to
+install the `XML::Parser` PERL module as well for your PERL installation, which
 requires libexpat.
 
   * You may wish to pass in the directory where gmmproc and generate_wrap_init.pl
-from glibmm is found, if they are not in `$(PREFIX)\share\glibmm-2.68\proc`, using 
-`GMMPROC_DIR=...` in the NMake commandline. If the `*.m4` files from pangomm are 
-not in `$(GMMPROC_DIR)\..\pangomm-2.48\proc\m4`, also pass in the directory where 
-pangomm's `*.m4` files can be located with `GMMPROC_PANGO_DIR=...`.
+from glibmm is found, if they are not in `$(GLIBMM_LIBDIR)\glibmm-2.68\proc`, using
+`GMMPROC_DIR=...` in the NMake commandline. You may also wish to pass in the directory
+where the .m4 files from pangomm are located, if not in `$(PANGOMM_LIBDIR)\pangomm-2.48\proc`
 
   * Make a new copy of the entire source tree to some location, where the build
 is to be done; then in `$(srcroot)\MSVC_NMake` run `nmake /f Makefile.vc CFG=[release|debug]`,
