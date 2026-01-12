@@ -60,6 +60,7 @@ OUTDIR = vs$(VSVER)\$(CFG)\$(PLAT)
 DEPS_MKFILE = deps-vs$(VSVER)-$(PLAT)-$(CFG).mak
 M4_PATH_MKFILE = find-m4-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
 UNIX_TOOLS_PATH_MKFILE = check-unix-tools-bindir-vs$(VSVER)-$(PLAT)-$(CFG).mak
+BUILD_MKFILE_SNIPPET = gtkmm-vs$(VSVER)-$(PLAT)-$(CFG).mak
 
 !if [for %t in (GTK PANGOMM GDK_PIXBUF PANGO GLIBMM CAIROMM SIGC CAIRO GRAPHENE HARFBUZZ FONTCONFIG FREETYPE GLIB EPOXY) do @(echo !ifndef %t_INCLUDEDIR>>$(DEPS_MKFILE) & echo %t_INCLUDEDIR=^$^(BASE_INCLUDEDIR^)>>$(DEPS_MKFILE) & echo !endif>>$(DEPS_MKFILE))]
 !endif

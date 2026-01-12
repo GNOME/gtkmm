@@ -37,128 +37,128 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 
 # For gdkmm
 
-!if [call create-lists.bat header gtkmm.mak gdkmm_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gdkmm_OBJS]
 !endif
 
-!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gdkmm\%~nc.obj]
+!if [for %c in ($(GDKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gdkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gdkmm\%~nc.obj]
+!if [for %c in ($(gdkmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gdkmm\%~nc.obj]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gdkmm_real_hg]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gdkmm_real_hg]
 !endif
 
-!if [for %c in ($(gdkmm_files_any_hg)) do @call create-lists.bat file gtkmm.mak ..\gdk\src\%c]
+!if [for %c in ($(gdkmm_files_any_hg)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ..\gdk\src\%c]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
 # gskmm
 
-!if [call create-lists.bat header gtkmm.mak gskmm_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gskmm_OBJS]
 !endif
 
-!if [for %c in ($(GSKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gskmm\%~nc.obj]
+!if [for %c in ($(GSKMM_INT_GENERATED_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gskmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(gskmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gskmm\%~nc.obj]
+!if [for %c in ($(gskmm_files_extra_cc)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gskmm\%~nc.obj]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gskmm_real_hg]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gskmm_real_hg]
 !endif
 
-!if [for %c in ($(gskmm_files_any_hg)) do @call create-lists.bat file gtkmm.mak ..\gsk\src\%c]
+!if [for %c in ($(gskmm_files_any_hg)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ..\gsk\src\%c]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
 # For gtkmm
-!if [call create-lists.bat header gtkmm.mak gtkmm_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_OBJS]
 !endif
 
-!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES:.cc=)) do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_GENERATED_SOURCES:.cc=)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm\%~nc.obj]
 !endif
 
-!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\%~nc.obj]
+!if [for %c in ($(GTKMM_INT_EXTRA_SOURCES)) do @if "%~xc" == ".cc" @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm\%~nc.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm\gtkmm.res]
+!if [@call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm\gtkmm.res]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gtkmm_real_hg]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_real_hg]
 !endif
 
-!if [for %c in ($(gtkmm_files_any_hg:.hg=)) do @call create-lists.bat file gtkmm.mak ..\gtk\src\%c.hg]
+!if [for %c in ($(gtkmm_files_any_hg:.hg=)) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ..\gtk\src\%c.hg]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
 # For gtkmm demos
-!if [call create-lists.bat header gtkmm.mak gtkmm_demo_OBJS]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_demo_OBJS]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-demo\%~ns.obj]
+!if [for %s in (..\demos\gtk-demo\*.cc) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm4-demo\%~ns.obj]
 !endif
 
-!if [@call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-demo\demo_resources.obj]
+!if [@call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm4-demo\demo_resources.obj]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gtkmm_demo_example_sources]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_demo_example_sources]
 !endif
 
-!if [for %s in (..\demos\gtk-demo\example_*.cc) do @call create-lists.bat file gtkmm.mak %s]
+!if [for %s in (..\demos\gtk-demo\example_*.cc) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) %s]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gtkmm_demo_resources]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_demo_resources]
 !endif
 
-!if [for %x in (gif jpg png webm ui glsl) do @for %s in (..\demos\gtk-demo\*.%x) do @call create-lists.bat file gtkmm.mak %s]
+!if [for %x in (gif jpg png webm ui glsl) do @for %s in (..\demos\gtk-demo\*.%x) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) %s]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gtkmm_tests]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_tests]
 !endif
 
-!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file gtkmm.mak ^$(OUTDIR)\gtkmm4-test-%d.exe]
+!if [for /f %d in ('dir /ad /b ..\tests\') do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) ^$(OUTDIR)\gtkmm4-test-%d.exe]
 !endif
 
-!if [call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [call create-lists.bat header gtkmm.mak gtkmm_tests & @(for /f %t in ('dir /ad /b ..\tests') do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer gtkmm.mak]
+!if [call create-lists.bat header $(BUILD_MKFILE_SNIPPET) gtkmm_tests & @(for /f %t in ('dir /ad /b ..\tests') do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs$(VSVER)\$(CFG)\$(PLAT)\%t.exe) & @call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for /f %t in ('dir /ad /b ..\tests') do @for %s in (..\tests\%t\*.cc) do @echo ^$(OUTDIR)\gtkmm-tests\%t-%~ns.obj: %s>>gtkmm.mak & @echo. if not exist ^$(@D)\ md ^$(@D)>>gtkmm.mak & @echo.	^$(CXX) ^$(GTKMM_DEMO_CFLAGS) ^$(LIBGTKMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>gtkmm.mak & @echo.>>gtkmm.mak]
+!if [for /f %t in ('dir /ad /b ..\tests') do @for %s in (..\tests\%t\*.cc) do @echo ^$(OUTDIR)\gtkmm-tests\%t-%~ns.obj: %s>>$(BUILD_MKFILE_SNIPPET) & @echo. if not exist ^$(@D)\ md ^$(@D)>>$(BUILD_MKFILE_SNIPPET) & @echo.	^$(CXX) ^$(GTKMM_DEMO_CFLAGS) ^$(LIBGTKMM_INCLUDES) /Fo^$(@D)\%t-%~ns.obj /Fd^$(@D)\ ^$** /c>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 !endif
 
-!if [for /f %t in ('dir /ad /b ..\tests\') do @call create-lists.bat header gtkmm.mak %t_OBJS & @(for %s in (..\tests\%t\*.cc) do @call create-lists.bat file gtkmm.mak vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\%t-%~ns.obj) & @call create-lists.bat footer gtkmm.mak]
+!if [for /f %t in ('dir /ad /b ..\tests\') do @call create-lists.bat header $(BUILD_MKFILE_SNIPPET) %t_OBJS & @(for %s in (..\tests\%t\*.cc) do @call create-lists.bat file $(BUILD_MKFILE_SNIPPET) vs$(VSVER)\$(CFG)\$(PLAT)\gtkmm-tests\%t-%~ns.obj) & @call create-lists.bat footer $(BUILD_MKFILE_SNIPPET)]
 !endif
-!if [for /f %t in ('dir /ad /b ..\tests') do @echo ^$(OUTDIR)\%t.exe: ^$(GTKMM_LIB) ^$(GDKMM_LIB) ^$(%t_OBJS)>>gtkmm.mak & @echo.	link ^$(LDFLAGS) ^$** ^$(DEP_LDFLAGS) ^$(SIGC_LIB) /out:^$@>>gtkmm.mak & @echo.>>gtkmm.mak]
+!if [for /f %t in ('dir /ad /b ..\tests') do @echo ^$(OUTDIR)\%t.exe: ^$(GTKMM_LIB) ^$(GDKMM_LIB) ^$(%t_OBJS)>>$(BUILD_MKFILE_SNIPPET) & @echo.	link ^$(LDFLAGS) ^$** ^$(DEP_LDFLAGS) ^$(SIGC_LIB) /out:^$@>>$(BUILD_MKFILE_SNIPPET) & @echo.>>$(BUILD_MKFILE_SNIPPET)]
 
 !endif
 
-!include gtkmm.mak
+!include $(BUILD_MKFILE_SNIPPET)
 
-!if [del /f /q gtkmm.mak]
+!if [del /f /q $(BUILD_MKFILE_SNIPPET)]
 !endif
