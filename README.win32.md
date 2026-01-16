@@ -2,7 +2,7 @@ Building gtkmm on Win32
 =
 
 Currently, both the mingw (native win32) gcc compiler and MS Visual
-Studio 2013 and later are supported. gtkmm can be built with
+Studio 2015 and later are supported. gtkmm can be built with
 mingw32-gcc using the gnu autotools (automake, autoconf, libtool) or
 Meson.  A `C++11`-compliant compiler is required; notice that in order
 to build the gtkmm demo program with Visual Studio, 2015 or later is
@@ -56,14 +56,7 @@ The standard Meson build instructions for *NIX should work, although it
 is untested at the time of writing.  Please see `README.md` for more details.
 
 
-### MS Visual Studio 2013 or later
-
-Note that it is generally not considered safe to link gdkmm/gtkmm built with
-Visual Studio 2013 with items that are built with Visual Studio 2015 and
-later, and packages depending on gdkmm/gtkmm can require Visual Studio 2015 or
-later due to the more comprehensive `C++11` support in the later Visual Studio
-versions. Note also that the gtkmm demo program won't be built with Visual Studio
-2013.
+### MS Visual Studio 2015 or later
 
 #### Building using NMake
 In a Visual Studio command prompt, navigate to the `MSVC_NMake` directory.
@@ -71,31 +64,31 @@ Run `nmake /f Makefile.vc CFG=[release|debug]` to build the gdkmm/gtkmm DLL with
 the gtkmm demo program. If a prefix other than
 `$(srcroot)\..\vs$(VSVER)\$(Platform)` is desired, pass in `PREFIX=$(your_prefix)`
 in the NMake command line.  In order to build the gtkmm demo program, the
-`glib-compile-resources` tool needs to reside in `$(PREFIX)\bin`, or it must be
-specified via passing in `GLIB_COMPILE_RESOURCES=...`  in the NMake command line.
-If building with Visual Studio 2013, note that the gtkmm demo program will not be
-built.
+`glib-compile-resources` tool needs to reside in `$(PREFIX)\bin` or `$(GLIB_BINDIR)`
+or `$(BASE_TOOLS_DIR)`, or it must be specified via passing in
+`GLIB_COMPILE_RESOURCES=...`  in the NMake command line.
 
 If using C++ dependencies that are built with Meson, specify `USE_MESON_LIBS=1`
 in your NMake command line.
 
 The following list lists the `$(VSVER)` and the `vc1xx` in the NMake-built DLL
 and .lib that corresponds to the Visual Studio version used
-(Visual Studio versions at or before 2012 are not supported):
-  * 2013: `12`, `g[d|t]kmm-vc120-3_0.[dll|pdb|lib]`
+(Visual Studio versions at or before 2013 are not supported):
   * 2015: `14`, `g[d|t]kmm-vc140-3_0.[dll|pdb|lib]`
   * 2017: `15`, `g[d|t]kmm-vc141-3_0.[dll|pdb|lib]`
   * 2019: `16`, `g[d|t]kmm-vc142-3_0.[dll|pdb|lib]`
   * 2022: `17`: `g[d|t]kmm-vc143-3_0.[dll|pdb|lib]`
+  * 2026: `18`: `g[d|t]kmm-vc145-3_0.[dll|pdb|lib]`
 
 For Meson, the DLL/PDB filenames and .lib filenames will be like:
-  * 2013: `g[d|t]kmm-vc120-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc120-3.0.lib`
   * 2015: `g[d|t]kmm-vc140-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc140-3.0.lib`
   * 2017: `g[d|t]kmm-vc141-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc141-3.0.lib`
   * 2019: `g[d|t]kmm-vc142-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc142-3.0.lib`
   * 2022: `g[d|t]kmm-vc143-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc143-3.0.lib`
+  * 2026: `g[d|t]kmm-vc145-3.0-1.[dll|pdb]`, `g[d|t]kmm-vc145-3.0.lib`
 
-Notice that this is no longer always the `vc$(VSVER)0` that was used before, to be consistent with other common C++ libraries such as Boost.
+Notice that this is no longer always the `vc$(VSVER)0` that was used before, to be
+consistent with other common C++ libraries such as Boost.
 Earlier gtkmm versions may still use the former `vc$(VSVER)0` naming scheme, so for 
 situations like where rebuilding code using gtkmm became
 inconvenient, a `USE_COMPAT_LIBS=1` NMake option is provided to use the older naming scheme.
@@ -114,25 +107,63 @@ program to appropriate locations under `$(PREFIX)`.
   * `clean`: Remove all the built files.  This includes the generated sources
 if building from a GIT checkout, as noted below.
 
-The NMake Makefiles now support building the gtkmm libraries directly from a GIT 
+There are also some options that are supported when building with NMake, use as needed:
+
+ * USE_COMPAT_LIBS: Set this to `1` to use the old `vc140` naming scheme. Use only if
+necessary or when rebuilding code using pangomm is inconvenient.
+ * BASE_INCLUDEDIR: Base directory where headers of needed libraries can be found,
+the default is `$(PREFIX)\include`; can be overridden with [DEP]_INCLUDEDIR as needed,
+as noted below. See [DEP]_INCLUDEDIR for more info.
+ * BASE_LIBDIR: Base directory where .lib's of needed libraries can be found as well as
+their architecture-dependent headers, the default is `$(PREFIX)\lib`; can be overridden
+with [DEP]_LIBDIR as needed, as noted below. See [DEP]_LIBDIR for more info.
+ * [DEP]_INCLUDEDIR: Base directory where headers of [DEP] may be found, default is
+`$(BASE_INCLUDEDIR)`; do not include the subdirectory of the headers here, i.e. use
+`GLIB_INCLUDEDIR=<some_dir>` where the GLib headers are under `<some_dir>\glib-2.0`,
+and so on. [DEP] includes GTK, GDK_PIXBUF, PANGO, PANGOMM, ATK, ATKMM, GLIB, GLIBMM,
+CAIRO, CAIROMM, HARFBUZZ, FONTCONFIG, FREETYPE, EPOXY and SIGC.
+(notice that HarfBuzz headers, and possibly FreeType and FontConfig headers are being included
+in the process). Use as needed.
+ * [DEP]_LIBDIR: Base directory where .lib's and architecture-dependent headers of [DEP]
+may be found, default is `$(BASE_LIBDIR)`; do not include the subdirectory where the
+architecture-dependent headers are, i.e. use `GLIB_LIBDIR=<some_dir>` where the GLib
+architecture-dependent headers (`glibconfig.h`) is located under `<some_dir>\glib-2.0\include`,
+and so on. [DEP] includes GTK, GDK_PIXBUF, PANGO, PANGOMM, ATK, ATKMM, GLIB, GLIBMM, CAIRO,
+CAIROMM, EPOXY and SIGC. Use as needed.
+* GMMPROC_DIR: Directory where glibmm's `gmmproc`/`generate_wrap_init.pl` m4/PERL scripts may
+be found, along with their auxiliary m4/PERL scripts, for building from a GIT checkout, default
+is `$(GLIBMM_LIBDIR)\glibmm-2.4\proc`. You need to ensure that `gmmproc`/`generate_wrap_init.pl`
+contain the correct paths that correspond to your system.
+* GMMPROC_PANGO_DIR: Directory where the .m4 scripts from pangomm can be found, for building
+from a GIT checkout, default is `$(PANGOMM_LIBDIR)\pangomm-1.4\proc`.
+* GMMPROC_ATK_DIR: Directory where the .m4 scripts from atkmm can be found, for building
+from a GIT checkout, default is `$(ATKMM_LIBDIR)\atkmm-1.6\proc`.
+* PERL, M4: Full paths to your PERL interpreter and the `m4` tool if they are not in `%PATH%`.
+PERL is needed for all builds; if building from a GIT checkout, the `XML::Parser` module (that
+depends on libexpat) is also required, and you are responsible for ensuring that `XML::Parser`
+does indeed load in your build env. `m4` is needed if building from GIT, and it is recommended
+that this `m4` is a part of your Cygwin or MSYS2/MSYS64 installation, as other UNIXy tools may
+be used. As an alternative to using `M4`, you may use `UNIX_TOOLS_BINDIR` to point to the `bin`
+directory of your Cygwin or MSYS2/MSYS64 installation so that `m4` and the other UNIXy tools can
+can be found as well.
+
+The NMake Makefiles now support building the pangomm libraries directly from a GIT 
 checkout with a few manual steps required, namely:
 
   * Ensure that you have a copy of Cygwin or MSYS/MSYS64 installed, including
 `m4.exe` and `sh.exe`.  You should also have a PERL for Windows installation
 as well, and your `%PATH%` should contain the paths to your PERL interpreter
-and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, it is 
-recommended that these paths are towards the end of your `%PATH%`. You need to 
-install the `XML::Parser` PERL module as well for your PERL installation, which 
+and the bin\ directory of your Cygwin or MSYS/MSYS64 installation, or use `PERL`,
+`M4` and/or `UNIX_TOOLS_BINDIR` as noted above. If including these in `%PATH%`, it
+is recommended that these paths are towards the end of your `%PATH%`. You need to
+install the `XML::Parser` PERL module as well for your PERL installation, which
 requires libexpat.
 
   * You may wish to pass in the directory where gmmproc and generate_wrap_init.pl
-from glibmm is found, if they are not in `$(PREFIX)\share\glibmm-2.4\proc`, using
-`GMMPROC_DIR=...` in the NMake commandline. If the `*.m4` files from pangomm are
-not in `$(GMMPROC_DIR)\..\pangomm-1.4\proc\m4`, also pass in the directory where
-pangomm's `*.m4` files can be located with `GMMPROC_PANGO_DIR=...`.  Likewise, if
-the `*.m4` files from atkmm are not in `$(GMMPROC_DIR)\..\atkmm-1.6\proc\m4`,
-also pass in the directory where atkmm's `*.m4` files can be located with
-`GMMPROC_ATK_DIR=...`.
+from glibmm is found, if they are not in `$(GLIBMM_LIBDIR)\glibmm-2.4\proc`, using
+`GMMPROC_DIR=...` in the NMake commandline. You may also wish to pass in the directory
+where the .m4 files from pangomm and atkmm are located, if not in
+`$(PANGOMM_LIBDIR)\pangomm-1.4\proc` and `$(ATKMM_LIBDIR)\atkmm-1.6\proc` respectively.
 
   * Make a new copy of the entire source tree to some location, where the build
 is to be done; then in `$(srcroot)\MSVC_NMake` run `nmake /f Makefile.vc CFG=[release|debug]`,
@@ -155,8 +186,7 @@ also required.
 
 #### Building Using Meson
 
-Note that one may not be able to fully build with Meson with Visual Studio 2013,
-as the gtkmm demo program requires Visual Studio 2015 or later.
+Visual Studio 2015 or later is required to build gtkmm.
 
 For building with Meson, please see `README.md` for further instructions. Please 
 note that using `-Ddefault_library=[static|both]` for Visual Studio builds is not 
