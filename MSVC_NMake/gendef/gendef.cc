@@ -84,7 +84,8 @@ int main(int argc,char** argv)
 			   */
 			  if (_stricmp(s, "__local_stdio_printf_options") != 0 &&
 			      _stricmp(s, "_vsnprintf_l") != 0 &&
-			      _stricmp(s, "_vsprintf_l") != 0) {
+			      _stricmp(s, "_vsprintf_l") != 0 &&
+			      _stricmp(s, "_Avx2WmemEnabledWeakValue") != 0) {
 #endif
 				if(strchr(s,'?')==0 && s[0]=='_' && strchr(s,'@') == 0 )//this is a C export type: _fct -> fct
 				    def_file << "    " << (s+1) << endl;
