@@ -137,6 +137,8 @@ MM_ARG_WITH_TAGFILE_DOC([atkmm-1.6.tag], [atkmm-1.6])
 # resource files in demo programs.
 AC_SUBST(GLIB_COMPILE_RESOURCES, [`$PKG_CONFIG --variable=glib_compile_resources gio-2.0`])
 AC_SUBST([MSVC_TOOLSET_VER], [''])
+AC_SUBST(DOXYGEN_HAVE_DOT, [YES])
+AM_SUBST_NOTMAKE(DOXYGEN_HAVE_DOT)
 AC_PROG_CC
 
 AC_LANG([C++])
