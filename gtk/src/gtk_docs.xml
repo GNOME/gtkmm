@@ -352,6 +352,24 @@ Since: 4.22
 </return>
 </signal>
 
+<signal name="GtkAccessibleIface::get_accessible_id">
+<description>
+Retrieves the accessible identifier for the accessible object.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an accessible object
+</parameter_description>
+</parameter>
+</parameters>
+<return> the accessible identifier
+
+</return>
+</signal>
+
 <signal name="GtkAccessibleInterface::get_accessible_parent">
 <description>
 Retrieves the accessible parent of an accessible object.
@@ -2217,110 +2235,6 @@ to delay the end of the session until state has been saved.
 <return></return>
 </signal>
 
-<signal name="GtkApplication::restore-state">
-<description>
-Emitted when application global state is restored.
-
-The handler for this signal should do the opposite of what the
-corresponding handler for [signal@Gtk.Application::save-state]
-does.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the `GtkApplication` which emitted the signal
-</parameter_description>
-</parameter>
-<parameter name="reason">
-<parameter_description> the reason for restoring state
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description> an &quot;a{sv}&quot; `GVariant` with state to restore
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
-
-<signal name="GtkApplication::restore-window">
-<description>
-Emitted when an application's per-window state is restored.
-
-In response to this signal, you should create a new application
-window, add it to @application, apply the provided @state, and present it.
-The application can use the @reason to determine how much of the state
-should be restored.
-
-You must be careful to be robust in the face of app upgrades and downgrades:
-the @state might have been created by a previous or occasionally even a future
-version of your app. Do not assume that a given key exists in the state.
-Apps must try to restore state saved by a previous version, but are free to
-discard state if it was written by a future version.
-
-GTK will remember which window the user was using most recently, and will
-emit this signal for that window first. Thus, if you decide that the provided
-@reason means that only one window should be restored, you can reliably
-ignore emissions if a window already exists
-
-Note that this signal is not emitted only during the app's initial launch.
-If all windows are closed but the app keeps running, the signal will be
-emitted the next time a new window is opened.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the `GtkApplication` which emitted the signal
-</parameter_description>
-</parameter>
-<parameter name="reason">
-<parameter_description> the reason this window is restored
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description> an &quot;a{sv}&quot; `GVariant` with state to restore, as saved by a [signal@Gtk.ApplicationWindow::save-state] handler
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkApplication::save-state">
-<description>
-Emitted when the application is saving global state.
-
-The handler for this signal should persist any
-global state of @application into @dict.
-
-See [signal@Gtk.Application::restore-state] for how to
-restore global state, and [signal@Gtk.ApplicationWindow::save-state]
-and [signal@Gtk.Application::restore-window] for handling
-per-window state.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> the `GtkApplication` which emitted the signal
-</parameter_description>
-</parameter>
-<parameter name="dict">
-<parameter_description> a `GVariantDict`
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
-
 <signal name="GtkApplication::window-added">
 <description>
 Emitted when a window is added to an application.
@@ -2369,16 +2283,6 @@ The currently focused window of the application.
 </description>
 </property>
 
-<property name="GtkApplication:autosave-interval">
-<description>
-The number of seconds between automatic state saves. Defaults to 15.
-A value of 0 will opt out of automatic state saving.
-
-Since: 4.22
-
-</description>
-</property>
-
 <property name="GtkApplication:menubar">
 <description>
 The menu model to be used for the application's menu bar.
@@ -2410,77 +2314,6 @@ Linux.
 </description>
 </property>
 
-<property name="GtkApplication:support-save">
-<description>
-Set this property to true if the application supports
-state saving and restoring.
-
-Since: 4.22
-
-</description>
-</property>
-
-<signal name="GtkApplicationClass::restore_state">
-<description>
-Class closure for the [signal@Application::restore-state] signal.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="reason">
-<parameter_description> the reason for restoring state
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description> a dictionary containing the application state to restore
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
-
-<signal name="GtkApplicationClass::restore_window">
-<description>
-Class closure for the [signal@Application::restore-window] signal.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="reason">
-<parameter_description> the reason this window is restored
-</parameter_description>
-</parameter>
-<parameter name="state">
-<parameter_description> the state to restore, as saved by a
-[signal@Gtk.ApplicationWindow::save-state] handler
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</signal>
-
-<signal name="GtkApplicationClass::save_state">
-<description>
-Class closure for the [signal@Application::save-state] signal.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="state">
-<parameter_description> a dictionary where to store the application's state
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
-
 <enum name="GtkApplicationInhibitFlags">
 <description>
 Types of user actions that may be blocked by `GtkApplication`.
@@ -2511,41 +2344,6 @@ marked as idle (and possibly locked)
 </parameters>
 </enum>
 
-<signal name="GtkApplicationWindow::save-state">
-<description>
-The handler for this signal should persist any
-application-specific state of @window into @dict.
-
-Note that window management state such as maximized,
-fullscreen, or window size should not be saved as
-part of this, they are handled by GTK.
-
-You must be careful to be robust in the face of app upgrades and downgrades:
-the @state might have been created by a previous or occasionally even a future
-version of your app. Do not assume that a given key exists in the state.
-Apps must try to restore state saved by a previous version, but are free to
-discard state if it was written by a future version.
-
-See [signal@Gtk.Application::restore-window].
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="window">
-<parameter_description> the window on which the signal is emitted
-</parameter_description>
-</parameter>
-<parameter name="dict">
-<parameter_description> a dictionary of type `a{sv}`
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
-
 <property name="GtkApplicationWindow:show-menubar">
 <description>
 If this property is true, the window will display a menubar
@@ -2558,24 +2356,6 @@ of whether the desktop shell is showing it or not.
 
 </description>
 </property>
-
-<signal name="GtkApplicationWindowClass::save_state">
-<description>
-Class closure for the [signal@ApplicationWindow::save-state] signal.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="dict">
-<parameter_description> a dictionary where to store the window's state
-</parameter_description>
-</parameter>
-</parameters>
-<return> true to stop stop further handlers from running
-
-</return>
-</signal>
 
 <enum name="GtkArrowType">
 <description>
@@ -17098,35 +16878,6 @@ or if the dialog gets programmatically hidden or destroyed
 </parameters>
 </enum>
 
-<enum name="GtkRestoreReason">
-<description>
-Enumerates possible reasons for an application to restore saved state.
-
-See [signal@Gtk.Application::restore-state].
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="GTK_RESTORE_REASON_PRISTINE">
-<parameter_description> Don't restore anything
-</parameter_description>
-</parameter>
-<parameter name="GTK_RESTORE_REASON_LAUNCH">
-<parameter_description> This is normal launch. Restore as little as is reasonable
-</parameter_description>
-</parameter>
-<parameter name="GTK_RESTORE_REASON_RECOVER">
-<parameter_description> The application has crashed before. Try to restore the previous state
-</parameter_description>
-</parameter>
-<parameter name="GTK_RESTORE_REASON_RESTORE">
-<parameter_description> This is a session restore. Restore the previous state as far as possible
-</parameter_description>
-</parameter>
-</parameters>
-</enum>
-
 <property name="GtkRevealer:child">
 <description>
 The child widget.
@@ -20513,6 +20264,11 @@ Since: 4.22
 
 </description>
 <parameters>
+<parameter name="GTK_SVG_ERROR_INVALID_SYNTAX">
+<parameter_description> The XML syntax is broken
+in some way
+</parameter_description>
+</parameter>
 <parameter name="GTK_SVG_ERROR_INVALID_ELEMENT">
 <parameter_description> An XML element is invalid
 (either because it is not part of SVG, or because it is
@@ -20520,7 +20276,7 @@ in the wrong place, or because it not implemented in GTK)
 </parameter_description>
 </parameter>
 <parameter name="GTK_SVG_ERROR_INVALID_ATTRIBUTE">
-<parameter_description> An XML attribute is invalid
+<parameter_description> An attribute is invalid
 (either because it is not part of SVG, or because it is
 not implemented in GTK, or its value is problematic)
 </parameter_description>
@@ -26148,6 +25904,30 @@ Since: 4.14
 <return></return>
 </function>
 
+<function name="gtk_accessible_get_accessible_id">
+<description>
+Retrieves the accessible identifier for the accessible object.
+
+This functionality can be overridden by `GtkAccessible`
+implementations.
+
+It is left to the accessible implementation to define the scope
+and uniqueness of the identifier.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an accessible object
+</parameter_description>
+</parameter>
+</parameters>
+<return> the accessible identifier
+
+</return>
+</function>
+
 <function name="gtk_accessible_get_accessible_parent">
 <description>
 Retrieves the accessible parent for an accessible object.
@@ -28764,26 +28544,6 @@ GTK will keep the application running as long as it has any windows.
 <return></return>
 </function>
 
-<function name="gtk_application_forget">
-<description>
-Forget state that has been previously saved and prevent
-further automatic state saving.
-
-In order to reenable state saving, call
-[method@Gtk.Application.save].
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> a `GtkApplication`
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_application_get_accels_for_action">
 <description>
 Gets the accelerators that are currently associated with
@@ -29082,28 +28842,6 @@ function, if the window was the last window of the application.
 </parameter>
 <parameter name="window">
 <parameter_description> a window
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_application_save">
-<description>
-Saves the state of application.
-
-See [method@Gtk.Application.forget] for a way to forget the state.
-
-If [property@Gtk.Application:register-session] is set, `GtkApplication`
-calls this function automatically when the application is closed or
-the session ends.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="application">
-<parameter_description> a `GtkApplication`
 </parameter_description>
 </parameter>
 </parameters>
@@ -48220,8 +47958,6 @@ The value that `self` evaluates to is set via `g_object_set()` on
 the object's property stays synchronized with `self`.
 
 If `self`'s evaluation fails, `target`'s `property` is not updated.
-You can ensure that this doesn't happen by using a fallback
-expression.
 
 Note that this function takes ownership of `self`. If you want
 to keep it around, you should [method@Gtk.Expression.ref] it beforehand.
@@ -108192,7 +107928,7 @@ bindings which cannot easily make use of the GObject structure offsets.
 </parameter_description>
 </parameter>
 <parameter name="widget_type">
-<parameter_description> The `GType` to get a template child for
+<parameter_description> The type of the widget class that defines the child in the template
 </parameter_description>
 </parameter>
 <parameter name="name">
