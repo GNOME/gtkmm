@@ -1,6 +1,7 @@
 #ifndef _GTKMM_STOCKID_H
 #define _GTKMM_STOCKID_H
 
+#include <gtkmmconfig.h>
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
 
 /* stockid.h

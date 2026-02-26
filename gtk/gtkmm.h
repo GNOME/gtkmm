@@ -102,9 +102,13 @@ extern const int gtkmm_micro_version;
 
 #include <gdkmm.h>
 
+#include <gtkmmconfig.h>
+
+#ifndef GTKMM_DISABLE_DEPRECATED
 //Include these first so they can do some undef/re-def magic for StockID.
-#include <gtkmm/toggleaction.h>
-#include <gtkmm/radioaction.h>
+# include <gtkmm/toggleaction.h>
+# include <gtkmm/radioaction.h>
+#endif
 
 #include <gtkmm/object.h>
 #include <gtkmm/aboutdialog.h>
@@ -114,13 +118,17 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/actionable.h>
 #include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>
-#include <gtkmm/alignment.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/alignment.h>
+#endif
 #include <gtkmm/appchooserbutton.h>
 #include <gtkmm/appchooserdialog.h>
 #include <gtkmm/appchooserwidget.h>
 #include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
-#include <gtkmm/arrow.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/arrow.h>
+#endif
 #include <gtkmm/aspectframe.h>
 #include <gtkmm/assistant.h>
 #include <gtkmm/base.h>
@@ -148,7 +156,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/colorbutton.h>
 #include <gtkmm/colorchooser.h>
 #include <gtkmm/colorchooserdialog.h>
-#include <gtkmm/colorselection.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/colorselection.h>
+#endif
 #include <gtkmm/combobox.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/container.h>
@@ -175,7 +185,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/fontchooser.h>
 #include <gtkmm/fontchooserdialog.h>
 #include <gtkmm/fontchooserwidget.h>
-#include <gtkmm/fontselection.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/fontselection.h>
+#endif
 #include <gtkmm/frame.h>
 #include <gtkmm/gesture.h>
 #include <gtkmm/gesturedrag.h>
@@ -188,21 +200,27 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gesturezoom.h>
 #include <gtkmm/glarea.h>
 #include <gtkmm/grid.h>
-#include <gtkmm/handlebox.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/handlebox.h>
+#endif
 #include <gtkmm/headerbar.h>
 #include <gtkmm/hvbox.h>
-#include <gtkmm/hvbuttonbox.h>
-#include <gtkmm/hvpaned.h>
-#include <gtkmm/hvscale.h>
-#include <gtkmm/hvscrollbar.h>
-#include <gtkmm/hvseparator.h>
-#include <gtkmm/iconset.h>
-#include <gtkmm/iconfactory.h>
-#include <gtkmm/iconsource.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/hvbuttonbox.h>
+# include <gtkmm/hvpaned.h>
+# include <gtkmm/hvscale.h>
+# include <gtkmm/hvscrollbar.h>
+# include <gtkmm/hvseparator.h>
+# include <gtkmm/iconfactory.h>
+# include <gtkmm/iconset.h>
+# include <gtkmm/iconsource.h>
+#endif
 #include <gtkmm/icontheme.h>
 #include <gtkmm/iconview.h>
 #include <gtkmm/image.h>
-#include <gtkmm/imagemenuitem.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/imagemenuitem.h>
+#endif
 #include <gtkmm/infobar.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/invisible.h>
@@ -224,7 +242,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/misc.h>
 #include <gtkmm/modelbutton.h>
 #include <gtkmm/notebook.h>
-#include <gtkmm/numerableicon.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/numerableicon.h>
+#endif
 #include <gtkmm/object.h>
 #include <gtkmm/offscreenwindow.h>
 #include <gtkmm/overlay.h>
@@ -253,7 +273,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/range.h>
-#include <gtkmm/recentaction.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/recentaction.h>
+#endif
 #include <gtkmm/recentchooser.h>
 #include <gtkmm/recentchooserdialog.h>
 #include <gtkmm/recentchoosermenu.h>
@@ -284,14 +306,18 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stacksidebar.h>
 #include <gtkmm/stackswitcher.h>
 #include <gtkmm/statusbar.h>
-#include <gtkmm/statusicon.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/stockitem.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/statusicon.h>
+# include <gtkmm/stock.h>
+# include <gtkmm/stockitem.h>
+#endif
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/styleproperty.h>
 #include <gtkmm/switch.h>
-#include <gtkmm/table.h>
-#include <gtkmm/tearoffmenuitem.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/table.h>
+# include <gtkmm/tearoffmenuitem.h>
+#endif
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textchildanchor.h>
 #include <gtkmm/textiter.h>
@@ -316,12 +342,16 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeviewcolumn.h>
-#include <gtkmm/uimanager.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/uimanager.h>
+#endif
 #include <gtkmm/viewport.h>
 #include <gtkmm/volumebutton.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpath.h>
 #include <gtkmm/window.h>
-#include <gtkmm/stockid.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/stockid.h>
+#endif
 
 #endif /* #ifndef GTKMM_H */

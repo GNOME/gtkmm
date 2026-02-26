@@ -1,6 +1,7 @@
 #undef GTK_DISABLE_DEPRECATED
 #define GDK_DISABLE_DEPRECATION_WARNINGS 1
 
+#include <gtkmmconfig.h>
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
 
 /* Copyright (C) 2002 The gtkmm Development Team

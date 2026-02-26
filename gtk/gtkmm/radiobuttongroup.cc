@@ -21,7 +21,9 @@
 
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/radiomenuitem.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
 #include <gtkmm/radioaction.h>
+#endif
 #include <gtkmm/radiotoolbutton.h>
 #include <gtk/gtk.h>
 

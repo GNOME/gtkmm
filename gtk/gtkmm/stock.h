@@ -1,6 +1,7 @@
 #ifndef _GTKMM_STOCK_H
 #define _GTKMM_STOCK_H
 
+#include <gtkmmconfig.h>
 #ifndef GTKMM_DISABLE_DEPRECATED // This whole file is deprecated.
 
 /* Copyright (C) 2002 The gtkmm Development Team

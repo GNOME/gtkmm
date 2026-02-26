@@ -18,7 +18,9 @@
 #define _GDKMM_GENERAL_H
 
 #include <gdkmm/pixbuf.h>
+#ifndef GDKMM_DISABLE_DEPRECATED
 #include <gdkmm/color.h>
+#endif
 #include <gdkmm/rectangle.h>
 #include <gdkmm/rgba.h>
 #include <gdkmm/glcontext.h>
