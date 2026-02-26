@@ -112,13 +112,17 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/actionbar.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/alertdialog.h>
-#include <gtkmm/appchooserbutton.h>
-#include <gtkmm/appchooserdialog.h>
-#include <gtkmm/appchooserwidget.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/appchooserbutton.h>
+# include <gtkmm/appchooserdialog.h>
+# include <gtkmm/appchooserwidget.h>
+#endif
 #include <gtkmm/application.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/aspectframe.h>
-#include <gtkmm/assistant.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/assistant.h>
+#endif
 #include <gtkmm/atcontext.h>
 #include <gtkmm/binlayout.h>
 #include <gtkmm/boolfilter.h>
@@ -127,32 +131,40 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/boxlayout.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
-#include <gtkmm/cellarea.h>
-#include <gtkmm/cellareabox.h>
-#include <gtkmm/cellareacontext.h>
-#include <gtkmm/cellview.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/cellarea.h>
+# include <gtkmm/cellareabox.h>
+# include <gtkmm/cellareacontext.h>
+# include <gtkmm/cellview.h>
+#endif
 #include <gtkmm/checkbutton.h>
-#include <gtkmm/cellrenderer.h>
-#include <gtkmm/cellrendereraccel.h>
-#include <gtkmm/cellrenderercombo.h>
-#include <gtkmm/cellrendererpixbuf.h>
-#include <gtkmm/cellrendererprogress.h>
-#include <gtkmm/cellrendererspin.h>
-#include <gtkmm/cellrendererspinner.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/cellrenderertoggle.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/cellrenderer.h>
+# include <gtkmm/cellrendereraccel.h>
+# include <gtkmm/cellrenderercombo.h>
+# include <gtkmm/cellrendererpixbuf.h>
+# include <gtkmm/cellrendererprogress.h>
+# include <gtkmm/cellrendererspin.h>
+# include <gtkmm/cellrendererspinner.h>
+# include <gtkmm/cellrenderertext.h>
+# include <gtkmm/cellrenderertoggle.h>
+#endif
 #include <gtkmm/centerbox.h>
 #include <gtkmm/centerlayout.h>
-#include <gtkmm/colorbutton.h>
-#include <gtkmm/colorchooser.h>
-#include <gtkmm/colorchooserdialog.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/colorbutton.h>
+# include <gtkmm/colorchooser.h>
+# include <gtkmm/colorchooserdialog.h>
+#endif
 #include <gtkmm/colordialogbutton.h>
 #include <gtkmm/columnview.h>
 #include <gtkmm/columnviewcell.h>
 #include <gtkmm/columnviewrow.h>
 #include <gtkmm/columnviewsorter.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/comboboxtext.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/combobox.h>
+# include <gtkmm/comboboxtext.h>
+#endif
 #include <gtkmm/constraintlayout.h>
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/csssection.h>
@@ -177,10 +189,12 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/eventcontrollerlegacy.h>
 #include <gtkmm/eventcontrollermotion.h>
 #include <gtkmm/eventcontrollerscroll.h>
-#include <gtkmm/filechooser.h>
-#include <gtkmm/filechooserdialog.h>
-#include <gtkmm/filechoosernative.h>
-#include <gtkmm/filechooserwidget.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/filechooser.h>
+# include <gtkmm/filechooserdialog.h>
+# include <gtkmm/filechoosernative.h>
+# include <gtkmm/filechooserwidget.h>
+#endif
 #include <gtkmm/filedialog.h>
 #include <gtkmm/filefilter.h>
 #include <gtkmm/filelauncher.h>
@@ -191,10 +205,12 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/flattenlistmodel.h>
 #include <gtkmm/flowbox.h>
 #include <gtkmm/flowboxchild.h>
-#include <gtkmm/fontbutton.h>
-#include <gtkmm/fontchooser.h>
-#include <gtkmm/fontchooserdialog.h>
-#include <gtkmm/fontchooserwidget.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/fontbutton.h>
+# include <gtkmm/fontchooser.h>
+# include <gtkmm/fontchooserdialog.h>
+# include <gtkmm/fontchooserwidget.h>
+#endif
 #include <gtkmm/fontdialogbutton.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/gesture.h>
@@ -215,9 +231,13 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/gridview.h>
 #include <gtkmm/headerbar.h>
 #include <gtkmm/icontheme.h>
-#include <gtkmm/iconview.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/iconview.h>
+#endif
 #include <gtkmm/image.h>
-#include <gtkmm/infobar.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/infobar.h>
+#endif
 #include <gtkmm/inscription.h>
 #include <gtkmm/calendar.h>
 #include <gtkmm/label.h>
@@ -227,14 +247,20 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/listbox.h>
 #include <gtkmm/listboxrow.h>
 #include <gtkmm/listheader.h>
-#include <gtkmm/liststore.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/liststore.h>
+#endif
 #include <gtkmm/listview.h>
-#include <gtkmm/listviewtext.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/listviewtext.h>
+#endif
 #include <gtkmm/linkbutton.h>
 #include <gtkmm/mediacontrols.h>
 #include <gtkmm/mediafile.h>
 #include <gtkmm/menubutton.h>
-#include <gtkmm/messagedialog.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/messagedialog.h>
+#endif
 #include <gtkmm/multifilter.h>
 #include <gtkmm/multiselection.h>
 #include <gtkmm/multisorter.h>
@@ -277,7 +303,9 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/searchbar.h>
-#include <gtkmm/searchentry.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/searchentry.h>
+#endif
 #include <gtkmm/searchentry2.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/sectionmodel.h>
@@ -285,11 +313,13 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/selectionlistmodelimpl.h>
 #include <gtkmm/settings.h>
 #include <gtkmm/shortcutcontroller.h>
-#include <gtkmm/shortcutlabel.h>
-#include <gtkmm/shortcutsgroup.h>
-#include <gtkmm/shortcutssection.h>
-#include <gtkmm/shortcutsshortcut.h>
-#include <gtkmm/shortcutswindow.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/shortcutlabel.h>
+# include <gtkmm/shortcutsgroup.h>
+# include <gtkmm/shortcutssection.h>
+# include <gtkmm/shortcutsshortcut.h>
+# include <gtkmm/shortcutswindow.h>
+#endif
 #include <gtkmm/signallistitemfactory.h>
 #include <gtkmm/singleselection.h>
 #include <gtkmm/sizegroup.h>
@@ -301,12 +331,16 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/stack.h>
 #include <gtkmm/stacksidebar.h>
 #include <gtkmm/stackswitcher.h>
-#include <gtkmm/statusbar.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/statusbar.h>
+#endif
 #include <gtkmm/stringfilter.h>
 #include <gtkmm/stringlist.h>
 #include <gtkmm/stringobject.h>
 #include <gtkmm/stringsorter.h>
-#include <gtkmm/stylecontext.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/stylecontext.h>
+#endif
 #include <gtkmm/svg.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/symbolicpaintable.h>
@@ -322,20 +356,24 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/tooltip.h>
 #include <gtkmm/treeexpander.h>
 #include <gtkmm/treelistmodel.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/treemodelfilter.h>
-#include <gtkmm/treemodelsort.h>
-#include <gtkmm/treepath.h>
-#include <gtkmm/treerowreference.h>
-#include <gtkmm/treeselection.h>
-#include <gtkmm/treestore.h>
-#include <gtkmm/treeview.h>
-#include <gtkmm/treeviewcolumn.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/treemodel.h>
+# include <gtkmm/treemodelfilter.h>
+# include <gtkmm/treemodelsort.h>
+# include <gtkmm/treepath.h>
+# include <gtkmm/treerowreference.h>
+# include <gtkmm/treeselection.h>
+# include <gtkmm/treestore.h>
+# include <gtkmm/treeview.h>
+# include <gtkmm/treeviewcolumn.h>
+#endif
 #include <gtkmm/urilauncher.h>
 #include <gtkmm/version.h>
 #include <gtkmm/video.h>
 #include <gtkmm/viewport.h>
-#include <gtkmm/volumebutton.h>
+#ifndef GTKMM_DISABLE_DEPRECATED
+# include <gtkmm/volumebutton.h>
+#endif
 #include <gtkmm/widget.h>
 #include <gtkmm/widgetpaintable.h>
 #include <gtkmm/windowcontrols.h>

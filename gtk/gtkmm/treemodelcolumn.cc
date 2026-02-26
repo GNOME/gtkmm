@@ -14,6 +14,7 @@
  * License along with this library; if not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <gtkmmconfig.h>
 #ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
 #include <gtkmm/treemodelcolumn.h>

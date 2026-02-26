@@ -49,7 +49,9 @@
 #include <gdkmm/monitor.h>
 #include <gdkmm/paintable.h>
 #include <gdkmm/pixbuf.h>
-#include <gdkmm/pixbufanimation.h>
+#ifndef GDKMM_DISABLE_DEPRECATED
+# include <gdkmm/pixbufanimation.h>
+#endif
 #include <gdkmm/pixbufformat.h>
 #include <gdkmm/pixbufloader.h>
 #include <gdkmm/popup.h>

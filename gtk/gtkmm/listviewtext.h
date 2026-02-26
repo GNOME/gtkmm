@@ -17,6 +17,7 @@
 #ifndef _GTKMM_LISTVIEW_TEXT_H
 #define _GTKMM_LISTVIEW_TEXT_H
 
+#include <gtkmmconfig.h>
 #ifndef GTKMM_DISABLE_DEPRECATED // The entire file is deprecated.
 
 #include <gtkmm/treeview.h>
