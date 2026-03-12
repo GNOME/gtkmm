@@ -17670,6 +17670,17 @@ Since: 4.14
 </description>
 </property>
 
+<property name="GtkSearchEntry:key-capture-widget">
+<description>
+The widget that the entry will use to capture key events.
+
+Key events are consumed by the search entry to start or continue a search.
+
+Since: 4.22
+
+</description>
+</property>
+
 <property name="GtkSearchEntry:placeholder-text">
 <description>
 The text that will be displayed in the `GtkSearchEntry`
@@ -20236,9 +20247,7 @@ Since: 4.22
 <description>
 The current state of the renderer.
 
-This can be a number between 0 and 63, or the special value
-`(unsigned int) -1` to indicate the 'empty' state in which
-nothing is drawn.
+This can be a number between 0 and 63.
 
 Since: 4.22
 
@@ -20304,9 +20313,10 @@ expecations
 
 <enum name="GtkSvgFeatures">
 <description>
-Features of the SVG renderer that can be disabled.
+Features of the SVG renderer that can be enabled or disabled.
 
-By default, all features are enabled.
+By default, all features except `GTK_SVG_TRADITIONAL_SYMBOLIC`
+are enabled.
 
 New values may be added in the future.
 
@@ -20315,9 +20325,8 @@ Since: 4.22
 </description>
 <parameters>
 <parameter name="GTK_SVG_ANIMATIONS">
-<parameter_description> Whether to run animations.
-If disabled, state changes are applied without
-transitions
+<parameter_description> Whether to run animations. If disabled,
+state changes are applied without transitions
 </parameter_description>
 </parameter>
 <parameter name="GTK_SVG_SYSTEM_RESOURCES">
@@ -20334,6 +20343,14 @@ images are loaded
 <parameter name="GTK_SVG_EXTENSIONS">
 <parameter_description> Whether to allow gpa extensions, such
 as states and transitions
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_TRADITIONAL_SYMBOLIC">
+<parameter_description> This feature is meant for
+compatibility with old symbolic icons. If this is enabled,
+fill and stroke attributes are ignored. The used colors
+are derived from symbolic style classes if present, and
+the default fill color is the symbolic foreground color.
 </parameter_description>
 </parameter>
 </parameters>
@@ -47958,6 +47975,7 @@ The value that `self` evaluates to is set via `g_object_set()` on
 the object's property stays synchronized with `self`.
 
 If `self`'s evaluation fails, `target`'s `property` is not updated.
+Use a [class@Gtk.TryExpression] to provide a fallback for this case.
 
 Note that this function takes ownership of `self`. If you want
 to keep it around, you should [method@Gtk.Expression.ref] it beforehand.
@@ -49996,6 +50014,31 @@ Adds a rule allowing a given mime type.
 </parameter>
 <parameter name="mime_type">
 <parameter_description> name of a MIME type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_file_filter_add_mime_types">
+<description>
+Adds a rule allowing a given array of mime types.
+It can for example be used with
+[Gly.Loader.get_mime_types](https://gnome.pages.gitlab.gnome.org/glycin/libglycin/type_func.Loader.get_mime_types.html).
+
+This is equivalent to calling [method@Gtk.FileFilter.add_mime_type]
+for all the supported mime types.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="filter">
+<parameter_description> a file filter
+</parameter_description>
+</parameter>
+<parameter name="mime_types">
+<parameter_description> a %NULL-terminated array of mime types
 </parameter_description>
 </parameter>
 </parameters>
@@ -88012,29 +88055,6 @@ Since: 4.22
 </return>
 </function>
 
-<function name="gtk_svg_get_n_states">
-<description>
-Gets the number of states defined in the SVG.
-
-Note that there is always an empty state, which does
-not count towards this number. If this function returns
-the value N, the meaningful states of the SVG are
-0, 1, ..., N - 1 and `GTK_SVG_STATE_EMPTY`.
-
-Since: 4.22
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> an SVG paintable
-</parameter_description>
-</parameter>
-</parameters>
-<return> the number of states
-
-</return>
-</function>
-
 <function name="gtk_svg_get_state">
 <description>
 Gets the current state of the paintable.
@@ -88049,6 +88069,35 @@ Since: 4.22
 </parameter>
 </parameters>
 <return> the state
+
+</return>
+</function>
+
+<function name="gtk_svg_get_state_names">
+<description>
+Returns a `NULL`-terminated array of
+state names, if available.
+
+Note that the returned array and the strings
+contained in it will only be valid until the
+`GtkSvg` is cleared or reloaded, is if you
+want to keep it around, you should make a copy.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> return location for the number
+of strings that are returned
+</parameter_description>
+</parameter>
+</parameters>
+<return> the state names
 
 </return>
 </function>
@@ -88173,7 +88222,7 @@ Since: 4.22
 
 <function name="gtk_svg_pause">
 <description>
-Stop any playing animations.
+Stop any playing animations and state transitions.
 
 Animations can be paused and started repeatedly.
 
@@ -88191,10 +88240,9 @@ Since: 4.22
 
 <function name="gtk_svg_play">
 <description>
-Start playing animations.
+Start playing animations and state transitions.
 
-Note that this is necessary for state changes as
-well.
+Animations can be paused and started repeatedly.
 
 Since: 4.22
 
@@ -88262,8 +88310,7 @@ Since: 4.22
 <description>
 Sets a frame clock.
 
-Without a frame clock, GTK has to rely
-on simple timeouts to run animations.
+Without a frame clock, GtkSvg will not advance animations.
 
 Since: 4.22
 
@@ -88285,11 +88332,10 @@ Since: 4.22
 <description>
 Sets the state of the paintable.
 
-Use [method@Gtk.Svg.get_n_states] to find out
-what states @self has.
-
-Note that [method@Gtk.Svg.play] must have been
-called for the SVG paintable to react to state changes.
+If the paintable is currently playing, the state change
+will apply transitions that are defined in the SVG. If
+the paintable is not playing, the state change will take
+effect instantaneously.
 
 Since: 4.22
 
@@ -88300,8 +88346,7 @@ Since: 4.22
 </parameter_description>
 </parameter>
 <parameter name="state">
-<parameter_description> the state to set, as a value between 0 and 63,
-or `(unsigned int) -1`
+<parameter_description> the state to set, as a value between 0 and 63
 </parameter_description>
 </parameter>
 </parameters>
@@ -88311,6 +88356,9 @@ or `(unsigned int) -1`
 <function name="gtk_svg_set_weight">
 <description>
 Sets the weight that is used when rendering.
+
+The weight affects the effective linewidth when stroking
+paths.
 
 The default value of -1 means to use the font weight
 from CSS.
@@ -104581,6 +104629,33 @@ Deprecated: 4.10: Use [class@Gtk.ListView] or [class@Gtk.ColumnView] instead
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_try_expression_new">
+<description>
+Creates a `GtkExpression` with an array of expressions.
+
+When evaluated, the `GtkTryExpression` tries to evaluate each of its expressions until it succeeds.
+If all expressions fail to evaluate, the `GtkTryExpression`'s evaluation fails as well.
+
+The value type of the expressions in the array must match.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="n_expressions">
+<parameter_description> The number of expressions
+</parameter_description>
+</parameter>
+<parameter name="expressions">
+<parameter_description> The array of expressions
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new `GtkExpression`
+
+</return>
 </function>
 
 <function name="gtk_uri_launcher_can_launch">
