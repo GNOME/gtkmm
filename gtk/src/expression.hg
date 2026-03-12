@@ -15,6 +15,7 @@
  */
 
 #include <gtkmm/expressionwatch.h>
+#include <vector>
 
 _DEFS(gtkmm,gtk)
 
@@ -309,6 +310,40 @@ private:
   static void fill_params(GtkExpression** gparams);
 }; // ClosureExpression<T>
 
+/** A `Gtk::Expression` that tries to evaluate each of its expressions until it succeeds.
+ *
+ * If all expressions fail to evaluate, the %Gtk::TryExpression's evaluation fails as well.
+ *
+ * @newin{4,22}
+ */
+template<class T>
+class TryExpression final : public Expression<T>
+{
+public:
+  /** Get the GType for this class, for use with the underlying GObject type system.
+ *
+ * @newin{4,22}
+   */
+  static GType get_type() G_GNUC_CONST;
+
+/** Creates an expression with a vector of expressions.
+ *
+ * When evaluated, the %Gtk::TryExpression tries to evaluate each of its
+ * expressions until it succeeds. If all expressions fail to evaluate,
+ * the %Gtk::TryExpression's evaluation fails as well.
+ *
+ * @param expressions A vector of Gtk::Expressions.
+ *        The value type of the expressions in the vector must match.
+ * @return A new %Gtk::TryExpression. If @a expressions is an empty vector,
+ *         or contains only empty RefPtrs, or the value types don't match,
+ *         an empty RefPtr is returned.
+ *
+ * @newin{4,22}
+ */
+  static Glib::RefPtr<TryExpression> create(const std::vector<Glib::RefPtr<Expression<T>>>& expressions);
+
+}; // TryExpression<T>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Expression_Private
@@ -569,6 +604,39 @@ template<class T>
 void ClosureExpression<T>::fill_params(GtkExpression**)
 {}
 
+template<class T>
+GType TryExpression<T>::get_type()
+{
+  return gtk_try_expression_get_type();
+}
+
+template<class T>
+Glib::RefPtr<TryExpression<T>> TryExpression<T>::create(
+  const std::vector<Glib::RefPtr<Expression<T>>>& expressions)
+{
+  std::vector<GtkExpression*> c_expressions;
+  for (const auto& expression : expressions)
+  {
+    if (expression)
+      c_expressions.push_back(expression->gobj());
+  }
+  if (c_expressions.empty())
+    return {};
+
+  auto returnvalue = Glib::make_refptr_for_instance<Gtk::TryExpression<T>>(
+    reinterpret_cast<Gtk::TryExpression<T>*>(
+      gtk_try_expression_new(c_expressions.size(), c_expressions.data())));
+
+  // If a GtkTryExpression is created, the expressions in c_expressions are
+  // unreferenced when the GtkTryExpression is finalized.
+  // Must compensate for that unreference by referencing them here.
+  if (returnvalue)
+  {
+    for (auto c_expression : c_expressions)
+      gtk_expression_ref(c_expression);
+  }
+  return returnvalue;
+}
 
 namespace Expression_Private
 {

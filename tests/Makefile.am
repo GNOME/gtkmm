@@ -25,6 +25,7 @@ check_PROGRAMS =			\
 	child_widget_managed/test	\
 	delete_cpp_child/test		\
 	dialog_deletethis/test		\
+	expressions/test \
 	filedialog/test \
 	gdk_graphene/test \
 	gdk_rgba/test \
@@ -38,6 +39,7 @@ check_PROGRAMS =			\
 	wrap_existing/test
 
 TESTS = bitset_iterator/test \
+	expressions/test \
 	object_move/test \
   gdk_graphene/test \
   gdk_rgba/test \
@@ -53,6 +55,7 @@ child_widget_managed_test_SOURCES  = child_widget_managed/main.cc
 delete_cpp_child_test_SOURCES      = delete_cpp_child/main.cc
 dialog_deletethis_test_SOURCES     = dialog_deletethis/main.cc
 filedialog_test_SOURCES            = filedialog/main.cc
+expressions_test_SOURCES           = expressions/main.cc
 gdk_graphene_test_SOURCES          = gdk_graphene/main.cc
 gdk_rgba_test_SOURCES              = gdk_rgba/main.cc
 get_children_test_SOURCES          = get_children/main.cc
