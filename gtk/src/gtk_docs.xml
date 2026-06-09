@@ -38,6 +38,15 @@ The `GdkDisplay` for the `GtkATContext`.
 </description>
 </property>
 
+<property name="GtkATContext:realized">
+<description>
+Whether the `GtkATContext` has been realized or not.
+
+Since: 4.24
+
+</description>
+</property>
+
 <signal name="GtkAboutDialog::activate-link">
 <description>
 Emitted every time a URL is activated.
@@ -1976,13 +1985,13 @@ Deprecated: 4.12: Use `GTK_ALIGN_BASELINE_FILL` instead
 </parameter_description>
 </parameter>
 <parameter name="GTK_ALIGN_BASELINE_FILL">
-<parameter_description>a different name for `GTK_ALIGN_BASELINE`.
+<parameter_description>stretch to fill all space, but align the baseline.
 
 Since: 4.12
 </parameter_description>
 </parameter>
 <parameter name="GTK_ALIGN_BASELINE_CENTER">
-<parameter_description>stretch to fill all space, but align the baseline.
+<parameter_description>align the baseline.
 
 Since: 4.12
 </parameter_description>
@@ -2235,6 +2244,117 @@ to delay the end of the session until state has been saved.
 <return></return>
 </signal>
 
+<signal name="GtkApplication::restore-state">
+<description>
+Emitted when application global state is restored.
+
+The handler for this signal should do the opposite of what the
+corresponding handler for [signal@Gtk.Application::save-state]
+does.
+
+You must be careful to be robust in the face of app upgrades and downgrades:
+the @state might have been created by a previous or occasionally even a future
+version of your app. Do not assume that a given key exists in the state.
+Apps must try to restore state saved by a previous version, but are free to
+discard state if it was written by a future version.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the application which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> the reason for restoring state
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> an `a{sv}` dictionary containing the state to restore, as saved by a [signal@Gtk.Application::save-state] handler
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop further handlers from running
+
+</return>
+</signal>
+
+<signal name="GtkApplication::restore-window">
+<description>
+Emitted when an application's per-window state is restored.
+
+In response to this signal, you should create a new application
+window, add it to @application, apply the provided @state, and present it.
+The application can use the @reason to determine how much of the state
+should be restored.
+
+You must be careful to be robust in the face of app upgrades and downgrades:
+the @state might have been created by a previous or occasionally even a future
+version of your app. Do not assume that a given key exists in the state.
+Apps must try to restore state saved by a previous version, but are free to
+discard state if it was written by a future version.
+
+GTK will remember which window the user was using most recently, and will
+emit this signal for that window first. Thus, if you decide that the provided
+@reason means that only one window should be restored, you can reliably
+ignore emissions if a window already exists
+
+This signal will be emitted whenever the application needs to restore its
+windows. This normally happens during the initial launch, but it can also
+happen in the existing application instance if it is re-activated after all
+application windows were closed.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the application which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> the reason this window is restored
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> an `a{sv}` dictionary containing the state to restore, as saved by a [signal@Gtk.ApplicationWindow::save-state] handler
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkApplication::save-state">
+<description>
+Emitted when the application is saving global state.
+
+The handler for this signal should persist any global state of
+@application into @dict.
+
+See [signal@Gtk.Application::restore-state] for how to
+restore global state, and [signal@Gtk.ApplicationWindow::save-state]
+and [signal@Gtk.Application::restore-window] for handling
+per-window state.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the application which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="dict">
+<parameter_description> a dictionary to populate with application state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop further handlers from running
+
+</return>
+</signal>
+
 <signal name="GtkApplication::window-added">
 <description>
 Emitted when a window is added to an application.
@@ -2283,6 +2403,16 @@ The currently focused window of the application.
 </description>
 </property>
 
+<property name="GtkApplication:autosave-interval">
+<description>
+The number of seconds between automatic state saves. Defaults to 15.
+A value of 0 will opt out of automatic state saving.
+
+Since: 4.24
+
+</description>
+</property>
+
 <property name="GtkApplication:menubar">
 <description>
 The menu model to be used for the application's menu bar.
@@ -2314,6 +2444,76 @@ Linux.
 </description>
 </property>
 
+<property name="GtkApplication:support-save">
+<description>
+Set this property to true if the application supports
+state saving and restoring.
+
+Since: 4.24
+
+</description>
+</property>
+
+<signal name="GtkApplicationClass::restore_state">
+<description>
+Class closure for the [signal@Application::restore-state] signal.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="reason">
+<parameter_description> the reason for restoring state
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> a dictionary containing the application state to restore
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop further handlers from running
+
+</return>
+</signal>
+
+<signal name="GtkApplicationClass::restore_window">
+<description>
+Class closure for the [signal@Application::restore-window] signal.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="reason">
+<parameter_description> the reason this window is restored
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> a dictionary containing the application window state to restore
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkApplicationClass::save_state">
+<description>
+Class closure for the [signal@Application::save-state] signal.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="state">
+<parameter_description> a dictionary to populate with application state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop further handlers from running
+
+</return>
+</signal>
+
 <enum name="GtkApplicationInhibitFlags">
 <description>
 Types of user actions that may be blocked by `GtkApplication`.
@@ -2344,6 +2544,35 @@ marked as idle (and possibly locked)
 </parameters>
 </enum>
 
+<signal name="GtkApplicationWindow::save-state">
+<description>
+The handler for this signal should persist any application-specific
+state of @window into @dict.
+
+Note that window management state such as maximized, fullscreen,
+or window size should not be saved as part of this. They are handled
+by GTK.
+
+See [signal@Gtk.Application::restore-window].
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the window which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="dict">
+<parameter_description> a dictionary to populate with application window state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
+
 <property name="GtkApplicationWindow:show-menubar">
 <description>
 If this property is true, the window will display a menubar
@@ -2356,6 +2585,24 @@ of whether the desktop shell is showing it or not.
 
 </description>
 </property>
+
+<signal name="GtkApplicationWindowClass::save_state">
+<description>
+Class closure for the [signal@ApplicationWindow::save-state] signal.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="dict">
+<parameter_description> a dictionary to populate with application window state
+</parameter_description>
+</parameter>
+</parameters>
+<return> true to stop stop further handlers from running
+
+</return>
+</signal>
 
 <enum name="GtkArrowType">
 <description>
@@ -5955,6 +6202,13 @@ Since: 4.20
 Since: 4.22
 </parameter_description>
 </parameter>
+<parameter name="GTK_DEBUG_GENERAL_INFO">
+<parameter_description>Print information from the GTK inspector 'general' page,
+in markdown format.
+
+Since: 4.24
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -7061,6 +7315,16 @@ should point after the newly inserted text.
 <return></return>
 </signal>
 
+<property name="GtkEditable:complete-text">
+<description>
+The contents of the entry, including uncommited content such as the
+preedit.
+
+Since: 4.24
+
+</description>
+</property>
+
 <property name="GtkEditable:cursor-position">
 <description>
 The current position of the insertion cursor in chars.
@@ -7165,6 +7429,10 @@ implement the `GtkEditable` interface.
 </parameter>
 <parameter name="GTK_EDITABLE_PROP_ENABLE_UNDO">
 <parameter_description> the property id for [property@Gtk.Editable:enable-undo]
+</parameter_description>
+</parameter>
+<parameter name="GTK_EDITABLE_PROP_COMPLETE_TEXT">
+<parameter_description> the property id for [property@Gtk.Editable:complete-text]
 </parameter_description>
 </parameter>
 <parameter name="GTK_EDITABLE_NUM_PROPERTIES">
@@ -7898,6 +8166,60 @@ Specifies the side of the entry at which an icon is placed.
 </parameter>
 </parameters>
 </enum>
+
+<property name="GtkEnumList:enum-type">
+<description>
+The type of the enum represented by the model.
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkEnumList:item-type">
+<description>
+The type of the items. See [method@Gio.ListModel.get_item_type].
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkEnumList:n-items">
+<description>
+The number of items. See [method@Gio.ListModel.get_n_items].
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkEnumListItem:name">
+<description>
+The enum value name.
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkEnumListItem:nick">
+<description>
+The enum value nick.
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkEnumListItem:value">
+<description>
+The enum value.
+
+Since: 4.24
+
+</description>
+</property>
 
 <property name="GtkEventController:name">
 <description>
@@ -16878,6 +17200,35 @@ or if the dialog gets programmatically hidden or destroyed
 </parameters>
 </enum>
 
+<enum name="GtkRestoreReason">
+<description>
+Enumerates possible reasons for an application to restore saved state.
+
+See [signal@Gtk.Application::restore-state].
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="GTK_RESTORE_REASON_PRISTINE">
+<parameter_description> Don't restore anything
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_LAUNCH">
+<parameter_description> This is normal launch. Restore as little as is reasonable
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_RECOVER">
+<parameter_description> The application has crashed before. Try to restore the previous state
+</parameter_description>
+</parameter>
+<parameter name="GTK_RESTORE_REASON_RESTORE">
+<parameter_description> This is a session restore. Restore the previous state as far as possible
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <property name="GtkRevealer:child">
 <description>
 The child widget.
@@ -17798,6 +18149,12 @@ Note that this signal does not specify the new selection state of the
 items, they need to be queried manually. It is also not necessary for
 a model to change the selection state of any of the items in the selection
 model, though it would be rather useless to emit such a signal.
+
+::: warning
+Note that you have to be careful when modifying the model in signal
+handlers, as it may cause reentrancy problems. This is also the
+case when you modify base models underneath the selection model.
+When in doubt, defer changes to an idle.
 
 </description>
 <parameters>
@@ -20219,6 +20576,15 @@ Since: 4.22
 </description>
 </property>
 
+<property name="GtkSvg:overflow">
+<description>
+Whether the rendering will be clipped to the bounds.
+
+Since: 4.24
+
+</description>
+</property>
+
 <property name="GtkSvg:playing">
 <description>
 Whether the paintable is currently animating its content.
@@ -20250,6 +20616,15 @@ The current state of the renderer.
 This can be a number between 0 and 63.
 
 Since: 4.22
+
+</description>
+</property>
+
+<property name="GtkSvg:stylesheet">
+<description>
+A CSS stylesheet to apply to the SVG.
+
+Since: 4.24
 
 </description>
 </property>
@@ -20308,6 +20683,23 @@ a suitable element
 expecations
 </parameter_description>
 </parameter>
+<parameter name="GTK_SVG_ERROR_IGNORED_ELEMENT">
+<parameter_description> An XML element is ignored,
+but it should not affect rendering (this error code is used
+for metadata and exension elements)
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_LIMITS_EXCEEDED">
+<parameter_description> An implementation limit has
+been hit, such as the number of loaded shapes.
+</parameter_description>
+</parameter>
+<parameter name="GTK_SVG_ERROR_NOT_IMPLEMENTED">
+<parameter_description> The SVG uses features that
+are not supported by `GtkSvg`. It may be advisable to use
+a different SVG renderer.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -20355,6 +20747,104 @@ the default fill color is the symbolic foreground color.
 </parameter>
 </parameters>
 </enum>
+
+<signal name="GtkSvgWidget::activate">
+<description>
+Emitted when a link or other element is activated.
+
+Activating elements can be achieved by clicking
+or by hitting &lt;kbd&gt;Enter&lt;/kbd&gt; while the element
+has focus.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the SVG widget
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the ID of the element
+</parameter_description>
+</parameter>
+<parameter name="href">
+<parameter_description> the href, if the element is a link
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GtkSvgWidget::error">
+<description>
+Signals that an error occurred.
+
+Errors can occur both during parsing and during rendering.
+
+The expected error values are in the [error@Gtk.SvgError] enumeration,
+context information about the location of parsing errors can
+be obtained with the various `gtk_svg_error` functions.
+
+Parsing errors are never fatal, so the parsing will resume after
+the error. Errors may however cause parts of the given data or
+even all of it to not be parsed at all. So it is a useful idea
+to check that the parsing succeeds by connecting to this signal.
+
+::: note
+This signal is emitted in the middle of parsing or rendering,
+and if you handle it, you must be careful. Logging the errors
+you receive is fine, but modifying the widget hierarchy or
+changing the paintable state definitively isn't.
+
+If in doubt, defer to an idle.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the widget
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> the error
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GtkSvgWidget:resource">
+<description>
+Resource to load SVG data from.
+
+This property is meant for use in ui files.
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkSvgWidget:state">
+<description>
+The current state of the renderer.
+
+This can be a number between 0 and 63.
+
+Since: 4.24
+
+</description>
+</property>
+
+<property name="GtkSvgWidget:stylesheet">
+<description>
+A CSS stylesheet to apply to the SVG.
+
+Since: 4.24
+
+</description>
+</property>
 
 <signal name="GtkSwitch::activate">
 <description>
@@ -24369,6 +24859,24 @@ Return: true if the key binding was handled
 <return></return>
 </signal>
 
+<signal name="GtkWindow::force-close">
+<description>
+Emitted when the compositor has decided to eliminate a window.
+
+@window *has* to be in a hidden state after this signal was handled.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="window">
+<parameter_description> the window which emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GtkWindow::keys-changed">
 <description>
 Emitted when the set of accelerators or mnemonics that
@@ -24634,6 +25142,18 @@ Class handler for the [signal@Window::close-request] signal.
 </parameters>
 <return> Whether the window should be destroyed
 </return>
+</signal>
+
+<signal name="GtkWindowClass::force_close">
+<description>
+Class handler for the [signal@Window::force-close] signal.
+
+Since: 4.24
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </signal>
 
 <property name="GtkWindowControls:decoration-layout">
@@ -28561,6 +29081,25 @@ GTK will keep the application running as long as it has any windows.
 <return></return>
 </function>
 
+<function name="gtk_application_forget">
+<description>
+Forget state that has been previously saved and prevent further automatic
+state saving.
+
+In order to re-enable state saving, call [method@Gtk.Application.save].
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> an application
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_application_get_accels_for_action">
 <description>
 Gets the accelerators that are currently associated with
@@ -28859,6 +29398,24 @@ function, if the window was the last window of the application.
 </parameter>
 <parameter name="window">
 <parameter_description> a window
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_application_save">
+<description>
+Saves the state of the application.
+
+See [method@Gtk.Application.forget] for a way to forget the state.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> an application
 </parameter_description>
 </parameter>
 </parameters>
@@ -34371,6 +34928,8 @@ Deprecated: 4.10
 Calls @callback for every `GtkCellRenderer` in @area with the
 allocated rectangle inside @cell_area.
 
+Deprecated: 4.10
+
 </description>
 <parameters>
 <parameter name="area">
@@ -34496,6 +35055,7 @@ gtk_cell_area_apply_attributes() is called and can be
 used to interact with renderers from `GtkCellArea`
 subclasses.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -34507,6 +35067,7 @@ subclasses.
 <return> The current `GtkTreePath` string for the current
 attributes applied to @area. This string belongs to the area and
 should not be freed.
+
 </return>
 </function>
 
@@ -34797,6 +35358,7 @@ Deprecated: 4.10
 Gets whether the area prefers a height-for-width layout
 or a width-for-height layout.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -34806,6 +35368,7 @@ or a width-for-height layout.
 </parameter>
 </parameters>
 <return> The `GtkSizeRequestMode` preferred by @area.
+
 </return>
 </function>
 
@@ -35139,6 +35702,8 @@ editing a cell, e.g. making the Esc key emit `GtkCellEditable::editing-done`.
 
 Note that the @cell_editable is created on-demand for the current edit; its
 lifetime is temporary and does not persist across other edits and/or cells.
+
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -37565,6 +38130,7 @@ Deprecated: 4.10: Use [class@Gtk.ColorDialogButton] instead
 <description>
 Creates a new color button showing the given color.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -37574,6 +38140,7 @@ Creates a new color button showing the given color.
 </parameter>
 </parameters>
 <return> a new color button
+
 </return>
 </function>
 
@@ -37771,11 +38338,13 @@ Deprecated: 4.10: Use [class@Gtk.ColorDialog] instead
 <description>
 Creates a new `GtkColorChooserWidget`.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
 </parameters>
 <return> a new `GtkColorChooserWidget`
+
 </return>
 </function>
 
@@ -44537,6 +45106,24 @@ and should be freed by the caller.
 </return>
 </function>
 
+<function name="gtk_editable_get_complete_text">
+<description>
+Retrieves the contents of @editable, including *pseudo-content*
+such as the preedit buffer.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="editable">
+<parameter_description> a `GtkEditable`
+</parameter_description>
+</parameter>
+</parameters>
+<return> the complete contents of the editable
+</return>
+</function>
+
 <function name="gtk_editable_get_delegate">
 <description>
 Gets the `GtkEditable` that @editable is delegating its
@@ -47124,6 +47711,94 @@ is used again. See [method@Gtk.Entry.set_invisible_char].
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gtk_enum_list_find">
+<description>
+Finds the position of a given enum value in @self.
+
+If the value is not found, [const@Gtk.INVALID_LIST_POSITION] is returned.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> an enum value
+</parameter_description>
+</parameter>
+</parameters>
+<return> the position of the value
+
+</return>
+</function>
+
+<function name="gtk_enum_list_get_enum_type">
+<description>
+Gets the type of the enum represented by @self.
+
+Since: 4.24
+
+</description>
+<parameters>
+</parameters>
+<return> the enum type
+
+</return>
+</function>
+
+<function name="gtk_enum_list_item_get_name">
+<description>
+Gets the enum value name.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the enum value name
+</return>
+</function>
+
+<function name="gtk_enum_list_item_get_nick">
+<description>
+Gets the enum value nick.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the enum value nick
+</return>
+</function>
+
+<function name="gtk_enum_list_item_get_value">
+<description>
+Gets the enum value.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the enum value
+</return>
+</function>
+
+<function name="gtk_enum_list_new">
+<description>
+Creates a new `GtkEnumList` for @enum_type.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="enum_type">
+<parameter_description> the type of the enum to construct the model from
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created `GtkEnumList`
+
+</return>
 </function>
 
 <function name="gtk_enumerate_printers">
@@ -84165,19 +84840,6 @@ The image is recorded until the next call to [method@Gtk.Snapshot.pop].
 <return></return>
 </function>
 
-<function name="gtk_snapshot_push_collect">
-<description>
-Private.
-
-Pushes state so a later pop_collect call can collect all nodes
-appended until that point.
-
-</description>
-<parameters>
-</parameters>
-<return></return>
-</function>
-
 <function name="gtk_snapshot_push_color_matrix">
 <description>
 Modifies the colors of an image by applying an affine transformation
@@ -84936,6 +85598,30 @@ Scales @snapshot's coordinate system by the given factors.
 </parameter>
 <parameter name="factor_z">
 <parameter_description> scaling factor on the Z axis
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_snapshot_set_snap">
+<description>
+Sets the snapping mode to use when appending snappable content
+to the snapshot.
+
+The snap mode is part of the current state, so [method@Snapshot.save]
+and [method@Snapshot.restore] can be used to remember a snap mode.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a `GtkSnapshot`
+</parameter_description>
+</parameter>
+<parameter name="snap">
+<parameter_description> the snapping mode to use
 </parameter_description>
 </parameter>
 </parameters>
@@ -86849,24 +87535,6 @@ the new message is being used in
 </return>
 </function>
 
-<function name="gtk_statusbar_get_message">
-<description>
-Retrieves the contents of the label in `GtkStatusbar`.
-
-Deprecated: 4.10: This widget will be removed in GTK 5
-
-</description>
-<parameters>
-<parameter name="statusbar">
-<parameter_description> a `GtkStatusbar`
-</parameter_description>
-</parameter>
-</parameters>
-<return> the contents of the statusbar
-
-</return>
-</function>
-
 <function name="gtk_statusbar_new">
 <description>
 Creates a new `GtkStatusbar` ready for messages.
@@ -88018,6 +88686,25 @@ Since: 4.22
 </return>
 </function>
 
+<function name="gtk_svg_error_get_input">
+<description>
+Returns a string describing the input source that
+the parsing error occurred in.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> an error in the [error@Gtk.SvgError] domain
+</parameter_description>
+</parameter>
+</parameters>
+<return> the input source
+
+</return>
+</function>
+
 <function name="gtk_svg_error_get_start">
 <description>
 Returns context information about the start position
@@ -88055,6 +88742,24 @@ Since: 4.22
 </return>
 </function>
 
+<function name="gtk_svg_get_overflow">
+<description>
+Gets the current overflow value.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current overflow value
+
+</return>
+</function>
+
 <function name="gtk_svg_get_state">
 <description>
 Gets the current state of the paintable.
@@ -88080,7 +88785,7 @@ state names, if available.
 
 Note that the returned array and the strings
 contained in it will only be valid until the
-`GtkSvg` is cleared or reloaded, is if you
+`GtkSvg` is cleared or reloaded, so if you
 want to keep it around, you should make a copy.
 
 Since: 4.22
@@ -88098,6 +88803,24 @@ of strings that are returned
 </parameter>
 </parameters>
 <return> the state names
+
+</return>
+</function>
+
+<function name="gtk_svg_get_stylesheet">
+<description>
+Gets the CSS user stylesheet.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a `GBytes` with the CSS data
 
 </return>
 </function>
@@ -88224,7 +88947,7 @@ Since: 4.22
 <description>
 Stop any playing animations and state transitions.
 
-Animations can be paused and started repeatedly.
+SvgAnimations can be paused and started repeatedly.
 
 Since: 4.22
 
@@ -88242,7 +88965,7 @@ Since: 4.22
 <description>
 Start playing animations and state transitions.
 
-Animations can be paused and started repeatedly.
+SvgAnimations can be paused and started repeatedly.
 
 Since: 4.22
 
@@ -88328,6 +89051,52 @@ Since: 4.22
 <return></return>
 </function>
 
+<function name="gtk_svg_set_overflow">
+<description>
+Sets whether the rendering will be clipped
+to the bounds.
+
+Clipping is expected for [iface@Gdk.Paintable]
+semantics, so this property should not be
+changed when using a `GtkSvg` as a paintable.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="overflow">
+<parameter_description> the new overflow value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_set_settings">
+<description>
+Sets a settings object holding settinsg used when
+rendering the SVG.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="settings">
+<parameter_description> the settings object
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gtk_svg_set_state">
 <description>
 Sets the state of the paintable.
@@ -88347,6 +89116,30 @@ Since: 4.22
 </parameter>
 <parameter name="state">
 <parameter_description> the state to set, as a value between 0 and 63
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_set_stylesheet">
+<description>
+Sets a CSS user stylesheet to use.
+
+Note that styles are applied at load time,
+so this function must be called before
+loading SVG.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG paintable
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> CSS data
 </parameter_description>
 </parameter>
 </parameters>
@@ -88373,6 +89166,128 @@ Since: 4.22
 </parameter>
 <parameter name="weight">
 <parameter_description> the font weight, as a value between -1 and 1000
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_widget_get_state">
+<description>
+Gets the current state of the widget.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG widget
+</parameter_description>
+</parameter>
+</parameters>
+<return> the state
+
+</return>
+</function>
+
+<function name="gtk_svg_widget_get_stylesheet">
+<description>
+Gets the CSS user stylesheet.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG widget
+</parameter_description>
+</parameter>
+</parameters>
+<return> a `GBytes` with the CSS data
+
+</return>
+</function>
+
+<function name="gtk_svg_widget_load_from_bytes">
+<description>
+Loads SVG content into an existing SVG widget.
+
+To track errors while loading SVG content, connect
+to the [signal@Gtk.SvgWidget::error] signal.
+
+This clears any previously loaded content.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG widget
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> the data to data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_widget_new">
+<description>
+Creates a new, empty `GtkSvgWidget`.
+
+Since: 4.24
+
+</description>
+<parameters>
+</parameters>
+<return> the new widget
+
+</return>
+</function>
+
+<function name="gtk_svg_widget_set_state">
+<description>
+Sets the state of the widget.
+
+The state change will apply transitions that are defined
+in the SVG. See [class@Gtk.Svg] for details about states
+and transitions.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG widget
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the state to set, as a value between 0 and 63
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_svg_widget_set_stylesheet">
+<description>
+Sets a CSS user stylesheet to use.
+
+Note that styles are applied at load time, so this
+function must be called before loading SVG.
+
+Since: 4.24
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> an SVG widget
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> CSS data
 </parameter_description>
 </parameter>
 </parameters>
@@ -98861,6 +99776,7 @@ Deprecated: 4.10
 <description>
 Returns the model the `GtkTreeModelSort` is sorting.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -98870,6 +99786,7 @@ Returns the model the `GtkTreeModelSort` is sorting.
 </parameter>
 </parameters>
 <return> the &quot;child model&quot; being sorted
+
 </return>
 </function>
 
@@ -98902,6 +99819,7 @@ Deprecated: 4.10
 <description>
 Creates a new `GtkTreeModelSort`, with @child_model as the child model.
 
+Deprecated: 4.10
 
 </description>
 <parameters>
@@ -98911,6 +99829,7 @@ Creates a new `GtkTreeModelSort`, with @child_model as the child model.
 </parameter>
 </parameters>
 <return> A new `GtkTreeModelSort`.
+
 </return>
 </function>
 
@@ -105594,7 +106513,9 @@ This is a more convenient alternative to connecting directly to the
 don't have to worry about when a frame clock is assigned to a widget.
 
 To remove a tick callback, pass the ID that is returned by this function
-to [method@Gtk.Widget.remove_tick_callback].
+to [method@Gtk.Widget.remove_tick_callback]. Tick callbacks will be
+removed automatically when the widget is destroyed, so you do not have
+to remove it yourself.
 
 
 </description>

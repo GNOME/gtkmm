@@ -522,6 +522,8 @@ Will be -1 if there is no valid active layout.
 
 This is only relevant for keyboard devices.
 
+Value changes from compositor events, connect to notify if needed.
+
 Since: 4.18
 
 </description>
@@ -573,6 +575,8 @@ Whether the device is represented by a cursor on the screen.
 The names of the keyboard layouts of a `GdkDevice`.
 
 This is only relevant for keyboard devices.
+
+Value changes from compositor events, connect to notify if needed.
 
 Since: 4.18
 
@@ -1991,9 +1995,28 @@ byte each of red, green and blue. It is not endian-dependent, so
 `CAIRO_FORMAT_ARGB32` is represented by different `GdkMemoryFormats`
 on architectures with different endiannesses.
 
-Its naming is modelled after
-[VkFormat](https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkFormat)
-for details).
+# A note on naming
+
+The format names are roughly modelled after
+[VkFormat](https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#VkFormat).
+A name follows `GDK_MEMORY_&lt;CHANNELS&gt;_&lt;DATA_TYPE&gt;_&lt;SUBSAMPLING&gt; &lt;PREMULTIPLIED&gt;`
+where CHANNELS describe how the RGBA channels are layed out in memory, with an
+X denoting padding. DATA_TYPE is unsigned normalized integer if not present, or
+otherwise FLOAT. The optional SUBSAMPLING defines the subsampling method used.
+The optional ENDIAN term describes the endianness if it is not
+host-endian. Finally, an optional PREMULTIPLIED term indicates that the color
+channels are premultiplied with the alpha value, if it is omitted, the data is
+not premultiplied or there is no alpha channel.
+
+The CHANNELS are given as a list of planes seperated by underscores where
+each plane is split into multiple elements describing one or more bytes of memory.
+Each element is given as the list of channels folowed by the amount of bits taken
+up.
+
+So the fictional format `RGB565_A8_PREMULTIPLIED` would describe a format with 2
+planes where the first plane is an unsigned 16 bit integer containing the RGB
+channels with 5, 6, and 5 bits respectively while the 2nd plane contains the
+alpha channel as an unisnged 8bit integer.
 
 </description>
 <parameters>
@@ -2763,6 +2786,57 @@ mapped into the 1st channel.
 Commonly known by the fourcc &quot;S416&quot;.
 
 Since: 4.20
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_ARGB2101010_PREMULTIPLIED">
+<parameter_description>4 bytes per pixel
+
+Bits 31..30 contain the alpha channel, 29..20 red, 19..10 green
+and 9..0 blue.
+
+The color values are premultiplied with the alpha value.
+
+Since: 4.24
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_ARGB2101010">
+<parameter_description>4 bytes per pixel
+
+Bits 31..30 contain the alpha channel, 29..20 red, 19..10 green
+and 9..0 blue.
+
+Since: 4.24
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_XRGB2101010">
+<parameter_description>4 bytes per pixel
+
+Bits 31..30 are padding, bits 29..20 contain red, 19..10 green
+and 9..0 blue.
+
+The format is opaque.
+
+Since: 4.24
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_ABGR2101010">
+<parameter_description>4 bytes per pixel
+
+Bits 31..30 contain the alpha channel, 29..20 blue, 19..10 green
+and 9..0 red.
+
+Since: 4.24
+</parameter_description>
+</parameter>
+<parameter name="GDK_MEMORY_XBGR2101010">
+<parameter_description>4 bytes per pixel
+
+Bits 31..30 are padding, bits 29..20 contain blue, 19..10 green
+and 9..0 red.
+
+The format is opaque.
+
+Since: 4.24
 </parameter_description>
 </parameter>
 </parameters>
@@ -4501,7 +4575,7 @@ Sets the workspace on which applications will be launched.
 
 This only works when running under a window manager that
 supports multiple workspaces, as described in the
-[Extended Window Manager Hints](http://www.freedesktop.org/Standards/wm-spec).
+[Extended Window Manager Hints](https://specifications.freedesktop.org/wm/latest/).
 Specifically this sets the `_NET_WM_DESKTOP` property described
 in that spec.
 
@@ -9093,7 +9167,7 @@ Since: 4.14
 
 <function name="gdk_dmabuf_texture_builder_get_fd">
 <description>
-Gets the file descriptor for a plane.
+Gets the file descriptor for a plane or -1 if none.
 
 Since: 4.14
 
@@ -9358,7 +9432,7 @@ Since: 4.14
 
 <function name="gdk_dmabuf_texture_builder_set_fd">
 <description>
-Sets the file descriptor for a plane.
+Sets the file descriptor for a plane or to -1 to unset it.
 
 Since: 4.14
 
@@ -11748,6 +11822,8 @@ is realized.
 You should check the return value of [method@Gdk.GLContext.get_use_es]
 after calling [method@Gdk.GLContext.realize] to decide whether to use
 the OpenGL or OpenGL ES API, extensions, or shaders.
+
+Deprecated: 4.6
 
 </description>
 <parameters>
@@ -18870,6 +18946,28 @@ percentages.
 </parameter>
 </parameters>
 <return> %TRUE if the parsing succeeded
+</return>
+</function>
+
+<function name="gdk_rgba_print">
+<description>
+Appends a representation of @rgba to @string.
+
+Since: 4.22
+
+</description>
+<parameters>
+<parameter name="rgba">
+<parameter_description> a `GdkRGBA`
+</parameter_description>
+</parameter>
+<parameter name="string">
+<parameter_description> the string to print to
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly allocated text string
+
 </return>
 </function>
 

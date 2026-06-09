@@ -13,6 +13,8 @@ shopt -s nullglob # Skip a filename pattern that matches no file
 "$gen_enums" "$gtk_source_prefix"/gtk/gtk!(*private).h \
              "$gtk_source_prefix"/gtk/css/gtk!(*private).h \
              "$gtk_source_prefix"/gtk/print/gtk!(*private).h \
+             "$gtk_source_prefix"/gtk/svg/gtk!(*private).h \
              "$gtk_source_prefix"/gtk/deprecated/gtk!(*private).h \
              "$gtk_build_prefix"/gtk/gtk*.h \
-             "$gtk_build_prefix"/gtk/css/gtk*.h > "$out_dir"/gtk_enums.defs
+             "$gtk_build_prefix"/gtk/css/gtk*.h \
+             "$gtk_build_prefix"/gtk/svg/gtk*.h > "$out_dir"/gtk_enums.defs
