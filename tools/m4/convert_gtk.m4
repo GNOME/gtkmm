@@ -297,6 +297,7 @@ _CONVERSION(`Gtk::Item&',`GtkItem*',__FR2P)
 _CONVERSION(Gtk::Notebook_Helpers::Page*,GtkNotebookPage*,`($1)((void*)($3))',`($2)((void*)($3))')
 
 _CONVERSION(`GtkSettings*',`Glib::RefPtr<Settings>', Glib::wrap($3))
+_CONVERSION(`const Glib::RefPtr<Settings>&',`GtkSettings*',__CONVERT_REFPTR_TO_P)
 
 _CONVERSION(`GtkIconPaintable*',`Glib::RefPtr<IconPaintable>',`Glib::wrap($3)')
 _CONVERSION(`GtkIconPaintable*',`Glib::RefPtr<const IconPaintable>',`Glib::wrap($3)')

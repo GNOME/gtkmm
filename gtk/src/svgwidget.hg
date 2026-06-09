@@ -1,0 +1,84 @@
+/* Copyright (C) 2026 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+ */
+
+_DEFS(gtkmm,gtk)
+_PINCLUDE(gtkmm/private/widget_p.h)
+
+#include <gtkmm/widget.h>
+#include <gtkmm/svg.h>
+
+namespace Gtk
+{
+/** A widget that renders SVG, with animations and event handling.
+ *
+ * %Gtk::SvgWidget uses Gtk::Svg internally, and you should read
+ * its documentation to learn about the supported SVG features and
+ * extensions.
+ *
+ * On top of the Gtk::Svg rendering, %Gtk::SvgWidget adds event handling.
+ * <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> keys can be used
+ * to move the focus and <kbd>Enter</kbd> and clicks will activate links
+ * by emitting signal_activate().
+ *
+ * The `tabindex` and `autofocus` attributes can be used to influence
+ * what elements act as focus locations, and where focus goes initially.
+ *
+ * The styling of the SVG content is following input-related pseudo
+ * classes such as `:focus`, `:active`, `:hover` or `:visited`.
+ *
+ * If Gtk::Widget::property_has_tooltip() is set, then the content
+ * of `<title>` elements will be shown as tooltips.
+ *
+ * SVG animations and different `<view>`s can be triggered by input
+ * events as well. The following events are supported: focus, blur,
+ * mouseenter, mouseleave, click.
+ * See the [SVG animation](https://svgwg.org/specs/animations/)
+ * specification for details.
+ *
+ * @ingroup Widgets
+ * @newin{4,24}
+ */
+class GTKMM_API SvgWidget : public Widget
+{
+  _CLASS_GTKOBJECT(SvgWidget, GtkSvgWidget, GTK_SVG_WIDGET, Gtk::Widget, GtkWidget, , , GTKMM_API)
+  _DO_NOT_DERIVE_GTYPE dnl// GtkSvgWidget is a final type
+  _STRUCT_NOT_HIDDEN
+
+public:
+  _CTOR_DEFAULT
+
+  _WRAP_METHOD(void load_from_bytes(const Glib::RefPtr<const Glib::Bytes>& bytes),
+    gtk_svg_widget_load_from_bytes)
+  _WRAP_METHOD(void set_stylesheet(const Glib::RefPtr<const Glib::Bytes>& bytes = {}),
+    gtk_svg_widget_set_stylesheet)
+  // Glib::Bytes is immutable. No need for a non-const get-method.
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> get_stylesheet() const,
+    gtk_svg_widget_get_stylesheet, refreturn)
+  _WRAP_METHOD(void set_state(unsigned int state), gtk_svg_widget_set_state)
+  _WRAP_METHOD(unsigned int get_state() const, gtk_svg_widget_get_state)
+
+#m4 _CONVERSION(`GError*',`const SvgErrorExtra&',`SvgErrorExtra(g_error_copy($3))')
+  // no_default_handler because GtkSvgWidgetClass is private.
+  _WRAP_SIGNAL(void error(const SvgErrorExtra& error), "error", no_default_handler)
+  _WRAP_SIGNAL(void activate(const Glib::ustring& id, const Glib::ustring& href),
+    "activate", no_default_handler)
+
+  _WRAP_PROPERTY("resource", std::string)
+  _WRAP_PROPERTY("state", unsigned int)
+  _WRAP_PROPERTY("stylesheet", Glib::RefPtr<Glib::Bytes>)
+};
+
+} // namespace Gtk

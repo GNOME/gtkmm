@@ -34,14 +34,10 @@ typedef struct _GtkWindow GtkWindow;
 
 namespace Gtk
 {
-//TODO: Add overview documentation discussing the techniques shown in the examples in gtkmm-documentation.
-//TODO: Add the screenshots from the C API?
-
-/** %Application class.
+/** A high-level API for writing applications.
  *
- * The %Gtk::Application class handles many important aspects
- * of a GTK+ application in a convenient fashion, without enforcing
- * a one-size-fits-all application model.
+ * The %Gtk::Application class handles many aspects of a GTK application
+ * in a convenient fashion, without enforcing a one-size-fits-all model.
  *
  * Currently, %Gtk::Application handles GTK and gtkmm initialization, application
  * uniqueness, session management, provides some basic scriptability and
@@ -52,24 +48,71 @@ namespace Gtk
  * While %Gtk::Application works fine with plain Gtk::Window%s, it is recommended
  * to use it together with Gtk::ApplicationWindow.
  *
- * When GDK threads are enabled, %Gtk::Application will acquire the GDK
- * lock when invoking actions that arrive from other processes.  The GDK
- * lock is not touched for local action invocations.  In order to have
- * actions invoked in a predictable context it is therefore recommended
- * that the GDK lock be held while invoking actions locally with
- * Gio::ActionGroup::activate_action().  The same applies to actions
- * associated with Gtk::ApplicationWindow and to the Gio::Application::activate() and
- * Gio::Application::open() methods.
+ * ## Initialization
  *
- * To specify a menubar that will be shown by
- * Gtk::ApplicationWindow%s, use set_menubar(). Use the base
- * Gio::ActionMap interface to add actions, to respond to the user
+ * A typical %Gtk::Application will create a window in its
+ * Gio::Application::signal_activate(), Gio::Application::signal_open()
+ * or Gio::Application::signal_command_line() handlers. Note that all
+ * of these signals may be emitted multiple times, so handlers must
+ * be careful to take existing windows into account.
+ *
+ * ## Automatic resources
+ *
+ * %Gtk::Application will automatically load menus from the `GtkBuilder`
+ * resource located at "gtk/menus.ui", relative to the application's
+ * resource base path (see Gio::Application::set_resource_base_path()).
+ * The menu with the ID "menubar" is taken as the application's
+ * menubar. Additional menus (most interesting submenus) can be named
+ * and accessed via get_menu_by_id() which allows for
+ * dynamic population of a part of the menu structure.
+ *
+ * Note that automatic resource loading uses the resource base path
+ * that is set at construction time and will not work if the resource
+ * base path is changed at a later time.
+ *
+ * It is also possible to provide the menubar manually using set_menubar().
+ * Use the base Gio::ActionMap interface to add actions, to respond to the user
  * selecting these menu items.
  *
- * %Gtk::Application optionally registers with a session manager
- * of the users session (if you set the register-session
- * property) and offers various functionality related to the session
- * life-cycle.
+ * %Gtk::Application will also automatically setup an icon search path for
+ * the default icon theme by appending "icons" to the resource base
+ * path. This allows your application to easily store its icons as
+ * resources. See Gtk::IconTheme::add_resource_path() for more information.
+ *
+ * If there is a resource located at `gtk/help-overlay.ui` which
+ * defines a Gtk::ShortcutsWindow with ID `help_overlay` then
+ * %Gtk::Application associates an instance of this shortcuts window with
+ * each Gtk::ApplicationWindow and sets up the keyboard accelerator
+ * <kbd>Control</kbd>+<kbd>?</kbd> to open it. To create a menu item that
+ * displays the shortcuts window, associate the item with the action
+ * `win.show-help-overlay`.
+ *
+ * %Gtk::Application will also automatically set the application id as the
+ * default window icon. Use Gtk::Window::set_default_icon_name() or
+ * Gtk::Window::property_icon_name() to override that behavior.
+ *
+ * ## State saving
+ *
+ * %Gtk::Application registers with a session manager if possible and
+ * offers various functionality related to the session life-cycle,
+ * such as state saving.
+ *
+ * State-saving functionality can be enabled by setting
+ * property_support_save() to true.
+ *
+ * In order to save and restore per-window state, applications must
+ * connect to signal_restore_window() and
+ * handle Gtk::ApplicationWindow::signal_save_state(). There
+ * are also signal_restore_state() and
+ * signal_save_state() signals, which can be used
+ * for global state that is not connected to any window.
+ *
+ * %Gtk::Application automatically saves state before app shutdown, and by
+ * default periodically auto-saves app state (as configured by
+ * property_autosave_interval()). Applications can
+ * also call save() themselves at opportune times.
+ *
+ * ## Inhibiting
  *
  * An application can block various ways to end the session with
  * the inhibit() method. Typical use cases for
@@ -78,6 +121,11 @@ namespace Gtk
  * manager may not honor the inhibitor, but it can be expected to
  * inform the user about the negative consequences of ending the
  * session while inhibitors are present.
+ *
+ * ## See Also
+ *
+ * - [Using GtkApplication](https://developer.gnome.org/documentation/tutorials/application.html)
+ * - [Gtkmm tutorial: Building applications](https://gnome.pages.gitlab.gnome.org/gtkmm-documentation/chapter-building-applications.html)
  *
  * @note
  * Most widgets can't safely be created before the application has been registered
@@ -297,20 +345,28 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gio::Menu> get_menu_by_id(const Glib::ustring& id), gtk_application_get_menu_by_id, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gio::Menu> get_menu_by_id(const Glib::ustring& id) const, gtk_application_get_menu_by_id, refreturn, constversion)
+  _WRAP_METHOD(void save(), gtk_application_save)
+  _WRAP_METHOD(void forget(), gtk_application_forget)
 
   _WRAP_PROPERTY("menubar", Glib::RefPtr<Gio::MenuModel>)
   _WRAP_PROPERTY("register-session", bool,
     deprecated "4.20: This property is ignored. GTK always registers with the session manager.")
   _WRAP_PROPERTY("screensaver-active", bool, newin "3,94")
   _WRAP_PROPERTY("active-window", Window*)
+  _WRAP_PROPERTY("support-save", bool)
+  _WRAP_PROPERTY("autosave-interval", unsigned int)
 
   _WRAP_SIGNAL(void window_added(Window* window), "window-added")
   _WRAP_SIGNAL(void window_removed(Window* window), "window-removed")
   // no_default_handler because the wrapped C signal has no default handler.
   _WRAP_SIGNAL(void query_end(), "query-end", no_default_handler)
 
-  // If GtkApplication::restore-window, ::save-state, ::restoee-state
-  // are added again, see how they were wrapped in gtkmm 4.21.2.
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GVariantDict*',`const Glib::RefPtr<Glib::VariantDict>&',`Glib::wrap($3, true)')
+  // TODO: Remove the following 3 no_default_handler when we can break ABI.
+  _WRAP_SIGNAL(void restore_window(RestoreReason reason, const Glib::VariantBase& state), "restore-window", no_default_handler)
+  _WRAP_SIGNAL(bool save_state(const Glib::RefPtr<Glib::VariantDict>& dict), "save-state", no_default_handler)
+  _WRAP_SIGNAL(bool restore_state(RestoreReason reason, const Glib::VariantBase& state), "restore-state", no_default_handler)
 
 private:
   /** This is just a way to call Glib::init() before calling a Glib::Object ctor,
