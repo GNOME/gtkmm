@@ -181,6 +181,7 @@ extern const int gtkmm_micro_version;
 #include <gtkmm/emojichooser.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/expander.h>
+#include <gtkmm/enumlist.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/error.h>
 #include <gtkmm/eventcontroller.h>
@@ -341,7 +342,7 @@ extern const int gtkmm_micro_version;
 #ifndef GTKMM_DISABLE_DEPRECATED
 # include <gtkmm/stylecontext.h>
 #endif
-#include <gtkmm/svg.h>
+#include <gtkmm/svgwidget.h>
 #include <gtkmm/switch.h>
 #include <gtkmm/symbolicpaintable.h>
 #include <gtkmm/text.h>
