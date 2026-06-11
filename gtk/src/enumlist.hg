@@ -17,6 +17,7 @@
 _CONFIGINCLUDE(gtkmmconfig.h)
 
 #include <giomm/listmodel.h>
+#include <gtkmm/enumlistitem.h>
 #include <gtk/gtk.h>
 
 _DEFS(gtkmm,gtk)
@@ -24,44 +25,132 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gtk
 {
-/** A Gio::ListModel representing values of a given enum.
+/** Base class of Gtk::EnumList.
  *
- * %Gtk::EnumList contains objects of type Gtk::EnumListItem.
+ * A Gio::ListModel representing values of a given enum.
+ * Usually it's easier to use the Gtk::EnumList<T> subclass.
  *
- * A simple way to use a %Gtk::EnumList is to populate a Gtk::DropDown
+ * %Gtk::EnumListBase contains items of type Gtk::EnumListItem.
+ *
+ * A simple way to use a %Gtk::EnumListBase is to populate a Gtk::DropDown
  * widget using the short name (or "nick") of the values of an
  * enumeration type:
- *
  * @code
  * GType enum_type = Glib::Value<Gtk::Justification>::value_type(); // an example
- * Glib::RefPtr<Gtk::EnumList> enum_list = Gtk::EnumList::create(enum_type);
+ * Glib::RefPtr<Gtk::EnumListBase> enum_list = Gtk::EnumListBase::create(enum_type);
  * Glib::RefPtr<Gtk::PropertyExpression> expression =
- *   Gtk::PropertyExpression::create(Gtk::EnumListItem::get_type(), "nick");
+ *   Gtk::PropertyExpression<Glib::ustring>::create(Gtk::EnumListItem::get_type(), "nick");
  * Gtk::DropDown* drop_down = Gtk::make_managed<Gtk::DropDown>(enum_list, expression);
  * @endcode
- *
  * All variables in the code snippet can be declared <b>auto</b>. The full types
  * are shown to make it clear what they are.
  *
- * @see Gio::ListModel
+ * @see Gio::ListModel, Gtk::EnumListItem
  * @ingroup ListView
  * @newin{4,24}
  */
-class GTKMM_API EnumList : public Glib::Object, public Gio::ListModel
+class GTKMM_API EnumListBase : public Glib::Object, public Gio::ListModel
 {
-  _CLASS_GOBJECT(EnumList, GtkEnumList, GTK_ENUM_LIST, Glib::Object, GObject, , , GTKMM_API)
+  _CLASS_GOBJECT(EnumListBase, GtkEnumList, GTK_ENUM_LIST, Glib::Object, GObject, , , GTKMM_API)
   _IMPLEMENTS_INTERFACE(Gio::ListModel)
   _DO_NOT_DERIVE_GTYPE dnl// GtkEnumList is a final type
   _STRUCT_NOT_HIDDEN
 
 protected:
-  _WRAP_CTOR(EnumList(GType enum_type), gtk_enum_list_new)
+  _WRAP_CTOR(EnumListBase(GType enum_type), gtk_enum_list_new)
 
 public:
-  _WRAP_METHOD_DOCS_ONLY(gtk_enum_list_new)
+  /** Creates a new `Gtk::EnumListBase` for @a enum_type.
+   *
+   * @newin{4,24}
+   *
+   * @param enum_type The type of the enum to construct the model from.
+   *        It can't be a flags type (such as Gtk::StateFlags).
+   * @return The newly created `Gtk::EnumListBase`.
+   */
   _WRAP_CREATE(GType enum_type)
 
   _WRAP_METHOD(GType get_enum_type() const, gtk_enum_list_get_enum_type)
+
+  /** Finds the position of a given enum value in this %EnumListBase.
+   *
+   * If the value is not found, GTK_INVALID_LIST_POSITION is returned.
+   *
+   * @newin{4,24}
+   *
+   * @param value An enum value. If the enum is an enum class, use
+   *   static_cast<int>(value) to cast the value to an int.
+   * @return The position of the value.
+   */
+  _WRAP_METHOD(unsigned int find(int value) const, gtk_enum_list_find)
+
+  /** Get the item at @a position.
+   *
+   * If @a position is greater than the number of items in this list,
+   * an empty RefPtr is returned.
+   *
+   * @newin{4,24}
+   *
+   * @param position The position of the item to fetch.
+   * @return The item at @a position.
+   */
+  Glib::RefPtr<EnumListItem> get_item(unsigned int position);
+
+  /** Get the item at @a position.
+   *
+   * If @a position is greater than the number of items in this list,
+   * an empty RefPtr is returned.
+   *
+   * @newin{4,24}
+   *
+   * @param position The position of the item to fetch.
+   * @return The item at @a position.
+   */
+  Glib::RefPtr<const EnumListItem> get_item(unsigned int position) const;
+
+  _WRAP_PROPERTY("enum-type", GType)
+  _WRAP_PROPERTY("item-type", GType)
+  _WRAP_PROPERTY("n-items", unsigned int)
+};
+
+/** A Gio::ListModel representing values of a given enum.
+ *
+ * %Gtk::EnumList contains items of type Gtk::EnumListItem.
+ *
+ * A simple way to use a %Gtk::EnumList is to populate a Gtk::DropDown
+ * widget using the short name (or "nick") of the values of an
+ * enumeration type:
+ * @code
+ * Glib::RefPtr<Gtk::EnumList<Gtk::Justification>> enum_list =
+ *   Gtk::EnumList<Gtk::Justification>::create();
+ * Glib::RefPtr<Gtk::PropertyExpression> expression =
+ *   Gtk::PropertyExpression<Glib::ustring>::create(Gtk::EnumListItem::get_type(), "nick");
+ * Gtk::DropDown* drop_down = Gtk::make_managed<Gtk::DropDown>(enum_list, expression);
+ * @endcode
+ * All variables in the code snippet can be declared <b>auto</b>. The full types
+ * are shown to make it clear what they are.
+ *
+ * @see Gio::ListModel, Gtk::EnumListItem
+ * @ingroup ListView
+ * @newin{4,24}
+ *
+ * @tparam T Type of an enum which has been registered in GLib's GType system.
+ *           It can't be a flags type (such as Gtk::StateFlags).
+ */
+template <typename T>
+class EnumList : public EnumListBase
+{
+protected:
+  EnumList();
+
+public:
+  /** Creates a new Gtk::EnumList<T> for enums to type T.
+   *
+   * @newin{4,24}
+   *
+   * @return The newly created Gtk::EnumList<T>.
+   */
+  static Glib::RefPtr<EnumList> create();
 
   /** Finds the position of a given enum value in this %EnumList.
    *
@@ -69,15 +158,26 @@ public:
    *
    * @newin{4,24}
    *
-   * @param value An enum value. If the enum is an enum class, use
-   *   static_cast<int>(value) to convert the value to an int.
+   * @param value An enum value.
    * @return The position of the value.
    */
-  _WRAP_METHOD(unsigned int find(int value) const, gtk_enum_list_find)
-
-  _WRAP_PROPERTY("enum-type", GType)
-  _WRAP_PROPERTY("item-type", GType)
-  _WRAP_PROPERTY("n-items", unsigned int)
+  unsigned int find(T value) const;
 };
 
+template <typename T>
+EnumList<T>::EnumList()
+: EnumListBase(Glib::Value<T>::value_type())
+{}
+
+template <typename T>
+Glib::RefPtr<EnumList<T>> EnumList<T>::create()
+{
+  return Glib::make_refptr_for_instance<EnumList<T>>(new EnumList<T>);
+}
+
+template <typename T>
+unsigned int EnumList<T>::find(T value) const
+{
+  return EnumListBase::find(static_cast<int>(value));
+}
 } // namespace Gtk
