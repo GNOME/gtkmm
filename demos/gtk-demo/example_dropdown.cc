@@ -12,6 +12,10 @@
 
 #include <gtkmm.h>
 #include <pangomm/cairofontmap.h>
+#include <iostream>
+
+using EnumListType = Gtk::Constraint::Strength;
+const Glib::ustring enum_list_type_name("Gtk::Constraint::Strength");
 
 class StringHolder : public Glib::Object {
 public:
@@ -60,6 +64,8 @@ protected:
   void strings_setup_item_full(const Glib::RefPtr<Gtk::ListItem>& item);
   void selected_item_changed(const Gtk::DropDown* dropdown,
                              const Glib::RefPtr<Gtk::ListItem>& item);
+  void selected_enum_changed(const Gtk::DropDown* dropdown,
+    const Glib::RefPtr<const Gtk::EnumList<EnumListType>>& model);
   void strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item, Gtk::DropDown* dropdown);
   void strings_unbind_item(const Glib::RefPtr<Gtk::ListItem>& item);
   Glib::RefPtr<Gtk::ListItemFactory> strings_factory_new(Gtk::DropDown* dropdown, bool full);
@@ -138,6 +144,18 @@ void Example_DropDown::selected_item_changed(const Gtk::DropDown* dropdown,
     checkmark->set_opacity(0.0);
 }
 
+void Example_DropDown::selected_enum_changed(const Gtk::DropDown* dropdown,
+  const Glib::RefPtr<const Gtk::EnumList<EnumListType>>& model)
+{
+  const auto selected = dropdown->get_selected();
+  std::cout << "DropDown enum changed: Position=" << selected << std::endl;
+
+  auto item = model->get_item(selected);
+  if (!item)
+    return;
+  std::cout << "  Value=" << item->get_value() << ", Name=" << item->get_name()
+    << ", Nick=" << item->get_nick() << std::endl;
+}
 void Example_DropDown::strings_bind_item(const Glib::RefPtr<Gtk::ListItem>& item,
                                          Gtk::DropDown* dropdown)
 {
@@ -324,6 +342,16 @@ Example_DropDown::Example_DropDown()
 
   dropdown = drop_down_new_from_strings(device_titles, device_icons, device_descriptions);
   m_box.append(*dropdown);
+
+  // Gtk::EnumList
+  m_box.append(*Gtk::make_managed<Gtk::Label>(enum_list_type_name));
+  auto enum_list = Gtk::EnumList<EnumListType>::create();
+  auto prop_expression =
+    Gtk::PropertyExpression<Glib::ustring>::create(Gtk::EnumListItem::get_type(), "nick");
+  dropdown = Gtk::make_managed<Gtk::DropDown>(enum_list, prop_expression);
+  m_box.append(*dropdown);
+  dropdown->property_selected().signal_changed().connect(
+    [this, dropdown, enum_list] () { selected_enum_changed(dropdown, enum_list); });
 }
 
 Example_DropDown::~Example_DropDown()
