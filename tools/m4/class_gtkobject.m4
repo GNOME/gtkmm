@@ -264,14 +264,14 @@ public:
 
   /** Get the GType for this class, for use with the underlying GObject type system.
    */
-  static GType get_type()      G_GNUC_CONST;
+  static GType get_type();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
-  static GType get_type(GTypeModule* module)      G_GNUC_CONST;
+  static GType get_type(GTypeModule* module);
 ',`')
 
-  static GType get_base_type() G_GNUC_CONST;
+  static GType get_base_type();
 #endif
 
   /// Provides access to the underlying C GObject.
