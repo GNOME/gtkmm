@@ -4,7 +4,8 @@
 #        generate_binding_py, m4_files, gtkmm_libversion, install_includedir,
 #        python3, gdkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, gmmproc_extra_m4_dirs, is_host_windows,
-#        gdkmm_extra_gendef_cpp_args, gdkmm_libname, macos_darwin_versions
+#        gdkmm_extra_gendef_cpp_args, gdkmm_libname, macos_darwin_versions,
+#        pkgconfig, base_pkgconfig_vars, base_pkgconfig_uninstalled_vars
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
 #         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets, gdkmm_own_dep
 
@@ -272,6 +273,20 @@ else
     install: true,
   )
 endif
+
+# Generate the pkg-config files
+pkgconfig.generate(
+  gdkmm_library,
+  name: 'gdkmm',
+  description: 'C++ binding for the GDK drawing kit',
+  filebase: gdkmm_pcname,
+  subdirs: gdkmm_pcname,
+  url: 'https://gtkmm.gnome.org/',
+  extra_cflags: '-I${libdir}/@0@/include'.format(gdkmm_pcname),
+  requires: gdkmm_build_dep,
+  variables: base_pkgconfig_vars,
+  uninstalled_variables: base_pkgconfig_uninstalled_vars
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(

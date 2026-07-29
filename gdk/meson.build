@@ -9,21 +9,9 @@
 # Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()
-pkg_conf_data.set('prefix', install_prefix)
-pkg_conf_data.set('exec_prefix', '${prefix}')
-pkg_conf_data.set('libdir', '${exec_prefix}' / install_libdir)
-pkg_conf_data.set('datarootdir', '${prefix}' / install_datadir)
-pkg_conf_data.set('datadir', '${datarootdir}')
-pkg_conf_data.set('includedir', '${prefix}' / install_includedir)
-pkg_conf_data.set('PACKAGE_TARNAME', meson.project_name())
 pkg_conf_data.set('PACKAGE_VERSION', meson.project_version())
 pkg_conf_data.set('GDKMM_MODULE_NAME', gdkmm_pcname)
-pkg_conf_data.set('GDKMM_API_VERSION', gtkmm_api_version)
-pkg_conf_data.set('GDKMM_MODULES', gdkmm_requires)
 pkg_conf_data.set('GTKMM_MODULE_NAME', gtkmm_pcname)
-pkg_conf_data.set('GTKMM_API_VERSION', gtkmm_api_version)
-pkg_conf_data.set('GTKMM_MODULES', gtkmm_requires)
-pkg_conf_data.set('MSVC_TOOLSET_VER', msvc14x_toolset_ver)
 if not build_deprecated_api
   pkg_conf_data.set('GDKMM_DISABLE_DEPRECATED', 1)
   pkg_conf_data.set('GTKMM_DISABLE_DEPRECATED', 1)
@@ -53,25 +41,6 @@ if library_build_type == 'static'
   pkg_conf_data.set('GDKMM_STATIC_LIB', 1)
   pkg_conf_data.set('GTKMM_STATIC_LIB', 1)
 endif
-
-configure_file(
-  input: 'gdkmm.pc.in',
-  output: gdkmm_pcname + '.pc',
-  configuration: pkg_conf_data,
-  install: true,
-  install_dir: install_pkgconfigdir,
-  install_tag: 'devel',
-)
-
-gdkmm_pkg_uninst_conf_data = configuration_data()
-gdkmm_pkg_uninst_conf_data.merge_from(pkg_conf_data)
-gdkmm_pkg_uninst_conf_data.set('srcdir', meson.current_source_dir())
-
-configure_file(
-  input: 'gdkmm-uninstalled.pc.in',
-  output: gdkmm_pcname + '-uninstalled.pc',
-  configuration: gdkmm_pkg_uninst_conf_data,
-)
 
 gdkmmconfig_h_meson = files('gdkmmconfig.h.meson')
 install_gdkmmconfigdir = install_libdir / gdkmm_pcname / 'include'

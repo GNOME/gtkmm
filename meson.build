@@ -12,8 +12,8 @@ project('gtkmm', 'c', 'cpp',
 )
 
 gtkmm_api_version = '3.0'
-gtkmm_pcname = meson.project_name() + '-' + gtkmm_api_version
-gdkmm_pcname = 'gdkmm-' + gtkmm_api_version
+gtkmm_pcname = '@0@-@1@'.format(meson.project_name(), gtkmm_api_version)
+gdkmm_pcname = 'gdkmm-@0@'.format(gtkmm_api_version)
 
 gtkmm_version_array = meson.project_version().split('.')
 gtkmm_major_version = gtkmm_version_array[0].to_int()
@@ -50,6 +50,21 @@ is_host_windows = host_machine.system() == 'windows'
 
 # Use the Python installation that Meson uses. Its version is >= 3.7.
 python3 = import('python').find_installation()
+pkgconfig = import('pkgconfig')
+common_pkgconfig_vars = [
+  'htmlrefpub=https://gnome.pages.gitlab.gnome.org/@0@/'.format(meson.project_name()),
+]
+base_pkgconfig_vars = [
+  'exec_prefix=${prefix}',
+  'datarootdir=${prefix}/share',
+  'datadir=${datarootdir}',
+  'docdir=${datarootdir}/doc/@0@'.format(gtkmm_pcname),
+  'doxytagfile=${docdir}/reference/@0@.tag'.format(gtkmm_pcname),
+  'htmlrefdir=${docdir}/reference/html',
+] + common_pkgconfig_vars
+base_pkgconfig_uninstalled_vars = [
+  'doxytagfile=${prefix}/docs/reference/@0@.tag'.format(gtkmm_pcname),
+] + common_pkgconfig_vars
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
