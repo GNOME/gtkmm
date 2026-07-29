@@ -211,20 +211,11 @@ else
 endif
 
 gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
-gdkmm_requires = [
-  'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
-  'gtk+-3.0', gtk_req,
-  'cairomm-1.0', cairomm_req,
-  'pangomm-1.4', cairomm_req,
-  'gdk-pixbuf-2.0', gdk_pixbuf_req,
-]
 
 gtkmm_build_dep = gdkmm_build_dep
-gtkmm_requires = gdkmm_requires
 
 if build_atkmm_api
   gtkmm_build_dep += [atkmm_dep]
-  gtkmm_requires += ['atkmm-1.6', atkmm_req]
 endif
 
 # not Windows
@@ -238,11 +229,7 @@ if host_machine.system() != 'windows'
   if gtk_unix_print_dep.found()
     gtkmm_build_dep += [gtk_unix_print_dep]
   endif
-  gtkmm_requires += ['gtk+-unix-print-3.0', '']
 endif
-
-gdkmm_requires = ' '.join(gdkmm_requires)
-gtkmm_requires = ' '.join(gtkmm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.

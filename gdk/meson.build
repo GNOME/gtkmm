@@ -1,11 +1,9 @@
 # gdk
 
-# Input: install_prefix, install_libdir, install_datadir, install_includedir,
-#        gdkmm_pcname, gtkmm_pcname, gtkmm_api_version, gdkmm_requires,
-#        gtkmm_requires, build_deprecated_api, install_pkgconfigdir,
-#        is_os_cocoa, cpp_compiler, gtkmm_major_version, gtkmm_minor_version,
-#        gtkmm_micro_version, build_atkmm_api, build_x11_api,
-#        msvc14x_toolset_ver
+# Input: install_libdir, gdkmm_pcname, gtkmm_pcname,
+#        build_deprecated_api, cpp_compiler, gtkmm_major_version,
+#        gtkmm_minor_version, gtkmm_micro_version, build_atkmm_api,
+#        build_x11_api
 # Output: pkg_conf_data, install_gdkmmconfigdir, gdkmmconfig_h_meson
 
 pkg_conf_data = configuration_data()

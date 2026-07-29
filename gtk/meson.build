@@ -1,6 +1,6 @@
 # gtk
 
-# Input: pkg_conf_data, gtkmm_pcname, install_pkgconfigdir, install_libdir
+# Input: pkg_conf_data, gtkmm_pcname, install_libdir
 # Output: install_gtkmmconfigdir, gtkmmconfig_h_meson
 
 gtkmmconfig_h_meson = files('gtkmmconfig.h.meson')
