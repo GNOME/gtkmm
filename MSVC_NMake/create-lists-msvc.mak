@@ -139,7 +139,7 @@ gdkmm_generated_private_headers = $(files_hg:.hg=_p.h)
 
 # We need to generate a temporary .bat file to generate $(OUTDIR)\gdkmm\applaunchcontext.h from a GIT checkout
 # so that we can use that to see whether we need to use gendef.exe, as the UNIXy tools might not be in %PATH%
-!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\gdk\%f if not exist ..\untracked\gdk\%f if not exist $(OUTDIR)\%f (echo @echo off>$(GENERATE_CHECK_HEADER_BAT) & echo setlocal EnableDelayedExpansion>>$(GENERATE_CHECK_HEADER_BAT) & echo md $(OUTDIR)\gdkmm\private>>$(GENERATE_CHECK_HEADER_BAT) & echo set "PATH=$(PATH);$(UNIX_TOOLS_BINDIR_CHECKED)">>$(GENERATE_CHECK_HEADER_BAT) & echo call $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src $(OUTDIR:\=/)/gdkmm>>$(GENERATE_CHECK_HEADER_BAT))]
+!if [for %f in (gdkmm\applaunchcontext.h) do @if not exist ..\gdk\%f if not exist ..\untracked\gdk\%f if not exist $(OUTDIR)\%f (echo @echo off>$(GENERATE_CHECK_HEADER_BAT) & echo setlocal EnableDelayedExpansion>>$(GENERATE_CHECK_HEADER_BAT) & echo md $(OUTDIR)\gdkmm\private>>$(GENERATE_CHECK_HEADER_BAT) & echo set "PATH=%PATH%;$(UNIX_TOOLS_BINDIR_CHECKED)">>$(GENERATE_CHECK_HEADER_BAT) & echo call $(PERL) -- $(GMMPROC_DIR)/gmmproc -I ../tools/m4 -I $(GMMPROC_PANGO_DIR) -I $(GMMPROC_ATK_DIR) --defs ../gdk/src applaunchcontext ../gdk/src $(OUTDIR:\=/)/gdkmm>>$(GENERATE_CHECK_HEADER_BAT))]
 !endif
 
 !if [if exist $(GENERATE_CHECK_HEADER_BAT) call $(GENERATE_CHECK_HEADER_BAT) & del $(GENERATE_CHECK_HEADER_BAT)]
