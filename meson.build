@@ -12,8 +12,8 @@ project('gtkmm', 'c', 'cpp',
 )
 
 gtkmm_api_version = '3.0'
-gtkmm_pcname = meson.project_name() + '-' + gtkmm_api_version
-gdkmm_pcname = 'gdkmm-' + gtkmm_api_version
+gtkmm_pcname = '@0@-@1@'.format(meson.project_name(), gtkmm_api_version)
+gdkmm_pcname = 'gdkmm-@0@'.format(gtkmm_api_version)
 
 gtkmm_version_array = meson.project_version().split('.')
 gtkmm_major_version = gtkmm_version_array[0].to_int()
@@ -50,6 +50,21 @@ is_host_windows = host_machine.system() == 'windows'
 
 # Use the Python installation that Meson uses. Its version is >= 3.7.
 python3 = import('python').find_installation()
+pkgconfig = import('pkgconfig')
+common_pkgconfig_vars = [
+  'htmlrefpub=https://gnome.pages.gitlab.gnome.org/@0@/'.format(meson.project_name()),
+]
+base_pkgconfig_vars = [
+  'exec_prefix=${prefix}',
+  'datarootdir=${prefix}/share',
+  'datadir=${datarootdir}',
+  'docdir=${datarootdir}/doc/@0@'.format(gtkmm_pcname),
+  'doxytagfile=${docdir}/reference/@0@.tag'.format(gtkmm_pcname),
+  'htmlrefdir=${docdir}/reference/html',
+] + common_pkgconfig_vars
+base_pkgconfig_uninstalled_vars = [
+  'doxytagfile=${prefix}/docs/reference/@0@.tag'.format(gtkmm_pcname),
+] + common_pkgconfig_vars
 
 # Do we build from a git repository?
 # Suppose we do if and only if the meson.build file is tracked by git.
@@ -196,20 +211,11 @@ else
 endif
 
 gdkmm_build_dep = [giomm_dep, gtk_dep, cairomm_dep, pangomm_dep, gdk_pixbuf_dep]
-gdkmm_requires = [
-  'giomm-2.@0@'.format(glibmm_req_minor_ver), glibmm_req,
-  'gtk+-3.0', gtk_req,
-  'cairomm-1.0', cairomm_req,
-  'pangomm-1.4', cairomm_req,
-  'gdk-pixbuf-2.0', gdk_pixbuf_req,
-]
 
 gtkmm_build_dep = gdkmm_build_dep
-gtkmm_requires = gdkmm_requires
 
 if build_atkmm_api
   gtkmm_build_dep += [atkmm_dep]
-  gtkmm_requires += ['atkmm-1.6', atkmm_req]
 endif
 
 # not Windows
@@ -223,11 +229,7 @@ if host_machine.system() != 'windows'
   if gtk_unix_print_dep.found()
     gtkmm_build_dep += [gtk_unix_print_dep]
   endif
-  gtkmm_requires += ['gtk+-unix-print-3.0', '']
 endif
-
-gdkmm_requires = ' '.join(gdkmm_requires)
-gtkmm_requires = ' '.join(gtkmm_requires)
 
 # Some dependencies are required only in maintainer mode and/or if
 # reference documentation shall be built.

@@ -5,7 +5,8 @@
 #        python3, gtkmm_rc, dummy_header_py, gmmproc_dir, build_shared_libs_directly,
 #        build_deprecated_api, build_x11_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_extra_gendef_cpp_args,
-#        gtkmm_libname, macos_darwin_versions
+#        gtkmm_libname, macos_darwin_versions, pkgconfig,
+#        base_pkgconfig_vars, base_pkgconfig_uninstalled_vars
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_own_dep
 
@@ -541,6 +542,22 @@ else
     install: true,
   )
 endif
+
+# Generate the pkg-config files
+pkgconfig.generate(
+  gtkmm_library,
+  name: 'gtkmm',
+  description: 'C++ binding for the GTK+ toolkit',
+  filebase: gtkmm_pcname,
+  subdirs: gtkmm_pcname,
+  url: 'https://gtkmm.gnome.org/',
+  extra_cflags: '-I${libdir}/@0@/include'.format(gtkmm_pcname),
+  requires: gtkmm_build_dep + gdkmm_library,
+  variables: base_pkgconfig_vars + [
+    'gmmprocm4dir=${libdir}/@0@/proc/m4'.format(gtkmm_pcname),
+  ],
+  uninstalled_variables: base_pkgconfig_uninstalled_vars
+)
 
 # Install built .h and _p.h files.
 meson.add_install_script(
