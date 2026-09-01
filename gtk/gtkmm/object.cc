@@ -99,9 +99,12 @@ void Object::_release_c_instance()
     //This prevents us from unref-ing it again, or destroying it again after GTK+ has told us that it has been disposed.
     if (!gobject_disposed_)
     {
-      if (referenced_ || (GTK_IS_WIDGET(object) && !gtk_widget_get_parent(GTK_WIDGET(object))))
+      if (referenced_ || (GTK_IS_WIDGET(object) &&
+        !gtk_widget_get_parent(GTK_WIDGET(object)) && !GTK_IS_INVISIBLE(object)))
       {
-        // It's not manage()d or it's an orphan widget, so we just unref to destroy it.
+        // It's not manage()d or it's an orphan widget (not a GtkInvisible),
+        // so we just unref to destroy it.
+        // Concerning GtkInvisible, see https://gitlab.gnome.org/GNOME/gtkmm/-/work_items/174
         #ifdef GLIBMM_DEBUG_REFCOUNTING
         g_warning("final unref: gtypename: %s, refcount: %d\n", G_OBJECT_TYPE_NAME(object), ((GObject*)object)->ref_count);
         #endif
