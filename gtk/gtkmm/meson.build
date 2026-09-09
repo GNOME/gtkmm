@@ -6,7 +6,8 @@
 #        build_deprecated_api, build_x11_api, gmmproc_extra_m4_dirs, is_host_windows,
 #        gdkmm_library, gdkmm_used_built_h_file_targets, gtkmm_extra_gendef_cpp_args,
 #        gtkmm_libname, macos_darwin_versions, pkgconfig,
-#        base_pkgconfig_vars, base_pkgconfig_uninstalled_vars
+#        base_pkgconfig_vars, base_pkgconfig_uninstalled_vars,
+#        gdkmm_built_dummy_h_file_target
 # Output: gtkmm_hg_ccg_basenames, gtkmm_extra_h_files, built_files_root,
 #         gtkmm_built_h_file_targets, gtkmm_own_dep
 
@@ -421,7 +422,7 @@ if maintainer_mode
   # If gtkmm_used_built_h_file_targets would be listed as sources to gtkmm_library,
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
-  built_dummy_h_file_target = custom_target('gtkmm-dummy_header.h',
+  gtkmm_built_dummy_h_file_target = custom_target('gtkmm-dummy_header.h',
     input: gtkmm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
@@ -472,7 +473,7 @@ else # not maintainer_mode
   endforeach
 
   gtk_gen_sources = built_cc_files
-  built_dummy_h_file_target = []
+  gtkmm_built_dummy_h_file_target = []
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'gtk',
           '..' / '..' / 'gdk', '..' / '..' / 'untracked' / 'gdk',
@@ -493,7 +494,8 @@ endif
 
 if build_shared_libs_directly
   gtkmm_library = library(gtkmm_libname, extra_gtkmm_objects,
-    gtk_gen_sources, built_dummy_h_file_target, gtkmm_extra_used_cc_files,
+    gtk_gen_sources, gtkmm_built_dummy_h_file_target, gtkmm_extra_used_cc_files,
+    gdkmm_built_dummy_h_file_target,
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gtkmm_cpp_args,
@@ -509,7 +511,8 @@ else
   # that we can run gendef.exe to get the .def file
   # needed for obtaining the .lib file for the gtkmm DLL
   gtk_int_lib = static_library('gtkmm-int',
-    gtk_gen_sources, built_dummy_h_file_target, gtkmm_extra_used_cc_files,
+    gtk_gen_sources, gtkmm_built_dummy_h_file_target, gtkmm_extra_used_cc_files,
+    gdkmm_built_dummy_h_file_target,
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gtkmm_cpp_args,

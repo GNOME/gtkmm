@@ -7,7 +7,8 @@
 #        gdkmm_extra_gendef_cpp_args, gdkmm_libname, macos_darwin_versions,
 #        pkgconfig, base_pkgconfig_vars, base_pkgconfig_uninstalled_vars
 # Output: gdkmm_hg_ccg_basenames, gdkmm_extra_h_files, built_files_root,
-#         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets, gdkmm_own_dep
+#         gdkmm_built_h_file_targets, gdkmm_used_built_h_file_targets,
+#         gdkmm_own_dep, gdkmm_built_dummy_h_file_target
 
 gdkmm_defs_basefiles = [
   'gdk.defs',
@@ -157,7 +158,7 @@ if maintainer_mode
   # If gdkmm_used_built_h_file_targets would be listed as sources to gdkmm_library,
   # all generated .cc files could be recompiled if one generated .h file has
   # been changed.
-  built_dummy_h_file_target = custom_target('gdkmm-dummy_header.h',
+  gdkmm_built_dummy_h_file_target = custom_target('gdkmm-dummy_header.h',
     input: gdkmm_built_h_file_targets,
     output: 'dummy_header.h',
     command: [
@@ -208,7 +209,7 @@ else # not maintainer_mode
   endforeach
 
   gdk_gen_sources = built_cc_files
-  built_dummy_h_file_target = []
+  gdkmm_built_dummy_h_file_target = []
 
   extra_include_dirs = [ '..', '..' / '..' / 'untracked' / 'gdk' ]
 
@@ -227,7 +228,7 @@ endif
 
 if build_shared_libs_directly
   gdkmm_library = library(gdkmm_libname, extra_gdkmm_objects,
-    gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
+    gdk_gen_sources, gdkmm_built_dummy_h_file_target, gdkmm_extra_cc_files,
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gdkmm_cpp_args,
@@ -242,7 +243,7 @@ else
   # that we can run gendef.exe to get the .def file
   # needed for obtaining the .lib file for the gdkmm DLL
   gdk_int_lib = static_library('gdkmm-int',
-    gdk_gen_sources, built_dummy_h_file_target, gdkmm_extra_cc_files,
+    gdk_gen_sources, gdkmm_built_dummy_h_file_target, gdkmm_extra_cc_files,
     implicit_include_directories: false,
     include_directories: extra_include_dirs,
     cpp_args: gdkmm_cpp_args,
