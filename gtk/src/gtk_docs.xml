@@ -5971,6 +5971,18 @@ in markdown format.
 Since: 4.24
 </parameter_description>
 </parameter>
+<parameter name="GTK_DEBUG_SVG_ERRORS">
+<parameter_description>Print GtkSvg errors.
+
+Since: 4.26
+</parameter_description>
+</parameter>
+<parameter name="GTK_DEBUG_SVG_CONTINUOUS">
+<parameter_description>Make GtkSvg run animations in continuous mode.
+
+Since: 4.26
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -10913,6 +10925,17 @@ Allow rubberband selection.
 Factory for populating list items.
 
 The factory must be for configuring [class@Gtk.ListItem] objects.
+
+</description>
+</property>
+
+<property name="GtkGridView:header-factory">
+<description>
+Factory for creating header widgets.
+
+The factory must be for configuring [class@Gtk.ListHeader] objects.
+
+Since: 4.26
 
 </description>
 </property>
@@ -27151,55 +27174,6 @@ no effect if the action bar is hidden.
 </parameter>
 <parameter name="revealed">
 <parameter_description> the new value for the property
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_action_observable_register_observer">
-<description>
-Registers @observer as being interested in changes to @action_name on
-@observable.
-
-</description>
-<parameters>
-<parameter name="observable">
-<parameter_description> a `GtkActionObservable`
-</parameter_description>
-</parameter>
-<parameter name="action_name">
-<parameter_description> the name of the action
-</parameter_description>
-</parameter>
-<parameter name="observer">
-<parameter_description> the `GtkActionObserver` to which the events will be reported
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gtk_action_observable_unregister_observer">
-<description>
-Removes the registration of @observer as being interested in changes
-to @action_name on @observable.
-
-If the observer was registered multiple times, it must be
-unregistered an equal number of times.
-
-</description>
-<parameters>
-<parameter name="observable">
-<parameter_description> a `GtkActionObservable`
-</parameter_description>
-</parameter>
-<parameter name="action_name">
-<parameter_description> the name of the action
-</parameter_description>
-</parameter>
-<parameter name="observer">
-<parameter_description> the `GtkActionObserver` to which the events will be reported
 </parameter_description>
 </parameter>
 </parameters>
@@ -43522,7 +43496,7 @@ and shown.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the `GtkDragIcon`
+<return> the icon widget
 </return>
 </function>
 
@@ -46205,7 +46179,7 @@ This function will set up @completion
 to have a list displaying all (and just) strings in the completion list,
 and to get those strings from @column in the model of @completion.
 
-This functions creates and adds a `GtkCellRendererText` for the selected
+This function creates and adds a `GtkCellRendererText` for the selected
 column. If you need to set the text column, but don't want the cell
 renderer, use g_object_set() to set the
 [property@Gtk.EntryCompletion:text-column] property directly.
@@ -56872,6 +56846,24 @@ Gets the factory that's currently used to populate list items.
 </return>
 </function>
 
+<function name="gtk_grid_view_get_header_factory">
+<description>
+Gets the factory that's currently used to populate section headers.
+
+Since: 4.26
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a gridview
+</parameter_description>
+</parameter>
+</parameters>
+<return> The factory in use
+
+</return>
+</function>
+
 <function name="gtk_grid_view_get_max_columns">
 <description>
 Gets the maximum number of columns that the grid will use.
@@ -57043,6 +57035,30 @@ Sets the `GtkListItemFactory` to use for populating list items.
 <parameters>
 <parameter name="self">
 <parameter_description> a `GtkGridView`
+</parameter_description>
+</parameter>
+<parameter name="factory">
+<parameter_description> the factory to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gtk_grid_view_set_header_factory">
+<description>
+Sets the `GtkListItemFactory` to use for populating the
+[class@Gtk.ListHeader] objects used in section headers.
+
+If this factory is set to `NULL`, the list will not show
+section headers.
+
+Since: 4.26
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a gridview
 </parameter_description>
 </parameter>
 <parameter name="factory">
@@ -84707,7 +84723,9 @@ to [method@Gtk.Snapshot.pop].
 
 <function name="gtk_snapshot_push_blur">
 <description>
-Blurs an image.
+Blurs an image using a gaussian blur.
+
+The blur radius has to be set to 2x the std deviation of the blur.
 
 The image is recorded until the next call to [method@Gtk.Snapshot.pop].
 
@@ -84718,7 +84736,7 @@ The image is recorded until the next call to [method@Gtk.Snapshot.pop].
 </parameter_description>
 </parameter>
 <parameter name="radius">
-<parameter_description> the blur radius to use. Must be positive
+<parameter_description> the blur radius to use. Must be positive. May be 0
 </parameter_description>
 </parameter>
 </parameters>
@@ -86079,7 +86097,7 @@ See [method@Gtk.SpinButton.set_increments].
 
 <function name="gtk_spin_button_get_numeric">
 <description>
-Returns whether non-numeric text can be typed into the spin button.
+Returns whether only numeric text can be typed into the spin button.
 
 
 </description>
@@ -86370,7 +86388,7 @@ the spin button’s arrows are activated.
 
 <function name="gtk_spin_button_set_numeric">
 <description>
-Sets the flag that determines if non-numeric text can be typed
+Sets the flag that determines if only numeric text can be typed
 into the spin button.
 
 </description>
@@ -93365,6 +93383,41 @@ if no toggle is found.
 </parameter>
 </parameters>
 <return> whether we found a tag toggle after @iter
+</return>
+</function>
+
+<function name="gtk_text_iter_forward_to_tag_toggle_with_limit">
+<description>
+Moves forward to the next tag toggle before @limit.
+
+Finds the next start or end of @tag, or of any tag if @tag is %NULL.
+Toggles at the initial position of @iter and at @limit are excluded.
+If no toggle is found, sets @iter to @limit and returns %FALSE.
+If @limit is at or before @iter, returns %FALSE without moving @iter.
+
+If @limit is %NULL, searches to the end of the buffer, including any
+toggle at the end iterator, just like
+[method@Gtk.TextIter.forward_to_tag_toggle].
+
+Since: 4.26
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a `GtkTextIter`
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> a `GtkTextTag`, or %NULL to find any tag toggle
+</parameter_description>
+</parameter>
+<parameter name="limit">
+<parameter_description> the exclusive search limit, in the same buffer as @iter
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether a matching tag toggle was found
+
 </return>
 </function>
 
@@ -101679,7 +101732,7 @@ This function is meant primarily for types that inherit from
 `GtkTreeStore`, and should only be used when constructing a new
 `GtkTreeStore`.
 
-This functions cannot be called after a row has been added,
+This function cannot be called after a row has been added,
 or a method on the `GtkTreeModel` interface is called on the
 tree store.
 
@@ -101725,7 +101778,7 @@ This function is meant primarily for types that inherit from
 `GtkTreeStore`, and should only be used when constructing a new
 `GtkTreeStore`.
 
-This functions cannot be called after a row has been added,
+This function cannot be called after a row has been added,
 or a method on the `GtkTreeModel` interface is called on the
 tree store.
 
@@ -106452,11 +106505,12 @@ to call for updating animations
 Assigns size, position, (optionally) a baseline and transform
 to a child widget.
 
-In this function, the allocation and baseline may be adjusted.
-The given allocation will be forced to be bigger than the
-widget's minimum size, as well as at least 0×0 in size.
+The given allocation must be large enough for the widget's minimum
+size, as well as at least 0×0 in size. See [method@Gtk.Widget.measure]
+for querying a minimum size.
 
-This function is only used by widget implementations.
+This function is only used by widget implementations to allocate a size
+for their direct children.
 
 For a version that does not take a transform, see
 [method@Gtk.Widget.size_allocate].
@@ -109487,7 +109541,7 @@ This function is only for use in widget implementations.
 Measures @widget in the orientation @orientation and for the given @for_size.
 
 As an example, if @orientation is %GTK_ORIENTATION_HORIZONTAL and @for_size
-is 300, this functions will compute the minimum and natural width of @widget
+is 300, this function will compute the minimum and natural width of @widget
 if it is allocated at a height of 300 pixels.
 
 See [GtkWidget’s geometry management section](class.Widget.html#height-for-width-geometry-management) for
@@ -110473,7 +110527,7 @@ Sets a widgets name.
 Setting a name allows you to refer to the widget from a
 CSS file. You can apply a style to widgets with a particular name
 in the CSS file. See the documentation for the CSS syntax (on the
-same page as the docs for [class@Gtk.StyleContext].
+same page as the docs for [class@Gtk.StyleContext]).
 
 Note that the CSS syntax has certain special characters to delimit
 and represent elements in a selector (period, #, &gt;, *...), so using
@@ -110895,8 +110949,15 @@ Deprecated: 4.10: Use [method@Gtk.Widget.set_visible] instead
 
 <function name="gtk_widget_size_allocate">
 <description>
-Allocates widget with a transformation that translates
-the origin to the position in @allocation.
+Allocates widget with a transformation that translates the origin to
+the position in @allocation.
+
+The given allocation must be large enough for the widget's minimum
+size, as well as at least 0×0 in size. See [method@Gtk.Widget.measure]
+for querying a minimum size.
+
+This function is only used by widget implementations to allocate a size
+for their direct children.
 
 This is a simple form of [method@Gtk.Widget.allocate].
 

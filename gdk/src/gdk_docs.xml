@@ -4039,8 +4039,8 @@ Emitted when GDK receives an input event for @surface.
 Emitted when the size of @surface is changed, or when relayout should
 be performed.
 
-Surface size is reported in ”application pixels”, not
-”device pixels” (see gdk_surface_get_scale_factor()).
+Surface size is reported in “application pixels”, not
+“device pixels” (see gdk_surface_get_scale_factor()).
 
 </description>
 <parameters>
@@ -4812,7 +4812,32 @@ to draw on `GdkSurface
 </return>
 </function>
 
-<function name="gdk_cairo_create_similar_surface">
+<function name="gdk_cairo_context_frame_set_surface">
+<description>
+This API is called by backends to set the surface that belongs to this frame.
+
+The surface must have been set after begin_frame() and can be unset again in
+end_frame(), but it must exist inbetween.
+
+Backends tend to use one of two methods here: Either they create and assign a
+surface during initialize_frame() and keep reusing the surface or they recreate
+a new surfaces every frame in begin_frame() and unset them again in end_frame().
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="surface">
+<parameter_description> the surface to use for rendering to this frame
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_cairo_create_similar_image">
 <description>
 Creates a surface for offscreen rendering that isn't
 confined by Cairo's clipping behavior. So this is
@@ -4820,6 +4845,45 @@ useful as an alternative to cairo_push_group() if
 you want a guarantee that the whole area will be
 created, for example when blurring and needing a larger
 input area.
+
+This function will set the surface's device scale and offset.
+
+Once done with rendering to the returned surface, you
+can render it to the given bounds with this code:
+
+```c
+cairo_set_source_surface (cr, surface);
+cairo_paint (cr);
+```
+
+
+</description>
+<parameters>
+<parameter name="cr">
+<parameter_description> cairo context
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format to use
+</parameter_description>
+</parameter>
+<parameter name="bounds">
+<parameter_description> the bounds to create the surface for
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new cairo image surface 
+</return>
+</function>
+
+<function name="gdk_cairo_create_similar_surface">
+<description>
+Creates a surface for offscreen rendering that isn't
+confined by Cairo's clipping behavior. So this is
+useful as an alternative to cairo_push_group() if
+you want a guarantee that the whole area will be
+created, for example when trying to repeat a region
+across a larger area.
 
 This function will set the surface's device scale and offset.
 
@@ -5740,6 +5804,22 @@ See [method@Gdk.Clipboard.store_async].
 </parameter>
 </parameters>
 <return> %TRUE if storing was successful.
+</return>
+</function>
+
+<function name="gdk_color_get_luminance">
+<description>
+Computes the luminance of the color and returns it.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the color
+</parameter_description>
+</parameter>
+</parameters>
+<return> the luminance
 </return>
 </function>
 
@@ -10168,6 +10248,153 @@ Use `GskRenderNode` and `GskRenderer`.
 <return></return>
 </function>
 
+<function name="gdk_draw_context_frame_add_damage">
+<description>
+Adds the given damage to the damage of this frame.
+
+The damage will be clipped to the frame's buffer size, so it is okay
+to add too large a region.
+
+This function must only be called in GdkDrawContext::begin_frame()
+implementations.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="damage">
+<parameter_description> damage to add
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_frame_discarded">
+<description>
+Marks the given frame as completed by the compositor discarding it.
+
+This function should be called by GDK backends.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_frame_get_color_state">
+<description>
+Gets the color state that will be/was used to render this frame.
+
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+</parameters>
+<return> the color state
+</return>
+</function>
+
+<function name="gdk_draw_context_frame_gpu_complete">
+<description>
+Marks this frame as completed on the GPU.
+
+If no GPU rendering is happening, then this function must be called during
+or before end_frame() with a value of 0.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> the monotonic timestamp in nanoseconds for when the GPU completed
+rendering this frame
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_frame_set_color_state">
+<description>
+Sets the color state to use for this frame.
+
+This function may only be called by backends in the begin_frame() function.
+
+If the color state isn't set, the default is sRGB.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="color_state">
+<parameter_description> the color state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_frame_stop_throttling">
+<description>
+Tells the frame clock to stop throttling redraws due to this frame
+at the given timestamp. See gdk_frame_timings_get_throttling_hint() for
+a longer discussion.
+
+If the compositor does not support throttling, then this function should
+be called in end_frame()/submit_frame() with a timestamp of 0.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> The timestamp for the throttling hint or 0 if the compositor 
+does not support throttling.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gdk_draw_context_frame_submitted">
+<description>
+Marks the given frame as submitted to the compositor.
+
+This function should be called by GDK backends upon frame
+submission when no further information about the compositor's use
+can be provided for this frame.
+
+</description>
+<parameters>
+<parameter name="frame">
+<parameter_description> the frame
+</parameter_description>
+</parameter>
+<parameter name="refresh">
+<parameter_description> the refresh interval to the next frame in nanoseconds
+or 0 to keep the existing interval.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gdk_draw_context_get_display">
 <description>
 Retrieves the `GdkDisplay` the @context is created for
@@ -11094,26 +11321,6 @@ is called the same number of times.
 <return></return>
 </function>
 
-<function name="gdk_frame_clock_discarded">
-<description>
-Marks the given frame as complete by the compositor discarding it.
-
-This function should be called by GDK backends.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a frame clock
-</parameter_description>
-</parameter>
-<parameter name="frame_counter">
-<parameter_description> the frame to provide info for
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_frame_clock_end_updating">
 <description>
 Stops updates for an animation.
@@ -11269,6 +11476,27 @@ candidate presentation time after the given base time.
 <return></return>
 </function>
 
+<function name="gdk_frame_clock_get_throttling">
+<description>
+Gets the number of frames where the compositor hasn't sent a throttling
+hint yet. See gdk_frame_timings_get_throttling_hint() for
+a longer discussion.
+
+This function is intended to be used by frame clock implementations.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the frame clock 
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of frames still waiting for a callback to stop
+throttling
+</return>
+</function>
+
 <function name="gdk_frame_clock_get_timings">
 <description>
 Retrieves a `GdkFrameTimings` object holding timing information
@@ -11296,23 +11524,6 @@ for the specified frame, or %NULL if it is not available
 </return>
 </function>
 
-<function name="gdk_frame_clock_outstanding">
-<description>
-Called whenever there is a buffer submitted to the compositor, usually
-by gdk_draw_context_end_frame() automatically.
-
-Note that gdk_draw_context_empty_frame() does not call this function.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> The frame clock
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gdk_frame_clock_presented">
 <description>
 Marks the given frame as presented by the compositor.
@@ -11323,12 +11534,8 @@ instead.
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> a frame clock
-</parameter_description>
-</parameter>
-<parameter name="frame_counter">
-<parameter_description> the frame to provide info for
+<parameter name="frame">
+<parameter_description> the frame
 </parameter_description>
 </parameter>
 <parameter name="presentation_time">
@@ -11338,7 +11545,7 @@ in the monotonic clock's time.
 </parameter>
 <parameter name="refresh">
 <parameter_description> the refresh interval to the next frame in nanoseconds
-or 0 to keep the predicted interval.
+or 0 to keep the previous interval.
 </parameter_description>
 </parameter>
 </parameters>
@@ -11367,33 +11574,6 @@ smooth animations.
 </parameter>
 <parameter name="phase">
 <parameter_description> the phase that is requested
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
-<function name="gdk_frame_clock_submitted">
-<description>
-Marks the given frame as complete by submission to the compositor.
-
-This function should be called by GDK backends upon frame
-submission when no further information about the compositor's use
-can be provided for this frame.
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> a frame clock
-</parameter_description>
-</parameter>
-<parameter name="frame_counter">
-<parameter_description> the frame to provide info for
-</parameter_description>
-</parameter>
-<parameter name="refresh">
-<parameter_description> the refresh interval to the next frame in nanoseconds
-or 0 to keep the predicted interval.
 </parameter_description>
 </parameter>
 </parameters>
@@ -12916,6 +13096,31 @@ Since: 4.24
 </parameters>
 <return>
 an array of keyvals
+
+</return>
+</function>
+
+<function name="gdk_keyval_is_alias">
+<description>
+Checks whether @keyval_a and @keyval_b are 'aliases' of one another.
+
+See [func@Gdk.keyval_get_aliases] for more information
+on aliases.
+
+Since: 4.26
+
+</description>
+<parameters>
+<parameter name="keyval_a">
+<parameter_description> a keyval
+</parameter_description>
+</parameter>
+<parameter name="keyval_b">
+<parameter_description> another keyval
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @keyval_a and @keyval_b are 'aliases' of one another.
 
 </return>
 </function>
@@ -21845,25 +22050,6 @@ Gets the Vulkan device that this context is using.
 </parameter>
 </parameters>
 <return> the VkDevice
-</return>
-</function>
-
-<function name="gdk_vulkan_context_get_draw_index">
-<description>
-Gets the index of the image that is currently being drawn.
-
-This function can only be used between [method@Gdk.DrawContext.begin_frame]
-and [method@Gdk.DrawContext.end_frame] calls.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> a `GdkVulkanContext`
-</parameter_description>
-</parameter>
-</parameters>
-<return> the index of the images that is being drawn
 </return>
 </function>
 
