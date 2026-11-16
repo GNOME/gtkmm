@@ -135,7 +135,7 @@ install_pkgconfigdir = install_libdir / 'pkgconfig'
 glibmm_req = '>= 2.89.0' # What's required indirectly via gtk's requirement
 
 # Gtk supported pkg-config files on MSVC files for a good while, so just use that
-gtk_req = '>= 4.23.4'
+gtk_req = '>= 4.25.0'
 gtk_dep = dependency('gtk4', version: gtk_req)
 
 cairomm_req = '>= 1.15.4'
